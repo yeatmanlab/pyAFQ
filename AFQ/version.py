@@ -25,7 +25,7 @@ CLASSIFIERS = ["Development Status :: 3 - Alpha",
                "Topic :: Scientific/Engineering"]
 
 # Description should be a one-liner:
-description = "shablona: a template for small scientific Python projects"
+description = "pyAFQ: Automated Fiber Quantification ... in Python"
 # Long description will go up on the pypi page
 long_description = """
 
@@ -46,7 +46,7 @@ Copyright (c) 2015--, Jason Yeatman, Ariel Rokem, The University of Washington
 eScience Institute.
 """
 
-NAME = "shablona"
+NAME = "pyAFQ"
 MAINTAINER = "Jason Yeatman"
 MAINTAINER_EMAIL = "jyeatman@uw.edu"
 DESCRIPTION = description
