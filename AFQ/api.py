@@ -43,7 +43,7 @@ class AFQ(object):
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi*", anat_folder="anat",
-                 anat_file="*T1w"):
+                 anat_file="*T1w*"):
         self.raw_path = raw_path
         self.preproc_path = preproc_path
         if self.preproc_path is None:
