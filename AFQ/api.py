@@ -53,7 +53,7 @@ class AFQ(object):
             # This creates the preproc_path such that:
             self.preproc_path = do_preprocessing(self.raw_path)
         # This is the place in which each subject's full data lives
-        self.subject_dirs = glob.glob(preproc_path + '%s*'%sub_prefix)
+        self.subject_dirs = glob.glob(preproc_path + '%s*' % sub_prefix)
         self.subjects = [op.split(p)[-1] for p in self.subject_dirs]
         sub_list = []
         sess_list = []
@@ -64,10 +64,18 @@ class AFQ(object):
         for subject, sub_dir in zip(self.subjects, self.subject_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
-                dwi_file_list.append(glob.glob(op.join(sub_dir, '%s/%s/%s.nii.gz'%(sess, dwi_folder, dwi_file)))[0])
-                bvec_file_list.append(glob.glob(op.join(sub_dir, '%s/%s/%s.bvec*'%(sess, dwi_folder, dwi_file)))[0])
-                bval_file_list.append(glob.glob(op.join(sub_dir, '%s/%s/%s.bval*'%(sess, dwi_folder, dwi_file)))[0])
-                anat_file_list.append(glob.glob(op.join(sub_dir, '%s/%s/%s.nii.gz'%(sess, anat_folder, anat_file)))[0])
+                dwi_file_list.append(glob.glob(op.join(sub_dir,
+                                     '%s/%s/%s.nii.gz' % (sess, dwi_folder,
+                                                          dwi_file)))[0])
+                bvec_file_list.append(glob.glob(op.join(sub_dir,
+                                      '%s/%s/%s.bvec*' % (sess, dwi_folder,
+                                                          dwi_file)))[0])
+                bval_file_list.append(glob.glob(op.join(sub_dir,
+                                      '%s/%s/%s.bval*' % (sess, dwi_folder,
+                                                          dwi_file)))[0])
+                anat_file_list.append(glob.glob(op.join(sub_dir,
+                                      '%s/%s/%s.nii.gz' % (sess, anat_folder,
+                                                           anat_file)))[0])
                 sub_list.append(subject)
                 sess_list.append(sess)
 
@@ -79,8 +87,6 @@ class AFQ(object):
                                             sess=sess_list))
         self.init_gtab()
         self.init_affine()
-
-    #def compute_profiles(self, force_recompute=False)
 
     def init_affine(self):
         affine_list = []
@@ -94,7 +100,6 @@ class AFQ(object):
                                 self.data_frame['bvec_file']):
             gtab_list.append(dpg.gradient_table(fbval, fbvec))
         self.data_frame['gtab'] = gtab_list
-
 
     def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
                          vol_idx=None, dilate=None, force_recompute=False):
