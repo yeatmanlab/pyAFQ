@@ -53,7 +53,8 @@ class AFQ(object):
             # This creates the preproc_path such that:
             self.preproc_path = do_preprocessing(self.raw_path)
         # This is the place in which each subject's full data lives
-        self.subject_dirs = glob.glob(preproc_path + '%s*' % sub_prefix)
+        self.subject_dirs = glob.glob(op.join(preproc_path,
+                                              '%s*' % sub_prefix))
         self.subjects = [op.split(p)[-1] for p in self.subject_dirs]
         sub_list = []
         sess_list = []
@@ -65,17 +66,25 @@ class AFQ(object):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
                 dwi_file_list.append(glob.glob(op.join(sub_dir,
-                                     '%s/%s/%s.nii.gz' % (sess, dwi_folder,
-                                                          dwi_file)))[0])
+                                                       ('%s/%s/%s.nii.gz' %
+                                                        (sess, dwi_folder,
+                                                         dwi_file))))[0])
+
                 bvec_file_list.append(glob.glob(op.join(sub_dir,
-                                      '%s/%s/%s.bvec*' % (sess, dwi_folder,
-                                                          dwi_file)))[0])
+                                                        ('%s/%s/%s.bvec*' %
+                                                         (sess, dwi_folder,
+                                                          dwi_file))))[0])
+
                 bval_file_list.append(glob.glob(op.join(sub_dir,
-                                      '%s/%s/%s.bval*' % (sess, dwi_folder,
-                                                          dwi_file)))[0])
+                                                        ('%s/%s/%s.bval*' %
+                                                         (sess, dwi_folder,
+                                                          dwi_file))))[0])
+
                 anat_file_list.append(glob.glob(op.join(sub_dir,
-                                      '%s/%s/%s.nii.gz' % (sess, anat_folder,
-                                                           anat_file)))[0])
+                                                        ('%s/%s/%s.nii.gz' %
+                                                         (sess,
+                                                          anat_folder,
+                                                          anat_file))))[0])
                 sub_list.append(subject)
                 sess_list.append(sess)
 
@@ -85,6 +94,7 @@ class AFQ(object):
                                             bval_file=bval_file_list,
                                             anat_file=anat_file_list,
                                             sess=sess_list))
+        self.shape = self.data_frame.shape
         self.init_gtab()
         self.init_affine()
 
@@ -134,3 +144,6 @@ class AFQ(object):
             else:
                 self.data_frame['brain_mask'] =\
                  nib.load(be_fname).get_data()
+
+    def fit_tensors():
+        raise NotImplementedError
