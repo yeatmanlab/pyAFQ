@@ -7,25 +7,26 @@ import numpy.testing as npt
 from AFQ import api
 
 
-
 def touch(fname, times=None):
     with open(fname, 'a'):
         os.utime(fname, times)
 
+
 def create_dummy_preproc_path(n_subjects, n_sessions):
     preproc_dir = tempfile.mkdtemp()
-    subjects = ['sub-%s'%(d+1) for d in range(n_subjects)]
-    sessions = ['sess-%s'%(d+1) for d in range(n_sessions)]
+    subjects = ['sub-%s' % (d+1) for d in range(n_subjects)]
+    sessions = ['sess-%s' % (d+1) for d in range(n_sessions)]
     for subject in subjects:
         for session in sessions:
             for modality in ['anat', 'dwi']:
                 os.makedirs(op.join(preproc_dir, subject, session, modality))
             touch(op.join(preproc_dir, subject, session,'anat', 'T1w.nii.gz'))
-            touch(op.join(preproc_dir, subject, session,'dwi', 'dwi.nii.gz'))
-            touch(op.join(preproc_dir, subject, session,'dwi', 'dwi.bvals'))
-            touch(op.join(preproc_dir, subject, session,'dwi', 'dwi.bvecs'))
+            touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.nii.gz'))
+            touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.bvals'))
+            touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.bvecs'))
 
     return preproc_dir
+
 
 def test_AFQ_init():
     """
