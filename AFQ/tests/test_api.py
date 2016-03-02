@@ -14,13 +14,13 @@ def touch(fname, times=None):
 
 def create_dummy_preproc_path(n_subjects, n_sessions):
     preproc_dir = tempfile.mkdtemp()
-    subjects = ['sub-%s' % (d+1) for d in range(n_subjects)]
-    sessions = ['sess-%s' % (d+1) for d in range(n_sessions)]
+    subjects = ['sub-%s' % (d + 1) for d in range(n_subjects)]
+    sessions = ['sess-%s' % (d + 1) for d in range(n_sessions)]
     for subject in subjects:
         for session in sessions:
             for modality in ['anat', 'dwi']:
                 os.makedirs(op.join(preproc_dir, subject, session, modality))
-            touch(op.join(preproc_dir, subject, session,'anat', 'T1w.nii.gz'))
+            touch(op.join(preproc_dir, subject, session, 'anat', 'T1w.nii.gz'))
             touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.nii.gz'))
             touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.bvals'))
             touch(op.join(preproc_dir, subject, session, 'dwi', 'dwi.bvecs'))
