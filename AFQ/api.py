@@ -2,6 +2,8 @@ import pandas as pd
 import glob
 import os.path as op
 
+import numpy as np
+
 import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
@@ -137,9 +139,13 @@ class AFQ(object):
                     self.data_frame['dwi_file'] == fdwi] = be_fname
 
             if not op.exists(be_fname):
+                img = nib.load(fdwi)
+                data = img.get_data()
+                mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
                 _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                             autocrop, dilate=dilate)
-                nib.save(nib.Nifti1Image(brain_mask.astype(int), img.affine),
+                nib.save(nib.Nifti1Image(brain_mask.astype(int),
+                                         img.affine),
                          be_fname)
 
             else:
