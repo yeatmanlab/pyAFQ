@@ -126,7 +126,7 @@ class AFQ(object):
             if not force_recompute:
                 for be_fname in self.data_frame['brain_mask_file']:
                     self.data_frame['brain_mask'] =\
-                                nib.load(be_fname).get_data()
+                        nib.load(be_fname).get_data()
                     return
         self.data_frame['brain_mask_file'] = np.nan
 
@@ -135,8 +135,8 @@ class AFQ(object):
             split_fdwi = op.split(fdwi)
             be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0],
                                '_brain_mask.nii.gz')
-            self.data_frame['brain_mask_file'][
-                    self.data_frame['dwi_file'] == fdwi] = be_fname
+            self.data_frame['brain_mask_file'][self.data_frame['dwi_file'] ==
+                                               fdwi] = be_fname
 
             if not op.exists(be_fname):
                 img = nib.load(fdwi)
@@ -150,7 +150,7 @@ class AFQ(object):
 
             else:
                 self.data_frame['brain_mask'] =\
-                 nib.load(be_fname).get_data()
+                    nib.load(be_fname).get_data()
 
     def fit_tensors():
         raise NotImplementedError
