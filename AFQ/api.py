@@ -1,9 +1,10 @@
 import pandas as pd
 import glob
 import os.path as op
+
+import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
-
 
 
 def do_preprocessing():
@@ -95,14 +96,13 @@ class AFQ(object):
                                             bval_file=bval_file_list,
                                             anat_file=anat_file_list,
                                             sess=sess_list))
-        self.shape = self.data_frame.shape
         self.init_gtab()
         self.init_affine()
 
     def init_affine(self):
         affine_list = []
         for fdwi in self.data_frame['dwi_file']:
-            affine_list.append(nib.load().get_affine())
+            affine_list.append(nib.load(fdwi).get_affine())
         self.data_frame['dwi_affine'] = affine_list
 
     def init_gtab(self):
