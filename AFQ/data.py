@@ -3,9 +3,8 @@ import nibabel as nib
 from dipy.data.fetcher import _make_fetcher
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
-
-baseurl = \
-"https://digital.lib.washington.edu/researchworks/bitstream/handle/1773/34926/"
+baseurl = ("https://digital.lib.washington.edu/researchworks" +
+           "/bitstream/handle/1773/34926/")
 
 fnames = ["Callosum_midsag.nii.gz",
           "L_AntFrontal.nii.gz",
@@ -47,6 +46,7 @@ fetch_templates = _make_fetcher("fetch_templates",
                                 afq_home, baseurl, fnames, fnames,
                                 md5_list=md5_hashes,
                                 doc="Download AFQ templates")
+
 
 def read_templates():
     """Load AFQ templates from file
