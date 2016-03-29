@@ -43,7 +43,8 @@ md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
               "2664e0b8c2d9c59f13649a89bfcce399"]
 
 fetch_templates = _make_fetcher("fetch_templates",
-                                afq_home, baseurl, fnames, fnames,
+                                op.join(afq_home, 'templates'),
+                                baseurl, fnames, fnames,
                                 md5_list=md5_hashes,
                                 doc="Download AFQ templates")
 
