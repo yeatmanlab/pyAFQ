@@ -67,11 +67,10 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_d=0, max_d=3,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-
     aff = img.get_affine()
     file_paths = {}
     for m, n in zip(maps, names):
-        file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz'%n)
+        file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz' % n)
         nib.save(nib.Nifti1Image(m, aff), file_paths[n])
 
     return file_paths
