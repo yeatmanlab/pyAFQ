@@ -30,6 +30,10 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_d=0, max_d=3,
         bval_files = [bval_files]
         bvec_files = [bvec_files]
 
+    # Load the mask if it is a string
+    if isinstance(mask, str):
+        mask = nib.load(mask).get_data()
+
     data = []
     bvals = []
     bvecs = []
