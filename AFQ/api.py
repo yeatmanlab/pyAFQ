@@ -114,7 +114,6 @@ class AFQ(object):
             gtab_list.append(dpg.gradient_table(fbval, fbvec))
         self.data_frame['gtab'] = gtab_list
 
-
     def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
                          vol_idx=None, dilate=None, force_recompute=False):
             self.data_frame['brain_mask_file'] = self.data_frame.apply(
