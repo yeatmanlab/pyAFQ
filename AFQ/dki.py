@@ -80,9 +80,9 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=0,
     MD = dkifit.md
     AD = dkifit.ad
     RD = dkifit.rd
-    MK = dkifit.mk(min_d, max_d)
-    AK = dkifit.ak(min_d, max_d)
-    RK = dkifit.rk(min_d, max_d)
+    MK = dkifit.mk(min_kurtosis, max_kurtosis)
+    AK = dkifit.ak(min_kurtosis, max_kurtosis)
+    RK = dkifit.rk(min_kurtosis, max_kurtosis)
 
     maps = [FA, MD, AD, RD, MK, AK, RK]
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK']
