@@ -11,7 +11,7 @@ from dipy.core import gradients as dpg
 def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=0,
             max_kurtosis=3, out_dir=None):
     """
-    Fit the DKI model, save files with parameters and derived maps
+    Fit the DKI model, save files with derived maps
 
     Parameters
     ----------
@@ -29,7 +29,19 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=0,
         The minimal plausible value of kurtosis. Default: 0.
     max_kurtosis : float, optional
         The maximal plausible value of kurtosis. Default: 3.
+    out_dir : str, optional
+        A full path to a directory to store the maps that get computed.
+        Default: maps get stored in the same directory as the last DWI file in
+        `data_files`.
 
+    Returns
+    -------
+    file_paths : a dict with the derived maps that were computed and full-paths
+    to the files containing these maps.
+
+    Note
+    ----
+    Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
 
     """
     types = [type(f) for f in [data_files, bval_files, bvec_files]]
