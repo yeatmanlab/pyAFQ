@@ -1,5 +1,10 @@
-from AFQ import dki
+import tempfile
+
 import numpy.testing as npt
+import nibabel.tmpdirs as nbtmp
+import dipy.data as dpd
+
+from AFQ import dki
 
 
 def test_fit_dki_inputs():
@@ -8,3 +13,8 @@ def test_fit_dki_inputs():
     bvec_files = "just another string"
     npt.assert_raises(ValueError, dki.fit_dki, data_files, bval_files,
                       bvec_files)
+
+def test_fit_dti():
+    fdata, fbval, fbvec = dpd.get_data('small_101D')
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        dki.fit_dki(fdata, fbval, fbvec, out_dir=tmpdir)
