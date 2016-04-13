@@ -8,7 +8,7 @@ from dipy.reconst import dki
 from dipy.core import gradients as dpg
 
 
-def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=0,
+def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
             max_kurtosis=3, out_dir=None):
     """
     Fit the DKI model, save files with derived maps
@@ -26,7 +26,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=0,
         Binary mask, set to True or 1 in voxels to be processed.
         Default: Process all voxels.
     min_kurtosis : float, optional
-        The minimal plausible value of kurtosis. Default: 0.
+        The minimal plausible value of kurtosis. Default: -1.
     max_kurtosis : float, optional
         The maximal plausible value of kurtosis. Default: 3.
     out_dir : str, optional
