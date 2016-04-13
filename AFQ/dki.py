@@ -83,9 +83,10 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     MK = dkifit.mk(min_kurtosis, max_kurtosis)
     AK = dkifit.ak(min_kurtosis, max_kurtosis)
     RK = dkifit.rk(min_kurtosis, max_kurtosis)
+    params = dkifit.model_params
 
-    maps = [FA, MD, AD, RD, MK, AK, RK]
-    names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK']
+    maps = [FA, MD, AD, RD, MK, AK, RK, params]
+    names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
 
     if out_dir is None:
         out_dir = op.join(op.split(dfile)[0], 'dki')

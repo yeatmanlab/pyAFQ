@@ -77,7 +77,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     RD = dtifit.rd
     params = dtifit.model_params
 
-    maps = [FA, MD, AD, RD]
+    maps = [FA, MD, AD, RD, params]
     names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
