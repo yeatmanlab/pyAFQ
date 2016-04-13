@@ -28,4 +28,5 @@ parser.add_option("-m","--mask", help="mask file")
 opts, args = parser.parse_args()
 
 
-dki.fit_dki(opts.dwi, opts.bval, opts.bvec, mask=opts.mask, out_dir=opts.out_dir)
+dki.fit_dki(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
+            out_dir=opts.out_dir)

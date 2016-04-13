@@ -8,22 +8,48 @@ from dipy.reconst import dki
 from dipy.core import gradients as dpg
 
 
-def fit_dki(data_files, bval_files, bvec_files, mask=None, min_d=0, max_d=3,
-            out_dir=None):
+def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
+            max_kurtosis=3, out_dir=None):
     """
-    Fit the DKI model, save files with parameters and derived maps
+    Fit the DKI model, save files with derived maps
 
     Parameters
     ----------
     data_files : str or list
-        if str, that's the full path
-        if list, each entry is a full path
+        Files containing DWI data. If this is a str, that's the full path to a
+        single file. If it's a list, each entry is a full path.
     bval_files : str or list
-        ditto
+        Equivalent to `data_files`.
     bvec_files : str or list
-        ditto
+        Equivalent to `data_files`.
+    mask : ndarray, optional
+        Binary mask, set to True or 1 in voxels to be processed.
+        Default: Process all voxels.
+    min_kurtosis : float, optional
+        The minimal plausible value of kurtosis. Default: -1.
+    max_kurtosis : float, optional
+        The maximal plausible value of kurtosis. Default: 3.
+    out_dir : str, optional
+        A full path to a directory to store the maps that get computed.
+        Default: maps get stored in the same directory as the last DWI file in
+        `data_files`.
+
+    Returns
+    -------
+    file_paths : a dict with the derived maps that were computed and full-paths
+    to the files containing these maps.
+
+    Note
+    ----
+    Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
+
     """
-    # XXX Check that inputs are uniform
+    types = [type(f) for f in [data_files, bval_files, bvec_files]]
+    if len(set(types)) > 1:
+        e_s = "Please provide consistent inputs to `fit_dki`. All file"
+        e_s += " inputs should be either lists of full paths, or a string"
+        e_s += " with one full path."
+        raise ValueError(e_s)
 
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -54,9 +80,9 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_d=0, max_d=3,
     MD = dkifit.md
     AD = dkifit.ad
     RD = dkifit.rd
-    MK = dkifit.mk(min_d, max_d)
-    AK = dkifit.ak(min_d, max_d)
-    RK = dkifit.rk(min_d, max_d)
+    MK = dkifit.mk(min_kurtosis, max_kurtosis)
+    AK = dkifit.ak(min_kurtosis, max_kurtosis)
+    RK = dkifit.rk(min_kurtosis, max_kurtosis)
 
     maps = [FA, MD, AD, RD, MK, AK, RK]
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK']
