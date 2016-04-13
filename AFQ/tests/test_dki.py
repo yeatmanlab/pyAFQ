@@ -1,5 +1,3 @@
-import tempfile
-
 import numpy.testing as npt
 import nibabel.tmpdirs as nbtmp
 import dipy.data as dpd
@@ -13,6 +11,7 @@ def test_fit_dki_inputs():
     bvec_files = "just another string"
     npt.assert_raises(ValueError, dki.fit_dki, data_files, bval_files,
                       bvec_files)
+
 
 def test_fit_dki():
     fdata, fbval, fbvec = dpd.get_data('small_101D')
