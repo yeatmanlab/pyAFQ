@@ -14,7 +14,7 @@ def test_fit_dki_inputs():
     npt.assert_raises(ValueError, dki.fit_dki, data_files, bval_files,
                       bvec_files)
 
-def test_fit_dti():
+def test_fit_dki():
     fdata, fbval, fbvec = dpd.get_data('small_101D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         dki.fit_dki(fdata, fbval, fbvec, out_dir=tmpdir)
