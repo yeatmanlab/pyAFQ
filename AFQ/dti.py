@@ -93,3 +93,39 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
         nib.save(nib.Nifti1Image(m, aff), file_paths[n])
 
     return file_paths
+
+def predict(params_file, gtab, S0_file=None, out_dir=None):
+    """
+    Create a signal prediction from DTI params
+
+    params_file : str
+        Full path to a file with parameters saved from a DKI fit
+
+    gtab : GradientTable object
+        The gradient table to predict for
+
+    S0_file : str
+        Full path to a nifti file that contains S0 measurements to incorporate
+        into the prediction. If the file contains 4D data, the volumes that
+        contain the S0 data must be the same as the gtab.b0s_mask.
+    """
+    if out_dir is None:
+        out_dir = op.join(op.split(params_file)[0])
+
+    if S0_file is None:
+        S0 = 1
+    else:
+        S0 = nib.load(S0_file).get_data()
+        # If the S0 data is 4D, we assume it comes from an acquisition that had
+        # B0 measurements in the same volumes described in the gtab:
+        if len(S0.shape) == 4:
+            S0 = np.mean(S0[..., gtab.b0s_mask], -1)
+        # Otherwise, we assume that it's already a 3D volume, and do nothing
+
+    img = nib.load(params_file)
+    params = img.get_data()
+    pred = dti.tensor_prediction(params, gtab, S0=S0)
+    fname = op.join(out_dir, 'dti_prediction.nii.gz')
+    nib.save(nib.Nifti1Image(pred, img.affine), fname)
+
+    return fname
