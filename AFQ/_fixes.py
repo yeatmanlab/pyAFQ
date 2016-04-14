@@ -4,9 +4,9 @@ import dipy.reconst.dki as dki
 
 def dki_prediction(dki_params, gtab, S0=150):
     """
-    In Dipy versions < 0.12, there is a bug in DKI prediction, that doesn't allow
-
-    See: https://github.com/nipy/dipy/pull/1028
+    In Dipy versions < 0.12, there is a bug in DKI prediction, that doesn't
+    allow using volumes of S0. This is temporary fix until the bug is fixed
+    upstream. See: https://github.com/nipy/dipy/pull/1028
 
     For now, we provide this as a fix, to monkey-patch into dipy.reconst.dki
 
@@ -57,7 +57,7 @@ def dki_prediction(dki_params, gtab, S0=150):
             this_S0 = S0_vol[v]
         else:
             this_S0 = S0_vol
-        X = np.concatenate((dt, fkt[v]*MD*MD,
+        X = np.concatenate((dt, fkt[v] * MD * MD,
                             np.array([np.log(this_S0)])),
                            axis=0)
         pred_sig[v] = np.exp(np.dot(A, X))
