@@ -1,11 +1,19 @@
 import os
 import os.path as op
+from distutils.version import LooseVersion
 
 import numpy as np
 import nibabel as nib
 
 from dipy.reconst import dki
 from dipy.core import gradients as dpg
+from ._fixes import dki_prediction
+
+import dipy
+
+if LooseVersion(dipy.__version__) < '0.12':
+    # Monkey patch the fix in:
+    dki.dki_prediction = dki_prediction
 
 
 def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
