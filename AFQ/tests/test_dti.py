@@ -17,4 +17,4 @@ def test_fit_dti():
                                 [fbvec1, fbvec2],
                                 out_dir=tmpdir)
         for f in file_dict.values():
-            op.exists(f)
+            npt.assert_(op.exists(f))
