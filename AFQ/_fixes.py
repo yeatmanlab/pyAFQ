@@ -1,4 +1,6 @@
-from dipy.reconst.utils import dki_design_matrix as design_matrix
+import numpy as np
+import dipy.reconst.dki as dki
+
 
 def dki_prediction(dki_params, gtab, S0=150):
     """
@@ -32,10 +34,10 @@ def dki_prediction(dki_params, gtab, S0=150):
 
         S=S_{0}e^{-bD+\frac{1}{6}b^{2}D^{2}K}
     """
-    evals, evecs, kt = split_dki_param(dki_params)
+    evals, evecs, kt = dki.split_dki_param(dki_params)
 
     # Define DKI design matrix according to given gtab
-    A = design_matrix(gtab)
+    A = dki.design_matrix(gtab)
 
     # Flat parameters and initialize pred_sig
     fevals = evals.reshape((-1, evals.shape[-1]))

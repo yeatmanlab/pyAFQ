@@ -29,7 +29,6 @@ def make_sim_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
     fimg, fbvals, fbvecs = dpd.get_data('small_64D')
     img = nib.load(fimg)
     bvals, bvecs = dio.read_bvals_bvecs(fbvals, fbvecs)
-    gtab = dpg.gradient_table(bvals, bvecs)
     # So  we create two shells out of it
     bvals_2s = np.concatenate((bvals, bvals * 2), axis=0)
     bvecs_2s = np.concatenate((bvecs, bvecs), axis=0)
