@@ -51,7 +51,7 @@ def dki_prediction(dki_params, gtab, S0=150):
     # looping for all voxels
     for v in range(len(pred_sig)):
         DT = np.dot(np.dot(fevecs[v], np.diag(fevals[v])), fevecs[v].T)
-        dt = lower_triangular(DT)
+        dt = dki.lower_triangular(DT)
         MD = (dt[0] + dt[2] + dt[5]) / 3
         if isinstance(S0_vol, np.ndarray):
             this_S0 = S0_vol[v]
