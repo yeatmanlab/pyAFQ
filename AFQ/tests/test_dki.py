@@ -40,7 +40,7 @@ def make_sim_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
                              [0.00099, 0, 0], [0.00226, 0.00087, 0.00087]])
     angles_cross = [(80, 10), (80, 10), (20, 30), (20, 30)]
     fie = 0.49
-    frac_cross = [fie*50, (1-fie) * 50, fie*50, (1-fie) * 50]
+    frac_cross = [fie * 50, (1 - fie) * 50, fie * 50, (1 - fie) * 50]
     # Noise free simulates
     signal_cross, dt_cross, kt_cross = multi_tensor_dki(gtab_2s, mevals_cross,
                                                         S0=100,
