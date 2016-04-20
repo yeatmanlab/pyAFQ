@@ -92,7 +92,7 @@ class AFQ(object):
                 sub_list.append(subject)
                 sess_list.append(sess)
 
-        self.data_frame = pd.DataFrame(dict(subjects=sub_list,
+        self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
@@ -116,41 +116,41 @@ class AFQ(object):
 
     def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
                          vol_idx=None, dilate=None, force_recompute=False):
+            self.data_frame['brain_mask_file'] = self.data_frame.apply(
+                                        _brain_extract_fname, axis=1)
 
-        if 'brain_mask' in self.data_frame.columns:
-            if not force_recompute:
-                return
-
-        self.data_frame['brain_mask'] = np.nan
-        if 'brain_mask_file' in self.data_frame.columns:
-            if not force_recompute:
-                for be_fname in self.data_frame['brain_mask_file']:
-                    self.data_frame['brain_mask'] =\
-                        nib.load(be_fname).get_data()
-                    return
-        self.data_frame['brain_mask_file'] = np.nan
-
-        for gtab, fdwi in zip(self.data_frame['gtab'],
-                              self.data_frame['dwi_file']):
-            split_fdwi = op.split(fdwi)
-            be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0],
-                               '_brain_mask.nii.gz')
-            self.data_frame['brain_mask_file'][self.data_frame['dwi_file'] ==
-                                               fdwi] = be_fname
-
-            if not op.exists(be_fname):
-                img = nib.load(fdwi)
-                data = img.get_data()
-                mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
-                _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                            autocrop, dilate=dilate)
-                nib.save(nib.Nifti1Image(brain_mask.astype(int),
-                                         img.affine),
-                         be_fname)
-
-            else:
-                self.data_frame['brain_mask'] =\
-                    nib.load(be_fname).get_data()
+            self.data_frame['brain_mask_img'] = self.data_frame.apply(
+                                        _brain_extract, axis=1,
+                                        median_radius=median_radius,
+                                        numpass=numpass,
+                                        autocrop=autocrop,
+                                        vol_idx=vol_idx,
+                                        dilate=dilate,
+                                        force_recompute=force_recompute)
 
     def fit_tensors():
         raise NotImplementedError
+
+
+def _brain_extract_fname(row):
+    split_fdwi = op.split(row['dwi_file'])
+    be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+                       '_brain_mask.nii.gz')
+    return be_fname
+
+
+def _brain_extract(row, median_radius=4, numpass=4, autocrop=False,
+                   vol_idx=None, dilate=None, force_recompute=False):
+    if not op.exists(row['brain_mask_file']) or force_recompute:
+        img = nib.load(row['dwi_file'])
+        data = img.get_data()
+        gtab = row['gtab']
+        mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+        _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
+                                    autocrop, dilate=dilate)
+        be_img = nib.Nifti1Image(brain_mask.astype(int),
+                                 img.affine)
+        nib.save(be_img, row['brain_mask_file'])
+        return be_img
+    else:
+        return nib.load(row['brain_mask_file'])
