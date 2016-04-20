@@ -1,30 +1,71 @@
-from dipy.tests import scriptrunner as dts
+import os.path as op
 
-runner = dts.ScriptRunner(script_sdir='bin',
-                          debug_print_var='AFQ_DEBUG_PRINT')
+import numpy as np
+import numpy.testing as npt
 
-run_command = runner.run_command
+import nibabel as nib
+import nibabel.tmpdirs as nbtmp
+
+import dipy.data as dpd
+
+from AFQ.tests.utils import (make_dki_data, make_dti_data, ScriptRunner,
+                             assert_image_shape_affine)
+
+runner = ScriptRunner(script_sdir='bin',
+                      module_sdir='AFQ',
+                      debug_print_var='AFQ_DEBUG_PRINT')
 
 
-def test_dipy_fit_tensor_again():
-    with InTemporaryDirectory():
-        dwi, bval, bvec = dpd.get_data("small_25")
-        # Copy data to tmp directory
-        shutil.copyfile(dwi, "small_25.nii.gz")
-        shutil.copyfile(bval, "small_25.bval")
-        shutil.copyfile(bvec, "small_25.bvec")
-        # Call script
-        cmd = ["dipy_fit_tensor", "--mask=none", "small_25.nii.gz"]
-        out = run_command(cmd)
-        assert_equal(out[0], 0)
+def test_fit_dki():
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        fbval = op.join(tmpdir, 'dki.bval')
+        fbvec = op.join(tmpdir, 'dki.bvec')
+        fdata = op.join(tmpdir, 'dki.nii.gz')
+        make_dki_data(fbval, fbvec, fdata)
+        cmd = ["pyAFQ_dki", "-d", fdata, "-l", fbval, "-c", fbvec, "-o", tmpdir]
+        out = runner.run_command(cmd)
+        npt.assert_equal(out[0], 0)
         # Get expected values
-        img = nib.load("small_25.nii.gz")
-        affine = img.get_affine()
-        shape = img.shape[:-1]
-        # Check expected outputs
-        assert_image_shape_affine("small_25_fa.nii.gz", shape, affine)
-        assert_image_shape_affine("small_25_t2di.nii.gz", shape, affine)
-        assert_image_shape_affine("small_25_dirFA.nii.gz", shape, affine)
-        assert_image_shape_affine("small_25_ad.nii.gz", shape, affine)
-        assert_image_shape_affine("small_25_md.nii.gz", shape, affine)
-        assert_image_shape_affine("small_25_rd.nii.gz", shape, affine)
+        names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK']
+        for n in names:
+            fname = op.join(tmpdir, "dki_%s.nii.gz" % n)
+            img = nib.load(fdata)
+            affine = img.get_affine()
+            shape = img.shape[:-1]
+            assert_image_shape_affine(fname, shape, affine)
+
+def test_predict_dki():
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        fbval = op.join(tmpdir, 'dki.bval')
+        fbvec = op.join(tmpdir, 'dki.bvec')
+        fdata = op.join(tmpdir, 'dki.nii.gz')
+        make_dki_data(fbval, fbvec, fdata)
+        cmd1 = ["pyAFQ_dki", "-d", fdata, "-l", fbval, "-c", fbvec,
+                "-o", tmpdir]
+        out = runner.run_command(cmd1)
+        # Get expected values
+        fparams = op.join(tmpdir, "dki_params.nii.gz")
+        cmd2 = ["pyAFQ_dki_predict", "-p", fparams, "-l", fbval, "-c", fbvec,
+                "-o", tmpdir]
+        out = runner.run_command(cmd2)
+        pred = nib.load(op.join(tmpdir, "dki_prediction.nii.gz")).get_data()
+        data = nib.load(op.join(tmpdir, "dki.nii.gz")).get_data()
+        npt.assert_array_almost_equal(pred, data)
+
+# def test_fit_dti():
+#     with nbtmp.InTemporaryDirectory() as tmpdir:
+#         fbval = op.join(tmpdir, 'dki.bval')
+#         fbvec = op.join(tmpdir, 'dki.bvec')
+#         fdata = op.join(tmpdir, 'dki.nii.gz')
+#         make_dki_data(fbval, fbvec, fdata)
+#         cmd = ["pyAFQ_dti", "-d", fdata, "-l", fbval, "-c", fbvec, "-o", tmpdir]
+#         out = runner.run_command(cmd)
+#         npt.assert_equal(out[0], 0)
+#         # Get expected values
+#         names = ['FA', 'MD', 'AD', 'RD']
+#         for n in names:
+#             fname = op.join(tmpdir, "dti_%s.nii.gz" % n)
+#             img = nib.load(fdata)
+#             affine = img.get_affine()
+#             shape = img.shape[:-1]
+#             assert_image_shape_affine(fname, shape, affine)

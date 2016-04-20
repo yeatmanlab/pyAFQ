@@ -1,8 +1,9 @@
-#!python
+#!/usr/bin/env python
 
 from optparse import OptionParser
 
 from AFQ import dki
+
 
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
@@ -12,21 +13,22 @@ usage = """pyAFQ_dki [options]"""
 parser = OptionParser(usage)
 
 parser.add_option("-d", "--dwi", type="string", action="callback",
-                  callback = parse_string,
+                  callback=parse_string,
                   help="Comma-separated (no spaces!) list of DWI files ")
 
 parser.add_option("-l", "--bval", type="string", action="callback",
-                  callback = parse_string,
+                  callback=parse_string,
                   help="Comma-separated (no spaces!) list of b-value files")
 
 parser.add_option("-c", "--bvec", type="string", action="callback",
-                  callback = parse_string,
+                  callback=parse_string,
                   help="Comma-separated (no spaces!) list of b-vector files")
 
-parser.add_option("-o","--out_dir", help="full path to directory for files to be saved (will be created if it doesn't exist)")
-parser.add_option("-m","--mask", help="mask file")
-opts, args = parser.parse_args()
+parser.add_option("-o", "--out_dir",
+                  help="full path to directory for files to be saved (will be created if it doesn't exist)")
 
+parser.add_option("-m", "--mask", help="mask file")
+opts, args = parser.parse_args()
 
 dki.fit_dki(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
             out_dir=opts.out_dir)

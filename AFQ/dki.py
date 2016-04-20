@@ -132,7 +132,7 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
         out_dir = op.join(op.split(params_file)[0])
 
     if S0_file is None:
-        S0 = 1
+        S0 = 100
     else:
         S0 = nib.load(S0_file).get_data()
         # If the S0 data is 4D, we assume it comes from an acquisition that had

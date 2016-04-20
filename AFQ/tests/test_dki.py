@@ -10,7 +10,7 @@ import dipy.data as dpd
 import dipy.core.gradients as dpg
 
 from AFQ import dki
-from .utils import make_dki_data
+from AFQ.tests.utils import make_dki_data
 
 def test_fit_dki_inputs():
     data_files = ["String in a list"]
