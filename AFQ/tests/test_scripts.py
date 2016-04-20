@@ -42,11 +42,14 @@ def test_predict_dki():
         cmd1 = ["pyAFQ_dki", "-d", fdata, "-l", fbval, "-c", fbvec,
                 "-o", tmpdir]
         out = runner.run_command(cmd1)
+        npt.assert_equal(out[0], 0)
+
         # Get expected values
         fparams = op.join(tmpdir, "dki_params.nii.gz")
         cmd2 = ["pyAFQ_dki_predict", "-p", fparams, "-l", fbval, "-c", fbvec,
                 "-o", tmpdir]
         out = runner.run_command(cmd2)
+        npt.assert_equal(out[0], 0)
         pred = nib.load(op.join(tmpdir, "dki_prediction.nii.gz")).get_data()
         data = nib.load(op.join(tmpdir, "dki.nii.gz")).get_data()
         npt.assert_array_almost_equal(pred, data)
