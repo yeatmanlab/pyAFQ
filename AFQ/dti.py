@@ -1,25 +1,16 @@
 import os
 import os.path as op
-from distutils.version import LooseVersion
 
 import numpy as np
 import nibabel as nib
 
-from dipy.reconst import dki
+from dipy.reconst import dti
 from dipy.core import gradients as dpg
-from ._fixes import dki_prediction
-
-import dipy
-
-if LooseVersion(dipy.__version__) < '0.12':
-    # Monkey patch the fix in:
-    dki.dki_prediction = dki_prediction
 
 
-def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
-            max_kurtosis=3, out_dir=None):
+def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     """
-    Fit the DKI model, save files with derived maps
+    Fit the DTI model using default settings, save files with derived maps
 
     Parameters
     ----------
@@ -33,10 +24,6 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     mask : ndarray, optional
         Binary mask, set to True or 1 in voxels to be processed.
         Default: Process all voxels.
-    min_kurtosis : float, optional
-        The minimal plausible value of kurtosis. Default: -1.
-    max_kurtosis : float, optional
-        The maximal plausible value of kurtosis. Default: 3.
     out_dir : str, optional
         A full path to a directory to store the maps that get computed.
         Default: maps get stored in the same directory as the last DWI file in
@@ -49,12 +36,12 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
 
     Note
     ----
-    Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
+    Maps that are calculated: FA, MD, AD, RD
 
     """
     types = [type(f) for f in [data_files, bval_files, bvec_files]]
     if len(set(types)) > 1:
-        e_s = "Please provide consistent inputs to `fit_dki`. All file"
+        e_s = "Please provide consistent inputs to `fit_dti`. All file"
         e_s += " inputs should be either lists of full paths, or a string"
         e_s += " with one full path."
         raise ValueError(e_s)
@@ -81,20 +68,17 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     gtab = dpg.gradient_table(np.concatenate(bvals),
                               np.concatenate(bvecs, -1))
 
-    dkimodel = dki.DiffusionKurtosisModel(gtab)
-    dkifit = dkimodel.fit(data, mask=mask)
+    dtimodel = dti.TensorModel(gtab)
+    dtifit = dtimodel.fit(data, mask=mask)
 
-    FA = dkifit.fa
-    MD = dkifit.md
-    AD = dkifit.ad
-    RD = dkifit.rd
-    MK = dkifit.mk(min_kurtosis, max_kurtosis)
-    AK = dkifit.ak(min_kurtosis, max_kurtosis)
-    RK = dkifit.rk(min_kurtosis, max_kurtosis)
-    params = dkifit.model_params
+    FA = dtifit.fa
+    MD = dtifit.md
+    AD = dtifit.ad
+    RD = dtifit.rd
+    params = dtifit.model_params
 
-    maps = [FA, MD, AD, RD, MK, AK, RK, params]
-    names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
+    maps = [FA, MD, AD, RD, params]
+    names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
         out_dir = op.join(op.split(dfile)[0], 'dki')
@@ -105,7 +89,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     aff = img.get_affine()
     file_paths = {}
     for m, n in zip(maps, names):
-        file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz' % n)
+        file_paths[n] = op.join(out_dir, 'dti_%s.nii.gz' % n)
         nib.save(nib.Nifti1Image(m, aff), file_paths[n])
 
     return file_paths
@@ -113,7 +97,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
 
 def predict(params_file, gtab, S0_file=None, out_dir=None):
     """
-    Create a signal prediction from DKI params
+    Create a signal prediction from DTI params
 
     params_file : str
         Full path to a file with parameters saved from a DKI fit
@@ -125,8 +109,6 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
         Full path to a nifti file that contains S0 measurements to incorporate
         into the prediction. If the file contains 4D data, the volumes that
         contain the S0 data must be the same as the gtab.b0s_mask.
-
-
     """
     if out_dir is None:
         out_dir = op.join(op.split(params_file)[0])
@@ -143,8 +125,8 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
 
     img = nib.load(params_file)
     params = img.get_data()
-    pred = dki.dki_prediction(params, gtab, S0=S0)
-    fname = op.join(out_dir, 'dki_prediction.nii.gz')
+    pred = dti.tensor_prediction(params, gtab, S0=S0)
+    fname = op.join(out_dir, 'dti_prediction.nii.gz')
     nib.save(nib.Nifti1Image(pred, img.affine), fname)
 
     return fname

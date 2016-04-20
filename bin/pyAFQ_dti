@@ -2,14 +2,14 @@
 
 from optparse import OptionParser
 
-from AFQ import dki
+from AFQ import dti
 
 
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
 
 
-usage = """pyAFQ_dki [options]"""
+usage = """pyAFQ_dti [options]"""
 parser = OptionParser(usage)
 
 parser.add_option("-d", "--dwi", type="string", action="callback",
@@ -30,5 +30,5 @@ parser.add_option("-o", "--out_dir",
 parser.add_option("-m", "--mask", help="mask file")
 opts, args = parser.parse_args()
 
-dki.fit_dki(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
+dti.fit_dti(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
             out_dir=opts.out_dir)

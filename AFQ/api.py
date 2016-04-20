@@ -116,17 +116,17 @@ class AFQ(object):
 
     def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
                          vol_idx=None, dilate=None, force_recompute=False):
-            self.data_frame['brain_mask_file'] = self.data_frame.apply(
-                                        _brain_extract_fname, axis=1)
+            self.data_frame['brain_mask_file'] =\
+                self.data_frame.apply(_brain_extract_fname, axis=1)
 
-            self.data_frame['brain_mask_img'] = self.data_frame.apply(
-                                        _brain_extract, axis=1,
-                                        median_radius=median_radius,
-                                        numpass=numpass,
-                                        autocrop=autocrop,
-                                        vol_idx=vol_idx,
-                                        dilate=dilate,
-                                        force_recompute=force_recompute)
+            self.data_frame['brain_mask_img'] =\
+                self.data_frame.apply(_brain_extract, axis=1,
+                                      median_radius=median_radius,
+                                      numpass=numpass,
+                                      autocrop=autocrop,
+                                      vol_idx=vol_idx,
+                                      dilate=dilate,
+                                      force_recompute=force_recompute)
 
     def fit_tensors():
         raise NotImplementedError
