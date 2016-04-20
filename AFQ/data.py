@@ -89,7 +89,7 @@ def fetch_hcp(subjects):
     AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
     AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX
 
-    The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)
+    The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
 
     Local filenames are changed to match our expected conventions.
     """
