@@ -1,3 +1,4 @@
+import os
 import os.path as op
 import boto3
 
@@ -95,7 +96,7 @@ def fetch_hcp(subjects):
     boto3.setup_default_session(profile_name='hcp')
     s3 = boto3.resource('s3')
     bucket = s3.Bucket('hcp-openaccess')
-    base_dir = op.join(op.expanduser('~'), 'AFQ_data')
+    base_dir = op.join(afq_home, "HCP")
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
     data_files = {}
