@@ -1,4 +1,6 @@
 import os.path as op
+import boto3
+
 import nibabel as nib
 from dipy.data.fetcher import _make_fetcher
 
@@ -62,3 +64,59 @@ def read_templates():
     for f in files:
         template_dict[f.split('.')[0]] = nib.load(op.join(folder, f))
     return template_dict
+
+
+def fetch_hcp(subjects):
+    """
+    Fetch HCP diffusion data.
+
+    Parameters
+    ----------
+    subjects : list
+       Each item is an integer, identifying one of the HCP subjects
+
+    Returns
+    -------
+    dict with remote and local names of thes files.
+
+    Notes
+    -----
+    To use this function, you need to have a file '~/.aws/credentials', that
+    includes a section:
+
+    [hcp]
+    AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
+    AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX
+
+    The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)
+
+    Local filenames are changed to match our expected conventions.
+    """
+    boto3.setup_default_session(profile_name='hcp')
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket('hcp-openaccess')
+    base_dir = op.join(op.expanduser('~'), 'AFQ_data')
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+    data_files = {}
+    for subject in subjects:
+        sub_dir = op.join(base_dir, '%s' % subject)
+        if not os.path.exists(op.join(base_dir, sub_dir)):
+            os.mkdir(sub_dir)
+            os.mkdir(os.path.join(sub_dir, 'sess'))
+            os.mkdir(os.path.join(sub_dir, 'sess', 'dwi'))
+            os.mkdir(os.path.join(sub_dir, 'sess', 'anat'))
+        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.bvals')] =\
+            'HCP/%s/T1w/Diffusion/bvals' % subject
+        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.bvecs')] =\
+            'HCP/%s/T1w/Diffusion/bvecs' % subject
+        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.nii.gz')] =\
+            'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
+        data_files[op.join(sub_dir, 'sess', 'anat', 'T1w_acpc_dc.nii.gz')] =\
+            'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
+
+    for k in data_files.keys():
+        if not op.exists(k):
+            bucket.download_file(data_files[k], k)
+
+    return data_files
