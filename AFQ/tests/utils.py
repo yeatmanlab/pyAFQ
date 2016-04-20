@@ -33,7 +33,7 @@ def make_dti_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
     gtab = dpg.gradient_table(bvals, bvecs)
 
     # Simulate a signal based on the DTI model:
-    signal = single_tensor(gtab, S0=150)
+    signal = single_tensor(gtab, S0=100)
     DWI = np.zeros(out_shape + (len(gtab.bvals), ))
     DWI[:] = signal
     nib.save(nib.Nifti1Image(DWI, img.affine), out_fdata)

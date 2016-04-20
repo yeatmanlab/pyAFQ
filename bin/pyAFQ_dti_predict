@@ -2,6 +2,8 @@
 
 from optparse import OptionParser
 
+import numpy as np
+import dipy.core.gradients as dpg
 from AFQ import dti
 
 
@@ -9,12 +11,12 @@ def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
 
 
-usage = """pyAFQ_dti [options]"""
+usage = """pyAFQ_dti_predict [options]"""
 parser = OptionParser(usage)
 
-parser.add_option("-d", "--dwi", type="string", action="callback",
+parser.add_option("-p", "--params", type="string", action="callback",
                   callback=parse_string,
-                  help="Comma-separated (no spaces!) list of DWI files ")
+                  help="A file containing DKI params")
 
 parser.add_option("-l", "--bval", type="string", action="callback",
                   callback=parse_string,
@@ -27,8 +29,21 @@ parser.add_option("-c", "--bvec", type="string", action="callback",
 parser.add_option("-o", "--out_dir",
                   help="full path to directory for files to be saved (will be created if it doesn't exist)")
 
-parser.add_option("-m", "--mask", help="mask file")
+parser.add_option("-s", "--S0_file",
+                  help="File containing S0 measurements to use in prediction")
+
 opts, args = parser.parse_args()
 
-dti.fit_dti(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
+bvals = []
+bvecs = []
+for bval_file, bvec_file in zip(opts.bval, opts.bvec):
+    bvals.append(np.loadtxt(bval_file))
+    bvecs.append(np.loadtxt(bvec_file))
+
+gtab = dpg.gradient_table(np.concatenate(bvals),
+                          np.concatenate(bvecs, -1))
+
+print(opts.out_dir)
+
+dti.predict(opts.params[0], gtab, S0_file=opts.S0_file,
             out_dir=opts.out_dir)
