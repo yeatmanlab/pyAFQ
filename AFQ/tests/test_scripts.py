@@ -52,20 +52,21 @@ def test_predict_dki():
         data = nib.load(op.join(tmpdir, "dki.nii.gz")).get_data()
         npt.assert_array_almost_equal(pred, data)
 
-# def test_fit_dti():
-#     with nbtmp.InTemporaryDirectory() as tmpdir:
-#         fbval = op.join(tmpdir, 'dki.bval')
-#         fbvec = op.join(tmpdir, 'dki.bvec')
-#         fdata = op.join(tmpdir, 'dki.nii.gz')
-#         make_dki_data(fbval, fbvec, fdata)
-#         cmd = ["pyAFQ_dti", "-d", fdata, "-l", fbval, "-c", fbvec, "-o", tmpdir]
-#         out = runner.run_command(cmd)
-#         npt.assert_equal(out[0], 0)
-#         # Get expected values
-#         names = ['FA', 'MD', 'AD', 'RD']
-#         for n in names:
-#             fname = op.join(tmpdir, "dti_%s.nii.gz" % n)
-#             img = nib.load(fdata)
-#             affine = img.get_affine()
-#             shape = img.shape[:-1]
-#             assert_image_shape_affine(fname, shape, affine)
+def test_fit_dti():
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
+        make_dti_data(fbval, fbvec, fdata)
+        cmd = ["pyAFQ_dti", "-d", fdata, "-l", fbval, "-c", fbvec,
+               "-o", tmpdir]
+        out = runner.run_command(cmd)
+        npt.assert_equal(out[0], 0)
+        # Get expected values
+        names = ['FA', 'MD', 'AD', 'RD']
+        for n in names:
+            fname = op.join(tmpdir, "dti_%s.nii.gz" % n)
+            img = nib.load(fdata)
+            affine = img.get_affine()
+            shape = img.shape[:-1]
+            assert_image_shape_affine(fname, shape, affine)

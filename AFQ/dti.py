@@ -89,7 +89,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     aff = img.get_affine()
     file_paths = {}
     for m, n in zip(maps, names):
-        file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz' % n)
+        file_paths[n] = op.join(out_dir, 'dti_%s.nii.gz' % n)
         nib.save(nib.Nifti1Image(m, aff), file_paths[n])
 
     return file_paths
