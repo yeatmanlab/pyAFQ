@@ -83,7 +83,7 @@ def make_dki_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
 
 What follows is code from Dipy.
 
-The code is (c) Dipy developers, 2009 -- 2016, and licensed under a BSD licensed
+The code is (c) Dipy developers, 2009 -- 2016, and released under a BSD license
 
 For details, see: https://github.com/nipy/dipy/blob/master/LICENSE
 

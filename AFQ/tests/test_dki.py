@@ -1,6 +1,5 @@
 import os.path as op
 
-import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
@@ -11,6 +10,7 @@ import dipy.core.gradients as dpg
 
 from AFQ import dki
 from AFQ.tests.utils import make_dki_data
+
 
 def test_fit_dki_inputs():
     data_files = ["String in a list"]

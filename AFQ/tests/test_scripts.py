@@ -1,12 +1,9 @@
 import os.path as op
 
-import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
-
-import dipy.data as dpd
 
 from AFQ.tests.utils import (make_dki_data, make_dti_data, ScriptRunner,
                              assert_image_shape_affine)
@@ -22,7 +19,8 @@ def test_fit_dki():
         fbvec = op.join(tmpdir, 'dki.bvec')
         fdata = op.join(tmpdir, 'dki.nii.gz')
         make_dki_data(fbval, fbvec, fdata)
-        cmd = ["pyAFQ_dki", "-d", fdata, "-l", fbval, "-c", fbvec, "-o", tmpdir]
+        cmd = ["pyAFQ_dki", "-d", fdata, "-l", fbval, "-c", fbvec,
+               "-o", tmpdir]
         out = runner.run_command(cmd)
         npt.assert_equal(out[0], 0)
         # Get expected values
@@ -83,11 +81,13 @@ def test_predict_dti():
         cmd1 = ["pyAFQ_dti", "-d", fdata, "-l", fbval, "-c", fbvec,
                 "-o", tmpdir]
         out = runner.run_command(cmd1)
+        npt.assert_equal(out[0], 0)
         # Get expected values
         fparams = op.join(tmpdir, "dti_params.nii.gz")
         cmd2 = ["pyAFQ_dti_predict", "-p", fparams, "-l", fbval, "-c", fbvec,
                 "-o", tmpdir]
         out = runner.run_command(cmd2)
+        npt.assert_equal(out[0], 0)
         pred = nib.load(op.join(tmpdir, "dti_prediction.nii.gz")).get_data()
         data = nib.load(op.join(tmpdir, "dti.nii.gz")).get_data()
         npt.assert_array_almost_equal(pred, data)

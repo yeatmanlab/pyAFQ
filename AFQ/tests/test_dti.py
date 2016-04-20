@@ -1,12 +1,10 @@
 import os.path as op
 
-import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
-import dipy.io as dio
 import dipy.core.gradients as dpg
 import dipy.data as dpd
 
