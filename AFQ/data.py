@@ -115,6 +115,8 @@ def fetch_hcp(subjects):
             'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
         data_files[op.join(sub_dir, 'sess', 'anat', 'T1w_acpc_dc.nii.gz')] =\
             'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
+        data_files[op.join(sub_dir, 'sess', 'anat', 'aparc+aseg.nii.gz')] =\
+            'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
 
     for k in data_files.keys():
         if not op.exists(k):
