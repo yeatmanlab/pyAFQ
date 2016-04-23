@@ -10,7 +10,7 @@ import dipy.data as dpd
 
 
 from AFQ import dti
-from AFQ.tests.utils import make_dti_data
+from AFQ.testing.utils import make_dti_data
 
 
 def test_fit_dti():

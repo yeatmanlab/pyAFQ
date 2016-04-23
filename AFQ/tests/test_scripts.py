@@ -5,8 +5,8 @@ import numpy.testing as npt
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
-from AFQ.tests.utils import (make_dki_data, make_dti_data, ScriptRunner,
-                             assert_image_shape_affine)
+from AFQ.testing.utils import (make_dki_data, make_dti_data, ScriptRunner,
+                               assert_image_shape_affine)
 
 runner = ScriptRunner(script_sdir='bin',
                       module_sdir='AFQ',
