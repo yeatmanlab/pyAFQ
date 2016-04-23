@@ -28,8 +28,9 @@ install:
 - python setup.py install --record installed_files.txt
 
 script:
-- py.test --cov=AFQ --verbose
 - flake8 --ignore N802,N806 `find . -name \*.py | grep -v setup.py | grep -v /doc/`
+
+- mkdir testing && cd testing && py.test --pyargs AFQ --cov=AFQ --verbose
 
 after_success:
 - coveralls
