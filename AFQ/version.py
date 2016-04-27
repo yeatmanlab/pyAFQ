@@ -66,5 +66,5 @@ PACKAGES = ['AFQ',
             'AFQ.tests',
             'AFQ.utils']
 PACKAGE_DATA = {'AFQ': [op.join('data', '*')]}
-SCRIPTS = [op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')]
 REQUIRES = ["numpy", "scipy", "dipy", "boto3"]
+SCRIPTS = [op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')]
