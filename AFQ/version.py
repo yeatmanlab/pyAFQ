@@ -65,4 +65,7 @@ PACKAGES = ['AFQ',
             'AFQ.tests']
 PACKAGE_DATA = {'AFQ': [pjoin('data', '*')]}
 REQUIRES = ["numpy", "scipy", "dipy"]
-SCRIPTS = [pjoin('bin', 'pyAFQ_dki')]
+SCRIPTS = [pjoin('bin', 'pyAFQ_dki'),
+           pjoin('bin', 'pyAFQ_dki_predict'),
+           pjoin('bin', 'pyAFQ_dti'),
+           pjoin('bin', 'pyAFQ_dti_predict')]
