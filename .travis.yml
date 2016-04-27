@@ -9,7 +9,7 @@ python:
   - 3.5
 
 env:
-  - CONDA_DEPS="pip flake8 pytest coverage numpy scipy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel pytest-cov"
+  - CONDA_DEPS="pip flake8 pytest coverage numpy scipy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel pytest-cov boto3"
 
 before_install:
 - export MINICONDA=$HOME/miniconda
