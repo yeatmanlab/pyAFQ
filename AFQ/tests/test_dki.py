@@ -1,6 +1,7 @@
 import os.path as op
 
 import numpy.testing as npt
+import pytest
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
@@ -16,8 +17,8 @@ def test_fit_dki_inputs():
     data_files = ["String in a list"]
     bval_files = "just a string"
     bvec_files = "just another string"
-    npt.assert_raises(ValueError, dki.fit_dki, data_files, bval_files,
-                      bvec_files)
+    pytest.raises(ValueError, dki.fit_dki, data_files, bval_files,
+                  bvec_files)
 
 
 def test_fit_dki():
