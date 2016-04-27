@@ -1,4 +1,5 @@
-from os.path import join as pjoin
+import os.path as op
+import glob
 
 # Format expected by setup.py and doc/source/conf.py: string of form "X.Y.Z"
 _version_major = 0
@@ -63,9 +64,6 @@ MICRO = _version_micro
 VERSION = __version__
 PACKAGES = ['AFQ',
             'AFQ.tests']
-PACKAGE_DATA = {'AFQ': [pjoin('data', '*')]}
+PACKAGE_DATA = {'AFQ': [op.join('data', '*')]}
 REQUIRES = ["numpy", "scipy", "dipy"]
-SCRIPTS = [pjoin('bin', 'pyAFQ_dki'),
-           pjoin('bin', 'pyAFQ_dki_predict'),
-           pjoin('bin', 'pyAFQ_dti'),
-           pjoin('bin', 'pyAFQ_dti_predict')]
+SCRIPTS = [op.join('bin', op.split(f)[-1]) for f in glob.glob('../bin/*')]
