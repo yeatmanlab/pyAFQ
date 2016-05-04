@@ -29,9 +29,9 @@ def test_fit_dti():
 
 def test_predict_dti():
     with nbtmp.InTemporaryDirectory() as tmpdir:
-        fbval = op.join(tmpdir, 'dki.bval')
-        fbvec = op.join(tmpdir, 'dki.bvec')
-        fdata = op.join(tmpdir, 'dki.nii.gz')
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
         make_dti_data(fbval, fbvec, fdata)
         file_dict = dti.fit_dti(fdata, fbval, fbvec, out_dir=tmpdir)
         params_file = file_dict['params']

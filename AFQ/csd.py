@@ -44,10 +44,8 @@ def fit_csd(data_files, bval_files, bvec_files, response=None,
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
     if response is None:
-        response, ratio = csd.auto_response(gtab, data, roi_radius=10,
-                                            fa_thr=0.7)
-    else:
-        response, ratio = response
+        response = csd.auto_response(gtab, data, roi_radius=10,
+                                     fa_thr=0.7)
 
     csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
                                                    sh_order=sh_order)
