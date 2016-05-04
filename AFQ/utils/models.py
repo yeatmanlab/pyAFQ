@@ -40,12 +40,8 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
     for dfile, bval_file, bvec_file in zip(data_files, bval_files, bvec_files):
         img = nib.load(dfile)
         data.append(img.get_data())
-        try:
-            bvals.append(np.loadtxt(bval_file))
-            bvecs.append(np.loadtxt(bvec_file))
-        except UnicodeDecodeError:   # This is a .npy file!
-            bvals.append(np.load(bval_file))
-            bvecs.append(np.load(bvec_file))
+        bvals.append(np.loadtxt(bval_file))
+        bvecs.append(np.loadtxt(bvec_file))
 
     data = np.concatenate(data, -1)
     gtab = dpg.gradient_table(np.concatenate(bvals),
