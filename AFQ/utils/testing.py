@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.testing as npt
-from nose.tools import assert_true
 
 import nibabel as nib
 import dipy.io as dio
@@ -10,7 +9,7 @@ from dipy.sims.voxel import multi_tensor_dki, single_tensor
 
 
 def assert_image_shape_affine(filename, shape, affine):
-    assert_true(os.path.isfile(filename))
+    npt.assert_(os.path.isfile(filename))
     image = nib.load(filename)
     npt.assert_equal(image.shape, shape)
     npt.assert_array_almost_equal(image.get_affine(), affine)

@@ -9,7 +9,7 @@ python:
   - 3.5
 
 env:
-  - CONDA_DEPS="pip flake8 nose coverage numpy scipy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel boto3"
+  - CONDA_DEPS="pip flake8 pytest coverage numpy scipy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel pytest-cov boto3"
 
 before_install:
 - export MINICONDA=$HOME/miniconda
@@ -28,8 +28,9 @@ install:
 - python setup.py install --record installed_files.txt
 
 script:
-- nosetests -v --with-coverage --cover-package=AFQ
 - flake8 --ignore N802,N806 `find . -name \*.py | grep -v setup.py | grep -v /doc/`
+
+- py.test --pyargs AFQ --cov=AFQ --verbose
 
 after_success:
 - coveralls
