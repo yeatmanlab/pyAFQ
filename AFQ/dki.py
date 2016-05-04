@@ -9,6 +9,8 @@ from dipy.reconst import dki
 from dipy.core import gradients as dpg
 from ._fixes import dki_prediction
 
+import AFQ.utils.models as ut
+
 import dipy
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -52,35 +54,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
 
     """
-    types = [type(f) for f in [data_files, bval_files, bvec_files]]
-    if len(set(types)) > 1:
-        e_s = "Please provide consistent inputs to `fit_dki`. All file"
-        e_s += " inputs should be either lists of full paths, or a string"
-        e_s += " with one full path."
-        raise ValueError(e_s)
-
-    if isinstance(data_files, str):
-        data_files = [data_files]
-        bval_files = [bval_files]
-        bvec_files = [bvec_files]
-
-    # Load the mask if it is a string
-    if isinstance(mask, str):
-        mask = nib.load(mask).get_data()
-
-    data = []
-    bvals = []
-    bvecs = []
-    for dfile, bval_file, bvec_file in zip(data_files, bval_files, bvec_files):
-        img = nib.load(dfile)
-        data.append(img.get_data())
-        bvals.append(np.loadtxt(bval_file))
-        bvecs.append(np.loadtxt(bvec_file))
-
-    data = np.concatenate(data, -1)
-    gtab = dpg.gradient_table(np.concatenate(bvals),
-                              np.concatenate(bvecs, -1))
-
+    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     dkifit = dkimodel.fit(data, mask=mask)
 
