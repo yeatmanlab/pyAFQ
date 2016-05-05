@@ -13,14 +13,14 @@ from AFQ import csd
 
 
 def test_fit_csd():
-    fdata, fbval, fbvec = dpd.get_data()
+    fdata, fbval, fbvec = dpd.get_data('small_64D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Convert from npy to txt:
         bvals = np.load(fbval)
         bvecs = np.load(fbvec)
         np.savetxt(op.join(tmpdir, 'bvals.txt'), bvals)
         np.savetxt(op.join(tmpdir, 'bvecs.txt'), bvecs)
-        for sh_order in [4, 8]:
+        for sh_order in [4, 6]:
             fname = csd.fit_csd(fdata, op.join(tmpdir, 'bvals.txt'),
                                 op.join(tmpdir, 'bvecs.txt'),
                                 out_dir=tmpdir, sh_order=sh_order)
