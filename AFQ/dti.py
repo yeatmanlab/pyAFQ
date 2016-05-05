@@ -106,6 +106,7 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
 
     return fname
 
+
 def tensor_odf(evals, evecs, sphere):
     """
     Calculate the tensor Orientation Distribution Function
