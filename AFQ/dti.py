@@ -1,9 +1,11 @@
 import os
 import os.path as op
+import warnings
 
 import numpy as np
 import nibabel as nib
 
+from dipy.core.geometry import vector_norm
 from dipy.reconst import dti
 
 import AFQ.utils.models as ut
@@ -54,7 +56,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files[0])[0], 'dki')
+        out_dir = op.join(op.split(data_files)[0], 'dti')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
@@ -103,3 +105,23 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
     nib.save(nib.Nifti1Image(pred, img.affine), fname)
 
     return fname
+
+def tensor_odf(evals, evecs, sphere):
+    """
+    Calculate the tensor Orientation Distribution Function
+
+    Parameters
+
+    """
+    lower = 4 * np.pi * np.sqrt(np.prod(evals, -1))
+    projection = np.dot(sphere.vertices, evecs)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        projection /= np.sqrt(evals)
+        odf = (vector_norm(projection) ** -3) / lower
+    # Zero evals are non-physical, we replace nans with zeros
+    any_zero = (evals == 0).any(-1)
+    odf = np.where(any_zero, 0, odf)
+    # Move odf to be on the last dimension
+    odf = np.rollaxis(odf, 0, odf.ndim)
+    return odf
