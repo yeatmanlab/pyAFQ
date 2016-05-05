@@ -7,6 +7,7 @@ import dipy.tracking.utils as dtu
 import dipy.direction as dpdir
 import dipy.data as dpd
 
+
 def csd_deterministic(params_file, max_angle=30., sphere=None,
                       seed_mask=None, seed_density=[2, 2, 2],
                       stop_mask=None, stop_threshold=0.2, step_size=0.5):
@@ -15,11 +16,31 @@ def csd_deterministic(params_file, max_angle=30., sphere=None,
 
     Parameters
     ----------
-    params_file : str, nibabel img
+    params_file : str, nibabel img.
         Full path to a nifti file containing CSD spherical harmonic
         coefficients, or nibabel img with model params.
+    max_angle : float, optional.
+        The maximum turning angle in each step. Default: 30
+    sphere : Sphere object, optional.
+        The discretization of direction getting. default:
+        dipy.data.default_sphere.
+    seed_mask : array, optional.
+        Binary mask describing the ROI within which we seed for tracking.
+        Default to the entire volume.
+    seed_density : int or list of ints, optional.
+        The seeding density: how many seeds in each voxel on each dimension.
+        Default: [2, 2, 2] (which is equivalent to 2)
+    stop_mask : array, optional.
+        A floating point value that determines a stopping criterion (e.g. FA).
+        Default to no stopping (all ones).
+    stop_threshold : float, optional.
+        A value of the stop_mask below which tracking is terminated. Default to
+        0.2.
+    step_size : float, optional.
 
-    model : str
+    Returns
+    -------
+    LocalTracking object.
     """
     if isinstance(params_file, str):
         params_img = nib.load(params_file)

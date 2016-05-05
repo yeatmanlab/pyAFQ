@@ -10,10 +10,10 @@ from dipy.core import gradients as dpg
 import AFQ.utils.models as ut
 
 
-def fit_csd(data_files, bval_files, bvec_files, response=None,
-            sh_order=8, lambda_=1, tau=0.1, mask=None, out_dir=None):
+def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
+            sh_order=8, lambda_=1, tau=0.1, out_dir=None):
     """
-    Fit the CSD model save file with SH coefficients
+    Fit the CSD model and save file with SH coefficients.
 
     Parameters
     ----------
@@ -29,18 +29,12 @@ def fit_csd(data_files, bval_files, bvec_files, response=None,
         Default: Process all voxels.
     out_dir : str, optional
         A full path to a directory to store the maps that get computed.
-        Default: maps get stored in the same directory as the last DWI file in
-        `data_files`.
+        Default: file with coefficients gets stored in the same directory as
+        the first DWI file in `data_files`.
 
     Returns
     -------
-    file_paths : a dict with the derived maps that were computed and full-paths
-    to the files containing these maps.
-
-    Note
-    ----
-    Maps that are calculated: FA, MD, AD, RD
-
+    fname : the full path to the file containing the SH coefficients.
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
     if response is None:
