@@ -1,5 +1,6 @@
 import numpy as np
 import nibabel as nib
+import dipy.reconst.shm as shm
 import dipy.tracking.local as dtl
 import dipy.tracking.utils as dtu
 from dipy.direction import (DeterministicMaximumDirectionGetter,
@@ -68,17 +69,18 @@ def track(params_file, directions="det",
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
 
-    if model_params.shape[-1] == 12:
-        model = "DTI"
-    elif model_params.shape[-1] == 27:
-        model = "DKI"
-    else:
+    # These are models that have ODFs (there might be others in the future...)
+    if model_params.shape[-1] == 12 or model_params.shape[-1] == 27:
+        model = "ODF"
+    # Could this be an SHM model? If the max order is a whole even number, it
+    # might be:
+    elif shm.calculate_max_order(model_params.shape[-1]) % 2 == 0:
         model = "SHM"
 
     if model == "SHM":
         dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
-    elif model == "DTI" or model == "DKI":
+    elif model == "ODF":
         evals = model_params[..., :3]
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)

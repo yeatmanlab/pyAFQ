@@ -15,18 +15,19 @@ def test_csd_deterministic():
         fbvec = op.join(tmpdir, 'dti.bvec')
         fdata = op.join(tmpdir, 'dti.nii.gz')
         make_tracking_data(fbval, fbvec, fdata)
-        fname = fit_csd(fdata, fbval, fbvec,
-                        response=((0.0015, 0.0003, 0.0003), 100),
-                        sh_order=8, lambda_=1, tau=0.1, mask=None,
-                        out_dir=tmpdir)
-        for directions in ["det", "prob"]:
-            sl = track(fname, directions,
-                       max_angle=30., sphere=None,
-                       seed_mask=None,
-                       seed_density=[1, 1, 1],
-                       stop_mask=None,
-                       stop_threshold=0.2,
-                       step_size=0.5)
+        for sh_order in [4, 8, 10]:
+            fname = fit_csd(fdata, fbval, fbvec,
+                            response=((0.0015, 0.0003, 0.0003), 100),
+                            sh_order=8, lambda_=1, tau=0.1, mask=None,
+                            out_dir=tmpdir)
+            for directions in ["det", "prob"]:
+                sl = track(fname, directions,
+                           max_angle=30., sphere=None,
+                           seed_mask=None,
+                           seed_density=[1, 1, 1],
+                           stop_mask=None,
+                           stop_threshold=0.2,
+                           step_size=0.5)
 
         # Generate the first streamline:
         sl0 = next(sl._generate_streamlines())
