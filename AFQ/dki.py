@@ -6,7 +6,6 @@ import numpy as np
 import nibabel as nib
 
 from dipy.reconst import dki
-from dipy.core import gradients as dpg
 from ._fixes import dki_prediction
 
 import AFQ.utils.models as ut
@@ -71,7 +70,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(dfile)[0], 'dki')
+        out_dir = op.join(op.split(data_files[0])[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)

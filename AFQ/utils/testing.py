@@ -265,8 +265,6 @@ def make_tracking_data(out_fbval, out_fbvec, out_fdata):
     fimg, fbvals, fbvecs = dpd.get_data('small_101D')
     bvals = np.loadtxt(fbvals)
     bvecs = np.loadtxt(fbvecs)
-    gtab = dpg.gradient_table(bvals, bvecs)
-
     # We simulate an affine with no shear component:
     affine = np.array([[2., 0., 0., -80.],
                        [0., 2., 0., -120.],

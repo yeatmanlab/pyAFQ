@@ -6,13 +6,10 @@ import numpy.testing as npt
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
-import dipy.core.gradients as dpg
 import dipy.data as dpd
 from dipy.reconst.shm import calculate_max_order
 
-
 from AFQ import csd
-from AFQ.utils.testing import make_dti_data
 
 
 def test_fit_csd():

@@ -1,10 +1,7 @@
 import os.path as op
-import numpy as np
 import numpy.testing as npt
 
 import nibabel.tmpdirs as nbtmp
-
-import dipy.data as dpd
 
 from AFQ.csd import fit_csd
 import AFQ.tractography as track

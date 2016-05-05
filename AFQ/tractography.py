@@ -1,7 +1,5 @@
 import numpy as np
 import nibabel as nib
-import dipy.reconst.dti as dti
-import dipy.reconst.csdeconv as csd
 import dipy.tracking.local as dtl
 import dipy.tracking.utils as dtu
 import dipy.direction as dpdir
@@ -58,10 +56,9 @@ def csd_deterministic(params_file, max_angle=30., sphere=None,
     if sphere is None:
         sphere = dpd.default_sphere
 
-    dg = dpdir.DeterministicMaximumDirectionGetter.from_shcoeff(
-                                                sh_coeff,
-                                                max_angle=30.,
-                                                sphere=sphere)
+    dg = dpdir.DeterministicMaximumDirectionGetter.from_shcoeff(sh_coeff,
+                                                                max_angle=30.,
+                                                                sphere=sphere)
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
 

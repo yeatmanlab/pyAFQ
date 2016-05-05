@@ -1,11 +1,9 @@
 import os
 import os.path as op
 
-import numpy as np
 import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
-from dipy.core import gradients as dpg
 
 import AFQ.utils.models as ut
 

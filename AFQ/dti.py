@@ -5,7 +5,6 @@ import numpy as np
 import nibabel as nib
 
 from dipy.reconst import dti
-from dipy.core import gradients as dpg
 
 import AFQ.utils.models as ut
 
@@ -55,7 +54,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(dfile)[0], 'dki')
+        out_dir = op.join(op.split(data_files[0])[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
