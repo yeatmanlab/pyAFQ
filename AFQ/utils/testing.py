@@ -6,7 +6,6 @@ import dipy.io as dio
 import dipy.data as dpd
 import dipy.core.gradients as dpg
 from dipy.sims.voxel import multi_tensor_dki, single_tensor
-from dipy.sims.phantom import orbital_phantom
 
 
 def assert_image_shape_affine(filename, shape, affine):
