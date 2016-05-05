@@ -64,7 +64,7 @@ def track(params_file, directions="det",
     if sphere is None:
         sphere = dpd.default_sphere
 
-    if directions=="det":
+    if directions == "det":
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
