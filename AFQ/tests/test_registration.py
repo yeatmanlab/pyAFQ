@@ -1,6 +1,5 @@
 import numpy as np
 
-import nibabel as nib
 import dipy.data as dpd
 
 from AFQ.registration import syn_registration
