@@ -4,8 +4,12 @@ import os.path as op
 import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
-
+from dipy.reconst import shm
 import AFQ.utils.models as ut
+
+# Monkey patch fixed spherical harmonics for conda
+from AFQ._fixes import spherical_harmonics
+shm.spherical_harmonics = spherical_harmonics
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,

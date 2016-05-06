@@ -9,7 +9,7 @@ python:
   - 3.5
 
 env:
-  - CONDA_DEPS="pip flake8 pytest coverage numpy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel pytest-cov boto3 scipy"
+  - CONDA_DEPS="pip flake8 pytest coverage numpy scipy matplotlib pandas" PIP_DEPS="coveralls dipy nibabel pytest-cov boto3"
 
 before_install:
 - export MINICONDA=$HOME/miniconda
@@ -34,3 +34,14 @@ script:
 
 after_success:
 - coveralls
+
+before_cache:
+# clean unused packages & installed files from conda cache
+# this makes the cache rebuilt less frequently
+- conda clean --tarballs --packages --index-cache
+- rm -rf $HOME/miniconda/pkgs/cache
+- xargs rm <installed_files.txt
+
+cache:
+  directories:
+    - $HOME/miniconda
