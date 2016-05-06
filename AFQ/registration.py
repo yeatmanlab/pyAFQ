@@ -3,7 +3,6 @@ Registration tools
 """
 import numpy as np
 import nibabel as nib
-import dipy.core.gradients as dpg
 from dipy.align.metrics import CCMetric, EMMetric, SSDMetric
 from dipy.align.imwarp import SymmetricDiffeomorphicRegistration
 
@@ -100,6 +99,8 @@ def resample(moving, static, moving_affine, static_affine):
                            static.shape, static_affine,
                            moving.shape, moving_affine)
     resampled = affine_map.transform(moving)
+    return resampled
+
 
 # Affine registration pipeline:
 affine_metric_dict = {'MI': MutualInformationMetric}
@@ -196,10 +197,10 @@ def register_series(series, ref, pipeline):
     if isinstance(ref, nib.Nifti1Image):
         static = ref
         static_data = static.get_data()
-        saff = static.get_affine()
+        s_aff = static.get_affine()
         moving = series
         moving_data = moving.get_data()
-        maff = moving.get_affine()
+        m_aff = moving.get_affine()
 
     elif isinstance(ref, int) or np.iterable(ref):
         data = series.get_data()

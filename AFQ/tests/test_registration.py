@@ -1,11 +1,9 @@
-import os.path as op
 import numpy as np
 
 import nibabel as nib
 import dipy.data as dpd
 
 from AFQ.registration import syn_registration
-from AFQ.utils.testing import make_dti_data
 
 
 def test_syn_registration():
