@@ -71,7 +71,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files[0])[0], 'dki')
+        out_dir = op.join(op.split(data_files)[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)

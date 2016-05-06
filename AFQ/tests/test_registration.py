@@ -1,12 +1,15 @@
+import os.path as op
+
 import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
+import nibabel.tmpdirs as nbtmp
 
 import dipy.data as dpd
 import dipy.core.gradients as dpg
 
-from AFQ.registration import (syn_registration, register_series,
+from AFQ.registration import (syn_registration, register_series, register_dwi,
                               c_of_mass, translation, rigid, affine)
 
 
@@ -48,3 +51,22 @@ def test_register_series():
                                                   translation,
                                                   rigid,
                                                   affine])
+
+
+def test_register_dwi():
+    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        # Use an abbreviated data-set:
+        img = nib.load(fdata)
+        data = img.get_data()[..., :10]
+        nib.save(nib.Nifti1Image(data, img.affine),
+                 op.join(tmpdir, 'data.nii.gz'))
+        # Convert from npy to txt:
+        bvals = np.load(fbval)
+        bvecs = np.load(fbvec)
+        np.savetxt(op.join(tmpdir, 'bvals.txt'), bvals[:10])
+        np.savetxt(op.join(tmpdir, 'bvecs.txt'), bvecs[:10])
+        reg_file = register_dwi(op.join(tmpdir, 'data.nii.gz'),
+                                op.join(tmpdir, 'bvals.txt'),
+                                op.join(tmpdir, 'bvecs.txt'))
+        npt.assert_(op.exists(reg_file))
