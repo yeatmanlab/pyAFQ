@@ -259,9 +259,9 @@ def register_dwi(data_files, bval_files, bvec_files,
         ref_data = data[..., gtab.b0s_mask]
 
     # Construct a series out of the DWI and the registered mean B0:
-    series = nib.Nifti1Image(np.concatenate([
-                                    ref_data,
-                                    data[..., ~gtab.b0s_mask]], -1),
+    series = nib.Nifti1Image(np.concatenate([ref_data,
+                                             data[...,
+                                                  ~gtab.b0s_mask]], -1),
                              img.affine)
 
     transformed_list, affine_list = register_series(series, ref=0,

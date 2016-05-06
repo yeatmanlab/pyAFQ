@@ -44,13 +44,13 @@ def test_register_series():
     fdata, fbval, fbvec = dpd.get_data('small_64D')
     img = nib.load(fdata)
     gtab = dpg.gradient_table(fbval, fbvec)
-    transformed_list, affine_list = register_series(
-                                        img,
-                                        ref=np.where(gtab.b0s_mask),
-                                        pipeline=[c_of_mass,
-                                                  translation,
-                                                  rigid,
-                                                  affine])
+    ref_idx = np.where(gtab.b0s_mask)
+    transformed_list, affine_list = register_series(img,
+                                                    ref=ref_idx,
+                                                    pipeline=[c_of_mass,
+                                                              translation,
+                                                              rigid,
+                                                              affine])
 
 
 def test_register_dwi():
