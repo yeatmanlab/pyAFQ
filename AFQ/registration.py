@@ -16,7 +16,6 @@ from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
                                    AffineTransform3D)
 
-import skimage.measure as measure
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
