@@ -1,9 +1,13 @@
 import numpy as np
 import numpy.testing as npt
 
-import dipy.data as dpd
+import nibabel as nib
 
-from AFQ.registration import syn_registration
+import dipy.data as dpd
+import dipy.core.gradients as dpg
+
+from AFQ.registration import (syn_registration, register_series,
+                              c_of_mass, translation, rigid, affine)
 
 
 def test_syn_registration():
@@ -31,3 +35,16 @@ def test_syn_registration():
                                               prealign=None)
 
     npt.assert_equal(warped_moving.shape, subset_t2.shape)
+
+
+def test_register_series():
+    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    img = nib.load(fdata)
+    gtab = dpg.gradient_table(fbval, fbvec)
+    transformed_list, affine_list = register_series(
+                                        img,
+                                        ref=np.where(gtab.b0s_mask),
+                                        pipeline=[c_of_mass,
+                                                  translation,
+                                                  rigid,
+                                                  affine])
