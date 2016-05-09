@@ -11,7 +11,8 @@ from dipy.reconst import dti
 import AFQ.utils.models as ut
 
 
-def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
+def fit_dti(data_files, bval_files, bvec_files, mask=None,
+            out_dir=None):
     """
     Fit the DTI model using default settings, save files with derived maps
 
@@ -42,7 +43,8 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None):
     Maps that are calculated: FA, MD, AD, RD
 
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
+                                            bvec_files, mask=mask)
     dtimodel = dti.TensorModel(gtab)
     dtifit = dtimodel.fit(data, mask=mask)
 

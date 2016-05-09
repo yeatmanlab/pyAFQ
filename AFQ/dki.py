@@ -17,8 +17,8 @@ if LooseVersion(dipy.__version__) < '0.12':
     dki.dki_prediction = dki_prediction
 
 
-def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
-            max_kurtosis=3, out_dir=None):
+def fit_dki(data_files, bval_files, bvec_files, mask=None,
+            min_kurtosis=-1, max_kurtosis=3, out_dir=None):
     """
     Fit the DKI model, save files with derived maps
 
@@ -53,7 +53,8 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1,
     Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
 
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
+                                            bvec_files, mask=mask)
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     dkifit = dkimodel.fit(data, mask=mask)
 
