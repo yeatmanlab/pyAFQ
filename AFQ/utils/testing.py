@@ -259,3 +259,18 @@ class ScriptRunner(object):
                 """.format(cmd, stdout, stderr))
         opp = self.output_processor
         return proc.returncode, opp(stdout), opp(stderr)
+
+
+def make_tracking_data(out_fbval, out_fbvec, out_fdata):
+    fimg, fbvals, fbvecs = dpd.get_data('small_101D')
+    bvals = np.loadtxt(fbvals)
+    bvecs = np.loadtxt(fbvecs)
+    # We simulate an affine with no shear component:
+    affine = np.array([[2., 0., 0., -80.],
+                       [0., 2., 0., -120.],
+                       [0., 0., 2., -60.],
+                       [0., 0., 0., 1.]])
+
+    nib.save(nib.Nifti1Image(nib.load(fimg).get_data(), affine), out_fdata)
+    np.savetxt(out_fbval, bvals)
+    np.savetxt(out_fbvec, bvecs)

@@ -1,5 +1,6 @@
 import os.path as op
 
+import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
@@ -29,9 +30,9 @@ def test_fit_dti():
 
 def test_predict_dti():
     with nbtmp.InTemporaryDirectory() as tmpdir:
-        fbval = op.join(tmpdir, 'dki.bval')
-        fbvec = op.join(tmpdir, 'dki.bvec')
-        fdata = op.join(tmpdir, 'dki.nii.gz')
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
         make_dti_data(fbval, fbvec, fdata)
         file_dict = dti.fit_dti(fdata, fbval, fbvec, out_dir=tmpdir)
         params_file = file_dict['params']
@@ -40,3 +41,16 @@ def test_predict_dti():
                                     out_dir=tmpdir)
         prediction = nib.load(predict_fname).get_data()
         npt.assert_almost_equal(prediction, nib.load(fdata).get_data())
+
+        # If you have a mask into the volume, you will predict only that
+        # part of the volume:
+        mask = np.zeros(prediction.shape[:3], dtype=bool)
+        mask[2:4, 2:4, 2:4] = 1
+        file_dict = dti.fit_dti(fdata, fbval, fbvec, mask=mask,
+                                out_dir=tmpdir)
+        params_file = file_dict['params']
+        predict_fname = dti.predict(params_file, gtab, S0_file=fdata,
+                                    out_dir=tmpdir)
+        prediction = nib.load(predict_fname).get_data()
+        npt.assert_almost_equal(prediction[mask],
+                                nib.load(fdata).get_data()[mask])
