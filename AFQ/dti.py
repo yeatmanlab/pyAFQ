@@ -43,8 +43,11 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     Maps that are calculated: FA, MD, AD, RD
 
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
-                                            bvec_files, mask=mask)
+    img, data, gtab, mask, out_dir = ut.prepare_data(data_files,
+                                                     bval_files,
+                                                     bvec_files,
+                                                     mask=mask,
+                                                     out_dir=out_dir)
     dtimodel = dti.TensorModel(gtab)
     dtifit = dtimodel.fit(data, mask=mask)
 
@@ -56,9 +59,6 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
 
     maps = [FA, MD, AD, RD, params]
     names = ['FA', 'MD', 'AD', 'RD', 'params']
-
-    if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dti')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)

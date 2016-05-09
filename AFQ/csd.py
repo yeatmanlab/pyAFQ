@@ -38,7 +38,11 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     -------
     fname : the full path to the file containing the SH coefficients.
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask, out_dir = ut.prepare_data(data_files,
+                                                     bval_files,
+                                                     bvec_files,
+                                                     mask=mask,
+                                                     out_dir=out_dir)
     if response is None:
         response, ratio = csd.auto_response(gtab, data, roi_radius=10,
                                             fa_thr=0.7)
