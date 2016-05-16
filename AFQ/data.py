@@ -53,7 +53,8 @@ callosum_md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
 
 fetch_callosum_templates = _make_fetcher("fetch_callosum_templates",
                                 op.join(afq_home, 'callosum_templates'),
-                                baseurl, remote_fnames, callosum_fnames,
+                                baseurl, remote_callosum_fnames,
+                                callosum_fnames,
                                 md5_list=callosum_md5_hashes,
                                 doc="Download AFQ callosum templates")
 
