@@ -51,7 +51,8 @@ callosum_md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
                        "25f24eb22879a05d12bda007c81ea55a",
                        "2664e0b8c2d9c59f13649a89bfcce399"]
 
-fetch_callosum_templates = _make_fetcher("fetch_callosum_templates",
+fetch_callosum_templates = _make_fetcher(
+                                "fetch_callosum_templates",
                                 op.join(afq_home, 'callosum_templates'),
                                 baseurl, callosum_remote_fnames,
                                 callosum_fnames,
@@ -184,10 +185,7 @@ def read_templates():
     for f in files:
         template_dict[f.split('.')[0]] = nib.load(op.join(folder, f))
     return template_dict
-
-
-
-
+    
 
 def fetch_hcp(subjects):
     """
