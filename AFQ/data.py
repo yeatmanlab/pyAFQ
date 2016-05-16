@@ -6,8 +6,8 @@ import nibabel as nib
 from dipy.data.fetcher import _make_fetcher
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
-baseurl = ("https://digital.lib.washington.edu/researchworks" +
-           "/bitstream/handle/1773/34926/")
+
+baseurl = "https://ndownloader.figshare.com/files/"
 
 fnames = ["Callosum_midsag.nii.gz",
           "L_AntFrontal.nii.gz",
@@ -27,6 +27,12 @@ fnames = ["Callosum_midsag.nii.gz",
           "R_SupParietal.nii.gz",
           "R_Temporal.nii.gz"]
 
+remote_fnames = ["5273794", "5273797", "5273800", "5273803", "5273806",
+                 "5273809", "5273812", "5273815", "5273821", "5273818",
+                 "5273824", "5273827", "5273830", "5273833", "5273836",
+                 "5273839", "5273842"]
+
+
 md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
               "987c6169de807c4e93dc2cbd7a25d506",
               "0da114123d0b0097b96fe450a459550b",
@@ -45,14 +51,14 @@ md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
               "25f24eb22879a05d12bda007c81ea55a",
               "2664e0b8c2d9c59f13649a89bfcce399"]
 
-fetch_templates = _make_fetcher("fetch_templates",
-                                op.join(afq_home, 'templates'),
-                                baseurl, fnames, fnames,
+fetch_callosum_templates = _make_fetcher("fetch_callosum_templates",
+                                op.join(afq_home, 'callosum_templates'),
+                                baseurl, remote_fnames, fnames,
                                 md5_list=md5_hashes,
-                                doc="Download AFQ templates")
+                                doc="Download AFQ callosum templates")
 
 
-def read_templates():
+def read_callosum_templates():
     """Load AFQ templates from file
 
     Returns
@@ -60,7 +66,7 @@ def read_templates():
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
-    files, folder = fetch_templates()
+    files, folder = fetch_callosum_templates()
     template_dict = {}
     for f in files:
         template_dict[f.split('.')[0]] = nib.load(op.join(folder, f))
