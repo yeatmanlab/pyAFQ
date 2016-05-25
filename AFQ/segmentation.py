@@ -25,15 +25,15 @@ def segment(fdata, fbval, fbvec, tracks, rules=seg_rules):
     dwi_affine = dwi.get_affine()
     dwi_data = dwi.get_data()
     mean_b0 = np.mean(dwi_data[..., gtab.b0s_mask], -1)
-    warped_b0, mapping = syn_registration(mean_b0, MNI_T2_data,
-                                          moving_affine=dwi_affine,
-                                          static_affine=MNI_T2_affine,
-                                          step_length=0.1,
-                                          sigma_diff=2.0,
-                                          metric='CC',
-                                          dim=3,
-                                          level_iters=[10, 10, 5],
-                                          prealign=None)
+    warped_b0, mapping = reg.syn_registration(mean_b0, MNI_T2_data,
+                                              moving_affine=dwi_affine,
+                                              static_affine=MNI_T2_affine,
+                                              step_length=0.1,
+                                              sigma_diff=2.0,
+                                              metric='CC',
+                                              dim=3,
+                                              level_iters=[10, 10, 5],
+                                              prealign=None)
 
     afq_templates = afd.read_templates()
 
