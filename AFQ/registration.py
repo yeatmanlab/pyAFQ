@@ -17,8 +17,12 @@ from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
                                    AffineTransform3D)
 
+from dipy.align.streamlinear import StreamlineLinearRegistration
+from dipy.tracking.streamline import set_number_of_points
+from dipy.tracking.utils import move_streamlines
 
-import AFQ.utils.models as ut
+import AFQ.utils.models as mut
+import AFQ.utils.streamlines as sut
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
@@ -249,7 +253,7 @@ def register_dwi(data_files, bval_files, bvec_files,
 
 
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask = mut.prepare_data(data_files, bval_files, bvec_files)
     if np.sum(gtab.b0s_mask) > 1:
         # First, register the b0s into one image:
         b0_img = nib.Nifti1Image(data[..., gtab.b0s_mask], img.affine)
@@ -278,3 +282,49 @@ def register_dwi(data_files, bval_files, bvec_files,
     path = op.join(out_dir, 'registered.nii.gz')
     nib.save(reg_img, path)
     return path
+
+
+def streamline_registration(moving, static, n_points=100,
+                            native_resampled=False):
+    """
+    Register two collections of streamlines ('bundles') to each other
+
+    Parameters
+    ----------
+    moving, static : lists of 3 by n, or str
+        The two bundles to be registered. Given either as lists of arrays with
+        3D coordinates, or strings containing full paths to these files.
+
+    n_points : int, optional
+        How many points to resample to. Default: 100.
+
+    native_resampled : bool, optional
+        Whether to return the moving bundle in the original space, but resampled
+        in the static space to n_points.
+
+    Returns
+    -------
+    aligned : list
+        Streamlines from the moving group, moved to be closely matched to
+        the static group.
+
+    matrix : array (4, 4)
+        The affine transformation that takes us from 'moving' to 'static'
+    """
+    # Load the streamlines, if you were given a file-name
+    if isinstance(moving, str):
+        moving = sut.read_trk(moving)
+
+    if isinstance(static, str):
+        static = sut.read_trk(static)
+
+    srr = StreamlineLinearRegistration()
+    srm = srr.optimize(static=set_number_of_points(static, n_points),
+                       moving=set_number_of_points(moving, n_points))
+
+    aligned = srm.transform(moving)
+    if native_resampled:
+        aligned = set_number_of_points(aligned, n_points)
+        aligned = move_streamlines(aligned, np.linalg.inv(srm.matrix))
+
+    return aligned, srm.matrix

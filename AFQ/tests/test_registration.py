@@ -10,8 +10,10 @@ import dipy.data as dpd
 import dipy.core.gradients as dpg
 
 from AFQ.registration import (syn_registration, register_series, register_dwi,
-                              c_of_mass, translation, rigid, affine)
+                              c_of_mass, translation, rigid, affine,
+                              streamline_registration)
 
+from dipy.tracking.utils import move_streamlines
 
 def test_syn_registration():
     MNI_T2 = dpd.read_mni_template()
@@ -70,3 +72,17 @@ def test_register_dwi():
                                 op.join(tmpdir, 'bvals.txt'),
                                 op.join(tmpdir, 'bvecs.txt'))
         npt.assert_(op.exists(reg_file))
+
+
+def test_streamline_registration():
+    sl1 = [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+           np.array([[0, 0, 0], [0, 0.5, 0.5 ], [0, 1, 1]])]
+    affine = np.eye(4)
+    affine[:3, 3] = np.random.randn(3)
+    sl2 = list(move_streamlines(sl1, affine))
+    aligned, matrix = streamline_registration(sl2, sl1)
+    npt.assert_almost_equal(matrix, np.linalg.inv(affine))
+    npt.assert_almost_equal(aligned[0], sl1[0])
+    npt.assert_almost_equal(aligned[1], sl1[1])
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        
