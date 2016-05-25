@@ -10,7 +10,12 @@ import dipy.data as dpd
 import dipy.core.gradients as dpg
 
 from AFQ.registration import (syn_registration, register_series, register_dwi,
-                              c_of_mass, translation, rigid, affine)
+                              c_of_mass, translation, rigid, affine,
+                              streamline_registration)
+
+from dipy.tracking.utils import move_streamlines
+
+from AFQ.utils.streamlines import write_trk
 
 
 def test_syn_registration():
@@ -70,3 +75,41 @@ def test_register_dwi():
                                 op.join(tmpdir, 'bvals.txt'),
                                 op.join(tmpdir, 'bvecs.txt'))
         npt.assert_(op.exists(reg_file))
+
+
+def test_streamline_registration():
+    sl1 = [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+           np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])]
+    affine = np.eye(4)
+    affine[:3, 3] = np.random.randn(3)
+    sl2 = list(move_streamlines(sl1, affine))
+    aligned, matrix = streamline_registration(sl2, sl1)
+    npt.assert_almost_equal(matrix, np.linalg.inv(affine))
+    npt.assert_almost_equal(aligned[0], sl1[0])
+    npt.assert_almost_equal(aligned[1], sl1[1])
+
+    # We assume the two tracks come from the same space, but it might have
+    # some affine associated with it:
+    base_aff = np.eye(4) * np.random.rand()
+    base_aff[:3, 3] = np.array([1, 2, 3])
+    base_aff[3, 3] = 1
+
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        for use_aff in [None, base_aff]:
+            fname1 = op.join(tmpdir, 'sl1.trk')
+            fname2 = op.join(tmpdir, 'sl2.trk')
+            if use_aff is not None:
+                # Move the streamlines to this other space, and report it:
+                write_trk(fname1,
+                          move_streamlines(sl1, np.linalg.inv(use_aff)),
+                          use_aff)
+                write_trk(fname2,
+                          move_streamlines(sl2, np.linalg.inv(use_aff)),
+                          use_aff)
+            else:
+                write_trk(fname1, sl1)
+                write_trk(fname2, sl2)
+
+            aligned, matrix = streamline_registration(fname2, fname1)
+            npt.assert_almost_equal(aligned[0], sl1[0], decimal=5)
+            npt.assert_almost_equal(aligned[1], sl1[1], decimal=5)
