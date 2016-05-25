@@ -253,7 +253,9 @@ def register_dwi(data_files, bval_files, bvec_files,
 
 
     """
-    img, data, gtab, mask = mut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask = mut.prepare_data(data_files,
+                                             bval_files,
+                                             bvec_files)
     if np.sum(gtab.b0s_mask) > 1:
         # First, register the b0s into one image:
         b0_img = nib.Nifti1Image(data[..., gtab.b0s_mask], img.affine)
@@ -299,8 +301,8 @@ def streamline_registration(moving, static, n_points=100,
         How many points to resample to. Default: 100.
 
     native_resampled : bool, optional
-        Whether to return the moving bundle in the original space, but resampled
-        in the static space to n_points.
+        Whether to return the moving bundle in the original space, but
+        resampled in the static space to n_points.
 
     Returns
     -------
@@ -314,7 +316,6 @@ def streamline_registration(moving, static, n_points=100,
     # Load the streamlines, if you were given a file-name
     if isinstance(moving, str):
         moving = sut.read_trk(moving)
-
     if isinstance(static, str):
         static = sut.read_trk(static)
 

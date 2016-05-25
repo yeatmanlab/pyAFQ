@@ -3,19 +3,48 @@ import nibabel as nib
 from nibabel import trackvis
 from dipy.tracking.utils import move_streamlines
 
-def read_trk(fname, points_space='rasmm'):
+
+def read_trk(fname):
     """
     Read from a .trk file, return streamlines and header
+
+    Parameters
+    ----------
+    fname : str
+        Full path to a trk file containing
+
+    Returns
+    -------
+    list : list of streamlines (3D coordinates)
+
+    Notes
+    -----
+    We assume that all streamlines are provided with the "rasmm" points_space.
+    That is, they have been transformed to the space reported by the affine
+    associated with the image from whence it came, and saved with this affine
+    (e.g., using `write_trk`).
+
     """
-    streams, hdr = trackvis.read(fname, points_space=points_space)
-    affine = hdr['vox_to_ras']
-    return move_streamlines([s[0] for s in streams], affine)
+    streams, hdr = trackvis.read(fname, points_space="rasmm")
+    return [s[0] for s in streams]
 
 
 def write_trk(fname, streamlines, affine=None, shape=None):
     """
     Write out a .trk file
 
+    Parameters
+    ----------
+    fname : str
+        Full path to save the file into
+    streamlines : list
+        A list of arrays of 3D coordinates
+    affine : array (4,4), optional.
+        An affine transformation associated with the streamlines. Defaults to
+        identity.
+    shape : 3-element tuple, optional
+        Spatial dimensions of an image associated with the streamlines.
+        Defaults to not be set in the file header.
     """
     if affine is None:
         affine = np.eye(4)
