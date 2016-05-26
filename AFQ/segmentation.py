@@ -3,21 +3,39 @@ import scipy.ndimage as ndim
 import nibabel as nib
 
 import dipy.data as dpd
+import dipy.tracking.utils as dtu
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.data as afd
 
-# These are the "include" and "exclude" rules we use per default
-seg_rules = {"callosum_occipital":
-             {"include": ["L_Occipital", "R_Occipital", "Callosum_midsag"],
-              "exclude": []}}
+
+# Set the default set as a constant:
+AFQ_BUNDLES = ["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO", "ILF",
+               "SLF", "ARC", "UNC"]
 
 
-def segment(fdata, fbval, fbvec, tracks, rules=seg_rules):
+def patch_up_roi(roi):
+    """
+    After being non-linearly transformed, ROIs tend to have holes in them.
+    We perform a couple of computational geometry operations on the ROI to
+    fix that up.
+
+    Parameters
+    ----------
+    roi : 3D binary array
+        The ROI after it has been transformed
+    """
+    return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
+
+
+def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES):
     img, data, gtab, mask = ut.prepare_data(data_files,
                                             bval_files,
                                             bvec_files)
+    xform_sl = [s for s in dtu.move_streamlines(streamlines,
+                                                np.linalg.inv(img.affine))]
+
     MNI_T2 = dpd.read_mni_template()
     MNI_T2_data = MNI_T2.get_data()
     MNI_T2_affine = MNI_T2.get_affine()
@@ -36,14 +54,24 @@ def segment(fdata, fbval, fbvec, tracks, rules=seg_rules):
                                               prealign=None)
 
     afq_templates = afd.read_templates()
+    # For the arcuate, we need to rename a few of these and duplicate SLF ROI:
+    afq_templates['ARC_roi1_L'] = afq_templates['SLF_roi1_L']
+    afq_templates['ARC_roi1_R'] = afq_templates['SLF_roi1_R']
+    afq_templates['ARC_roi2_L'] = afq_templates['SLFt_roi2_L']
+    afq_templates['ARC_roi2_R'] = afq_templates['SLFt_roir_R']
+    fiber_groups = {}
+    for hemi in ["R", "L"]:
+        for bundle in bundles:
+            ROIs = [bundle + "_roi%s_"%i + hemi for i in range(2)]
+            select_sl = xform_sl
+            for ROI in ROIs:
+                data = afq_templates[ROI].get_data()
+                warped_ROI = patch_up_roi(mapping.transform_inverse(data,
+                                                interpolation='nearest'))
 
-    for bundle in seg_rules:
-        include_rois = afq_templates[seg_rules[bundle]["include"]]
-        exclude_rois = afq_templates[eg_rules[bundle]["exclude"]]
-        warped_includes = []
-        for roi in include_rois:
-            roi_data = nib.load(roi).get_data()
-            warped_includes.append(
-                mapping.transform_inverse(
-                    ndim.binary_dilation(roi_data).astype(int),
-                    interpolation='nearest'))
+                select_sl = dts.select_by_rois(select_sl,
+                                               [warped_ROI.astype(bool)],
+                                               [True])
+            fiber_groups[bundle] = select_sl
+
+    return fiber_groups
