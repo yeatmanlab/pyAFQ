@@ -52,9 +52,15 @@ def test_syn_registration():
         file_mapping = read_mapping(mapping_fname,
                                     subset_b0_img,
                                     subset_t2_img)
+
+        # Test that it has the same effect on the data:
         warped_from_file = file_mapping.transform(subset_b0)
         npt.assert_equal(warped_from_file, warped_moving)
 
+        # Test that it is, attribute by attribute, identical:
+        for k in mapping.__dict__:
+            assert (np.all(mapping.__getattribute__(k) ==
+                           file_mapping.__getattribute__(k)))
 
 def test_register_series():
     fdata, fbval, fbvec = dpd.get_data('small_64D')
