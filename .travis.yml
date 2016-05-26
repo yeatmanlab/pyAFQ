@@ -30,7 +30,7 @@ install:
 script:
 - flake8 --ignore N802,N806 `find . -name \*.py | grep -v setup.py | grep -v /doc/`
 
-- py.test --cov-report term --cov=. test.py
+- py.test --cov-report term --cov=.
 
 after_success:
 - coveralls
