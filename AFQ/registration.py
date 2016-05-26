@@ -18,6 +18,8 @@ from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
                                    AffineTransform3D)
 
+import dipy.core.gradients as dpg
+import dipy.data as dpd
 from dipy.align.streamlinear import StreamlineLinearRegistration
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import move_streamlines
@@ -84,6 +86,47 @@ def syn_registration(moving, static,
 
     warped_moving = mapping.transform(moving)
     return warped_moving, mapping
+
+
+def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
+    """
+    Parameters
+    -----------
+    dwi : nifti image or str
+        Image containing DWI data, or full path to a nifti file with DWI.
+    gtab : GradientTable or list of strings
+        The gradients associated with the DWI data, or a string with [fbcal, ]
+    template : nifti image or str, optional
+
+    syn_kwargs : key-word arguments for :func:`syn_registration`
+
+    Returns
+    -------
+    DiffeomorphicMap object
+    """
+    if template is None:
+        template = dpd.read_mni_template()
+    if isinstance(template, str):
+        template = nib.load(template)
+
+    template_data = template.get_data()
+    template_affine = template.get_affine()
+
+    if isinstance(dwi, str):
+        dwi = nib.load(dwi)
+
+    if not isinstance(gtab, dpg.GradientTable):
+        gtab = dpg.gradient_table(*gtab)
+
+    dwi_affine = dwi.get_affine()
+    dwi_data = dwi.get_data()
+    mean_b0 = np.mean(dwi_data[..., gtab.b0s_mask], -1)
+    warped_b0, mapping = syn_registration(mean_b0, template_data,
+                                          moving_affine=dwi_affine,
+                                          static_affine=template_affine,
+                                          **syn_kwargs)
+    return mapping
+
 
 
 def write_mapping(mapping, fname):
