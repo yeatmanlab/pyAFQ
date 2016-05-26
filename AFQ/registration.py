@@ -6,7 +6,8 @@ import os.path as op
 import numpy as np
 import nibabel as nib
 from dipy.align.metrics import CCMetric, EMMetric, SSDMetric
-from dipy.align.imwarp import SymmetricDiffeomorphicRegistration
+from dipy.align.imwarp import (SymmetricDiffeomorphicRegistration,
+                               DiffeomorphicMap)
 
 from dipy.align.imaffine import (transform_centers_of_mass,
                                  AffineMap,
@@ -84,6 +85,56 @@ def syn_registration(moving, static,
     warped_moving = mapping.transform(moving)
     return warped_moving, mapping
 
+
+def write_mapping(mapping, fname):
+    """
+    Write out a syn registration mapping to file
+
+    Parameters
+    ----------
+    mapping : a DiffeomorphicMap object derived from :func:`syn_registration`
+    fname : str
+        Full path to the nifti file storing the mapping
+
+    """
+    mapping_data =  np.array([mapping.forward.T, mapping.backward.T]).T
+    nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
+
+
+def read_mapping(fname, domain_img, codomain_img):
+    """
+    Read a syn registration mapping from a nifti file
+
+    Parameters
+
+    Returns
+    -------
+    A :class:`DiffeomorphicMap` object
+
+
+    """
+
+    disp_image = nib.load(fname)
+
+    if isinstance(domain_img, str):
+        domain_img = nib.load(domain_img)
+
+    if isinstance(codomain_img, str):
+        codomain_img = nib.load(codomain_img)
+
+    mapping = DiffeomorphicMap(3, disp_image.shape[:3],
+                               disp_grid2world=np.linalg.inv(disp_image.affine),
+                               domain_shape=domain_img.shape[:3],
+                               domain_grid2world=domain_img.affine,
+                               codomain_shape=codomain_img.shape,
+                               codomain_grid2world=codomain_img.affine)
+
+    disp_data = disp_image.get_data()
+    mapping.forward = disp_data[..., 0]
+    mapping.backward = disp_data[..., 1]
+    mapping.is_inverse = True
+
+    return mapping
 
 def resample(moving, static, moving_affine, static_affine):
     """Resample an image from one space to another.
