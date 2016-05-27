@@ -1,11 +1,14 @@
+import numpy as np
 import multiprocessing
-from joblib import Parallel, delayed
+import joblib
+import dask
 
 
-def parfor(func, in_list, out_shape=None, n_jobs=-1, func_args=[],
-           func_kwargs={}):
+def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="dask",
+           backend="threading", func_args=[], func_kwargs={}):
     """
     Parallel for loop for numpy arrays
+
     Parameters
     ----------
     func : callable
@@ -16,12 +19,18 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, func_args=[],
     in_list : list
        All legitimate inputs to the function to operate over.
     n_jobs : integer, optional
-        The number of jobs to perform in parallel. -1 to use all cpus
+        The number of jobs to perform in parallel. -1 to use all cpus.
         Default: 1
-    args : list, optional
-        Positional arguments to `func`
-    kwargs : list, optional
-        Keyword arguments to `func`
+    engine : str
+        {"dask", "joblib", "serial"}
+        The last one is useful for debugging -- runs the code without any
+        parallelization.
+    backend : str
+        What joblib backend to use. Irrelevant for other engines.
+    func_args : list, optional
+        Positional arguments to `func`.
+    func_kwargs : list, optional
+        Keyword arguments to `func`.
     Returns
     -------
     ndarray of identical shape to `arr`
@@ -32,12 +41,25 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, func_args=[],
         n_jobs = multiprocessing.cpu_count()
         n_jobs=n_jobs-1
 
-    p = Parallel(n_jobs=n_jobs, backend="threading")
-    d = delayed(func)
-    d_l = []
-    for in_element in in_list:
-        d_l.append(d(in_element, *func_args, **func_kwargs))
-    results = p(d_l)
+    if engine == "joblib":
+        p = joblib.Parallel(n_jobs=n_jobs, backend=backend)
+        d = joblib.delayed(func)
+        d_l = []
+        for in_element in in_list:
+            d_l.append(d(in_element, *func_args, **func_kwargs))
+        results = p(d_l)
+
+    if engine == "dask":
+        d = dask.delayed(func)
+        d_l = []
+        for in_element in in_list:
+            d_l.append(d(in_element, *func_args, **func_kwargs))
+        results = [d.compute() for d in d_l]
+
+    elif engine == "serial":
+        results = []
+        for in_element in in_list:
+            results.append(func(in_element, *func_args, **func_kwargs))
 
     if out_shape is not None:
         return np.array(results).reshape(out_shape)

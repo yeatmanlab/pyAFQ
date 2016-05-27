@@ -1,3 +1,5 @@
+from itertools import chain
+
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
@@ -11,74 +13,12 @@ from dipy.tracking.local.localtrack import local_tracker
 from AFQ.dti import tensor_odf
 from AFQ.utils.parallel import parfor
 
+def parallel_local_tracking(s, dg, threshold_classifier, affine,
+                            step_size=0.5, return_all=True):
 
-class ParallelLocalTracking(dtl.LocalTracking):
-    def __init__(self, direction_getter, tissue_classifier, seeds, affine,
-                 step_size, max_cross=None, maxlen=500, fixedstep=True,
-                 return_all=True, n_jobs=-1):
-        dtl.LocalTracking.__init__(self,
-                       direction_getter,
-                       tissue_classifier,
-                       seeds,
-                       affine,
-                       step_size,
-                       max_cross=max_cross,
-                       maxlen=maxlen,
-                       fixedstep=fixedstep,
-                       return_all=return_all)
-        self.n_jobs = n_jobs
-
-    def _generate_streamlines(self):
-        N = self.maxlen
-        dg = self.direction_getter
-        tc = self.tissue_classifier
-        ss = self.step_size
-        fixed = self.fixed
-        max_cross = self.max_cross
-        vs = self._voxel_size
-
-        # Get inverse transform (lin/offset) for seeds
-        inv_A = np.linalg.inv(self.affine)
-        lin = inv_A[:3, :3]
-        offset = inv_A[:3, 3]
-
-        F = np.empty((N + 1, 3), dtype=float)
-        B = F.copy()
-        sl = []
-        return parfor(self.track_from_seed, self.seeds,
-                      func_args=[B, lin, offset, dg, max_cross, tc, ss, fixed,
-                                 vs, F])
-
-
-    def track_from_seed(self, s, B, lin, offset, dg, max_cross, tc, ss, fixed,
-                        vs, F):
-        s = np.dot(lin, s) + offset
-        directions = dg.initial_direction(s)
-        if directions.size == 0 and self.return_all:
-            # only the seed position
-            return [s]
-        directions = directions[:max_cross]
-        for first_step in directions:
-            stepsF, tissue_class = local_tracker(dg, tc, s, first_step,
-                                                 vs, F, ss, fixed)
-            if not (self.return_all or
-                    tissue_class == TissueTypes.ENDPOINT or
-                    tissue_class == TissueTypes.OUTSIDEIMAGE):
-                continue
-            first_step = -first_step
-            stepsB, tissue_class = local_tracker(dg, tc, s, first_step,
-                                                 vs, B, ss, fixed)
-            if not (self.return_all or
-                    tissue_class == TissueTypes.ENDPOINT or
-                    tissue_class == TissueTypes.OUTSIDEIMAGE):
-                continue
-
-            if stepsB == 1:
-                streamline = F[:stepsF].copy()
-            else:
-                parts = (B[stepsB-1:0:-1], F[:stepsF])
-                streamline = np.concatenate(parts, axis=0)
-            return streamline
+    return list(dtl.LocalTracking(dg, threshold_classifier, [s], affine,
+                             step_size=step_size,
+                             return_all=True)._generate_streamlines())
 
 
 def track(params_file, directions="det",
@@ -167,16 +107,16 @@ def track(params_file, directions="det",
                                                          stop_threshold)
 
     if n_jobs == 1:
-        streamlines = dtl.LocalTracking(dg, threshold_classifier,
+        streamlines = list(dtl.LocalTracking(dg, threshold_classifier,
                                         seeds, affine,
                                         step_size=step_size,
-                                        return_all=True)
+                                return_all=True)._generate_streamlines())
     else:
-        streamlines = ParallelLocalTracking(dg, threshold_classifier,
-                                            seeds, affine,
-                                            step_size=step_size,
-                                            return_all=True,
-                                            n_jobs=n_jobs)
+        streamlines = parfor(parallel_local_tracking, seeds,
+                             engine="joblib",
+                             func_args=[dg, threshold_classifier, affine],
+                             func_kwargs=dict(step_size=step_size,
+                                              return_all=True),
+                             n_jobs=n_jobs)
 
-
-    return list(streamlines._generate_streamlines())
+    return list(chain(*streamlines))

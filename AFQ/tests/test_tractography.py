@@ -27,10 +27,12 @@ def test_csd_deterministic():
                     sl = track(fname, directions,
                                max_angle=30., sphere=None,
                                seed_mask=None,
-                               seeds=np.array([[ -80., -120.,  -60.]]),
+                               seeds=np.array([[ -80., -120.,  -60.],
+                                               [-81, -120, -61]]),
                                stop_mask=None,
                                stop_threshold=0.2,
                                step_size=0.5, n_jobs=n_jobs)
+
                     npt.assert_equal(sl[0].shape[-1], 3)
 
 
@@ -48,7 +50,8 @@ def test_dti_deterministic():
                            max_angle=30.,
                            sphere=None,
                            seed_mask=None,
-                           seeds=np.array([[ -80., -120.,  -60.]]),
+                           seeds=np.array([[ -80., -120.,  -60.],
+                                           [-81, -120, -61]]),
                            stop_mask=None,
                            stop_threshold=0.2,
                            step_size=0.5)
