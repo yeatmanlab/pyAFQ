@@ -10,49 +10,68 @@ from AFQ.tractography import track
 from AFQ.utils.testing import make_tracking_data
 
 
+seeds = np.array([[ -80., -120.,  -60.],
+                  [-81, -120, -61]])
+
+tmpdir = nbtmp.InTemporaryDirectory()
+fbval = op.join(tmpdir.name, 'dti.bval')
+fbvec = op.join(tmpdir.name, 'dti.bvec')
+fdata = op.join(tmpdir.name, 'dti.nii.gz')
+make_tracking_data(fbval, fbvec, fdata)
+
 def test_csd_deterministic():
-    with nbtmp.InTemporaryDirectory() as tmpdir:
-        fbval = op.join(tmpdir, 'dti.bval')
-        fbvec = op.join(tmpdir, 'dti.bvec')
-        fdata = op.join(tmpdir, 'dti.nii.gz')
-        make_tracking_data(fbval, fbvec, fdata)
+    for sh_order in [4, 8, 10]:
+        fname = fit_csd(fdata, fbval, fbvec,
+                        response=((0.0015, 0.0003, 0.0003), 100),
+                        sh_order=8, lambda_=1, tau=0.1, mask=None,
+                        out_dir=tmpdir.name)
+        for directions in ["det", "prob"]:
+            sl_serial = track(fname, directions,
+                              max_angle=30., sphere=None,
+                              seed_mask=None,
+                              seeds=seeds,
+                              stop_mask=None,
+                              stop_threshold=0.2,
+                              step_size=0.5, n_jobs=1)
+            npt.assert_equal(sl_serial[0].shape[-1], 3)
 
-        for sh_order in [4, 8, 10]:
-            fname = fit_csd(fdata, fbval, fbvec,
-                            response=((0.0015, 0.0003, 0.0003), 100),
-                            sh_order=8, lambda_=1, tau=0.1, mask=None,
-                            out_dir=tmpdir)
-            for directions in ["det", "prob"]:
-                for n_jobs in [1, -1]:
-                    sl = track(fname, directions,
-                               max_angle=30., sphere=None,
-                               seed_mask=None,
-                               seeds=np.array([[ -80., -120.,  -60.],
-                                               [-81, -120, -61]]),
-                               stop_mask=None,
-                               stop_threshold=0.2,
-                               step_size=0.5, n_jobs=n_jobs)
+            sl_parallel = track(fname, directions,
+                                max_angle=30., sphere=None,
+                                seed_mask=None,
+                                seeds=seeds,
+                                stop_mask=None,
+                                stop_threshold=0.2,
+                                step_size=0.5, n_jobs=-1)
+            npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
-                    npt.assert_equal(sl[0].shape[-1], 3)
+            if directions == 'det':
+                npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
 
 
 def test_dti_deterministic():
-    with nbtmp.InTemporaryDirectory() as tmpdir:
-        fbval = op.join(tmpdir, 'dti.bval')
-        fbvec = op.join(tmpdir, 'dti.bvec')
-        fdata = op.join(tmpdir, 'dti.nii.gz')
-        make_tracking_data(fbval, fbvec, fdata)
-        fdict = fit_dti(fdata, fbval, fbvec)
-        for directions in ["det", "prob"]:
-            for n_jobs in [1, -1]:
-                sl = track(fdict['params'],
-                           directions,
-                           max_angle=30.,
-                           sphere=None,
-                           seed_mask=None,
-                           seeds=np.array([[ -80., -120.,  -60.],
-                                           [-81, -120, -61]]),
-                           stop_mask=None,
-                           stop_threshold=0.2,
-                           step_size=0.5)
-                npt.assert_equal(sl[0].shape[-1], 3)
+    fdict = fit_dti(fdata, fbval, fbvec)
+    for directions in ["det", "prob"]:
+        sl_serial = track(fdict['params'],
+                          directions,
+                          max_angle=30.,
+                          sphere=None,
+                          seed_mask=None,
+                          seeds=seeds,
+                          stop_mask=None,
+                          stop_threshold=0.2,
+                          step_size=0.5, n_jobs=1)
+        npt.assert_equal(sl_serial[0].shape[-1], 3)
+
+        sl_parallel = track(fdict['params'],
+                            directions,
+                            max_angle=30.,
+                            sphere=None,
+                            seed_mask=None,
+                            seeds=seeds,
+                            stop_mask=None,
+                            stop_threshold=0.2,
+                            step_size=0.5, n_jobs=-1)
+        npt.assert_equal(sl_parallel[0].shape[-1], 3)
+
+        if directions == 'det':
+            npt.assert_almost_equal(sl_parallel[0], sl_serial[0])

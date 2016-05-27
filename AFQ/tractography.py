@@ -16,9 +16,9 @@ from AFQ.utils.parallel import parfor
 def parallel_local_tracking(s, dg, threshold_classifier, affine,
                             step_size=0.5, return_all=True):
 
-    return list(dtl.LocalTracking(dg, threshold_classifier, [s], affine,
+    return dtl.LocalTracking(dg, threshold_classifier, [s], affine,
                              step_size=step_size,
-                             return_all=True)._generate_streamlines())
+                             return_all=True)
 
 
 def track(params_file, directions="det",
@@ -110,13 +110,15 @@ def track(params_file, directions="det",
         streamlines = list(dtl.LocalTracking(dg, threshold_classifier,
                                         seeds, affine,
                                         step_size=step_size,
-                                return_all=True)._generate_streamlines())
+                                        return_all=True))
     else:
-        streamlines = parfor(parallel_local_tracking, seeds,
-                             engine="joblib",
-                             func_args=[dg, threshold_classifier, affine],
-                             func_kwargs=dict(step_size=step_size,
-                                              return_all=True),
-                             n_jobs=n_jobs)
-
-    return list(chain(*streamlines))
+        streamlines = list(parfor(
+                            parallel_local_tracking,
+                            seeds,
+                            engine="joblib",
+                            func_args=[dg, threshold_classifier, affine],
+                            func_kwargs=dict(step_size=step_size,
+                                             return_all=True),
+                            n_jobs=n_jobs))
+        streamlines = list(chain(*streamlines))
+    return streamlines
