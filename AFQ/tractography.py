@@ -6,14 +6,143 @@ import dipy.tracking.utils as dtu
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.data as dpd
+from dipy.tracking.local.localtrack import local_tracker
 
 from AFQ.dti import tensor_odf
 
+import multiprocessing
+from joblib import Parallel, delayed
+
+
+def parfor(func, in_list, out_shape=None, n_jobs=-1, func_args=[],
+           func_kwargs={}):
+    """
+    Parallel for loop for numpy arrays
+    Parameters
+    ----------
+    func : callable
+        The function to apply to each item in the array. Must have the form:
+        func(arr, idx, *args, *kwargs) where arr is an ndarray and idx is an
+        index into that array (a tuple). The Return of `func` needs to be one
+        item (e.g. float, int) per input item.
+    in_list : list
+       All legitimate inputs to the function to operate over.
+    n_jobs : integer, optional
+        The number of jobs to perform in parallel. -1 to use all cpus
+        Default: 1
+    args : list, optional
+        Positional arguments to `func`
+    kwargs : list, optional
+        Keyword arguments to `func`
+    Returns
+    -------
+    ndarray of identical shape to `arr`
+    Examples
+    --------
+    """
+    if n_jobs == -1:
+        n_jobs = multiprocessing.cpu_count()
+        n_jobs=n_jobs-1
+
+    p = Parallel(n_jobs=n_jobs, backend="threading")
+    d = delayed(func)
+    d_l = []
+    for in_element in in_list:
+        d_l.append(d(in_element, *func_args, **func_kwargs))
+    results = p(d_l)
+
+    if out_shape is not None:
+        return np.array(results).reshape(out_shape)
+    else:
+        return results
+
+
+class ParallelLocalTracking(dtl.LocalTracking):
+    def __init__(self, direction_getter, tissue_classifier, seeds, affine,
+                 step_size, max_cross=None, maxlen=500, fixedstep=True,
+                 return_all=True, n_jobs=-1):
+        dtl.LocalTracking.__init__(self,
+                       direction_getter,
+                       tissue_classifier,
+                       seeds,
+                       affine,
+                       step_size,
+                       max_cross=max_cross,
+                       maxlen=maxlen,
+                       fixedstep=fixedstep,
+                       return_all=return_all)
+        self.n_jobs = n_jobs
+
+    def _generate_streamlines(self):
+        N = self.maxlen
+        dg = self.direction_getter
+        tc = self.tissue_classifier
+        ss = self.step_size
+        fixed = self.fixed
+        max_cross = self.max_cross
+        vs = self._voxel_size
+
+        # Get inverse transform (lin/offset) for seeds
+        inv_A = np.linalg.inv(self.affine)
+        lin = inv_A[:3, :3]
+        offset = inv_A[:3, 3]
+
+        F = np.empty((N + 1, 3), dtype=float)
+        B = F.copy()
+        sl = []
+        return parfor(self.track_from_seed, self.seeds,
+                      func_args=[B, lin, offset, dg, max_cross, tc, ss, fixed,
+                                 vs, F])
+
+
+    def track_from_seed(self, s, B, lin, offset, dg, max_cross, tc, ss, fixed,
+                        vs, F):
+        s = np.dot(lin, s) + offset
+        directions = dg.initial_direction(s)
+        if directions.size == 0 and self.return_all:
+            # only the seed position
+            return [s]
+        directions = directions[:max_cross]
+        for first_step in directions:
+            stepsF, tissue_class = local_tracker(dg, tc, s, first_step,
+                                                 vs, F, ss, fixed)
+            if not (self.return_all or
+                    tissue_class == TissueTypes.ENDPOINT or
+                    tissue_class == TissueTypes.OUTSIDEIMAGE):
+                continue
+            first_step = -first_step
+            stepsB, tissue_class = local_tracker(dg, tc, s, first_step,
+                                                 vs, B, ss, fixed)
+            if not (self.return_all or
+                    tissue_class == TissueTypes.ENDPOINT or
+                    tissue_class == TissueTypes.OUTSIDEIMAGE):
+                continue
+
+            if stepsB == 1:
+                streamline = F[:stepsF].copy()
+            else:
+                parts = (B[stepsB-1:0:-1], F[:stepsF])
+                streamline = np.concatenate(parts, axis=0)
+            return streamline
+
+
+    # def next(self):
+    #     return self.__iter__.next()
+    #
+    # def track(self):
+    #     x = self.next()
+    #     sl = []
+    #     while x:
+    #         sl.append(x)
+    #         x = self.next()
+    #     return sl
+    #     #return Parallel(self.n_jobs)(delayed(self.next))
 
 def track(params_file, directions="det",
           max_angle=30., sphere=None,
-          seed_mask=None, seed_density=[2, 2, 2],
-          stop_mask=None, stop_threshold=0.2, step_size=0.5):
+          seed_mask=None, seeds=[2, 2, 2],
+          stop_mask=None, stop_threshold=0.2, step_size=0.5,
+          n_jobs=-1):
     """
     Deterministic tracking using CSD
 
@@ -33,9 +162,10 @@ def track(params_file, directions="det",
     seed_mask : array, optional.
         Binary mask describing the ROI within which we seed for tracking.
         Default to the entire volume.
-    seed_density : int or list of ints, optional.
-        The seeding density: how many seeds in each voxel on each dimension.
-        Default: [2, 2, 2] (which is equivalent to 2)
+    seed : int or 2D array, optional.
+        The seeding density: if this is an int, it is is how many seeds in each
+        voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
+        array, these are the coordinates of the seeds.
     stop_mask : array, optional.
         A floating point value that determines a stopping criterion (e.g. FA).
         Default to no stopping (all ones).
@@ -56,11 +186,11 @@ def track(params_file, directions="det",
     model_params = params_img.get_data()
     affine = params_img.get_affine()
 
-    if seed_mask is None:
-        seed_mask = np.ones(params_img.shape[:3])
-    seeds = dtu.seeds_from_mask(seed_mask, density=seed_density,
-                                affine=affine)
-
+    if isinstance(seeds, int):
+        if seed_mask is None:
+            seed_mask = np.ones(params_img.shape[:3])
+            seeds = dtu.seeds_from_mask(seed_mask, density=seeds,
+                                        affine=affine)
     if sphere is None:
         sphere = dpd.default_sphere
 
@@ -92,8 +222,17 @@ def track(params_file, directions="det",
     threshold_classifier = dtl.ThresholdTissueClassifier(stop_mask,
                                                          stop_threshold)
 
-    streamlines = dtl.LocalTracking(dg, threshold_classifier,
-                                    seeds, affine,
-                                    step_size=step_size,
-                                    return_all=True)
-    return streamlines
+    if n_jobs == 1:
+        streamlines = dtl.LocalTracking(dg, threshold_classifier,
+                                        seeds, affine,
+                                        step_size=step_size,
+                                        return_all=True)
+    else:
+        streamlines = ParallelLocalTracking(dg, threshold_classifier,
+                                            seeds, affine,
+                                            step_size=step_size,
+                                            return_all=True,
+                                            n_jobs=n_jobs)
+
+
+    return list(streamlines._generate_streamlines())
