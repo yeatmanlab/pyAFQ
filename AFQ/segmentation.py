@@ -44,11 +44,11 @@ def patch_up_roi(roi):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES,
-            templates=AFQ_TEMPLATES, mapping=None, generate=False):
+            templates=AFQ_TEMPLATES, mapping=None, as_generator=True):
     """
 
     generate : bool
-        Whether to generate the streamlines here
+        Whether to generate the streamlines here, or return generators.
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
     xform_sl = [s for s in dtu.move_streamlines(streamlines,
@@ -72,6 +72,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES,
                 select_sl = dts.select_by_rois(select_sl,
                                                [warped_ROI.astype(bool)],
                                                [True])
-            fiber_groups[bundle + "_" + hemi] = select_sl
+            if as_generator:
+                fiber_groups[bundle + "_" + hemi] = select_sl
+            else:
+                fiber_groups[bundle + "_" + hemi] = list(select_sl)
 
     return fiber_groups
