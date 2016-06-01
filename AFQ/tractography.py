@@ -3,7 +3,8 @@ from itertools import chain
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
-import dipy.tracking.local as dtl
+import AFQ.localtracking as dtl
+from dipy.tracking.local import ThresholdTissueClassifier
 import dipy.tracking.utils as dtu
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
@@ -13,19 +14,10 @@ from dipy.tracking.local.localtrack import local_tracker
 from AFQ.dti import tensor_odf
 from AFQ.utils.parallel import parfor
 
-def parallel_local_tracking(s, dg, threshold_classifier, affine,
-                            step_size=0.5, return_all=True):
 
-    return dtl.LocalTracking(dg, threshold_classifier, [s], affine,
-                             step_size=step_size,
-                             return_all=True)
-
-
-def track(params_file, directions="det",
-          max_angle=30., sphere=None,
-          seed_mask=None, seeds=2,
-          stop_mask=None, stop_threshold=0.2, step_size=0.5,
-          n_jobs=-1):
+def track(params_file, directions="det", max_angle=30., sphere=None,
+          seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.2,
+          step_size=0.5, n_jobs=-1):
     """
     Deterministic tracking using CSD
 
@@ -103,22 +95,15 @@ def track(params_file, directions="det",
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
 
-    threshold_classifier = dtl.ThresholdTissueClassifier(stop_mask,
-                                                         stop_threshold)
+    threshold_classifier = ThresholdTissueClassifier(stop_mask,
+                                                     stop_threshold)
 
-    if n_jobs == 1:
-        streamlines = list(dtl.LocalTracking(dg, threshold_classifier,
-                                        seeds, affine,
+    tracker = dtl.ParallelLocalTracking(dg,
+                                        threshold_classifier,
+                                        seeds,
+                                        affine,
                                         step_size=step_size,
-                                        return_all=True))
-    else:
-        streamlines = list(parfor(
-                            parallel_local_tracking,
-                            seeds,
-                            engine="joblib",
-                            func_args=[dg, threshold_classifier, affine],
-                            func_kwargs=dict(step_size=step_size,
-                                             return_all=True),
-                            n_jobs=n_jobs))
-        streamlines = list(chain(*streamlines))
-    return streamlines
+                                        return_all=True,
+                                        n_jobs=n_jobs)
+
+    return list(tracker.generate_streamlines())

@@ -2,9 +2,10 @@ import numpy as np
 import multiprocessing
 import joblib
 import dask
+import dask.multiprocessing
 
 
-def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="dask",
+def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
            backend="threading", func_args=[], func_kwargs={}):
     """
     Parallel for loop for numpy arrays
@@ -49,12 +50,17 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="dask",
             d_l.append(d(in_element, *func_args, **func_kwargs))
         results = p(d_l)
 
-    if engine == "dask":
-        d = dask.delayed(func)
-        d_l = []
-        for in_element in in_list:
-            d_l.append(d(in_element, *func_args, **func_kwargs))
-        results = [d.compute() for d in d_l]
+    elif engine == "dask":
+        def partial(func, *args, **keywords):
+            def newfunc(in_arg):
+                return func(in_arg, *args, **keywords)
+            return newfunc
+        p = partial(func, *func_args, **func_kwargs)
+        d = dask.delayed([p(i) for i in in_list])
+        if backend == "multiprocessing":
+            results = d.compute(get=dask.multiprocessing.get)
+        elif backend == "threading":
+            results = d.compute(get=dask.threaded.get)
 
     elif engine == "serial":
         results = []

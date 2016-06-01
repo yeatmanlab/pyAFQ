@@ -19,7 +19,7 @@ fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
 make_tracking_data(fbval, fbvec, fdata)
 
-def test_csd_deterministic():
+def test_csd_tracking():
     for sh_order in [4, 8, 10]:
         fname = fit_csd(fdata, fbval, fbvec,
                         response=((0.0015, 0.0003, 0.0003), 100),
@@ -41,14 +41,14 @@ def test_csd_deterministic():
                                 seeds=seeds,
                                 stop_mask=None,
                                 stop_threshold=0.2,
-                                step_size=0.5, n_jobs=-1)
+                                step_size=0.5, n_jobs=2)
             npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
             if directions == 'det':
                 npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
 
 
-def test_dti_deterministic():
+def test_dti_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
         sl_serial = track(fdict['params'],

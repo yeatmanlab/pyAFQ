@@ -12,10 +12,14 @@ def test_parfor():
     i, j = np.random.randint(0, 9, 2)
     my_list = list(my_array.ravel())
     for engine in ["joblib", "dask", "serial"]:
-        npt.assert_equal(para.parfor(power_it, my_list, engine=engine,
-                                      out_shape=my_array.shape)[i, j],
-                         power_it(my_array[i, j]))
+        for backend in ["threading", "multiprocessing"]:
+            npt.assert_equal(para.parfor(power_it, my_list, engine=engine,
+                                          backend=backend,
+                                          out_shape=my_array.shape)[i, j],
 
-        # If it's not reshaped, the first item should be the item 0, 0:
-        npt.assert_equal(para.parfor(power_it, my_list, engine=engine)[0],
-                         power_it(my_array[0, 0]))
+                             power_it(my_array[i, j]))
+
+            # If it's not reshaped, the first item should be the item 0, 0:
+            npt.assert_equal(para.parfor(power_it, my_list, engine=engine,
+                                        backend=backend)[0],
+                             power_it(my_array[0, 0]))
