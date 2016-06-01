@@ -32,17 +32,22 @@ def test_csd_tracking():
                               seeds=seeds,
                               stop_mask=None,
                               stop_threshold=0.2,
-                              step_size=0.5, n_jobs=1)
+                              step_size=0.5,
+                              n_jobs=1)
             npt.assert_equal(sl_serial[0].shape[-1], 3)
-
-            sl_parallel = track(fname, directions,
-                                max_angle=30., sphere=None,
-                                seed_mask=None,
-                                seeds=seeds,
-                                stop_mask=None,
-                                stop_threshold=0.2,
-                                step_size=0.5, n_jobs=2)
-            npt.assert_equal(sl_parallel[0].shape[-1], 3)
+            for engine in ["dask"]:
+                for backend in ["threading", "multiprocessing"]:
+                    sl_parallel = track(fname, directions,
+                                        max_angle=30., sphere=None,
+                                        seed_mask=None,
+                                        seeds=seeds,
+                                        stop_mask=None,
+                                        stop_threshold=0.2,
+                                        step_size=0.5,
+                                        n_jobs=2,
+                                        engine=engine,
+                                        backend=backend)
+                    npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
             if directions == 'det':
                 npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
@@ -59,19 +64,24 @@ def test_dti_tracking():
                           seeds=seeds,
                           stop_mask=None,
                           stop_threshold=0.2,
-                          step_size=0.5, n_jobs=1)
+                          step_size=0.5,
+                          n_jobs=1)
         npt.assert_equal(sl_serial[0].shape[-1], 3)
-
-        sl_parallel = track(fdict['params'],
-                            directions,
-                            max_angle=30.,
-                            sphere=None,
-                            seed_mask=None,
-                            seeds=seeds,
-                            stop_mask=None,
-                            stop_threshold=0.2,
-                            step_size=0.5, n_jobs=-1)
-        npt.assert_equal(sl_parallel[0].shape[-1], 3)
+        for engine in ["dask"]:
+            for backend in ["threading", "multiprocessing"]:
+                sl_parallel = track(fdict['params'],
+                                    directions,
+                                    max_angle=30.,
+                                    sphere=None,
+                                    seed_mask=None,
+                                    seeds=seeds,
+                                    stop_mask=None,
+                                    stop_threshold=0.2,
+                                    step_size=0.5,
+                                    n_jobs=2,
+                                    engine=engine,
+                                    backend=backend)
+                npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
         if directions == 'det':
             npt.assert_almost_equal(sl_parallel[0], sl_serial[0])

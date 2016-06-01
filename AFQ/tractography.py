@@ -17,7 +17,7 @@ from AFQ.utils.parallel import parfor
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.2,
-          step_size=0.5, n_jobs=-1):
+          step_size=0.5, n_jobs=-1, backend="multiprocessing", engine="dask"):
     """
     Deterministic tracking using CSD
 
@@ -97,6 +97,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
+    if n_jobs == 1:
+        engine="serial"
 
     tracker = dtl.ParallelLocalTracking(dg,
                                         threshold_classifier,
@@ -104,6 +106,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                         affine,
                                         step_size=step_size,
                                         return_all=True,
-                                        n_jobs=n_jobs)
+                                        n_jobs=n_jobs,
+                                        backend=backend,
+                                        engine=engine)
 
     return list(tracker.generate_streamlines())
