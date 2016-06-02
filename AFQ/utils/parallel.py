@@ -3,7 +3,7 @@ import multiprocessing
 import joblib
 import dask
 import dask.multiprocessing
-
+import time
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
            backend="threading", func_args=[], func_kwargs={}):
@@ -56,12 +56,13 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
                 return func(in_arg, *args, **keywords)
             return newfunc
         p = partial(func, *func_args, **func_kwargs)
-        d = dask.delayed([p(i) for i in in_list])
+        d = [dask.delayed(p)(i) for i in in_list]
         if backend == "multiprocessing":
-            results = d.compute(get=dask.multiprocessing.get)
+            results = dask.compute(*d, get=dask.multiprocessing.get,
+                                   workers=n_jobs)
         elif backend == "threading":
-            results = d.compute(get=dask.threaded.get)
-
+            results = dask.compute(*d, get=dask.threaded.get,
+                                   workers=n_jobs)
     elif engine == "serial":
         results = []
         for in_element in in_list:
