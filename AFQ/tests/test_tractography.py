@@ -10,7 +10,7 @@ from AFQ.tractography import track
 from AFQ.utils.testing import make_tracking_data
 
 
-seeds = np.array([[ -80., -120.,  -60.],
+seeds = np.array([[-80., -120.,  -60.],
                   [-81, -121, -61]])
 
 tmpdir = nbtmp.InTemporaryDirectory()

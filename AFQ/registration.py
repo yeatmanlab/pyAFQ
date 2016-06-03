@@ -128,7 +128,6 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     return mapping
 
 
-
 def write_mapping(mapping, fname):
     """
     Write out a syn registration mapping to file
@@ -140,7 +139,7 @@ def write_mapping(mapping, fname):
         Full path to the nifti file storing the mapping
 
     """
-    mapping_data =  np.array([mapping.forward.T, mapping.backward.T]).T
+    mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
     nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
 
 
@@ -184,6 +183,7 @@ def read_mapping(disp, domain_img, codomain_img):
     mapping.is_inverse = True
 
     return mapping
+
 
 def resample(moving, static, moving_affine, static_affine):
     """Resample an image from one space to another.

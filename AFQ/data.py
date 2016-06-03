@@ -252,16 +252,16 @@ stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
 stanford_hardi_tractography_fnames = ['mapping.nii.gz',
                                       'tractography_subsampled.trk']
 
-fetch_stanford_hardi_tractography =\
-                  _make_fetcher("fetch_stanford_hardi_tractography",
-                                op.join(afq_home,
-                                        'stanford_hardi_tractography'),
-                                baseurl,
-                                stanford_hardi_tractography_remote_fnames,
-                                stanford_hardi_tractography_fnames,
-                                md5_list=stanford_hardi_tractography_hashes,
-                                doc="""Download Stanford HARDI tractography
-                                       and mapping. For testing purposes""")
+fetch_stanford_hardi_tractography = _make_fetcher(
+    "fetch_stanford_hardi_tractography",
+    op.join(afq_home,
+            'stanford_hardi_tractography'),
+    baseurl,
+    stanford_hardi_tractography_remote_fnames,
+    stanford_hardi_tractography_fnames,
+    md5_list=stanford_hardi_tractography_hashes,
+    doc="""Download Stanford HARDI tractography and mapping. For testing
+           purposes""")
 
 
 def read_stanford_hardi_tractograpy():
@@ -270,12 +270,12 @@ def read_stanford_hardi_tractograpy():
     """
     files, folder = fetch_stanford_hardi_tractography()
     files_dict = {}
-    files_dict['mapping.nii.gz'] = nib.load(op.join(
-                                        afq_home,
-                                        'stanford_hardi_tractography',
-                                        'mapping.nii.gz'))
-    files_dict['tractography_subsampled.trk'] = read_trk(op.join(
-                                        afq_home,
-                                        'stanford_hardi_tractography',
-                                        'tractography_subsampled.trk'))
+    files_dict['mapping.nii.gz'] = nib.load(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'mapping.nii.gz'))
+    files_dict['tractography_subsampled.trk'] = read_trk(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'tractography_subsampled.trk'))
     return files_dict

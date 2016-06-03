@@ -13,8 +13,8 @@ import AFQ.data as afd
 
 # Set the default set as a module-wide constant:
 AFQ_BUNDLES = ["ATR", "CGC", "CST",
-                #"FA", "FP",
-                "HCC", "IFO", "ILF",
+               # "FA", "FP",
+               "HCC", "IFO", "ILF",
                "SLF", "ARC", "UNC"]
 
 # Read in the standard templates:
@@ -71,12 +71,13 @@ def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES,
     fiber_groups = {}
     for hemi in ["R", "L"]:
         for bundle in bundles:
-            ROIs = [bundle + "_roi%s_"%(i+1) + hemi for i in range(2)]
+            ROIs = [bundle + "_roi%s_" % (i + 1) + hemi for i in range(2)]
             select_sl = xform_sl
             for ROI in ROIs:
                 data = templates[ROI].get_data()
-                warped_ROI = patch_up_roi(mapping.transform_inverse(data,
-                                                interpolation='nearest'))
+                warped_ROI = patch_up_roi(mapping.transform_inverse(
+                    data,
+                    interpolation='nearest'))
 
                 select_sl = dts.select_by_rois(select_sl,
                                                [warped_ROI.astype(bool)],

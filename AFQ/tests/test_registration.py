@@ -12,7 +12,7 @@ import dipy.core.gradients as dpg
 from AFQ.registration import (syn_registration, register_series, register_dwi,
                               c_of_mass, translation, rigid, affine,
                               streamline_registration, write_mapping,
-                              read_mapping, syn_register_dwi)
+                              read_mapping, syn_register_dwi, AffineMap)
 
 from dipy.tracking.utils import move_streamlines
 
@@ -68,6 +68,7 @@ def test_syn_registration():
 
 def test_syn_register_dwi():
     mapping = syn_register_dwi(subset_dwi_data, gtab, template=subset_t2_img)
+    npt.assert_equal(isinstance(mapping, AffineMap), True)
 
 
 def test_register_series():
