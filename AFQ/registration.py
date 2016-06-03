@@ -144,20 +144,26 @@ def write_mapping(mapping, fname):
     nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
 
 
-def read_mapping(fname, domain_img, codomain_img):
+def read_mapping(disp, domain_img, codomain_img):
     """
     Read a syn registration mapping from a nifti file
 
     Parameters
+    ----------
+    disp : str or Nifti1Image
+        A file of image containing the mapping displacement field in each voxel
+        Shape (x, y, z, 3, 2)
+
+    domain_img : str or Nifti1Image
+
+    codomain_img : str or Nifti1Image
 
     Returns
     -------
     A :class:`DiffeomorphicMap` object
-
-
     """
-
-    disp_image = nib.load(fname)
+    if isinstance(disp, str):
+        disp = nib.load(fname)
 
     if isinstance(domain_img, str):
         domain_img = nib.load(domain_img)
@@ -165,14 +171,14 @@ def read_mapping(fname, domain_img, codomain_img):
     if isinstance(codomain_img, str):
         codomain_img = nib.load(codomain_img)
 
-    mapping = DiffeomorphicMap(3, disp_image.shape[:3],
-                               disp_grid2world=np.linalg.inv(disp_image.affine),
+    mapping = DiffeomorphicMap(3, disp.shape[:3],
+                               disp_grid2world=np.linalg.inv(disp.affine),
                                domain_shape=domain_img.shape[:3],
                                domain_grid2world=domain_img.affine,
                                codomain_shape=codomain_img.shape,
                                codomain_grid2world=codomain_img.affine)
 
-    disp_data = disp_image.get_data()
+    disp_data = disp.get_data()
     mapping.forward = disp_data[..., 0]
     mapping.backward = disp_data[..., 1]
     mapping.is_inverse = True

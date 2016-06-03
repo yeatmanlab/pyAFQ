@@ -28,4 +28,5 @@ def test_segment():
     fiber_groups = seg.segment(hardi_fdata,
                                hardi_fbval,
                                hardi_fbvec,
-                               streamlines, mapping="stanford_hardi_mapping.nii.gz")
+                               streamlines,
+                               mapping=mapping)

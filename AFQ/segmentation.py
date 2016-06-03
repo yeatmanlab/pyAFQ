@@ -65,7 +65,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES,
         mapping = reg.syn_register_dwi(fdata, gtab, template=reg_template,
                                        **reg_kwargs)
 
-    if isinstance(mapping, str):
+    if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
 
     fiber_groups = {}
