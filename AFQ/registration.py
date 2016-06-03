@@ -163,7 +163,7 @@ def read_mapping(disp, domain_img, codomain_img):
     A :class:`DiffeomorphicMap` object
     """
     if isinstance(disp, str):
-        disp = nib.load(fname)
+        disp = nib.load(disp)
 
     if isinstance(domain_img, str):
         domain_img = nib.load(domain_img)
