@@ -3,8 +3,6 @@ from itertools import chain
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
-import AFQ.localtracking as dtl
-
 
 import dipy.data as dpd
 from dipy.align import Bunch
@@ -105,8 +103,6 @@ class ParallelLocalTracking(object):
         inv_A = np.linalg.inv(self.affine)
         self.lin = inv_A[:3, :3]
         self.offset = inv_A[:3, 3]
-        # Preallocate:
-        self.F = np.zeros((self.maxlen + 1, 3), dtype=float)
         # Parallelization:
         self.n_jobs = n_jobs
         self.backend = backend
@@ -126,10 +122,11 @@ class ParallelLocalTracking(object):
             # only the seed position
             return [s]
         directions = directions[:self.max_cross]
-        B = self.F.copy()
+        F = np.zeros((self.maxlen + 1, 3), dtype=float)
+        B = np.zeros((self.maxlen + 1, 3), dtype=float)
         streamlines = []
         for first_step in directions:
-            stepsF, tissue_class = local_tracker(self.direction_getter, self.tissue_classifier,s,first_step,self._voxel_size,self.F, self.step_size,self.fixed)
+            stepsF, tissue_class = local_tracker(self.direction_getter, self.tissue_classifier,s,first_step,self._voxel_size, F, self.step_size,self.fixed)
             if not (self.return_all or
                     tissue_class == TissueTypes.ENDPOINT or
                     tissue_class == TissueTypes.OUTSIDEIMAGE):
@@ -141,13 +138,12 @@ class ParallelLocalTracking(object):
                 continue
 
             if stepsB == 1:
-                streamlines.append(self.F[:stepsF].copy())
+                streamlines.append(F[:stepsF].copy())
             else:
-                parts = (B[stepsB-1:0:-1], self.F[:stepsF])
+                parts = (B[stepsB-1:0:-1], F[:stepsF])
                 streamlines.append(np.concatenate(parts, axis=0))
 
         return streamlines
-
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
