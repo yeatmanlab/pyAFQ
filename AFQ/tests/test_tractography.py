@@ -49,8 +49,8 @@ def test_csd_tracking():
                                         backend=backend)
                     npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
-            if directions == 'det':
-                npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
+                    if directions == 'det':
+                        npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
 
 
 def test_dti_tracking():
@@ -83,5 +83,5 @@ def test_dti_tracking():
                                     backend=backend)
                 npt.assert_equal(sl_parallel[0].shape[-1], 3)
 
-        if directions == 'det':
-            npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
+                if directions == 'det':
+                    npt.assert_almost_equal(sl_parallel[0], sl_serial[0])

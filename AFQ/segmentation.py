@@ -3,6 +3,7 @@ import scipy.ndimage as ndim
 
 import nibabel as nib
 
+import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 
@@ -44,20 +45,28 @@ def patch_up_roi(roi):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles=AFQ_BUNDLES,
-            templates=AFQ_TEMPLATES, mapping=None, as_generator=True):
+            templates=AFQ_TEMPLATES, reg_template=None, mapping=None,
+            as_generator=True, **reg_kwargs):
     """
 
     generate : bool
         Whether to generate the streamlines here, or return generators.
+
+    reg_template : template to use for registration (defaults to the MNI T2)
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
     xform_sl = [s for s in dtu.move_streamlines(streamlines,
                                                 np.linalg.inv(img.affine))]
+
+    if reg_template is None:
+        reg_template = dpd.read_mni_template()
+
     if mapping is None:
-        mapping = reg.syn_register_dwi(fdata, gtab)
+        mapping = reg.syn_register_dwi(fdata, gtab, template=reg_template,
+                                       **reg_kwargs)
 
     if isinstance(mapping, str):
-        mapping = reg.read_mapping(mapping)
+        mapping = reg.read_mapping(mapping, img, reg_template)
 
     fiber_groups = {}
     for hemi in ["R", "L"]:
