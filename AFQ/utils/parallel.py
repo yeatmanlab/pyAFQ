@@ -3,7 +3,7 @@ import multiprocessing
 import joblib
 import dask
 import dask.multiprocessing
-import time
+
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
            backend="threading", func_args=[], func_kwargs={}):
@@ -40,7 +40,7 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
     """
     if n_jobs == -1:
         n_jobs = multiprocessing.cpu_count()
-        n_jobs=n_jobs-1
+        n_jobs = n_jobs - 1
 
     if engine == "joblib":
         p = joblib.Parallel(n_jobs=n_jobs, backend=backend)

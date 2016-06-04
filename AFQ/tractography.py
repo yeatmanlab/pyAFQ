@@ -126,12 +126,26 @@ class ParallelLocalTracking(object):
         B = np.zeros((self.maxlen + 1, 3), dtype=float)
         streamlines = []
         for first_step in directions:
-            stepsF, tissue_class = local_tracker(self.direction_getter, self.tissue_classifier,s,first_step,self._voxel_size, F, self.step_size,self.fixed)
+            stepsF, tissue_class = local_tracker(self.direction_getter,
+                                                 self.tissue_classifier,
+                                                 s,
+                                                 first_step,
+                                                 self._voxel_size,
+                                                 F,
+                                                 self.step_size,
+                                                 self.fixed)
             if not (self.return_all or
                     tissue_class == TissueTypes.ENDPOINT or
                     tissue_class == TissueTypes.OUTSIDEIMAGE):
                 continue
-            stepsB, tissue_class = local_tracker(self.direction_getter, self.tissue_classifier, s, -first_step, self._voxel_size, B, self.step_size, self.fixed)
+            stepsB, tissue_class = local_tracker(self.direction_getter,
+                                                 self.tissue_classifier,
+                                                 s,
+                                                 -first_step,
+                                                 self._voxel_size,
+                                                 B,
+                                                 self.step_size,
+                                                 self.fixed)
             if not (self.return_all or
                     tissue_class == TissueTypes.ENDPOINT or
                     tissue_class == TissueTypes.OUTSIDEIMAGE):
@@ -140,7 +154,7 @@ class ParallelLocalTracking(object):
             if stepsB == 1:
                 streamlines.append(F[:stepsF].copy())
             else:
-                parts = (B[stepsB-1:0:-1], F[:stepsF])
+                parts = (B[stepsB - 1:0:-1], F[:stepsF])
                 streamlines.append(np.concatenate(parts, axis=0))
 
         return streamlines
@@ -229,7 +243,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
     if n_jobs == 1:
-        engine="serial"
+        engine = "serial"
 
     tracker = ParallelLocalTracking(dg,
                                     threshold_classifier,

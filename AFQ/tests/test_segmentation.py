@@ -1,5 +1,7 @@
 import os.path as op
 
+import numpy.testing as npt
+
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 
@@ -22,4 +24,5 @@ def test_segment():
                                hardi_fbvec,
                                streamlines,
                                mapping=mapping)
-    
+
+    npt.assert_equal(len(fiber_groups), 18)

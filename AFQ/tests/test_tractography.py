@@ -10,7 +10,7 @@ from AFQ.tractography import track
 from AFQ.utils.testing import make_tracking_data
 
 
-seeds = np.array([[-80., -120.,  -60.],
+seeds = np.array([[-80., -120., -60.],
                   [-81, -121, -61]])
 
 tmpdir = nbtmp.InTemporaryDirectory()
@@ -18,6 +18,7 @@ fbval = op.join(tmpdir.name, 'dti.bval')
 fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
 make_tracking_data(fbval, fbvec, fdata)
+
 
 def test_csd_tracking():
     for sh_order in [4, 8, 10]:
