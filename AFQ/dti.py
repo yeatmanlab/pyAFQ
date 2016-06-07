@@ -1,6 +1,5 @@
 import os
 import os.path as op
-import warnings
 
 import numpy as np
 import nibabel as nib
@@ -116,15 +115,13 @@ def tensor_odf(evals, evecs, sphere):
     Parameters
 
     """
-    lower = 4 * np.pi * np.sqrt(np.prod(evals, -1))
-    projection = np.dot(sphere.vertices, evecs)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        projection /= np.sqrt(evals)
-        odf = (vector_norm(projection) ** -3) / lower
-    # Zero evals are non-physical, we replace nans with zeros
-    any_zero = (evals == 0).any(-1)
-    odf = np.where(any_zero, 0, odf)
-    # Move odf to be on the last dimension
-    odf = np.rollaxis(odf, 0, odf.ndim)
+    odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
+    mask = np.where((evals[..., 0] > 0) &
+                    (evals[..., 1] > 0) &
+                    (evals[..., 2] > 0))
+
+    lower = 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
+    projection = np.dot(sphere.vertices, evecs[mask])
+    projection /= np.sqrt(evals[mask])
+    odf[mask] = ((vector_norm(projection) ** -3) / lower).T
     return odf

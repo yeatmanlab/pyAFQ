@@ -5,6 +5,8 @@ import boto3
 import nibabel as nib
 from dipy.data.fetcher import _make_fetcher
 
+from AFQ.utils.streamlines import read_trk
+
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
 baseurl = "https://ndownloader.figshare.com/files/"
@@ -243,3 +245,37 @@ def fetch_hcp(subjects):
             bucket.download_file(data_files[k], k)
 
     return data_files
+
+stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]
+stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
+                                      'f20854b4f710577c58bd01072cfb4de6']
+stanford_hardi_tractography_fnames = ['mapping.nii.gz',
+                                      'tractography_subsampled.trk']
+
+fetch_stanford_hardi_tractography = _make_fetcher(
+    "fetch_stanford_hardi_tractography",
+    op.join(afq_home,
+            'stanford_hardi_tractography'),
+    baseurl,
+    stanford_hardi_tractography_remote_fnames,
+    stanford_hardi_tractography_fnames,
+    md5_list=stanford_hardi_tractography_hashes,
+    doc="""Download Stanford HARDI tractography and mapping. For testing
+           purposes""")
+
+
+def read_stanford_hardi_tractograpy():
+    """
+
+    """
+    files, folder = fetch_stanford_hardi_tractography()
+    files_dict = {}
+    files_dict['mapping.nii.gz'] = nib.load(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'mapping.nii.gz'))
+    files_dict['tractography_subsampled.trk'] = read_trk(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'tractography_subsampled.trk'))
+    return files_dict

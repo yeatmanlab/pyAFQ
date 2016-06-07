@@ -6,7 +6,8 @@ import os.path as op
 import numpy as np
 import nibabel as nib
 from dipy.align.metrics import CCMetric, EMMetric, SSDMetric
-from dipy.align.imwarp import SymmetricDiffeomorphicRegistration
+from dipy.align.imwarp import (SymmetricDiffeomorphicRegistration,
+                               DiffeomorphicMap)
 
 from dipy.align.imaffine import (transform_centers_of_mass,
                                  AffineMap,
@@ -17,6 +18,8 @@ from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
                                    AffineTransform3D)
 
+import dipy.core.gradients as dpg
+import dipy.data as dpd
 from dipy.align.streamlinear import StreamlineLinearRegistration
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import move_streamlines
@@ -83,6 +86,103 @@ def syn_registration(moving, static,
 
     warped_moving = mapping.transform(moving)
     return warped_moving, mapping
+
+
+def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
+    """
+    Parameters
+    -----------
+    dwi : nifti image or str
+        Image containing DWI data, or full path to a nifti file with DWI.
+    gtab : GradientTable or list of strings
+        The gradients associated with the DWI data, or a string with [fbcal, ]
+    template : nifti image or str, optional
+
+    syn_kwargs : key-word arguments for :func:`syn_registration`
+
+    Returns
+    -------
+    DiffeomorphicMap object
+    """
+    if template is None:
+        template = dpd.read_mni_template()
+    if isinstance(template, str):
+        template = nib.load(template)
+
+    template_data = template.get_data()
+    template_affine = template.get_affine()
+
+    if isinstance(dwi, str):
+        dwi = nib.load(dwi)
+
+    if not isinstance(gtab, dpg.GradientTable):
+        gtab = dpg.gradient_table(*gtab)
+
+    dwi_affine = dwi.get_affine()
+    dwi_data = dwi.get_data()
+    mean_b0 = np.mean(dwi_data[..., gtab.b0s_mask], -1)
+    warped_b0, mapping = syn_registration(mean_b0, template_data,
+                                          moving_affine=dwi_affine,
+                                          static_affine=template_affine,
+                                          **syn_kwargs)
+    return mapping
+
+
+def write_mapping(mapping, fname):
+    """
+    Write out a syn registration mapping to file
+
+    Parameters
+    ----------
+    mapping : a DiffeomorphicMap object derived from :func:`syn_registration`
+    fname : str
+        Full path to the nifti file storing the mapping
+
+    """
+    mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
+    nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
+
+
+def read_mapping(disp, domain_img, codomain_img):
+    """
+    Read a syn registration mapping from a nifti file
+
+    Parameters
+    ----------
+    disp : str or Nifti1Image
+        A file of image containing the mapping displacement field in each voxel
+        Shape (x, y, z, 3, 2)
+
+    domain_img : str or Nifti1Image
+
+    codomain_img : str or Nifti1Image
+
+    Returns
+    -------
+    A :class:`DiffeomorphicMap` object
+    """
+    if isinstance(disp, str):
+        disp = nib.load(disp)
+
+    if isinstance(domain_img, str):
+        domain_img = nib.load(domain_img)
+
+    if isinstance(codomain_img, str):
+        codomain_img = nib.load(codomain_img)
+
+    mapping = DiffeomorphicMap(3, disp.shape[:3],
+                               disp_grid2world=np.linalg.inv(disp.affine),
+                               domain_shape=domain_img.shape[:3],
+                               domain_grid2world=domain_img.affine,
+                               codomain_shape=codomain_img.shape,
+                               codomain_grid2world=codomain_img.affine)
+
+    disp_data = disp.get_data()
+    mapping.forward = disp_data[..., 0]
+    mapping.backward = disp_data[..., 1]
+    mapping.is_inverse = True
+
+    return mapping
 
 
 def resample(moving, static, moving_affine, static_affine):

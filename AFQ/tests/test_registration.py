@@ -11,38 +11,64 @@ import dipy.core.gradients as dpg
 
 from AFQ.registration import (syn_registration, register_series, register_dwi,
                               c_of_mass, translation, rigid, affine,
-                              streamline_registration)
+                              streamline_registration, write_mapping,
+                              read_mapping, syn_register_dwi, DiffeomorphicMap)
 
 from dipy.tracking.utils import move_streamlines
 
 from AFQ.utils.streamlines import write_trk
 
+MNI_T2 = dpd.read_mni_template()
+hardi_img, gtab = dpd.read_stanford_hardi()
+MNI_T2_data = MNI_T2.get_data()
+MNI_T2_affine = MNI_T2.get_affine()
+hardi_data = hardi_img.get_data()
+hardi_affine = hardi_img.get_affine()
+b0 = hardi_data[..., gtab.b0s_mask]
+mean_b0 = np.mean(b0, -1)
+
+# We select some arbitrary chunk of data so this goes quicker:
+subset_b0 = mean_b0[40:50, 40:50, 40:50]
+subset_dwi_data = nib.Nifti1Image(hardi_data[40:50, 40:50, 40:50],
+                                  hardi_affine)
+subset_t2 = MNI_T2_data[40:60, 40:60, 40:60]
+subset_b0_img = nib.Nifti1Image(subset_b0, hardi_affine)
+subset_t2_img = nib.Nifti1Image(subset_t2, MNI_T2_affine)
+
 
 def test_syn_registration():
-    MNI_T2 = dpd.read_mni_template()
-    ni, gtab = dpd.read_stanford_hardi()
-    MNI_T2_data = MNI_T2.get_data()
-    MNI_T2_affine = MNI_T2.get_affine()
-    hardi_data = ni.get_data()
-    hardi_affine = ni.get_affine()
-    b0 = hardi_data[..., gtab.b0s_mask]
-    mean_b0 = np.mean(b0, -1)
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        warped_moving, mapping = syn_registration(subset_b0,
+                                                  subset_t2,
+                                                  moving_affine=hardi_affine,
+                                                  static_affine=MNI_T2_affine,
+                                                  step_length=0.1,
+                                                  metric='CC',
+                                                  dim=3,
+                                                  level_iters=[10, 10, 5],
+                                                  sigma_diff=2.0,
+                                                  prealign=None)
 
-    # We select some arbitrary chunk of data so this goes quicker:
-    subset_b0 = mean_b0[40:50, 40:50, 40:50]
-    subset_t2 = MNI_T2_data[40:60, 40:60, 40:60]
-    warped_moving, mapping = syn_registration(subset_b0,
-                                              subset_t2,
-                                              moving_affine=hardi_affine,
-                                              static_affine=MNI_T2_affine,
-                                              step_length=0.1,
-                                              metric='CC',
-                                              dim=3,
-                                              level_iters=[10, 10, 5],
-                                              sigma_diff=2.0,
-                                              prealign=None)
+        npt.assert_equal(warped_moving.shape, subset_t2.shape)
+        mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
+        write_mapping(mapping, mapping_fname)
+        file_mapping = read_mapping(mapping_fname,
+                                    subset_b0_img,
+                                    subset_t2_img)
 
-    npt.assert_equal(warped_moving.shape, subset_t2.shape)
+        # Test that it has the same effect on the data:
+        warped_from_file = file_mapping.transform(subset_b0)
+        npt.assert_equal(warped_from_file, warped_moving)
+
+        # Test that it is, attribute by attribute, identical:
+        for k in mapping.__dict__:
+            assert (np.all(mapping.__getattribute__(k) ==
+                           file_mapping.__getattribute__(k)))
+
+
+def test_syn_register_dwi():
+    mapping = syn_register_dwi(subset_dwi_data, gtab, template=subset_t2_img)
+    npt.assert_equal(isinstance(mapping, DiffeomorphicMap), True)
 
 
 def test_register_series():
