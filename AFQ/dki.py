@@ -18,7 +18,7 @@ if LooseVersion(dipy.__version__) < '0.12':
 
 
 def fit_dki(data_files, bval_files, bvec_files, mask=None,
-            min_kurtosis=-1, max_kurtosis=3, out_dir=None):
+            min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0):
     """
     Fit the DKI model, save files with derived maps
 
@@ -40,8 +40,10 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
         The maximal plausible value of kurtosis. Default: 3.
     out_dir : str, optional
         A full path to a directory to store the maps that get computed.
-        Default: maps get stored in the same directory as the last DWI file in
-        `data_files`.
+        Default: maps get stored in the same directory as the last DWI file
+        in `data_files`.
+    b0_threshold : float
+
 
     Returns
     -------
@@ -54,7 +56,9 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
 
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
-                                            bvec_files, mask=mask)
+                                            bvec_files, mask=mask,
+                                            b0_threshold=0)
+
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     dkifit = dkimodel.fit(data, mask=mask)
 
