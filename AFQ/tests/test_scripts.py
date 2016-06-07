@@ -47,7 +47,7 @@ def test_predict_dki():
         # Get expected values
         fparams = op.join(tmpdir, "dki_params.nii.gz")
         cmd2 = ["pyAFQ_dki_predict", "-p", fparams, "-l", fbval, "-c", fbvec,
-                "-o", tmpdir]
+                "-o", tmpdir, '-b', '0']
         out = runner.run_command(cmd2)
         npt.assert_equal(out[0], 0)
         pred = nib.load(op.join(tmpdir, "dki_prediction.nii.gz")).get_data()
@@ -62,7 +62,7 @@ def test_fit_dti():
         fdata = op.join(tmpdir, 'dti.nii.gz')
         make_dti_data(fbval, fbvec, fdata)
         cmd = ["pyAFQ_dti", "-d", fdata, "-l", fbval, "-c", fbvec,
-               "-o", tmpdir]
+               "-o", tmpdir, '-b', '0']
         out = runner.run_command(cmd)
         npt.assert_equal(out[0], 0)
         # Get expected values
@@ -88,7 +88,7 @@ def test_predict_dti():
         # Get expected values
         fparams = op.join(tmpdir, "dti_params.nii.gz")
         cmd2 = ["pyAFQ_dti_predict", "-p", fparams, "-l", fbval, "-c", fbvec,
-                "-o", tmpdir]
+                "-o", tmpdir, '-b', '0']
         out = runner.run_command(cmd2)
         npt.assert_equal(out[0], 0)
         pred = nib.load(op.join(tmpdir, "dti_prediction.nii.gz")).get_data()

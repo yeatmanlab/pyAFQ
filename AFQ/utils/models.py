@@ -3,7 +3,8 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 
 
-def prepare_data(data_files, bval_files, bvec_files, mask=None):
+def prepare_data(data_files, bval_files, bvec_files, mask=None,
+                 b0_threshold=0):
     """
     Parameters
     ----------
@@ -14,13 +15,18 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
         Equivalent to `data_files`.
     bvec_files : str or list
         Equivalent to `data_files`.
-    mask :
-    Returns
+    mask : str or Nifti1Image object
 
+    Returns
+    -------
+    img : Nifti1Image
+    data : ndarray
+    gtab : GradientTable
+    mask : ndarray
     """
     types = [type(f) for f in [data_files, bval_files, bvec_files]]
     if len(set(types)) > 1:
-        e_s = "Please provide consistent inputs to `fit_dti`. All file"
+        e_s = "Please provide consistent inputs to `prepare_data`. All file"
         e_s += " inputs should be either lists of full paths, or a string"
         e_s += " with one full path."
         raise ValueError(e_s)
@@ -32,7 +38,7 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
 
     # Load the mask if it is a string
     if isinstance(mask, str):
-        mask = nib.load(mask).get_data()
+        mask = nib.load(mask).get_data().astype(bool)
 
     data = []
     bvals = []
@@ -45,6 +51,7 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
 
     data = np.concatenate(data, -1)
     gtab = dpg.gradient_table(np.concatenate(bvals),
-                              np.concatenate(bvecs, -1))
+                              np.concatenate(bvecs, -1),
+                              b0_threshold=b0_threshold)
 
     return img, data, gtab, mask

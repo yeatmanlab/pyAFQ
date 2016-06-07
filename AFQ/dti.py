@@ -11,7 +11,7 @@ import AFQ.utils.models as ut
 
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
-            out_dir=None):
+            out_dir=None, b0_threshold=0):
     """
     Fit the DTI model using default settings, save files with derived maps
 
@@ -29,8 +29,9 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
         Default: Process all voxels.
     out_dir : str, optional
         A full path to a directory to store the maps that get computed.
-        Default: maps get stored in the same directory as the last DWI file in
-        `data_files`.
+        Default: maps get stored in the same directory as the last DWI file
+        in `data_files`.
+    b0_threshold : float
 
     Returns
     -------
@@ -43,7 +44,8 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
 
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
-                                            bvec_files, mask=mask)
+                                            bvec_files, mask=mask,
+                                            b0_threshold=b0_threshold)
     dtimodel = dti.TensorModel(gtab)
     dtifit = dtimodel.fit(data, mask=mask)
 
