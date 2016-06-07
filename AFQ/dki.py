@@ -57,7 +57,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
                                             bvec_files, mask=mask,
-                                            b0_threshold=0)
+                                            b0_threshold=b0_threshold)
 
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     dkifit = dkimodel.fit(data, mask=mask)
