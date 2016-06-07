@@ -53,8 +53,12 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     Maps that are calculated: FA, MD, AD, RD, MK, AK, RK
 
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
-                                            bvec_files, mask=mask)
+    img, data, gtab, mask, out_dir = ut.prepare_data(data_files,
+                                                     bval_files,
+                                                     bvec_files,
+                                                     mask=mask,
+                                                     out_dir=out_dir)
+
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     dkifit = dkimodel.fit(data, mask=mask)
 
@@ -69,9 +73,6 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
 
     maps = [FA, MD, AD, RD, MK, AK, RK, params]
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
-
-    if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)

@@ -1,9 +1,11 @@
+import os.path as op
 import numpy as np
 import nibabel as nib
 import dipy.core.gradients as dpg
 
 
-def prepare_data(data_files, bval_files, bvec_files, mask=None):
+def prepare_data(data_files, bval_files, bvec_files, mask=None,
+                 out_dir=None):
     """
     Parameters
     ----------
@@ -20,9 +22,9 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
     """
     types = [type(f) for f in [data_files, bval_files, bvec_files]]
     if len(set(types)) > 1:
-        e_s = "Please provide consistent inputs to `fit_dti`. All file"
-        e_s += " inputs should be either lists of full paths, or a string"
-        e_s += " with one full path."
+        e_s = "Please provide consistent inputs to `prepare_data`."
+        e_s += " All file inputs should be either lists of full paths, "
+        e_s += "or a string with one full path."
         raise ValueError(e_s)
 
     if isinstance(data_files, str):
@@ -47,4 +49,7 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None):
     gtab = dpg.gradient_table(np.concatenate(bvals),
                               np.concatenate(bvecs, -1))
 
-    return img, data, gtab, mask
+    if out_dir is None:
+        out_dir = op.split(data_files[0])
+
+    return img, data, gtab, mask, out_dir
