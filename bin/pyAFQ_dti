@@ -29,8 +29,10 @@ parser.add_option("-o", "--out_dir",
 
 parser.add_option("-m", "--mask", help="mask file")
 
-parser.add_option('-b', '--b0_threshold', help="b0 threshold", default=0)
+parser.add_option('-b', '--b0_threshold', help="b0 threshold",
+                  default=0, type=float)
+
 opts, args = parser.parse_args()
 
 dti.fit_dti(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
-            out_dir=opts.out_dir, b0_threshold=float(opts.b0_threshold))
+            out_dir=opts.out_dir, b0_threshold=opts.b0_threshold)
