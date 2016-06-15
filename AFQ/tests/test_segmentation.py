@@ -19,8 +19,11 @@ def test_segment():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     templates = afd.read_templates()
-    bundles = {'ARC_L':{'ROIs': [templates['SLF_roi1_L'],
-                                 templates['SLFt_roi2_L']],
+    bundles = {'CST_L':{'ROIs': [templates['CST_roi1_L'],
+                                 templates['CST_roi2_L']],
+                        'rules': [True, True]},
+               'CST_R':{'ROIs': [templates['CST_roi1_R'],
+                                 templates['CST_roi1_R']],
                         'rules': [True, True]}}
 
     fiber_groups = seg.segment(hardi_fdata,
@@ -29,6 +32,11 @@ def test_segment():
                                streamlines,
                                bundles,
                                mapping=mapping,
-                               as_generator=False)
+                               as_generator=True)
 
-    npt.assert_equal(len(fiber_groups), 1)
+    # We asked for 2 fiber groups:
+    npt.assert_equal(len(fiber_groups), 2)
+    # There happen to be 8 fibers in the right CST:
+    CST_R_sl = list(fiber_groups['CST_R'])
+    CST_L_sl = list(fiber_groups['CST_L'])
+    npt.assert_equal(len(CST_R_sl), 8)

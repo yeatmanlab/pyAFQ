@@ -1,8 +1,10 @@
 import numpy as np
 import scipy.ndimage as ndim
+from distutils.version import LooseVersion
 
 import nibabel as nib
 
+import dipy
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
@@ -11,6 +13,12 @@ import dipy.tracking.streamlinespeed as dps
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.data as afd
+import AFQ._fixes as fix
+
+if LooseVersion(dipy.__version__) < '0.12':
+    # Monkey patch the fix in:
+    dps.orient_by_rois = fix.orient_by_rois
+
 
 def patch_up_roi(roi):
     """
@@ -62,8 +70,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     fiber_groups = {}
     for bundle in bundles:
+        select_sl = xform_sl
         for ROI, rule in zip(bundles[bundle]['ROIs'], bundles[bundle]['rules']):
-            select_sl = xform_sl
             data = ROI.get_data()
             warped_ROI = patch_up_roi(mapping.transform_inverse(
                 data,
@@ -83,8 +91,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         orient_ROIs = [bundles[bundle]['ROIs'][idx[0][0]],
                        bundles[bundle]['ROIs'][idx[0][-1]]]
 
-        select_sl = dts.orient_by_rois(select_sl, orient_ROIs[0].get_data(),
-                                       orient_ROIs[1].get_data())
+        select_sl = dts.orient_by_rois(select_sl,
+                                       orient_ROIs[0].get_data(),
+                                       orient_ROIs[1].get_data(),
+                                       copy=False)
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
@@ -133,19 +143,19 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         return tract_profile
 
 
-def gaussian_weights(fgarray):
-    """
-    Let's considder calculating these weights within our fiber groups object so that this object carries the wweights with it
-    """
-    for node in range(fgarray.shape[1]):
-        # Grab all the coordinates at this node
-        n = fgarray[:,node]
-        # This should come back as a 3D covariance matrix with var(x), var(y),
-        # var(z) along the diagonal etc.
-        S = np.cov(n)
-        # Calculate the mean or median of this node as well
-        m = np.mean(n)
-        # Weights are the inverse of the Mahalanobis distance
-        for fn in range(fgarray.shape[0])
-            # calculate Mahalanobis for node on fiber[fn]
-            w[fn,node] = np.sqrt(np.dot((n[fn]-m).T,np.inv(S),n[fn]-m))
+# def gaussian_weights(fgarray):
+#     """
+#     Let's considder calculating these weights within our fiber groups object so that this object carries the wweights with it
+#     """
+#     for node in range(fgarray.shape[1]):
+#         # Grab all the coordinates at this node
+#         n = fgarray[:,node]
+#         # This should come back as a 3D covariance matrix with var(x), var(y),
+#         # var(z) along the diagonal etc.
+#         S = np.cov(n)
+#         # Calculate the mean or median of this node as well
+#         m = np.mean(n)
+#         # Weights are the inverse of the Mahalanobis distance
+#         for fn in range(fgarray.shape[0]):
+#             # calculate Mahalanobis for node on fiber[fn]
+#             w[fn,node] = np.sqrt(np.dot((n[fn]-m).T,np.inv(S),n[fn]-m))
