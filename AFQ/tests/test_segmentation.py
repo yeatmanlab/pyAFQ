@@ -18,11 +18,17 @@ def test_segment():
     file_dict = afd.read_stanford_hardi_tractograpy()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
+    templates = afd.read_templates()
+    bundles = {'ARC_L':{'ROIs': [templates['SLF_roi1_L'],
+                                 templates['SLFt_roi2_L']],
+                        'rules': [True, True]}}
 
     fiber_groups = seg.segment(hardi_fdata,
                                hardi_fbval,
                                hardi_fbvec,
                                streamlines,
-                               mapping=mapping)
+                               bundles,
+                               mapping=mapping,
+                               as_generator=False)
 
-    npt.assert_equal(len(fiber_groups), 18)
+    npt.assert_equal(len(fiber_groups), 1)
