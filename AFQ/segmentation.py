@@ -127,20 +127,14 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         fgarray = np.array(dps.set_number_of_points(streamlines, n_points))
 
     # ...and move them back to native space before indexing into the volume:
-    values = values_from_volume(img, fgarray, affine=affine)
+    values = dts.values_from_volume(img, fgarray, affine=affine)
 
     # We assume that weights *always sum to 1 across streamlines*:
     if weighting is None:
         w = np.ones(values.shape) / values.shape[0]
 
     tract_profile = np.sum(w * values, 0)
-
-    #tract_profile = np.mean(w * values, 0)
-
-    if weighting is not None:
-        return weights, tract_profile
-    else:
-        return tract_profile
+    return tract_profile
 
 
 # def gaussian_weights(fgarray):
