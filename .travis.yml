@@ -2,7 +2,7 @@ sudo: false
 
 env:
   global:
-    - CONDA_DEPS="pip flake8 pytest coverage dipy pandas joblib" PIP_DEPS="coveralls pytest-cov boto3 dask"
+    - CONDA_DEPS="pip flake8 pytest dipy pandas joblib" PIP_DEPS="coveralls pytest-cov boto3 dask"
 
 matrix:
   include:
