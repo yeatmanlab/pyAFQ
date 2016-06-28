@@ -1,5 +1,8 @@
+import types
+
 import numpy as np
 from scipy.special import lpmv, gammaln
+from scipy.spatial.distance import cdist
 
 import dipy.reconst.dki as dki
 

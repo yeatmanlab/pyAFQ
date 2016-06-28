@@ -17,7 +17,7 @@ import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
     # Monkey patch the fix in:
-    dps.orient_by_rois = fix.orient_by_rois
+    dts.orient_by_rois = fix.orient_by_rois
 
 
 def patch_up_roi(roi):
