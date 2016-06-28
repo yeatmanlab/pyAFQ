@@ -94,7 +94,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_sl = dts.orient_by_rois(select_sl,
                                        orient_ROIs[0].get_data(),
                                        orient_ROIs[1].get_data(),
-                                       copy=False)
+                                       in_place=True)
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
