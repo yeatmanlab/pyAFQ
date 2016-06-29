@@ -8,32 +8,33 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 
+import AFQ.data as afd
+
 
 def do_preprocessing():
     raise NotImplementedError
 
-#
-# # Set the default set as a module-wide constant:
-# BUNDLE_NAMES = ["ATR", "CGC", "CST",
-#                # "FA", "FP",
-#                "HCC", "IFO", "ILF",
-#                "SLF", "ARC", "UNC"]
-#
-# # Read in the standard templates:
-# AFQ_TEMPLATES = afd.read_templates()
-# # For the arcuate, we need to rename a few of these and duplicate the SLF
-# # ROI:
-# AFQ_TEMPLATES['ARC_roi1_L'] = AFQ_TEMPLATES['SLF_roi1_L']
-# AFQ_TEMPLATES['ARC_roi1_R'] = AFQ_TEMPLATES['SLF_roi1_R']
-# AFQ_TEMPLATES['ARC_roi2_L'] = AFQ_TEMPLATES['SLFt_roi2_L']
-# AFQ_TEMPLATES['ARC_roi2_R'] = AFQ_TEMPLATES['SLFt_roi2_R']
-#
-# #AFQ_BUNDLES = {'name': {'ROIs':[img, img], 'rules':[True, True]}}
-# AFQ_BUNDLES = {}
-#
-# for name in BUNDLE_NAMES:
-#     for hemi in ["R", "L"]:
-#         AFQ_BUNDLES[name] = [[r for r in AFQ_TEMPLATES[]]]
+
+templates = afd.read_templates()
+
+# Set the default set as a module-wide constant:
+bundle_names = ["ATR", "CGC", "CST",
+                # "FA", "FP",
+                "HCC", "IFO", "ILF",
+                "SLF", "ARC", "UNC"]
+
+# For the arcuate, we need to rename a few of these and duplicate the SLF ROI:
+templates['ARC_roi1_L'] = templates['SLF_roi1_L']
+templates['ARC_roi1_R'] = templates['SLF_roi1_R']
+templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
+templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
+
+AFQ_BUNDLES = {}
+for name in bundle_names:
+    for hemi in ['_R', '_L']:
+        AFQ_BUNDLES[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
+                                             templates[name + '_roi1' + hemi]],
+                                    'rules': [True, True]}
 
 
 class AFQ(object):

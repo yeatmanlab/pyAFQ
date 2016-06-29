@@ -118,7 +118,7 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
     """
     if isinstance(streamlines, list):
         # Resample each streamline to the same number of points
-        # list => array
+        # list => np.array
         # Setting the number of points should happen in a streamline template
         # space, rather than in the subject native space, but for now we do
         # everything as in the Matlab version -- in native space.
