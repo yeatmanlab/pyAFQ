@@ -1,9 +1,11 @@
 import types
+from copy import deepcopy
 
 import numpy as np
 from scipy.special import lpmv, gammaln
 from scipy.spatial.distance import cdist
 
+from nibabel.affines import apply_affine
 import dipy.reconst.dki as dki
 
 

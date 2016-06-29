@@ -12,7 +12,7 @@ from dipy.segment.mask import median_otsu
 def do_preprocessing():
     raise NotImplementedError
 
-# 
+#
 # # Set the default set as a module-wide constant:
 # BUNDLE_NAMES = ["ATR", "CGC", "CST",
 #                # "FA", "FP",
@@ -21,7 +21,8 @@ def do_preprocessing():
 #
 # # Read in the standard templates:
 # AFQ_TEMPLATES = afd.read_templates()
-# # For the arcuate, we need to rename a few of these and duplicate the SLF ROI:
+# # For the arcuate, we need to rename a few of these and duplicate the SLF
+# # ROI:
 # AFQ_TEMPLATES['ARC_roi1_L'] = AFQ_TEMPLATES['SLF_roi1_L']
 # AFQ_TEMPLATES['ARC_roi1_R'] = AFQ_TEMPLATES['SLF_roi1_R']
 # AFQ_TEMPLATES['ARC_roi2_L'] = AFQ_TEMPLATES['SLFt_roi2_L']

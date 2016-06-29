@@ -12,7 +12,6 @@ import dipy.tracking.streamlinespeed as dps
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
-import AFQ.data as afd
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -71,15 +70,16 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     fiber_groups = {}
     for bundle in bundles:
         select_sl = xform_sl
-        for ROI, rule in zip(bundles[bundle]['ROIs'], bundles[bundle]['rules']):
+        for ROI, rule in zip(bundles[bundle]['ROIs'],
+                             bundles[bundle]['rules']):
             data = ROI.get_data()
             warped_ROI = patch_up_roi(mapping.transform_inverse(
                 data,
                 interpolation='nearest'))
             # This function requires lists as inputs:
             select_sl = dts.select_by_rois(select_sl,
-                               [warped_ROI.astype(bool)],
-                               [rule])
+                                           [warped_ROI.astype(bool)],
+                                           [rule])
         # Next, we reorient each streamline according to an ARBITRARY, but
         # CONSISTENT order. To do this, we use the first ROI for which the rule
         # is True as the first one to pass through, and the last ROI for which
@@ -139,12 +139,14 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
 
 # def gaussian_weights(fgarray):
 #     """
-#     Let's considder calculating these weights within our fiber groups object so that this object carries the wweights with it
+#     Let's consider calculating these weights within our fiber groups object
+#     so that this object carries the wweights with it
 #     """
 #     for node in range(fgarray.shape[1]):
 #         # Grab all the coordinates at this node
 #         n = fgarray[:,node]
-#         # This should come back as a 3D covariance matrix with var(x), var(y),
+#         # This should come back as a 3D covariance matrix with
+#         # var(x), var(y),
 #         # var(z) along the diagonal etc.
 #         S = np.cov(n)
 #         # Calculate the mean or median of this node as well
