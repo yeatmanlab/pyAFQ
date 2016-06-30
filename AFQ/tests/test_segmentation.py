@@ -58,8 +58,8 @@ def test_gaussian_weights():
     bundle = np.array([np.array([x, y, z]).T + 1,
                        np.array([x, y, z]).T - 1])
     # In this case, all nodes receives an equal weight of 0.5:
-    #w = seg.gaussian_weights(bundle)
-    #npt.assert_equal(w, np.ones(bundle.shape[:-1]) * 0.5)
+    w = seg.gaussian_weights(bundle)
+    npt.assert_equal(w, np.ones(bundle.shape[:-1]) * 0.5)
 
     # Here, some nodes are twice as far from the mean as others
     bundle = np.array([np.array([x, y, z]).T + 2,
