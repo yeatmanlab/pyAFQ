@@ -45,9 +45,10 @@ def test_segment():
     npt.assert_equal(len(CST_R_sl), 8)
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
-                                    np.ones(nib.load(hardi_fdata).shape[:3]),
-                                    CST_R_sl)
+        np.ones(nib.load(hardi_fdata).shape[:3]),
+        CST_R_sl)
     npt.assert_equal(tract_profile, np.ones(100))
+
 
 def test_gaussian_weights():
     # Some bogus x,y,z coordinates
