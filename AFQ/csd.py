@@ -11,6 +11,8 @@ import AFQ.utils.models as ut
 from AFQ._fixes import spherical_harmonics
 shm.spherical_harmonics = spherical_harmonics
 
+__all__ = ["fit_csd"]
+
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
             sh_order=8, lambda_=1, tau=0.1, out_dir=None):

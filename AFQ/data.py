@@ -7,6 +7,11 @@ from dipy.data.fetcher import _make_fetcher
 
 from AFQ.utils.streamlines import read_trk
 
+__all__ = ["fetch_callosum_templates", "read_callosum_templates",
+           "fetch_templates", "read_templates", "fetch_hcp",
+           "fetch_stanford_hardi_tractography",
+           "read_stanford_hardi_tractography"]
+
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
 baseurl = "https://ndownloader.figshare.com/files/"

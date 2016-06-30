@@ -31,6 +31,11 @@ syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
                    'SSD': SSDMetric}
 
+__all__ = ["syn_registration", "syn_register_dwi", "write_mapping",
+           "read_mapping", "resample", "c_of_mass", "translation", "rigid",
+           "affine" "affine_registration", "register_series", "register_dwi",
+           "streamlines_registration"]
+
 
 def syn_registration(moving, static,
                      moving_affine=None,

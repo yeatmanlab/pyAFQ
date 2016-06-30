@@ -16,6 +16,8 @@ if LooseVersion(dipy.__version__) < '0.12':
     # Monkey patch the fix in:
     dki.dki_prediction = dki_prediction
 
+__all__ = ["fit_dki", "predict"]
+
 
 def fit_dki(data_files, bval_files, bvec_files, mask=None,
             min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0):

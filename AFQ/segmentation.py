@@ -21,6 +21,9 @@ if LooseVersion(dipy.__version__) < '0.12':
     dts.orient_by_rois = fix.orient_by_rois
 
 
+__all__ = ["patch_up_roi", "segment"]
+
+
 def patch_up_roi(roi):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
