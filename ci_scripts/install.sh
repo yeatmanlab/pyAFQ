@@ -24,11 +24,11 @@ popd
 
 # Configure the conda environment and put it in the path using the
 # provided versions
-conda create -n testenv --yes python=$PYTHON_VERSION pip nose \
-      numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION
+conda create -n testenv --yes python=$PYTHON_VERSION $CONDA_DEPS
 
 source activate testenv
 
+pip install $PIP_DEPS
 
 if [[ "$COVERAGE" == "true" ]]; then
     pip install coverage coveralls
