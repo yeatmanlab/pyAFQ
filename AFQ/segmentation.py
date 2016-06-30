@@ -1,6 +1,8 @@
+from distutils.version import LooseVersion
+
 import numpy as np
 import scipy.ndimage as ndim
-from distutils.version import LooseVersion
+from scipy.spatial.distance import mahalanobis
 
 import nibabel as nib
 
@@ -104,7 +106,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
 
 def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
-                            weighting=None):
+                            weights=None):
     """
 
     Parameters
@@ -113,7 +115,10 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
 
     streamlines : list of arrays, or array
 
-    weighting : 1D array or 2D array (optional)
+    weights : 1D array or 2D array (optional)
+        Weight each streamline (1D) or each node (2D) when calculating the
+        tract-profiles. Must sum to 1 across streamlines (in each node if
+        relevant).
 
     """
     if isinstance(streamlines, list):
@@ -130,28 +135,54 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
     values = dts.values_from_volume(img, fgarray, affine=affine)
 
     # We assume that weights *always sum to 1 across streamlines*:
-    if weighting is None:
-        w = np.ones(values.shape) / values.shape[0]
+    if weights is None:
+        weights = np.ones(values.shape) / values.shape[0]
 
-    tract_profile = np.sum(w * values, 0)
+    tract_profile = np.sum(weights * values, 0)
     return tract_profile
 
 
-# def gaussian_weights(fgarray):
-#     """
-#     Let's consider calculating these weights within our fiber groups object
-#     so that this object carries the wweights with it
-#     """
-#     for node in range(fgarray.shape[1]):
-#         # Grab all the coordinates at this node
-#         n = fgarray[:,node]
-#         # This should come back as a 3D covariance matrix with
-#         # var(x), var(y),
-#         # var(z) along the diagonal etc.
-#         S = np.cov(n)
-#         # Calculate the mean or median of this node as well
-#         m = np.mean(n)
-#         # Weights are the inverse of the Mahalanobis distance
-#         for fn in range(fgarray.shape[0]):
-#             # calculate Mahalanobis for node on fiber[fn]
-#             w[fn,node] = np.sqrt(np.dot((n[fn]-m).T,np.inv(S),n[fn]-m))
+def gaussian_weights(bundle, n_points=100):
+    """
+    Calculate weights for each streamline/node in a bundle, based on a
+    Mahalanobis distance from the mean of the bundle, at that node
+
+    Parameters
+    ----------
+    bundle : array or list
+        If this is a list, assume that it is a list of streamline coordinates
+        (each entry is a 2D array, of shape n by 3). If this is an array, this
+        is a resampled version of the streamlines, with equal number of points
+        in each streamline.
+    n_points : int, optional
+        The number of points to resample to. *If the `bundle` is an array, this
+        input is ignored*. Default: 100.
+
+    Returns
+    -------
+    w : array of shape (n_streamlines, n_points)
+        Weights for each node in each streamline, calculated as its relative
+        Mahalanobis distance, relative to the distribution of coordinates at
+        that node position across streamlines.
+    """
+    if isinstance(bundle, list):
+        # if you got a list, assume that it needs to be resampled:
+        bundle = np.array(dps.set_number_of_points(bundle, n_points))
+    else:
+        n_points = bundle.shape[-1]
+
+    w = np.zeros((bundle.shape[0], n_points))
+    for node in range(bundle.shape[1]):
+        # This should come back as a 3D covariance matrix with the spatial
+        # variance covariance of this node across the different streamlines
+        # This is a 3-by-3 array:
+        node_coords = bundle[:, node]
+        c = np.cov(node_coords.T)
+        # Calculate the mean or median of this node as well
+        m = np.mean(node_coords, 0)
+        # Weights are the inverse of the Mahalanobis distance
+        for fn in range(bundle.shape[0]):
+            # calculate Mahalanobis for node on fiber[fn]
+            w[fn, node] = mahalanobis(node_coords[fn], m, c)
+    # Normalize before returning:
+    return w / np.sum(w, 0)
