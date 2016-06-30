@@ -24,8 +24,7 @@ opts = dict(name=NAME,
             author_email=AUTHOR_EMAIL,
             platforms=PLATFORMS,
             version=VERSION,
-            packages=PACKAGES,
-            package_data=find_packages(),
+            packages=find_packages(),
             requires=REQUIRES,
             scripts=SCRIPTS)
 
