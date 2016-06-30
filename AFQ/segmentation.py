@@ -180,12 +180,16 @@ def gaussian_weights(bundle, n_points=100):
         # variance covariance of this node across the different streamlines
         # This is a 3-by-3 array:
         node_coords = bundle[:, node]
-        c = np.cov(node_coords.T)
+        c = np.cov(node_coords.T, ddof=0)
         # Calculate the mean or median of this node as well
+        # delta = node_coords - np.mean(node_coords, 0)
         m = np.mean(node_coords, 0)
         # Weights are the inverse of the Mahalanobis distance
         for fn in range(bundle.shape[0]):
             # calculate Mahalanobis for node on fiber[fn]
             w[fn, node] = mahalanobis(node_coords[fn], m, c)
-    # Normalize before returning:
+    # weighting is inverse to the distance (the further you are, the less you
+    # should be weighted)
+    w = 1 / w
+    # Normalize before returning, so that the weights in each node sum to 1:
     return w / np.sum(w, 0)
