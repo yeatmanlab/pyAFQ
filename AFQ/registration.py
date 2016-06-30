@@ -33,8 +33,8 @@ syn_metric_dict = {'CC': CCMetric,
 
 __all__ = ["syn_registration", "syn_register_dwi", "write_mapping",
            "read_mapping", "resample", "c_of_mass", "translation", "rigid",
-           "affine" "affine_registration", "register_series", "register_dwi",
-           "streamlines_registration"]
+           "affine", "affine_registration", "register_series", "register_dwi",
+           "streamline_registration"]
 
 
 def syn_registration(moving, static,
