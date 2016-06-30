@@ -1,30 +1,25 @@
-.. project-template documentation master file, created by
-   sphinx-quickstart on Mon Jan 18 14:44:12 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to sklearn-template's documentation!
-============================================
+AFQ: Automated Fiber Quantification
+=====================================================
 
-This project is a reference implementation to anyone who wishes to develop
-scikit-learn compatible classes. It comes with a `template` module which
-contains a single estimator with unit tests.
+As described in Yeatman2012_.
 
+.. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman, "Tract profiles of white matter properties: automating fiber-tract quantification", PloS One, 7: e49790
 
     .. toctree::
        :maxdepth: 2
 
-       api
+       installation_guide
        auto_examples/index
-       ...
-
-See the `README <https://github.com/vighneshbirodkar/project-template/blob/master/README.md>`_
-for more information.
+       reference/index
 
 
-Indices and tables
-==================
+.. figure:: _static/eScience_Logo_HR.png
+   :align: center
+   :figclass: align-center
+   :target: http://escience.washington.edu
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   Acknowledgements: this work was supported by a grant from the
+   `Gordon & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
+   `Alfred P. Sloan Foundation <http://www.sloan.org/>`_ to the
+   `University of Washington eScience Institute <http://escience.washington.edu/>`_.

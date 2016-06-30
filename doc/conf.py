@@ -46,8 +46,8 @@ extensions = [
     'sphinx.ext.pngmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx_gallery.gen_gallery'
-
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.autosummary'
 ]
 
 sphinx_gallery_conf = {
@@ -72,8 +72,8 @@ plot_gallery = True
 master_doc = 'index'
 
 # General information about the project.
-project = u'sklearn-template'
-copyright = u'2016, Vighnesh Birodkar'
+project = u'AFQ'
+copyright = u'2016, Ariel Rokem and Jason Yeatman, The University of Washington eScience Institute'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -205,7 +205,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'project-templatedoc'
+htmlhelp_basename = 'AFQ-doc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -225,8 +225,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'project-template.tex', u'project-template Documentation',
-   u'Vighnesh Birodkar', 'manual'),
+  ('index', 'AFQ.tex', u'Automated Fiber Quantification: Documentation',
+   u'Ariel Rokem', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -255,8 +255,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'project-template', u'project-template Documentation',
-     [u'Vighnesh Birodkar'], 1)
+    ('index', 'AFQ', u'CAutomated Fiber Quantification: Documentation',
+     [u'Ariel Rokem'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -269,8 +269,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'project-template', u'project-template Documentation',
-   u'Vighnesh Birodkar', 'project-template', 'One line description of project.',
+  ('index', 'AFQ', u'AFQ Documentation',
+   u'Ariel Rokem', 'AFQ', 'Automated Fiber Quantification',
    'Miscellaneous'),
 ]
 
@@ -283,9 +283,28 @@ def generate_example_rst(app, what, name, obj, options, lines):
         # touch file
         open(examples_path, 'w').close()
 
+currentdir = os.path.abspath(os.path.dirname(__file__))
+ver_file = os.path.join(currentdir, '..', project, 'version.py')
+with open(ver_file) as f:
+    exec(f.read())
+source_version = __version__
+
+
+currentdir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(currentdir, 'tools'))
+import buildmodref
+
+# autogenerate api documentation
+# (see https://github.com/rtfd/readthedocs.org/issues/1139)
+
+def generateapidoc(_):
+    output_path = os.path.join(currentdir, 'reference')
+    buildmodref.writeapi(project, output_path, source_version, True)
+
 
 def setup(app):
     app.connect('autodoc-process-docstring', generate_example_rst)
+    app.connect('builder-inited', generateapidoc)
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
@@ -301,4 +320,5 @@ def setup(app):
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'http://docs.python.org/': None,
+                       'http://scikit-learn.org/stable/': None}
