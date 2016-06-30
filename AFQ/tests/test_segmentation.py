@@ -43,6 +43,7 @@ def test_segment():
     # There happen to be 8 fibers in the right CST:
     CST_R_sl = list(fiber_groups['CST_R'])
     npt.assert_equal(len(CST_R_sl), 8)
+    # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
                                     np.ones(nib.load(hardi_fdata).shape[:3]),
                                     CST_R_sl)
