@@ -14,7 +14,7 @@
 
 import sys
 import os
-
+from distutils.version import LooseVersion
 import sphinx_rtd_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -287,7 +287,8 @@ currentdir = os.path.abspath(os.path.dirname(__file__))
 ver_file = os.path.join(currentdir, '..', project, 'version.py')
 with open(ver_file) as f:
     exec(f.read())
-source_version = __version__
+
+source_version = LooseVersion(__version__)
 
 
 currentdir = os.path.abspath(os.path.dirname(__file__))

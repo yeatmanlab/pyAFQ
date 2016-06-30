@@ -39,7 +39,7 @@ class ApiDocWriter(object):
                  rst_extension='.txt',
                  package_skip_patterns=None,
                  module_skip_patterns=None,
-                 other_defines = True
+                 other_defines=True
                  ):
         ''' Initialize package for parsing
 

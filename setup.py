@@ -1,3 +1,5 @@
+from setuptools import find_packages
+
 import os
 try:
     from setuptools import setup
@@ -23,7 +25,7 @@ opts = dict(name=NAME,
             platforms=PLATFORMS,
             version=VERSION,
             packages=PACKAGES,
-            package_data=PACKAGE_DATA,
+            package_data=find_packages(),
             requires=REQUIRES,
             scripts=SCRIPTS)
 

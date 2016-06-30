@@ -1,4 +1,3 @@
-from setuptools import find_packages
 import os.path as op
 import glob
 
@@ -63,7 +62,5 @@ MAJOR = _version_major
 MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
-PACKAGES = find_packages()
-PACKAGE_DATA = {'AFQ': [op.join('data', '*')]}
 REQUIRES = ["numpy", "scipy", "dipy", "boto3"]
 SCRIPTS = [op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')]
