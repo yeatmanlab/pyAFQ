@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 import numpy.testing as npt
 
+import nibabel as nib
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 
@@ -42,7 +43,10 @@ def test_segment():
     # There happen to be 8 fibers in the right CST:
     CST_R_sl = list(fiber_groups['CST_R'])
     npt.assert_equal(len(CST_R_sl), 8)
-
+    tract_profile = seg.calculate_tract_profile(
+                                    np.ones(nib.load(hardi_fdata).shape[:3]),
+                                    CST_R_sl)
+    npt.assert_equal(tract_profile, np.ones(100))
 
 def test_gaussian_weights():
     # Some bogus x,y,z coordinates

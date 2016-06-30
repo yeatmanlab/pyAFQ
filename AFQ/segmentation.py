@@ -130,7 +130,8 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         # In the future, an SLR object can be passed here, and then it would
         # move these streamlines into the template space before resampling...
         fgarray = np.array(dps.set_number_of_points(streamlines, n_points))
-
+    else:
+        fgarray = streamlines
     # ...and move them back to native space before indexing into the volume:
     values = dts.values_from_volume(img, fgarray, affine=affine)
 
