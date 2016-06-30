@@ -8,9 +8,33 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 
+import AFQ.data as afd
+
 
 def do_preprocessing():
     raise NotImplementedError
+
+
+templates = afd.read_templates()
+
+# Set the default set as a module-wide constant:
+bundle_names = ["ATR", "CGC", "CST",
+                # "FA", "FP",
+                "HCC", "IFO", "ILF",
+                "SLF", "ARC", "UNC"]
+
+# For the arcuate, we need to rename a few of these and duplicate the SLF ROI:
+templates['ARC_roi1_L'] = templates['SLF_roi1_L']
+templates['ARC_roi1_R'] = templates['SLF_roi1_R']
+templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
+templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
+
+AFQ_BUNDLES = {}
+for name in bundle_names:
+    for hemi in ['_R', '_L']:
+        AFQ_BUNDLES[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
+                                             templates[name + '_roi1' + hemi]],
+                                    'rules': [True, True]}
 
 
 class AFQ(object):
