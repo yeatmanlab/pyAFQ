@@ -269,7 +269,7 @@ fetch_stanford_hardi_tractography = _make_fetcher(
            purposes""")
 
 
-def read_stanford_hardi_tractograpy():
+def read_stanford_hardi_tractography():
     """
 
     """
