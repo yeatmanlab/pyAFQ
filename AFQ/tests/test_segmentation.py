@@ -1,5 +1,6 @@
 import os.path as op
 
+import numpy as np
 import numpy.testing as npt
 
 import dipy.data as dpd
@@ -39,3 +40,21 @@ def test_segment():
     # There happen to be 8 fibers in the right CST:
     CST_R_sl = list(fiber_groups['CST_R'])
     npt.assert_equal(len(CST_R_sl), 8)
+
+
+def test_gaussian_weights():
+    # Some bogus x,y,z coordinates
+    x = np.arange(10)
+    y = np.arange(10)
+    z = np.arange(10)
+    # This has the wrong shape (2, 3, 10):
+    bundle = np.array([[x, y, z], [x, y, z]])
+    npt.assert_raises(ValueError, seg.gaussian_weights, bundle)
+    # Reallocate with the right shape. This time, we're going to create a
+    # distribution for which we can predict the weights we would expect
+    # to get:
+    bundle = np.array([np.array([x, y, z]).T + 1,
+                       np.array([x, y, z]).T - 1])
+    # In this case, all nodes receives an equal weight of 0.5:
+    w = seg.gaussian_weights(bundle)
+    npt.assert_equal(w, np.ones(bundle.shape[:-1]) * 0.5)

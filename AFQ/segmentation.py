@@ -162,14 +162,17 @@ def gaussian_weights(bundle, n_points=100):
     -------
     w : array of shape (n_streamlines, n_points)
         Weights for each node in each streamline, calculated as its relative
-        Mahalanobis distance, relative to the distribution of coordinates at
-        that node position across streamlines.
+        inverse of the Mahalanobis distance, relative to the distribution of
+        coordinates at that node position across streamlines.
     """
     if isinstance(bundle, list):
         # if you got a list, assume that it needs to be resampled:
         bundle = np.array(dps.set_number_of_points(bundle, n_points))
     else:
-        n_points = bundle.shape[-1]
+        if bundle.shape[-1] != 3:
+            e_s = "Input must be shape (n_streamlines, n_points, 3)"
+            raise ValueError(e_s)
+        n_points = bundle.shape[1]
 
     w = np.zeros((bundle.shape[0], n_points))
     for node in range(bundle.shape[1]):
