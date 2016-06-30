@@ -1,62 +1,25 @@
-sudo: false
-
-env:
-  global:
-    - CONDA_DEPS="pip flake8 pytest coverage dipy pandas joblib dask" PIP_DEPS="coveralls pytest-cov boto3"
-
-matrix:
-  include:
-    - os: osx
-      env:
-         - PYTHON_VERSION=2.7
-         - MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh"
-    - os: osx
-      env:
-         - PYTHON_VERSION=3.5
-         - MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh"
-    - os: linux
-      env:
-         - PYTHON_VERSION=2.7
-         - MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh"
-    - os: linux
-      env:
-         - PYTHON_VERSION=3.5
-         - MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh"
-
-before_install:
-  - export MINICONDA=$HOME/miniconda
-  - export PATH="$MINICONDA/bin:$PATH"
-  - hash -r
-  - echo $MINICONDA_URL
-  - wget $MINICONDA_URL -O miniconda.sh;
-  - bash miniconda.sh -b -f -p $MINICONDA;
-  - conda config --set always_yes yes
-  - conda update conda
-  - conda info -a
-  - conda config --add channels conda-forge
-  - conda install python=$PYTHON_VERSION $CONDA_DEPS
-  - pip install $PIP_DEPS
-
-install:
-- python setup.py install --record installed_files.txt
-
-script:
-- flake8 --ignore N802,N806 `find . -name \*.py | grep -v setup.py | grep -v /doc/`
-
-- mkdir for_test
-- cd for_test
-- py.test --pyargs AFQ --cov-report term-missing --cov=AFQ
-
-after_success:
-- coveralls
-
-before_cache:
-# clean unused packages & installed files from conda cache
-# this makes the cache rebuilt less frequently
-- conda clean --tarballs --packages --index-cache
-- rm -rf $HOME/miniconda/pkgs/cache
-- xargs rm <installed_files.txt
+language: python
 
 cache:
+  apt: true
+  # We use three different cache directory
+  # to work around a Travis bug with multi-platform cache
   directories:
-    - $HOME/miniconda
+  - $HOME/.cache/pip
+  - $HOME/download
+env:
+  global:
+    # Directory where tests are run from
+    - TEST_DIR=/tmp/test_dir/
+    - MODULE=AFQ
+  matrix:
+    - DISTRIB="conda" PYTHON_VERSION="2.7"
+      NUMPY_VERSION="1.6.2" SCIPY_VERSION="0.11.0" CYTHON_VERSION="0.21"
+    - DISTRIB="conda" PYTHON_VERSION="3.5" COVERAGE="true"
+      NUMPY_VERSION="1.10.4" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
+
+install: source ci_scripts/install.sh
+script:
+  - flake8 --ignore N802,N806 `find . -name \*.py | grep -v setup.py | grep -v /doc/`
+  - bash ci_scripts/test.sh
+after_success: source ci_scripts/success.sh
