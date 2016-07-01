@@ -45,39 +45,38 @@ def make_bundles(bundle_names=["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO",
 
 class AFQ(object):
     """
-    Requires the following file structure:
+    Requires the following file structure in your study folder::
 
-        study_folder/
-            |- sub-01/
-                |- sess-test/
-                    |- anat/
-                        |- T1w.nii.gz
-                    |- dwi/
-                        |- dwi.nii.gz
-                        |- dwi.bvals
-                        |- dwi.bvecs
-                |- sess-retest/
-                    |- anat/
-                        |- T1w.nii.gz
-                    |- dwi/
-                        |- dwi.nii.gz
-                        |- dwi.bvals
-                        |- dwi.bvecs
-            |- sub-02/
-                |- sess-test/
-                    |- anat/
-                        |- T1w.nii.gz
-                    |- dwi/
-                        |- dwi.nii.gz
-                        |- dwi.bvals
-                        |- dwi.bvecs
-                |- sess-retest/
-                    |- anat/
-                        |- T1w.nii.gz
-                    |- dwi/
-                        |- dwi.nii.gz
-                        |- dwi.bvals
-                        |- dwi.bvecs
+        ├── sub01
+        │   ├── sess02
+        │   │   ├── anat
+        │   │   │   └── T1.nii.gz
+        │   │   └── dwi
+        │   │       ├── dwi.bvals
+        │   │       ├── dwi.bvecs
+        │   │       └── dwi.nii.gz
+        │   └── sess02
+        │       ├── anat
+        │       │   └── T1w.nii.gz
+        │       └── dwi
+        │           ├── dwi.bvals
+        │           ├── dwi.bvecs
+        │           └── dwi.nii.gz
+        └── sub02
+            ├── sess02
+            │   ├── anat
+            │   │   └── T1w.nii.gz
+            │   └── dwi
+            │       ├── dwi.bvals
+            │       ├── dwi.bvecs
+            │       └── dwi.nii.gz
+            └── sess02
+                ├── anat
+                │   └── T1w.nii.gz
+                └── dwi
+                    ├── dwi.bvals
+                    ├── dwi.bvecs
+                    └── dwi.nii.gz
 
 
     All subjects'/sessions' dwi_prefix needs to be the same!
