@@ -9,6 +9,8 @@ from dipy.reconst import dti
 
 import AFQ.utils.models as ut
 
+__all__ = ["fit_dti", "predict", "tensor_odf"]
+
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
             out_dir=None, b0_threshold=0):
@@ -115,7 +117,13 @@ def tensor_odf(evals, evecs, sphere):
     Calculate the tensor Orientation Distribution Function
 
     Parameters
-
+    ----------
+    evals : array (4D)
+        Eigenvalues of a tensor. Shape (x, y, z, 3).
+    evecs : array (5D)
+        Eigenvectors of a tensor. Shape (x, y, z, 3, 3)
+    sphere : sphere object
+        The ODF will be calculated in each vertex of this sphere.
     """
     odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
     mask = np.where((evals[..., 0] > 0) &

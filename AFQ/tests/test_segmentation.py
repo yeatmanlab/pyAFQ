@@ -19,7 +19,7 @@ def test_segment():
     hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
     hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
     hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
-    file_dict = afd.read_stanford_hardi_tractograpy()
+    file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     templates = afd.read_templates()
