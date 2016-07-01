@@ -11,7 +11,7 @@ profiles for FA (calculated with DTI).
 
 import os.path as op
 import matplotlib.pyplot as plt
-import seaborn as sns  # noqa   # Importing seaborn is sufficient
+import seaborn as sns  # Importing seaborn is sufficient to style the plots
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
