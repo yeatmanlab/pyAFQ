@@ -30,6 +30,7 @@ TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 __all__ = ["ParallelLocalTracking", "track"]
 
+
 class ParallelLocalTracking(object):
     """A streamline generator for local tracking methods"""
 
