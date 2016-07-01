@@ -3,8 +3,9 @@
 Plotting a tract profile
 ==========================
 
-An example of tracking and segmenting two tracts, and plotting`their tract
+An example of tracking and segmenting two tracts, and plotting their tract
 profiles for FA (calculated with DTI).
+
 """
 
 
