@@ -1,6 +1,6 @@
 """
 ==========================
-Plotting a tract profile
+Plotting tract profiles
 ==========================
 
 An example of tracking and segmenting two tracts, and plotting their tract
