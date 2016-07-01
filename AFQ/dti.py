@@ -12,8 +12,15 @@ import AFQ.utils.models as ut
 __all__ = ["fit_dti", "predict", "tensor_odf"]
 
 
+def _fit(gtab, data, mask=None):
+    dtimodel = dti.TensorModel(gtab)
+    dtifit = dtimodel.fit(data, mask=mask)
+    return (dtifit, dtifit.fa, dtifit.md, dtifit.ad, dtifit.rd,
+            dtifit.model_params)
+
+
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
-            out_dir=None, b0_threshold=0):
+            out_dir=None, file_prefix=None, b0_threshold=0):
     """
     Fit the DTI model using default settings, save files with derived maps
 
@@ -43,33 +50,28 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     Note
     ----
     Maps that are calculated: FA, MD, AD, RD
-
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
                                             bvec_files, mask=mask,
                                             b0_threshold=b0_threshold)
-    dtimodel = dti.TensorModel(gtab)
-    dtifit = dtimodel.fit(data, mask=mask)
 
-    FA = dtifit.fa
-    MD = dtifit.md
-    AD = dtifit.ad
-    RD = dtifit.rd
-    params = dtifit.model_params
+    # In this case, we dump the fit object
+    _, FA, MD, AD, RD, params = _fit(gtab, data, mask=None)
 
     maps = [FA, MD, AD, RD, params]
     names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
         out_dir = op.join(op.split(data_files)[0], 'dti')
-
+    if file_prefix is None:
+        file_prefix = ''
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
     aff = img.get_affine()
     file_paths = {}
     for m, n in zip(maps, names):
-        file_paths[n] = op.join(out_dir, 'dti_%s.nii.gz' % n)
+        file_paths[n] = op.join(out_dir, file_prefix + 'dti_%s.nii.gz' % n)
         nib.save(nib.Nifti1Image(m, aff), file_paths[n])
 
     return file_paths

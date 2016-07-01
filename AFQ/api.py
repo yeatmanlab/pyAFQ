@@ -15,39 +15,69 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-templates = afd.read_templates()
+def make_bundles(bundle_names=["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO",
+                               "ILF", "SLF", "ARC", "UNC"]):
+    """
+    Create a bundle dictionary, needed for the segmentation
 
-# Set the default set as a module-wide constant:
-bundle_names = ["ATR", "CGC", "CST",
-                # "FA", "FP",
-                "HCC", "IFO", "ILF",
-                "SLF", "ARC", "UNC"]
+    Parameters
+    ----------
+    bundle_names : list, optional
+        A list of the bundles to be used in this case. Default: all of them
+    """
+    templates = afd.read_templates()
+    # For the arcuate, we need to rename a few of these and duplicate the SLF
+    # ROI:
+    templates['ARC_roi1_L'] = templates['SLF_roi1_L']
+    templates['ARC_roi1_R'] = templates['SLF_roi1_R']
+    templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
+    templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
 
-# For the arcuate, we need to rename a few of these and duplicate the SLF ROI:
-templates['ARC_roi1_L'] = templates['SLF_roi1_L']
-templates['ARC_roi1_R'] = templates['SLF_roi1_R']
-templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
-templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
-
-AFQ_BUNDLES = {}
-for name in bundle_names:
-    for hemi in ['_R', '_L']:
-        AFQ_BUNDLES[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
-                                             templates[name + '_roi1' + hemi]],
-                                    'rules': [True, True]}
+    afq_bundles = {}
+    for name in bundle_names:
+        for hemi in ['_R', '_L']:
+            afq_bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' +
+                                                           hemi],
+                                                 templates[name + '_roi1' +
+                                                           hemi]],
+                                        'rules': [True, True]}
 
 
 class AFQ(object):
     """
     Requires the following file structure:
 
-    study_folder/
-                sub-01
-                sub-02/sess-test
-                sub-02/sess-retest/anat/T1w.nii.gz
-                sub-02/sess-retest/dwi/dwi.nii.gz
-                sub-02/sess-retest/dwi/dwi.bvals
-                sub-02/sess-retest/dwi/dwi.bvecs
+        study_folder/
+            |- sub-01/
+                |- sess-test/
+                    |- anat/
+                        |- T1w.nii.gz
+                    |- dwi/
+                        |- dwi.nii.gz
+                        |- dwi.bvals
+                        |- dwi.bvecs
+                |- sess-retest/
+                    |- anat/
+                        |- T1w.nii.gz
+                    |- dwi/
+                        |- dwi.nii.gz
+                        |- dwi.bvals
+                        |- dwi.bvecs
+            |- sub-02/
+                |- sess-test/
+                    |- anat/
+                        |- T1w.nii.gz
+                    |- dwi/
+                        |- dwi.nii.gz
+                        |- dwi.bvals
+                        |- dwi.bvecs
+                |- sess-retest/
+                    |- anat/
+                        |- T1w.nii.gz
+                    |- dwi/
+                        |- dwi.nii.gz
+                        |- dwi.bvals
+                        |- dwi.bvecs
 
 
     All subjects'/sessions' dwi_prefix needs to be the same!
@@ -140,20 +170,40 @@ class AFQ(object):
 
     def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
                          vol_idx=None, dilate=None, force_recompute=False):
-            self.data_frame['brain_mask_file'] =\
-                self.data_frame.apply(_brain_extract_fname, axis=1)
+        self.data_frame['brain_mask_file'] =\
+            self.data_frame.apply(_extract_fname,
+                                  args=('brain_mask'), axis=1)
 
-            self.data_frame['brain_mask_img'] =\
-                self.data_frame.apply(_brain_extract, axis=1,
-                                      median_radius=median_radius,
-                                      numpass=numpass,
-                                      autocrop=autocrop,
-                                      vol_idx=vol_idx,
-                                      dilate=dilate,
-                                      force_recompute=force_recompute)
+        self.data_frame['brain_mask_img'] =\
+            self.data_frame.apply(_brain_extract, axis=1,
+                                  median_radius=median_radius,
+                                  numpass=numpass,
+                                  autocrop=autocrop,
+                                  vol_idx=vol_idx,
+                                  dilate=dilate,
+                                  force_recompute=force_recompute)
 
-    def fit_tensors():
-        raise NotImplementedError
+#     def tensor_FA(self):
+#         self.data_frame['FA_file'] =\
+#             self.data_frame.apply(_tensor_md_fname, axis=1)
+#
+#         self.data_frame['FA_img'] =\
+#             self.data_frame.apply(_tensor_fa, axis=1)
+#
+#     def tensor_MD(self):
+#         self.data_frame['MD_file'] =\
+#             self.data_frame.apply(_tensor_md_fname, axis=1)
+#
+#         self.data_frame['MD_img'] =\
+#             self.data_frame.apply(_tensor_md, axis=1)
+#
+#
+# def _extract_fname(row, suffix):
+#     split_fdwi = op.split(row['dwi_file'])
+#     fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+#                     suffix)
+#     return fname
+#
 
 
 def _brain_extract_fname(row):
@@ -178,3 +228,27 @@ def _brain_extract(row, median_radius=4, numpass=4, autocrop=False,
         return be_img
     else:
         return nib.load(row['brain_mask_file'])
+
+
+# def _tensor_fa_fname(row):
+#     split_fdwi = op.split(row['dwi_file'])
+#     be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+#                        'dti_FA.nii.gz')
+#
+#
+# def _tensor_fnames(row):
+#     split_fdwi = op.split(row['dwi_file'])
+#     names = ['FA', 'MD', 'AD', 'RD', 'params']
+#
+#     for n in names:
+#         file_paths[n] = op.join(out_dir, 'dti_%s.nii.gz' % n)
+#         be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+#                            '_brain_mask.nii.gz')
+#
+#
+# def _fit_tensor(row, mask=None, force_recompute):
+#     if not op.exists(row['dti_files']) or force_recompute:
+#         out_dir = op.split(row['dwi_file'])[0]
+#         dt_files = fit_dti(row['dwi_file'], row['bval_file'],
+#                            row['bvec_file'], mask=mask,
+#                            out_dir=out_dir, b0_threshold=b0_threshold)
