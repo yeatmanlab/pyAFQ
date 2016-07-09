@@ -48,53 +48,46 @@ class AFQ(object):
     Requires the following file structure in your study folder::
 
         ├── sub01
-        │   ├── sess02
+        │   ├── sess01
         │   │   ├── anat
-        │   │   │   └── T1.nii.gz
+        │   │   │   └── sub-01_sess-01_T1.nii.gz
         │   │   └── dwi
-        │   │       ├── dwi.bvals
-        │   │       ├── dwi.bvecs
-        │   │       └── dwi.nii.gz
+        │   │       ├── sub-01_sess-01_dwi.bvals
+        │   │       ├── sub-01_sess-01_dwi.bvecs
+        │   │       └── sub-01_sess-01_dwi.nii.gz
         │   └── sess02
         │       ├── anat
-        │       │   └── T1w.nii.gz
+        │       │   └── sub-01_sess-02_T1w.nii.gz
         │       └── dwi
-        │           ├── dwi.bvals
-        │           ├── dwi.bvecs
-        │           └── dwi.nii.gz
+        │           ├── sub-01_sess-02_dwi.bvals
+        │           ├── sub-01_sess-02_dwi.bvecs
+        │           └── sub-01_sess-02_dwi.nii.gz
         └── sub02
-            ├── sess02
+            ├── sess01
             │   ├── anat
-            │   │   └── T1w.nii.gz
+            │   │   └── sub-02_sess-01_T1w.nii.gz
             │   └── dwi
-            │       ├── dwi.bvals
-            │       ├── dwi.bvecs
-            │       └── dwi.nii.gz
+            │       ├── sub-02_sess-01_dwi.bvals
+            │       ├── sub-02_sess-01_dwi.bvecs
+            │       └── sub-02_sess-01_dwi.nii.gz
             └── sess02
                 ├── anat
-                │   └── T1w.nii.gz
+                │   └── sub-02_sess-02_T1w.nii.gz
                 └── dwi
-                    ├── dwi.bvals
-                    ├── dwi.bvecs
-                    └── dwi.nii.gz
+                    ├── sub-02_sess-02_dwi.bvals
+                    ├── sub-02_sess-02_dwi.bvecs
+                    └── sub-02_sess-02_dwi.nii.gz
 
+    Notes
+    -----
+    The structure of the file-system required here resembles that specified
+    by BIDS [1]_. In the future, this will be organized according to the
+    BIDS derivatives specification, as we require preprocessed, rather than
+    raw data.
 
-    All subjects'/sessions' dwi_prefix needs to be the same!
-
-    That is, you *can't* have:
-
-        sub-01/sess-test/dwi/dwi.nii.gz
-        sub-02/sess-retest/dwi/dwi_foo.nii.gz
-
-    Even though these are different subjects/sessions/etc.
-
-    Instead you can (and must!) have:
-
-        sub-01/sess-test/dwi/mydata_foo.nii.gz
-        sub-02/sess-retest/dwi/mydata_foo.nii.gz
-
-    Where any part of this string (e.g. "foo") can report on things like the
-    number of directions, the preprocessing that happened, etc.
+    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
+           a format for organizing and describing outputs of neuroimaging
+           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
     """
     def __init__(self, raw_path=None, preproc_path=None,
