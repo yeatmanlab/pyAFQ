@@ -62,5 +62,4 @@ def test_AFQ_data():
     Test with some actual data
     """
     afd.organize_stanford_data()
-    base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
-    myafq = api.AFQ(preproc_path=base_dir, sub_prefix='sub')
+    myafq = api.AFQ(preproc_path=afd.afq_home, sub_prefix='sub')
