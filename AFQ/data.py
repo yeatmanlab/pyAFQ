@@ -324,6 +324,8 @@ def organize_stanford_data():
     """
     Create the expected file-system structure for the Stanford HARDI data-set
     """
+    if not op.exists(afq_home):
+        os.mkdir(afq_home)
     base_folder = op.join(afq_home, 'stanford_hardi')
     if not op.exists(base_folder):
         os.mkdir(base_folder)
