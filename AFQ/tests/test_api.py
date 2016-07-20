@@ -7,6 +7,7 @@ import numpy.testing as npt
 
 import nibabel as nib
 from AFQ import api
+import AFQ.data as afd
 
 
 def touch(fname, times=None):
@@ -54,3 +55,12 @@ def test_AFQ_init():
     preproc_path = create_dummy_preproc_path(n_subjects, n_sessions)
     my_afq = api.AFQ(preproc_path=preproc_path)
     npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 8))
+
+
+def test_AFQ_data():
+    """
+    Test with some actual data
+    """
+    afd.organize_stanford_data()
+    base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
+    myafq = api.AFQ(preproc_path=base_dir, sub_prefix='sub')

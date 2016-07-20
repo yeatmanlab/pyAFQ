@@ -4,7 +4,10 @@ import json
 
 import boto3
 
+import numpy as np
+
 import nibabel as nib
+import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 
 from AFQ.utils.streamlines import read_trk
@@ -12,7 +15,8 @@ from AFQ.utils.streamlines import read_trk
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
-           "read_stanford_hardi_tractography"]
+           "read_stanford_hardi_tractography",
+           "organize_stanford_data"]
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
@@ -240,7 +244,9 @@ def fetch_hcp(subjects):
 
     data_files = {}
     for subject in subjects:
-        sub_dir = op.join(base_dir, 'sub-%s' % subject)
+        # We make a single session folder per subject for this case, because
+        # AFQ api expects session structure:
+        sub_dir = op.join(base_dir, 'sub-%s' % subject, "sess-01")
         if not os.path.exists(op.join(base_dir, sub_dir)):
             os.mkdir(sub_dir)
             os.mkdir(os.path.join(sub_dir, 'dwi'))
@@ -312,3 +318,24 @@ def read_stanford_hardi_tractography():
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'))
     return files_dict
+
+
+def organize_stanford_data():
+    """
+    Create the expected file-system structure for the Stanford HARDI data-set
+    """
+    base_folder = op.join(afq_home, 'stanford_hardi')
+    if not op.exists(base_folder):
+        os.mkdir(base_folder)
+        os.mkdir(op.join(base_folder, 'sub-01'))
+        os.mkdir(op.join(base_folder, 'sub-01', 'sess-01'))
+        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+        os.mkdir(anat_folder)
+        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
+        os.mkdir(dwi_folder)
+        t1_img = dpd.read_stanford_t1()
+        nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        dwi_img, gtab = dpd.read_stanford_hardi()
+        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)

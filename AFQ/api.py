@@ -155,25 +155,20 @@ class AFQ(object):
         self.init_gtab()
         self.init_affine()
 
-
     def init_affine(self):
-        affine_list = []
-        for fdwi in self.data_frame['dwi_file']:
-            affine_list.append(nib.load(fdwi).get_affine())
-        self.data_frame['dwi_affine'] = affine_list
+        self.data_frame['dwi_affine'] = self.data_frame.apply(
+            lambda x: [nib.load(x['dwi_file']).get_affine()], axis=1)
 
     def init_gtab(self):
-        gtab_list = []
-        for fbval, fbvec in zip(self.data_frame['bval_file'],
-                                self.data_frame['bvec_file']):
-            gtab_list.append(dpg.gradient_table(fbval, fbvec))
-        self.data_frame['gtab'] = gtab_list
+        self.data_frame['gtab'] = self.data_frame.apply(
+            lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file']),
+            axis=1)
 
-    def brain_extraction(self, median_radius=4, numpass=4, autocrop=False,
-                         vol_idx=None, dilate=None, force_recompute=False):
+    def brain_mask(self, median_radius=4, numpass=4, autocrop=False,
+                   vol_idx=None, dilate=None, force_recompute=False):
         self.data_frame['brain_mask_file'] =\
-            self.data_frame.apply(_extract_fname,
-                                  args=('brain_mask'), axis=1)
+            self.data_frame.apply(_get_fname, suffix='_brain_mask.nii.gz',
+                                  axis=1)
 
         self.data_frame['brain_mask_img'] =\
             self.data_frame.apply(_brain_extract, axis=1,
@@ -184,27 +179,21 @@ class AFQ(object):
                                   dilate=dilate,
                                   force_recompute=force_recompute)
 
-#     def tensor_FA(self):
-#         self.data_frame['FA_file'] =\
-#             self.data_frame.apply(_tensor_md_fname, axis=1)
-#
-#         self.data_frame['FA_img'] =\
-#             self.data_frame.apply(_tensor_fa, axis=1)
-#
-#     def tensor_MD(self):
-#         self.data_frame['MD_file'] =\
-#             self.data_frame.apply(_tensor_md_fname, axis=1)
-#
-#         self.data_frame['MD_img'] =\
-#             self.data_frame.apply(_tensor_md, axis=1)
-#
-#
-# def _extract_fname(row, suffix):
-#     split_fdwi = op.split(row['dwi_file'])
-#     fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-#                     suffix)
-#     return fname
-#
+    def DTI(self, mask=None):
+        self.data_frame['dti_params_file'] =\
+            self.data_frame.apply(_get_fname,
+                                  args=['_dti_params.nii.gz'], axis=1)
+
+        self.data_frame['dti_params_img'] =\
+            self.data_fram.apply(_dti)
+
+
+def _get_fname(row, suffix):
+    split_fdwi = op.split(row['dwi_file'])
+    fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+                    suffix)
+    return fname
+
 
 
 def _brain_extract_fname(row):
