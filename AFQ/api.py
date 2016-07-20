@@ -45,11 +45,12 @@ def make_bundles(bundle_names=["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO",
 
 class AFQ(object):
     """
-    Requires the following file structure in your study folder::
+    This is file folder structure that AFQ requires in your study folder::
 
         ├── sub01
         │   ├── sess01
         │   │   ├── anat
+        │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
         │   │   │   └── sub-01_sess-01_T1.nii.gz
         │   │   └── dwi
         │   │       ├── sub-01_sess-01_dwi.bvals
@@ -57,6 +58,7 @@ class AFQ(object):
         │   │       └── sub-01_sess-01_dwi.nii.gz
         │   └── sess02
         │       ├── anat
+        │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
         │       │   └── sub-01_sess-02_T1w.nii.gz
         │       └── dwi
         │           ├── sub-01_sess-02_dwi.bvals
@@ -65,6 +67,7 @@ class AFQ(object):
         └── sub02
             ├── sess01
             │   ├── anat
+            │       ├── sub-02_sess-01_aparc+aseg.nii.gz
             │   │   └── sub-02_sess-01_T1w.nii.gz
             │   └── dwi
             │       ├── sub-02_sess-01_dwi.bvals
@@ -72,11 +75,16 @@ class AFQ(object):
             │       └── sub-02_sess-01_dwi.nii.gz
             └── sess02
                 ├── anat
+                │   ├── sub-02_sess-02_aparc+aseg.nii.gz
                 │   └── sub-02_sess-02_T1w.nii.gz
                 └── dwi
                     ├── sub-02_sess-02_dwi.bvals
                     ├── sub-02_sess-02_dwi.bvecs
                     └── sub-02_sess-02_dwi.nii.gz
+
+    For now, it is up to users to arrange this file folder structure in their
+    data, with preprocessed data, but in the future, this structure will be
+    automatically generated from
 
     Notes
     -----
@@ -146,6 +154,7 @@ class AFQ(object):
                                             sess=sess_list))
         self.init_gtab()
         self.init_affine()
+
 
     def init_affine(self):
         affine_list = []
