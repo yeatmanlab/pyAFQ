@@ -9,6 +9,8 @@ import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 
 import AFQ.data as afd
+import AFQ.dti as dti
+from dipy.reconst.dti import TensorModel, TensorFit
 
 
 def do_preprocessing():
@@ -153,7 +155,7 @@ class AFQ(object):
                                             anat_file=anat_file_list,
                                             sess=sess_list))
         self.set_gtab()
-        self.set_affine()
+        self.set_dwi_affine()
 
     def set_gtab(self):
         self.data_frame['gtab'] = self.data_frame.apply(
@@ -165,14 +167,14 @@ class AFQ(object):
 
     gtab = property(get_gtab, set_gtab)
 
-    def set_affine(self):
-        self.data_frame['dwi_affine'] = self.data_frame.apply(
-            lambda x: [nib.load(x['dwi_file']).get_affine()], axis=1)
+    def set_dwi_affine(self):
+        self.data_frame['dwi_affine'] =\
+            self.data_frame['dwi_file'].apply(_get_affine)
 
-    def get_affine(self):
+    def get_dwi_affine(self):
         return self.data_frame['dwi_affine']
 
-    affine = property(get_affine, set_affine)
+    dwi_affine = property(get_dwi_affine, set_dwi_affine)
 
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
@@ -213,8 +215,9 @@ class AFQ(object):
 
     def get_brain_mask(self):
         self.set_brain_mask()
-        return self.data_frame['brain_mask_img'].apply(
-            nib.Nifti1Image.get_data)
+        self.data_frame['brain_mask'] =\
+            self.data_frame['brain_mask_img'].apply(nib.Nifti1Image.get_data)
+        return self.data_frame['brain_mask']
 
     brain_mask = property(get_brain_mask, set_brain_mask)
 
@@ -222,12 +225,68 @@ class AFQ(object):
         if 'dwi_data_img' not in self.data_frame.columns:
             self.data_frame['dwi_data_img'] =\
                 self.data_frame['dwi_file'].apply(nib.load)
+        self.data_frame['dwi_data'] =\
+            self.data_frame['dwi_data_img'].apply(nib.Nifti1Image.get_data)
 
     def get_dwi_data(self):
         self.set_dwi_data()
-        return self.data_frame['dwi_data_img'].apply(nib.Nifti1Image.get_data)
+        return self.data_frame['dwi_data']
 
     dwi_data = property(get_dwi_data, set_dwi_data)
+
+    def _dti(self, row, mask=None):
+        if not op.exists('dti_params_file'):
+            self.set_dwi_data()
+            data = row['dwi_data']
+            gtab = row['gtab']
+            mask = row['brain_mask']
+            dtf = dti._fit(gtab, data, mask=mask)
+            nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
+                     row['dti_params_file'])
+            return dtf
+        else:
+            model_params = nib.load(row['dti_params_file'])
+            gtab = row['gtab']
+            tm = TensorModel(gtab)
+            return TensorFit(tm, model_params)
+
+    def _dti_params_img(self, row):
+        return nib.Nifti1Image(row['dti'].model_params, row['dwi_affine'])
+
+    def get_dti(self):
+        self.set_dti()
+        return self.data_frame['dti']
+
+    def set_dti(self):
+        self.data_frame['dti_params_file'] =\
+            self.data_frame.apply(_get_fname, suffix='_dti_params.nii.gz',
+                                  axis=1)
+        self.data_frame['dti'] = self.data_frame.apply(self._dti,
+                                                       axis=1)
+        self.data_frame['dti_params_img'] =\
+            self.data_frame.apply(self._dti_params_img, axis=1)
+
+    dti = property(get_dti, set_dti)
+
+    def get_dti_params(self):
+        self.set_dti_params()
+        return self.data_frame['dti_params']
+
+    def set_dti_params(self, mask=None):
+        self.set_dti()
+        self.data_frame['dti_params'] =\
+            self.data_frame['dti_params_img'].apply(
+                nib.Nifti1Image.get_data)
+
+    dti_params = property(get_dti_params, set_dti_params)
+
+
+def _get_dti_params(dtf):
+    return dti.model_params
+
+
+def _get_affine(fname):
+    nib.load(fname).get_affine
 
 
 def _get_fname(row, suffix):

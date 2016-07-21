@@ -65,3 +65,4 @@ def test_AFQ_data():
     myafq = api.AFQ(preproc_path=op.join(afd.afq_home, 'stanford_hardi'),
                     sub_prefix='sub')
     npt.assert_equal(myafq.brain_mask[0].shape, myafq.dwi_data[0].shape[:3])
+    npt.assert_equal(myafq.dti[0].fa.shape, myafq.brain_mask[0].shape)

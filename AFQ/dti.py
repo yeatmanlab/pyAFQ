@@ -14,9 +14,7 @@ __all__ = ["fit_dti", "predict", "tensor_odf"]
 
 def _fit(gtab, data, mask=None):
     dtimodel = dti.TensorModel(gtab)
-    dtifit = dtimodel.fit(data, mask=mask)
-    return (dtifit, dtifit.fa, dtifit.md, dtifit.ad, dtifit.rd,
-            dtifit.model_params)
+    return dtimodel.fit(data, mask=mask)
 
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
@@ -56,7 +54,8 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
                                             b0_threshold=b0_threshold)
 
     # In this case, we dump the fit object
-    _, FA, MD, AD, RD, params = _fit(gtab, data, mask=None)
+    dtf = _fit(gtab, data, mask=None)
+    FA, MD, AD, RD, params = dtf.fa, dtf.md, dtf.ad, dtf.rd, dtf.model_params
 
     maps = [FA, MD, AD, RD, params]
     names = ['FA', 'MD', 'AD', 'RD', 'params']
