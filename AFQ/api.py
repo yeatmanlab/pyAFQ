@@ -193,17 +193,24 @@ class AFQ(object):
                                   force_recompute=force_recompute)
 
     def get_brain_mask(self):
-        return self.data_frame['brain_mask_img']
+        if 'brain_mask_img' not in self.data_frame.columns:
+            self.set_brain_mask()
+
+        return self.data_frame['brain_mask_img'].apply(
+                                        nib.Nifti1Image.get_data)
 
     brain_mask = property(get_brain_mask, set_brain_mask)
 
-    def DTI(self, mask=None):
-        self.data_frame['dti_params_file'] =\
-            self.data_frame.apply(_get_fname,
-                                  args=['_dti_params.nii.gz'], axis=1)
+    def set_dwi_data(self):
+        self.data_frame['dwi_data_img'] =\
+                self.data_frame['dwi_file'].apply(nib.load)
 
-        self.data_frame['dti_params_img'] =\
-            self.data_fram.apply(_dti)
+    def get_dwi_data(self):
+        if 'dwi_data_img' not in self.data_frame.columns:
+            self.set_dwi_data()
+        return self.data_frame['dwi_data_img'].apply(nib.Nifti1Image.get_data)
+
+    dwi_data = property(get_dwi_data, set_dwi_data)
 
 
 def _get_fname(row, suffix):
