@@ -274,15 +274,13 @@ def fetch_hcp(subjects):
     dataset_description = {
          "BIDSVersion": "1.0.0",
          "Name": "HCP",
-         "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""", # noqa
+         "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
          "Subjects": subjects}
 
     with open(op.join(base_dir, 'dataset_description.json'), 'w') as outfile:
         json.dump(dataset_description, outfile)
 
-
     return data_files
-
 
 
 stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]

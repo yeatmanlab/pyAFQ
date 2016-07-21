@@ -197,13 +197,13 @@ class AFQ(object):
             self.set_brain_mask()
 
         return self.data_frame['brain_mask_img'].apply(
-                                        nib.Nifti1Image.get_data)
+            nib.Nifti1Image.get_data)
 
     brain_mask = property(get_brain_mask, set_brain_mask)
 
     def set_dwi_data(self):
         self.data_frame['dwi_data_img'] =\
-                self.data_frame['dwi_file'].apply(nib.load)
+            self.data_frame['dwi_file'].apply(nib.load)
 
     def get_dwi_data(self):
         if 'dwi_data_img' not in self.data_frame.columns:
@@ -218,6 +218,7 @@ def _get_fname(row, suffix):
     fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
                     suffix)
     return fname
+
 
 def _brain_extract(row, median_radius=4, numpass=4, autocrop=False,
                    vol_idx=None, dilate=None, force_recompute=False):
