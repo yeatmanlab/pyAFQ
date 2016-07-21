@@ -213,7 +213,6 @@ class AFQ(object):
 
     def get_brain_mask(self):
         self.set_brain_mask()
-
         return self.data_frame['brain_mask_img'].apply(
             nib.Nifti1Image.get_data)
 
