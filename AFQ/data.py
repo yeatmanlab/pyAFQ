@@ -318,13 +318,17 @@ def read_stanford_hardi_tractography():
     return files_dict
 
 
-def organize_stanford_data():
+def organize_stanford_data(path=None):
     """
     Create the expected file-system structure for the Stanford HARDI data-set
     """
-    if not op.exists(afq_home):
-        os.mkdir(afq_home)
-    base_folder = op.join(afq_home, 'stanford_hardi')
+    if path is None:
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        base_folder = op.join(afq_home, 'stanford_hardi')
+    else:
+        base_folder = op.join(path, 'stanford_hardi')
+
     if not op.exists(base_folder):
         os.mkdir(base_folder)
         os.mkdir(op.join(base_folder, 'sub-01'))

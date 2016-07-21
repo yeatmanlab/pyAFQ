@@ -6,6 +6,8 @@ import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
+import nibabel.tmpdirs as nbtmp
+
 from AFQ import api
 import AFQ.data as afd
 
@@ -61,8 +63,9 @@ def test_AFQ_data():
     """
     Test with some actual data
     """
-    afd.organize_stanford_data()
-    myafq = api.AFQ(preproc_path=op.join(afd.afq_home, 'stanford_hardi'),
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
                     sub_prefix='sub')
     npt.assert_equal(myafq.brain_mask[0].shape,
                      myafq.dwi_data_img[0].shape[:3])

@@ -182,9 +182,9 @@ class AFQ(object):
     def _brain_extract(self, row, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None, force_recompute=False):
         if not op.exists(row['brain_mask_file']) or force_recompute:
-            self.set_dwi_data()
+            self.set_dwi_data_img()
             img = row['dwi_data_img']
-            data = row['dwi_data']
+            data = img.get_data()
             gtab = row['gtab']
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
