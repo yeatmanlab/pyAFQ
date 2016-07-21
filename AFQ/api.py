@@ -152,20 +152,33 @@ class AFQ(object):
                                             bval_file=bval_file_list,
                                             anat_file=anat_file_list,
                                             sess=sess_list))
-        self.init_gtab()
-        self.init_affine()
+        self.set_gtab()
+        self.set_affine()
 
-    def init_affine(self):
-        self.data_frame['dwi_affine'] = self.data_frame.apply(
-            lambda x: [nib.load(x['dwi_file']).get_affine()], axis=1)
-
-    def init_gtab(self):
+    def set_gtab(self):
         self.data_frame['gtab'] = self.data_frame.apply(
             lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file']),
             axis=1)
 
-    def brain_mask(self, median_radius=4, numpass=4, autocrop=False,
-                   vol_idx=None, dilate=None, force_recompute=False):
+    def get_gtab(self):
+        return self.data_frame['gtab']
+
+    gtab = property(get_gtab, set_gtab)
+
+    def set_affine(self):
+        self.data_frame['dwi_affine'] = self.data_frame.apply(
+            lambda x: [nib.load(x['dwi_file']).get_affine()], axis=1)
+
+    def get_affine(self):
+        return self.data_frame['dwi_affine']
+
+    affine = property(get_affine, set_affine)
+
+    def __getitem__(self, k):
+        return self.data_frame.__getitem__(k)
+
+    def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
+                       vol_idx=None, dilate=None, force_recompute=False):
         self.data_frame['brain_mask_file'] =\
             self.data_frame.apply(_get_fname, suffix='_brain_mask.nii.gz',
                                   axis=1)
@@ -178,6 +191,11 @@ class AFQ(object):
                                   vol_idx=vol_idx,
                                   dilate=dilate,
                                   force_recompute=force_recompute)
+
+    def get_brain_mask(self):
+        return self.data_frame['brain_mask_img']
+
+    brain_mask = property(get_brain_mask, set_brain_mask)
 
     def DTI(self, mask=None):
         self.data_frame['dti_params_file'] =\
@@ -193,15 +211,6 @@ def _get_fname(row, suffix):
     fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
                     suffix)
     return fname
-
-
-
-def _brain_extract_fname(row):
-    split_fdwi = op.split(row['dwi_file'])
-    be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-                       '_brain_mask.nii.gz')
-    return be_fname
-
 
 def _brain_extract(row, median_radius=4, numpass=4, autocrop=False,
                    vol_idx=None, dilate=None, force_recompute=False):

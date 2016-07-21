@@ -62,4 +62,6 @@ def test_AFQ_data():
     Test with some actual data
     """
     afd.organize_stanford_data()
-    myafq = api.AFQ(preproc_path=afd.afq_home, sub_prefix='sub')
+    myafq = api.AFQ(preproc_path=op.join(afd.afq_home, 'stanford_hardi'),
+                    sub_prefix='sub')
+    myafq.set_brain_mask()
