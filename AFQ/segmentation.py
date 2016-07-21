@@ -116,10 +116,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                                        orient_ROIs[0].get_data(),
                                        orient_ROIs[1].get_data(),
                                        as_generator=True)
-        if clip_to_roi:
-            dts.clip()
+        #if clip_to_roi:
+        #    dts.clip()
 
-        #selec
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
