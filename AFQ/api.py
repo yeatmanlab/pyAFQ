@@ -221,23 +221,22 @@ class AFQ(object):
 
     brain_mask = property(get_brain_mask, set_brain_mask)
 
-    def set_dwi_data(self):
+    def set_dwi_data_img(self):
         if 'dwi_data_img' not in self.data_frame.columns:
             self.data_frame['dwi_data_img'] =\
                 self.data_frame['dwi_file'].apply(nib.load)
-        self.data_frame['dwi_data'] =\
-            self.data_frame['dwi_data_img'].apply(nib.Nifti1Image.get_data)
 
-    def get_dwi_data(self):
-        self.set_dwi_data()
-        return self.data_frame['dwi_data']
+    def get_dwi_data_img(self):
+        self.set_dwi_data_img()
+        return self.data_frame['dwi_data_img']
 
-    dwi_data = property(get_dwi_data, set_dwi_data)
+    dwi_data_img = property(get_dwi_data_img, set_dwi_data_img)
 
     def _dti(self, row, mask=None):
         if not op.exists('dti_params_file'):
-            self.set_dwi_data()
-            data = row['dwi_data']
+            self.set_dwi_data_img()
+            img = row['dwi_data_img']
+            data = img.get_data()
             gtab = row['gtab']
             mask = row['brain_mask']
             dtf = dti._fit(gtab, data, mask=mask)
