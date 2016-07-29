@@ -246,18 +246,20 @@ def fetch_hcp(subjects):
     for subject in subjects:
         # We make a single session folder per subject for this case, because
         # AFQ api expects session structure:
-        sub_dir = op.join(base_dir, 'sub-%s' % subject, "sess-01")
-        if not os.path.exists(op.join(base_dir, sub_dir)):
+        sub_dir = op.join(base_dir, 'sub-%s' % subject)
+        sess_dir = op.join(sub_dir, "sess-01")
+        if not os.path.exists(sub_dir):
             os.mkdir(sub_dir)
-            os.mkdir(os.path.join(sub_dir, 'dwi'))
-            os.mkdir(os.path.join(sub_dir, 'anat'))
-        data_files[op.join(sub_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
+            os.mkdir(sess_dir)
+            os.mkdir(os.path.join(sess_dir, 'dwi'))
+            os.mkdir(os.path.join(sess_dir, 'anat'))
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
             'HCP/%s/T1w/Diffusion/bvals' % subject
-        data_files[op.join(sub_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
             'HCP/%s/T1w/Diffusion/bvecs' % subject
-        data_files[op.join(sub_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
             'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
-        data_files[op.join(sub_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
+        data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
             'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
 
         sub_deriv_dir = op.join(deriv_dir, 'sub-%s' % subject)

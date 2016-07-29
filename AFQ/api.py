@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import pandas as pd
 import glob
 import os.path as op
@@ -199,6 +200,9 @@ class AFQ(object):
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None, force_recompute=False):
         if 'brain_mask_img' not in self.data_frame.columns or force_recompute:
+            # Check if it should be computed before computing. Note that this
+            # function does nothing if the brain mask is already computed and
+            # we are not forcing the recompute
             self.data_frame['brain_mask_file'] =\
                 self.data_frame.apply(_get_fname, suffix='_brain_mask.nii.gz',
                                       axis=1)
@@ -214,6 +218,9 @@ class AFQ(object):
                                       force_recompute=force_recompute)
 
     def get_brain_mask(self):
+        # We are thinking that this is our prototype for how all properties
+        # will work. When we ask for a property we first set it. Within the set
+        # we fist check if it is already computed.
         self.set_brain_mask()
         self.data_frame['brain_mask'] =\
             self.data_frame['brain_mask_img'].apply(nib.Nifti1Image.get_data)
@@ -279,6 +286,27 @@ class AFQ(object):
 
     dti_params = property(get_dti_params, set_dti_params)
 
+    streamlines = property(get_wholebrainFG, set_wholebrainFG)
+
+    def get_streamlines(self):
+
+    def set_streamlines(self):
+        if 'streamlines_file' not in self.data_frame.columns:
+            self.data_frame['streamlines_file'] =\
+                self.data_frame.apply(_get_fname, suffix='_streamlines.trk',
+                                      axis=1)
+
+                self.data_frame['streamlines']  =\
+                    self.data_frame.apply(self._tracking, axis=1)
+
+
+
+
+    def _tracking(self, row, mask=None):
+        print("Tracking with some algorithm on the dti")
+        streamlines = list(aft.track(row['dti_params']))
+        aus.write_trk(row['streamlines_file'], streamlines,
+                      affine=row['dwi_affine'])
 
 def _get_dti_params(dtf):
     return dti.model_params
