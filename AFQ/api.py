@@ -234,11 +234,11 @@ class AFQ(object):
 
     def _dti(self, row, mask=None):
         if not op.exists('dti_params_file'):
-            self.set_dwi_data_img()
             img = row['dwi_data_img']
             data = img.get_data()
             gtab = row['gtab']
-            mask = row['brain_mask']
+            if mask is None:
+                mask = row['brain_mask_img'].get_data()
             dtf = dti._fit(gtab, data, mask=mask)
             nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
                      row['dti_params_file'])
@@ -256,12 +256,15 @@ class AFQ(object):
         self.set_dti()
         return self.data_frame['dti']
 
-    def set_dti(self):
+    def set_dti(self, mask=None):
+        self.set_dwi_data_img()
+        self.set_brain_mask()
         self.data_frame['dti_params_file'] =\
             self.data_frame.apply(_get_fname, suffix='_dti_params.nii.gz',
                                   axis=1)
         self.data_frame['dti'] = self.data_frame.apply(self._dti,
-                                                       axis=1)
+                                                       axis=1,
+                                                       mask=mask)
         self.data_frame['dti_params_img'] =\
             self.data_frame.apply(self._dti_params_img, axis=1)
 
@@ -285,7 +288,7 @@ def _get_dti_params(dtf):
 
 
 def _get_affine(fname):
-    nib.load(fname).get_affine
+    return nib.load(fname).get_affine()
 
 
 def _get_fname(row, suffix):
