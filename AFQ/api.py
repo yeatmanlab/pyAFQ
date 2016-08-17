@@ -18,8 +18,8 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-def make_bundles(bundle_names=["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO",
-                               "ILF", "SLF", "ARC", "UNC"]):
+def make_bundle_dict(bundle_names=["ATR", "CGC", "CST", "FA", "FP",
+                                   "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -44,6 +44,44 @@ def make_bundles(bundle_names=["ATR", "CGC", "CST", "FA", "FP", "HCC", "IFO",
                                                  templates[name + '_roi1' +
                                                            hemi]],
                                         'rules': [True, True]}
+
+
+def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
+                vol_idx=None, dilate=None, force_recompute=False):
+    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
+    if not op.exists(brain_mask_file) or force_recompute:
+        img = nib.load(row['dwi_file'])
+        data = img.get_data()
+        gtab = row['gtab']
+        mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+        _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
+                                    autocrop, dilate=dilate)
+        be_img = nib.Nifti1Image(brain_mask.astype(int),
+                                 img.affine)
+        nib.save(be_img, brain_mask_file)
+    return brain_mask_file
+
+def _dti(row, force_recompute=False):
+    dti_params_file = _get_fname(row, '_dti_params.nii.gz')
+    if not op.exists(dti_params_file) or force_recompute:
+        img = nib.load(row['dwi_file'])
+        data = img.get_data()
+        gtab = row['gtab']
+        brain_mask_file = _brain_mask(row)
+        mask = nib.load(brain_mask_file).get_data()
+        dtf = dti._fit(gtab, data, mask=mask)
+        nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
+                 dti_params_file)
+    return dti_params_file
+
+def _streamlines(row, force_recompute=False):
+    streamlines_file = _get_fname(row, '_streamlines.trk')
+    if not op.exists(row['streamlines_file']) or force_recompute:
+        dti_params_file = _dti(row)
+        streamlines = list(aft.track(dti_params_file))
+        aus.write_trk(streamlines_file, streamlines,
+                      affine=row['dwi_affine'])
+    return streamlines_file
 
 
 class AFQ(object):
@@ -104,7 +142,7 @@ class AFQ(object):
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi*", anat_folder="anat",
-                 anat_file="*T1w*"):
+                 anat_file="*T1w*", b0_threshold=0):
         self.raw_path = raw_path
         self.preproc_path = preproc_path
         if self.preproc_path is None:
@@ -155,12 +193,13 @@ class AFQ(object):
                                             bval_file=bval_file_list,
                                             anat_file=anat_file_list,
                                             sess=sess_list))
-        self.set_gtab()
+        self.set_gtab(b0_threshold)
         self.set_dwi_affine()
 
-    def set_gtab(self):
+    def set_gtab(self, b0_threshold):
         self.data_frame['gtab'] = self.data_frame.apply(
-            lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file']),
+            lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file'],
+                                         b0_threshold=b0_threshold),
             axis=1)
 
     def get_gtab(self):
@@ -180,139 +219,38 @@ class AFQ(object):
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
 
-    def _brain_extract(self, row, median_radius=4, numpass=4, autocrop=False,
-                       vol_idx=None, dilate=None, force_recompute=False):
-        if not op.exists(row['brain_mask_file']) or force_recompute:
-            self.set_dwi_data_img()
-            img = row['dwi_data_img']
-            data = img.get_data()
-            gtab = row['gtab']
-            mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
-            _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                        autocrop, dilate=dilate)
-            be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                     img.affine)
-            nib.save(be_img, row['brain_mask_file'])
-            return be_img
-        else:
-            return nib.load(row['brain_mask_file'])
 
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None, force_recompute=False):
-        if 'brain_mask_img' not in self.data_frame.columns or force_recompute:
-            # Check if it should be computed before computing. Note that this
-            # function does nothing if the brain mask is already computed and
-            # we are not forcing the recompute
+        if 'brain_mask_file' not in self.data_frame.columns or force_recompute:
             self.data_frame['brain_mask_file'] =\
-                self.data_frame.apply(_get_fname, suffix='_brain_mask.nii.gz',
-                                      axis=1)
-
-            self.data_frame['brain_mask_img'] =\
-                self.data_frame.apply(self._brain_extract,
-                                      axis=1,
-                                      median_radius=median_radius,
-                                      numpass=numpass,
-                                      autocrop=autocrop,
-                                      vol_idx=vol_idx,
-                                      dilate=dilate,
-                                      force_recompute=force_recompute)
+                self.data_frame.apply(_brain_mask, axis=1)
 
     def get_brain_mask(self):
-        # We are thinking that this is our prototype for how all properties
-        # will work. When we ask for a property we first set it. Within the set
-        # we fist check if it is already computed.
         self.set_brain_mask()
-        self.data_frame['brain_mask'] =\
-            self.data_frame['brain_mask_img'].apply(nib.Nifti1Image.get_data)
-        return self.data_frame['brain_mask']
+        return self.data_frame['brain_mask_file']
 
     brain_mask = property(get_brain_mask, set_brain_mask)
 
-    def set_dwi_data_img(self):
-        if 'dwi_data_img' not in self.data_frame.columns:
-            self.data_frame['dwi_data_img'] =\
-                self.data_frame['dwi_file'].apply(nib.load)
-
-    def get_dwi_data_img(self):
-        self.set_dwi_data_img()
-        return self.data_frame['dwi_data_img']
-
-    dwi_data_img = property(get_dwi_data_img, set_dwi_data_img)
-
-    def _dti(self, row, mask=None):
-        if not op.exists('dti_params_file'):
-            img = row['dwi_data_img']
-            data = img.get_data()
-            gtab = row['gtab']
-            if mask is None:
-                mask = row['brain_mask_img'].get_data()
-            dtf = dti._fit(gtab, data, mask=mask)
-            nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
-                     row['dti_params_file'])
-            return dtf
-        else:
-            model_params = nib.load(row['dti_params_file'])
-            gtab = row['gtab']
-            tm = TensorModel(gtab)
-            return TensorFit(tm, model_params)
-
-    def _dti_params_img(self, row):
-        return nib.Nifti1Image(row['dti'].model_params, row['dwi_affine'])
+    def set_dti(self, force_recompute=False):
+        if 'dti_params_file' not in self.data_frame.columns or force_recompute:
+            self.data_frame['dti_params_file'] =\
+                self.data_frame.apply(_dti, axis=1)
 
     def get_dti(self):
         self.set_dti()
-        return self.data_frame['dti']
-
-    def set_dti(self, mask=None):
-        self.set_dwi_data_img()
-        self.set_brain_mask()
-        self.data_frame['dti_params_file'] =\
-            self.data_frame.apply(_get_fname, suffix='_dti_params.nii.gz',
-                                  axis=1)
-        self.data_frame['dti'] = self.data_frame.apply(self._dti,
-                                                       axis=1,
-                                                       mask=mask)
-        self.data_frame['dti_params_img'] =\
-            self.data_frame.apply(self._dti_params_img, axis=1)
+        return self.data_frame['dti_params_file']
 
     dti = property(get_dti, set_dti)
 
-    def get_dti_params(self):
-        self.set_dti_params()
-        return self.data_frame['dti_params']
-
-    def set_dti_params(self, mask=None):
-        self.set_dti()
-        self.data_frame['dti_params'] =\
-            self.data_frame['dti_params_img'].apply(
-                nib.Nifti1Image.get_data)
-
-    dti_params = property(get_dti_params, set_dti_params)
-
-    streamlines = property(get_wholebrainFG, set_wholebrainFG)
+    def set_streamlines(self, force_recompute=False):
+        if 'streamlines_file' not in self.data_frame.columns or force_recompute:
+            self.data_frame['streamlines_file'] =\
+                self.data_frame.apply(_streamlines, axis=1)
 
     def get_streamlines(self):
-
-    def set_streamlines(self):
-        if 'streamlines_file' not in self.data_frame.columns:
-            self.data_frame['streamlines_file'] =\
-                self.data_frame.apply(_get_fname, suffix='_streamlines.trk',
-                                      axis=1)
-
-                self.data_frame['streamlines']  =\
-                    self.data_frame.apply(self._tracking, axis=1)
-
-
-
-
-    def _tracking(self, row, mask=None):
-        print("Tracking with some algorithm on the dti")
-        streamlines = list(aft.track(row['dti_params']))
-        aus.write_trk(row['streamlines_file'], streamlines,
-                      affine=row['dwi_affine'])
-
-def _get_dti_params(dtf):
-    return dti.model_params
+        self.set_streamlines()
+        return self.data_frame['streamlines_file']
 
 
 def _get_affine(fname):

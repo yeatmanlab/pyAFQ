@@ -67,7 +67,7 @@ def test_AFQ_data():
     afd.organize_stanford_data(path=tmpdir.name)
     myafq = api.AFQ(preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
                     sub_prefix='sub')
-    npt.assert_equal(myafq.brain_mask[0].shape,
-                     myafq.dwi_data_img[0].shape[:3])
-    npt.assert_equal(myafq.brain_mask[0].shape,
-                     myafq.dti[0].fa.shape)
+    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+                     nib.load(myafq['dwi_file'][0]).shape[:3])
+    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+                     nib.load(myafq.dti[0]).shape[:3])

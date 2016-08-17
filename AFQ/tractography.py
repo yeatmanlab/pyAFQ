@@ -167,7 +167,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.2,
           step_size=0.5, n_jobs=-1, backend="multiprocessing", engine="dask"):
     """
-    Deterministic tracking using CSD
+    Tractography
 
     Parameters
     ----------
