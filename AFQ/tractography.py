@@ -68,7 +68,6 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         seeds = dtu.seeds_from_mask(seed_mask,
                                     density=seeds,
                                     affine=affine)
-
     if sphere is None:
         sphere = dpd.default_sphere
 
@@ -104,7 +103,17 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         return _local_tracking(seeds, dg, threshold_classifier, affine,
                                step_size=step_size)
     else:
-        ll = parfor(_local_tracking, seeds, n_jobs=n_jobs,
+        if n_chunks < seeds.shape[0]:
+            seeds_list = []
+            i2 = 0
+            seeds_per_chunk = seeds.shape[0] // n_chunks
+            for chunk in range(n_chunks - 1):
+                i1 = i2
+                i2 = seeds_per_chunk * (chunk + 1)
+                seeds_list.append(seeds[i1:i2])
+        else:
+            seeds_list = seeds
+        ll = parfor(_local_tracking, seeds_list, n_jobs=n_jobs,
                     engine=engine, backend=backend,
                     func_args=[dg, threshold_classifier, affine],
                     func_kwargs=dict(step_size=step_size))
