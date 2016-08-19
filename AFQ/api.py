@@ -332,6 +332,21 @@ class AFQ(object):
 
     dti = property(get_dti, set_dti)
 
+    def set_dti_fa(self, force_recompute=False):
+        if 'dti_fa_file' not in self.data_frame.columns or force_recompute:
+            self.data_frame['dti_fa_file'] =\
+                self.data_frame.apply(_dti_fa, axis=1)
+
+    def get_dti_fa(self):
+        self.set_dti_fa()
+        return self.data_frame['dti_fa_file']
+
+    dti_fa = property(get_dti_fa, set_dti_fa)
+
+
+
+
+
     def set_streamlines(self, force_recompute=False):
         if ('streamlines_file' not in self.data_frame.columns or
                 force_recompute):
