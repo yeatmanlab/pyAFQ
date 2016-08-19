@@ -11,15 +11,19 @@ from dipy.segment.mask import median_otsu
 
 import AFQ.data as afd
 import AFQ.dti as dti
+import AFQ.tractography as aft
 from dipy.reconst.dti import TensorModel, TensorFit
-
+import AFQ.utils.streamlines as aus
 
 def do_preprocessing():
     raise NotImplementedError
 
 
-def make_bundle_dict(bundle_names=["ATR", "CGC", "CST", "FA", "FP",
-                                   "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]):
+BUNDLES = ["ATR", "CGC", "CST", "FA", "FP",
+           "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+
+
+def make_bundle_dict(bundle_names=BUNDLES):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -61,6 +65,7 @@ def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
         nib.save(be_img, brain_mask_file)
     return brain_mask_file
 
+
 def _dti(row, force_recompute=False):
     dti_params_file = _get_fname(row, '_dti_params.nii.gz')
     if not op.exists(dti_params_file) or force_recompute:
@@ -74,14 +79,79 @@ def _dti(row, force_recompute=False):
                  dti_params_file)
     return dti_params_file
 
-def _streamlines(row, force_recompute=False):
-    streamlines_file = _get_fname(row, '_streamlines.trk')
-    if not op.exists(row['streamlines_file']) or force_recompute:
-        dti_params_file = _dti(row)
-        streamlines = list(aft.track(dti_params_file))
+
+def _dti_fit(row):
+    dti_params_file = _dti(row)
+    dti_params = nib.load(dti_params_file).get_data()
+    tm = TensorModel(row['gtab'])
+    tf = TensorFit(tm, dti_params)
+    return tf
+
+
+def _dti_fa(row, force_recompute=False):
+    dti_fa_file = _get_fname(row, '_dti_fa.nii.gz')
+    if not op.exists(dti_fa_file) or force_recompute:
+        tf = _dti_fit(row)
+        fa = tf.fa
+        nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
+                 dti_fa_file)
+    return dti_fa_file
+
+
+def _dti_md(row, force_recompute=False):
+    dti_md_file = _get_fname(row, '_dti_md.nii.gz')
+    if not op.exists(dti_fa_file) or force_recompute:
+        tf = _dti_fit(row)
+        md = tf.md
+        nib.save(nib.Nifti1Image(md, row['dwi_affine']),
+                 dti_md_file)
+    return dti_md_file
+
+
+def _streamlines(row, odf_model="DTI", directions="det",
+                 force_recompute=False):
+    streamlines_file = _get_fname(row,
+                                  '%s_%s_streamlines.trk' % (odf_model,
+                                                             directions))
+    if not op.exists(streamlines_file) or force_recompute:
+        if odf_model == "DTI":
+            params_file = _dti(row)
+        else:
+            raise(NotImplementedError)
+        fa_file = _dti_fa(row)
+        fa = nib.load(fa_file).get_data()
+        wm_mask = np.zeros_like(fa)
+        wm_mask[fa > 0.2] = 1
+        streamlines = list(aft.track(params_file,
+                                     directions=directions,
+                                     seeds=1,
+                                     seed_mask=wm_mask,
+                                     stop_mask=fa))
         aus.write_trk(streamlines_file, streamlines,
                       affine=row['dwi_affine'])
     return streamlines_file
+
+
+def _bundles(row, odf_model="DTI", directions="det", cleaning_params=None):
+    """
+
+    """
+    fdata = row["dwi_file"]
+    gtab = row["gtab"]
+    streamlines = _streamlines(row, odf_model, directions="det")
+    seg.segment(fdata, gtab, streamlines)
+
+    return
+
+
+def _clean_bundles(row):
+    pass
+
+
+def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None):
+    pass
+
+
 
 
 class AFQ(object):
@@ -142,8 +212,28 @@ class AFQ(object):
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi*", anat_folder="anat",
-                 anat_file="*T1w*", b0_threshold=0):
+                 anat_file="*T1w*", b0_threshold=0,
+                 odf_model="DTI", directions="det",
+                 bundle_list=BUNDLES):
+        """
+
+        b0_threshold : int, optional
+            The value of b under which it is considered to be b0. Default: 0.
+
+        odf_model : string, optional
+            Which model to use for determining directions in tractography
+            {"DTI", "DKI", "CSD"}. Default: "DTI"
+
+        directions : string, optional
+            How to select directions for tracking (deterministic or
+            probablistic) {"det", "prob"}. Default: "det".
+
+        """
+        self.directions = directions
+        self.odf_model = odf_model
         self.raw_path = raw_path
+        self.bundle_list = bundle_list
+
         self.preproc_path = preproc_path
         if self.preproc_path is None:
             if self.raw_path is None:
@@ -219,7 +309,6 @@ class AFQ(object):
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
 
-
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None, force_recompute=False):
         if 'brain_mask_file' not in self.data_frame.columns or force_recompute:
@@ -244,13 +333,18 @@ class AFQ(object):
     dti = property(get_dti, set_dti)
 
     def set_streamlines(self, force_recompute=False):
-        if 'streamlines_file' not in self.data_frame.columns or force_recompute:
+        if ('streamlines_file' not in self.data_frame.columns or
+                force_recompute):
             self.data_frame['streamlines_file'] =\
-                self.data_frame.apply(_streamlines, axis=1)
+                self.data_frame.apply(_streamlines, axis=1,
+                                      odf_model=self.odf_model,
+                                      directions=self.directions)
 
     def get_streamlines(self):
         self.set_streamlines()
         return self.data_frame['streamlines_file']
+
+    streamlines = property(get_streamlines, set_streamlines)
 
 
 def _get_affine(fname):
