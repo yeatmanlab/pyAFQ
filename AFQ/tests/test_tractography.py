@@ -38,7 +38,7 @@ def test_csd_tracking():
                               n_jobs=1,
                               engine="serial")
             npt.assert_equal(sl_serial[0].shape[-1], 3)
-            for engine in ["dask"]:
+            for engine in ["dask", "joblib"]:
                 for backend in ["threading"]:
                     sl_parallel = track(fname, directions,
                                         max_angle=30., sphere=None,
@@ -70,7 +70,7 @@ def test_dti_tracking():
                           step_size=0.5,
                           engine="serial")
         npt.assert_equal(sl_serial[0].shape[-1], 3)
-        for engine in ["dask"]:
+        for engine in ["dask", "joblib"]:
             for backend in ["threading"]:
                 sl_parallel = track(fdict['params'],
                                     directions,
