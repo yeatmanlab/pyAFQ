@@ -122,11 +122,11 @@ def _streamlines(row, odf_model="DTI", directions="det",
         fa = nib.load(fa_file).get_data()
         wm_mask = np.zeros_like(fa)
         wm_mask[fa > 0.2] = 1
-        streamlines = list(aft.track(params_file,
-                                     directions=directions,
-                                     seeds=1,
-                                     seed_mask=wm_mask,
-                                     stop_mask=fa))
+        streamlines = aft.track(params_file,
+                                directions=directions,
+                                seeds=1,
+                                seed_mask=wm_mask,
+                                stop_mask=fa)
         aus.write_trk(streamlines_file, streamlines,
                       affine=row['dwi_affine'])
     return streamlines_file
@@ -211,7 +211,7 @@ class AFQ(object):
     """
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
-                 dwi_file="*dwi*", anat_folder="anat",
+                 dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", b0_threshold=0,
                  odf_model="DTI", directions="det",
                  bundle_list=BUNDLES):
