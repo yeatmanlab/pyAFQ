@@ -19,7 +19,7 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST", "FA", "FP",
+BUNDLES = ["ATR", "CGC", "CST",
            "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
 
 
@@ -42,10 +42,12 @@ def make_bundle_dict(bundle_names=BUNDLES):
 
     afq_bundles = {}
     for name in bundle_names:
+        # Considder hard coding since we might have different rulse for
+        # some tracts
         for hemi in ['_R', '_L']:
             afq_bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' +
                                                            hemi],
-                                                 templates[name + '_roi1' +
+                                                 templates[name + '_roi2' +
                                                            hemi]],
                                         'rules': [True, True]}
 
