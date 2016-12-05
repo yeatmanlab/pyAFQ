@@ -324,6 +324,8 @@ def organize_stanford_data(path=None):
     """
     Create the expected file-system structure for the Stanford HARDI data-set
     """
+    dpd.fetch_stanford_hardi()
+
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
@@ -341,6 +343,9 @@ def organize_stanford_data(path=None):
         os.mkdir(dwi_folder)
         t1_img = dpd.read_stanford_t1()
         nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        seg_img = dpd.read_stanford_labels()[-1]
+        nib.save(seg_img, op.join(anat_folder,
+                                 'sub-01_sess-01_aparc+aseg.nii.gz'))
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)

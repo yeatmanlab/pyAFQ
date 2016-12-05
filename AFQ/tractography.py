@@ -16,7 +16,7 @@ from AFQ.utils.parallel import parfor
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.2,
+          seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.99,
           step_size=0.5, n_jobs=-1, n_chunks=100,
           backend="threading", engine="dask"):
     """
@@ -47,7 +47,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         Default to no stopping (all ones).
     stop_threshold : float, optional.
         A value of the stop_mask below which tracking is terminated. Default to
-        0.2.
+        0.99 (this means that if no stop_mask is passed, we will stop only at
+        the edge of the image)
     step_size : float, optional.
 
     Returns

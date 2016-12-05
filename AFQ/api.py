@@ -6,6 +6,8 @@ import os.path as op
 import numpy as np
 
 import nibabel as nib
+from nibabel import trackvis as tv
+
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 
@@ -19,8 +21,7 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST",
-           "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
 
 
 def make_bundle_dict(bundle_names=BUNDLES):
@@ -51,6 +52,7 @@ def make_bundle_dict(bundle_names=BUNDLES):
                                                            hemi]],
                                         'rules': [True, True]}
     return afq_bundles
+
 
 def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
                 vol_idx=None, dilate=None, force_recompute=False):
@@ -102,7 +104,7 @@ def _dti_fa(row, force_recompute=False):
 
 def _dti_md(row, force_recompute=False):
     dti_md_file = _get_fname(row, '_dti_md.nii.gz')
-    if not op.exists(dti_fa_file) or force_recompute:
+    if not op.exists(dti_md_file) or force_recompute:
         tf = _dti_fit(row)
         md = tf.md
         nib.save(nib.Nifti1Image(md, row['dwi_affine']),
@@ -111,7 +113,16 @@ def _dti_md(row, force_recompute=False):
 
 
 def _streamlines(row, odf_model="DTI", directions="det",
-                 force_recompute=False):
+                 force_recompute=False, labels=[1, 2]):
+    """
+
+    labels : list
+        The values within the segmentation that are considered white matter. We
+        will use this part of the image both to seed tracking (seeding
+        throughout), and for stopping.
+
+
+    """
     streamlines_file = _get_fname(row,
                                   '%s_%s_streamlines.trk' % (odf_model,
                                                              directions))
@@ -120,30 +131,45 @@ def _streamlines(row, odf_model="DTI", directions="det",
             params_file = _dti(row)
         else:
             raise(NotImplementedError)
-        fa_file = _dti_fa(row)
-        fa = nib.load(fa_file).get_data()
-        wm_mask = np.zeros_like(fa)
-        wm_mask[fa > 0.2] = 1
+
+        seg = nib.load(row['seg_file']).get_data()
+        # For different sets of labels, extract all the voxels that have any
+        # of these values:
+        wm_mask = np.sum(np.concatenate([(seg == l)[..., None]
+                                         for l in labels], -1), -1)
+
         streamlines = aft.track(params_file,
-                                directions=directions,
-                                seeds=1,
+                                directions='det',
+                                seeds=2,
                                 seed_mask=wm_mask,
-                                stop_mask=fa)
+                                stop_mask=wm_mask)
+
         aus.write_trk(streamlines_file, streamlines,
                       affine=row['dwi_affine'])
+
     return streamlines_file
 
 
-def _bundles(row, odf_model="DTI", directions="det", cleaning_params=None):
+def _bundles(row, odf_model="DTI", directions="det", cleaning_params=None,
+             force_recompute=False):
     """
 
     """
-    fdata = row["dwi_file"]
-    gtab = row["gtab"]
-    streamlines = _streamlines(row, odf_model, directions="det")
-    seg.segment(fdata, gtab, streamlines)
+    bundles_file = _get_fname(row,
+                              '%s_%s_bundles.trk' % (odf_model,
+                                                     directions))
+    if not op.exists(bundles_file) or force_recompute:
+        streamlines_file = _streamlines(row, odf_model=odf_model,
+                                        directions=directions,
+                                        force_recompute=force_recompute)
+        sl = aus.read_trk(streamlines_file)
+        fdata = row["dwi_file"]
 
-    return
+        bundle_dict = make_bundle_dict()
+        foo = seg.segment(row['dwi_file'][0], row['bval_file'][0],
+                          row['bvec_file'][0], sl, bundle_dict, )
+
+        seg.segment(fdata, gtab, streamlines)
 
 
 def _clean_bundles(row):
@@ -152,8 +178,6 @@ def _clean_bundles(row):
 
 def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None):
     pass
-
-
 
 
 class AFQ(object):
@@ -214,8 +238,8 @@ class AFQ(object):
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
-                 anat_file="*T1w*", b0_threshold=0,
-                 odf_model="DTI", directions="det",
+                 anat_file="*T1w*", seg_file='*aparc+aseg*',
+                 b0_threshold=0, odf_model="DTI", directions="det",
                  bundle_list=BUNDLES):
         """
 
@@ -253,6 +277,7 @@ class AFQ(object):
         bvec_file_list = []
         bval_file_list = []
         anat_file_list = []
+        seg_file_list = []
         for subject, sub_dir in zip(self.subjects, self.subject_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
@@ -276,6 +301,13 @@ class AFQ(object):
                                                          (sess,
                                                           anat_folder,
                                                           anat_file))))[0])
+
+                seg_file_list.append(glob.glob(op.join(sub_dir,
+                                                       ('%s/%s/%s.nii.gz' %
+                                                        (sess,
+                                                         anat_folder,
+                                                         seg_file))))[0])
+
                 sub_list.append(subject)
                 sess_list.append(sess)
 
@@ -284,6 +316,7 @@ class AFQ(object):
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             anat_file=anat_file_list,
+                                            seg_file=seg_file_list,
                                             sess=sess_list))
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
@@ -345,9 +378,16 @@ class AFQ(object):
 
     dti_fa = property(get_dti_fa, set_dti_fa)
 
+    def set_dti_md(self, force_recompute=False):
+        if 'dti_md_file' not in self.data_frame.columns or force_recompute:
+            self.data_frame['dti_md_file'] =\
+                self.data_frame.apply(_dti_md, axis=1)
 
+    def get_dti_md(self):
+        self.set_dti_md()
+        return self.data_frame['dti_md_file']
 
-
+    dti_md = property(get_dti_md, set_dti_md)
 
     def set_streamlines(self, force_recompute=False):
         if ('streamlines_file' not in self.data_frame.columns or
@@ -362,6 +402,7 @@ class AFQ(object):
         return self.data_frame['streamlines_file']
 
     streamlines = property(get_streamlines, set_streamlines)
+
 
 
 def _get_affine(fname):
