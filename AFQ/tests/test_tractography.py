@@ -13,6 +13,7 @@ from AFQ.utils.testing import make_tracking_data
 seeds = np.array([[-80., -120., -60.],
                   [-81, -121, -61]])
 
+
 tmpdir = nbtmp.InTemporaryDirectory()
 fbval = op.join(tmpdir.name, 'dti.bval')
 fbvec = op.join(tmpdir.name, 'dti.bvec')
@@ -34,9 +35,10 @@ def test_csd_tracking():
                               stop_mask=None,
                               stop_threshold=0.2,
                               step_size=0.5,
-                              n_jobs=1)
+                              n_jobs=1,
+                              engine="serial")
             npt.assert_equal(sl_serial[0].shape[-1], 3)
-            for engine in ["dask"]:
+            for engine in ["dask", "joblib"]:
                 for backend in ["threading"]:
                     sl_parallel = track(fname, directions,
                                         max_angle=30., sphere=None,
@@ -66,9 +68,9 @@ def test_dti_tracking():
                           stop_mask=None,
                           stop_threshold=0.2,
                           step_size=0.5,
-                          n_jobs=1)
+                          engine="serial")
         npt.assert_equal(sl_serial[0].shape[-1], 3)
-        for engine in ["dask"]:
+        for engine in ["dask", "joblib"]:
             for backend in ["threading"]:
                 sl_parallel = track(fdict['params'],
                                     directions,
@@ -77,7 +79,7 @@ def test_dti_tracking():
                                     seed_mask=None,
                                     seeds=seeds,
                                     stop_mask=None,
-                                    stop_threshold=0.2,
+                                    stop_threshold=0,
                                     step_size=0.5,
                                     n_jobs=2,
                                     engine=engine,

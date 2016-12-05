@@ -1,8 +1,13 @@
 import os
 import os.path as op
+import json
+
 import boto3
 
+import numpy as np
+
 import nibabel as nib
+import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 
 from AFQ.utils.streamlines import read_trk
@@ -10,7 +15,8 @@ from AFQ.utils.streamlines import read_trk
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
-           "read_stanford_hardi_tractography"]
+           "read_stanford_hardi_tractography",
+           "organize_stanford_data"]
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
@@ -196,7 +202,8 @@ def read_templates():
 
 def fetch_hcp(subjects):
     """
-    Fetch HCP diffusion data.
+    Fetch HCP diffusion data and arrange it in a manner that resembles the
+    BIDS [1]_ specification.
 
     Parameters
     ----------
@@ -205,7 +212,7 @@ def fetch_hcp(subjects):
 
     Returns
     -------
-    dict with remote and local names of thes files.
+    dict with remote and local names of these files.
 
     Notes
     -----
@@ -219,6 +226,10 @@ def fetch_hcp(subjects):
     The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
 
     Local filenames are changed to match our expected conventions.
+
+    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
+           a format for organizing and describing outputs of neuroimaging
+           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
     """
     boto3.setup_default_session(profile_name='hcp')
     s3 = boto3.resource('s3')
@@ -226,30 +237,53 @@ def fetch_hcp(subjects):
     base_dir = op.join(afq_home, "HCP")
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
+
+    deriv_dir = os.path.join(base_dir, "derivatives")
+    if not os.path.exists(deriv_dir):
+        os.mkdir(deriv_dir)
+
     data_files = {}
     for subject in subjects:
-        sub_dir = op.join(base_dir, '%s' % subject)
-        if not os.path.exists(op.join(base_dir, sub_dir)):
+        # We make a single session folder per subject for this case, because
+        # AFQ api expects session structure:
+        sub_dir = op.join(base_dir, 'sub-%s' % subject)
+        sess_dir = op.join(sub_dir, "sess-01")
+        if not os.path.exists(sub_dir):
             os.mkdir(sub_dir)
-            os.mkdir(os.path.join(sub_dir, 'sess'))
-            os.mkdir(os.path.join(sub_dir, 'sess', 'dwi'))
-            os.mkdir(os.path.join(sub_dir, 'sess', 'anat'))
-        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.bvals')] =\
+            os.mkdir(sess_dir)
+            os.mkdir(os.path.join(sess_dir, 'dwi'))
+            os.mkdir(os.path.join(sess_dir, 'anat'))
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
             'HCP/%s/T1w/Diffusion/bvals' % subject
-        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.bvecs')] =\
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
             'HCP/%s/T1w/Diffusion/bvecs' % subject
-        data_files[op.join(sub_dir, 'sess', 'dwi', 'dwi.nii.gz')] =\
+        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
             'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
-        data_files[op.join(sub_dir, 'sess', 'anat', 'T1w_acpc_dc.nii.gz')] =\
+        data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
             'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
-        data_files[op.join(sub_dir, 'sess', 'anat', 'aparc+aseg.nii.gz')] =\
+
+        sub_deriv_dir = op.join(deriv_dir, 'sub-%s' % subject)
+        if not os.path.exists(sub_deriv_dir):
+            os.mkdir(sub_deriv_dir)
+        data_files[op.join(sub_deriv_dir,
+                           'sub-%s_aparc+aseg.nii.gz' % subject)] =\
             'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
 
     for k in data_files.keys():
         if not op.exists(k):
             bucket.download_file(data_files[k], k)
+    # Create the BIDS dataset description file text
+    dataset_description = {
+         "BIDSVersion": "1.0.0",
+         "Name": "HCP",
+         "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
+         "Subjects": subjects}
+
+    with open(op.join(base_dir, 'dataset_description.json'), 'w') as outfile:
+        json.dump(dataset_description, outfile)
 
     return data_files
+
 
 stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]
 stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
@@ -284,3 +318,30 @@ def read_stanford_hardi_tractography():
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'))
     return files_dict
+
+
+def organize_stanford_data(path=None):
+    """
+    Create the expected file-system structure for the Stanford HARDI data-set
+    """
+    if path is None:
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        base_folder = op.join(afq_home, 'stanford_hardi')
+    else:
+        base_folder = op.join(path, 'stanford_hardi')
+
+    if not op.exists(base_folder):
+        os.mkdir(base_folder)
+        os.mkdir(op.join(base_folder, 'sub-01'))
+        os.mkdir(op.join(base_folder, 'sub-01', 'sess-01'))
+        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+        os.mkdir(anat_folder)
+        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
+        os.mkdir(dwi_folder)
+        t1_img = dpd.read_stanford_t1()
+        nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        dwi_img, gtab = dpd.read_stanford_hardi()
+        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)

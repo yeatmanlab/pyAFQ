@@ -6,7 +6,10 @@ import numpy as np
 import numpy.testing as npt
 
 import nibabel as nib
+import nibabel.tmpdirs as nbtmp
+
 from AFQ import api
+import AFQ.data as afd
 
 
 def touch(fname, times=None):
@@ -54,3 +57,17 @@ def test_AFQ_init():
     preproc_path = create_dummy_preproc_path(n_subjects, n_sessions)
     my_afq = api.AFQ(preproc_path=preproc_path)
     npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 8))
+
+
+def test_AFQ_data():
+    """
+    Test with some actual data
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
+                    sub_prefix='sub')
+    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+                     nib.load(myafq['dwi_file'][0]).shape[:3])
+    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+                     nib.load(myafq.dti[0]).shape[:3])

@@ -32,11 +32,14 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         Positional arguments to `func`.
     func_kwargs : list, optional
         Keyword arguments to `func`.
+
     Returns
     -------
     ndarray of identical shape to `arr`
+
     Examples
     --------
+
     """
     if n_jobs == -1:
         n_jobs = multiprocessing.cpu_count()
