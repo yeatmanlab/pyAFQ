@@ -50,7 +50,7 @@ def make_bundle_dict(bundle_names=BUNDLES):
                                                  templates[name + '_roi2' +
                                                            hemi]],
                                         'rules': [True, True]}
-
+    return afq_bundles
 
 def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
                 vol_idx=None, dilate=None, force_recompute=False):
