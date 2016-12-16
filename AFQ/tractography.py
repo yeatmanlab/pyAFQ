@@ -16,9 +16,8 @@ from AFQ.utils.parallel import parfor
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.99,
-          step_size=0.5, n_jobs=-1, n_chunks=100,
-          backend="threading", engine="dask"):
+          seed_mask=None, seeds=1, stop_mask=None, stop_threshold=0,
+          step_size=0.5):
     """
     Tractography
 
@@ -47,13 +46,13 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         Default to no stopping (all ones).
     stop_threshold : float, optional.
         A value of the stop_mask below which tracking is terminated. Default to
-        0.99 (this means that if no stop_mask is passed, we will stop only at
+        0 (this means that if no stop_mask is passed, we will stop only at
         the edge of the image)
     step_size : float, optional.
 
     Returns
     -------
-    LocalTracking object.
+    list of streamlines ()
     """
     if isinstance(params_file, str):
         params_img = nib.load(params_file)
@@ -100,30 +99,14 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
 
-    if engine == "serial":
-        return _local_tracking(seeds, dg, threshold_classifier, affine,
-                               step_size=step_size)
-    else:
-        if n_chunks < seeds.shape[0]:
-            seeds_list = []
-            i2 = 0
-            seeds_per_chunk = seeds.shape[0] // n_chunks
-            for chunk in range(n_chunks - 1):
-                i1 = i2
-                i2 = seeds_per_chunk * (chunk + 1)
-                seeds_list.append(seeds[i1:i2])
-        else:
-            seeds_list = seeds
-        ll = parfor(_local_tracking, seeds_list, n_jobs=n_jobs,
-                    engine=engine, backend=backend,
-                    func_args=[dg, threshold_classifier, affine],
-                    func_kwargs=dict(step_size=step_size))
+    return _local_tracking(seeds, dg, threshold_classifier, affine,
+                           step_size=step_size)
 
-        return(list(chain(*ll)))
 
 def _local_tracking(seeds, dg, threshold_classifier, affine,
                     step_size=0.5):
     """
+    Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
