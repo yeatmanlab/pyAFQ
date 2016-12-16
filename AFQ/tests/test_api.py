@@ -44,6 +44,9 @@ def create_dummy_preproc_path(n_subjects, n_sessions):
             nib.save(nib.Nifti1Image(data, aff),
                      op.join(preproc_dir, subject, session, 'anat',
                              'T1w.nii.gz'))
+            nib.save(nib.Nifti1Image(data, aff),
+                     op.join(preproc_dir, subject, session, 'anat',
+                             'aparc+aseg.nii.gz'))
 
     return preproc_dir
 
@@ -56,7 +59,7 @@ def test_AFQ_init():
     n_sessions = 2
     preproc_path = create_dummy_preproc_path(n_subjects, n_sessions)
     my_afq = api.AFQ(preproc_path=preproc_path)
-    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 8))
+    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 9))
 
 
 def test_AFQ_data():

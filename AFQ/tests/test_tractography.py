@@ -11,7 +11,8 @@ from AFQ.utils.testing import make_tracking_data
 
 
 seeds = np.array([[-80., -120., -60.],
-                  [-81, -121, -61]])
+                  [-81, -121, -61],
+                  [-81, -120, -60]])
 
 
 tmpdir = nbtmp.InTemporaryDirectory()
@@ -29,11 +30,14 @@ def test_csd_tracking():
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
             sl = track(fname, directions,
-                       max_angle=30., sphere=None,
+                       max_angle=30.,
+                       sphere=None,
                        seed_mask=None,
                        seeds=seeds,
                        stop_mask=None,
                        step_size=0.5)
+
+            assert len(sl[0]) > 10
 
 
 def test_dti_tracking():
