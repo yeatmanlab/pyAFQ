@@ -16,6 +16,7 @@ import AFQ.dti as dti
 import AFQ.tractography as aft
 from dipy.reconst.dti import TensorModel, TensorFit
 import AFQ.utils.streamlines as aus
+import AFQ.segmentation as seg
 
 def do_preprocessing():
     raise NotImplementedError
@@ -150,7 +151,7 @@ def _streamlines(row, odf_model="DTI", directions="det",
     return streamlines_file
 
 
-def _bundles(row, odf_model="DTI", directions="det", cleaning_params=None,
+def _bundles(row, odf_model="DTI", directions="det",
              force_recompute=False):
     """
 
@@ -164,20 +165,31 @@ def _bundles(row, odf_model="DTI", directions="det", cleaning_params=None,
                                         force_recompute=force_recompute)
         sl = aus.read_trk(streamlines_file)
         fdata = row["dwi_file"]
-
         bundle_dict = make_bundle_dict()
-        foo = seg.segment(row['dwi_file'][0], row['bval_file'][0],
-                          row['bvec_file'][0], sl, bundle_dict, )
+        bundles = seg.segment(row['dwi_file'], row['bval_file'],
+                              row['bvec_file'], sl, bundle_dict)
+        tgram = nib.streamlines.Tractogram([], {'bundle': []})
+        for b in bundles:
+            sl = list(bundles[b])
+            tgram2 = nib.streamlines.Tractogram(
+                        sl,
+                        data_per_streamline={'bundle': len(sl) * [sl]},
+                        affine_to_rasmm=row['dwi_affine'])
+            tgram = aus.add_bundles(tgram, tgram2)
+        nib.streamlines.save(tgram, bundles_file)
 
-        seg.segment(fdata, gtab, streamlines)
 
-
-def _clean_bundles(row):
-    pass
-
-
-def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None):
-    pass
+def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None,
+                    force_recompute=False):
+    profiles_file = _get_fname(row, '_profiles.csv')
+    if not op.exists() or force_recompute:
+        bundles_file = _bundles(row,
+                                odf_model=odf_model,
+                                directions=directions,
+                                force_recompute=force_recompute)
+        for scalar in scalars:
+            scalar_data = nib.load(row[scalar]).get_data()
+            seg.calculate_tract_profile(scalar_data, fiber_groups[bundle])
 
 
 class AFQ(object):
@@ -221,7 +233,7 @@ class AFQ(object):
 
     For now, it is up to users to arrange this file folder structure in their
     data, with preprocessed data, but in the future, this structure will be
-    automatically generated from
+    automatically generated from BIDS-compliant preprocessed data [1]_.
 
     Notes
     -----
@@ -402,6 +414,20 @@ class AFQ(object):
         return self.data_frame['streamlines_file']
 
     streamlines = property(get_streamlines, set_streamlines)
+
+    def set_bundles(self, force_recompute=False):
+        if ('bundles_file' not in self.data_frame.columns or
+                force_recompute):
+            self.data_frame['bundles_file'] =\
+                self.data_frame.apply(_bundles, axis=1,
+                                      odf_model=self.odf_model,
+                                      directions=self.directions)
+
+    def get_bundles(self):
+        self.set_bundles()
+        return self.data_frame['bundles_file']
+
+    bundles = property(get_bundles, set_bundles)
 
 
 

@@ -3,6 +3,14 @@ import nibabel as nib
 from nibabel import trackvis
 from dipy.tracking.utils import move_streamlines
 
+def add_bundles(*args):
+    result = nib.streamlines.Tractogram([], {'bundle': []})
+    for t in args:
+        result = nib.streamlines.Tractogram(
+            list(result.streamlines) + list(t.streamlines),
+            {'bundle': (list(result.data_per_streamline['bundle']) +
+                        list(t.data_per_streamline['bundle']))})
+    return result
 
 def read_trk(fname):
     """
