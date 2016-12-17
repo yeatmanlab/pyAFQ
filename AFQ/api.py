@@ -22,7 +22,9 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+#BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+
+BUNDLES = ["CST", "ARC"]
 
 
 def make_bundle_dict(bundle_names=BUNDLES):
@@ -163,21 +165,25 @@ def _bundles(row, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, odf_model=odf_model,
                                         directions=directions,
                                         force_recompute=force_recompute)
-        sl = aus.read_trk(streamlines_file)
+        sl = nib.streamlines.load(streamlines_file)
+        sl.apply_affine(np.linalg.inv(sl.affine))
         fdata = row["dwi_file"]
         bundle_dict = make_bundle_dict()
         bundles = seg.segment(row['dwi_file'], row['bval_file'],
                               row['bvec_file'], sl, bundle_dict)
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundles:
+            print("Segmenting: %s" % b)
             sl = list(bundles[b])
             tgram2 = nib.streamlines.Tractogram(
                         sl,
                         data_per_streamline={'bundle': len(sl) * [sl]},
                         affine_to_rasmm=row['dwi_affine'])
             tgram = aus.add_bundles(tgram, tgram2)
+
         nib.streamlines.save(tgram, bundles_file)
 
+    return bundles_file
 
 def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None,
                     force_recompute=False):
