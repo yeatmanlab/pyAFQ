@@ -48,6 +48,8 @@ def make_bundle_dict(bundle_names=BUNDLES):
     templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
 
     afq_bundles = {}
+    # Each bundles gets a digit identifier (to be stored in the tractogram)
+    uid = 1
     for name in bundle_names:
         # Considder hard coding since we might have different rulse for
         # some tracts
@@ -56,7 +58,10 @@ def make_bundle_dict(bundle_names=BUNDLES):
                                                            hemi],
                                                  templates[name + '_roi2' +
                                                            hemi]],
-                                        'rules': [True, True]}
+                                        'rules': [True, True],
+                                        'uid': uid}
+            uid += 1
+
     return afq_bundles
 
 
@@ -165,6 +170,21 @@ def _streamlines(row, odf_model="DTI", directions="det",
     return streamlines_file
 
 
+def _tgramer(bundles, bundle_dict, affine):
+    tgram = nib.streamlines.Tractogram([], {'bundle': []})
+    for b in bundles:
+        print("Segmenting: %s" % b)
+        this_sl = list(bundles[b])
+        this_tgram = nib.streamlines.Tractogram(
+                            this_sl,
+                            data_per_streamline={
+                                'bundle': (len(this_sl) *
+                                           [bundle_dict[b]['uid']])},
+                            affine_to_rasmm=affine)
+        tgram = aus.add_bundles(tgram, this_tgram)
+    return tgram
+
+
 def _bundles(row, odf_model="DTI", directions="det",
              force_recompute=False):
     """
@@ -190,18 +210,8 @@ def _bundles(row, odf_model="DTI", directions="det",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
-        tgram = nib.streamlines.Tractogram([], {'bundle': []})
-        for b in bundles:
-            print("Segmenting: %s" % b)
-            this_sl = list(bundles[b])
-            this_tgram = nib.streamlines.Tractogram(
-                                        this_sl,
-                                        data_per_streamline={
-                                            'bundle': (len(this_sl) * [b])},
-                                        affine_to_rasmm=row['dwi_affine'])
-            tgram = aus.add_bundles(tgram, this_tgram)
+        tgram = _tgramer(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
-
     return bundles_file
 
 
@@ -278,7 +288,7 @@ class AFQ(object):
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
                  b0_threshold=0, odf_model="DTI", directions="det",
-                 bundle_list=BUNDLES):
+                 bundle_list=BUNDLES, dask_it=False):
         """
 
         b0_threshold : int, optional
@@ -291,6 +301,9 @@ class AFQ(object):
         directions : string, optional
             How to select directions for tracking (deterministic or
             probablistic) {"det", "prob"}. Default: "det".
+
+        dask_it : bool, optional
+            Whether to use a dask DataFrame object
 
         """
         self.directions = directions
@@ -349,15 +362,16 @@ class AFQ(object):
                 sub_list.append(subject)
                 sess_list.append(sess)
 
-        self.data_frame = ddf.from_pandas(
-                            pd.DataFrame(dict(subject=sub_list,
-                                              dwi_file=dwi_file_list,
-                                              bvec_file=bvec_file_list,
-                                              bval_file=bval_file_list,
-                                              anat_file=anat_file_list,
-                                              seg_file=seg_file_list,
-                                              sess=sess_list)),
-                            npartitions=len(sub_list))
+        self.data_frame = pd.DataFrame(dict(subject=sub_list,
+                                            dwi_file=dwi_file_list,
+                                            bvec_file=bvec_file_list,
+                                            bval_file=bval_file_list,
+                                            anat_file=anat_file_list,
+                                            seg_file=seg_file_list,
+                                            sess=sess_list))
+        if dask_it:
+            self.data_frame = ddf.from_pandas(self.data_frame,
+                                              npartitions=len(sub_list))
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
 

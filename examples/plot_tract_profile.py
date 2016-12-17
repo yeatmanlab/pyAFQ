@@ -19,7 +19,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
-
+%matplotlib inline
 
 dpd.fetch_stanford_hardi()
 
@@ -37,7 +37,6 @@ if not op.exists('./dti_FA.nii.gz'):
 else:
     dti_params = {'FA': './dti_FA.nii.gz',
                   'params': './dti_params.nii.gz'}
-
 
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
