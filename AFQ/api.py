@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import pandas as pd
+import dask.dataframe as ddf
 import glob
 import os.path as op
 
@@ -178,7 +179,6 @@ def _bundles(row, odf_model="DTI", directions="det",
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        fdata = row["dwi_file"]
         bundle_dict = make_bundle_dict()
         reg_template = dpd.read_mni_template()
         mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
@@ -186,22 +186,20 @@ def _bundles(row, odf_model="DTI", directions="det",
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
-                              list(sl),
+                              sl,
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
-
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundles:
             print("Segmenting: %s" % b)
-            streamlines = list(bundles[b])
-            tgram2 = nib.streamlines.Tractogram(
-                        streamlines,
-                        data_per_streamline={
-                            'bundle': len(streamlines) * [streamlines]},
-                        affine_to_rasmm=row['dwi_affine'])
-            tgram = aus.add_bundles(tgram, tgram2)
-        1/0.
+            this_sl = list(bundles[b])
+            this_tgram = nib.streamlines.Tractogram(
+                                        this_sl,
+                                        data_per_streamline={
+                                            'bundle': (len(this_sl) * [b])},
+                                        affine_to_rasmm=row['dwi_affine'])
+            tgram = aus.add_bundles(tgram, this_tgram)
         nib.streamlines.save(tgram, bundles_file)
 
     return bundles_file
@@ -351,13 +349,15 @@ class AFQ(object):
                 sub_list.append(subject)
                 sess_list.append(sess)
 
-        self.data_frame = pd.DataFrame(dict(subject=sub_list,
-                                            dwi_file=dwi_file_list,
-                                            bvec_file=bvec_file_list,
-                                            bval_file=bval_file_list,
-                                            anat_file=anat_file_list,
-                                            seg_file=seg_file_list,
-                                            sess=sess_list))
+        self.data_frame = ddf.from_pandas(
+                            pd.DataFrame(dict(subject=sub_list,
+                                              dwi_file=dwi_file_list,
+                                              bvec_file=bvec_file_list,
+                                              bval_file=bval_file_list,
+                                              anat_file=anat_file_list,
+                                              seg_file=seg_file_list,
+                                              sess=sess_list)),
+                            npartitions=len(sub_list))
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
 

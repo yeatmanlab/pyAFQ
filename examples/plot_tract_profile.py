@@ -7,8 +7,6 @@ An example of tracking and segmenting two tracts, and plotting their tract
 profiles for FA (calculated with DTI).
 
 """
-
-
 import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
