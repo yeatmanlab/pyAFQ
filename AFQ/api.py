@@ -10,6 +10,7 @@ from nibabel import trackvis as tv
 
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
+import dipy.data as dpd
 
 import AFQ.data as afd
 import AFQ.dti as dti
@@ -17,6 +18,7 @@ import AFQ.tractography as aft
 from dipy.reconst.dti import TensorModel, TensorFit
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
+import AFQ.registration as reg
 
 def do_preprocessing():
     raise NotImplementedError
@@ -115,16 +117,25 @@ def _dti_md(row, force_recompute=False):
     return dti_md_file
 
 
+def _mapping(row, force_recompute=False):
+    mapping_file = _get_fname(row, '_mapping.nii.gz')
+    if not op.exists(mapping_file) or force_recompute:
+        gtab = row['gtab']
+        reg_template = dpd.read_mni_template()
+        mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
+                                       template=reg_template)
+
+        reg.write_mapping(mapping, mapping_file)
+    return mapping_file
+
+
 def _streamlines(row, odf_model="DTI", directions="det",
                  force_recompute=False, labels=[1, 2]):
     """
-
     labels : list
         The values within the segmentation that are considered white matter. We
         will use this part of the image both to seed tracking (seeding
         throughout), and for stopping.
-
-
     """
     streamlines_file = _get_fname(row,
                                   '%s_%s_streamlines.trk' % (odf_model,
@@ -165,25 +176,36 @@ def _bundles(row, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, odf_model=odf_model,
                                         directions=directions,
                                         force_recompute=force_recompute)
-        sl = nib.streamlines.load(streamlines_file)
-        sl.apply_affine(np.linalg.inv(sl.affine))
+        tg = nib.streamlines.load(streamlines_file).tractogram
+        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
         fdata = row["dwi_file"]
         bundle_dict = make_bundle_dict()
-        bundles = seg.segment(row['dwi_file'], row['bval_file'],
-                              row['bvec_file'], sl, bundle_dict)
+        reg_template = dpd.read_mni_template()
+        mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
+                                   reg_template)
+        bundles = seg.segment(row['dwi_file'],
+                              row['bval_file'],
+                              row['bvec_file'],
+                              list(sl),
+                              bundle_dict,
+                              reg_template=reg_template,
+                              mapping=mapping)
+
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundles:
             print("Segmenting: %s" % b)
-            sl = list(bundles[b])
+            streamlines = list(bundles[b])
             tgram2 = nib.streamlines.Tractogram(
-                        sl,
-                        data_per_streamline={'bundle': len(sl) * [sl]},
+                        streamlines,
+                        data_per_streamline={
+                            'bundle': len(streamlines) * [streamlines]},
                         affine_to_rasmm=row['dwi_affine'])
             tgram = aus.add_bundles(tgram, tgram2)
-
+        1/0.
         nib.streamlines.save(tgram, bundles_file)
 
     return bundles_file
+
 
 def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None,
                     force_recompute=False):
@@ -407,6 +429,18 @@ class AFQ(object):
 
     dti_md = property(get_dti_md, set_dti_md)
 
+    def set_mapping(self, force_recompute=False):
+        if 'mapping' not in self.data_frame.columns or force_recompute:
+            self.data_frame['mapping'] =\
+                self.data_frame.apply(_mapping, axis=1)
+
+    def get_mapping(self):
+        self.set_mapping()
+        return self.data_frame['mapping']
+
+    mapping = property(get_mapping, set_mapping)
+
+
     def set_streamlines(self, force_recompute=False):
         if ('streamlines_file' not in self.data_frame.columns or
                 force_recompute):
@@ -434,7 +468,6 @@ class AFQ(object):
         return self.data_frame['bundles_file']
 
     bundles = property(get_bundles, set_bundles)
-
 
 
 def _get_affine(fname):
