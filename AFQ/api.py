@@ -213,17 +213,44 @@ def _bundles(row, odf_model="DTI", directions="det",
     return bundles_file
 
 
-def _tract_profiles(row, scalars=["DTI_FA", "DTI_MD"], weighting=None,
+def _tract_profiles(row, scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
-    if not op.exists() or force_recompute:
+    if not op.exists(profiles_file) or force_recompute:
         bundles_file = _bundles(row,
                                 odf_model=odf_model,
                                 directions=directions,
                                 force_recompute=force_recompute)
+        bundle_dict = make_bundle_dict()
+        keys = []
+        vals = []
+        for k in bundle_dict.keys():
+            keys.append(bundle_dict[k]['uid'])
+            vals.append(k)
+        reverse_dict = dict(zip(keys, vals))
+
+        bundle_names = []
+        nodes = []
+
+        trk = nib.streamlines.load(bundles_file)
         for scalar in scalars:
-            scalar_data = nib.load(row[scalar]).get_data()
-            seg.calculate_tract_profile(scalar_data, fiber_groups[bundle])
+            scalar_data = nib.load(row[scalar + "_file"]).get_data()
+            for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
+                idx = np.where(
+                    trk.tractogram.data_per_streamline['bundle'] == b)[0]
+                this_sl = list(trk.streamlines[idx])
+                bundle_name = reverse_dict[b]
+                this_profile = seg.calculate_tract_profile(scalar_data,
+                                                           this_sl)
+    # Columns: bundle_name, scalar, node_number
+    # Rows:    string,      float,  integer (index)
+    profile_dframe = pd.DataFrame()
+    profile_dframe.to_csv(profiles_file)
+
+    return profiles_file
+
+
+
 
 
 class AFQ(object):
