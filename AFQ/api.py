@@ -25,9 +25,7 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-#BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
-
-BUNDLES = ["CST", "ARC"]
+BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
 
 
 def make_bundle_dict(bundle_names=BUNDLES):
