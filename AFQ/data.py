@@ -238,10 +238,6 @@ def fetch_hcp(subjects):
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
 
-    deriv_dir = os.path.join(base_dir, "derivatives")
-    if not os.path.exists(deriv_dir):
-        os.mkdir(deriv_dir)
-
     data_files = {}
     for subject in subjects:
         # We make a single session folder per subject for this case, because
@@ -261,11 +257,7 @@ def fetch_hcp(subjects):
             'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
             'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
-
-        sub_deriv_dir = op.join(deriv_dir, 'sub-%s' % subject)
-        if not os.path.exists(sub_deriv_dir):
-            os.mkdir(sub_deriv_dir)
-        data_files[op.join(sub_deriv_dir,
+        data_files[op.join(sess_dir, 'anat',
                            'sub-%s_aparc+aseg.nii.gz' % subject)] =\
             'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
 
