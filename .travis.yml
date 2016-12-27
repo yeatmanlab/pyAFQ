@@ -19,7 +19,7 @@ before_install:
   - conda update conda
   - conda info -a
   - conda config --add channels conda-forge
-  - conda install python=$PYTHON_VERSION $CONDA_DEPS
+  - conda install python=$TRAVIS_PYTHON_VERSION $CONDA_DEPS
   - pip install $PIP_DEPS
 
 install:
