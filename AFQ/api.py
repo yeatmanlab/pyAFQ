@@ -7,7 +7,6 @@ import os.path as op
 import numpy as np
 
 import nibabel as nib
-from nibabel import trackvis as tv
 
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
@@ -20,6 +19,7 @@ from dipy.reconst.dti import TensorModel, TensorFit
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
+
 
 def do_preprocessing():
     raise NotImplementedError
@@ -150,17 +150,35 @@ def _streamlines(row, odf_model="DTI", directions="det",
         else:
             raise(NotImplementedError)
 
-        seg = nib.load(row['seg_file']).get_data()
+        seg_img = nib.load(row['seg_file'])
+        dwi_img = nib.load(row['dwi_file'])
+        seg_data_orig = seg_img.get_data()
+        # Corpus callosum labels:
+        cc_mask = ((seg_data_orig == 251) |
+                   (seg_data_orig == 252) |
+                   (seg_data_orig == 253) |
+                   (seg_data_orig == 254) |
+                   (seg_data_orig == 255))
+
+        # Cerebral white matter in both hemispheres + corpus callosum
+        wm_mask = ((seg_data_orig == 41) | (seg_data_orig == 2) |
+                   (cc_mask))
+
+        dwi_data = dwi_img.get_data()
+        resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                             seg_img.affine,
+                             dwi_img.affine)).astype(int)
+
         # For different sets of labels, extract all the voxels that have any
         # of these values:
-        wm_mask = np.sum(np.concatenate([(seg == l)[..., None]
-                                         for l in labels], -1), -1)
+        # wm_mask = np.sum(np.concatenate([(seg == l)[..., None]
+        #                                  for l in labels], -1), -1)
 
         streamlines = aft.track(params_file,
                                 directions='det',
                                 seeds=2,
-                                seed_mask=wm_mask,
-                                stop_mask=wm_mask)
+                                seed_mask=resamp_wm,
+                                stop_mask=resamp_wm)
 
         aus.write_trk(streamlines_file, streamlines,
                       affine=row['dwi_affine'])
@@ -174,10 +192,10 @@ def _tgramer(bundles, bundle_dict, affine):
         print("Segmenting: %s" % b)
         this_sl = list(bundles[b])
         this_tgram = nib.streamlines.Tractogram(
-                            this_sl,
-                            data_per_streamline={
-                                'bundle': (len(this_sl) *
-                                           [bundle_dict[b]['uid']])},
+                        this_sl,
+                        data_per_streamline={
+                            'bundle': (len(this_sl) *
+                                       [bundle_dict[b]['uid']])},
                             affine_to_rasmm=affine)
         tgram = aus.add_bundles(tgram, this_tgram)
     return tgram
@@ -248,9 +266,6 @@ def _tract_profiles(row, scalars=["dti_fa", "dti_md"], weighting=None,
     profile_dframe.to_csv(profiles_file)
 
     return profiles_file
-
-
-
 
 
 class AFQ(object):
