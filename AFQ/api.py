@@ -121,6 +121,11 @@ def _dti_md(row, force_recompute=False):
     return dti_md_file
 
 
+# Keep track of functions that compute scalars:
+scalar_dict = {"dti_fa": _dti_fa,
+               "dti_md": _dti_md}
+
+
 def _mapping(row, force_recompute=False):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
     if not op.exists(mapping_file) or force_recompute:
@@ -238,9 +243,16 @@ def _tract_profiles(row, odf_model="DTI", directions="det",
             vals.append(k)
         reverse_dict = dict(zip(keys, vals))
 
+        bundle_names = []
+        profiles = []
+        node_numbers = []
+        scalar_names = []
+
         trk = nib.streamlines.load(bundles_file)
         for scalar in scalars:
-            scalar_data = nib.load(row[scalar + "_file"]).get_data()
+            scalar_file = scalar_dict[scalar](row,
+                                              force_recompute=force_recompute)
+            scalar_data = nib.load(scalar_file).get_data()
             for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                 idx = np.where(
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
@@ -248,9 +260,18 @@ def _tract_profiles(row, odf_model="DTI", directions="det",
                 bundle_name = reverse_dict[b]
                 this_profile = seg.calculate_tract_profile(scalar_data,
                                                            this_sl)
+                nodes = list(np.arange(this_profile.shape[0]))
+                bundle_names.extend([bundle_name] * len(nodes))
+                node_numbers.extend(nodes)
+                scalar_names.extend([scalar] * len(nodes))
+                profiles.extend(list(this_profile))
+
     # Columns: bundle_name, scalar, node_number
     # Rows:    string,      float,  integer (index)
-    profile_dframe = pd.DataFrame()
+    profile_dframe = pd.DataFrame(dict(profiles=profiles,
+                                       bundle=bundle_names,
+                                       node=node_numbers,
+                                       scalar=scalar_names))
     profile_dframe.to_csv(profiles_file)
 
     return profiles_file
@@ -516,6 +537,18 @@ class AFQ(object):
         return self.data_frame['bundles_file']
 
     bundles = property(get_bundles, set_bundles)
+
+    def set_tract_profiles(self, force_recompute=False):
+        if ('tract_profiles_file' not in self.data_frame.columns or
+                force_recompute):
+            self.data_frame['tract_profiles_file'] =\
+                self.data_frame.apply(_tract_profiles, axis=1)
+
+    def get_tract_profiles(self):
+        self.set_tract_profiles()
+        return self.data_frame['tract_profiles_file']
+
+    tract_profiles = property(get_tract_profiles, set_tract_profiles)
 
 
 def _get_affine(fname):
