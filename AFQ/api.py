@@ -196,7 +196,7 @@ def _tgramer(bundles, bundle_dict, affine):
     return tgram
 
 
-def _bundles(row, odf_model="DTI", directions="det",
+def _bundles(row, wm_labels, odf_model="DTI", directions="det",
              force_recompute=False):
     """
 
@@ -205,7 +205,8 @@ def _bundles(row, odf_model="DTI", directions="det",
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
     if not op.exists(bundles_file) or force_recompute:
-        streamlines_file = _streamlines(row, odf_model=odf_model,
+        streamlines_file = _streamlines(row, wm_labels,
+                                        odf_model=odf_model,
                                         directions=directions,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
@@ -226,12 +227,13 @@ def _bundles(row, odf_model="DTI", directions="det",
     return bundles_file
 
 
-def _tract_profiles(row, odf_model="DTI", directions="det",
+def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
                     scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
         bundles_file = _bundles(row,
+                                wm_labels,
                                 odf_model=odf_model,
                                 directions=directions,
                                 force_recompute=force_recompute)
@@ -514,7 +516,7 @@ class AFQ(object):
                 force_recompute):
             self.data_frame['streamlines_file'] =\
                 self.data_frame.apply(_streamlines, axis=1,
-                                      args=self.wm_labels,
+                                      args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions)
 
@@ -529,6 +531,7 @@ class AFQ(object):
                 force_recompute):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
+                                      args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions)
 
@@ -542,7 +545,9 @@ class AFQ(object):
         if ('tract_profiles_file' not in self.data_frame.columns or
                 force_recompute):
             self.data_frame['tract_profiles_file'] =\
-                self.data_frame.apply(_tract_profiles, axis=1)
+                self.data_frame.apply(_tract_profiles,
+                                      args=[self.wm_labels],
+                                      axis=1)
 
     def get_tract_profiles(self):
         self.set_tract_profiles()
@@ -560,26 +565,3 @@ def _get_fname(row, suffix):
     fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
                     suffix)
     return fname
-
-# def _tensor_fa_fname(row):
-#     split_fdwi = op.split(row['dwi_file'])
-#     be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-#                        'dti_FA.nii.gz')
-#
-#
-# def _tensor_fnames(row):
-#     split_fdwi = op.split(row['dwi_file'])
-#     names = ['FA', 'MD', 'AD', 'RD', 'params']
-#
-#     for n in names:
-#         file_paths[n] = op.join(out_dir, 'dti_%s.nii.gz' % n)
-#         be_fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-#                            '_brain_mask.nii.gz')
-#
-#
-# def _fit_tensor(row, mask=None, force_recompute):
-#     if not op.exists(row['dti_files']) or force_recompute:
-#         out_dir = op.split(row['dwi_file'])[0]
-#         dt_files = fit_dti(row['dwi_file'], row['bval_file'],
-#                            row['bvec_file'], mask=mask,
-#                            out_dir=out_dir, b0_threshold=b0_threshold)
