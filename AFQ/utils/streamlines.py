@@ -3,6 +3,7 @@ import nibabel as nib
 from nibabel import trackvis
 from dipy.tracking.utils import move_streamlines
 
+
 def add_bundles(t1, t2):
     """
     Combine two bundles, using the second bundles affine
@@ -11,7 +12,8 @@ def add_bundles(t1, t2):
         list(t1.streamlines) + list(t2.streamlines),
         {'bundle': (list(t1.data_per_streamline['bundle']) +
                     list(t2.data_per_streamline['bundle']))},
-                    affine_to_rasmm=t2.affine_to_rasmm)
+        affine_to_rasmm=t2.affine_to_rasmm)
+
 
 def read_trk(fname):
     """

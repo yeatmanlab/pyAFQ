@@ -19,7 +19,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
-%matplotlib inline
+
 
 dpd.fetch_stanford_hardi()
 

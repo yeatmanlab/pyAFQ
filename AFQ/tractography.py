@@ -1,18 +1,14 @@
-from itertools import chain
-
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
 
 import dipy.data as dpd
-from dipy.align import Bunch
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.tracking.local import ThresholdTissueClassifier, LocalTracking
 
 from AFQ.dti import tensor_odf
-from AFQ.utils.parallel import parfor
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,

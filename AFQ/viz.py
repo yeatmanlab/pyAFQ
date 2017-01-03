@@ -5,7 +5,6 @@ import IPython.display as display
 
 import nibabel as nib
 from dipy.viz import fvtk
-from dipy.viz.colormap import line_colors
 from palettable.tableau import Tableau_20
 
 

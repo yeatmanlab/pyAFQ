@@ -133,8 +133,8 @@ def _mapping(row, force_recompute=False):
     return mapping_file
 
 
-def _streamlines(row, odf_model="DTI", directions="det",
-                 force_recompute=False, labels=[1, 2]):
+def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
+                 force_recompute=False):
     """
     labels : list
         The values within the segmentation that are considered white matter. We
@@ -153,26 +153,16 @@ def _streamlines(row, odf_model="DTI", directions="det",
         seg_img = nib.load(row['seg_file'])
         dwi_img = nib.load(row['dwi_file'])
         seg_data_orig = seg_img.get_data()
-        # Corpus callosum labels:
-        cc_mask = ((seg_data_orig == 251) |
-                   (seg_data_orig == 252) |
-                   (seg_data_orig == 253) |
-                   (seg_data_orig == 254) |
-                   (seg_data_orig == 255))
 
-        # Cerebral white matter in both hemispheres + corpus callosum
-        wm_mask = ((seg_data_orig == 41) | (seg_data_orig == 2) |
-                   (cc_mask))
+        # For different sets of labels, extract all the voxels that have any
+        # of these values:
+        wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
+                                         for l in wm_labels], -1), -1)
 
         dwi_data = dwi_img.get_data()
         resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
                              seg_img.affine,
                              dwi_img.affine)).astype(int)
-
-        # For different sets of labels, extract all the voxels that have any
-        # of these values:
-        # wm_mask = np.sum(np.concatenate([(seg == l)[..., None]
-        #                                  for l in labels], -1), -1)
 
         streamlines = aft.track(params_file,
                                 directions='det',
@@ -192,11 +182,11 @@ def _tgramer(bundles, bundle_dict, affine):
         print("Segmenting: %s" % b)
         this_sl = list(bundles[b])
         this_tgram = nib.streamlines.Tractogram(
-                        this_sl,
-                        data_per_streamline={
-                            'bundle': (len(this_sl) *
-                                       [bundle_dict[b]['uid']])},
-                            affine_to_rasmm=affine)
+            this_sl,
+            data_per_streamline={
+                'bundle': (len(this_sl) *
+                           [bundle_dict[b]['uid']])},
+                affine_to_rasmm=affine)
         tgram = aus.add_bundles(tgram, this_tgram)
     return tgram
 
@@ -231,7 +221,8 @@ def _bundles(row, odf_model="DTI", directions="det",
     return bundles_file
 
 
-def _tract_profiles(row, scalars=["dti_fa", "dti_md"], weighting=None,
+def _tract_profiles(row, odf_model="DTI", directions="det",
+                    scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
@@ -246,9 +237,6 @@ def _tract_profiles(row, scalars=["dti_fa", "dti_md"], weighting=None,
             keys.append(bundle_dict[k]['uid'])
             vals.append(k)
         reverse_dict = dict(zip(keys, vals))
-
-        bundle_names = []
-        nodes = []
 
         trk = nib.streamlines.load(bundles_file)
         for scalar in scalars:
@@ -328,7 +316,8 @@ class AFQ(object):
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
                  b0_threshold=0, odf_model="DTI", directions="det",
-                 bundle_list=BUNDLES, dask_it=False):
+                 bundle_list=BUNDLES, dask_it=False,
+                 wm_labels=[251, 252, 253, 254, 255, 41, 2]):
         """
 
         b0_threshold : int, optional
@@ -345,11 +334,16 @@ class AFQ(object):
         dask_it : bool, optional
             Whether to use a dask DataFrame object
 
+        wm_labels : list, optional
+            A list of the labels of the white matter in the segmentation file
+            used. Default: the white matter values for the segmentation
+            provided with the HCP data: [251, 252, 253, 254, 255, 41, 2].
         """
         self.directions = directions
         self.odf_model = odf_model
         self.raw_path = raw_path
         self.bundle_list = bundle_list
+        self.wm_labels = wm_labels
 
         self.preproc_path = preproc_path
         if self.preproc_path is None:
@@ -494,12 +488,12 @@ class AFQ(object):
 
     mapping = property(get_mapping, set_mapping)
 
-
     def set_streamlines(self, force_recompute=False):
         if ('streamlines_file' not in self.data_frame.columns or
                 force_recompute):
             self.data_frame['streamlines_file'] =\
                 self.data_frame.apply(_streamlines, axis=1,
+                                      args=self.wm_labels,
                                       odf_model=self.odf_model,
                                       directions=self.directions)
 
