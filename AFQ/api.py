@@ -260,8 +260,10 @@ def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
                 this_sl = list(trk.streamlines[idx])
                 bundle_name = reverse_dict[b]
-                this_profile = seg.calculate_tract_profile(scalar_data,
-                                                           this_sl)
+                this_profile = seg.calculate_tract_profile(
+                    scalar_data,
+                    this_sl,
+                    affine=row['dwi_affine'])
                 nodes = list(np.arange(this_profile.shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
                 node_numbers.extend(nodes)
