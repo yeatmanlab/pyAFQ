@@ -13,9 +13,9 @@ from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 
 import AFQ.data as afd
-import AFQ.dti as dti
+from AFQ.dti import _fit as dti_fit
 import AFQ.tractography as aft
-from dipy.reconst.dti import TensorModel, TensorFit
+import dipy.reconst.dti as dpy_dti
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
@@ -87,7 +87,7 @@ def _dti(row, force_recompute=False):
         gtab = row['gtab']
         brain_mask_file = _brain_mask(row)
         mask = nib.load(brain_mask_file).get_data()
-        dtf = dti._fit(gtab, data, mask=mask)
+        dtf = dti_fit(gtab, data, mask=mask)
         nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
                  dti_params_file)
     return dti_params_file
@@ -96,8 +96,8 @@ def _dti(row, force_recompute=False):
 def _dti_fit(row):
     dti_params_file = _dti(row)
     dti_params = nib.load(dti_params_file).get_data()
-    tm = TensorModel(row['gtab'])
-    tf = TensorFit(tm, dti_params)
+    tm = dpy_dti.TensorModel(row['gtab'])
+    tf = dpy_dti.TensorFit(tm, dti_params)
     return tf
 
 
@@ -122,8 +122,8 @@ def _dti_md(row, force_recompute=False):
 
 
 # Keep track of functions that compute scalars:
-scalar_dict = {"dti_fa": _dti_fa,
-               "dti_md": _dti_md}
+_scalar_dict = {"dti_fa": _dti_fa,
+                "dti_md": _dti_md}
 
 
 def _mapping(row, force_recompute=False):
@@ -141,7 +141,7 @@ def _mapping(row, force_recompute=False):
 def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                  force_recompute=False):
     """
-    labels : list
+    wm_labels : list
         The values within the segmentation that are considered white matter. We
         will use this part of the image both to seed tracking (seeding
         throughout), and for stopping.
@@ -198,9 +198,6 @@ def _tgramer(bundles, bundle_dict, affine):
 
 def _bundles(row, wm_labels, odf_model="DTI", directions="det",
              force_recompute=False):
-    """
-
-    """
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -252,8 +249,8 @@ def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
 
         trk = nib.streamlines.load(bundles_file)
         for scalar in scalars:
-            scalar_file = scalar_dict[scalar](row,
-                                              force_recompute=force_recompute)
+            scalar_file = _scalar_dict[scalar](row,
+                                               force_recompute=force_recompute)
             scalar_data = nib.load(scalar_file).get_data()
             for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                 idx = np.where(
@@ -373,7 +370,7 @@ class AFQ(object):
             if self.raw_path is None:
                 e_s = "must provide either preproc_path or raw_path (or both)"
                 raise ValueError(e_s)
-            # This creates the preproc_path such that:
+            # This creates the preproc_path such that everything else works:
             self.preproc_path = do_preprocessing(self.raw_path)
         # This is the place in which each subject's full data lives
         self.subject_dirs = glob.glob(op.join(preproc_path,
