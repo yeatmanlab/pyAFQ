@@ -9,6 +9,7 @@ profiles for FA (calculated with DTI).
 """
 import os.path as op
 import matplotlib.pyplot as plt
+import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
@@ -43,8 +44,8 @@ if not op.exists('dti_streamlines.trk'):
     streamlines = list(aft.track(dti_params['params']))
     aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
 else:
-    streamlines = aus.read_trk('./dti_streamlines.trk')
-
+    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
 # Use only a small portion of the streamlines, for expedience:
 streamlines = streamlines[::100]
