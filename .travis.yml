@@ -1,19 +1,12 @@
+language: python
 sudo: false
-
 env:
   global:
-    - CONDA_DEPS="pip flake8 pytest dipy pandas joblib dask" PIP_DEPS="coveralls pytest-cov boto3"
+    - CONDA_DEPS="pip flake8 pytest dipy pandas joblib dask" PIP_DEPS="coveralls pytest-cov boto3" MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh"
 
-matrix:
-  include:
-    - os: linux
-      env:
-         - PYTHON_VERSION=2.7
-         - MINICONDA_URL="http://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh"
-    - os: linux
-      env:
-         - PYTHON_VERSION=3.5
-         - MINICONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+python:
+- '2.7'
+- '3.5'
 
 before_install:
   - export MINICONDA=$HOME/miniconda
@@ -26,7 +19,7 @@ before_install:
   - conda update conda
   - conda info -a
   - conda config --add channels conda-forge
-  - conda install python=$PYTHON_VERSION $CONDA_DEPS
+  - conda install python=$TRAVIS_PYTHON_VERSION $CONDA_DEPS
   - pip install $PIP_DEPS
 
 install:
@@ -41,14 +34,3 @@ script:
 
 after_success:
 - coveralls
-
-before_cache:
-# clean unused packages & installed files from conda cache
-# this makes the cache rebuilt less frequently
-- conda clean --tarballs --packages --index-cache
-- rm -rf $HOME/miniconda/pkgs/cache
-- xargs rm <installed_files.txt
-
-cache:
-  directories:
-    - $HOME/miniconda

@@ -1,0 +1,7 @@
+dipy
+numpy
+scipy
+pandas
+joblib
+dask
+palettable

@@ -22,6 +22,6 @@ myafq = api.AFQ(preproc_path=op.join(afd.afq_home, 'stanford_hardi'),
 FA = nib.load(myafq.dti_fa[0]).get_data()
 
 fig, ax = plt.subplots(1)
-ax.matshow(FA[:, :, FA.shape[-1]//2], cmap='viridis')
+ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
 ax.axis("off")
 plt.show()

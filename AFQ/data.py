@@ -238,10 +238,6 @@ def fetch_hcp(subjects):
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
 
-    deriv_dir = os.path.join(base_dir, "derivatives")
-    if not os.path.exists(deriv_dir):
-        os.mkdir(deriv_dir)
-
     data_files = {}
     for subject in subjects:
         # We make a single session folder per subject for this case, because
@@ -261,11 +257,7 @@ def fetch_hcp(subjects):
             'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
             'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
-
-        sub_deriv_dir = op.join(deriv_dir, 'sub-%s' % subject)
-        if not os.path.exists(sub_deriv_dir):
-            os.mkdir(sub_deriv_dir)
-        data_files[op.join(sub_deriv_dir,
+        data_files[op.join(sess_dir, 'anat',
                            'sub-%s_aparc+aseg.nii.gz' % subject)] =\
             'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
 
@@ -324,6 +316,8 @@ def organize_stanford_data(path=None):
     """
     Create the expected file-system structure for the Stanford HARDI data-set
     """
+    dpd.fetch_stanford_hardi()
+
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
@@ -341,6 +335,9 @@ def organize_stanford_data(path=None):
         os.mkdir(dwi_folder)
         t1_img = dpd.read_stanford_t1()
         nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        seg_img = dpd.read_stanford_labels()[-1]
+        nib.save(seg_img, op.join(anat_folder,
+                                  'sub-01_sess-01_aparc+aseg.nii.gz'))
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)

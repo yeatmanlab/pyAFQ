@@ -11,7 +11,8 @@ from AFQ.utils.testing import make_tracking_data
 
 
 seeds = np.array([[-80., -120., -60.],
-                  [-81, -121, -61]])
+                  [-81, -121, -61],
+                  [-81, -120, -60]])
 
 
 tmpdir = nbtmp.InTemporaryDirectory()
@@ -28,63 +29,25 @@ def test_csd_tracking():
                         sh_order=8, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
-            sl_serial = track(fname, directions,
-                              max_angle=30., sphere=None,
-                              seed_mask=None,
-                              seeds=seeds,
-                              stop_mask=None,
-                              stop_threshold=0.2,
-                              step_size=0.5,
-                              n_jobs=1,
-                              engine="serial")
-            npt.assert_equal(sl_serial[0].shape[-1], 3)
-            for engine in ["dask", "joblib"]:
-                for backend in ["threading"]:
-                    sl_parallel = track(fname, directions,
-                                        max_angle=30., sphere=None,
-                                        seed_mask=None,
-                                        seeds=seeds,
-                                        stop_mask=None,
-                                        stop_threshold=0.2,
-                                        step_size=0.5,
-                                        n_jobs=2,
-                                        engine=engine,
-                                        backend=backend)
-                    npt.assert_equal(sl_parallel[0].shape[-1], 3)
+            sl = track(fname, directions,
+                       max_angle=30.,
+                       sphere=None,
+                       seed_mask=None,
+                       seeds=seeds,
+                       stop_mask=None,
+                       step_size=0.5)
 
-                    if directions == 'det':
-                        npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
+            npt.assert_(len(sl[0]) > 10)
 
 
 def test_dti_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
-        sl_serial = track(fdict['params'],
-                          directions,
-                          max_angle=30.,
-                          sphere=None,
-                          seed_mask=None,
-                          seeds=seeds,
-                          stop_mask=None,
-                          stop_threshold=0.2,
-                          step_size=0.5,
-                          engine="serial")
-        npt.assert_equal(sl_serial[0].shape[-1], 3)
-        for engine in ["dask", "joblib"]:
-            for backend in ["threading"]:
-                sl_parallel = track(fdict['params'],
-                                    directions,
-                                    max_angle=30.,
-                                    sphere=None,
-                                    seed_mask=None,
-                                    seeds=seeds,
-                                    stop_mask=None,
-                                    stop_threshold=0,
-                                    step_size=0.5,
-                                    n_jobs=2,
-                                    engine=engine,
-                                    backend=backend)
-                npt.assert_equal(sl_parallel[0].shape[-1], 3)
-
-                if directions == 'det':
-                    npt.assert_almost_equal(sl_parallel[0], sl_serial[0])
+        sl = track(fdict['params'],
+                   directions,
+                   max_angle=30.,
+                   sphere=None,
+                   seed_mask=None,
+                   seeds=1,
+                   step_size=0.5)
+        npt.assert_(len(sl[0]) > 10)

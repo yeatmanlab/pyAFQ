@@ -7,8 +7,6 @@ An example of tracking and segmenting two tracts, and plotting their tract
 profiles for FA (calculated with DTI).
 
 """
-
-
 import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
@@ -39,7 +37,6 @@ if not op.exists('./dti_FA.nii.gz'):
 else:
     dti_params = {'FA': './dti_FA.nii.gz',
                   'params': './dti_params.nii.gz'}
-
 
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
@@ -81,7 +78,8 @@ fiber_groups = seg.segment(hardi_fdata,
                            bundles,
                            reg_template=MNI_T2_img,
                            mapping=mapping,
-                           as_generator=False)
+                           as_generator=False,
+                           affine=img.affine)
 
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_data()
@@ -89,8 +87,6 @@ FA_data = FA_img.get_data()
 print("Extracting tract profiles...")
 for bundle in bundles:
     fig, ax = plt.subplots(1)
-    w = seg.gaussian_weights(fiber_groups[bundle])
-    profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle],
-                                          weights=w)
+    profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
     ax.plot(profile)
     ax.set_title(bundle)

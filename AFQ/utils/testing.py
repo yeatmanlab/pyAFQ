@@ -78,8 +78,8 @@ def make_dki_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
     np.savetxt(out_fbval, bvals_2s)
     np.savetxt(out_fbvec, bvecs_2s)
 
-"""
 
+"""
 What follows is code from Dipy.
 
 The code is (c) Dipy developers, 2009 -- 2016, and released under a BSD license

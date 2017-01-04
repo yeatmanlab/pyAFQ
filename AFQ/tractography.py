@@ -1,24 +1,19 @@
-from itertools import chain
-
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
 
 import dipy.data as dpd
-from dipy.align import Bunch
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.tracking.local import ThresholdTissueClassifier, LocalTracking
 
 from AFQ.dti import tensor_odf
-from AFQ.utils.parallel import parfor
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, seeds=2, stop_mask=None, stop_threshold=0.2,
-          step_size=0.5, n_jobs=-1, n_chunks=100,
-          backend="threading", engine="dask"):
+          seed_mask=None, seeds=1, stop_mask=None, stop_threshold=0,
+          step_size=0.5, min_length=10):
     """
     Tractography
 
@@ -47,12 +42,16 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         Default to no stopping (all ones).
     stop_threshold : float, optional.
         A value of the stop_mask below which tracking is terminated. Default to
-        0.2.
+        0 (this means that if no stop_mask is passed, we will stop only at
+        the edge of the image)
     step_size : float, optional.
+        The size (in mm) of a step of tractography. Default: 0.5
+    min_length: int, optional
+        The miminal length (no. of nodes) in a streamline. Default: 10
 
     Returns
     -------
-    LocalTracking object.
+    list of streamlines ()
     """
     if isinstance(params_file, str):
         params_img = nib.load(params_file)
@@ -60,7 +59,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         params_img = params_file
 
     model_params = params_img.get_data()
-    affine = params_img.get_affine()
+    affine = params_img.affine
 
     if isinstance(seeds, int):
         if seed_mask is None:
@@ -99,30 +98,14 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
 
-    if engine == "serial":
-        return _local_tracking(seeds, dg, threshold_classifier, affine,
-                               step_size=step_size)
-    else:
-        if n_chunks < seeds.shape[0]:
-            seeds_list = []
-            i2 = 0
-            seeds_per_chunk = seeds.shape[0] // n_chunks
-            for chunk in range(n_chunks - 1):
-                i1 = i2
-                i2 = seeds_per_chunk * (chunk + 1)
-                seeds_list.append(seeds[i1:i2])
-        else:
-            seeds_list = seeds
-        ll = parfor(_local_tracking, seeds_list, n_jobs=n_jobs,
-                    engine=engine, backend=backend,
-                    func_args=[dg, threshold_classifier, affine],
-                    func_kwargs=dict(step_size=step_size))
+    return _local_tracking(seeds, dg, threshold_classifier, affine,
+                           step_size=step_size, min_length=min_length)
 
-        return(list(chain(*ll)))
 
 def _local_tracking(seeds, dg, threshold_classifier, affine,
-                    step_size=0.5):
+                    step_size=0.5, min_length=10):
     """
+    Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
@@ -132,4 +115,4 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
                             affine,
                             step_size=step_size)
 
-    return list(tracker)
+    return [l for l in tracker if l.shape[0] > min_length]
