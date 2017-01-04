@@ -270,13 +270,11 @@ def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
                 scalar_names.extend([scalar] * len(nodes))
                 profiles.extend(list(this_profile))
 
-    # Columns: bundle_name, scalar, node_number
-    # Rows:    string,      float,  integer (index)
-    profile_dframe = pd.DataFrame(dict(profiles=profiles,
-                                       bundle=bundle_names,
-                                       node=node_numbers,
-                                       scalar=scalar_names))
-    profile_dframe.to_csv(profiles_file)
+        profile_dframe = pd.DataFrame(dict(profiles=profiles,
+                                           bundle=bundle_names,
+                                           node=node_numbers,
+                                           scalar=scalar_names))
+        profile_dframe.to_csv(profiles_file)
 
     return profiles_file
 
