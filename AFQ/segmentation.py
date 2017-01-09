@@ -199,7 +199,7 @@ def gaussian_weights(bundle, n_points=100):
             raise ValueError(e_s)
         n_points = bundle.shape[1]
 
-    w = np.zeros((bundle.shape[0], n_points))
+    m_dist = np.zeros((bundle.shape[0], n_points))
     for node in range(bundle.shape[1]):
         # This should come back as a 3D covariance matrix with the spatial
         # variance covariance of this node across the different streamlines
@@ -212,9 +212,36 @@ def gaussian_weights(bundle, n_points=100):
         # Weights are the inverse of the Mahalanobis distance
         for fn in range(bundle.shape[0]):
             # calculate Mahalanobis for node on fiber[fn]
-            w[fn, node] = mahalanobis(node_coords[fn], m, c)
+            m_dist[fn, node] = mahalanobis(node_coords[fn], m, c)
     # weighting is inverse to the distance (the further you are, the less you
     # should be weighted)
-    w = 1 / w
+    w = 1 / m_dist
     # Normalize before returning, so that the weights in each node sum to 1:
-    return w / np.sum(w, 0)
+    w = w / np.sum(w, 0)
+
+    # Return normalized weights and mahalanobis distance
+    return m_dist, w
+
+def clean_bundle(bundle, n_points=100, M_thresh, L_thresh):
+    """
+    Clean a bundle by removing fibers that are far from the core of the tract
+    (in terms of mahalanobis distance) or are too long or short (in mm)
+
+    Parameters
+    ----------
+    bundle : array or list
+        If this is a list, assume that it is a list of streamline coordinates
+        (each entry is a 2D array, of shape n by 3). If this is an array, this
+        is a resampled version of the streamlines, with equal number of points
+        in each streamline.
+    n_points : int, optional
+        The number of points to resample to. *If the `bundle` is an array, this
+        input is ignored*. Default: 100.
+    M_thresh : This is the threshold for distance a fiber can be from the core
+    L_thesh : Length threshold for how long or short a fiber can be
+
+    Returns
+    -------
+    bundle_clear : cleaned bundle
+    rmidx : indices for fibers that were removed from original bundle
+    """
