@@ -1,38 +1,35 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 from AFQ import dki
 
+description = """Fit the DKI model, save files with derived maps"""
+parser = ArgumentParser(description=description)
 
-def parse_string(option, opt, value, parser):
-    setattr(parser.values, option.dest, value.split(','))
+parser.add_argument("-d", "--dwi", nargs="+", required=True,
+                  help="DWI file or list of DWI files (separated by spaces)")
 
+parser.add_argument("-l", "--bval", nargs="+", required=True,
+                  help="""b-value file or list of b-value files
+                  (separated by spaces)""")
 
-usage = """pyAFQ_dki [options]"""
-parser = OptionParser(usage)
+parser.add_argument("-c", "--bvec", nargs="+", required=True,
+                  help="""b-vector file or list of b-vector files
+                  (separated by spaces)""")
 
-parser.add_option("-d", "--dwi", type="string", action="callback",
-                  callback=parse_string,
-                  help="Comma-separated (no spaces!) list of DWI files ")
+parser.add_argument("-o", "--out_dir",
+                  help="""full path to directory for files to be saved 
+                  (will be created if it doesn't exist)""")
 
-parser.add_option("-l", "--bval", type="string", action="callback",
-                  callback=parse_string,
-                  help="Comma-separated (no spaces!) list of b-value files")
+parser.add_argument("-m", "--mask", help="""
+        binary mask, set to True or 1 in voxels to be processed.
+        default: Process all voxels.""")
 
-parser.add_option("-c", "--bvec", type="string", action="callback",
-                  callback=parse_string,
-                  help="Comma-separated (no spaces!) list of b-vector files")
-
-parser.add_option("-o", "--out_dir",
-                  help="full path to directory for files to be saved (will be created if it doesn't exist)")
-
-parser.add_option("-m", "--mask", help="mask file")
-
-parser.add_option('-b', '--b0_threshold', help="b0 threshold",
+parser.add_argument('-b', '--b0_threshold', help="b0 threshold",
                   default=0, type=float)
 
-opts, args = parser.parse_args()
+args = parser.parse_args()
 
-dki.fit_dki(opts.dwi, opts.bval, opts.bvec, mask=opts.mask,
-            out_dir=opts.out_dir, b0_threshold=opts.b0_threshold)
+dki.fit_dki(args.dwi, args.bval, args.bvec, mask=args.mask,
+            out_dir=args.out_dir, b0_threshold=args.b0_threshold)
