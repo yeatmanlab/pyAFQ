@@ -4,10 +4,12 @@ from argparse import ArgumentParser
 
 import numpy as np
 import dipy.core.gradients as dpg
-from AFQ import dti
 
-description = """Create a signal prediction from DTI params."""
+description = """Create a signal prediction from DKI or DTI params."""
 parser = ArgumentParser(description=description)
+
+parser.add_argument("-t", "--model_type", metavar="model_type", required=True,
+        choices=["dki", "dti"], help="fitting method ('dki' or 'dti')")
 
 parser.add_argument("-p", "--params", metavar="param_file", required=True,
         help="path to file containing DKI params")
@@ -43,5 +45,10 @@ gtab = dpg.gradient_table(np.concatenate(bvals),
         np.concatenate(bvecs, -1),
         b0_threshold=args.b0_threshold)
 
-dti.predict(args.params, gtab, S0_file=args.S0_file,
+if args.model_type == "dki":
+    from AFQ import dki as model_type
+else:
+    from AFQ import dti as model_type
+
+model_type.predict(args.params, gtab, S0_file=args.S0_file,
         out_dir=args.out_dir)

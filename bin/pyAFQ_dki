@@ -2,10 +2,11 @@
 
 from argparse import ArgumentParser
 
-from AFQ import dki
-
-description = """Fit the DKI model, save files with derived maps"""
+description = """Fit a DKI or DTI model, save files with derived maps"""
 parser = ArgumentParser(description=description)
+
+parser.add_argument("-t", "--model_type", metavar="model_type", required=True,
+        choices=["dki", "dti"], help="fitting method ('dki' or 'dti')")
 
 parser.add_argument("-d", "--dwi", nargs="+", required=True,
         help="DWI file or list of DWI files (separated by spaces)")
@@ -31,5 +32,12 @@ parser.add_argument('-b', '--b0_threshold', help="b0 threshold",
 
 args = parser.parse_args()
 
-dki.fit_dki(args.dwi, args.bval, args.bvec, mask=args.mask,
+if args.model_type == "dki":
+    from AFQ import dki
+    fit = dki.fit_dki
+else:
+    from AFQ import dti
+    fit = dti.fit_dti
+
+fit(args.dwi, args.bval, args.bvec, mask=args.mask,
         out_dir=args.out_dir, b0_threshold=args.b0_threshold)
