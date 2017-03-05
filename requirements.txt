@@ -5,3 +5,6 @@ pandas
 joblib
 dask
 palettable
+cloudpickle
+toolz
+boto3
