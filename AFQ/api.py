@@ -461,7 +461,9 @@ class AFQ(object):
                        vol_idx=None, dilate=None):
         if 'brain_mask_file' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['brain_mask_file'] =\
-                self.data_frame.apply(_brain_mask, axis=1)
+                self.data_frame.apply(_brain_mask,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
 
     def get_brain_mask(self):
         self.set_brain_mask()
@@ -472,7 +474,9 @@ class AFQ(object):
     def set_dti(self):
         if 'dti_params_file' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['dti_params_file'] =\
-                self.data_frame.apply(_dti, axis=1)
+                self.data_frame.apply(_dti,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
 
     def get_dti(self):
         self.set_dti()
@@ -483,7 +487,9 @@ class AFQ(object):
     def set_dti_fa(self):
         if 'dti_fa_file' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['dti_fa_file'] =\
-                self.data_frame.apply(_dti_fa, axis=1)
+                self.data_frame.apply(_dti_fa,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
 
     def get_dti_fa(self):
         self.set_dti_fa()
@@ -494,7 +500,9 @@ class AFQ(object):
     def set_dti_md(self):
         if 'dti_md_file' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['dti_md_file'] =\
-                self.data_frame.apply(_dti_md, axis=1)
+                self.data_frame.apply(_dti_md,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
 
     def get_dti_md(self):
         self.set_dti_md()
@@ -505,7 +513,9 @@ class AFQ(object):
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['mapping'] =\
-                self.data_frame.apply(_mapping, axis=1)
+                self.data_frame.apply(_mapping,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
 
     def get_mapping(self):
         self.set_mapping()
@@ -520,10 +530,10 @@ class AFQ(object):
                 self.data_frame.apply(_streamlines, axis=1,
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
-                                      directions=self.directions)
+                                      directions=self.directions,
+                                      force_recompute=self.force_recompute)
 
     def get_streamlines(self):
-        print 'hi'
         self.set_streamlines()
         return self.data_frame['streamlines_file']
 
@@ -536,7 +546,8 @@ class AFQ(object):
                 self.data_frame.apply(_bundles, axis=1,
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
-                                      directions=self.directions)
+                                      directions=self.directions,
+                                      force_recompute=self.force_recompute)
 
     def get_bundles(self):
         self.set_bundles()
@@ -550,6 +561,7 @@ class AFQ(object):
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels],
+                                      force_recompute=self.force_recompute,
                                       axis=1)
 
     def get_tract_profiles(self):
