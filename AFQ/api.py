@@ -459,7 +459,8 @@ class AFQ(object):
 
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None):
-        if 'brain_mask_file' not in self.data_frame.columns or self.force_recompute:
+        if ('brain_mask_file' not in self.data_frame.columns or
+                self.force_recompute):
             self.data_frame['brain_mask_file'] =\
                 self.data_frame.apply(_brain_mask,
                                       axis=1,
@@ -472,7 +473,8 @@ class AFQ(object):
     brain_mask = property(get_brain_mask, set_brain_mask)
 
     def set_dti(self):
-        if 'dti_params_file' not in self.data_frame.columns or self.force_recompute:
+        if ('dti_params_file' not in self.data_frame.columns or
+                self.force_recompute):
             self.data_frame['dti_params_file'] =\
                 self.data_frame.apply(_dti,
                                       axis=1,
@@ -485,7 +487,8 @@ class AFQ(object):
     dti = property(get_dti, set_dti)
 
     def set_dti_fa(self):
-        if 'dti_fa_file' not in self.data_frame.columns or self.force_recompute:
+        if ('dti_fa_file' not in self.data_frame.columns or
+                self.force_recompute):
             self.data_frame['dti_fa_file'] =\
                 self.data_frame.apply(_dti_fa,
                                       axis=1,
@@ -498,7 +501,8 @@ class AFQ(object):
     dti_fa = property(get_dti_fa, set_dti_fa)
 
     def set_dti_md(self):
-        if 'dti_md_file' not in self.data_frame.columns or self.force_recompute:
+        if ('dti_md_file' not in self.data_frame.columns or
+                self.force_recompute):
             self.data_frame['dti_md_file'] =\
                 self.data_frame.apply(_dti_md,
                                       axis=1,
