@@ -5,3 +5,4 @@ pandas
 joblib
 dask
 palettable
+boto3
