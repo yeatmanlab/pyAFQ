@@ -217,7 +217,7 @@ def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
 
     MD = params[..., 0]
     MK = params[..., 1]
-    S0 = params[..., 0]
+    S0 = params[..., 2]
 
     maps = [MD, MK, S0]
     names = ['MD', 'MK', 'S0']
