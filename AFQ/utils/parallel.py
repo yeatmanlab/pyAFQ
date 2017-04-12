@@ -32,11 +32,14 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         Positional arguments to `func`.
     func_kwargs : list, optional
         Keyword arguments to `func`.
+
     Returns
     -------
     ndarray of identical shape to `arr`
+
     Examples
     --------
+
     """
     if n_jobs == -1:
         n_jobs = multiprocessing.cpu_count()
@@ -63,6 +66,9 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         elif backend == "threading":
             results = dask.compute(*d, get=dask.threaded.get,
                                    workers=n_jobs)
+        else:
+            raise ValueError("%s is not a backend for dask" % backend)
+
     elif engine == "serial":
         results = []
         for in_element in in_list:

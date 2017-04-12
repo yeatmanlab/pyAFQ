@@ -43,20 +43,36 @@ def patch_up_roi(roi):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
-            reg_template=None, mapping=None, as_generator=True, **reg_kwargs):
+            reg_template=None, mapping=None, as_generator=True,
+            clip_to_roi=True, **reg_kwargs):
     """
+    Segment streamlines into bundles.
 
-    generate : bool
-        Whether to generate the streamlines here, or return generators.
+    Parameters
+    ----------
+    fdata, fbval, fbvec : str
+        Full path to data, bvals, bvecs
 
-    reg_template : template to use for registration (defaults to the MNI T2)
+    streamlines : list of 2D arrays
+        Each array is a streamline, shape (3, N).
 
     bundles: dict
         The format is something like::
 
              {'name': {'ROIs':[img, img], 'rules':[True, True]}}
 
+    reg_template : str or nib.Nifti1Image, optional.
+        Template to use for registration (defaults to the MNI T2)
 
+    mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional
+        A mapping between DWI space and a template. Defaults to generate this.
+
+    as_generator : bool, optional
+        Whether to generate the streamlines here, or return generators.
+        Default: True.
+
+    clip_to_roi : bool, optional
+        Whether to clip the streamlines between the ROIs
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
     xform_sl = [s for s in dtu.move_streamlines(streamlines,
@@ -99,7 +115,12 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_sl = dts.orient_by_rois(select_sl,
                                        orient_ROIs[0].get_data(),
                                        orient_ROIs[1].get_data(),
-                                       in_place=True)
+                                       as_generator=True)
+
+        #  XXX Implement clipping to the ROIs
+        #  if clip_to_roi:
+        #    dts.clip()
+
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
