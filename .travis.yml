@@ -21,7 +21,7 @@ before_install:
   - conda config --add channels conda-forge
   - conda install python=$TRAVIS_PYTHON_VERSION $CONDA_DEPS
   - pip install $PIP_DEPS
-  - pip install git+ssh://git@github.com/nipy/dipy
+  - pip install https://github.com/nipy/dipy/archive/master.zip
 
 install:
 - python setup.py install --record installed_files.txt
