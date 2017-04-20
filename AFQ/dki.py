@@ -118,7 +118,7 @@ def avs_dki_df(gtab, data, mask=None, min_signal=1.0e-6):
             1) Direct Mean Diffusivity measure
             2) Direct Mean Kurtosis measure
             3) Direct S0 estimate
-    
+
     Reference
     ---------
     Henriques, R.N., Correia, M.M., Interpreting age-related changes based
@@ -128,14 +128,14 @@ def avs_dki_df(gtab, data, mask=None, min_signal=1.0e-6):
     params = np.zeros(data.shape[:-1] + (3,))
 
     bmag = int(np.log10(gtab.bvals.max()))
-    b = gtab.bvals.copy() / (10 ** (bmag-1))  # normalize b units
-    b = b.round() * (10 ** (bmag-1))
+    b = gtab.bvals.copy() / (10 ** (bmag - 1))  # normalize b units
+    b = b.round() * (10 ** (bmag - 1))
     uniqueb = np.unique(b)
     nb = len(uniqueb)
 
     B = np.zeros((nb, 3))
     B[:, 0] = -uniqueb
-    B[:, 1] = 1.0/6.0 * uniqueb**2
+    B[:, 1] = 1.0 / 6.0 * uniqueb ** 2
     B[:, 2] = np.ones(nb)
 
     ng = np.zeros(nb)
@@ -172,7 +172,7 @@ def avs_dki_df(gtab, data, mask=None, min_signal=1.0e-6):
 
 
 def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
-                b0_threshold=0):
+             b0_threshold=0):
     """
     Fit the DKI model, save files with derived maps
 
