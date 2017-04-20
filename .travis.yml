@@ -2,7 +2,7 @@ language: python
 sudo: false
 env:
   global:
-    - CONDA_DEPS="pip flake8 pytest dipy pandas joblib dask" PIP_DEPS="coveralls pytest-cov boto3" MINICONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+    - CONDA_DEPS="pip flake8 pytest pandas joblib dask" PIP_DEPS="coveralls pytest-cov boto3" MINICONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 
 python:
 - '2.7'
@@ -21,6 +21,7 @@ before_install:
   - conda config --add channels conda-forge
   - conda install python=$TRAVIS_PYTHON_VERSION $CONDA_DEPS
   - pip install $PIP_DEPS
+  - pip install git+ssh://git@github.com/nipy/dipy
 
 install:
 - python setup.py install --record installed_files.txt
