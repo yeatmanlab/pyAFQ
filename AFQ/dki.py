@@ -311,7 +311,6 @@ def fit_dkimicro(data_files, bval_files, bvec_files, mask=None,
     return file_paths
 
 
-
 def predict(params_file, gtab, S0_file=None, out_dir=None):
     """
     Create a signal prediction from DKI params
