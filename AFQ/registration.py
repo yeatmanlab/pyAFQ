@@ -295,7 +295,7 @@ def affine_registration(moving, static,
 
 
 def register_series(series, ref, pipeline):
-    """ Register a series to a reference image.
+    """Register a series to a reference image.
 
     Parameters
     ----------
