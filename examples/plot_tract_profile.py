@@ -8,6 +8,7 @@ profiles for FA (calculated with DTI).
 
 """
 import os.path as op
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import nibabel as nib
@@ -21,7 +22,7 @@ import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
 
-
+plt.switch_backend('agg')
 dpd.fetch_stanford_hardi()
 
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
