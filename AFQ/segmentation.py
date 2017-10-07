@@ -41,7 +41,7 @@ def patch_up_roi(roi):
     """
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
 
-
+@profile
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, as_generator=True,
             clip_to_roi=True, **reg_kwargs):
