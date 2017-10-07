@@ -8,7 +8,6 @@ profiles for FA (calculated with DTI).
 
 """
 import os.path as op
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import nibabel as nib
