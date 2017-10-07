@@ -128,7 +128,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
-            fiber_groups[bundle] = list(select_sl)
+            fiber_groups[bundle] = nib.streamlines.Tractogram(select_sl, affine_to_rasmm=img.affine)
 
     return fiber_groups
 
