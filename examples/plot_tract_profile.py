@@ -277,4 +277,3 @@ for bundle in bundles:
     profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
     ax.plot(profile)
     ax.set_title(bundle)
->>>>>>> 6079a8e0504b49e5b2f9a36f92afaccf198e4b33
