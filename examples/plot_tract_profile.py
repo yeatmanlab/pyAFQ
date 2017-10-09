@@ -8,8 +8,6 @@ profiles for FA (calculated with DTI).
 
 """
 import os.path as op
-import matplotlib.pyplot as plt
-matplotlib.use('agg')
 import numpy as np
 import nibabel as nib
 import dipy.data as dpd
@@ -194,14 +192,14 @@ def func():
                             as_generator=False,
                             affine=img.affine)
 
-    FA_img = nib.load(dti_params['FA'])
-    FA_data = FA_img.get_data()
-
-    print("Extracting tract profiles...")
-    for bundle in bundles:
-        fig, ax = plt.subplots(1)
-        profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
-        ax.plot(profile)
-        ax.set_title(bundle)
+    # FA_img = nib.load(dti_params['FA'])
+    # FA_data = FA_img.get_data()
+    #
+    # print("Extracting tract profiles...")
+    # for bundle in bundles:
+    #     fig, ax = plt.subplots(1)
+    #     profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
+    #     ax.plot(profile)
+    #     ax.set_title(bundle)
 
 func()
