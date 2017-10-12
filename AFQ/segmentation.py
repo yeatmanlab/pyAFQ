@@ -41,7 +41,6 @@ def patch_up_roi(roi):
     """
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
 
-@profile
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, as_generator=True,
             clip_to_roi=True, **reg_kwargs):
@@ -124,7 +123,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
-            fiber_groups[bundle] = list(select_sl)
+            fiber_groups[bundle] = nib.streamlines.Tractogram(select_sl, affine_to_rasmm=img.affine)
 
     return fiber_groups
 
