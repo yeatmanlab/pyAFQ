@@ -236,7 +236,7 @@ def fetch_hcp(subjects):
     bucket = s3.Bucket('hcp-openaccess')
     base_dir = op.join(afq_home, "HCP")
     if not os.path.exists(base_dir):
-        os.mkdir(base_dir)
+        os.makedirs(base_dir, exist_ok=True)
 
     data_files = {}
     for subject in subjects:
