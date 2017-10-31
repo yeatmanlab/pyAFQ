@@ -23,14 +23,3 @@ script:
 
 after_success:
 - coveralls
-- |
-    if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then
-      pip install sphinx sphinx-gallery pillow
-      # Doctr for gh-pages;
-      set -e;
-      pip install doctr;
-      cd doc;
-      make html;
-      cd ..;
-      doctr deploy .;
-    fi
