@@ -28,4 +28,4 @@ def test_read_write_trk():
         new_sl = aus.read_trk(fname)
         # Compare each streamline:
         for new, old in zip(new_sl, sl):
-            npt.assert_almost_equal(new, old, decimal=5)
+            npt.assert_almost_equal(new, old, decimal=4)
