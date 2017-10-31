@@ -24,6 +24,7 @@ import AFQ.segmentation as seg
 dpd.fetch_stanford_hardi()
 
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
+print(hardi_dir)
 hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
 hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
 hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")

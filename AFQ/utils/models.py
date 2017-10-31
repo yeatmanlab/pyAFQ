@@ -3,6 +3,7 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 
 
+#@profile
 def prepare_data(data_files, bval_files, bvec_files, mask=None,
                  b0_threshold=0):
     """
@@ -40,18 +41,29 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
     if isinstance(mask, str):
         mask = nib.load(mask).get_data().astype(bool)
 
-    data = []
-    bvals = []
-    bvecs = []
-    for dfile, bval_file, bvec_file in zip(data_files, bval_files, bvec_files):
-        img = nib.load(dfile)
-        data.append(img.get_data())
-        bvals.append(np.loadtxt(bval_file))
-        bvecs.append(np.loadtxt(bvec_file))
+    #print(nib.load(data_files[0]).shape)
 
-    data = np.concatenate(data, -1)
-    gtab = dpg.gradient_table(np.concatenate(bvals),
-                              np.concatenate(bvecs, -1),
-                              b0_threshold=b0_threshold)
+    data = [nib.load(dfile).get_data() for dfile in data_files]
+    img = nib.load(data_files[-1])
+    bvals = [np.loadtxt(bval_file) for bval_file in bval_files]
+    bvecs = [np.loadtxt(bvec_file) for bvec_file in bvec_files]
 
-    return img, data, gtab, mask
+    print(data[0].shape)
+    print(bvals[0].shape)
+    print(bvecs[0].shape)
+
+    data = np.concatenate([data[0], datatest])
+    bvals = np.concatenate([bvals[0], bvalstest])
+    bvecs = np.concatenate([bvecs[0], bvecstest])
+
+    print(data.shape)
+    print(bvals.shape)
+    print(bvecs.shape)
+
+    #gtab = dpg.gradient_table(bvals,bvecs,b0_threshold=b0_threshold)
+
+    return img, data, mask
+
+prepare_data(data_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.nii.gz',
+             bval_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bval',
+             bvec_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bvec')
