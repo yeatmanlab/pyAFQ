@@ -48,22 +48,10 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
     bvals = [np.loadtxt(bval_file) for bval_file in bval_files]
     bvecs = [np.loadtxt(bvec_file) for bvec_file in bvec_files]
 
-    print(data[0].shape)
-    print(bvals[0].shape)
-    print(bvecs[0].shape)
+    gtab = dpg.gradient_table(bvals,bvecs,b0_threshold=b0_threshold)
 
-    data = np.concatenate([data[0], datatest])
-    bvals = np.concatenate([bvals[0], bvalstest])
-    bvecs = np.concatenate([bvecs[0], bvecstest])
+    return img, data, gtab, mask
 
-    print(data.shape)
-    print(bvals.shape)
-    print(bvecs.shape)
-
-    #gtab = dpg.gradient_table(bvals,bvecs,b0_threshold=b0_threshold)
-
-    return img, data, mask
-
-prepare_data(data_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.nii.gz',
-             bval_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bval',
-             bvec_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bvec')
+# prepare_data(data_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.nii.gz',
+#              bval_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bval',
+#              bvec_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bvec')
