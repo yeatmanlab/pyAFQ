@@ -2,8 +2,6 @@ import numpy as np
 import nibabel as nib
 import dipy.core.gradients as dpg
 
-
-#@profile
 def prepare_data(data_files, bval_files, bvec_files, mask=None,
                  b0_threshold=0):
     """
@@ -41,8 +39,6 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
     if isinstance(mask, str):
         mask = nib.load(mask).get_data().astype(bool)
 
-    #print(nib.load(data_files[0]).shape)
-
     data = [nib.load(dfile).get_data() for dfile in data_files]
     img = nib.load(data_files[-1])
     bvals = [np.loadtxt(bval_file) for bval_file in bval_files]
@@ -52,6 +48,3 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
 
     return img, data, gtab, mask
 
-# prepare_data(data_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.nii.gz',
-#              bval_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bval',
-#              bvec_files='/Users/aarya/.dipy/stanford_hardi/HARDI150.bvec')
