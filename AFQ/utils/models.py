@@ -44,7 +44,11 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
     bvals = [np.loadtxt(bval_file) for bval_file in bval_files]
     bvecs = [np.loadtxt(bvec_file) for bvec_file in bvec_files]
 
-    gtab = dpg.gradient_table(bvals,bvecs,b0_threshold=b0_threshold)
+    gtab = dpg.gradient_table(np.concatenate(bvals),
+                              np.concatenate(bvecs, -1),
+                              b0_threshold=b0_threshold)
 
     return img, data, gtab, mask
+
+
 
