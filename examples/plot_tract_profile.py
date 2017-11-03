@@ -24,7 +24,6 @@ import AFQ.segmentation as seg
 dpd.fetch_stanford_hardi()
 
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-print(hardi_dir)
 hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
 hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
 hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
@@ -34,10 +33,9 @@ img = nib.load(hardi_fdata)
 print("Calculating DTI...")
 if not op.exists('./dti_FA.nii.gz'):
     dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
-                            out_dir='.')
+                             out_dir='.')
 else:
-    dti_params = {'FA': './dti_FA.nii.gz',
-                'params': './dti_params.nii.gz'}
+    dti_params = {'FA': './dti_FA.nii.gz', 'params': './dti_params.nii.gz'}
 
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
@@ -56,15 +54,15 @@ bundle_names = ["CST", "ILF"]
 bundles = {}
 for name in bundle_names:
     for hemi in ['_R', '_L']:
-        bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
-                                        templates[name + '_roi1' + hemi]],
-                                'rules': [True, True]}
-
+        bundles[name + hemi] = dict(ROIs=[templates[name + '_roi1' + hemi],
+                                          templates[name + '_roi1' + hemi]],
+                                    rules=[True, True])
 
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
     import dipy.core.gradients as dpg
+
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     mapping = reg.syn_register_dwi(hardi_fdata, gtab)
     reg.write_mapping(mapping, './mapping.nii.gz')
@@ -73,14 +71,14 @@ else:
 
 print("Segmenting fiber groups...")
 fiber_groups = seg.segment(hardi_fdata,
-                        hardi_fbval,
-                        hardi_fbvec,
-                        streamlines,
-                        bundles,
-                        reg_template=MNI_T2_img,
-                        mapping=mapping,
-                        as_generator=False,
-                        affine=img.affine)
+                           hardi_fbval,
+                           hardi_fbvec,
+                           streamlines,
+                           bundles,
+                           reg_template=MNI_T2_img,
+                           mapping=mapping,
+                           affine=img.affine,
+                           as_generator=False)
 
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_data()
@@ -91,4 +89,3 @@ for bundle in bundles:
     profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
     ax.plot(profile)
     ax.set_title(bundle)
-

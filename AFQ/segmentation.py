@@ -20,7 +20,6 @@ if LooseVersion(dipy.__version__) < '0.12':
     # Monkey patch the fix in:
     dts.orient_by_rois = fix.orient_by_rois
 
-
 __all__ = ["patch_up_roi", "segment"]
 
 
@@ -40,6 +39,7 @@ def patch_up_roi(roi):
     ROI after dilation and hole-filling
     """
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
+
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, as_generator=True,
@@ -123,10 +123,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
-            fiber_groups[bundle] = nib.streamlines.Tractogram(
-                                    select_sl,
-                                    affine_to_rasmm=img.affine)
-
+            fiber_groups[bundle] = nib.streamlines.Tractogram(select_sl,
+                                                              affine_to_rasmm=img.affine)
     return fiber_groups
 
 

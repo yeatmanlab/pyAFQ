@@ -2,6 +2,7 @@ import numpy as np
 import nibabel as nib
 import dipy.core.gradients as dpg
 
+
 def prepare_data(data_files, bval_files, bvec_files, mask=None,
                  b0_threshold=0):
     """
@@ -50,8 +51,3 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
                               b0_threshold=b0_threshold)
 
     return img, data, gtab, mask
-
-
-
-
-
