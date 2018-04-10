@@ -52,4 +52,4 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
 
     gtab = dpg.gradient_table(bvals, bvecs, b0_threshold=b0_threshold)
 
-    return img, data, gtab, mask
+    return img_array[-1], data, gtab, mask
