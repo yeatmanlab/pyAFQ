@@ -101,6 +101,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             select_sl = dts.select_by_rois(select_sl,
                                            [warped_ROI.astype(bool)],
                                            [rule])
+
         # Next, we reorient each streamline according to an ARBITRARY, but
         # CONSISTENT order. To do this, we use the first ROI for which the rule
         # is True as the first one to pass through, and the last ROI for which
@@ -112,21 +113,30 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         orient_ROIs = [bundles[bundle]['ROIs'][idx[0][0]],
                        bundles[bundle]['ROIs'][idx[0][-1]]]
 
+        ROI0 = orient_ROIs[0].get_data()
+        ROI1 = orient_ROIs[1].get_data()
         select_sl = dts.orient_by_rois(select_sl,
-                                       orient_ROIs[0].get_data(),
-                                       orient_ROIs[1].get_data(),
+                                       ROI0,
+                                       ROI1,
                                        as_generator=as_generator)
 
         #  XXX Implement clipping to the ROIs
         #  if clip_to_roi:
-        #    dts.clip()
+        #    dts.clip_to_rois(select_sl,
+        #                     orient_ROIs[0].get_data(),
+        #                     orient_ROIs[1].get_data(),
+        #                     as_generator=as_generator)
 
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
-            fiber_groups[bundle] = list(select_sl)
+            fiber_groups[bundle] = dts.Streamlines(select_sl)
 
     return fiber_groups
+
+
+def _resample_bundle(streamlines, n_points):
+     return np.array(dps.set_number_of_points(streamlines, n_points))
 
 
 def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
@@ -145,7 +155,7 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         relevant).
 
     """
-    if isinstance(streamlines, list):
+    if isinstance(streamlines, list) or isinstance(streamlines, dts.Streamlines):
         # Resample each streamline to the same number of points
         # list => np.array
         # Setting the number of points should happen in a streamline template
@@ -153,7 +163,7 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         # everything as in the Matlab version -- in native space.
         # In the future, an SLR object can be passed here, and then it would
         # move these streamlines into the template space before resampling...
-        fgarray = np.array(dps.set_number_of_points(streamlines, n_points))
+        fgarray = _resample_bundle(streamlines, n_points)
     else:
         fgarray = streamlines
     # ...and move them back to native space before indexing into the volume:
@@ -190,9 +200,9 @@ def gaussian_weights(bundle, n_points=100):
         inverse of the Mahalanobis distance, relative to the distribution of
         coordinates at that node position across streamlines.
     """
-    if isinstance(bundle, list):
+    if isinstance(bundle, list) or isinstance(bundle, dts.Streamlines):
         # if you got a list, assume that it needs to be resampled:
-        bundle = np.array(dps.set_number_of_points(bundle, n_points))
+        bundle = _resample_bundle(bundle, n_points)
     else:
         if bundle.shape[-1] != 3:
             e_s = "Input must be shape (n_streamlines, n_points, 3)"
