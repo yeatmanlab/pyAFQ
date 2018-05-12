@@ -40,14 +40,10 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
     if isinstance(mask, str):
         mask = nib.load(mask).get_data().astype(bool)
 
-    data = []
-    bvals = []
-    bvecs = []
-    for dfile, bval_file, bvec_file in zip(data_files, bval_files, bvec_files):
-        img = nib.load(dfile)
-        data.append(img.get_data())
-        bvals.append(np.loadtxt(bval_file))
-        bvecs.append(np.loadtxt(bvec_file))
+    data = [nib.load(dfile).get_data() for dfile in data_files]
+    img = nib.load(data_files[-1])
+    bvals = [np.loadtxt(bval_file) for bval_file in bval_files]
+    bvecs = [np.loadtxt(bvec_file) for bvec_file in bvec_files]
 
     data = np.concatenate(data, -1)
     gtab = dpg.gradient_table(np.concatenate(bvals),

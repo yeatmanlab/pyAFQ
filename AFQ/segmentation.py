@@ -20,7 +20,6 @@ if LooseVersion(dipy.__version__) < '0.12':
     # Monkey patch the fix in:
     dts.orient_by_rois = fix.orient_by_rois
 
-
 __all__ = ["patch_up_roi", "segment"]
 
 
@@ -124,8 +123,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         if as_generator:
             fiber_groups[bundle] = select_sl
         else:
-            fiber_groups[bundle] = list(select_sl)
-
+            fiber_groups[bundle] = nib.streamlines.Tractogram(select_sl,
+                                                              affine_to_rasmm=img.affine)
     return fiber_groups
 
 
