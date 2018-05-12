@@ -115,7 +115,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_sl = dts.orient_by_rois(select_sl,
                                        orient_ROIs[0].get_data(),
                                        orient_ROIs[1].get_data(),
-                                       as_generator=True)
+                                       as_generator=as_generator)
 
         #  XXX Implement clipping to the ROIs
         #  if clip_to_roi:
