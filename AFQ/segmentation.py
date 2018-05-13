@@ -90,7 +90,8 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
         Whether to clip the streamlines between the ROIs
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
-    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines, np.linalg.inv(img.affine)))
+    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
+                                                    np.linalg.inv(img.affine)))
 
     if reg_template is None:
         reg_template = dpd.read_mni_template()
