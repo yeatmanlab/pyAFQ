@@ -57,7 +57,7 @@ bundles = {}
 for name in bundle_names:
     for hemi in ['_R', '_L']:
         bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
-                                         templates[name + '_roi1' + hemi]],
+                                         templates[name + '_roi2' + hemi]],
                                 'rules': [True, True]}
 
 
