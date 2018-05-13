@@ -48,18 +48,14 @@ def select_streamlines(streamlines, ROI, affine=None, include=True):
     """
     tol = dts.dist_to_corner(np.eye(4))
     roi_coords = np.array(np.where(ROI)).T
-    out = dts.Streamlines()
     if include:
         for sl in streamlines:
             if dts.streamline_near_roi(sl, roi_coords, tol=tol):
-                out.append(sl)
+                yield sl
     else:
         for sl in streamlines:
             if not dts.streamline_near_roi(sl, roi_coords, tol=tol):
-                out.append(sl)
-
-    return out
-
+                yield sl
 
 def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
                          reg_template=None, mapping=None,
@@ -109,7 +105,7 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
     streamlines_in_bundles = np.zeros(len(xform_sl))
 
     for bundle_idx, bundle in enumerate(bundles):
-        select_sl = dts.Streamlines()
+        print(bundle)
         # Only consider streamlines that haven't been taken:
         idx_possible = np.where(streamlines_in_bundles==0)[0]
         ROI0 = bundles[bundle]['ROIs'][0]
@@ -134,23 +130,28 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
             if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
                 if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
                     streamlines_in_bundles[idx] = bundle_idx + 1
-                    # Next, we reorient each streamline according to
-                    # an ARBITRARY, but CONSISTENT order:
-                    dist0 = cdist(sl, roi_coords0, 'euclidean')
-                    dist1 = cdist(sl, roi_coords1, 'euclidean')
-                    min0 = np.argmin(dist0, 0)[0]
-                    min1 = np.argmin(dist1, 0)[0]
-                    if min0 > min1:
-                        sl = sl[::-1]
-                        if clip_to_roi:
-                            sl = sl[min1:min0]
-                    elif clip_to_roi:
-                        sl = sl[min0:min1]
 
-                    select_sl.append(sl)
-        fiber_groups[bundle] = select_sl
-        print(len(fiber_groups[bundle]))
+        select_idx = np.where(streamlines_in_bundles == bundle_idx + 1)
+        # Use a list here, because Streamlines don't support item assignment:
+        select_sl = list(xform_sl[select_idx])
+        print(len(select_sl))
+        # Next, we reorient each streamline according to
+        # an ARBITRARY, but CONSISTENT order:
+        for idx in range(len(select_sl)):
+            this_sl = select_sl[idx]
+            dist0 = cdist(this_sl, roi_coords0, 'euclidean')
+            dist1 = cdist(this_sl, roi_coords1, 'euclidean')
+            min0 = np.argmin(dist0, 0)[0]
+            min1 = np.argmin(dist1, 0)[0]
+            if min0 > min1:
+                this_sl = this_sl[::-1]
+                if clip_to_roi:
+                    this_sl = this_sl[min1:min0]
+            elif clip_to_roi:
+                this_sl = this_sl[min0:min1]
+            select_sl[idx] = this_sl
 
+        fiber_groups[bundle] = dts.Streamlines(select_sl)
 
     return fiber_groups
 
