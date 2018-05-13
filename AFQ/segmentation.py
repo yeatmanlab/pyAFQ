@@ -44,7 +44,7 @@ def patch_up_roi(roi):
 
 def select_streamlines(streamlines, ROI, affine=None, include=True):
     """
-    Select streamlines based just on an exclusion criterion
+    Select streamlines based on a criterion
     """
     tol = dts.dist_to_corner(np.eye(4))
     roi_coords = np.array(np.where(ROI)).T

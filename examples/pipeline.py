@@ -38,14 +38,19 @@ else:
 
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
-    streamlines = list(aft.track(dti_params['params']))
+    FA = nib.load(dti_params["FA"]).get_data()
+    step_size = 1
+    min_length_mm = 50
+    streamlines = dts.Streamlines(aft.track(dti_params['params'], seeds=2, stop_mask=FA,
+                                           stop_threshold=0.2, step_size=step_size,
+                                           min_length=min_length_mm/step_size))
     aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
 # Use only a small portion of the streamlines, for expedience:
-streamlines = streamlines[::100]
+streamlines = streamlines[::10]
 
 print("Splitting into tracks that cross midline, and those that don't")
 midsaggital_roi = np.zeros(img.shape[:3])
