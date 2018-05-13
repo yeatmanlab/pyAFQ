@@ -2,7 +2,7 @@ from distutils.version import LooseVersion
 
 import numpy as np
 import scipy.ndimage as ndim
-from scipy.spatial.distance import mahalanobis
+from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
 
@@ -42,11 +42,30 @@ def patch_up_roi(roi):
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundles,
-            reg_template=None, mapping=None, as_generator=True,
-            clip_to_roi=True, **reg_kwargs):
+def select_streamlines(streamlines, ROI, affine=None, include=True):
     """
-    Segment streamlines into bundles.
+    Select streamlines based just on an exclusion criterion
+    """
+    tol = dts.dist_to_corner(np.eye(4))
+    roi_coords = np.array(np.where(ROI)).T
+    out = dts.Streamlines()
+    if include:
+        for sl in streamlines:
+            if dts.streamline_near_roi(sl, roi_coords, tol=tol):
+                out.append(sl)
+    else:
+        for sl in streamlines:
+            if not dts.streamline_near_roi(sl, roi_coords, tol=tol):
+                out.append(sl)
+
+    return out
+
+
+def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
+                         reg_template=None, mapping=None,
+                         clip_to_roi=True, **reg_kwargs):
+    """
+    Segment streamlines into bundles based on inclusion ROIs.
 
     Parameters
     ----------
@@ -67,16 +86,11 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional
         A mapping between DWI space and a template. Defaults to generate this.
 
-    as_generator : bool, optional
-        Whether to generate the streamlines here, or return generators.
-        Default: True.
-
     clip_to_roi : bool, optional
         Whether to clip the streamlines between the ROIs
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
-    xform_sl = [s for s in dtu.move_streamlines(streamlines,
-                                                np.linalg.inv(img.affine))]
+    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines, np.linalg.inv(img.affine)))
 
     if reg_template is None:
         reg_template = dpd.read_mni_template()
@@ -88,49 +102,54 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
 
+    tol = dts.dist_to_corner(np.eye(4))
+
     fiber_groups = {}
-    for bundle in bundles:
-        select_sl = xform_sl
-        for ROI, rule in zip(bundles[bundle]['ROIs'],
-                             bundles[bundle]['rules']):
-            data = ROI.get_data()
-            warped_ROI = patch_up_roi(mapping.transform_inverse(
-                data,
-                interpolation='nearest'))
-            # This function requires lists as inputs:
-            select_sl = dts.select_by_rois(select_sl,
-                                           [warped_ROI.astype(bool)],
-                                           [rule])
+    streamlines_in_bundles = np.zeros(len(xform_sl))
 
-        # Next, we reorient each streamline according to an ARBITRARY, but
-        # CONSISTENT order. To do this, we use the first ROI for which the rule
-        # is True as the first one to pass through, and the last ROI for which
-        # the rule is True as the last one to pass through:
+    for bundle_idx, bundle in enumerate(bundles):
+        select_sl = dts.Streamlines()
+        # Only consider streamlines that haven't been taken:
+        idx_possible = np.where(streamlines_in_bundles==0)[0]
+        ROI0 = bundles[bundle]['ROIs'][0]
+        ROI1 = bundles[bundle]['ROIs'][1]
+        if not isinstance(ROI0, np.ndarray):
+            ROI0 = ROI0.get_data()
+        warped_ROI0 = patch_up_roi(mapping.transform_inverse(
+                            ROI0,
+                            interpolation='nearest')).astype(bool)
+        if not isinstance(ROI1, np.ndarray):
+            ROI1 = ROI1.get_data()
 
-        # Indices where the 'rule' is True:
-        idx = np.where(bundles[bundle]['rules'])
+        warped_ROI1 = patch_up_roi(mapping.transform_inverse(
+                            ROI1,
+                            interpolation='nearest')).astype(bool)
 
-        orient_ROIs = [bundles[bundle]['ROIs'][idx[0][0]],
-                       bundles[bundle]['ROIs'][idx[0][-1]]]
+        roi_coords0 = np.array(np.where(warped_ROI0)).T
+        roi_coords1 = np.array(np.where(warped_ROI1)).T
 
-        ROI0 = orient_ROIs[0].get_data()
-        ROI1 = orient_ROIs[1].get_data()
-        select_sl = dts.orient_by_rois(select_sl,
-                                       ROI0,
-                                       ROI1,
-                                       as_generator=as_generator)
+        for idx in idx_possible:
+            sl = xform_sl[idx]
+            if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
+                if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
+                    streamlines_in_bundles[idx] = bundle_idx + 1
+                    # Next, we reorient each streamline according to
+                    # an ARBITRARY, but CONSISTENT order:
+                    dist0 = cdist(sl, roi_coords0, 'euclidean')
+                    dist1 = cdist(sl, roi_coords1, 'euclidean')
+                    min0 = np.argmin(dist0, 0)[0]
+                    min1 = np.argmin(dist1, 0)[0]
+                    if min0 > min1:
+                        sl = sl[::-1]
+                        if clip_to_roi:
+                            sl = sl[min1:min0]
+                    elif clip_to_roi:
+                        sl = sl[min0:min1]
 
-        #  XXX Implement clipping to the ROIs
-        #  if clip_to_roi:
-        #    dts.clip_to_rois(select_sl,
-        #                     orient_ROIs[0].get_data(),
-        #                     orient_ROIs[1].get_data(),
-        #                     as_generator=as_generator)
+                    select_sl.append(sl)
+        fiber_groups[bundle] = select_sl
+        print(len(fiber_groups[bundle]))
 
-        if as_generator:
-            fiber_groups[bundle] = select_sl
-        else:
-            fiber_groups[bundle] = dts.Streamlines(select_sl)
 
     return fiber_groups
 
