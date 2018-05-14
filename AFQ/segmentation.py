@@ -96,7 +96,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     streamlines_in_bundles = np.zeros(len(xform_sl))
 
     for bundle_idx, bundle in enumerate(bundles):
-        print(bundle)
         # Only consider streamlines that haven't been taken:
         idx_possible = np.where(streamlines_in_bundles==0)[0]
         ROI0 = bundles[bundle]['ROIs'][0]
@@ -135,7 +134,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_idx = np.where(streamlines_in_bundles == bundle_idx + 1)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
-        print(len(select_sl))
         # Next, we reorient each streamline according to
         # an ARBITRARY, but CONSISTENT order:
         for idx in range(len(select_sl)):
@@ -152,19 +150,20 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                 this_sl = this_sl[min0:min1]
             select_sl[idx] = this_sl
 
+        select_sl = dts.Streamlines(select_sl)
         if clean_rounds:
             if len(select_sl) > 0:
                 w = gaussian_weights(select_sl, n_points=100,
                                      return_mahalnobis=True)
                 rounds_elapsed = 0
-                while np.any(weights > 1) and rounds_elapsed < n_rounds:
+                while np.any(w > 1) and rounds_elapsed < clean_rounds:
                     idx_belong = np.unique(np.where(w < 1)[0])
-                    select_sl = select_sl[idx_belong]
+                    select_sl = select_sl[idx_belong.astype(int)]
                     w = gaussian_weights(select_sl, n_points=100,
                                          return_mahalnobis=True)
                     rounds_elapsed += 1
 
-        fiber_groups[bundle] = dts.Streamlines(select_sl)
+        fiber_groups[bundle] = select_sl
 
     return fiber_groups
 
