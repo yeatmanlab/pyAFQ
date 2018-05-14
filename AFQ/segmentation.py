@@ -42,24 +42,9 @@ def patch_up_roi(roi):
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
 
 
-def select_streamlines(streamlines, ROI, affine=None, include=True):
-    """
-    Select streamlines based on a criterion
-    """
-    tol = dts.dist_to_corner(np.eye(4))
-    roi_coords = np.array(np.where(ROI)).T
-    if include:
-        for sl in streamlines:
-            if dts.streamline_near_roi(sl, roi_coords, tol=tol):
-                yield sl
-    else:
-        for sl in streamlines:
-            if not dts.streamline_near_roi(sl, roi_coords, tol=tol):
-                yield sl
-
-def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
-                         reg_template=None, mapping=None,
-                         clip_to_roi=True, **reg_kwargs):
+def segment(fdata, fbval, fbvec, streamlines, bundles,
+            reg_template=None, mapping=None, clip_to_roi=True,
+            crosses_midline=None, clean_rounds=5, **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
@@ -84,6 +69,12 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
 
     clip_to_roi : bool, optional
         Whether to clip the streamlines between the ROIs
+
+    crosses_midline: None or bool, optional.
+        Whether you want the streamlines to all cross the midline (True) or not
+        cross the midline (False). Default: None, which means that you ignore whether
+        the streamlines cross the midline or not.
+    clean_rounds
     """
     img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
@@ -112,6 +103,7 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
         ROI1 = bundles[bundle]['ROIs'][1]
         if not isinstance(ROI0, np.ndarray):
             ROI0 = ROI0.get_data()
+
         warped_ROI0 = patch_up_roi(mapping.transform_inverse(
                             ROI0,
                             interpolation='nearest')).astype(bool)
@@ -127,6 +119,15 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
 
         for idx in idx_possible:
             sl = xform_sl[idx]
+            if crosses_midline is not None:
+                if np.any(sl[:, 0] > img.shape[0]//2) and np.any(sl[:, 0] < img.shape[0]//2):
+                    # This means that the streamline does cross the midline:
+                    if crosses_midline:
+                        # This is what we want, keep going
+                        pass
+                    else:
+                        # This is not what we want, skip to next streamline
+                        continue
             if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
                 if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
                     streamlines_in_bundles[idx] = bundle_idx + 1
@@ -150,6 +151,18 @@ def segment_by_inclusion(fdata, fbval, fbvec, streamlines, bundles,
             elif clip_to_roi:
                 this_sl = this_sl[min0:min1]
             select_sl[idx] = this_sl
+
+        if clean_rounds:
+            if len(select_sl) > 0:
+                w = gaussian_weights(select_sl, n_points=100,
+                                     return_mahalnobis=True)
+                rounds_elapsed = 0
+                while np.any(weights > 1) and rounds_elapsed < n_rounds:
+                    idx_belong = np.unique(np.where(w < 1)[0])
+                    select_sl = select_sl[idx_belong]
+                    w = gaussian_weights(select_sl, n_points=100,
+                                         return_mahalnobis=True)
+                    rounds_elapsed += 1
 
         fiber_groups[bundle] = dts.Streamlines(select_sl)
 
@@ -198,7 +211,7 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
     return tract_profile
 
 
-def gaussian_weights(bundle, n_points=100):
+def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
     """
     Calculate weights for each streamline/node in a bundle, based on a
     Mahalanobis distance from the mean of the bundle, at that node
@@ -243,7 +256,9 @@ def gaussian_weights(bundle, n_points=100):
         # Weights are the inverse of the Mahalanobis distance
         for fn in range(bundle.shape[0]):
             # calculate Mahalanobis for node on fiber[fn]
-            w[fn, node] = mahalanobis(node_coords[fn], m, c)
+            w[fn, node] = mahalanobis(node_coords[fn], m, np.linalg.inv(c))
+    if return_mahalnobis:
+        return w
     # weighting is inverse to the distance (the further you are, the less you
     # should be weighted)
     w = 1 / w
