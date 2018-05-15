@@ -76,7 +76,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         the streamlines cross the midline or not.
     clean_rounds
     """
-    img, data, gtab, mask = ut.prepare_data(fdata, fbval, fbvec)
+    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
+    tol = dts.dist_to_corner(img.affine)
+
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
                                                     np.linalg.inv(img.affine)))
 
@@ -90,7 +92,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
 
-    tol = dts.dist_to_corner(np.eye(4))
 
     fiber_groups = {}
     streamlines_in_bundles = np.zeros(len(xform_sl))
@@ -100,6 +101,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         idx_possible = np.where(streamlines_in_bundles==0)[0]
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
+        # ROI_prob =
         if not isinstance(ROI0, np.ndarray):
             ROI0 = ROI0.get_data()
 
