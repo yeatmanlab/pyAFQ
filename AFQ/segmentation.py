@@ -44,37 +44,51 @@ def patch_up_roi(roi):
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, clip_to_roi=True,
-            crosses_midline=None, clean_rounds=5, **reg_kwargs):
+            crosses_midline=None, clean_rounds=5, prob_threshold=0,
+            **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
     Parameters
     ----------
-    fdata, fbval, fbvec : str
-        Full path to data, bvals, bvecs
+    fdata, fbval, fbvec : str Full path to data, bvals, bvecs
 
-    streamlines : list of 2D arrays
-        Each array is a streamline, shape (3, N).
+    streamlines : list of 2D arrays Each array is a streamline, shape
+        (3, N).
 
-    bundles: dict
-        The format is something like::
+    bundles: dict The format is something like::
 
              {'name': {'ROIs':[img, img], 'rules':[True, True]}}
 
-    reg_template : str or nib.Nifti1Image, optional.
-        Template to use for registration (defaults to the MNI T2)
+    reg_template : str or nib.Nifti1Image, optional. Template to use for
+        registration (defaults to the MNI T2)
 
     mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional
-        A mapping between DWI space and a template. Defaults to generate this.
+        A mapping between DWI space and a template. Defaults to generate
+        this.
 
-    clip_to_roi : bool, optional
-        Whether to clip the streamlines between the ROIs
+    clip_to_roi : bool, optional Whether to clip the streamlines between
+        the ROIs
 
-    crosses_midline: None or bool, optional.
-        Whether you want the streamlines to all cross the midline (True) or not
-        cross the midline (False). Default: None, which means that you ignore whether
-        the streamlines cross the midline or not.
-    clean_rounds
+    crosses_midline : None or bool, optional. Whether you want the
+        streamlines to all cross the midline (True) or not cross the
+        midline (False). Default: None, which means that you ignore
+        whether the streamlines cross the midline or not.
+
+    prob_threshold: float.
+        Cleaning of fiber groups is done using probability maps from [Hua2008]_.
+        Here, we choose an average probability that needs to be exceeded for an
+        individual streamline to be retained. Default to 0.
+
+    clean_rounds : int. Number of rounds of cleaning based
+
+    References
+    ----------
+
+    .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
+    Tract probability maps in stereotaxic spaces: analyses of white
+    matter anatomy and tract-specific quantification. Neuroimage 39:
+    336–347
     """
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
     tol = dts.dist_to_corner(img.affine)
@@ -97,11 +111,12 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     streamlines_in_bundles = np.zeros(len(xform_sl))
 
     for bundle_idx, bundle in enumerate(bundles):
+        print(bundle)
         # Only consider streamlines that haven't been taken:
         idx_possible = np.where(streamlines_in_bundles==0)[0]
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
-        # ROI_prob =
+        prob_map = bundles[bundle]['prob_map']
         if not isinstance(ROI0, np.ndarray):
             ROI0 = ROI0.get_data()
 
@@ -114,6 +129,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         warped_ROI1 = patch_up_roi(mapping.transform_inverse(
                             ROI1,
                             interpolation='nearest')).astype(bool)
+
 
         roi_coords0 = np.array(np.where(warped_ROI0)).T
         roi_coords1 = np.array(np.where(warped_ROI1)).T
@@ -150,20 +166,44 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                     this_sl = this_sl[min1:min0]
             elif clip_to_roi:
                 this_sl = this_sl[min0:min1]
-            select_sl[idx] = this_sl
 
+            select_sl[idx] = this_sl
+        # We'll use a Streamlines object for the next steps
+        # because these objects support indexing with arrays:
         select_sl = dts.Streamlines(select_sl)
-        if clean_rounds:
-            if len(select_sl) > 0:
-                w = gaussian_weights(select_sl, n_points=100,
-                                     return_mahalnobis=True)
-                rounds_elapsed = 0
-                while np.any(w > 1) and rounds_elapsed < clean_rounds:
-                    idx_belong = np.unique(np.where(w < 1)[0])
-                    select_sl = select_sl[idx_belong.astype(int)]
+        print(len(select_sl))
+        # If there are no streamlines, we don't do anything:
+        if len(select_sl) > 0:
+            # Otherwise, clean it up:
+            # First we clean up using the probability map:
+            if not isinstance(prob_map, np.ndarray):
+                prob_map = prob_map.get_data()
+
+            warped_prob_map = patch_up_roi(mapping.transform_inverse(
+                                prob_map,
+                                interpolation='nearest')).astype(bool)
+
+            # For expedience, we approximate each streamline as a 100 point curve:
+            fgarray = _resample_bundle(select_sl, 100)
+            probs = dts.values_from_volume(warped_prob_map, fgarray).mean(axis=-1)
+
+            select_sl = select_sl[probs > prob_threshold]
+            print(len(select_sl))
+
+            # Then clean using distance from the mean fiber:
+            if clean_rounds:
+                if len(select_sl) > 0:
                     w = gaussian_weights(select_sl, n_points=100,
-                                         return_mahalnobis=True)
-                    rounds_elapsed += 1
+                                        return_mahalnobis=True)
+                    rounds_elapsed = 0
+                    while np.any(w > 1) and rounds_elapsed < clean_rounds:
+                        idx_belong = np.unique(np.where(w < 1)[0])
+                        select_sl = select_sl[idx_belong.astype(int)]
+                        w = gaussian_weights(select_sl, n_points=100,
+                                            return_mahalnobis=True)
+                        rounds_elapsed += 1
+
+        print(len(select_sl))
 
         fiber_groups[bundle] = select_sl
 
