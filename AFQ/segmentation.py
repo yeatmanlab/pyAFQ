@@ -45,8 +45,7 @@ def patch_up_roi(roi):
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, clip_to_roi=True,
             crosses_midline=None, clean_rounds=5, clean_threshold=2,
-            prob_threshold=0,
-            **reg_kwargs):
+            prob_threshold=0, **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
@@ -81,13 +80,13 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         mean of extracted bundles. Default: 5
 
     clean_threshold : float, optional.
-        Threshold of cleaning based on the Mahalanobis distance. Default: 2.
+        Threshold of cleaning based on the Mahalanobis distance (the units
+        are standard deviations). Default: 2.
 
     prob_threshold: float.
         Cleaning of fiber groups is done using probability maps from [Hua2008]_.
         Here, we choose an average probability that needs to be exceeded for an
-        individual streamline to be retained. Default to 0.
-
+        individual streamline to be retained. Default: 0.
 
     References
     ----------
@@ -156,13 +155,12 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                             ROI1,
                             interpolation='nearest')).astype(bool)
 
-
         roi_coords0 = np.array(np.where(warped_ROI0)).T
         roi_coords1 = np.array(np.where(warped_ROI1)).T
 
         # Replace this here, so we can reuse below:
         bundles[bundle]['ROIs'][0] = roi_coords0
-        bundles[bundle]['ROIs'][0] = roi_coords1
+        bundles[bundle]['ROIs'][1] = roi_coords1
 
         crosses_midline = bundles[bundle]['cross_midline']
 
