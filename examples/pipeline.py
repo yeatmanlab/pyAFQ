@@ -93,47 +93,36 @@ bundle_names = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
 bundles = {}
 for name in bundle_names:
     for hemi in ['_R', '_L']:
-#        bundles[name + hemi] = {'ROIs': [midsaggital_roi,
-#                                         templates[name + '_roi1' + hemi],
-#                                         templates[name + '_roi1' + hemi]],
-#                                'rules': [False, True, True]}
         bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
                                          templates[name + '_roi2' + hemi]],
-                                'rules': [True, True]}
+                                'rules': [True, True],
+                                'prob_map': templates[name + hemi + '_prob_map'],
+                                'cross_midline': False}
 
+
+bundles["FP"] = {'ROIs': [templates["FP_L"],
+                          templates["FP_R"]],
+                 'rules':[True, True],
+                 'prob_map': templates['FP_prob_map'],
+                 'cross_midline': True}
+
+bundles["FA"] = {'ROIs': [templates["FA_L"],
+                          templates["FA_R"]],
+                 'rules':[True, True],
+                 'prob_map': templates['FA_prob_map'],
+                 'cross_midline': True}
 
 print("Segmenting fiber groups...")
-fiber_groups_no_midsag = seg.segment(fdata,
-                                     fbval,
-                                     fbvec,
-                                     streamlines,
-                                     bundles,
-                                     reg_template=MNI_T2_img,
-                                     mapping=mapping,
-                                     affine=img.affine,
-                                     clip_to_roi=False,
-                                     crosses_midline=False)
-
-bundles_midsag = {}
-bundles_midsag["FP"] = {'ROIs': [templates["FP_L"],
-                                 templates["FP_R"]],
-                 'rules':[True, True]}
-bundles_midsag["FA"] = {'ROIs': [templates["FA_L"],
-                                 templates["FA_R"]],
-                        'rules':[True, True]}
-
-fiber_groups_midsag = seg.segment(fdata,
-                                  fbval,
-                                  fbvec,
-                                  streamlines,
-                                  bundles_midsag,
-                                  reg_template=MNI_T2_img,
-                                  mapping=mapping,
-                                  affine=img.affine,
-                                  clip_to_roi=False,
-                                  crosses_midline=True)
-
-fiber_groups = {**fiber_groups_no_midsag, **fiber_groups_midsag}
+fiber_groups = seg.segment(fdata,
+                           fbval,
+                           fbvec,
+                           streamlines,
+                           bundles,
+                           reg_template=MNI_T2_img,
+                           mapping=mapping,
+                           affine=img.affine,
+                           clip_to_roi=False,
+                           crosses_midline=False)
 
 
 print("Getting tract profiles")
