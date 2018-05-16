@@ -183,7 +183,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     # Eliminate fibers that don't pass through any ROI criterion:
     possible_fibers = np.mean(streamlines_in_bundles, -1) > 0
     xform_sl = xform_sl[possible_fibers]
-    streamlines_in_bundles[possible_fibers]
+    streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
 
     for bundle_idx, bundle in enumerate(bundles):
