@@ -140,10 +140,10 @@ for bundle in fiber_groups:
             else:
                 stat_data = nib.load(dti_params[stat_key]).get_data()
                 fgarray = seg._resample_bundle(fiber_groups[bundle], n_points)
-                #weights = seg.gaussian_weights(fgarray)
+                weights = seg.gaussian_weights(fgarray)
                 profile = seg.calculate_tract_profile(stat_data,
-                                                      fgarray)#,
-                                                      #weights=weights)
+                                                      fgarray,
+                                                      weights=weights)
                 bundle_df[stat_key] = profile
         dfs.append(bundle_df)
     else:
