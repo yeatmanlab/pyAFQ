@@ -42,6 +42,103 @@ def patch_up_roi(roi):
     return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
 
 
+def _resample_bundle(streamlines, n_points):
+     return np.array(dps.set_number_of_points(streamlines, n_points))
+
+
+def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
+                            weights=None):
+    """
+
+    Parameters
+    ----------
+    img : 3D volume
+
+    streamlines : list of arrays, or array
+
+    weights : 1D array or 2D array (optional)
+        Weight each streamline (1D) or each node (2D) when calculating the
+        tract-profiles. Must sum to 1 across streamlines (in each node if
+        relevant).
+
+    """
+    if isinstance(streamlines, list) or isinstance(streamlines, dts.Streamlines):
+        # Resample each streamline to the same number of points
+        # list => np.array
+        # Setting the number of points should happen in a streamline template
+        # space, rather than in the subject native space, but for now we do
+        # everything as in the Matlab version -- in native space.
+        # In the future, an SLR object can be passed here, and then it would
+        # move these streamlines into the template space before resampling...
+        fgarray = _resample_bundle(streamlines, n_points)
+    else:
+        fgarray = streamlines
+    # ...and move them back to native space before indexing into the volume:
+    values = dts.values_from_volume(img, fgarray, affine=affine)
+
+    # We assume that weights *always sum to 1 across streamlines*:
+    if weights is None:
+        weights = np.ones(values.shape) / values.shape[0]
+
+    tract_profile = np.sum(weights * values, 0)
+    return tract_profile
+
+
+def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
+    """
+    Calculate weights for each streamline/node in a bundle, based on a
+    Mahalanobis distance from the mean of the bundle, at that node
+
+    Parameters
+    ----------
+    bundle : array or list
+        If this is a list, assume that it is a list of streamline coordinates
+        (each entry is a 2D array, of shape n by 3). If this is an array, this
+        is a resampled version of the streamlines, with equal number of points
+        in each streamline.
+    n_points : int, optional
+        The number of points to resample to. *If the `bundle` is an array, this
+        input is ignored*. Default: 100.
+
+    Returns
+    -------
+    w : array of shape (n_streamlines, n_points)
+        Weights for each node in each streamline, calculated as its relative
+        inverse of the Mahalanobis distance, relative to the distribution of
+        coordinates at that node position across streamlines.
+    """
+    if isinstance(bundle, list) or isinstance(bundle, dts.Streamlines):
+        # if you got a list, assume that it needs to be resampled:
+        bundle = _resample_bundle(bundle, n_points)
+    else:
+        if bundle.shape[-1] != 3:
+            e_s = "Input must be shape (n_streamlines, n_points, 3)"
+            raise ValueError(e_s)
+        n_points = bundle.shape[1]
+
+    w = np.zeros((bundle.shape[0], n_points))
+    for node in range(bundle.shape[1]):
+        # This should come back as a 3D covariance matrix with the spatial
+        # variance covariance of this node across the different streamlines
+        # This is a 3-by-3 array:
+        node_coords = bundle[:, node]
+        c = np.cov(node_coords.T, ddof=0)
+        # Calculate the mean or median of this node as well
+        # delta = node_coords - np.mean(node_coords, 0)
+        m = np.mean(node_coords, 0)
+        # Weights are the inverse of the Mahalanobis distance
+        for fn in range(bundle.shape[0]):
+            # calculate Mahalanobis for node on fiber[fn]
+            w[fn, node] = mahalanobis(node_coords[fn], m, np.linalg.inv(c))
+    if return_mahalnobis:
+        return w
+    # weighting is inverse to the distance (the further you are, the less you
+    # should be weighted)
+    w = 1 / w
+    # Normalize before returning, so that the weights in each node sum to 1:
+    return w / np.sum(w, 0)
+
+
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, clip_to_roi=True,
             crosses_midline=None, clean_rounds=5, clean_threshold=2,
@@ -114,6 +211,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     fiber_probabilities = np.zeros((len(xform_sl), len(bundles)))
 
+    # For expedience, we approximate each streamline as a 100 point curve:
+    fgarray = _resample_bundle(xform_sl, 100)
+
     for bundle_idx, bundle in enumerate(bundles):
         prob_map = bundles[bundle]['prob_map']
         if not isinstance(prob_map, np.ndarray):
@@ -123,8 +223,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                             prob_map,
                             interpolation='nearest')).astype(bool)
 
-        # For expedience, we approximate each streamline as a 100 point curve:
-        fgarray = _resample_bundle(xform_sl, 100)
         probs = dts.values_from_volume(warped_prob_map, fgarray).mean(axis=-1)
         fiber_probabilities[:, bundle_idx] = probs
 
@@ -234,100 +332,3 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         fiber_groups[bundle] = select_sl
 
     return fiber_groups
-
-
-def _resample_bundle(streamlines, n_points):
-     return np.array(dps.set_number_of_points(streamlines, n_points))
-
-
-def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
-                            weights=None):
-    """
-
-    Parameters
-    ----------
-    img : 3D volume
-
-    streamlines : list of arrays, or array
-
-    weights : 1D array or 2D array (optional)
-        Weight each streamline (1D) or each node (2D) when calculating the
-        tract-profiles. Must sum to 1 across streamlines (in each node if
-        relevant).
-
-    """
-    if isinstance(streamlines, list) or isinstance(streamlines, dts.Streamlines):
-        # Resample each streamline to the same number of points
-        # list => np.array
-        # Setting the number of points should happen in a streamline template
-        # space, rather than in the subject native space, but for now we do
-        # everything as in the Matlab version -- in native space.
-        # In the future, an SLR object can be passed here, and then it would
-        # move these streamlines into the template space before resampling...
-        fgarray = _resample_bundle(streamlines, n_points)
-    else:
-        fgarray = streamlines
-    # ...and move them back to native space before indexing into the volume:
-    values = dts.values_from_volume(img, fgarray, affine=affine)
-
-    # We assume that weights *always sum to 1 across streamlines*:
-    if weights is None:
-        weights = np.ones(values.shape) / values.shape[0]
-
-    tract_profile = np.sum(weights * values, 0)
-    return tract_profile
-
-
-def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
-    """
-    Calculate weights for each streamline/node in a bundle, based on a
-    Mahalanobis distance from the mean of the bundle, at that node
-
-    Parameters
-    ----------
-    bundle : array or list
-        If this is a list, assume that it is a list of streamline coordinates
-        (each entry is a 2D array, of shape n by 3). If this is an array, this
-        is a resampled version of the streamlines, with equal number of points
-        in each streamline.
-    n_points : int, optional
-        The number of points to resample to. *If the `bundle` is an array, this
-        input is ignored*. Default: 100.
-
-    Returns
-    -------
-    w : array of shape (n_streamlines, n_points)
-        Weights for each node in each streamline, calculated as its relative
-        inverse of the Mahalanobis distance, relative to the distribution of
-        coordinates at that node position across streamlines.
-    """
-    if isinstance(bundle, list) or isinstance(bundle, dts.Streamlines):
-        # if you got a list, assume that it needs to be resampled:
-        bundle = _resample_bundle(bundle, n_points)
-    else:
-        if bundle.shape[-1] != 3:
-            e_s = "Input must be shape (n_streamlines, n_points, 3)"
-            raise ValueError(e_s)
-        n_points = bundle.shape[1]
-
-    w = np.zeros((bundle.shape[0], n_points))
-    for node in range(bundle.shape[1]):
-        # This should come back as a 3D covariance matrix with the spatial
-        # variance covariance of this node across the different streamlines
-        # This is a 3-by-3 array:
-        node_coords = bundle[:, node]
-        c = np.cov(node_coords.T, ddof=0)
-        # Calculate the mean or median of this node as well
-        # delta = node_coords - np.mean(node_coords, 0)
-        m = np.mean(node_coords, 0)
-        # Weights are the inverse of the Mahalanobis distance
-        for fn in range(bundle.shape[0]):
-            # calculate Mahalanobis for node on fiber[fn]
-            w[fn, node] = mahalanobis(node_coords[fn], m, np.linalg.inv(c))
-    if return_mahalnobis:
-        return w
-    # weighting is inverse to the distance (the further you are, the less you
-    # should be weighted)
-    w = 1 / w
-    # Normalize before returning, so that the weights in each node sum to 1:
-    return w / np.sum(w, 0)
