@@ -213,21 +213,30 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     # For expedience, we approximate each streamline as a 100 point curve:
     fgarray = _resample_bundle(xform_sl, 100)
-
+    # We're going to put back together all the probability volumes:
+    prob_vol = []
     for bundle_idx, bundle in enumerate(bundles):
         prob_map = bundles[bundle]['prob_map']
         if not isinstance(prob_map, np.ndarray):
             prob_map = prob_map.get_data()
+        warped_prob_map = mapping.transform_inverse(prob_map,
+                                                    interpolation='nearest')
+        prob_vol.append(warped_prob_map[..., None])
 
-        warped_prob_map = patch_up_roi(mapping.transform_inverse(
-                            prob_map,
-                            interpolation='nearest')).astype(bool)
+    # This is the 4D probability volume:
+    prob_vol = np.concatenate(prob_vol, -1)
 
-        probs = dts.values_from_volume(warped_prob_map, fgarray).mean(axis=-1)
-        fiber_probabilities[:, bundle_idx] = probs
+    # We can extract the values for all the bundles in one call:
+    fiber_probabilities = dts.values_from_volume(prob_vol,
+                                                 fgarray)
 
-    # Eliminate fibers that just aren't:
-    possible_fibers = np.mean(fiber_probabilities, -1) > prob_threshold
+    # And average for each fiber across all the nodes (second dim):
+    fiber_probabilities = np.mean(fiber_probabilities,
+                                  axis=1)
+
+    # Eliminate fibers that just aren't. For this, we need to find rows of the
+    # array where all entries are smaller than the threshold:
+    possible_fibers = np.sum(fiber_probabilities > prob_threshold, -1) > 0
     xform_sl = xform_sl[possible_fibers]
     fiber_probabilities = fiber_probabilities[possible_fibers]
 
@@ -276,8 +285,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                 if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
                     streamlines_in_bundles[sl_idx, bundle_idx] = fiber_probabilities[sl_idx, bundle_idx]
 
-    # Eliminate fibers that don't pass through any ROI criterion:
-    possible_fibers = np.mean(streamlines_in_bundles, -1) > 0
+    # Eliminate any fibers not selected using the plane ROIs:
+    possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
     xform_sl = xform_sl[possible_fibers]
     streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
@@ -288,6 +297,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
         if len(select_sl) == 0:
+            fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
             continue
 
