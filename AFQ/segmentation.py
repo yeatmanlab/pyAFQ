@@ -140,8 +140,8 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
-            reg_template=None, mapping=None, clip_to_roi=True,
-            crosses_midline=None, clean_rounds=5, clean_threshold=2,
+            reg_template=None, mapping=None, clip_to_roi=False,
+            clean_rounds=5, clean_threshold=2,
             prob_threshold=0, **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
@@ -166,11 +166,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     clip_to_roi : bool, optional Whether to clip the streamlines between
         the ROIs
-
-    crosses_midline : None or bool, optional. Whether you want the
-        streamlines to all cross the midline (True) or not cross the
-        midline (False). Default: None, which means that you ignore
-        whether the streamlines cross the midline or not.
 
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from the
@@ -314,10 +309,12 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             min1 = np.argmin(dist1, 0)[0]
             if min0 > min1:
                 this_sl = this_sl[::-1]
-                if clip_to_roi:
-                    this_sl = this_sl[min1:min0]
-            elif clip_to_roi:
-                this_sl = this_sl[min0:min1]
+
+            # XXX Need to fix this:
+                #if clip_to_roi:
+                #    this_sl = this_sl[min1:min0]
+            #elif clip_to_roi:
+            #    this_sl = this_sl[min0:min1]
 
             select_sl[idx] = this_sl
         # We'll use a Streamlines object for the next steps
