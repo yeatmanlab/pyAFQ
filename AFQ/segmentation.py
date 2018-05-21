@@ -141,7 +141,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
             reg_template=None, mapping=None, clip_to_roi=False,
-            clean_rounds=5, clean_threshold=2,
+            clean_rounds=5, clean_threshold=6,
             prob_threshold=0, **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
@@ -173,7 +173,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     clean_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units
-        are standard deviations). Default: 2.
+        are standard deviations). Default: 6.
 
     prob_threshold: float.
         Cleaning of fiber groups is done using probability maps from [Hua2008]_.
@@ -285,7 +285,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     xform_sl = xform_sl[possible_fibers]
     streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
-
     for bundle_idx, bundle in enumerate(bundles):
         print(bundle)
         select_idx = np.where(bundle_choice == bundle_idx)
@@ -329,7 +328,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                                     return_mahalnobis=True)
                 rounds_elapsed = 0
                 while np.any(w > clean_threshold) and rounds_elapsed < clean_rounds:
-                    idx_belong = np.unique(np.where(w < clean_threshold)[0])
+                    idx_belong = np.where(np.all(w < clean_threshold, axis=-1))[0]
                     select_sl = select_sl[idx_belong.astype(int)]
                     w = gaussian_weights(select_sl, n_points=100,
                                         return_mahalnobis=True)
