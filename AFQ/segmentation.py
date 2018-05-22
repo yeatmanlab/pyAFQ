@@ -117,6 +117,10 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
         n_points = bundle.shape[1]
 
     w = np.zeros((bundle.shape[0], n_points))
+    # If there's only one fiber here, it gets the entire weighting:
+    if bundle.shape[0] == 1:
+        return np.array([1])
+
     for node in range(bundle.shape[1]):
         # This should come back as a 3D covariance matrix with the spatial
         # variance covariance of this node across the different streamlines
@@ -140,8 +144,8 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
-            reg_template=None, mapping=None, clip_to_roi=False,
-            clean_rounds=5, clean_threshold=6,
+            reg_template=None, mapping=None,
+            clean_rounds=5, clean_threshold=6, min_sl=20,
             prob_threshold=0, **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
@@ -164,9 +168,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         A mapping between DWI space and a template. Defaults to generate
         this.
 
-    clip_to_roi : bool, optional Whether to clip the streamlines between
-        the ROIs
-
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from the
         mean of extracted bundles. Default: 5
@@ -175,10 +176,14 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         Threshold of cleaning based on the Mahalanobis distance (the units
         are standard deviations). Default: 6.
 
-    prob_threshold: float.
+    prob_threshold : float.
         Cleaning of fiber groups is done using probability maps from [Hua2008]_.
         Here, we choose an average probability that needs to be exceeded for an
         individual streamline to be retained. Default: 0.
+
+    min_sl : int
+       Number of streamlines in a bundle under which we will not bother with
+       cleaning outliers.
 
     References
     ----------
@@ -270,6 +275,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     xform_sl = xform_sl[possible_fibers]
     streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
+
     for bundle_idx, bundle in enumerate(bundles):
         print(bundle)
         select_idx = np.where(bundle_choice == bundle_idx)
@@ -293,13 +299,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             min1 = np.argmin(dist1, 0)[0]
             if min0 > min1:
                 this_sl = this_sl[::-1]
-
-            # XXX Need to fix this:
-                #if clip_to_roi:
-                #    this_sl = this_sl[min1:min0]
-            #elif clip_to_roi:
-            #    this_sl = this_sl[min0:min1]
-
             select_sl[idx] = this_sl
         # We'll use a Streamlines object for the next steps
         # because these objects support indexing with arrays:
@@ -308,12 +307,13 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
         #Next, clean using distance from the mean fiber:
         if clean_rounds:
-            if len(select_sl) > 0:
+            if len(select_sl) > min_sl:
                 w = gaussian_weights(select_sl, n_points=100,
                                     return_mahalnobis=True)
                 rounds_elapsed = 0
-                # XXX Need to do error checking here to make sure that there are streamlines left!
-                while np.any(w > clean_threshold) and rounds_elapsed < clean_rounds:
+                while (np.any(w > clean_threshold) and
+                       rounds_elapsed < clean_rounds and
+                       len(select_sl) > min_sl):
                     idx_belong = np.where(np.all(w < clean_threshold, axis=-1))[0]
                     select_sl = select_sl[idx_belong.astype(int)]
                     w = gaussian_weights(select_sl, n_points=100,
