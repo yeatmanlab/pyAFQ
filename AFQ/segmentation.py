@@ -208,40 +208,22 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     # For expedience, we approximate each streamline as a 100 point curve:
     fgarray = _resample_bundle(xform_sl, 100)
-    # We're going to put back together all the probability volumes:
-    prob_vol = []
+    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundles)))
+
+    fiber_groups = {}
+
     for bundle_idx, bundle in enumerate(bundles):
+        print(bundle)
+
         prob_map = bundles[bundle]['prob_map']
         if not isinstance(prob_map, np.ndarray):
             prob_map = prob_map.get_data()
         warped_prob_map = mapping.transform_inverse(prob_map,
                                                     interpolation='nearest')
-        prob_vol.append(warped_prob_map[..., None])
+        fiber_probabilities = dts.values_from_volume(warped_prob_map,
+                                                     fgarray)
+        fiber_probabilities = np.mean(fiber_probabilities, -1)
 
-    # This is the 4D probability volume:
-    prob_vol = np.concatenate(prob_vol, -1)
-
-    # We can extract the values for all the bundles in one call:
-    fiber_probabilities = dts.values_from_volume(prob_vol,
-                                                 fgarray)
-
-    # And average for each fiber across all the nodes (second dim):
-    fiber_probabilities = np.mean(fiber_probabilities,
-                                  axis=1)
-
-    # Eliminate fibers that just aren't. For this, we need to find rows of the
-    # array where all entries are smaller than the threshold:
-    possible_fibers = np.sum(fiber_probabilities > prob_threshold, -1) > 0
-    xform_sl = xform_sl[possible_fibers]
-    fiber_probabilities = fiber_probabilities[possible_fibers]
-
-    fiber_groups = {}
-    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundles)))
-
-    for bundle_idx, bundle in enumerate(bundles):
-        print(bundle)
-        # # Only consider streamlines that haven't been taken:
-        # idx_possible = np.where(streamlines_in_bundles==0)[0]
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
         if not isinstance(ROI0, np.ndarray):
@@ -267,18 +249,21 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         crosses_midline = bundles[bundle]['cross_midline']
 
         for sl_idx, sl in enumerate(xform_sl):
-            if crosses_midline is not None:
-                if (np.any(sl[:, 0] > img.shape[0]//2) and np.any(sl[:, 0] < img.shape[0]//2)):
-                    # This means that the streamline does cross the midline:
-                    if crosses_midline:
-                        # This is what we want, keep going
-                        pass
-                    else:
-                        # This is not what we want, skip to next streamline
-                        continue
-            if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
-                if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
-                    streamlines_in_bundles[sl_idx, bundle_idx] = fiber_probabilities[sl_idx, bundle_idx]
+            if fiber_probabilities[sl_idx] > prob_threshold:
+                if crosses_midline is not None:
+                    if (np.any(sl[:, 0] > img.shape[0]//2) and
+                            np.any(sl[:, 0] < img.shape[0]//2)):
+                        # This means that the streamline does cross the midline:
+                        if crosses_midline:
+                            # This is what we want, keep going
+                            pass
+                        else:
+                            # This is not what we want, skip to next streamline
+                            continue
+                if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
+                    if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
+                        streamlines_in_bundles[sl_idx, bundle_idx] =\
+                                         fiber_probabilities[sl_idx]
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
@@ -327,6 +312,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                 w = gaussian_weights(select_sl, n_points=100,
                                     return_mahalnobis=True)
                 rounds_elapsed = 0
+                # XXX Need to do error checking here to make sure that there are streamlines left!
                 while np.any(w > clean_threshold) and rounds_elapsed < clean_rounds:
                     idx_belong = np.where(np.all(w < clean_threshold, axis=-1))[0]
                     select_sl = select_sl[idx_belong.astype(int)]
