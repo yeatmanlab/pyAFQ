@@ -67,7 +67,7 @@ if not op.exists('dti_streamlines.trk'):
     streamlines = dts.Streamlines(aft.track(dti_params['params'],
                                             directions="det",
                                             seed_mask=wm_mask,
-                                            seeds=1,
+                                            seeds=2,
                                             stop_mask=FA,
                                             stop_threshold=0.2,
                                             step_size=step_size,
