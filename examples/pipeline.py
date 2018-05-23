@@ -61,14 +61,15 @@ print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
     FA = nib.load(dti_params["FA"]).get_data()
     wm_mask = np.zeros_like(FA)
-    wm_mask[FA > 0.1] = 1
+    wm_mask[FA > 0.2] = 1
     step_size = 1
     min_length_mm = 50
     streamlines = dts.Streamlines(aft.track(dti_params['params'],
+                                            directions="det",
                                             seed_mask=wm_mask,
-                                            seeds=2,
+                                            seeds=1,
                                             stop_mask=FA,
-                                            stop_threshold=0.1,
+                                            stop_threshold=0.2,
                                             step_size=step_size,
                                             min_length=min_length_mm/step_size))
     aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
@@ -77,7 +78,7 @@ else:
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
 # Use only a small portion of the streamlines, for expedience:
-# streamlines = streamlines[::10]
+#streamlines = streamlines[::10]
 
 print("We're looking at: %s streamlines"%len(streamlines))
 
@@ -105,7 +106,6 @@ bundles["FP"] = {'ROIs': [templates["FP_L"],
                  'rules':[True, True],
                  'prob_map': templates['FP_prob_map'],
                  'cross_midline': True}
-
 bundles["FA"] = {'ROIs': [templates["FA_L"],
                           templates["FA_R"]],
                  'rules':[True, True],
@@ -121,8 +121,8 @@ fiber_groups = seg.segment(fdata,
                            reg_template=MNI_T2_img,
                            mapping=mapping,
                            affine=img.affine,
-                           clip_to_roi=False,
-                           crosses_midline=False)
+                           clean_threshold=6,
+                           prob_threshold=5)
 
 
 print("Getting tract profiles")
