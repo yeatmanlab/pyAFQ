@@ -43,7 +43,7 @@ def patch_up_roi(roi):
 
 
 def _resample_bundle(streamlines, n_points):
-     return np.array(dps.set_number_of_points(streamlines, n_points))
+    return np.array(dps.set_number_of_points(streamlines, n_points))
 
 
 def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
@@ -62,7 +62,8 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         relevant).
 
     """
-    if isinstance(streamlines, list) or isinstance(streamlines, dts.Streamlines):
+    if (isinstance(streamlines, list) or
+            isinstance(streamlines, dts.Streamlines)):
         # Resample each streamline to the same number of points
         # list => np.array
         # Setting the number of points should happen in a streamline template
@@ -180,9 +181,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         are standard deviations). Default: 6.
 
     prob_threshold : float.
-        Cleaning of fiber groups is done using probability maps from [Hua2008]_.
-        Here, we choose an average probability that needs to be exceeded for an
-        individual streamline to be retained. Default: 0.
+        Cleaning of fiber groups is done using probability maps
+        from [Hua2008]_. Here, we choose an average probability that needs to
+        be exceeded for an individual streamline to be retained. Default: 0.
 
     min_sl : int
        Number of streamlines in a bundle under which we will not bother with
@@ -237,15 +238,18 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         if not isinstance(ROI0, np.ndarray):
             ROI0 = ROI0.get_data()
 
-        warped_ROI0 = patch_up_roi(mapping.transform_inverse(
-                            ROI0,
-                            interpolation='nearest')).astype(bool)
+        warped_ROI0 = patch_up_roi(
+            mapping.transform_inverse(
+                ROI0,
+                interpolation='nearest')).astype(bool)
+
         if not isinstance(ROI1, np.ndarray):
             ROI1 = ROI1.get_data()
 
-        warped_ROI1 = patch_up_roi(mapping.transform_inverse(
-                            ROI1,
-                            interpolation='nearest')).astype(bool)
+        warped_ROI1 = patch_up_roi(
+            mapping.transform_inverse(
+                ROI1,
+                interpolation='nearest')).astype(bool)
 
         roi_coords0 = np.array(np.where(warped_ROI0)).T
         roi_coords1 = np.array(np.where(warped_ROI1)).T
@@ -259,9 +263,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         for sl_idx, sl in enumerate(xform_sl):
             if fiber_probabilities[sl_idx] > prob_threshold:
                 if crosses_midline is not None:
-                    if (np.any(sl[:, 0] > img.shape[0]//2) and
-                            np.any(sl[:, 0] < img.shape[0]//2)):
-                        # This means that the streamline does cross the midline:
+                    if (np.any(sl[:, 0] > img.shape[0] // 2) and
+                            np.any(sl[:, 0] < img.shape[0] // 2)):
+                        # This means that the streamline does
+                        # cross the midline:
                         if crosses_midline:
                             # This is what we want, keep going
                             pass
@@ -271,7 +276,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                 if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
                     if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
-                                         fiber_probabilities[sl_idx]
+                            fiber_probabilities[sl_idx]
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
@@ -308,19 +313,21 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_sl = dts.Streamlines(select_sl)
         print(len(select_sl))
 
-        #Next, clean using distance from the mean fiber:
+        # Next, clean using distance from the mean fiber:
         if clean_rounds:
             if len(select_sl) > min_sl:
                 w = gaussian_weights(select_sl, n_points=100,
-                                    return_mahalnobis=True)
+                                     return_mahalnobis=True)
                 rounds_elapsed = 0
                 while (np.any(w > clean_threshold) and
                        rounds_elapsed < clean_rounds and
                        len(select_sl) > min_sl):
-                    idx_belong = np.where(np.all(w < clean_threshold, axis=-1))[0]
+                    idx_belong = np.where(
+                        np.all(w < clean_threshold, axis=-1))[0]
                     select_sl = select_sl[idx_belong.astype(int)]
-                    w = gaussian_weights(select_sl, n_points=100,
-                                        return_mahalnobis=True)
+                    w = gaussian_weights(select_sl,
+                                         n_points=100,
+                                         return_mahalnobis=True)
                     rounds_elapsed += 1
 
         print(len(select_sl))

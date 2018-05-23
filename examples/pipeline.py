@@ -9,7 +9,6 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
-import AFQ.api as api
 import dipy.data as dpd
 
 import dipy.tracking.streamline as dts
@@ -32,7 +31,8 @@ mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
 print("Calculating brain-mask")
 if not op.exists('./brain_mask.nii.gz'):
     _, brain_mask = median_otsu(mean_b0, median_radius=4, numpass=4)
-    nib.save(nib.Nifti1Image(brain_mask.astype(int), img.affine), './brain_mask.nii.gz')
+    nib.save(nib.Nifti1Image(brain_mask.astype(int),
+                             img.affine), './brain_mask.nii.gz')
 else:
     brain_mas = nib.load('./brain_mask.nii.gz').get_data().astype(bool)
 
@@ -64,23 +64,21 @@ if not op.exists('dti_streamlines.trk'):
     wm_mask[FA > 0.2] = 1
     step_size = 1
     min_length_mm = 50
-    streamlines = dts.Streamlines(aft.track(dti_params['params'],
-                                            directions="det",
-                                            seed_mask=wm_mask,
-                                            seeds=2,
-                                            stop_mask=FA,
-                                            stop_threshold=0.2,
-                                            step_size=step_size,
-                                            min_length=min_length_mm/step_size))
+    streamlines = dts.Streamlines(
+        aft.track(dti_params['params'],
+                  directions="det",
+                  seed_mask=wm_mask,
+                  seeds=2,
+                  stop_mask=FA,
+                  stop_threshold=0.2,
+                  step_size=step_size,
+                  min_length=min_length_mm / step_size))
     aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
-# Use only a small portion of the streamlines, for expedience:
-#streamlines = streamlines[::10]
-
-print("We're looking at: %s streamlines"%len(streamlines))
+print("We're looking at: %s streamlines" % len(streamlines))
 
 templates = afd.read_templates()
 templates['ARC_roi1_L'] = templates['SLF_roi1_L']
@@ -94,21 +92,22 @@ bundle_names = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
 bundles = {}
 for name in bundle_names:
     for hemi in ['_R', '_L']:
-        bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
-                                         templates[name + '_roi2' + hemi]],
-                                'rules': [True, True],
-                                'prob_map': templates[name + hemi + '_prob_map'],
-                                'cross_midline': False}
+        bundles[name + hemi] = {
+            'ROIs': [templates[name + '_roi1' + hemi],
+                     templates[name + '_roi2' + hemi]],
+            'rules': [True, True],
+            'prob_map': templates[name + hemi + '_prob_map'],
+            'cross_midline': False}
 
 
 bundles["FP"] = {'ROIs': [templates["FP_L"],
                           templates["FP_R"]],
-                 'rules':[True, True],
+                 'rules': [True, True],
                  'prob_map': templates['FP_prob_map'],
                  'cross_midline': True}
 bundles["FA"] = {'ROIs': [templates["FA_L"],
                           templates["FA_R"]],
-                 'rules':[True, True],
+                 'rules': [True, True],
                  'prob_map': templates['FA_prob_map'],
                  'cross_midline': True}
 
@@ -130,9 +129,11 @@ n_points = 100
 
 dfs = []
 for bundle in fiber_groups:
-    print("Getting profile for: %s"%bundle)
+    print("Getting profile for: %s" % bundle)
     if len(fiber_groups[bundle]) > 0:
-        bundle_df = pd.DataFrame(data={'tractID': [bundle] * n_points, 'nodeID': np.arange(1, n_points + 1)})
+        bundle_df = pd.DataFrame(data={
+            'tractID': [bundle] * n_points,
+            'nodeID': np.arange(1, n_points + 1)})
 
         for stat_key in dti_params.keys():
             if stat_key == 'params':
@@ -147,6 +148,6 @@ for bundle in fiber_groups:
                 bundle_df[stat_key] = profile
         dfs.append(bundle_df)
     else:
-        print("There are no fibers in %s"%bundle)
+        print("There are no fibers in %s" % bundle)
 
 result = pd.concat(dfs)
