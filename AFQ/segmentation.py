@@ -127,6 +127,9 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
         # This is a 3-by-3 array:
         node_coords = bundle[:, node]
         c = np.cov(node_coords.T, ddof=0)
+        c = np.array([[c[0, 0], c[0, 1], c[0, 2]],
+                      [0, c[1, 1], c[1, 2]],
+                      [0, 0, c[2, 2]]])
         # Calculate the mean or median of this node as well
         # delta = node_coords - np.mean(node_coords, 0)
         m = np.mean(node_coords, 0)
