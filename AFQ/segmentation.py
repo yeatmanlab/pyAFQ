@@ -191,11 +191,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
 
     References
     ----------
-
     .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
     Tract probability maps in stereotaxic spaces: analyses of white
     matter anatomy and tract-specific quantification. Neuroimage 39:
-    336–347
+    336-347
     """
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
     tol = dts.dist_to_corner(img.affine)
