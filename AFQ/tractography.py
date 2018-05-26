@@ -13,7 +13,7 @@ from AFQ.dti import tensor_odf
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seeds=1, stop_mask=None, stop_threshold=0,
-          step_size=0.5, min_length=10):
+          step_size=1.0, min_length=10, max_length=250):
     """
     Tractography
 
@@ -45,9 +45,11 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         0 (this means that if no stop_mask is passed, we will stop only at
         the edge of the image)
     step_size : float, optional.
-        The size (in mm) of a step of tractography. Default: 0.5
+        The size (in mm) of a step of tractography. Default: 1.0
     min_length: int, optional
-        The miminal length (no. of nodes) in a streamline. Default: 10
+        The miminal length (mm) in a streamline. Default: 10
+    max_length: int, optional
+        The miminal length (mm) in a streamline. Default: 250
 
     Returns
     -------
@@ -99,11 +101,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                      stop_threshold)
 
     return _local_tracking(seeds, dg, threshold_classifier, affine,
-                           step_size=step_size, min_length=min_length)
+                           step_size=step_size, min_length=min_length,
+                           max_length=max_length)
 
 
 def _local_tracking(seeds, dg, threshold_classifier, affine,
-                    step_size=0.5, min_length=10):
+                    step_size=0.5, min_length=10, max_length=250):
     """
     Helper function
     """
@@ -115,4 +118,6 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
                             affine,
                             step_size=step_size)
 
-    return [l for l in tracker if l.shape[0] > min_length]
+    return [l for l in tracker
+            if l.shape[0] * step_size > min_length and
+            l.shape[0] * step_size < max_length]

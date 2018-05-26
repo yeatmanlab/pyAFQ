@@ -25,10 +25,14 @@ def test_segment():
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
                                   templates['CST_roi2_L']],
-                         'rules': [True, True]},
+                         'rules': [True, True],
+                         'prob_map': templates['CST_L_prob_map'],
+                         'cross_midline': False},
                'CST_R': {'ROIs': [templates['CST_roi1_R'],
                                   templates['CST_roi1_R']],
-                         'rules': [True, True]}}
+                         'rules': [True, True],
+                         'prob_map': templates['CST_R_prob_map'],
+                         'cross_midline': False}}
 
     fiber_groups = seg.segment(hardi_fdata,
                                hardi_fbval,
@@ -42,12 +46,12 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     # There happen to be 8 fibers in the right CST:
     CST_R_sl = list(fiber_groups['CST_R'])
-    npt.assert_equal(len(CST_R_sl), 8)
+    npt.assert_equal(len(CST_R_sl), 5)
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
         CST_R_sl)
-    npt.assert_equal(tract_profile, np.ones(100))
+    npt.assert_almost_equal(tract_profile, np.ones(100))
 
 
 def test_gaussian_weights():
