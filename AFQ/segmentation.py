@@ -214,7 +214,19 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     fiber_groups = {}
 
     for bundle_idx, bundle in enumerate(bundles):
+<<<<<<< HEAD
         # Get the ROI coordinates:
+=======
+        prob_map = bundles[bundle]['prob_map']
+        if not isinstance(prob_map, np.ndarray):
+            prob_map = prob_map.get_data()
+        warped_prob_map = mapping.transform_inverse(prob_map,
+                                                    interpolation='nearest')
+        fiber_probabilities = dts.values_from_volume(warped_prob_map,
+                                                     fgarray)
+        fiber_probabilities = np.mean(fiber_probabilities, -1)
+
+>>>>>>> We no longer need to subset here, because it's gotten reasonably fast :-)
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
         if not isinstance(ROI0, np.ndarray):
@@ -281,7 +293,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
 
     for bundle_idx, bundle in enumerate(bundles):
-        print(bundle)
         select_idx = np.where(bundle_choice == bundle_idx)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
@@ -300,6 +311,27 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         # We'll set this to Streamlines object for the next steps (e.g.,
         # cleaning) because these objects support indexing with arrays:
         select_sl = dts.Streamlines(select_sl)
+<<<<<<< HEAD
+=======
+
+        # Next, clean using distance from the mean fiber:
+        if clean_rounds:
+            if len(select_sl) > min_sl:
+                w = gaussian_weights(select_sl, n_points=100,
+                                     return_mahalnobis=True)
+                rounds_elapsed = 0
+                while (np.any(w > clean_threshold) and
+                       rounds_elapsed < clean_rounds and
+                       len(select_sl) > min_sl):
+                    idx_belong = np.where(
+                        np.all(w < clean_threshold, axis=-1))[0]
+                    select_sl = select_sl[idx_belong.astype(int)]
+                    w = gaussian_weights(select_sl,
+                                         n_points=100,
+                                         return_mahalnobis=True)
+                    rounds_elapsed += 1
+
+>>>>>>> We no longer need to subset here, because it's gotten reasonably fast :-)
         fiber_groups[bundle] = select_sl
 
     return fiber_groups
