@@ -25,7 +25,8 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
+           "FA", "FP"]
 
 
 def make_bundle_dict(bundle_names=BUNDLES):
@@ -49,16 +50,30 @@ def make_bundle_dict(bundle_names=BUNDLES):
     # Each bundles gets a digit identifier (to be stored in the tractogram)
     uid = 1
     for name in bundle_names:
-        # Considder hard coding since we might have different rulse for
+        # Consider hard coding since we might have different rules for
         # some tracts
-        for hemi in ['_R', '_L']:
-            afq_bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' +
-                                                           hemi],
-                                                 templates[name + '_roi2' +
-                                                           hemi]],
-                                        'rules': [True, True],
-                                        'uid': uid}
+        if name in ["FA", "FP"]:
+            afq_bundles[name] = {
+                'ROIs': [templates[name + "_L"],
+                         templates[name + "_R"]],
+                'rules': [True, True],
+                'prob_map': templates[name + "_prob_map"],
+                'cross_midline': True,
+                'uid': uid}
             uid += 1
+
+        else:
+            for hemi in ['_R', '_L']:
+                afq_bundles[name + hemi] = {
+                    'ROIs': [templates[name + '_roi1' + hemi],
+                             templates[name + '_roi2' + hemi]],
+                    'rules': [True, True],
+                    'prob_map': templates[name + hemi + '_prob_map'],
+                    'cross_midline': False,
+                    'uid': uid}
+
+                uid += 1
+
 
     return afq_bundles
 
