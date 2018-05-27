@@ -23,7 +23,7 @@ def visualize_bundles(trk, ren=None, inline=True, interact=False):
     for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
         idx = np.where(trk.tractogram.data_per_streamline['bundle'] == b)[0]
         this_sl = list(trk.streamlines[idx])
-        sl_actor = fvtk.line(this_sl, Tableau_20.colors[int(b)])
+        sl_actor = fvtk.line(this_sl, Tableau_20.colors[np.mod(20, int(b))])
         fvtk.add(ren, sl_actor)
 
     if inline:
