@@ -217,6 +217,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     # For expedience, we approximate each streamline as a 100 point curve:
     fgarray = _resample_bundle(xform_sl, 100)
     streamlines_in_bundles = np.zeros((len(xform_sl), len(bundles)))
+    min_dist_coords = np.zeros((len(xform_sl), len(bundles), 2))
 
     fiber_groups = {}
 
@@ -272,8 +273,14 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                         else:
                             # This is not what we want, skip to next streamline
                             continue
-                if dts.streamline_near_roi(sl, roi_coords0, tol=tol):
-                    if dts.streamline_near_roi(sl, roi_coords1, tol=tol):
+                dist0 = cdist(sl, roi_coords0, 'euclidean')
+                if np.min(dist0) <= tol:
+                    dist1 = cdist(sl, roi_coords0, 'euclidean')
+                    if np.min(dist1) <= tol:
+                        min_dist_coords[sl_idx, bundle_idx, 0] =\
+                            np.argmin(dist0, 0)[0]
+                        min_dist_coords[sl_idx, bundle_idx, 1] =\
+                            np.argmin(dist1, 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
 
@@ -281,6 +288,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
     xform_sl = xform_sl[possible_fibers]
     streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
+    min_dist_coords = min_dist_coords[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
 
     for bundle_idx, bundle in enumerate(bundles):
@@ -288,6 +296,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         select_idx = np.where(bundle_choice == bundle_idx)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
+        # Sub-sample min_dist_coords:
+        min_dist_coords_bundle = min_dist_coords[select_idx]
         if len(select_sl) == 0:
             fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
@@ -299,14 +309,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         roi_coords1 = bundles[bundle]['ROIs'][1]
 
         for idx in range(len(select_sl)):
-            this_sl = select_sl[idx]
-            dist0 = cdist(this_sl, roi_coords0, 'euclidean')
-            dist1 = cdist(this_sl, roi_coords1, 'euclidean')
-            min0 = np.argmin(dist0, 0)[0]
-            min1 = np.argmin(dist1, 0)[0]
+            min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
+            min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
             if min0 > min1:
-                this_sl = this_sl[::-1]
-            select_sl[idx] = this_sl
+                select_sl[idx] = select_sl[idx][::-1]
         # We'll use a Streamlines object for the next steps
         # because these objects support indexing with arrays:
         select_sl = dts.Streamlines(select_sl)
