@@ -56,10 +56,12 @@ bundle_names = ["CST", "ILF"]
 bundles = {}
 for name in bundle_names:
     for hemi in ['_R', '_L']:
-        bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' + hemi],
-                                         templates[name + '_roi2' + hemi]],
-                                'rules': [True, True]}
-
+        bundles[name + hemi] = {
+            'ROIs': [templates[name + '_roi1' + hemi],
+                     templates[name + '_roi2' + hemi]],
+            'rules': [True, True],
+            'prob_map': templates[name + hemi + '_prob_map'],
+            'cross_midline': False}
 
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
@@ -82,6 +84,11 @@ fiber_groups = seg.segment(hardi_fdata,
                            as_generator=False,
                            affine=img.affine)
 
+
+print("Cleaning fiber groups...")
+for bundle in bundles:
+    fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
+
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_data()
 
@@ -91,3 +98,5 @@ for bundle in bundles:
     profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
     ax.plot(profile)
     ax.set_title(bundle)
+
+plt.show()

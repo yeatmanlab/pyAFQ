@@ -148,53 +148,45 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundles,
-            reg_template=None, mapping=None,
-            clean_rounds=5, clean_threshold=6, min_sl=20,
-            prob_threshold=0, **reg_kwargs):
+            reg_template=None, mapping=None, prob_threshold=0,
+            **reg_kwargs):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
     Parameters
     ----------
-    fdata, fbval, fbvec : str Full path to data, bvals, bvecs
+    fdata, fbval, fbvec : str
+        Full path to data, bvals, bvecs
 
-    streamlines : list of 2D arrays Each array is a streamline, shape
-        (3, N).
+    streamlines : list of 2D arrays
+        Each array is a streamline, shape (3, N).
 
-    bundles: dict The format is something like::
+    bundles: dict
+        The format is something like::
 
-             {'name': {'ROIs':[img, img], 'rules':[True, True]}}
+            {'name': {'ROIs':[img1, img2],
+            'rules':[True, True]},
+            'prob_map': img3,
+            'cross_midline': False}
 
-    reg_template : str or nib.Nifti1Image, optional. Template to use for
-        registration (defaults to the MNI T2)
+    reg_template : str or nib.Nifti1Image, optional.
+        Template to use for registration (defaults to the MNI T2)
 
     mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional
         A mapping between DWI space and a template. Defaults to generate
         this.
 
-    clean_rounds : int, optional.
-        Number of rounds of cleaning based on the Mahalanobis distance from the
-        mean of extracted bundles. Default: 5
-
-    clean_threshold : float, optional.
-        Threshold of cleaning based on the Mahalanobis distance (the units
-        are standard deviations). Default: 6.
-
     prob_threshold : float.
-        Cleaning of fiber groups is done using probability maps
-        from [Hua2008]_. Here, we choose an average probability that needs to
-        be exceeded for an individual streamline to be retained. Default: 0.
-
-    min_sl : int
-       Number of streamlines in a bundle under which we will not bother with
-       cleaning outliers.
+        Initial cleaning of fiber groups is done using probability maps from
+        [Hua2008]_. Here, we choose an average probability that needs to be
+        exceeded for an individual streamline to be retained. Default: 0.
 
     References
     ----------
     .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
-    Tract probability maps in stereotaxic spaces: analyses of white
-    matter anatomy and tract-specific quantification. Neuroimage 39:
-    336-347
+       Tract probability maps in stereotaxic spaces: analyses of white
+       matter anatomy and tract-specific quantification. Neuroimage 39:
+       336-347
     """
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
     tol = dts.dist_to_corner(img.affine)
@@ -313,29 +305,62 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
             if min0 > min1:
                 select_sl[idx] = select_sl[idx][::-1]
-        # We'll use a Streamlines object for the next steps
-        # because these objects support indexing with arrays:
+        # We'll set this to Streamlines object for the next steps (e.g.,
+        # cleaning) because these objects support indexing with arrays:
         select_sl = dts.Streamlines(select_sl)
-        print(len(select_sl))
-
-        # Next, clean using distance from the mean fiber:
-        if clean_rounds:
-            if len(select_sl) > min_sl:
-                w = gaussian_weights(select_sl, n_points=100,
-                                     return_mahalnobis=True)
-                rounds_elapsed = 0
-                while (np.any(w > clean_threshold) and
-                       rounds_elapsed < clean_rounds and
-                       len(select_sl) > min_sl):
-                    idx_belong = np.where(
-                        np.all(w < clean_threshold, axis=-1))[0]
-                    select_sl = select_sl[idx_belong.astype(int)]
-                    w = gaussian_weights(select_sl,
-                                         n_points=100,
-                                         return_mahalnobis=True)
-                    rounds_elapsed += 1
-
-        print(len(select_sl))
         fiber_groups[bundle] = select_sl
 
     return fiber_groups
+
+
+def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
+                      clean_threshold=6, min_sl=20):
+    """
+    Clean a segmented fiber group based on the Mahalnobis distance of
+    each streamline
+
+    Parameters
+    ----------
+
+    streamlines : nibabel.Streamlines class instance. The streamlines
+        constituting a fiber group.
+
+    clean_rounds : int, optional. Number of rounds of cleaning based on
+        the Mahalanobis distance from the mean of extracted bundles.
+        Default: 5
+
+    clean_threshold : float, optional. Threshold of cleaning based on the
+        Mahalanobis distance (the units are standard deviations).
+        Default: 6.
+
+    min_sl : int Number of streamlines in a bundle under which we will
+       not bother with cleaning outliers.
+
+    Returns
+    -------
+    A nibabel.Streamlines class instance containing only the streamlines
+    that have a Mahalanobis distance smaller than `clean_threshold` from
+    the mean of each one of the nodes.
+    """
+    # We don't even bother if there aren't enough streamlines:
+    if len(streamlines) > min_sl:
+        # This calculates the Mahalanobis for each streamline/node:
+        w = gaussian_weights(streamlines, n_points=n_points,
+                             return_mahalnobis=True)
+        # We'll only do this for clean_rounds
+        rounds_elapsed = 0
+        while (np.any(w > clean_threshold) and
+                rounds_elapsed < clean_rounds and
+                len(streamlines) > min_sl):
+            # Select the fibers that have Mahalanobis smaller than the
+            # threshold for all their nodes:
+            idx_belong = np.where(
+                np.all(w < clean_threshold, axis=-1))[0]
+            # Update by selection:
+            streamlines = streamlines[idx_belong.astype(int)]
+            # Repeat:
+            w = gaussian_weights(streamlines,
+                                 n_points=n_points,
+                                 return_mahalnobis=True)
+            rounds_elapsed += 1
+    return streamlines
