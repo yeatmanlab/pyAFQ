@@ -311,6 +311,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         # We'll set this to Streamlines object for the next steps (e.g.,
         # cleaning) because these objects support indexing with arrays:
         select_sl = dts.Streamlines(select_sl)
+        fiber_groups[bundle] = select_sl
 
     return fiber_groups
 
