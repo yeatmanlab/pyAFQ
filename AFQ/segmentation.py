@@ -280,24 +280,27 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     min_dist_coords = min_dist_coords[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
 
+    # We do another round through, so that we can orient all the
+    # streamlines within a bundle in the same orientation with respect to
+    # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
+    # to ROI1).
     for bundle_idx, bundle in enumerate(bundles):
         select_idx = np.where(bundle_choice == bundle_idx)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
-        # Sub-sample min_dist_coords:
-        min_dist_coords_bundle = min_dist_coords[select_idx]
         if len(select_sl) == 0:
             fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
             continue
 
+        # Sub-sample min_dist_coords:
+        min_dist_coords_bundle = min_dist_coords[select_idx]
         for idx in range(len(select_sl)):
             min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
             min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
             if min0 > min1:
                 select_sl[idx] = select_sl[idx][::-1]
-        # We'll set this to Streamlines object for the next steps (e.g.,
-        # cleaning) because these objects support indexing with arrays:
+        # Set this to nibabel.Streamlines object for output:
         select_sl = dts.Streamlines(select_sl)
         fiber_groups[bundle] = select_sl
 
