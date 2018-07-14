@@ -108,7 +108,8 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
         inverse of the Mahalanobis distance, relative to the distribution of
         coordinates at that node position across streamlines.
     """
-    if isinstance(bundle, list) or isinstance(bundle, dts.Streamlines):
+    if (isinstance(bundle, list) or isinstance(bundle, dts.Streamlines) or
+            isinstance(bundle, nib.streamlines.array_sequence.ArraySequence)):
         # if you got a list, assume that it needs to be resampled:
         bundle = _resample_bundle(bundle, n_points)
     else:

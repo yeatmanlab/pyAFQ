@@ -74,3 +74,21 @@ def test_AFQ_data():
                      nib.load(myafq['dwi_file'][0]).shape[:3])
     npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
                      nib.load(myafq.dti[0]).shape[:3])
+
+
+
+def test_AFQ_data():
+    """
+    Test with some actual data
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(
+        preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
+        sub_prefix='sub', seeds=np.array([[40,40,40], [40,40,41]]))
+
+    # For things to go reasonably fast, we'll set a brain mask that includes only a small number of voxels and use that:
+    dwi_shape = nib.load(myafq.data_frame.dwi_file[0]).shape
+    brain_mask = np.zeros(dwi_shape[:-1])
+    myafq.data_frame['brain_mask']
+    myafq.bundles

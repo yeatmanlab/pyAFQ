@@ -1,6 +1,7 @@
 import os.path as op
 import numpy as np
 import numpy.testing as npt
+import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 from AFQ.utils import streamlines as aus
 import dipy.tracking.utils as dtu
@@ -43,5 +44,16 @@ def test_bundles_to_tgram():
                        [0., 0., 0., 1.]])
     tgram = aus.bundles_to_tgram(bundles, bundle_dict, affine)
     new_bundles = aus.tgram_to_bundles(tgram, bundle_dict)
-
     npt.assert_equal(new_bundles, bundles)
+
+
+def test_add_bundles():
+    t1 = nib.streamlines.Tractogram(
+            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    t2 = nib.streamlines.Tractogram(
+            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    aus.add_bundles(t1, t2)

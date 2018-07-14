@@ -152,7 +152,7 @@ def _mapping(row, force_recompute=False):
     return mapping_file
 
 
-def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
+def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
                  force_recompute=False):
     """
     wm_labels : list
@@ -185,7 +185,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 
         streamlines = aft.track(params_file,
                                 directions='det',
-                                seeds=2,
+                                seeds=seeds,
                                 seed_mask=resamp_wm,
                                 stop_mask=resamp_wm)
 
@@ -195,22 +195,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
     return streamlines_file
 
 
-def _tgramer(bundles, bundle_dict, affine):
-    tgram = nib.streamlines.Tractogram([], {'bundle': []})
-    for b in bundles:
-        print("Segmenting: %s" % b)
-        this_sl = list(bundles[b])
-        this_tgram = nib.streamlines.Tractogram(
-            this_sl,
-            data_per_streamline={
-                'bundle': (len(this_sl) *
-                           [bundle_dict[b]['uid']])},
-                affine_to_rasmm=affine)
-        tgram = aus.add_bundles(tgram, this_tgram)
-    return tgram
-
-
-def _bundles(row, wm_labels, odf_model="DTI", directions="det",
+def _bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
              force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
@@ -219,6 +204,7 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, wm_labels,
                                         odf_model=odf_model,
                                         directions=directions,
+                                        seeds=seeds,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
@@ -233,9 +219,43 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
-        tgram = _tgramer(bundles, bundle_dict, row['dwi_affine'])
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
+
+
+def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
+             force_recompute=False):
+    clean_bundles_file = _get_fname(row,
+                                    '%s_%s_clean_bundles.trk' % (odf_model,
+                                                                 directions))
+    if not op.exists(clean_bundles_file) or force_recompute:
+        bundles_file = _bundles(row,
+                                wm_labels,
+                                odf_model="DTI",
+                                directions="det",
+                                seeds=seeds,
+                                force_recompute=False)
+        tg = nib.streamlines.load(bundles_file).tractogram
+        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        bundle_dict = make_bundle_dict()
+        tgram = nib.streamlines.Tractogram([], {'bundle': []})
+        for b in bundle_dict.keys():
+            idx = np.where(tg.data_per_streamline['bundle'] ==
+                           bundle_dict[b]['uid'])
+            this_sl = sl[idx]
+            this_sl = seg.clean_fiber_group(this_sl)
+            this_tgram = nib.streamlines.Tractogram(
+                this_sl,
+                data_per_streamline={
+                    'bundle': (len(this_sl) *
+                               [bundle_dict[b]['uid']])},
+                    affine_to_rasmm=row['dwi_affine'])
+            tgram = aus.add_bundles(tgram, this_tgram)
+        nib.streamlines.save(tgram, clean_bundles_file)
+
+    return bundles_file
+
 
 
 def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
@@ -349,7 +369,7 @@ class AFQ(object):
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
-                 b0_threshold=0, odf_model="DTI", directions="det",
+                 b0_threshold=0, odf_model="DTI", directions="det", seeds=2,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
                  wm_labels=[251, 252, 253, 254, 255, 41, 2]):
@@ -383,6 +403,7 @@ class AFQ(object):
         self.bundle_list = bundle_list
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
+        self.seeds = seeds
 
         self.preproc_path = preproc_path
         if self.preproc_path is None:
@@ -549,6 +570,7 @@ class AFQ(object):
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
+                                      seeds=self.seeds,
                                       force_recompute=self.force_recompute)
 
     def get_streamlines(self):
@@ -565,6 +587,7 @@ class AFQ(object):
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
+                                      seeds=self.seeds,
                                       force_recompute=self.force_recompute)
 
     def get_bundles(self):
@@ -572,6 +595,23 @@ class AFQ(object):
         return self.data_frame['bundles_file']
 
     bundles = property(get_bundles, set_bundles)
+
+    def set_clean_bundles(self):
+        if ('clean_bundles_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['clean_bundles_file'] =\
+                self.data_frame.apply(_clean_bundles, axis=1,
+                                      args=[self.wm_labels],
+                                      odf_model=self.odf_model,
+                                      directions=self.directions,
+                                      seeds=self.seeds,
+                                      force_recompute=self.force_recompute)
+
+    def get_clean_bundles(self):
+        self.set_clean_bundles()
+        return self.data_frame['clean_bundles_file']
+
+    clean_bundles = property(get_clean_bundles, set_clean_bundles)
 
     def set_tract_profiles(self):
         if ('tract_profiles_file' not in self.data_frame.columns or

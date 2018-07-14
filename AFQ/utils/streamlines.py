@@ -6,12 +6,19 @@ import dipy.tracking.utils as dtu
 
 def add_bundles(t1, t2):
     """
-    Combine two bundles, using the second bundles affine
+    Combine two bundles, using the second bundles' affine and
+    data_per_streamline keys.
+
+    Parameters
+    ----------
+    t1, t2 : nib.streamlines.Tractogram class instances
     """
+    data_per_streamline = {k : (list(t1.data_per_streamline[k]) +
+                                list(t2.data_per_streamline[k]))
+                           for k in t2.data_per_streamline.keys()}
     return nib.streamlines.Tractogram(
         list(t1.streamlines) + list(t2.streamlines),
-        {'bundle': (list(t1.data_per_streamline['bundle']) +
-                    list(t2.data_per_streamline['bundle']))},
+        data_per_streamline,
         affine_to_rasmm=t2.affine_to_rasmm)
 
 
