@@ -44,7 +44,7 @@ def test_segment():
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
-    # There happen to be 8 fibers in the right CST:
+    # There happen to be 5 fibers in the right CST:
     CST_R_sl = fiber_groups['CST_R']
     npt.assert_equal(len(CST_R_sl), 5)
     # Calculate the tract profile for a volume of all-ones:
@@ -68,6 +68,30 @@ def test_segment():
     # threshold to a relatively small number will exclude some streamlines:
     clean_sl = seg.clean_fiber_group(CST_R_sl, min_sl=2, clean_threshold=2)
     npt.assert_equal(len(clean_sl), 3)
+
+    # What if you don't have probability maps?
+    bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
+                                  templates['CST_roi2_L']],
+                         'rules': [True, True],
+                         'cross_midline': False},
+               'CST_R': {'ROIs': [templates['CST_roi1_R'],
+                                  templates['CST_roi1_R']],
+                         'rules': [True, True],
+                         'cross_midline': False}}
+
+    fiber_groups = seg.segment(hardi_fdata,
+                               hardi_fbval,
+                               hardi_fbvec,
+                               streamlines,
+                               bundles,
+                               mapping=mapping,
+                               as_generator=True)
+
+    # This condition should still hold
+    npt.assert_equal(len(fiber_groups), 2)
+    # But one of the streamlines has switched identities without the
+    # probability map to guide selection
+    npt.assert_equal(len(fiber_groups['CST_R']), 6)
 
 
 def test_gaussian_weights():

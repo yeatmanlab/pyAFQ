@@ -214,17 +214,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     fiber_groups = {}
 
     for bundle_idx, bundle in enumerate(bundles):
-        print(bundle)
-
-        prob_map = bundles[bundle]['prob_map']
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_data()
-        warped_prob_map = mapping.transform_inverse(prob_map,
-                                                    interpolation='nearest')
-        fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                     fgarray)
-        fiber_probabilities = np.mean(fiber_probabilities, -1)
-
+        # Get the ROI coordinates:
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
         if not isinstance(ROI0, np.ndarray):
@@ -246,11 +236,18 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         roi_coords0 = np.array(np.where(warped_ROI0)).T
         roi_coords1 = np.array(np.where(warped_ROI1)).T
 
-        # Replace this here, so we can reuse below:
-        bundles[bundle]['ROIs'][0] = roi_coords0
-        bundles[bundle]['ROIs'][1] = roi_coords1
-
         crosses_midline = bundles[bundle]['cross_midline']
+
+        # The probability map if doesn't exist is all ones with the same
+        # shape as the ROIs:
+        prob_map = bundles[bundle].get('prob_map', np.ones(ROI0.shape))
+        if not isinstance(prob_map, np.ndarray):
+            prob_map = prob_map.get_data()
+        warped_prob_map = mapping.transform_inverse(prob_map,
+                                                    interpolation='nearest')
+        fiber_probabilities = dts.values_from_volume(warped_prob_map,
+                                                     fgarray)
+        fiber_probabilities = np.mean(fiber_probabilities, -1)
 
         for sl_idx, sl in enumerate(xform_sl):
             if fiber_probabilities[sl_idx] > prob_threshold:
@@ -267,7 +264,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                             continue
                 dist0 = cdist(sl, roi_coords0, 'euclidean')
                 if np.min(dist0) <= tol:
-                    dist1 = cdist(sl, roi_coords0, 'euclidean')
+                    dist1 = cdist(sl, roi_coords1, 'euclidean')
                     if np.min(dist1) <= tol:
                         min_dist_coords[sl_idx, bundle_idx, 0] =\
                             np.argmin(dist0, 0)[0]
@@ -294,11 +291,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
             continue
-
-        # Next, we reorient each streamline according to
-        # an ARBITRARY, but CONSISTENT order:
-        roi_coords0 = bundles[bundle]['ROIs'][0]
-        roi_coords1 = bundles[bundle]['ROIs'][1]
 
         for idx in range(len(select_sl)):
             min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
