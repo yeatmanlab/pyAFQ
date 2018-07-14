@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib
 from nibabel import trackvis
-from dipy.tracking.utils import move_streamlines
+import dipy.tracking.utils as dtu
 
 
 def add_bundles(t1, t2):
@@ -61,7 +61,7 @@ def write_trk(fname, streamlines, affine=None, shape=None):
         affine = np.eye(4)
 
     zooms = np.sqrt((affine * affine).sum(0))
-    streamlines = move_streamlines(streamlines, affine)
+    streamlines = dtu.move_streamlines(streamlines, affine)
     data = ((s, None, None) for s in streamlines)
 
     voxel_order = nib.orientations.aff2axcodes(affine)
@@ -74,3 +74,58 @@ def write_trk(fname, streamlines, affine=None, shape=None):
     if shape is not None:
         hdr['dim'] = shape
     trackvis.write(fname, data, hdr, points_space="rasmm")
+
+
+def bundles_to_tgram(bundles, bundle_dict, affine):
+    """
+    Create a nibabel trk Tractogram object from bundles and their
+    specification.
+
+    Parameters
+    ----------
+    bundles: dict
+        Each item in the dict is the streamlines of a particular bundle.
+    bundle_dict: dict
+        A bundle specification dictionary. Each item includes in particular a
+        `uid` key that is a unique integer for that bundle.
+    affine : array
+        The affine_to_rasmm input to `nib.streamlines.Tractogram`
+    """
+    tgram = nib.streamlines.Tractogram([], {'bundle': []})
+    for b in bundles:
+        print("Segmenting: %s" % b)
+        this_sl = list(bundles[b])
+        this_tgram = nib.streamlines.Tractogram(
+            this_sl,
+            data_per_streamline={
+                'bundle': (len(this_sl) *
+                           [bundle_dict[b]['uid']])},
+                affine_to_rasmm=affine)
+        tgram = add_bundles(tgram, this_tgram)
+    return tgram
+
+def tgram_to_bundles(tgram, bundle_dict):
+    """
+    Convert a nib.streamlines.Tractogram object to a dict with items
+    holding the streamlines in each bundle.
+
+    Parameters
+    ----------
+    tgram : nib.streamlines.Tractogram class instance.
+
+        Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
+
+    bundle_dict: dict
+        A bundle specification dictionary. Each item includes in particular a
+        `uid` key that is a unique integer for that bundle.
+    """
+    bundles = {}
+    for b in bundle_dict.keys():
+        uid = bundle_dict[b]['uid']
+        idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
+        # sl = list(dtu.move_streamlines(tgram.streamlines[idx],
+        #                                np.linalg.inv(tgram.affine_to_rasmm)))
+        sl = list(tgram.streamlines[idx])
+
+        bundles[b] = sl
+    return bundles
