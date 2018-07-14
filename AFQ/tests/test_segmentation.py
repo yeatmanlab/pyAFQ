@@ -58,7 +58,6 @@ def test_segment():
         np.ones(nib.load(hardi_fdata).shape[:3]),
         seg._resample_bundle(CST_R_sl, 100))
 
-
     npt.assert_almost_equal(tract_profile, np.ones(100))
     clean_sl = seg.clean_fiber_group(CST_R_sl)
     # Since there are only 5 streamlines here, nothing should happen:

@@ -8,6 +8,8 @@ import numpy.testing as npt
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
+import dipy.tracking.utils as dtu
+
 from AFQ import api
 import AFQ.data as afd
 
@@ -83,12 +85,28 @@ def test_AFQ_data():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = [s for s in streamlines if s.shape[0] > 10]
     myafq = api.AFQ(
         preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
-        sub_prefix='sub', seeds=np.array([[40,40,40], [40,40,41]]))
+        sub_prefix='sub')
 
-    # For things to go reasonably fast, we'll set a brain mask that includes only a small number of voxels and use that:
+    # For things to go reasonably fast, we'll set a brain mask that
+    # includes only a small number of voxels and use that:
+    streamlines = list(dtu.move_streamlines(
+                            streamlines,
+                            np.linalg.inv(myafq.dwi_affine[0])))
+
     dwi_shape = nib.load(myafq.data_frame.dwi_file[0]).shape
     brain_mask = np.zeros(dwi_shape[:-1])
-    myafq.data_frame['brain_mask']
+    for sl in streamlines:
+        brain_mask[sl.astype(int)] = 1
+    nib.save(nib.Nifti1Image(brain_mask, myafq.dwi_affine[0]),
+            op.join(tmpdir.name, 'brain_mask.nii.gz'))
+
+    # Replace the brain-mask before moving on:
+    myafq.brain_mask[0] = op.join(tmpdir.name, 'brain_mask.nii.gz')
+    1/0.
     myafq.bundles
