@@ -264,7 +264,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                             continue
                 dist0 = cdist(sl, roi_coords0, 'euclidean')
                 if np.min(dist0) <= tol:
-                    dist1 = cdist(sl, roi_coords0, 'euclidean')
+                    dist1 = cdist(sl, roi_coords1, 'euclidean')
                     if np.min(dist1) <= tol:
                         min_dist_coords[sl_idx, bundle_idx, 0] =\
                             np.argmin(dist0, 0)[0]
@@ -291,11 +291,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
             fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
             continue
-
-        # Next, we reorient each streamline according to
-        # an ARBITRARY, but CONSISTENT order:
-        roi_coords0 = bundles[bundle]['ROIs'][0]
-        roi_coords1 = bundles[bundle]['ROIs'][1]
 
         for idx in range(len(select_sl)):
             min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
