@@ -242,7 +242,7 @@ def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundle_dict.keys():
             idx = np.where(tg.data_per_streamline['bundle'] ==
-                           bundle_dict[b]['uid'])
+                           bundle_dict[b]['uid'])[0]
             this_sl = sl[idx]
             this_sl = seg.clean_fiber_group(this_sl)
             this_tgram = nib.streamlines.Tractogram(
