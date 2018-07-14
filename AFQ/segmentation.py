@@ -214,19 +214,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     fiber_groups = {}
 
     for bundle_idx, bundle in enumerate(bundles):
-<<<<<<< HEAD
         # Get the ROI coordinates:
-=======
-        prob_map = bundles[bundle]['prob_map']
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_data()
-        warped_prob_map = mapping.transform_inverse(prob_map,
-                                                    interpolation='nearest')
-        fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                     fgarray)
-        fiber_probabilities = np.mean(fiber_probabilities, -1)
-
->>>>>>> We no longer need to subset here, because it's gotten reasonably fast :-)
         ROI0 = bundles[bundle]['ROIs'][0]
         ROI1 = bundles[bundle]['ROIs'][1]
         if not isinstance(ROI0, np.ndarray):
