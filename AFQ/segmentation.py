@@ -346,7 +346,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     if len(streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
         w = gaussian_weights(streamlines, n_points=n_points,
-                                return_mahalnobis=True)
+                             return_mahalnobis=True)
         # We'll only do this for clean_rounds
         rounds_elapsed = 0
         while (np.any(w > clean_threshold) and
