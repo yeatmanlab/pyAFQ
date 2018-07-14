@@ -45,13 +45,29 @@ def test_segment():
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
     # There happen to be 8 fibers in the right CST:
-    CST_R_sl = list(fiber_groups['CST_R'])
+    CST_R_sl = fiber_groups['CST_R']
     npt.assert_equal(len(CST_R_sl), 5)
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
         CST_R_sl)
     npt.assert_almost_equal(tract_profile, np.ones(100))
+
+    # Test providing an array input to calculate_tract_profile:
+    tract_profile = seg.calculate_tract_profile(
+        np.ones(nib.load(hardi_fdata).shape[:3]),
+        seg._resample_bundle(CST_R_sl, 100))
+
+
+    npt.assert_almost_equal(tract_profile, np.ones(100))
+    clean_sl = seg.clean_fiber_group(CST_R_sl)
+    # Since there are only 5 streamlines here, nothing should happen:
+    npt.assert_equal(clean_sl, CST_R_sl)
+
+    # Setting minimum number of streamlines to a smaller number and
+    # threshold to a relatively small number will exclude some streamlines:
+    clean_sl = seg.clean_fiber_group(CST_R_sl, min_sl=2, clean_threshold=2)
+    npt.assert_equal(len(clean_sl), 3)
 
 
 def test_gaussian_weights():

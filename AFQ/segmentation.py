@@ -363,5 +363,4 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
                                  n_points=n_points,
                                  return_mahalnobis=True)
             rounds_elapsed += 1
-
     return streamlines
