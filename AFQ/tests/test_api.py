@@ -9,10 +9,13 @@ import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
 import dipy.tracking.utils as dtu
+import dipy.data as dpd
+from dipy.data import fetcher
 
 from AFQ import api
 import AFQ.data as afd
-
+import AFQ.segmentation as seg
+import AFQ.utils.streamlines as aus
 
 def touch(fname, times=None):
     with open(fname, 'a'):
@@ -85,28 +88,26 @@ def test_AFQ_data():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    file_dict = afd.read_stanford_hardi_tractography()
-    mapping = file_dict['mapping.nii.gz']
-    streamlines = file_dict['tractography_subsampled.trk']
-    streamlines = [s for s in streamlines if s.shape[0] > 10]
     myafq = api.AFQ(
         preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
         sub_prefix='sub')
 
-    # For things to go reasonably fast, we'll set a brain mask that
-    # includes only a small number of voxels and use that:
-    streamlines = list(dtu.move_streamlines(
-                            streamlines,
-                            np.linalg.inv(myafq.dwi_affine[0])))
+    # Replace the streamlines and mapping with the streamlines that have
+    # been precomputed:
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    streamlines = file_dict['tractography_subsampled.trk']
+    sl_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
+                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
-    dwi_shape = nib.load(myafq.data_frame.dwi_file[0]).shape
-    brain_mask = np.zeros(dwi_shape[:-1])
-    for sl in streamlines:
-        brain_mask[sl.astype(int)] = 1
-    nib.save(nib.Nifti1Image(brain_mask, myafq.dwi_affine[0]),
-            op.join(tmpdir.name, 'brain_mask.nii.gz'))
+    aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
-    # Replace the brain-mask before moving on:
-    myafq.brain_mask[0] = op.join(tmpdir.name, 'brain_mask.nii.gz')
-    1/0.
-    myafq.bundles
+    mapping_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
+                           'sub-01_sess-01_dwi_mapping.nii.gz')
+
+    nib.save(mapping, mapping_file)
+    bundle_dict = api.make_bundle_dict()
+    templates = afd.read_templates()
+    tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
+    bundles = aus.tgram_to_bundles(tgram, bundle_dict)
+    npt.assert_equal(len(bundles['CST_R']), 1)

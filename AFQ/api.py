@@ -225,7 +225,7 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
 
 
 def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
-             force_recompute=False):
+                   force_recompute=False):
     clean_bundles_file = _get_fname(row,
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
@@ -255,7 +255,6 @@ def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
         nib.streamlines.save(tgram, clean_bundles_file)
 
     return bundles_file
-
 
 
 def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
