@@ -292,7 +292,7 @@ def fetch_hcp(subjects):
         bucket = s3.Bucket('hcp-openaccess')
         # This will trigger the client error in case this S3 bucket
         # doesn't exist
-        list_all = list(bucket.objects.all())
+        list(bucket.objects.all())
     except botocore.exceptions.ClientError:
         bucket = s3.Bucket('hcp-openaccess-temp')
 

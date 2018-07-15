@@ -184,7 +184,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
                              dwi_img.affine)).astype(int)
 
         streamlines = aft.track(params_file,
-                                directions='det',
+                                directions=directions,
                                 seeds=seeds,
                                 seed_mask=resamp_wm,
                                 stop_mask=resamp_wm)
@@ -232,8 +232,8 @@ def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
     if not op.exists(clean_bundles_file) or force_recompute:
         bundles_file = _bundles(row,
                                 wm_labels,
-                                odf_model="DTI",
-                                directions="det",
+                                odf_model=odf_model,
+                                directions=direction,
                                 seeds=seeds,
                                 force_recompute=False)
         tg = nib.streamlines.load(bundles_file).tractogram
