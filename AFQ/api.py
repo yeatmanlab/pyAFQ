@@ -233,7 +233,7 @@ def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
         bundles_file = _bundles(row,
                                 wm_labels,
                                 odf_model=odf_model,
-                                directions=direction,
+                                directions=directions,
                                 seeds=seeds,
                                 force_recompute=False)
         tg = nib.streamlines.load(bundles_file).tractogram
