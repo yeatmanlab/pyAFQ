@@ -3,6 +3,7 @@ import os.path as op
 import json
 
 import boto3
+import botocore
 
 import numpy as np
 
@@ -287,7 +288,14 @@ def fetch_hcp(subjects):
     """
     boto3.setup_default_session(profile_name='hcp')
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket('hcp-openaccess')
+    try:
+        bucket = s3.Bucket('hcp-openaccess')
+        # This will trigger the client error in case this S3 bucket
+        # doesn't exist
+        list_all = list(bucket.objects.all())
+    except botocore.exceptions.ClientError:
+        bucket = s3.Bucket('hcp-openaccess-temp')
+
     base_dir = op.join(afq_home, "HCP")
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
