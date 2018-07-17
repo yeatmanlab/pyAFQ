@@ -98,12 +98,8 @@ def test_gaussian_weights():
     x = np.arange(10)
     y = np.arange(10)
     z = np.arange(10)
-    # This has the wrong shape (2, 3, 10):
-    bundle = np.array([[x, y, z], [x, y, z]])
-    pytest.raises(ValueError, seg.gaussian_weights, bundle)
-    # Reallocate with the right shape. This time, we're going to create a
-    # distribution for which we can predict the weights we would expect
-    # to get:
+    # Create a distribution for which we can predict the weights we would
+    # expect to get:
     bundle = np.array([np.array([x, y, z]).T + 1,
                        np.array([x, y, z]).T - 1])
     # In this case, all nodes receives an equal weight of 0.5:

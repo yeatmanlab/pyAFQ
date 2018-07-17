@@ -62,8 +62,11 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         relevant).
 
     """
-    if (isinstance(streamlines, list) or
-            isinstance(streamlines, dts.Streamlines)):
+    # It's already an array
+    if isinstance(streamlines, np.ndarray):
+        fgarray = streamlines
+    else:
+        # It's some other kind of thing (list, Streamlines, etc.).
         # Resample each streamline to the same number of points
         # list => np.array
         # Setting the number of points should happen in a streamline template
@@ -72,8 +75,6 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         # In the future, an SLR object can be passed here, and then it would
         # move these streamlines into the template space before resampling...
         fgarray = _resample_bundle(streamlines, n_points)
-    else:
-        fgarray = streamlines
     # ...and move them back to native space before indexing into the volume:
     values = dts.values_from_volume(img, fgarray, affine=affine)
 
@@ -108,20 +109,20 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
         inverse of the Mahalanobis distance, relative to the distribution of
         coordinates at that node position across streamlines.
     """
-    if (isinstance(bundle, list) or isinstance(bundle, dts.Streamlines) or
-            isinstance(bundle, nib.streamlines.array_sequence.ArraySequence)):
-        # if you got a list, assume that it needs to be resampled:
-        bundle = _resample_bundle(bundle, n_points)
-    else:
-        if bundle.shape[-1] != 3:
-            e_s = "Input must be shape (n_streamlines, n_points, 3)"
-            raise ValueError(e_s)
+    if isinstance(bundle, np.ndarray):
+        # It's an array, go with it:
         n_points = bundle.shape[1]
-
+    else:
+        # It's something else, assume that it needs to be resampled:
+        bundle = _resample_bundle(bundle, n_points)
     w = np.zeros((bundle.shape[0], n_points))
+
     # If there's only one fiber here, it gets the entire weighting:
     if bundle.shape[0] == 1:
-        return np.array([1])
+        if return_mahalnobis:
+            return np.array([np.nan])
+        else:
+            return np.array([1])
 
     for node in range(bundle.shape[1]):
         # This should come back as a 3D covariance matrix with the spatial
@@ -148,7 +149,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
     return w / np.sum(w, 0)
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundles,
+def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
             **reg_kwargs):
     """
@@ -189,7 +190,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
        matter anatomy and tract-specific quantification. Neuroimage 39:
        336-347
     """
-    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
+    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
+                                      b0_threshold=b0_threshold)
     tol = dts.dist_to_corner(img.affine)
 
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
@@ -337,25 +339,31 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     that have a Mahalanobis distance smaller than `clean_threshold` from
     the mean of each one of the nodes.
     """
+
     # We don't even bother if there aren't enough streamlines:
-    if len(streamlines) > min_sl:
-        # This calculates the Mahalanobis for each streamline/node:
-        w = gaussian_weights(streamlines, n_points=n_points,
-                             return_mahalnobis=True)
-        # We'll only do this for clean_rounds
-        rounds_elapsed = 0
-        while (np.any(w > clean_threshold) and
-                rounds_elapsed < clean_rounds and
-                len(streamlines) > min_sl):
-            # Select the fibers that have Mahalanobis smaller than the
-            # threshold for all their nodes:
-            idx_belong = np.where(
-                np.all(w < clean_threshold, axis=-1))[0]
-            # Update by selection:
-            streamlines = streamlines[idx_belong.astype(int)]
-            # Repeat:
-            w = gaussian_weights(streamlines,
-                                 n_points=n_points,
-                                 return_mahalnobis=True)
-            rounds_elapsed += 1
-    return streamlines
+    if len(streamlines) < min_sl:
+        return streamlines
+
+    # Resample once up-front:
+    fgarray = _resample_bundle(streamlines, n_points)
+    # Keep this around, so you can use it for indexing at the very end:
+    idx = np.arange(fgarray.shape[0])
+    # This calculates the Mahalanobis for each streamline/node:
+    w = gaussian_weights(fgarray, return_mahalnobis=True)
+    # We'll only do this for clean_rounds
+    rounds_elapsed = 0
+    while (np.any(w > clean_threshold) and
+            rounds_elapsed < clean_rounds and
+            len(streamlines) > min_sl):
+        # Select the fibers that have Mahalanobis smaller than the
+        # threshold for all their nodes:
+        idx_belong = np.where(
+            np.all(w < clean_threshold, axis=-1))[0]
+        idx = idx[idx_belong.astype(int)]
+        # Update by selection:
+        fgarray = fgarray[idx_belong.astype(int)]
+        # Repeat:
+        w = gaussian_weights(fgarray, return_mahalnobis=True)
+        rounds_elapsed += 1
+    # Select based on the variable that was keeping track of things for us:
+    return streamlines[idx]
