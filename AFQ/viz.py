@@ -5,6 +5,8 @@ import IPython.display as display
 
 import nibabel as nib
 from dipy.viz import fvtk
+from dipy.viz.colormap import line_colors
+
 from palettable.tableau import Tableau_20
 
 
@@ -19,6 +21,12 @@ def visualize_bundles(trk, ren=None, inline=True, interact=False):
 
     if ren is None:
         ren = fvtk.ren()
+
+    # There are no bundles in here:
+    if list(trk.tractogram.data_per_streamline.keys()) == []:
+        streamlines = list(trk.streamlines)
+        sl_actor = fvtk.line(streamlines, line_colors(streamlines))
+        fvtk.add(ren, sl_actor)
 
     for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
         idx = np.where(trk.tractogram.data_per_streamline['bundle'] == b)[0]
