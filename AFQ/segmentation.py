@@ -149,6 +149,32 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
     return w / np.sum(w, 0)
 
 
+def _check_sl_with_inclusion(sl, include_rois, tol):
+    """
+    Helper function to check that a streamline is close to a list of
+    inclusion ROIS.
+    """
+    dist = []
+    for roi in include_rois:
+        dist.append(cdist(sl, roi, 'euclidean'))
+        if np.min(dist[-1]) > tol:
+            # Too far from one of them:
+            return False, []
+    # Apparently you checked all the ROIs and it was close to all of them
+    return True, dist
+
+
+def _check_sl_with_exclusion(sl, exclude_rois, tol):
+    """ Helper function to check that a streamline is not too close to a list
+    of exclusion ROIs.
+    """
+    for roi in exclude_rois:
+        if np.min(cdist(sl, roi, 'euclidian')) < tol:
+            return False
+    # Either there are no exclusion ROIs, or you are not close to any:
+    return True
+
+
 def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
             **reg_kwargs):
@@ -217,33 +243,31 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
     fiber_groups = {}
 
     for bundle_idx, bundle in enumerate(bundles):
-        # Get the ROI coordinates:
-        ROI0 = bundles[bundle]['ROIs'][0]
-        ROI1 = bundles[bundle]['ROIs'][1]
-        if not isinstance(ROI0, np.ndarray):
-            ROI0 = ROI0.get_data()
+        rules = bundles[bundle]['rules']
+        include_rois = []
+        exclude_rois = []
+        for rule_idx, rule in enumerate(rules):
+            roi = bundles[bundle]['ROIs'][rule_idx]
+            if not isinstance(roi, np.ndarray):
+                roi = roi.get_data()
 
-        warped_ROI0 = patch_up_roi(
-            mapping.transform_inverse(
-                ROI0,
-                interpolation='nearest')).astype(bool)
-
-        if not isinstance(ROI1, np.ndarray):
-            ROI1 = ROI1.get_data()
-
-        warped_ROI1 = patch_up_roi(
-            mapping.transform_inverse(
-                ROI1,
-                interpolation='nearest')).astype(bool)
-
-        roi_coords0 = np.array(np.where(warped_ROI0)).T
-        roi_coords1 = np.array(np.where(warped_ROI1)).T
+            warped_roi = patch_up_roi(
+                           mapping.transform_inverse(
+                                roi,
+                                interpolation='nearest')).astype(bool)
+            if rule:
+                # include ROI:
+                include_rois.append(np.array(np.where(warped_roi)).T)
+            else:
+                # Exclude ROI:
+                exclude_rois.append(np.array(np.where(warped_roi)).T)
 
         crosses_midline = bundles[bundle]['cross_midline']
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
-        prob_map = bundles[bundle].get('prob_map', np.ones(ROI0.shape))
+        prob_map = bundles[bundle].get('prob_map', np.ones(roi.shape))
+
         if not isinstance(prob_map, np.ndarray):
             prob_map = prob_map.get_data()
         warped_prob_map = mapping.transform_inverse(prob_map,
@@ -265,14 +289,17 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
                         else:
                             # This is not what we want, skip to next streamline
                             continue
-                dist0 = cdist(sl, roi_coords0, 'euclidean')
-                if np.min(dist0) <= tol:
-                    dist1 = cdist(sl, roi_coords1, 'euclidean')
-                    if np.min(dist1) <= tol:
+
+                is_close, dist = _check_sl_with_inclusion(sl, include_rois,
+                                                          tol)
+                if is_close:
+                    is_far = _check_sl_with_exclusion(sl, exclude_rois,
+                                                      tol)
+                    if is_far:
                         min_dist_coords[sl_idx, bundle_idx, 0] =\
-                            np.argmin(dist0, 0)[0]
+                            np.argmin(dist[0], 0)[0]
                         min_dist_coords[sl_idx, bundle_idx, 1] =\
-                            np.argmin(dist1, 0)[0]
+                            np.argmin(dist[1], 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
 

@@ -61,7 +61,17 @@ def make_bundle_dict(bundle_names=BUNDLES):
                 'cross_midline': True,
                 'uid': uid}
             uid += 1
-
+        # SLF is a special case, because it has an exclusion ROI:
+        elif name == "SLF":
+            for hemi in ['_R', '_L']:
+                afq_bundles[name + hemi] = {
+                    'ROIs': [templates[name + '_roi1' + hemi],
+                             templates[name + '_roi2' + hemi],
+                             templates["SLFt_roi2_" + hemi]],
+                    'rules': [True, True, False],
+                    'prob_map': templates[name + hemi + '_prob_map'],
+                    'cross_midline': False,
+                    'uid': uid}
         else:
             for hemi in ['_R', '_L']:
                 afq_bundles[name + hemi] = {
@@ -73,6 +83,7 @@ def make_bundle_dict(bundle_names=BUNDLES):
                     'uid': uid}
 
                 uid += 1
+
 
     return afq_bundles
 
