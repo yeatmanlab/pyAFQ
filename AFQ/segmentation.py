@@ -149,6 +149,34 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
     return w / np.sum(w, 0)
 
 
+def split_streamlines(streamlines, affine, low_coord=10):
+    """
+    Classify streamlines and split sl passing the mid-point below some height.
+
+    Parameters
+    ----------
+    streamlines : list or Streamlines class instance.
+
+    affine : ndarray
+        An affine transformation into a template space.
+
+    low_coords: int
+        How many coordinates below the 0,0,0 point should a streamline be to
+        be split if it passes the midline.
+
+
+    Returns
+    -------
+    streamlines that have been processed, a boolean array of whether they
+    cross the midline or not, a boolean array that for those who do not cross
+    designates whether they are strictly in the left hemispher, and a boolean
+    that tells us whether the streamline has superior-inferior parts that pass
+    below `low_coord` steps below the middle of the image (which should also
+    be `low_coord` mms for templates with 1 mm resolution)
+    """
+    # XXX Need to implement!
+    return streamlines, cross, left, lower_than
+
 def _check_sl_with_inclusion(sl, include_rois, tol):
     """
     Helper function to check that a streamline is close to a list of
@@ -169,7 +197,7 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     of exclusion ROIs.
     """
     for roi in exclude_rois:
-        if np.min(cdist(sl, roi, 'euclidian')) < tol:
+        if np.min(cdist(sl, roi, 'euclidean')) < tol:
             return False
     # Either there are no exclusion ROIs, or you are not close to any:
     return True
@@ -218,10 +246,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
     """
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
                                       b0_threshold=b0_threshold)
-    tol = dts.dist_to_corner(img.affine)
 
-    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
-                                                    np.linalg.inv(img.affine)))
+    tol = dts.dist_to_corner(img.affine)
 
     if reg_template is None:
         reg_template = dpd.read_mni_template()
@@ -230,8 +256,19 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
         mapping = reg.syn_register_dwi(fdata, gtab, template=reg_template,
                                        **reg_kwargs)
 
+    # Classify the streamlines and split those that: 1) cross the
+    # midline, and 2) pass under 10 mm below the mid-point of their
+    # representation in the template space:
+    # streamlines, cross, lower_than, left, right = split_streamlines(
+    #                                                 streamlines,
+    #                                                 reg_template.affine)
+
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
+
+    # Transform streamlines into the diffusion space:
+    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
+                                                    np.linalg.inv(img.affine)))
 
     fiber_probabilities = np.zeros((len(xform_sl), len(bundles)))
 
