@@ -67,7 +67,7 @@ def make_bundle_dict(bundle_names=BUNDLES):
                 afq_bundles[name + hemi] = {
                     'ROIs': [templates[name + '_roi1' + hemi],
                              templates[name + '_roi2' + hemi],
-                             templates["SLFt_roi2_" + hemi]],
+                             templates["SLFt_roi2" + hemi]],
                     'rules': [True, True, False],
                     'prob_map': templates[name + hemi + '_prob_map'],
                     'cross_midline': False,
@@ -206,8 +206,8 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
     return streamlines_file
 
 
-def _bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
-             force_recompute=False):
+def _bundles(row, wm_labels, bundle_list, odf_model="DTI", directions="det",
+             seeds=2, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -219,7 +219,7 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        bundle_dict = make_bundle_dict()
+        bundle_dict = make_bundle_dict(bundle_list)
         reg_template = dpd.read_mni_template()
         mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
                                    reg_template)
@@ -235,14 +235,15 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
     return bundles_file
 
 
-def _clean_bundles(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
-                   force_recompute=False):
+def _clean_bundles(row, wm_labels, bundle_list, odf_model="DTI",
+                   directions="det", seeds=2, force_recompute=False):
     clean_bundles_file = _get_fname(row,
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
     if not op.exists(clean_bundles_file) or force_recompute:
         bundles_file = _bundles(row,
                                 wm_labels,
+                                bundle_list,
                                 odf_model=odf_model,
                                 directions=directions,
                                 seeds=seeds,
@@ -322,6 +323,7 @@ def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
 
 class AFQ(object):
     """
+
     This is file folder structure that AFQ requires in your study folder::
 
         ├── sub01
@@ -382,7 +384,7 @@ class AFQ(object):
                  b0_threshold=0, odf_model="DTI", directions="det", seeds=2,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
-                 wm_labels=[251, 252, 253, 254, 255, 41, 2]):
+                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
 
         b0_threshold : int, optional
@@ -594,7 +596,8 @@ class AFQ(object):
                 self.force_recompute):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
-                                      args=[self.wm_labels],
+                                      args=[self.wm_labels,
+                                            self.bundle_list],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       seeds=self.seeds,
@@ -611,7 +614,8 @@ class AFQ(object):
                 self.force_recompute):
             self.data_frame['clean_bundles_file'] =\
                 self.data_frame.apply(_clean_bundles, axis=1,
-                                      args=[self.wm_labels],
+                                      args=[self.wm_labels,
+                                            self.bundle_list],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       seeds=self.seeds,
