@@ -90,13 +90,14 @@ def make_bundle_dict(bundle_names=BUNDLES):
 
 
 def _b0(row, force_recompute=False):
-    b0_file = _get_fname(row, '_dwi_b0.nii.gz')
+    b0_file = _get_fname(row, '_b0.nii.gz')
     if not op.exists(b0_file) or force_recompute:
         img = nib.load(row['dwi_file'])
         data = img.get_data()
         gtab = row['gtab']
         mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
-        nib.save(mean_b0, b0_file)
+        mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
+        nib.save(mean_b0_img, b0_file)
     return b0_file
 
 
@@ -104,11 +105,12 @@ def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
                 vol_idx=None, dilate=None, force_recompute=False):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file) or force_recompute:
-        mean_b0 = nib.load(row['b0_file']).get_data()
+        mean_b0_img = nib.load(row['b0_file'])
+        mean_b0 = mean_b0_img.get_data()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
         be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                 img.affine)
+                                 mean_b0_img.affine)
         nib.save(be_img, brain_mask_file)
     return brain_mask_file
 
