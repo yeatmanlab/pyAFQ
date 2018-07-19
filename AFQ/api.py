@@ -265,7 +265,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
             tgram = aus.add_bundles(tgram, this_tgram)
         nib.streamlines.save(tgram, clean_bundles_file)
 
-    return bundles_file
+    return clean_bundles_file
 
 
 def _tract_profiles(row, wm_labels, bundle_dict,
