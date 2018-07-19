@@ -1,7 +1,6 @@
 from distutils.version import LooseVersion
 
 import numpy as np
-import scipy.ndimage as ndim
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
@@ -14,6 +13,7 @@ import dipy.tracking.streamlinespeed as dps
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
+import AFQ.utils.volume as auv
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -21,25 +21,7 @@ if LooseVersion(dipy.__version__) < '0.12':
     dts.orient_by_rois = fix.orient_by_rois
 
 
-__all__ = ["patch_up_roi", "segment"]
-
-
-def patch_up_roi(roi):
-    """
-    After being non-linearly transformed, ROIs tend to have holes in them.
-    We perform a couple of computational geometry operations on the ROI to
-    fix that up.
-
-    Parameters
-    ----------
-    roi : 3D binary array
-        The ROI after it has been transformed
-
-    Returns
-    -------
-    ROI after dilation and hole-filling
-    """
-    return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
+__all__ = ["segment"]
 
 
 def _resample_bundle(streamlines, n_points):
@@ -203,7 +185,7 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     return True
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
+def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
             **reg_kwargs):
     """
@@ -217,7 +199,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
     streamlines : list of 2D arrays
         Each array is a streamline, shape (3, N).
 
-    bundles: dict
+    bundle_dict: dict
         The format is something like::
 
             {'name': {'ROIs':[img1, img2],
@@ -270,28 +252,28 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
                                                     np.linalg.inv(img.affine)))
 
-    fiber_probabilities = np.zeros((len(xform_sl), len(bundles)))
+    fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
     # For expedience, we approximate each streamline as a 100 point curve:
     fgarray = _resample_bundle(xform_sl, 100)
-    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundles)))
-    min_dist_coords = np.zeros((len(xform_sl), len(bundles), 2))
+    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundle_dict)))
+    min_dist_coords = np.zeros((len(xform_sl), len(bundle_dict), 2))
 
     fiber_groups = {}
 
-    for bundle_idx, bundle in enumerate(bundles):
-        rules = bundles[bundle]['rules']
+    for bundle_idx, bundle in enumerate(bundle_dict):
+        rules = bundle_dict[bundle]['rules']
         include_rois = []
         exclude_rois = []
         for rule_idx, rule in enumerate(rules):
-            roi = bundles[bundle]['ROIs'][rule_idx]
+            roi = bundle_dict[bundle]['ROIs'][rule_idx]
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_data()
 
-            warped_roi = patch_up_roi(
-                           mapping.transform_inverse(
-                                roi,
-                                interpolation='nearest')).astype(bool)
+            warped_roi = auv.patch_up_roi(
+                              mapping.transform_inverse(
+                                   roi,
+                                   interpolation='nearest')).astype(bool)
             if rule:
                 # include ROI:
                 include_rois.append(np.array(np.where(warped_roi)).T)
@@ -299,11 +281,11 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
                 # Exclude ROI:
                 exclude_rois.append(np.array(np.where(warped_roi)).T)
 
-        crosses_midline = bundles[bundle]['cross_midline']
+        crosses_midline = bundle_dict[bundle]['cross_midline']
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
-        prob_map = bundles[bundle].get('prob_map', np.ones(roi.shape))
+        prob_map = bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
 
         if not isinstance(prob_map, np.ndarray):
             prob_map = prob_map.get_data()
@@ -351,7 +333,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles, b0_threshold=0,
     # streamlines within a bundle in the same orientation with respect to
     # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
     # to ROI1).
-    for bundle_idx, bundle in enumerate(bundles):
+    for bundle_idx, bundle in enumerate(bundle_dict):
         select_idx = np.where(bundle_choice == bundle_idx)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
