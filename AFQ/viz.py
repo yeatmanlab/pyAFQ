@@ -138,9 +138,28 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     return _inline_interact(ren, inline, interact)
 
 
-def visualize_volume(volume, x=None, y=None, z=None):
+def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
+                     interact=False):
     """
     Visualize a volume
     """
+    vol_actor = actor.slicer(volume)
 
-    vol_actor = actor.slicer(t1_data)
+    if x is None:
+        x = volume.shape[0] // 2
+    if y is None:
+        y = volume.shape[1] // 2
+    if z is None:
+        z = volume.shape[2] // 2
+
+    vol_actor1.display(x=x)
+    vol_actor2 = vol_actor1.copy(y=y)
+    vol_actor3 = vol_actor1.copy(z=z)
+    if ren is None:
+        ren = window.ren()
+
+    ren.add(vol_actor1)
+    ren.add(vol_actor2)
+    ren.add(vol_acto22)
+
+    return _inline_interact(ren, inline, interact)
