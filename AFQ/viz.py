@@ -6,8 +6,15 @@ import IPython.display as display
 import nibabel as nib
 from dipy.viz.colormap import line_colors
 from dipy.viz import window, actor
+import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 from palettable.tableau import Tableau_20
+
+import AFQ.utils.volume as auv
+import AFQ.registration as reg
+
+
 
 def _inline_interact(ren, inline, interact):
     """
@@ -22,43 +29,104 @@ def _inline_interact(ren, inline, interact):
     if interact:
         window.show(ren)
 
-    return RuntimeError
+    return ren
 
 
-def visualize_bundles(trk, ren=None, inline=True, interact=False):
+def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None, color=None,
+                      inline=True, interact=False):
     """
     Visualize bundles in 3D using VTK
     """
+
+
     if isinstance(trk, str):
         trk = nib.streamlines.load(trk)
+        tg = trk.tractogram
+    else:
+        # Assume these are streamlines (as list or Streamlines object):
+        tg = nib.streamlines.Tractogram(trk)
+
+    if affine_or_mapping is not None:
+        tg = tg.apply_affine(np.linalg.inv(affine_or_mapping))
+
+    streamlines = tg.streamlines
 
     if ren is None:
         ren = window.Renderer()
 
     # There are no bundles in here:
-    if list(trk.tractogram.data_per_streamline.keys()) == []:
-        streamlines = list(trk.streamlines)
+    if list(tg.data_per_streamline.keys()) == []:
+        streamlines = list(streamlines)
         sl_actor = actor.line(streamlines, line_colors(streamlines))
         ren.add(sl_actor)
 
-    for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
-        idx = np.where(trk.tractogram.data_per_streamline['bundle'] == b)[0]
-        this_sl = list(trk.streamlines[idx])
-        sl_actor = actor.line(this_sl, Tableau_20.colors[np.mod(20, int(b))])
+    if bundle is None:
+        for b in np.unique(tg.data_per_streamline['bundle']):
+            idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
+            this_sl = list(streamlines[idx])
+            if color is not None:
+                sl_actor = actor.line(this_sl, color)
+            else:
+                sl_actor = actor.line(this_sl,
+                                      Tableau_20.colors[np.mod(20, int(b))])
+            ren.add(sl_actor)
+    else:
+        idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
+        this_sl = list(streamlines[idx])
+        if color is not None:
+            sl_actor = actor.line(this_sl, color)
+        else:
+            sl_actor = actor.line(this_sl,
+                                Tableau_20.colors[np.mod(20, int(bundle))])
         ren.add(sl_actor)
+
 
     return _inline_interact(ren, inline, interact)
 
 
-def visualize_roi(roi, ren=None, inline=True, interact=False):
+def visualize_roi(roi, affine_or_mapping=None, static_img=None,
+                  roi_affine=None, static_affine=None, reg_template=None,
+                  ren=None, color=None, inline=True, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
     """
+    if not isinstance(roi, np.ndarray):
+        if isinstance(roi, str):
+            roi = nib.load(roi).get_data()
+        else:
+            roi = roi.get_data()
+
+    if affine_or_mapping is not None:
+        if isinstance(affine_or_mapping, np.ndarray):
+            # This is an affine:
+            if (static_img is None or roi_affine is None or
+                  static_affine is None):
+                raise ValueError("If using an affine to transform an ROI, "
+                                 "need to also specify all of the following",
+                                  "inputs: `static_img`, `roi_affine`, ",
+                                  "`static_affine`")
+            roi = reg.resample(roi, static_img, roi_affine, static_affine)
+        else:
+            # Assume it is  a mapping:
+            if (isinstance(affine_or_mapping, str) or
+                  isinstance(affine_or_mapping, nib.Nifti1Image)):
+                if reg_template is None or static_img is None:
+                    raise ValueError(
+                        "If using a mapping to transform an ROI, need to ",
+                        "also specify all of the following inputs: ",
+                        "`reg_template`, `static_img`")
+                affine_or_mapping = reg.read_mapping(affine_or_mapping,
+                                                     static_img,
+                                                     reg_template)
+
+            roi = auv.patch_up_roi(affine_or_mapping.transform_inverse(
+                                        roi,
+                                        interpolation='nearest')).astype(bool)
 
     if ren is None:
         ren = window.ren()
 
-    roi_actor = actor.contour_from_roi(roi)
+    roi_actor = actor.contour_from_roi(roi, color=color)
     ren.add(roi_actor)
 
     if inline:
