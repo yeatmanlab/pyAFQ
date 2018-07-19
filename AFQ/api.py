@@ -89,14 +89,22 @@ def make_bundle_dict(bundle_names=BUNDLES):
     return afq_bundles
 
 
-def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
-                vol_idx=None, dilate=None, force_recompute=False):
-    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
-    if not op.exists(brain_mask_file) or force_recompute:
+def _b0(row, force_recompute=False):
+    b0_file = _get_fname(row, '_dwi_b0.nii.gz')
+    if not op.exists(b0_file) or force_recompute:
         img = nib.load(row['dwi_file'])
         data = img.get_data()
         gtab = row['gtab']
         mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+        nib.save(mean_b0, b0_file)
+    return b0_file
+
+
+def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
+                vol_idx=None, dilate=None, force_recompute=False):
+    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
+    if not op.exists(brain_mask_file) or force_recompute:
+        mean_b0 = nib.load(row['b0_file']).get_data()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
         be_img = nib.Nifti1Image(brain_mask.astype(int),
@@ -503,6 +511,20 @@ class AFQ(object):
 
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
+
+    def set_b0(self):
+        if ('b0_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['b0_file'] =\
+                self.data_frame.apply(_b0,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_b0(self):
+        self.set_b0()
+        return self.data_frame['b0_file']
+
+    b0 = property(get_b0, set_b0)
 
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None):
