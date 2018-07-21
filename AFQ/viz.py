@@ -6,8 +6,6 @@ import IPython.display as display
 import nibabel as nib
 from dipy.viz.colormap import line_colors
 from dipy.viz import window, actor, ui
-import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
 
 from palettable.tableau import Tableau_20
 
@@ -15,30 +13,27 @@ import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
 
-
 def _inline_interact(ren, inline, interact):
     """
     Helper function to reuse across viz functions
     """
+    if interact:
+        window.show(ren)
+
     if inline:
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
-        window.record(ren, out_path=fname)
+        window.record(ren, out_path=fname, size=(1200, 1200))
         display.display_png(display.Image(fname))
-
-    if interact:
-        window.show(ren)
 
     return ren
 
 
-def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None, color=None,
-                      inline=True, interact=False):
+def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
+                      color=None, inline=True, interact=False):
     """
     Visualize bundles in 3D using VTK
     """
-
-
     if isinstance(trk, str):
         trk = nib.streamlines.load(trk)
         tg = trk.tractogram
@@ -59,27 +54,38 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None, color=
         streamlines = list(streamlines)
         sl_actor = actor.line(streamlines, line_colors(streamlines))
         ren.add(sl_actor)
-
+        sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+        sl_actor.GetProperty().SetLineWidth(6)
     if bundle is None:
         for b in np.unique(tg.data_per_streamline['bundle']):
             idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
             this_sl = list(streamlines[idx])
             if color is not None:
                 sl_actor = actor.line(this_sl, color)
+                sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+                sl_actor.GetProperty().SetLineWidth(6)
             else:
                 sl_actor = actor.line(this_sl,
                                       Tableau_20.colors[np.mod(20, int(b))])
+                sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+                sl_actor.GetProperty().SetLineWidth(6)
+
             ren.add(sl_actor)
     else:
         idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
         this_sl = list(streamlines[idx])
         if color is not None:
             sl_actor = actor.line(this_sl, color)
-        else:
-            sl_actor = actor.line(this_sl,
-                                Tableau_20.colors[np.mod(20, int(bundle))])
-        ren.add(sl_actor)
+            sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+            sl_actor.GetProperty().SetLineWidth(6)
 
+        else:
+            sl_actor = actor.line(
+                this_sl,
+                Tableau_20.colors[np.mod(20, int(bundle))])
+            sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+            sl_actor.GetProperty().SetLineWidth(6)
+        ren.add(sl_actor)
 
     return _inline_interact(ren, inline, interact)
 
@@ -100,16 +106,16 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
         if isinstance(affine_or_mapping, np.ndarray):
             # This is an affine:
             if (static_img is None or roi_affine is None or
-                  static_affine is None):
+                    static_affine is None):
                 raise ValueError("If using an affine to transform an ROI, "
                                  "need to also specify all of the following",
-                                  "inputs: `static_img`, `roi_affine`, ",
-                                  "`static_affine`")
+                                 "inputs: `static_img`, `roi_affine`, ",
+                                 "`static_affine`")
             roi = reg.resample(roi, static_img, roi_affine, static_affine)
         else:
             # Assume it is  a mapping:
             if (isinstance(affine_or_mapping, str) or
-                  isinstance(affine_or_mapping, nib.Nifti1Image)):
+                    isinstance(affine_or_mapping, nib.Nifti1Image)):
                 if reg_template is None or static_img is None:
                     raise ValueError(
                         "If using a mapping to transform an ROI, need to ",
@@ -120,8 +126,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                                                      reg_template)
 
             roi = auv.patch_up_roi(affine_or_mapping.transform_inverse(
-                                        roi,
-                                        interpolation='nearest')).astype(bool)
+                                   roi,
+                                   interpolation='nearest')).astype(bool)
 
     if ren is None:
         ren = window.ren()
@@ -154,19 +160,19 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
     image_actor_x = image_actor_z.copy()
     x_midpoint = int(np.round(shape[0] / 2))
     image_actor_x.display_extent(x_midpoint,
-                                x_midpoint, 0,
-                                shape[1] - 1,
-                                0,
-                                shape[2] - 1)
+                                 x_midpoint, 0,
+                                 shape[1] - 1,
+                                 0,
+                                 shape[2] - 1)
 
     image_actor_y = image_actor_z.copy()
     y_midpoint = int(np.round(shape[1] / 2))
     image_actor_y.display_extent(0,
-                                shape[0] - 1,
-                                y_midpoint,
-                                y_midpoint,
-                                0,
-                                shape[2] - 1)
+                                 shape[0] - 1,
+                                 y_midpoint,
+                                 y_midpoint,
+                                 0,
+                                 shape[2] - 1)
 
     ren.add(image_actor_z)
     ren.add(image_actor_x)
@@ -194,9 +200,9 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
                                     length=140)
 
     opacity_slider = ui.LineSlider2D(min_value=0.0,
-                                    max_value=1.0,
-                                    initial_value=slicer_opacity,
-                                    length=140)
+                                     max_value=1.0,
+                                     initial_value=slicer_opacity,
+                                     length=140)
 
     def change_slice_z(slider):
         z = int(np.round(slider.value))
@@ -235,16 +241,15 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
 
         return label
 
-
     line_slider_label_z = build_label(text="Z Slice")
     line_slider_label_x = build_label(text="X Slice")
     line_slider_label_y = build_label(text="Y Slice")
     opacity_slider_label = build_label(text="Opacity")
 
     panel = ui.Panel2D(size=(300, 200),
-                    color=(1, 1, 1),
-                    opacity=0.1,
-                    align="right")
+                       color=(1, 1, 1),
+                       opacity=0.1,
+                       align="right")
     panel.center = (1030, 120)
 
     panel.add_element(line_slider_label_x, (0.1, 0.75))
@@ -280,4 +285,4 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
         show_m.render()
         show_m.start()
 
-    return ren
+    return _inline_interact(ren, inline, interact)
