@@ -1,5 +1,5 @@
-import numpy as np
 import scipy.ndimage as ndim
+
 
 def patch_up_roi(roi):
     """
