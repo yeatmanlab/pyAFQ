@@ -27,12 +27,12 @@ def test_segment():
                                   templates['CST_roi2_L']],
                          'rules': [True, True],
                          'prob_map': templates['CST_L_prob_map'],
-                         'cross_midline': False},
+                         'cross_midline': None},
                'CST_R': {'ROIs': [templates['CST_roi1_R'],
                                   templates['CST_roi1_R']],
                          'rules': [True, True],
                          'prob_map': templates['CST_R_prob_map'],
-                         'cross_midline': False}}
+                         'cross_midline': None}}
 
     fiber_groups = seg.segment(hardi_fdata,
                                hardi_fbval,
@@ -44,9 +44,9 @@ def test_segment():
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
-    # There happen to be 5 fibers in the right CST:
+    # There happen to be 8 fibers in the right CST:
     CST_R_sl = fiber_groups['CST_R']
-    npt.assert_equal(len(CST_R_sl), 5)
+    npt.assert_equal(len(CST_R_sl), 7)
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
@@ -60,7 +60,7 @@ def test_segment():
 
     npt.assert_almost_equal(tract_profile, np.ones(100))
     clean_sl = seg.clean_fiber_group(CST_R_sl)
-    # Since there are only 5 streamlines here, nothing should happen:
+    # Since there are only 8 streamlines here, nothing should happen:
     npt.assert_equal(clean_sl, CST_R_sl)
 
     # Setting minimum number of streamlines to a smaller number and
@@ -88,9 +88,9 @@ def test_segment():
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
-    # But one of the streamlines has switched identities without the
-    # probability map to guide selection
-    npt.assert_equal(len(fiber_groups['CST_R']), 6)
+    # There are more streamlines here without the probability map to
+    # guide selection
+    npt.assert_equal(len(fiber_groups['CST_R']), 9)
 
 
 def test_gaussian_weights():
