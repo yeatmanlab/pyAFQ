@@ -157,8 +157,8 @@ def split_streamlines(streamlines, template, low_coord=10):
     """
     # Move the streamlines to the space of the template:
     xform_sl = dts.Streamlines(dtu.move_streamlines(
-                    streamlines,
-                    np.linalg.inv(template.affine)))
+        streamlines,
+        np.linalg.inv(template.affine)))
     # What is the x,y,z coordinate of 0,0,0 in the template space?
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
@@ -178,15 +178,16 @@ def split_streamlines(streamlines, template, low_coord=10):
                 sl2 = sl[split_idx:]
                 # Add them both in the end:
                 xform_sl = dts.Streamlines(list(xform_sl[:sl_idx]) +
-                                           list(xform_sl[sl_idx+1:]))
+                                           list(xform_sl[sl_idx + 1:]))
                 xform_sl.append(sl1)
                 xform_sl.append(sl2)
                 crosses = np.concatenate([crosses, np.zeros(2)])
             else:
-                crosses[sl_idx] == True
+                crosses[sl_idx] = True
     # Move back to the original space:
     streamlines = dtu.move_streamlines(xform_sl, template.affine)
     return streamlines, crosses
+
 
 def _check_sl_with_inclusion(sl, include_rois, tol):
     """
@@ -296,11 +297,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             roi = bundle_dict[bundle]['ROIs'][rule_idx]
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_data()
-
             warped_roi = auv.patch_up_roi(
-                              mapping.transform_inverse(
-                                   roi,
-                                   interpolation='nearest')).astype(bool)
+                mapping.transform_inverse(
+                    roi,
+                    interpolation='nearest')).astype(bool)
             if rule:
                 # include ROI:
                 include_rois.append(np.array(np.where(warped_roi)).T)

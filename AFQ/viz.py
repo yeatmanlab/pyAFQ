@@ -266,7 +266,6 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
     global size
     size = ren.GetSize()
 
-
     def win_callback(obj, event):
         global size
         if size != obj.GetSize():
