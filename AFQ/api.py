@@ -139,12 +139,18 @@ def _mapping(row, force_recompute=False):
 
 
 def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
-                 force_recompute=False):
+                 fa_threshold=0.2, force_recompute=False):
     """
     wm_labels : list
         The values within the segmentation that are considered white matter. We
         will use this part of the image both to seed tracking (seeding
         throughout), and for stopping.
+
+    fa_threshold : float
+        As a fallback, when we don't have a segmentation file, we might need
+        to use DTI FA to determine where the white matter is. In these cases,
+        we will use this number as a threshold. Everything in the FA image
+        that is larger than this number will be designated as WM.
     """
     streamlines_file = _get_fname(row,
                                   '%s_%s_streamlines.trk' % (odf_model,
@@ -155,19 +161,29 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
         else:
             raise(NotImplementedError)
 
-        seg_img = nib.load(row['seg_file'])
         dwi_img = nib.load(row['dwi_file'])
-        seg_data_orig = seg_img.get_data()
-
-        # For different sets of labels, extract all the voxels that have any
-        # of these values:
-        wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
-                                         for l in wm_labels], -1), -1)
-
         dwi_data = dwi_img.get_data()
-        resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                             seg_img.affine,
-                             dwi_img.affine)).astype(int)
+
+        seg_file = row['seg_file']
+
+        if seg_file is not None:
+            # If we have a segmentation file to work from:
+            seg_img = nib.load(row['seg_file'])
+            seg_data_orig = seg_img.get_data()
+            # For different sets of labels, extract all the voxels that have
+            # any of these values:
+            wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
+                                             for l in wm_labels], -1), -1)
+
+            resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                                 seg_img.affine,
+                                 dwi_img.affine)).astype(int)
+
+        else:
+            # Sometimes we have no choice, but to detect WM based on DTI FA:
+            fa = nib.load(_dti_fa(row)).get_data()
+            # We'll use an FA threshold of 0.2
+            resamp_wm = fa > fa_threshold
 
         streamlines = aft.track(params_file,
                                 directions='det',
@@ -197,7 +213,7 @@ def _tgramer(bundles, bundle_dict, affine):
 
 
 def _bundles(row, wm_labels, odf_model="DTI", directions="det",
-             force_recompute=False):
+             fa_threshold=0.2, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -205,6 +221,7 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, wm_labels,
                                         odf_model=odf_model,
                                         directions=directions,
+                                        fa_threshold=fa_threshold,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
@@ -226,13 +243,14 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
 
 def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
                     scalars=["dti_fa", "dti_md"], weighting=None,
-                    force_recompute=False):
+                    fa_threshold=0.2, force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
         bundles_file = _bundles(row,
                                 wm_labels,
                                 odf_model=odf_model,
                                 directions=directions,
+                                fa_threshold=fa_threshold,
                                 force_recompute=force_recompute)
         bundle_dict = make_bundle_dict()
         keys = []
@@ -406,17 +424,25 @@ class AFQ(object):
                                                          (sess, dwi_folder,
                                                           dwi_file))))[0])
 
-                anat_file_list.append(glob.glob(op.join(sub_dir,
-                                                        ('%s/%s/%s.nii.gz' %
-                                                         (sess,
-                                                          anat_folder,
-                                                          anat_file))))[0])
+                anat_files = glob.glob(op.join(sub_dir, ('%s/%s/%s.nii.gz' %
+                                               (sess,
+                                                anat_folder,
+                                                anat_file))))
 
-                seg_file_list.append(glob.glob(op.join(sub_dir,
-                                                       ('%s/%s/%s.nii.gz' %
-                                                        (sess,
-                                                         anat_folder,
-                                                         seg_file))))[0])
+                # Sometimes we don't have anatomical files:
+                if len(anat_files):
+                    anat_file_list.append(anat_files[0])
+                else:
+                    anat_file_list.append(None)
+
+                seg_files = glob.glob(op.join(sub_dir, ('%s/%s/%s.nii.gz' %
+                                              (sess,
+                                               anat_folder,
+                                               seg_file))))
+                if len(seg_files):
+                    seg_file_list.append([0])
+                else:
+                    seg_file_list.append(None)
 
                 sub_list.append(subject)
                 sess_list.append(sess)
