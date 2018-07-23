@@ -5,6 +5,7 @@ import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 from AFQ.utils import streamlines as aus
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 
 def test_read_write_trk():
@@ -56,4 +57,34 @@ def test_add_bundles():
             [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
              np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
 
-    aus.add_bundles(t1, t2)
+    added = aus.add_bundles(t1, t2)
+    test_tgram =nib.streamlines.Tractogram(
+            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]]),
+             np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    for sl1, sl2 in zip(added.streamlines, test_tgram.streamlines):
+        npt.assert_array_equal(sl1, sl2)
+
+
+def test_split_streamline():
+    streamlines = dts.Streamlines([np.array([[1.,2.,3.],
+                                    [4.,5.,6.]]),
+                                   np.array([[7.,8.,9.],
+                                    [10.,11.,12.],
+                                    [13., 14., 15.]])])
+    assert streamlines == streamlines
+    sl_to_split = 1
+    split_idx = 1
+    new_streamlines = aus.split_streamline(streamlines, sl_to_split, split_idx)
+    test_streamlines = dts.Streamlines([np.array([[1., 2., 3.],
+                                                  [4., 5., 6.]]),
+                                        np.array([[7., 8., 9.]]),
+                                        np.array([[10., 11., 12.],
+                                                  [13., 14., 15.]])])
+
+    assert new_streamlines == test_streamlines
+    # # For some reason, I need to test these one by one:
+    # for sl1, sl2 in zip(new_streamlines, test_streamlines):
+    #     npt.assert_array_equal(sl1, sl2)

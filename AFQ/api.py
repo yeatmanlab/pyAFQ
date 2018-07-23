@@ -104,7 +104,7 @@ def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
                 vol_idx=None, dilate=None, force_recompute=False):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file) or force_recompute:
-        mean_b0_img = nib.load(row['b0_file'])
+        mean_b0_img = nib.load(_b0(row))
         mean_b0 = mean_b0_img.get_data()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
@@ -173,8 +173,8 @@ def _mapping(row, force_recompute=False):
     return mapping_file
 
 
-def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
-                 force_recompute=False):
+def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
+                 n_seeds=2, random_seeds=False, force_recompute=False):
     """
     wm_labels : list
         The values within the segmentation that are considered white matter. We
@@ -206,7 +206,8 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
 
         streamlines = aft.track(params_file,
                                 directions=directions,
-                                seeds=seeds,
+                                n_seeds=n_seeds,
+                                random_seeds=random_seeds,
                                 seed_mask=resamp_wm,
                                 stop_mask=resamp_wm)
 
@@ -217,7 +218,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det", seeds=2,
 
 
 def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
-             seeds=2, force_recompute=False):
+             n_seeds=2, random_seeds=False, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -225,7 +226,8 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, wm_labels,
                                         odf_model=odf_model,
                                         directions=directions,
-                                        seeds=seeds,
+                                        n_seeds=n_seeds,
+                                        random_seeds=random_seeds,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
@@ -245,7 +247,8 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
 
 
 def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
-                   directions="det", seeds=2, force_recompute=False):
+                   directions="det", n_seeds=2, random_seeds=False,
+                   force_recompute=False):
     clean_bundles_file = _get_fname(row,
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
@@ -255,7 +258,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
                                 bundle_dict,
                                 odf_model=odf_model,
                                 directions=directions,
-                                seeds=seeds,
+                                n_seeds=n_seeds,
+                                random_seeds=random_seeds,
                                 force_recompute=False)
         tg = nib.streamlines.load(bundles_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
@@ -390,7 +394,8 @@ class AFQ(object):
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
-                 b0_threshold=0, odf_model="DTI", directions="det", seeds=2,
+                 b0_threshold=0, odf_model="DTI", directions="det",
+                 n_seeds=2, random_seeds=False,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
@@ -416,7 +421,8 @@ class AFQ(object):
         wm_labels : list, optional
             A list of the labels of the white matter in the segmentation file
             used. Default: the white matter values for the segmentation
-            provided with the HCP data: [251, 252, 253, 254, 255, 41, 2].
+            provided with the HCP data, including labels for midbraing:
+            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
         """
         self.directions = directions
         self.odf_model = odf_model
@@ -424,7 +430,8 @@ class AFQ(object):
         self.bundle_dict = make_bundle_dict(bundle_list)
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
-        self.seeds = seeds
+        self.n_seeds = n_seeds
+        self.random_seeds = random_seeds
 
         self.preproc_path = preproc_path
         if self.preproc_path is None:
@@ -605,7 +612,8 @@ class AFQ(object):
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
-                                      seeds=self.seeds,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
                                       force_recompute=self.force_recompute)
 
     def get_streamlines(self):
@@ -623,7 +631,8 @@ class AFQ(object):
                                             self.bundle_dict],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
-                                      seeds=self.seeds,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
                                       force_recompute=self.force_recompute)
 
     def get_bundles(self):
@@ -641,7 +650,8 @@ class AFQ(object):
                                             self.bundle_dict],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
-                                      seeds=self.seeds,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
                                       force_recompute=self.force_recompute)
 
     def get_clean_bundles(self):

@@ -14,6 +14,7 @@ import dipy.tracking.streamlinespeed as dps
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
+import AFQ.utils.streamlines as aus
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -155,35 +156,30 @@ def split_streamlines(streamlines, template, low_coord=10):
     below `low_coord` steps below the middle of the image (which should also
     be `low_coord` mms for templates with 1 mm resolution)
     """
-    # Move the streamlines to the space of the template:
-    xform_sl = dts.Streamlines(dtu.move_streamlines(
-        streamlines,
+    # Move the streamlines to the space of the template but don't generate
+    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
         np.linalg.inv(template.affine)))
     # What is the x,y,z coordinate of 0,0,0 in the template space?
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
     cross_below = zero_coord[2] - low_coord
-    # Initialize a boolean array that will contain a True if the array
-    # crosses the midline (even after splitting):
-    crosses = np.zeros(len(xform_sl), dtype=bool)
-    for sl_idx in range(len(xform_sl)):
-        sl = xform_sl[sl_idx]
+    crosses = []
+    for sl_idx, sl in enumerate(xform_sl):
         if (np.any(sl[:, 0] > zero_coord[0]) and
                 np.any(sl[:, 0] < zero_coord[0])):
             if np.any(sl[:, 2] < cross_below):
                 # This is a streamline that needs to be split where it
                 # crosses the midline:
                 split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
-                sl1 = sl[:split_idx]
-                sl2 = sl[split_idx:]
-                # Add them both in the end:
-                xform_sl = dts.Streamlines(list(xform_sl[:sl_idx]) +
-                                           list(xform_sl[sl_idx + 1:]))
-                xform_sl.append(sl1)
-                xform_sl.append(sl2)
-                crosses = np.concatenate([crosses, np.zeros(2)])
+                xform_sl = aus.split_streamline(
+                    xform_sl, sl_idx, split_idx)
+                crosses.append(True)
+                crosses.append(True)
             else:
-                crosses[sl_idx] = True
+                crosses.append(True)
+        else:
+            crosses.append(False)
+
     # Move back to the original space:
     streamlines = dtu.move_streamlines(xform_sl, template.affine)
     return streamlines, crosses
