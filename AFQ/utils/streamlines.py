@@ -137,3 +137,31 @@ def tgram_to_bundles(tgram, bundle_dict):
 
         bundles[b] = sl
     return bundles
+
+
+def split_streamline(streamlines, sl_to_split, split_idx):
+    """
+    Given a Streamlines object, split one of the underlying streamlines
+
+    Parameters
+    ----------
+    streamlines : a Streamlines class instance
+        The group of streamlines, one of which is being split.
+    sl_to_split : int
+        The index of the streamline that is being split
+    split_idx : int
+        Where is the streamline being split
+    """
+    this_sl = streamlines[sl_to_split]
+
+    streamlines._lengths = np.concatenate([
+        streamlines._lengths[:sl_to_split],
+        np.array([split_idx]),
+        np.array([this_sl.shape[0] - split_idx]),
+        streamlines._lengths[sl_to_split+1:]])
+
+    streamlines._offsets = np.concatenate([
+        np.array([0]),
+        np.cumsum(streamlines._lengths[:-1])])
+
+    return streamlines

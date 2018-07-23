@@ -75,39 +75,36 @@ def test_AFQ_data():
     afd.organize_stanford_data(path=tmpdir.name)
     myafq = api.AFQ(preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
                     sub_prefix='sub')
-    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+    npt.assert_equal(nib.load(myafq.b0[0]).shape,
                      nib.load(myafq['dwi_file'][0]).shape[:3])
-    npt.assert_equal(nib.load(myafq.brain_mask[0]).shape,
+    npt.assert_equal(nib.load(myafq.b0[0]).shape,
                      nib.load(myafq.dti[0]).shape[:3])
 
 
 
-def test_AFQ_data():
+def test_AFQ_data2():
     """
-    Test with some actual data
+    Test with some actual data again, this time for track segmentation
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
     myafq = api.AFQ(
         preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
-        sub_prefix='sub')
+        sub_prefix='sub',
+        bundle_list=["SLF", "ARC", "CST", "FP"])
 
-    # Replace the streamlines and mapping with the streamlines that have
-    # been precomputed:
+    # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     sl_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
-                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+                     'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
     aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
     mapping_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
                            'sub-01_sess-01_dwi_mapping.nii.gz')
-
     nib.save(mapping, mapping_file)
-    bundle_dict = api.make_bundle_dict()
-    templates = afd.read_templates()
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
-    bundles = aus.tgram_to_bundles(tgram, bundle_dict)
-    npt.assert_equal(len(bundles['CST_R']), 2)
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
+    npt.assert_equal(len(bundles['CST_R']), 3)
