@@ -84,7 +84,12 @@ def test_split_streamline():
                                         np.array([[10., 11., 12.],
                                                   [13., 14., 15.]])])
 
-    assert new_streamlines == test_streamlines
-    # # For some reason, I need to test these one by one:
-    # for sl1, sl2 in zip(new_streamlines, test_streamlines):
-    #     npt.assert_array_equal(sl1, sl2)
+    # Test equality of the underlying dict items:
+    for k in new_streamlines.__dict__.keys():
+        if isinstance(new_streamlines.__dict__[k], np.ndarray):
+            npt.assert_array_equal(
+                new_streamlines.__dict__[k],
+                test_streamlines.__dict__[k]
+                )
+        else:
+            assert new_streamlines.__dict__[k] == test_streamlines.__dict__[k]

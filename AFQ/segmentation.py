@@ -164,17 +164,20 @@ def split_streamlines(streamlines, template, low_coord=10):
                         np.array([0, 0, 0, 1]))
     cross_below = zero_coord[2] - low_coord
     crosses = []
+    already_split = 0
     for sl_idx, sl in enumerate(xform_sl):
         if (np.any(sl[:, 0] > zero_coord[0]) and
-                np.any(sl[:, 0] < zero_coord[0])):
+              np.any(sl[:, 0] < zero_coord[0])):
             if np.any(sl[:, 2] < cross_below):
                 # This is a streamline that needs to be split where it
                 # crosses the midline:
                 split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
                 xform_sl = aus.split_streamline(
-                    xform_sl, sl_idx, split_idx)
-                crosses.append(True)
-                crosses.append(True)
+                    xform_sl, sl_idx + already_split, split_idx)
+                already_split = already_split + 1
+                # Now that it's been split, neither cross the midline:
+                crosses.append(False)
+                crosses.append(False)
             else:
                 crosses.append(True)
         else:
@@ -276,6 +279,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
     xform_sl = dts.Streamlines(dtu.move_streamlines(sl_with_split,
                                                     np.linalg.inv(img.affine)))
 
+    # xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
+    #                                                 np.linalg.inv(img.affine)))
+
     fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
     # For expedience, we approximate each streamline as a 100 point curve:
@@ -321,9 +327,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
         for sl_idx, sl in enumerate(xform_sl):
             if fiber_probabilities[sl_idx] > prob_threshold:
                 if crosses_midline is not None:
+                    # This means that the streamline does
+                    # cross the midline:
                     if crosses[sl_idx]:
-                        # This means that the streamline does
-                        # cross the midline:
                         if crosses_midline:
                             # This is what we want, keep going
                             pass

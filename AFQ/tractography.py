@@ -78,7 +78,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                affine=affine)
         else:
             seeds = dtu.seeds_from_mask(seed_mask,
-                                        density=seeds,
+                                        density=n_seeds,
                                         affine=affine)
     else:
         # If user provided an array, we'll use n_seeds as the seeds:
