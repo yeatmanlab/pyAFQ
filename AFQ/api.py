@@ -161,13 +161,35 @@ _scalar_dict = {"dti_fa": _dti_fa,
                 "dti_md": _dti_md}
 
 
+def _reg_prealign(row, force_recompute=False):
+    prealign_file = _get_fname(row, '_reg_prealign.npy')
+    if not op.exists(prealign_file) or force_recompute:
+        moving = nib.load(_b0(row, force_recompute=force_recompute))
+        static = dpd.read_mni_template()
+        moving_data = moving.get_data()
+        moving_affine = moving.affine
+        static_data = static.get_data()
+        static_affine = static.affine
+        _, aff = reg.affine_registration(moving_data,
+                                         static_data,
+                                         moving_affine,
+                                         static_affine)
+        np.save(prealign_file, aff)
+    return prealign_file
+
+
 def _mapping(row, force_recompute=False):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
     if not op.exists(mapping_file) or force_recompute:
         gtab = row['gtab']
         reg_template = dpd.read_mni_template()
+        reg_prealign  = np.load(_reg_prealign(
+            row,
+            force_recompute=force_recompute))
+
         mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
-                                       template=reg_template)
+                                       template=reg_template,
+                                       prealign=prealign)
 
         reg.write_mapping(mapping, mapping_file)
     return mapping_file
