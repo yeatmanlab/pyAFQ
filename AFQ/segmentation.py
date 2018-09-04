@@ -214,6 +214,29 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     return True
 
 
+def recobundles_segmentation(fdata, fbval, fbvec, streamlines, bundle_dict,
+                             b0_threshold=0, **reg_kwargs):
+    """
+    Segment a set of streamlines, based on a dictionary of template bundles
+    and a set of segmentation rules encoded in a data-frame.
+
+    bundle_dict: dict with keys are names of the, and the values are trk files
+    """
+    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
+                                      b0_threshold=b0_threshold)
+
+    # Transform streamlines into the diffusion space:
+    xform_sl = dts.Streamlines(dtu.move_streamlines(sl_with_split,
+                                                    np.linalg.inv(img.affine)))
+
+    bundle_membership = np.zeros((len(xform_sl), len(bundle_dict)))
+
+
+
+
+
+    return fiber_probabilities
+
 def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
             **reg_kwargs):
@@ -349,6 +372,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
                             np.argmin(dist[1], 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
+
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
