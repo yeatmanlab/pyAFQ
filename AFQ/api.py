@@ -189,7 +189,7 @@ def _mapping(row, force_recompute=False):
 
         mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                        template=reg_template,
-                                       prealign=prealign)
+                                       prealign=reg_prealign)
 
         reg.write_mapping(mapping, mapping_file)
     return mapping_file
@@ -254,8 +254,9 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
         reg_template = dpd.read_mni_template()
+        reg_prealign = np.load(row['reg_prealign'])
         mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
-                                   reg_template)
+                                   reg_template, prealign=reg_prealign)
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
@@ -625,6 +626,21 @@ class AFQ(object):
         return self.data_frame['mapping']
 
     mapping = property(get_mapping, set_mapping)
+
+    def set_reg_prealign(self):
+        if 'reg_prealign' not in self.data_frame.columns or self.force_recompute:
+            self.data_frame['reg_prealign'] =\
+                self.data_frame.apply(_reg_prealign,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_reg_prealign(self):
+        self.set_reg_prealign()
+        return self.data_frame['reg_prealign']
+
+    mapping = property(get_reg_prealign, set_reg_prealign)
+
+
 
     def set_streamlines(self):
         if ('streamlines_file' not in self.data_frame.columns or

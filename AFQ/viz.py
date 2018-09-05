@@ -90,7 +90,7 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
     return _inline_interact(ren, inline, interact)
 
 
-def visualize_roi(roi, affine_or_mapping=None, static_img=None,
+def visualize_roi(roi, affine_or_mapping=None, static_img=None, prealign=None,
                   roi_affine=None, static_affine=None, reg_template=None,
                   ren=None, color=None, inline=True, interact=False):
     """
@@ -123,7 +123,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                         "`reg_template`, `static_img`")
                 affine_or_mapping = reg.read_mapping(affine_or_mapping,
                                                      static_img,
-                                                     reg_template)
+                                                     reg_template,
+                                                     prealign=prealign)
 
             roi = auv.patch_up_roi(affine_or_mapping.transform_inverse(
                                    roi,

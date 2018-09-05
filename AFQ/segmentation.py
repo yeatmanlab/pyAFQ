@@ -226,16 +226,14 @@ def recobundles_segmentation(fdata, fbval, fbvec, streamlines, bundle_dict,
                                       b0_threshold=b0_threshold)
 
     # Transform streamlines into the diffusion space:
-    xform_sl = dts.Streamlines(dtu.move_streamlines(sl_with_split,
+    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
                                                     np.linalg.inv(img.affine)))
 
-    bundle_membership = np.zeros((len(xform_sl), len(bundle_dict)))
-
-
-
-
+    fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
     return fiber_probabilities
+
+
 
 def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
