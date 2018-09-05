@@ -11,6 +11,7 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
+import dipy.tracking.utils as dtu
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -211,8 +212,10 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 seed_mask=resamp_wm,
                                 stop_mask=resamp_wm)
 
-        aus.write_trk(streamlines_file, streamlines,
-                      affine=row['dwi_affine'])
+        aus.write_trk(streamlines_file,
+                      dtu.move_streamlines(streamlines,
+                                           np.linalg.inv(dwi_img.affine)),
+                      affine=dwi_img.affine)
 
     return streamlines_file
 
