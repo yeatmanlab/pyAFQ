@@ -183,7 +183,7 @@ def _mapping(row, force_recompute=False):
     if not op.exists(mapping_file) or force_recompute:
         gtab = row['gtab']
         reg_template = dpd.read_mni_template()
-        reg_prealign  = np.load(_reg_prealign(
+        reg_prealign = np.load(_reg_prealign(
             row,
             force_recompute=force_recompute))
 
@@ -223,8 +223,8 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 
         dwi_data = dwi_img.get_data()
         resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                             seg_img.affine,
-                             dwi_img.affine)).astype(int)
+                                          seg_img.affine,
+                                          dwi_img.affine)).astype(int)
 
         streamlines = aft.track(params_file,
                                 directions=directions,
@@ -379,22 +379,22 @@ class AFQ(object):
         │           ├── sub-01_sess-02_dwi.bvecs
         │           └── sub-01_sess-02_dwi.nii.gz
         └── sub02
-            ├── sess01
-            │   ├── anat
-            │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-            │   │   └── sub-02_sess-01_T1w.nii.gz
-            │   └── dwi
-            │       ├── sub-02_sess-01_dwi.bvals
-            │       ├── sub-02_sess-01_dwi.bvecs
-            │       └── sub-02_sess-01_dwi.nii.gz
-            └── sess02
-                ├── anat
+               ├── sess01
+               │   ├── anat
+               │       ├── sub-02_sess-01_aparc+aseg.nii.gz
+               │   │   └── sub-02_sess-01_T1w.nii.gz
+               │   └── dwi
+               │       ├── sub-02_sess-01_dwi.bvals
+               │       ├── sub-02_sess-01_dwi.bvecs
+               │       └── sub-02_sess-01_dwi.nii.gz
+               └── sess02
+                       ├── anat
                 │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-                │   └── sub-02_sess-02_T1w.nii.gz
-                └── dwi
-                    ├── sub-02_sess-02_dwi.bvals
-                    ├── sub-02_sess-02_dwi.bvecs
-                    └── sub-02_sess-02_dwi.nii.gz
+                       │   └── sub-02_sess-02_T1w.nii.gz
+                       └── dwi
+                               ├── sub-02_sess-02_dwi.bvals
+                               ├── sub-02_sess-02_dwi.bvecs
+                               └── sub-02_sess-02_dwi.nii.gz
 
     For now, it is up to users to arrange this file folder structure in their
     data, with preprocessed data, but in the future, this structure will be
@@ -412,6 +412,7 @@ class AFQ(object):
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
     """
+
     def __init__(self, raw_path=None, preproc_path=None,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
