@@ -135,18 +135,14 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
 def split_streamlines(streamlines, template, low_coord=10):
     """
     Classify streamlines and split sl passing the mid-point below some height.
-
     Parameters
     ----------
     streamlines : list or Streamlines class instance.
-
     template : nibabel.Nifti1Image class instance
         An affine transformation into a template space.
-
     low_coords: int
         How many coordinates below the 0,0,0 point should a streamline be to
         be split if it passes the midline.
-
     Returns
     -------
     streamlines that have been processed, a boolean array of whether they
@@ -164,17 +160,20 @@ def split_streamlines(streamlines, template, low_coord=10):
                         np.array([0, 0, 0, 1]))
     cross_below = zero_coord[2] - low_coord
     crosses = []
+    already_split = 0
     for sl_idx, sl in enumerate(xform_sl):
         if (np.any(sl[:, 0] > zero_coord[0]) and
-                np.any(sl[:, 0] < zero_coord[0])):
+              np.any(sl[:, 0] < zero_coord[0])):
             if np.any(sl[:, 2] < cross_below):
                 # This is a streamline that needs to be split where it
                 # crosses the midline:
                 split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
                 xform_sl = aus.split_streamline(
-                    xform_sl, sl_idx, split_idx)
-                crosses.append(True)
-                crosses.append(True)
+                    xform_sl, sl_idx + already_split, split_idx)
+                already_split = already_split + 1
+                # Now that it's been split, neither cross the midline:
+                crosses.append(False)
+                crosses.append(False)
             else:
                 crosses.append(True)
         else:

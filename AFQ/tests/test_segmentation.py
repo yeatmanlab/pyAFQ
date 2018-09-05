@@ -47,7 +47,7 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     # There happen to be 8 fibers in the right CST:
     CST_R_sl = fiber_groups['CST_R']
-    npt.assert_equal(len(CST_R_sl), 8)
+    npt.assert_equal(len(CST_R_sl), 7)
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = seg.calculate_tract_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
@@ -67,7 +67,7 @@ def test_segment():
     # Setting minimum number of streamlines to a smaller number and
     # threshold to a relatively small number will exclude some streamlines:
     clean_sl = seg.clean_fiber_group(CST_R_sl, min_sl=2, clean_threshold=2)
-    npt.assert_equal(len(clean_sl), 4)
+    npt.assert_equal(len(clean_sl), 3)
 
     # What if you don't have probability maps?
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -89,7 +89,7 @@ def test_segment():
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_equal(len(fiber_groups['CST_R']), 8)
+    npt.assert_equal(len(fiber_groups['CST_R']), 9)
 
 
 def test_gaussian_weights():
