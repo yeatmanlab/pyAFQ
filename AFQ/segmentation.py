@@ -181,7 +181,7 @@ def split_streamlines(streamlines, template, low_coord=10):
 
     # Move back to the original space:
     streamlines = dtu.move_streamlines(xform_sl, template.affine)
-    return streamlines, crosses
+    return dts.Streamlines(streamlines), crosses
 
 
 def _check_sl_with_inclusion(sl, include_rois, tol):
@@ -266,14 +266,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
     # Classify the streamlines and split those that: 1) cross the
     # midline, and 2) pass under 10 mm below the mid-point of their
     # representation in the template space:
-    sl_with_split, crosses = split_streamlines(streamlines, reg_template)
+    xform_sl, crosses = split_streamlines(streamlines, reg_template)
 
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
-
-    # Transform streamlines into the diffusion space:
-    xform_sl = dts.Streamlines(dtu.move_streamlines(sl_with_split,
-                                                    np.linalg.inv(img.affine)))
 
     fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
