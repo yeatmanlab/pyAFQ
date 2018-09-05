@@ -638,7 +638,7 @@ class AFQ(object):
         self.set_reg_prealign()
         return self.data_frame['reg_prealign']
 
-    mapping = property(get_reg_prealign, set_reg_prealign)
+    reg_prealign = property(get_reg_prealign, set_reg_prealign)
 
 
 
