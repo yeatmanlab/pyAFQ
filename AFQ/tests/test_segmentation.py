@@ -25,8 +25,9 @@ def test_segment():
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
-    streamlines = dts.Streamlines(dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
-                                                        np.linalg.inv(hardi_img.affine)))
+    streamlines = dts.Streamlines(
+        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                             np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],

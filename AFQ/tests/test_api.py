@@ -9,6 +9,7 @@ import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
 
@@ -97,6 +98,9 @@ def test_AFQ_data2():
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                             np.linalg.inv(myafq.dwi_affine[0])))
     sl_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
@@ -107,4 +111,4 @@ def test_AFQ_data2():
     nib.save(mapping, mapping_file)
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-    npt.assert_equal(len(bundles['CST_R']), 2)
+    npt.assert_equal(len(bundles['CST_R']), 3)
