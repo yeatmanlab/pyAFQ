@@ -200,8 +200,8 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
             # expected location:
             seg_img = nib.load(row['seg_file'])
             seg_data_orig = seg_img.get_data()
-            # For different sets of labels, extract all the voxels that have any
-            # of these values:
+            # For different sets of labels, extract all the voxels that
+            # have any of these values:
             wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
                                             for l in wm_labels], -1), -1)
 

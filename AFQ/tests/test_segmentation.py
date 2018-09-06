@@ -95,7 +95,7 @@ def test_segment():
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_equal(len(fiber_groups['CST_R']), 8)
+    npt.assert_equal(len(fiber_groups['CST_R']), 6)
 
 
 def test_gaussian_weights():

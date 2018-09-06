@@ -7,14 +7,14 @@ import nibabel as nib
 
 import dipy
 import dipy.data as dpd
-import dipy.tracking.utils as dtu
+# import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-import AFQ.utils.streamlines as aus
+# import AFQ.utils.streamlines as aus
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -156,9 +156,9 @@ def split_streamlines(streamlines, template, low_coord=10):
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
 
-    #cross_below = zero_coord[2] - low_coord
+    # cross_below = zero_coord[2] - low_coord
     crosses = np.zeros(len(streamlines), dtype=bool)
-    #already_split = 0
+    # already_split = 0
     for sl_idx, sl in enumerate(streamlines):
         if np.any(sl[:, 0] > zero_coord[0]) and \
            np.any(sl[:, 0] < zero_coord[0]):
