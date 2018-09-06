@@ -2,6 +2,7 @@ from distutils.version import LooseVersion
 
 import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
+import pandas as pd
 
 import nibabel as nib
 
@@ -10,6 +11,8 @@ import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
+from dipy.segment.bundles import RecoBundles
+from dipy.segment.clustering import qbx_with_merge
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -27,6 +30,95 @@ __all__ = ["segment"]
 
 def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
+
+
+# make dictionary from excel sheet
+def build_volumetric_atlas_dict(track_name, roi_df):
+    rois = roi_df[track_name]
+    roi_groups = list(rois.value_counts().index)
+
+    roi_dict = {}
+    roi_dict['include'] = {}
+    roi_dict['exclude'] = {}
+
+    for i in roi_groups:
+        if i > 0:
+            roitype = 'include'
+        elif i < 0:
+            roitype = 'exclude'
+        else:
+            raise('UHOH')
+        setname = 'set' + str(int(i))
+        roi_dict[roitype][setname] = {}
+
+        temp = roi_df[rois == i]
+        for j, name in enumerate(temp['VOIS']):
+            roi_dict[roitype][setname][name] = temp['aparc+aseg'].values[j]
+    return roi_dict
+
+
+# combine the rois into a single "NOT" exclusion and sets of "AND" inclusion
+def combine_rois(mydict, apac):
+    include = []
+    exclude = []
+    for i, iset in enumerate(mydict['include'].keys()):
+        for item in mydict['include'][iset].items():
+            include.append(1 * (apac == item[-1]))
+    for j, jset in enumerate(mydict['exclude'].keys()):
+        for item in mydict['exclude'][jset].items():
+            exclude.append(1 * (apac == item[-1]))
+    return include, exclude
+
+
+# targeting script to target streamlines with ROIs
+def check_targets(sls, include, exclude, tol):
+    keep_array = np.zeros(len(sls))
+    for i, sl in enumerate(sls):
+        is_close_include, dist = _check_sl_with_inclusion(sl, include, tol)
+        is_close_exclude, dist = _check_sl_with_exclusion(sl, exclude, tol)
+        if is_close_include and not is_close_exclude:
+            keep_array[i] = 1
+    return keep_array
+
+
+def calculate_volumetric_atlas_score(streamlines, csv_lookup_path,
+                                     volumetric_atlas_path,
+                                     track_list_path, file_map_path, tol):
+    # Here we assume the csv column names match track_list names
+    roi_df = pd.read_excel(csv_lookup_path)
+    track_list_df = pd.read_excel(track_list_path, index_col='column_name')
+    track_list = list(track_list_df[track_list_df.segment_this > 0].index)
+
+    # Build dictionary of include/exclude rois and freesurfer codes from csv
+    roi_dict = {}
+    for tr in track_list:
+        roi_dict[tr] = build_volumetric_atlas_dict(tr, roi_matrix=roi_df)
+    atlas_data = nib.load(volumetric_atlas_path).get_data()
+
+    streamlines_by_bundle = np.zeros(len())
+    for i, tr in enumerate(track_list):
+        include, exclude = combine_rois(roi_dict[tr], atlas_data)
+        streamlines_by_bundle[:, i] = check_targets(
+            streamlines, include, exclude, tol)
+    return streamlines_by_bundle
+
+
+def calculate_bundle_atlas_score(bundle_atlas_dict, whole_brain, mni2sub_xfm,
+                                 cluster_thr=5, pruning_thr=10,
+                                 reduction_thr=10):
+    cluster_map = qbx_with_merge(whole_brain, thresholds=[40, 25, 20, 10])
+    rb = RecoBundles(whole_brain, cluster_map=cluster_map,
+                     cluster_thr=cluster_thr)
+    track_list = bundle_atlas_dict.keys()
+    streamlines_by_bundle = np.zeros(len(whole_brain), len(track_list))
+    for i, b in enumerate(track_list):
+        bundle_xfmd = dtu.move_streamlines(bundle_atlas_dict[b], mni2sub_xfm)
+        b_atlassp, labels, b_subsp = rb.recognize(model_bundle=bundle_xfmd,
+                                                  model_clust_thr=5.,
+                                                  reduction_thr=10,
+                                                  pruning_thr=pruning_thr)
+        streamlines_by_bundle[:, i] = labels
+    return streamlines_by_bundle
 
 
 def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
@@ -158,7 +250,7 @@ def split_streamlines(streamlines, template, low_coord=10):
     """
     # Move the streamlines to the space of the template but don't generate
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
-        np.linalg.inv(template.affine)))
+                                                    np.linalg.inv(template.affine)))
     # What is the x,y,z coordinate of 0,0,0 in the template space?
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
@@ -167,7 +259,7 @@ def split_streamlines(streamlines, template, low_coord=10):
     already_split = 0
     for sl_idx, sl in enumerate(xform_sl):
         if (np.any(sl[:, 0] > zero_coord[0]) and
-              np.any(sl[:, 0] < zero_coord[0])):
+                np.any(sl[:, 0] < zero_coord[0])):
             if np.any(sl[:, 2] < cross_below):
                 # This is a streamline that needs to be split where it
                 # crosses the midline:
@@ -231,11 +323,8 @@ def recobundles_segmentation(fdata, fbval, fbvec, streamlines, bundle_dict,
 
     bundle_membership = np.zeros((len(xform_sl), len(bundle_dict)))
 
-
-
-
-
     return fiber_probabilities
+
 
 def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
@@ -372,7 +461,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
                             np.argmin(dist[1], 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
-
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
