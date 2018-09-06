@@ -154,7 +154,7 @@ def split_streamlines(streamlines, template, low_coord=10):
     """
     # Move the streamlines to the space of the template but don't generate
     xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
-        np.linalg.inv(template.affine)))
+                               np.linalg.inv(template.affine)))
     # What is the x,y,z coordinate of 0,0,0 in the template space?
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
@@ -162,8 +162,8 @@ def split_streamlines(streamlines, template, low_coord=10):
     crosses = []
     already_split = 0
     for sl_idx, sl in enumerate(xform_sl):
-        if (np.any(sl[:, 0] > zero_coord[0]) and
-              np.any(sl[:, 0] < zero_coord[0])):
+        if np.any(sl[:, 0] > zero_coord[0]) and \
+           np.any(sl[:, 0] < zero_coord[0]):
             if np.any(sl[:, 2] < cross_below):
                 # This is a streamline that needs to be split where it
                 # crosses the midline:

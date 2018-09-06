@@ -101,8 +101,8 @@ def _b0(row, force_recompute=False):
     return b0_file
 
 
-def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
-                vol_idx=None, dilate=None, force_recompute=False):
+def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
+                vol_idx=None, dilate=10, force_recompute=False):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file) or force_recompute:
         mean_b0_img = nib.load(_b0(row))
