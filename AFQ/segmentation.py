@@ -63,10 +63,10 @@ def combine_rois(mydict, apac):
     exclude = []
     for i, iset in enumerate(mydict['include'].keys()):
         for item in mydict['include'][iset].items():
-            include.append(1 * (apac == item[-1]))
+            include.append(np.array(np.where(apac == item[-1])).T)
     for j, jset in enumerate(mydict['exclude'].keys()):
         for item in mydict['exclude'][jset].items():
-            exclude.append(1 * (apac == item[-1]))
+            exclude.append(np.array(np.where(apac == item[-1])).T)
     return include, exclude
 
 
@@ -75,31 +75,38 @@ def check_targets(sls, include, exclude, tol):
     keep_array = np.zeros(len(sls))
     for i, sl in enumerate(sls):
         is_close_include, dist = _check_sl_with_inclusion(sl, include, tol)
-        is_close_exclude, dist = _check_sl_with_exclusion(sl, exclude, tol)
-        if is_close_include and not is_close_exclude:
-            keep_array[i] = 1
+        if is_close_include:
+            is_close_exclude = _check_sl_with_exclusion(sl, exclude, tol)
+            if not is_close_exclude:
+                keep_array[i] = 1
     return keep_array
 
 
 def calculate_volumetric_atlas_score(streamlines, csv_lookup_path,
                                      volumetric_atlas_path,
-                                     track_list_path, file_map_path, tol):
+                                     track_list_path, file_map_path, tvaff,
+                                     tol):
     # Here we assume the csv column names match track_list names
     roi_df = pd.read_excel(csv_lookup_path)
     track_list_df = pd.read_excel(track_list_path, index_col='column_name')
-    track_list = list(track_list_df[track_list_df.segment_this > 0].index)
+    track_list = list(track_list_df[track_list_df.segment_this > 0].index)[1:2]
+
+    aff = np.linalg.inv(nib.load(volumetric_atlas_path).affine)
 
     # Build dictionary of include/exclude rois and freesurfer codes from csv
     roi_dict = {}
     for tr in track_list:
-        roi_dict[tr] = build_volumetric_atlas_dict(tr, roi_matrix=roi_df)
+        roi_dict[tr] = build_volumetric_atlas_dict(tr, roi_df=roi_df)
     atlas_data = nib.load(volumetric_atlas_path).get_data()
 
-    streamlines_by_bundle = np.zeros(len())
+    streamlines_by_bundle = np.zeros([len(streamlines), len(track_list)])
     for i, tr in enumerate(track_list):
+        print(tr)
+        xfmd_sls = dts.Streamlines(dtu.move_streamlines(streamlines,
+                                                        aff))
         include, exclude = combine_rois(roi_dict[tr], atlas_data)
         streamlines_by_bundle[:, i] = check_targets(
-            streamlines, include, exclude, tol)
+            xfmd_sls, include, exclude, tol)
     return streamlines_by_bundle
 
 
@@ -110,7 +117,7 @@ def calculate_bundle_atlas_score(bundle_atlas_dict, whole_brain, mni2sub_xfm,
     rb = RecoBundles(whole_brain, cluster_map=cluster_map,
                      cluster_thr=cluster_thr)
     track_list = bundle_atlas_dict.keys()
-    streamlines_by_bundle = np.zeros(len(whole_brain), len(track_list))
+    streamlines_by_bundle = np.zeros([len(whole_brain), len(track_list)])
     for i, b in enumerate(track_list):
         bundle_xfmd = dtu.move_streamlines(bundle_atlas_dict[b], mni2sub_xfm)
         b_atlassp, labels, b_subsp = rb.recognize(model_bundle=bundle_xfmd,
