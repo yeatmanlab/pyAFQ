@@ -40,6 +40,7 @@ def make_bundle_dict(bundle_names=BUNDLES):
         A list of the bundles to be used in this case. Default: all of them
     """
     templates = afd.read_templates()
+    callosal_templates = afd.read_callosum_templates()
     # For the arcuate, we need to rename a few of these and duplicate the SLF
     # ROI:
     templates['ARC_roi1_L'] = templates['SLF_roi1_L']
@@ -56,8 +57,9 @@ def make_bundle_dict(bundle_names=BUNDLES):
         if name in ["FA", "FP"]:
             afq_bundles[name] = {
                 'ROIs': [templates[name + "_L"],
-                         templates[name + "_R"]],
-                'rules': [True, True],
+                         templates[name + "_R"],
+                         callosal_templates["Callosum_midsag"]],
+                'rules': [True, True, True],
                 'prob_map': templates[name + "_prob_map"],
                 'cross_midline': True,
                 'uid': uid}
