@@ -307,13 +307,12 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
-        bundles_file = _bundles(row,
-                                wm_labels,
-                                bundle_dict,
-                                reg_template,
-                                odf_model=odf_model,
-                                directions=directions,
-                                force_recompute=force_recompute)
+        bundles_file = _clean_bundles(row,
+                                      wm_labels,
+                                      bundle_dict,
+                                      odf_model=odf_model,
+                                      directions=directions,
+                                      force_recompute=force_recompute)
         keys = []
         vals = []
         for k in bundle_dict.keys():
