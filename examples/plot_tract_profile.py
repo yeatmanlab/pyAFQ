@@ -13,6 +13,8 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
+import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 import AFQ.utils.streamlines as aus
 import AFQ.data as afd
@@ -46,6 +48,10 @@ if not op.exists('dti_streamlines.trk'):
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
+
+streamlines = dts.Streamlines(
+        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                             np.linalg.inv(img.affine)))
 
 templates = afd.read_templates()
 bundle_names = ["CST", "ILF"]

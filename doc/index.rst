@@ -2,8 +2,6 @@
 AFQ: Automated Fiber Quantification
 ====================================
 
-**pyAFQ is pre-release software. For the time-being, we recomend that you use the** `Matlab version of AFQ <https://github.com/yeatmanlab/AFQ>`_.
-
 Tractography based on diffusion weighted MRI (dMRI) is used to find  the major
 white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
@@ -35,7 +33,11 @@ obvious from mean measures of that tract (Yeatman2012_).
    :figclass: align-center
    :target: http://escience.washington.edu
 
-   Acknowledgements: this work was supported by a grant from the
-   `Gordon & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
+   Acknowledgements: this work was supported by a grant from the `Gordon
+   & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
    `Alfred P. Sloan Foundation <http://www.sloan.org/>`_ to the
-   `University of Washington eScience Institute <http://escience.washington.edu/>`_.
+   `University of Washington eScience Institute
+   <http://escience.washington.edu/>`_, by a
+   `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
+   R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by
+   an NSF grant () to Jason Yeatman.
