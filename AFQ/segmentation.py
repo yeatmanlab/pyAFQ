@@ -147,41 +147,40 @@ def split_streamlines(streamlines, template, low_coord=10):
     -------
     streamlines that have been processed, a boolean array of whether they
     cross the midline or not, a boolean array that for those who do not cross
-    designates whether they are strictly in the left hemispher, and a boolean
+    designates whether they are strictly in the left hemisphere, and a boolean
     that tells us whether the streamline has superior-inferior parts that pass
     below `low_coord` steps below the middle of the image (which should also
     be `low_coord` mms for templates with 1 mm resolution)
     """
-    # Move the streamlines to the space of the template but don't generate
-    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
-                               np.linalg.inv(template.affine)))
     # What is the x,y,z coordinate of 0,0,0 in the template space?
     zero_coord = np.dot(np.linalg.inv(template.affine),
                         np.array([0, 0, 0, 1]))
-    cross_below = zero_coord[2] - low_coord
-    crosses = []
-    already_split = 0
-    for sl_idx, sl in enumerate(xform_sl):
+
+    #cross_below = zero_coord[2] - low_coord
+    crosses = np.zeros(len(streamlines), dtype=bool)
+    #already_split = 0
+    for sl_idx, sl in enumerate(streamlines):
         if np.any(sl[:, 0] > zero_coord[0]) and \
            np.any(sl[:, 0] < zero_coord[0]):
-            if np.any(sl[:, 2] < cross_below):
-                # This is a streamline that needs to be split where it
-                # crosses the midline:
-                split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
-                xform_sl = aus.split_streamline(
-                    xform_sl, sl_idx + already_split, split_idx)
-                already_split = already_split + 1
-                # Now that it's been split, neither cross the midline:
-                crosses.append(False)
-                crosses.append(False)
-            else:
-                crosses.append(True)
+            # if np.any(sl[:, 2] < cross_below):
+            #     # This is a streamline that needs to be split where it
+            #     # crosses the midline:
+            #     split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
+            #     streamlines = aus.split_streamline(
+            #         streamlines, sl_idx + already_split, split_idx)
+            #     already_split = already_split + 1
+            #     # Now that it's been split, neither cross the midline:
+            #     crosses[sl_idx] = False
+            #     crosses = np.concatenate([crosses[:sl_idx+1],
+            #                               np.array([False]),
+            #                               crosses[sl_idx+1:]])
+            # else:
+                crosses[sl_idx] = True
         else:
-            crosses.append(False)
+            crosses[sl_idx] = False
 
     # Move back to the original space:
-    streamlines = dtu.move_streamlines(xform_sl, template.affine)
-    return dts.Streamlines(streamlines), crosses
+    return streamlines, crosses
 
 
 def _check_sl_with_inclusion(sl, include_rois, tol):
@@ -266,7 +265,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
     # Classify the streamlines and split those that: 1) cross the
     # midline, and 2) pass under 10 mm below the mid-point of their
     # representation in the template space:
-    xform_sl, crosses = split_streamlines(streamlines, reg_template)
+    xform_sl, crosses = split_streamlines(streamlines, img)
 
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)

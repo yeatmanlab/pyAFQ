@@ -25,8 +25,8 @@ def touch(fname, times=None):
 
 def create_dummy_preproc_path(n_subjects, n_sessions):
     preproc_dir = tempfile.mkdtemp()
-    subjects = ['sub-%s' % (d + 1) for d in range(n_subjects)]
-    sessions = ['sess-%s' % (d + 1) for d in range(n_sessions)]
+    subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
+    sessions = ['sess-0%s' % (d + 1) for d in range(n_sessions)]
     for subject in subjects:
         for session in sessions:
             for modality in ['anat', 'dwi']:
@@ -111,4 +111,4 @@ def test_AFQ_data2():
     nib.save(mapping, mapping_file)
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-    npt.assert_equal(len(bundles['CST_R']), 3)
+    npt.assert_equal(len(bundles['CST_R']), 1)
