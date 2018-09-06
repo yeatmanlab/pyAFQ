@@ -6,6 +6,7 @@ import dipy.data as dpd
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 from dipy.tracking.local import ThresholdTissueClassifier, LocalTracking
 
 from AFQ.dti import tensor_odf
@@ -132,6 +133,6 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
                             affine,
                             step_size=step_size)
 
-    return [l for l in tracker
-            if l.shape[0] * step_size > min_length and
-            l.shape[0] * step_size < max_length]
+    return dts.Streamlines(
+        [l for l in tracker if l.shape[0] * step_size > min_length and
+         l.shape[0] * step_size < max_length])
