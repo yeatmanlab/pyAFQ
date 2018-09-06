@@ -49,9 +49,9 @@ else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
-streamlines = dts.Streamlines(
-        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
-                             np.linalg.inv(img.affine)))
+streamlines = dts.Streamlines(dtu.move_streamlines(
+    [s for s in streamlines if s.shape[0] > 100],
+    np.linalg.inv(img.affine)))
 
 templates = afd.read_templates()
 bundle_names = ["CST", "ILF"]
