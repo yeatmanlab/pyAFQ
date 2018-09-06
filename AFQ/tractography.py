@@ -12,7 +12,8 @@ from AFQ.dti import tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, seeds=1, stop_mask=None, stop_threshold=0,
+          seed_mask=None, n_seeds=1, random_seeds=False,
+          stop_mask=None, stop_threshold=0,
           step_size=1.0, min_length=10, max_length=250):
     """
     Tractography
@@ -33,10 +34,15 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     seed_mask : array, optional.
         Binary mask describing the ROI within which we seed for tracking.
         Default to the entire volume.
-    seed : int or 2D array, optional.
+    n_seeds : int or 2D array, optional.
         The seeding density: if this is an int, it is is how many seeds in each
         voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
-        array, these are the coordinates of the seeds.
+        array, these are the coordinates of the seeds. Unless random_seeds is
+        set to True, in which case this is the total number of random seeds
+        to generate within the mask.
+    random_seeds : bool
+        Whether to generate a total of n_seeds random seeds in the mask.
+        Default: XXX.
     stop_mask : array, optional.
         A floating point value that determines a stopping criterion (e.g. FA).
         Default to no stopping (all ones).
@@ -63,12 +69,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     model_params = params_img.get_data()
     affine = params_img.affine
 
-    if isinstance(seeds, int):
+    if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
-        seeds = dtu.seeds_from_mask(seed_mask,
-                                    density=seeds,
-                                    affine=affine)
+        if random_seeds:
+            seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
+                                               seed_count_per_voxel=False,
+                                               affine=affine)
+        else:
+            seeds = dtu.seeds_from_mask(seed_mask,
+                                        density=n_seeds,
+                                        affine=affine)
+    else:
+        # If user provided an array, we'll use n_seeds as the seeds:
+        seeds = n_seeds
     if sphere is None:
         sphere = dpd.default_sphere
 

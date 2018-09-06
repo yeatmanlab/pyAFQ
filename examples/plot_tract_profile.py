@@ -47,9 +47,6 @@ else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
 
-# Use only a small portion of the streamlines, for expedience:
-streamlines = streamlines[::100]
-
 templates = afd.read_templates()
 bundle_names = ["CST", "ILF"]
 
@@ -95,7 +92,9 @@ FA_data = FA_img.get_data()
 print("Extracting tract profiles...")
 for bundle in bundles:
     fig, ax = plt.subplots(1)
-    profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle])
+    weights = seg.gaussian_weights(fiber_groups[bundle])
+    profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle],
+                                          weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)
 

@@ -11,6 +11,7 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
+import dipy.tracking.utils as dtu
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -25,7 +26,8 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC"]
+BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
+           "FA", "FP"]
 
 
 def make_bundle_dict(bundle_names=BUNDLES):
@@ -49,32 +51,66 @@ def make_bundle_dict(bundle_names=BUNDLES):
     # Each bundles gets a digit identifier (to be stored in the tractogram)
     uid = 1
     for name in bundle_names:
-        # Considder hard coding since we might have different rulse for
+        # Consider hard coding since we might have different rules for
         # some tracts
-        for hemi in ['_R', '_L']:
-            afq_bundles[name + hemi] = {'ROIs': [templates[name + '_roi1' +
-                                                           hemi],
-                                                 templates[name + '_roi2' +
-                                                           hemi]],
-                                        'rules': [True, True],
-                                        'uid': uid}
+        if name in ["FA", "FP"]:
+            afq_bundles[name] = {
+                'ROIs': [templates[name + "_L"],
+                         templates[name + "_R"]],
+                'rules': [True, True],
+                'prob_map': templates[name + "_prob_map"],
+                'cross_midline': True,
+                'uid': uid}
             uid += 1
+        # SLF is a special case, because it has an exclusion ROI:
+        elif name == "SLF":
+            for hemi in ['_R', '_L']:
+                afq_bundles[name + hemi] = {
+                    'ROIs': [templates[name + '_roi1' + hemi],
+                             templates[name + '_roi2' + hemi],
+                             templates["SLFt_roi2" + hemi]],
+                    'rules': [True, True, False],
+                    'prob_map': templates[name + hemi + '_prob_map'],
+                    'cross_midline': False,
+                    'uid': uid}
+                uid += 1
+        else:
+            for hemi in ['_R', '_L']:
+                afq_bundles[name + hemi] = {
+                    'ROIs': [templates[name + '_roi1' + hemi],
+                             templates[name + '_roi2' + hemi]],
+                    'rules': [True, True],
+                    'prob_map': templates[name + hemi + '_prob_map'],
+                    'cross_midline': False,
+                    'uid': uid}
+
+                uid += 1
 
     return afq_bundles
 
 
-def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
-                vol_idx=None, dilate=None, force_recompute=False):
-    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
-    if not op.exists(brain_mask_file) or force_recompute:
+def _b0(row, force_recompute=False):
+    b0_file = _get_fname(row, '_b0.nii.gz')
+    if not op.exists(b0_file) or force_recompute:
         img = nib.load(row['dwi_file'])
         data = img.get_data()
         gtab = row['gtab']
         mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+        mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
+        nib.save(mean_b0_img, b0_file)
+    return b0_file
+
+
+def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
+                vol_idx=None, dilate=10, force_recompute=False):
+    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
+    if not op.exists(brain_mask_file) or force_recompute:
+        mean_b0_img = nib.load(_b0(row))
+        mean_b0 = mean_b0_img.get_data()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
         be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                 img.affine)
+                                 mean_b0_img.affine)
         nib.save(be_img, brain_mask_file)
     return brain_mask_file
 
@@ -139,7 +175,8 @@ def _mapping(row, force_recompute=False):
 
 
 def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
-                 force_recompute=False):
+                 n_seeds=2, random_seeds=False, force_recompute=False,
+                 wm_fa_thresh=0.2):
     """
     wm_labels : list
         The values within the segmentation that are considered white matter. We
@@ -155,49 +192,45 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
         else:
             raise(NotImplementedError)
 
-        seg_img = nib.load(row['seg_file'])
         dwi_img = nib.load(row['dwi_file'])
-        seg_data_orig = seg_img.get_data()
-
-        # For different sets of labels, extract all the voxels that have any
-        # of these values:
-        wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
-                                         for l in wm_labels], -1), -1)
-
         dwi_data = dwi_img.get_data()
-        resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                             seg_img.affine,
-                             dwi_img.affine)).astype(int)
+
+        if 'seg_file' in row.index:
+            # If we found a white matter segmentation in the
+            # expected location:
+            seg_img = nib.load(row['seg_file'])
+            seg_data_orig = seg_img.get_data()
+            # For different sets of labels, extract all the voxels that
+            # have any of these values:
+            wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
+                                            for l in wm_labels], -1), -1)
+
+            # Resample to DWI data:
+            wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                                            seg_img.affine,
+                                            dwi_img.affine)).astype(int)
+        else:
+            # Otherwise, we'll identify the white matter based on FA:
+            dti_fa = nib.load(_dti_fa(row)).get_data()
+            wm_mask = dti_fa > wm_fa_thresh
 
         streamlines = aft.track(params_file,
-                                directions='det',
-                                seeds=2,
-                                seed_mask=resamp_wm,
-                                stop_mask=resamp_wm)
+                                directions=directions,
+                                n_seeds=n_seeds,
+                                random_seeds=random_seeds,
+                                seed_mask=wm_mask,
+                                stop_mask=wm_mask)
 
-        aus.write_trk(streamlines_file, streamlines,
-                      affine=row['dwi_affine'])
+        aus.write_trk(streamlines_file,
+                      dtu.move_streamlines(streamlines,
+                                           np.linalg.inv(dwi_img.affine)),
+                      affine=dwi_img.affine)
 
     return streamlines_file
 
 
-def _tgramer(bundles, bundle_dict, affine):
-    tgram = nib.streamlines.Tractogram([], {'bundle': []})
-    for b in bundles:
-        print("Segmenting: %s" % b)
-        this_sl = list(bundles[b])
-        this_tgram = nib.streamlines.Tractogram(
-            this_sl,
-            data_per_streamline={
-                'bundle': (len(this_sl) *
-                           [bundle_dict[b]['uid']])},
-                affine_to_rasmm=affine)
-        tgram = aus.add_bundles(tgram, this_tgram)
-    return tgram
-
-
-def _bundles(row, wm_labels, odf_model="DTI", directions="det",
-             force_recompute=False):
+def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
+             n_seeds=2, random_seeds=False, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -205,10 +238,11 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
         streamlines_file = _streamlines(row, wm_labels,
                                         odf_model=odf_model,
                                         directions=directions,
+                                        n_seeds=n_seeds,
+                                        random_seeds=random_seeds,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        bundle_dict = make_bundle_dict()
         reg_template = dpd.read_mni_template()
         mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
                                    reg_template)
@@ -219,22 +253,58 @@ def _bundles(row, wm_labels, odf_model="DTI", directions="det",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
-        tgram = _tgramer(bundles, bundle_dict, row['dwi_affine'])
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
 
 
-def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
+def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
+                   directions="det", n_seeds=2, random_seeds=False,
+                   force_recompute=False):
+    clean_bundles_file = _get_fname(row,
+                                    '%s_%s_clean_bundles.trk' % (odf_model,
+                                                                 directions))
+    if not op.exists(clean_bundles_file) or force_recompute:
+        bundles_file = _bundles(row,
+                                wm_labels,
+                                bundle_dict,
+                                odf_model=odf_model,
+                                directions=directions,
+                                n_seeds=n_seeds,
+                                random_seeds=random_seeds,
+                                force_recompute=False)
+        tg = nib.streamlines.load(bundles_file).tractogram
+        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        tgram = nib.streamlines.Tractogram([], {'bundle': []})
+        for b in bundle_dict.keys():
+            idx = np.where(tg.data_per_streamline['bundle'] ==
+                           bundle_dict[b]['uid'])[0]
+            this_sl = sl[idx]
+            this_sl = seg.clean_fiber_group(this_sl)
+            this_tgram = nib.streamlines.Tractogram(
+                this_sl,
+                data_per_streamline={
+                    'bundle': (len(this_sl) *
+                               [bundle_dict[b]['uid']])},
+                    affine_to_rasmm=row['dwi_affine'])
+            tgram = aus.add_bundles(tgram, this_tgram)
+        nib.streamlines.save(tgram, clean_bundles_file)
+
+    return clean_bundles_file
+
+
+def _tract_profiles(row, wm_labels, bundle_dict,
+                    odf_model="DTI", directions="det",
                     scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
         bundles_file = _bundles(row,
                                 wm_labels,
+                                bundle_dict,
                                 odf_model=odf_model,
                                 directions=directions,
                                 force_recompute=force_recompute)
-        bundle_dict = make_bundle_dict()
         keys = []
         vals = []
         for k in bundle_dict.keys():
@@ -278,6 +348,7 @@ def _tract_profiles(row, wm_labels, odf_model="DTI", directions="det",
 
 class AFQ(object):
     """
+
     This is file folder structure that AFQ requires in your study folder::
 
         ├── sub01
@@ -336,9 +407,10 @@ class AFQ(object):
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
                  b0_threshold=0, odf_model="DTI", directions="det",
+                 n_seeds=2, random_seeds=False,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
-                 wm_labels=[251, 252, 253, 254, 255, 41, 2]):
+                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
 
         b0_threshold : int, optional
@@ -361,14 +433,17 @@ class AFQ(object):
         wm_labels : list, optional
             A list of the labels of the white matter in the segmentation file
             used. Default: the white matter values for the segmentation
-            provided with the HCP data: [251, 252, 253, 254, 255, 41, 2].
+            provided with the HCP data, including labels for midbraing:
+            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
         """
         self.directions = directions
         self.odf_model = odf_model
         self.raw_path = raw_path
-        self.bundle_list = bundle_list
+        self.bundle_dict = make_bundle_dict(bundle_list)
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
+        self.n_seeds = n_seeds
+        self.random_seeds = random_seeds
 
         self.preproc_path = preproc_path
         if self.preproc_path is None:
@@ -406,28 +481,36 @@ class AFQ(object):
                                                          (sess, dwi_folder,
                                                           dwi_file))))[0])
 
-                anat_file_list.append(glob.glob(op.join(sub_dir,
-                                                        ('%s/%s/%s.nii.gz' %
-                                                         (sess,
-                                                          anat_folder,
-                                                          anat_file))))[0])
+                # The following two may or may not exist:
+                this_anat_file = glob.glob(op.join(sub_dir,
+                                           ('%s/%s/%s.nii.gz' %
+                                            (sess,
+                                             anat_folder,
+                                             anat_file))))
+                if len(this_anat_file):
+                    anat_file_list.append(this_anat_file[0])
 
-                seg_file_list.append(glob.glob(op.join(sub_dir,
-                                                       ('%s/%s/%s.nii.gz' %
-                                                        (sess,
-                                                         anat_folder,
-                                                         seg_file))))[0])
+                this_seg_file = glob.glob(op.join(sub_dir,
+                                                  ('%s/%s/%s.nii.gz' %
+                                                   (sess,
+                                                    anat_folder,
+                                                    seg_file))))
+                if len(this_seg_file):
+                    seg_file_list.append(this_seg_file[0])
 
                 sub_list.append(subject)
                 sess_list.append(sess)
-
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            anat_file=anat_file_list,
-                                            seg_file=seg_file_list,
                                             sess=sess_list))
+        # Add these if they exist:
+        if len(seg_file_list):
+            self.data_frame['seg_file'] = seg_file_list
+        if len(anat_file_list):
+            self.data_frame['anat_file'] = anat_file_list
+
         if dask_it:
             self.data_frame = ddf.from_pandas(self.data_frame,
                                               npartitions=len(sub_list))
@@ -456,6 +539,20 @@ class AFQ(object):
 
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
+
+    def set_b0(self):
+        if ('b0_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['b0_file'] =\
+                self.data_frame.apply(_b0,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_b0(self):
+        self.set_b0()
+        return self.data_frame['b0_file']
+
+    b0 = property(get_b0, set_b0)
 
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None):
@@ -535,6 +632,8 @@ class AFQ(object):
                                       args=[self.wm_labels],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
                                       force_recompute=self.force_recompute)
 
     def get_streamlines(self):
@@ -548,9 +647,12 @@ class AFQ(object):
                 self.force_recompute):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
-                                      args=[self.wm_labels],
+                                      args=[self.wm_labels,
+                                            self.bundle_dict],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
                                       force_recompute=self.force_recompute)
 
     def get_bundles(self):
@@ -559,12 +661,32 @@ class AFQ(object):
 
     bundles = property(get_bundles, set_bundles)
 
+    def set_clean_bundles(self):
+        if ('clean_bundles_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['clean_bundles_file'] =\
+                self.data_frame.apply(_clean_bundles, axis=1,
+                                      args=[self.wm_labels,
+                                            self.bundle_dict],
+                                      odf_model=self.odf_model,
+                                      directions=self.directions,
+                                      n_seeds=self.n_seeds,
+                                      random_seeds=self.random_seeds,
+                                      force_recompute=self.force_recompute)
+
+    def get_clean_bundles(self):
+        self.set_clean_bundles()
+        return self.data_frame['clean_bundles_file']
+
+    clean_bundles = property(get_clean_bundles, set_clean_bundles)
+
     def set_tract_profiles(self):
         if ('tract_profiles_file' not in self.data_frame.columns or
                 self.force_recompute):
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
-                                      args=[self.wm_labels],
+                                      args=[self.wm_labels,
+                                            self.bundle_dict],
                                       force_recompute=self.force_recompute,
                                       axis=1)
 

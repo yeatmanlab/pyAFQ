@@ -1,19 +1,20 @@
 from distutils.version import LooseVersion
 
 import numpy as np
-import scipy.ndimage as ndim
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
 
 import dipy
 import dipy.data as dpd
-import dipy.tracking.utils as dtu
+# import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
+import AFQ.utils.volume as auv
+# import AFQ.utils.streamlines as aus
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -21,25 +22,7 @@ if LooseVersion(dipy.__version__) < '0.12':
     dts.orient_by_rois = fix.orient_by_rois
 
 
-__all__ = ["patch_up_roi", "segment"]
-
-
-def patch_up_roi(roi):
-    """
-    After being non-linearly transformed, ROIs tend to have holes in them.
-    We perform a couple of computational geometry operations on the ROI to
-    fix that up.
-
-    Parameters
-    ----------
-    roi : 3D binary array
-        The ROI after it has been transformed
-
-    Returns
-    -------
-    ROI after dilation and hole-filling
-    """
-    return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
+__all__ = ["segment"]
 
 
 def _resample_bundle(streamlines, n_points):
@@ -62,8 +45,11 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         relevant).
 
     """
-    if (isinstance(streamlines, list) or
-            isinstance(streamlines, dts.Streamlines)):
+    # It's already an array
+    if isinstance(streamlines, np.ndarray):
+        fgarray = streamlines
+    else:
+        # It's some other kind of thing (list, Streamlines, etc.).
         # Resample each streamline to the same number of points
         # list => np.array
         # Setting the number of points should happen in a streamline template
@@ -72,8 +58,6 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         # In the future, an SLR object can be passed here, and then it would
         # move these streamlines into the template space before resampling...
         fgarray = _resample_bundle(streamlines, n_points)
-    else:
-        fgarray = streamlines
     # ...and move them back to native space before indexing into the volume:
     values = dts.values_from_volume(img, fgarray, affine=affine)
 
@@ -108,19 +92,20 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
         inverse of the Mahalanobis distance, relative to the distribution of
         coordinates at that node position across streamlines.
     """
-    if isinstance(bundle, list) or isinstance(bundle, dts.Streamlines):
-        # if you got a list, assume that it needs to be resampled:
-        bundle = _resample_bundle(bundle, n_points)
-    else:
-        if bundle.shape[-1] != 3:
-            e_s = "Input must be shape (n_streamlines, n_points, 3)"
-            raise ValueError(e_s)
+    if isinstance(bundle, np.ndarray):
+        # It's an array, go with it:
         n_points = bundle.shape[1]
-
+    else:
+        # It's something else, assume that it needs to be resampled:
+        bundle = _resample_bundle(bundle, n_points)
     w = np.zeros((bundle.shape[0], n_points))
+
     # If there's only one fiber here, it gets the entire weighting:
     if bundle.shape[0] == 1:
-        return np.array([1])
+        if return_mahalnobis:
+            return np.array([np.nan])
+        else:
+            return np.array([1])
 
     for node in range(bundle.shape[1]):
         # This should come back as a 3D covariance matrix with the spatial
@@ -147,7 +132,84 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
     return w / np.sum(w, 0)
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundles,
+def split_streamlines(streamlines, template, low_coord=10):
+    """
+    Classify streamlines and split sl passing the mid-point below some height.
+    Parameters
+    ----------
+    streamlines : list or Streamlines class instance.
+    template : nibabel.Nifti1Image class instance
+        An affine transformation into a template space.
+    low_coords: int
+        How many coordinates below the 0,0,0 point should a streamline be to
+        be split if it passes the midline.
+    Returns
+    -------
+    streamlines that have been processed, a boolean array of whether they
+    cross the midline or not, a boolean array that for those who do not cross
+    designates whether they are strictly in the left hemisphere, and a boolean
+    that tells us whether the streamline has superior-inferior parts that pass
+    below `low_coord` steps below the middle of the image (which should also
+    be `low_coord` mms for templates with 1 mm resolution)
+    """
+    # What is the x,y,z coordinate of 0,0,0 in the template space?
+    zero_coord = np.dot(np.linalg.inv(template.affine),
+                        np.array([0, 0, 0, 1]))
+
+    # cross_below = zero_coord[2] - low_coord
+    crosses = np.zeros(len(streamlines), dtype=bool)
+    # already_split = 0
+    for sl_idx, sl in enumerate(streamlines):
+        if np.any(sl[:, 0] > zero_coord[0]) and \
+           np.any(sl[:, 0] < zero_coord[0]):
+            # if np.any(sl[:, 2] < cross_below):
+            #     # This is a streamline that needs to be split where it
+            #     # crosses the midline:
+            #     split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
+            #     streamlines = aus.split_streamline(
+            #         streamlines, sl_idx + already_split, split_idx)
+            #     already_split = already_split + 1
+            #     # Now that it's been split, neither cross the midline:
+            #     crosses[sl_idx] = False
+            #     crosses = np.concatenate([crosses[:sl_idx+1],
+            #                               np.array([False]),
+            #                               crosses[sl_idx+1:]])
+            # else:
+                crosses[sl_idx] = True
+        else:
+            crosses[sl_idx] = False
+
+    # Move back to the original space:
+    return streamlines, crosses
+
+
+def _check_sl_with_inclusion(sl, include_rois, tol):
+    """
+    Helper function to check that a streamline is close to a list of
+    inclusion ROIS.
+    """
+    dist = []
+    for roi in include_rois:
+        dist.append(cdist(sl, roi, 'euclidean'))
+        if np.min(dist[-1]) > tol:
+            # Too far from one of them:
+            return False, []
+    # Apparently you checked all the ROIs and it was close to all of them
+    return True, dist
+
+
+def _check_sl_with_exclusion(sl, exclude_rois, tol):
+    """ Helper function to check that a streamline is not too close to a list
+    of exclusion ROIs.
+    """
+    for roi in exclude_rois:
+        if np.min(cdist(sl, roi, 'euclidean')) < tol:
+            return False
+    # Either there are no exclusion ROIs, or you are not close to any:
+    return True
+
+
+def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             reg_template=None, mapping=None, prob_threshold=0,
             **reg_kwargs):
     """
@@ -161,7 +223,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     streamlines : list of 2D arrays
         Each array is a streamline, shape (3, N).
 
-    bundles: dict
+    bundle_dict: dict
         The format is something like::
 
             {'name': {'ROIs':[img1, img2],
@@ -188,11 +250,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
        matter anatomy and tract-specific quantification. Neuroimage 39:
        336-347
     """
-    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec)
-    tol = dts.dist_to_corner(img.affine)
+    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
+                                      b0_threshold=b0_threshold)
 
-    xform_sl = dts.Streamlines(dtu.move_streamlines(streamlines,
-                                                    np.linalg.inv(img.affine)))
+    tol = dts.dist_to_corner(img.affine)
 
     if reg_template is None:
         reg_template = dpd.read_mni_template()
@@ -201,46 +262,48 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         mapping = reg.syn_register_dwi(fdata, gtab, template=reg_template,
                                        **reg_kwargs)
 
+    # Classify the streamlines and split those that: 1) cross the
+    # midline, and 2) pass under 10 mm below the mid-point of their
+    # representation in the template space:
+    xform_sl, crosses = split_streamlines(streamlines, img)
+
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
         mapping = reg.read_mapping(mapping, img, reg_template)
 
-    fiber_probabilities = np.zeros((len(xform_sl), len(bundles)))
+    fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
     # For expedience, we approximate each streamline as a 100 point curve:
     fgarray = _resample_bundle(xform_sl, 100)
-    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundles)))
-    min_dist_coords = np.zeros((len(xform_sl), len(bundles), 2))
+    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundle_dict)))
+    min_dist_coords = np.zeros((len(xform_sl), len(bundle_dict), 2))
 
     fiber_groups = {}
 
-    for bundle_idx, bundle in enumerate(bundles):
-        # Get the ROI coordinates:
-        ROI0 = bundles[bundle]['ROIs'][0]
-        ROI1 = bundles[bundle]['ROIs'][1]
-        if not isinstance(ROI0, np.ndarray):
-            ROI0 = ROI0.get_data()
+    for bundle_idx, bundle in enumerate(bundle_dict):
+        rules = bundle_dict[bundle]['rules']
+        include_rois = []
+        exclude_rois = []
+        for rule_idx, rule in enumerate(rules):
+            roi = bundle_dict[bundle]['ROIs'][rule_idx]
+            if not isinstance(roi, np.ndarray):
+                roi = roi.get_data()
+            warped_roi = auv.patch_up_roi(
+                mapping.transform_inverse(
+                    roi,
+                    interpolation='nearest')).astype(bool)
+            if rule:
+                # include ROI:
+                include_rois.append(np.array(np.where(warped_roi)).T)
+            else:
+                # Exclude ROI:
+                exclude_rois.append(np.array(np.where(warped_roi)).T)
 
-        warped_ROI0 = patch_up_roi(
-            mapping.transform_inverse(
-                ROI0,
-                interpolation='nearest')).astype(bool)
-
-        if not isinstance(ROI1, np.ndarray):
-            ROI1 = ROI1.get_data()
-
-        warped_ROI1 = patch_up_roi(
-            mapping.transform_inverse(
-                ROI1,
-                interpolation='nearest')).astype(bool)
-
-        roi_coords0 = np.array(np.where(warped_ROI0)).T
-        roi_coords1 = np.array(np.where(warped_ROI1)).T
-
-        crosses_midline = bundles[bundle]['cross_midline']
+        crosses_midline = bundle_dict[bundle]['cross_midline']
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
-        prob_map = bundles[bundle].get('prob_map', np.ones(ROI0.shape))
+        prob_map = bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
+
         if not isinstance(prob_map, np.ndarray):
             prob_map = prob_map.get_data()
         warped_prob_map = mapping.transform_inverse(prob_map,
@@ -252,8 +315,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
         for sl_idx, sl in enumerate(xform_sl):
             if fiber_probabilities[sl_idx] > prob_threshold:
                 if crosses_midline is not None:
-                    if (np.any(sl[:, 0] > img.shape[0] // 2) and
-                            np.any(sl[:, 0] < img.shape[0] // 2)):
+                    if crosses[sl_idx]:
                         # This means that the streamline does
                         # cross the midline:
                         if crosses_midline:
@@ -262,14 +324,17 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
                         else:
                             # This is not what we want, skip to next streamline
                             continue
-                dist0 = cdist(sl, roi_coords0, 'euclidean')
-                if np.min(dist0) <= tol:
-                    dist1 = cdist(sl, roi_coords1, 'euclidean')
-                    if np.min(dist1) <= tol:
+
+                is_close, dist = _check_sl_with_inclusion(sl, include_rois,
+                                                          tol)
+                if is_close:
+                    is_far = _check_sl_with_exclusion(sl, exclude_rois,
+                                                      tol)
+                    if is_far:
                         min_dist_coords[sl_idx, bundle_idx, 0] =\
-                            np.argmin(dist0, 0)[0]
+                            np.argmin(dist[0], 0)[0]
                         min_dist_coords[sl_idx, bundle_idx, 1] =\
-                            np.argmin(dist1, 0)[0]
+                            np.argmin(dist[1], 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
 
@@ -280,25 +345,27 @@ def segment(fdata, fbval, fbvec, streamlines, bundles,
     min_dist_coords = min_dist_coords[possible_fibers]
     bundle_choice = np.argmax(streamlines_in_bundles, -1)
 
-    for bundle_idx, bundle in enumerate(bundles):
-        print(bundle)
+    # We do another round through, so that we can orient all the
+    # streamlines within a bundle in the same orientation with respect to
+    # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
+    # to ROI1).
+    for bundle_idx, bundle in enumerate(bundle_dict):
         select_idx = np.where(bundle_choice == bundle_idx)
         # Use a list here, because Streamlines don't support item assignment:
         select_sl = list(xform_sl[select_idx])
-        # Sub-sample min_dist_coords:
-        min_dist_coords_bundle = min_dist_coords[select_idx]
         if len(select_sl) == 0:
             fiber_groups[bundle] = dts.Streamlines([])
             # There's nothing here, move to the next bundle:
             continue
 
+        # Sub-sample min_dist_coords:
+        min_dist_coords_bundle = min_dist_coords[select_idx]
         for idx in range(len(select_sl)):
             min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
             min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
             if min0 > min1:
                 select_sl[idx] = select_sl[idx][::-1]
-        # We'll set this to Streamlines object for the next steps (e.g.,
-        # cleaning) because these objects support indexing with arrays:
+        # Set this to nibabel.Streamlines object for output:
         select_sl = dts.Streamlines(select_sl)
         fiber_groups[bundle] = select_sl
 
@@ -334,25 +401,31 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     that have a Mahalanobis distance smaller than `clean_threshold` from
     the mean of each one of the nodes.
     """
+
     # We don't even bother if there aren't enough streamlines:
-    if len(streamlines) > min_sl:
-        # This calculates the Mahalanobis for each streamline/node:
-        w = gaussian_weights(streamlines, n_points=n_points,
-                             return_mahalnobis=True)
-        # We'll only do this for clean_rounds
-        rounds_elapsed = 0
-        while (np.any(w > clean_threshold) and
-                rounds_elapsed < clean_rounds and
-                len(streamlines) > min_sl):
-            # Select the fibers that have Mahalanobis smaller than the
-            # threshold for all their nodes:
-            idx_belong = np.where(
-                np.all(w < clean_threshold, axis=-1))[0]
-            # Update by selection:
-            streamlines = streamlines[idx_belong.astype(int)]
-            # Repeat:
-            w = gaussian_weights(streamlines,
-                                 n_points=n_points,
-                                 return_mahalnobis=True)
-            rounds_elapsed += 1
-    return streamlines
+    if len(streamlines) < min_sl:
+        return streamlines
+
+    # Resample once up-front:
+    fgarray = _resample_bundle(streamlines, n_points)
+    # Keep this around, so you can use it for indexing at the very end:
+    idx = np.arange(fgarray.shape[0])
+    # This calculates the Mahalanobis for each streamline/node:
+    w = gaussian_weights(fgarray, return_mahalnobis=True)
+    # We'll only do this for clean_rounds
+    rounds_elapsed = 0
+    while (np.any(w > clean_threshold) and
+            rounds_elapsed < clean_rounds and
+            len(streamlines) > min_sl):
+        # Select the fibers that have Mahalanobis smaller than the
+        # threshold for all their nodes:
+        idx_belong = np.where(
+            np.all(w < clean_threshold, axis=-1))[0]
+        idx = idx[idx_belong.astype(int)]
+        # Update by selection:
+        fgarray = fgarray[idx_belong.astype(int)]
+        # Repeat:
+        w = gaussian_weights(fgarray, return_mahalnobis=True)
+        rounds_elapsed += 1
+    # Select based on the variable that was keeping track of things for us:
+    return streamlines[idx]

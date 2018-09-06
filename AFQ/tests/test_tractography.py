@@ -33,7 +33,7 @@ def test_csd_tracking():
                        max_angle=30.,
                        sphere=None,
                        seed_mask=None,
-                       seeds=seeds,
+                       n_seeds=seeds,
                        stop_mask=None,
                        step_size=0.5)
 
@@ -48,6 +48,6 @@ def test_dti_tracking():
                    max_angle=30.,
                    sphere=None,
                    seed_mask=None,
-                   seeds=1,
+                   n_seeds=1,
                    step_size=0.5)
         npt.assert_(len(sl[0]) > 10)

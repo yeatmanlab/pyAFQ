@@ -1,17 +1,24 @@
 import numpy as np
 import nibabel as nib
 from nibabel import trackvis
-from dipy.tracking.utils import move_streamlines
+import dipy.tracking.utils as dtu
 
 
 def add_bundles(t1, t2):
     """
-    Combine two bundles, using the second bundles affine
+    Combine two bundles, using the second bundles' affine and
+    data_per_streamline keys.
+
+    Parameters
+    ----------
+    t1, t2 : nib.streamlines.Tractogram class instances
     """
+    data_per_streamline = {k: (list(t1.data_per_streamline[k]) +
+                               list(t2.data_per_streamline[k]))
+                           for k in t2.data_per_streamline.keys()}
     return nib.streamlines.Tractogram(
         list(t1.streamlines) + list(t2.streamlines),
-        {'bundle': (list(t1.data_per_streamline['bundle']) +
-                    list(t2.data_per_streamline['bundle']))},
+        data_per_streamline,
         affine_to_rasmm=t2.affine_to_rasmm)
 
 
@@ -61,7 +68,7 @@ def write_trk(fname, streamlines, affine=None, shape=None):
         affine = np.eye(4)
 
     zooms = np.sqrt((affine * affine).sum(0))
-    streamlines = move_streamlines(streamlines, affine)
+    streamlines = dtu.move_streamlines(streamlines, affine)
     data = ((s, None, None) for s in streamlines)
 
     voxel_order = nib.orientations.aff2axcodes(affine)
@@ -74,3 +81,86 @@ def write_trk(fname, streamlines, affine=None, shape=None):
     if shape is not None:
         hdr['dim'] = shape
     trackvis.write(fname, data, hdr, points_space="rasmm")
+
+
+def bundles_to_tgram(bundles, bundle_dict, affine):
+    """
+    Create a nibabel trk Tractogram object from bundles and their
+    specification.
+
+    Parameters
+    ----------
+    bundles: dict
+        Each item in the dict is the streamlines of a particular bundle.
+    bundle_dict: dict
+        A bundle specification dictionary. Each item includes in particular a
+        `uid` key that is a unique integer for that bundle.
+    affine : array
+        The affine_to_rasmm input to `nib.streamlines.Tractogram`
+    """
+    tgram = nib.streamlines.Tractogram([], {'bundle': []})
+    for b in bundles:
+        this_sl = list(bundles[b])
+        this_tgram = nib.streamlines.Tractogram(
+            this_sl,
+            data_per_streamline={
+                'bundle': (len(this_sl) *
+                           [bundle_dict[b]['uid']])},
+                affine_to_rasmm=affine)
+        tgram = add_bundles(tgram, this_tgram)
+    return tgram
+
+
+def tgram_to_bundles(tgram, bundle_dict):
+    """
+    Convert a nib.streamlines.Tractogram object to a dict with items
+    holding the streamlines in each bundle.
+
+    Parameters
+    ----------
+    tgram : nib.streamlines.Tractogram class instance.
+
+        Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
+
+    bundle_dict: dict
+        A bundle specification dictionary. Each item includes in particular a
+        `uid` key that is a unique integer for that bundle.
+    """
+    bundles = {}
+    for b in bundle_dict.keys():
+        uid = bundle_dict[b]['uid']
+        idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
+        # sl = list(dtu.move_streamlines(tgram.streamlines[idx],
+        #                                np.linalg.inv(tgram.affine_to_rasmm)))
+        sl = list(tgram.streamlines[idx])
+
+        bundles[b] = sl
+    return bundles
+
+
+def split_streamline(streamlines, sl_to_split, split_idx):
+    """
+    Given a Streamlines object, split one of the underlying streamlines
+
+    Parameters
+    ----------
+    streamlines : a Streamlines class instance
+        The group of streamlines, one of which is being split.
+    sl_to_split : int
+        The index of the streamline that is being split
+    split_idx : int
+        Where is the streamline being split
+    """
+    this_sl = streamlines[sl_to_split]
+
+    streamlines._lengths = np.concatenate([
+        streamlines._lengths[:sl_to_split],
+        np.array([split_idx]),
+        np.array([this_sl.shape[0] - split_idx]),
+        streamlines._lengths[sl_to_split + 1:]])
+
+    streamlines._offsets = np.concatenate([
+        np.array([0]),
+        np.cumsum(streamlines._lengths[:-1])])
+
+    return streamlines
