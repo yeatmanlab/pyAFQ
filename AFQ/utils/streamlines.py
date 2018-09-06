@@ -100,7 +100,6 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
     """
     tgram = nib.streamlines.Tractogram([], {'bundle': []})
     for b in bundles:
-        print("Segmenting: %s" % b)
         this_sl = list(bundles[b])
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
@@ -158,7 +157,7 @@ def split_streamline(streamlines, sl_to_split, split_idx):
         streamlines._lengths[:sl_to_split],
         np.array([split_idx]),
         np.array([this_sl.shape[0] - split_idx]),
-        streamlines._lengths[sl_to_split+1:]])
+        streamlines._lengths[sl_to_split + 1:]])
 
     streamlines._offsets = np.concatenate([
         np.array([0]),

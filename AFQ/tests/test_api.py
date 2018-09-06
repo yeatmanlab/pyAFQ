@@ -9,6 +9,7 @@ import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
 
@@ -17,6 +18,7 @@ import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 
+
 def touch(fname, times=None):
     with open(fname, 'a'):
         os.utime(fname, times)
@@ -24,8 +26,8 @@ def touch(fname, times=None):
 
 def create_dummy_preproc_path(n_subjects, n_sessions):
     preproc_dir = tempfile.mkdtemp()
-    subjects = ['sub-%s' % (d + 1) for d in range(n_subjects)]
-    sessions = ['sess-%s' % (d + 1) for d in range(n_sessions)]
+    subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
+    sessions = ['sess-0%s' % (d + 1) for d in range(n_sessions)]
     for subject in subjects:
         for session in sessions:
             for modality in ['anat', 'dwi']:
@@ -81,7 +83,6 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
-
 def test_AFQ_data2():
     """
     Test with some actual data again, this time for track segmentation
@@ -97,8 +98,11 @@ def test_AFQ_data2():
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                             np.linalg.inv(myafq.dwi_affine[0])))
     sl_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
-                     'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
     aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
@@ -107,4 +111,4 @@ def test_AFQ_data2():
     nib.save(mapping, mapping_file)
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-    npt.assert_equal(len(bundles['CST_R']), 3)
+    npt.assert_equal(len(bundles['CST_R']), 1)

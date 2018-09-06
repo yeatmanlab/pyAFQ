@@ -11,6 +11,7 @@ import nibabel as nib
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
+import dipy.tracking.utils as dtu
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -100,8 +101,8 @@ def _b0(row, force_recompute=False):
     return b0_file
 
 
-def _brain_mask(row, median_radius=4, numpass=4, autocrop=False,
-                vol_idx=None, dilate=None, force_recompute=False):
+def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
+                vol_idx=None, dilate=10, force_recompute=False):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file) or force_recompute:
         mean_b0_img = nib.load(_b0(row))
@@ -196,7 +197,8 @@ def _mapping(row, force_recompute=False):
 
 
 def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
-                 n_seeds=2, random_seeds=False, force_recompute=False):
+                 n_seeds=2, random_seeds=False, force_recompute=False,
+                 wm_fa_thresh=0.2):
     """
     wm_labels : list
         The values within the segmentation that are considered white matter. We
@@ -212,29 +214,39 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
         else:
             raise(NotImplementedError)
 
-        seg_img = nib.load(row['seg_file'])
         dwi_img = nib.load(row['dwi_file'])
-        seg_data_orig = seg_img.get_data()
-
-        # For different sets of labels, extract all the voxels that have any
-        # of these values:
-        wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
-                                         for l in wm_labels], -1), -1)
-
         dwi_data = dwi_img.get_data()
-        resamp_wm = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                                          seg_img.affine,
-                                          dwi_img.affine)).astype(int)
+
+        if 'seg_file' in row.index:
+            # If we found a white matter segmentation in the
+            # expected location:
+            seg_img = nib.load(row['seg_file'])
+            seg_data_orig = seg_img.get_data()
+            # For different sets of labels, extract all the voxels that
+            # have any of these values:
+            wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
+                                             for l in wm_labels], -1), -1)
+
+            # Resample to DWI data:
+            wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                                            seg_img.affine,
+                                            dwi_img.affine)).astype(int)
+        else:
+            # Otherwise, we'll identify the white matter based on FA:
+            dti_fa = nib.load(_dti_fa(row)).get_data()
+            wm_mask = dti_fa > wm_fa_thresh
 
         streamlines = aft.track(params_file,
                                 directions=directions,
                                 n_seeds=n_seeds,
                                 random_seeds=random_seeds,
-                                seed_mask=resamp_wm,
-                                stop_mask=resamp_wm)
+                                seed_mask=wm_mask,
+                                stop_mask=wm_mask)
 
-        aus.write_trk(streamlines_file, streamlines,
-                      affine=row['dwi_affine'])
+        aus.write_trk(streamlines_file,
+                      dtu.move_streamlines(streamlines,
+                                           np.linalg.inv(dwi_img.affine)),
+                      affine=dwi_img.affine)
 
     return streamlines_file
 
@@ -379,22 +391,22 @@ class AFQ(object):
         │           ├── sub-01_sess-02_dwi.bvecs
         │           └── sub-01_sess-02_dwi.nii.gz
         └── sub02
-               ├── sess01
-               │   ├── anat
-               │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-               │   │   └── sub-02_sess-01_T1w.nii.gz
-               │   └── dwi
-               │       ├── sub-02_sess-01_dwi.bvals
-               │       ├── sub-02_sess-01_dwi.bvecs
-               │       └── sub-02_sess-01_dwi.nii.gz
-               └── sess02
-                       ├── anat
+                     ├── sess01
+                     │   ├── anat
+                     │       ├── sub-02_sess-01_aparc+aseg.nii.gz
+                     │   │   └── sub-02_sess-01_T1w.nii.gz
+                     │   └── dwi
+                     │       ├── sub-02_sess-01_dwi.bvals
+                     │       ├── sub-02_sess-01_dwi.bvecs
+                     │       └── sub-02_sess-01_dwi.nii.gz
+                     └── sess02
+                                     ├── anat
                 │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-                       │   └── sub-02_sess-02_T1w.nii.gz
-                       └── dwi
-                               ├── sub-02_sess-02_dwi.bvals
-                               ├── sub-02_sess-02_dwi.bvecs
-                               └── sub-02_sess-02_dwi.nii.gz
+                                     │   └── sub-02_sess-02_T1w.nii.gz
+                                     └── dwi
+                                                     ├── sub-02_sess-02_dwi.bvals
+                                                     ├── sub-02_sess-02_dwi.bvecs
+                                                     └── sub-02_sess-02_dwi.nii.gz
 
     For now, it is up to users to arrange this file folder structure in their
     data, with preprocessed data, but in the future, this structure will be
@@ -492,28 +504,36 @@ class AFQ(object):
                                                          (sess, dwi_folder,
                                                           dwi_file))))[0])
 
-                anat_file_list.append(glob.glob(op.join(sub_dir,
-                                                        ('%s/%s/%s.nii.gz' %
-                                                         (sess,
-                                                          anat_folder,
-                                                          anat_file))))[0])
+                # The following two may or may not exist:
+                this_anat_file = glob.glob(op.join(sub_dir,
+                                                   ('%s/%s/%s.nii.gz' %
+                                                    (sess,
+                                                     anat_folder,
+                                                     anat_file))))
+                if len(this_anat_file):
+                    anat_file_list.append(this_anat_file[0])
 
-                seg_file_list.append(glob.glob(op.join(sub_dir,
-                                                       ('%s/%s/%s.nii.gz' %
-                                                        (sess,
-                                                         anat_folder,
-                                                         seg_file))))[0])
+                this_seg_file = glob.glob(op.join(sub_dir,
+                                                  ('%s/%s/%s.nii.gz' %
+                                                   (sess,
+                                                    anat_folder,
+                                                    seg_file))))
+                if len(this_seg_file):
+                    seg_file_list.append(this_seg_file[0])
 
                 sub_list.append(subject)
                 sess_list.append(sess)
-
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            anat_file=anat_file_list,
-                                            seg_file=seg_file_list,
                                             sess=sess_list))
+        # Add these if they exist:
+        if len(seg_file_list):
+            self.data_frame['seg_file'] = seg_file_list
+        if len(anat_file_list):
+            self.data_frame['anat_file'] = anat_file_list
+
         if dask_it:
             self.data_frame = ddf.from_pandas(self.data_frame,
                                               npartitions=len(sub_list))

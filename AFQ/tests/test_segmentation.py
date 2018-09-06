@@ -9,6 +9,7 @@ import nibabel as nib
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 import dipy.tracking.streamline as dts
+import dipy.tracking.utils as dtu
 
 import AFQ.data as afd
 import AFQ.segmentation as seg
@@ -18,11 +19,16 @@ def test_segment():
     dpd.fetch_stanford_hardi()
     hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
     hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
+    hardi_img = nib.load(hardi_fdata)
     hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
     hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+        dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                             np.linalg.inv(hardi_img.affine)))
+
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
                                   templates['CST_roi2_L']],
@@ -89,7 +95,7 @@ def test_segment():
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_equal(len(fiber_groups['CST_R']), 8)
+    npt.assert_equal(len(fiber_groups['CST_R']), 6)
 
 
 def test_gaussian_weights():
