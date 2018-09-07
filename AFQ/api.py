@@ -25,7 +25,6 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 
 
-
 def do_preprocessing():
     raise NotImplementedError
 
@@ -250,8 +249,10 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
 
-        mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
+        mapping = reg.read_mapping(_mapping(row, reg_template),
+                                   row['dwi_file'],
                                    reg_template)
+
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
@@ -353,9 +354,10 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
 
     return profiles_file
 
+
 def _export_rois(row, bundle_dict, reg_template):
     mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
-                                reg_template)
+                               reg_template)
 
     rois_dir = op.join(row['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
@@ -368,13 +370,45 @@ def _export_rois(row, bundle_dict, reg_template):
             else:
                 inclusion = 'exclude'
             fname = op.join(
-                rois_dir, '%s_roi%s_%s.nii.gz'%(bundle, ii+1, inclusion))
+                rois_dir, '%s_roi%s_%s.nii.gz' % (bundle, ii + 1, inclusion))
             warped_roi = auv.patch_up_roi(
                 (mapping.transform_inverse(
                     roi.get_data(),
                     interpolation='linear')) > 0).astype(int)
             nib.save(nib.Nifti1Image(warped_roi, row['dwi_affine']),
                      fname)
+
+
+def _export_bundles(row, wm_labels, bundle_dict, reg_template,
+                    odf_model="DTI", directions="det", n_seeds=2,
+                    random_seeds=False, force_recompute=False):
+
+    bundles_file = _clean_bundles(row,
+                                  wm_labels,
+                                  bundle_dict,
+                                  reg_template,
+                                  odf_model=odf_model,
+                                  directions=directions,
+                                  n_seeds=n_seeds,
+                                  random_seeds=random_seeds,
+                                  force_recompute=force_recompute)
+
+    bundles_dir = op.join(row['results_dir'], 'bundles')
+    os.makedirs(bundles_dir, exist_ok=True)
+    trk = nib.streamlines.load(bundles_file)
+    tg = trk.tractogram
+    streamlines = tg.streamlines
+    for bundle in bundle_dict:
+        uid = bundle_dict[bundle]['uid']
+        idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+        this_sl = (streamlines[idx])
+        fname = op.join(bundles_dir, '%s.trk' % bundle)
+        aus.write_trk(
+            fname,
+            dtu.move_streamlines(
+                this_sl,
+                np.linalg.inv(row['dwi_affine'])),
+            affine=row['dwi_affine'])
 
 
 def _get_affine(fname):
@@ -495,7 +529,7 @@ class AFQ(object):
             self.reg_template = dpd.read_mni_template()
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
-               reg_template = nib.load(reg_template)
+                reg_template = nib.load(reg_template)
             self.reg_template = reg_template
         # This is the place in which each subject's full data lives
         self.preafq_dirs = glob.glob(op.join(preafq_path,
@@ -765,4 +799,16 @@ class AFQ(object):
         self.data_frame.apply(_export_rois,
                               args=[self.bundle_dict,
                                     self.reg_template],
+                              axis=1)
+
+    def export_bundles(self):
+        self.data_frame.apply(_export_bundles,
+                              args=[self.wm_labels,
+                                    self.bundle_dict,
+                                    self.reg_template,
+                                    self.odf_model,
+                                    self.directions,
+                                    self.n_seeds,
+                                    self.random_seeds,
+                                    self.force_recompute],
                               axis=1)

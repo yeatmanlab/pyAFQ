@@ -118,3 +118,9 @@ def test_AFQ_data2():
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
                     'ROIs',
                     'CST_R_roi1_include.nii.gz'))
+
+    # Test bundles exporting:
+    myafq.export_bundles()
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                    'bundles',
+                    'CST_R.trk'))
