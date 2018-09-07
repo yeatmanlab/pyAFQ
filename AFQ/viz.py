@@ -319,50 +319,29 @@ def qc_multibundle_ren(bundle_list, showme=False):
     return ren
 
 
-def save_spin_single_bundle(bundle, Nframes=18,
-                            savename='temp', showme=False,
-                            savespin=True, size=(200, 200)):
-
-    ren = window.Renderer()
-    ren.SetBackground(1, 1, 1)
-
-    window.clear(ren)
-    ren.set_camera(position=(-606.93, -153.23, 28.70),
-                   focal_point=(2.78, 11.06, 15.66),
-                   view_up=(0, 0, 1))
-
-    ren.add(actor.streamtube(bundle, linewidth=0.4))
-
-    if savespin:
-        increment = int(360 / Nframes)
-        for i in range(0, Nframes):
-            ren.yaw(increment)
-            window.record(ren, out_path=savename + str(i) + '.png', size=size)
-    else:
-        window.record(ren, out_path=savename, size=size)
-    if showme:
-        window.show(ren)
-
-
-def make_spin_snapshots(ren, Nframes=25, size=(200, 200), savename='temp'):
+def make_spin_snapshots(ren, output_path, Nframes=25, size=(200, 200)):
+    png_paths = []
     increment = int(360 / Nframes)
     for i in range(0, Nframes):
+        pngpath = op.join(output_path, str(i) + '.png')
         ren.yaw(increment)
-        window.record(ren, out_path=savename + str(i) + '.png', size=size)
-    return savename
+        window.record(ren, out_path=pngpath, size=size)
+        png_paths.append(pngpath)
+    return png_paths
 
 
-def make_mosaic(input_base_name, output_base_name='temp',
-                mo_height=1000, mo_width=1000):
-    im = pilim.open(input_base_name + str(0) + '.png')
+def make_mosaic(ren, output_path, Nframes=25, patch_size=(200, 200),
+                mosaic_height=1000, mosaic_width=1000):
+    tdir = tempfile.gettempdir()
+    png_paths = make_spin_snapshots(ren, tdir, Nframes, patch_size)
+    im = pilim.open(png_paths[0])
     panel_width, panel_height = im.size
-    mosaic = pilim.new('RGB', (mo_width, mo_height))
+    mosaic = pilim.new('RGB', (mosaic_width, mosaic_height))
     hop = 0
-    for j in range(0, mo_height, panel_height):
-        for i in range(0, mo_width, panel_width):
-            im = pilim.open(input_base_name + str(hop) + '.png')
+    for j in range(0, mosaic_height, panel_height):
+        for i in range(0, mosaic_width, panel_width):
+            im = pilim.open(png_paths[hop])
             mosaic.paste(im, (i, j))
             hop += 1
-    save_name = output_base_name + '_mosaic.png'
-    mosaic.save(save_name)
-    return save_name
+    mosaic.save(output_path)
+    return output_path
