@@ -2,7 +2,7 @@ import scipy.ndimage as ndim
 from skimage.filters import gaussian
 
 
-def patch_up_roi(roi):
+def patch_up_roi(roi, sigma=0.5):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
     We perform a couple of computational geometry operations on the ROI to
@@ -11,7 +11,10 @@ def patch_up_roi(roi):
     Parameters
     ----------
     roi : 3D binary array
-        The ROI after it has been transformed
+        The ROI after it has been transformed.
+
+    sigma : float
+        The sigma for initial Gaussian smoothing.
 
     Returns
     -------
@@ -19,4 +22,4 @@ def patch_up_roi(roi):
     """
 
     return ndim.binary_fill_holes(
-        ndim.binary_dilation(gaussian(roi)).astype(float))
+        ndim.binary_dilation(gaussian(roi, sigma=sigma)).astype(float))
