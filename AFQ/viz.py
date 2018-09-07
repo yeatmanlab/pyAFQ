@@ -289,12 +289,21 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
     return _inline_interact(ren, inline, interact)
 
 
-# TODO: Abstract this out to make simple render functions
-# then pass the render into the save_spin functions
-def save_spin_multibundle(bundle_list, Nframes=18,
-                          savename='temp', showme=False,
-                          savespin=True, size=(200, 200)):
+def qc_bundle_ren(bundle, showme=False):
+    ren = window.Renderer()
+    ren.SetBackground(1, 1, 1)
 
+    window.clear(ren)
+    ren.set_camera(position=(-606.93, -153.23, 28.70),
+                   focal_point=(2.78, 11.06, 15.66),
+                   view_up=(0, 0, 1))
+    ren.add(actor.streamtube(bundle, linewidth=0.3))
+    if showme:
+        window.show(ren)
+    return ren
+
+
+def qc_multibundle_ren(bundle_list, showme=False):
     ren = window.Renderer()
     colormap = actor.create_colormap(np.arange(len(bundle_list) + 1))
 
@@ -302,19 +311,12 @@ def save_spin_multibundle(bundle_list, Nframes=18,
     ren.set_camera(position=(-606.93, -153.23, 28.70),
                    focal_point=(2.78, 11.06, 15.66),
                    view_up=(0, 0, 1))
-
     ren.SetBackground(1, 1, 1)
-    for i, clusters in enumerate(bundle_list):
-        ren.add(actor.streamtube(clusters, colormap[i], linewidth=0.4))
-    if savespin:
-        increment = int(360 / Nframes)
-        for i in range(0, Nframes):
-            ren.yaw(increment)
-            window.record(ren, out_path=savename + str(i) + '.png', size=size)
-    else:
-        window.record(ren, out_path=savename, size=size)
+    for i, bundle in enumerate(bundle_list):
+        ren.add(actor.streamtube(bundle, colormap[i], linewidth=0.3))
     if showme:
         window.show(ren)
+    return ren
 
 
 def save_spin_single_bundle(bundle, Nframes=18,
@@ -342,14 +344,25 @@ def save_spin_single_bundle(bundle, Nframes=18,
         window.show(ren)
 
 
-def make_mosaic(base_name):
-    mosaic = pilim.new('RGB', (1000, 1000))
+def make_spin_snapshots(ren, Nframes=25, size=(200, 200), savename='temp'):
+    increment = int(360 / Nframes)
+    for i in range(0, Nframes):
+        ren.yaw(increment)
+        window.record(ren, out_path=savename + str(i) + '.png', size=size)
+    return savename
+
+
+def make_mosaic(input_base_name, output_base_name='temp',
+                mo_height=1000, mo_width=1000):
+    im = pilim.open(input_base_name + str(0) + '.png')
+    panel_width, panel_height = im.size
+    mosaic = pilim.new('RGB', (mo_width, mo_height))
     hop = 0
-    for j in range(0, 1000, 200):
-        for i in range(0, 1000, 200):
-            im = pilim.open(base_name + str(hop) + '.png')
+    for j in range(0, mo_height, panel_height):
+        for i in range(0, mo_width, panel_width):
+            im = pilim.open(input_base_name + str(hop) + '.png')
             mosaic.paste(im, (i, j))
             hop += 1
-
-    mosaic.show()
-    mosaic.save(base_name + '_mosaic.png')
+    save_name = output_base_name + '_mosaic.png'
+    mosaic.save(save_name)
+    return save_name
