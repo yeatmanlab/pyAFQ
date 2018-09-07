@@ -2,7 +2,9 @@
 import pandas as pd
 import dask.dataframe as ddf
 import glob
+import os
 import os.path as op
+from pathlib import PurePath
 
 import numpy as np
 
@@ -20,6 +22,7 @@ import dipy.reconst.dti as dpy_dti
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
+import AFQ.utils.volume as auv
 
 
 def do_preprocessing():
@@ -164,11 +167,10 @@ _scalar_dict = {"dti_fa": _dti_fa,
                 "dti_md": _dti_md}
 
 
-def _mapping(row, force_recompute=False):
+def _mapping(row, reg_template, force_recompute=False):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
     if not op.exists(mapping_file) or force_recompute:
         gtab = row['gtab']
-        reg_template = dpd.read_mni_template()
         mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                        template=reg_template)
 
@@ -231,8 +233,9 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
     return streamlines_file
 
 
-def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
-             n_seeds=2, random_seeds=False, force_recompute=False):
+def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
+             directions="det", n_seeds=2, random_seeds=False,
+             force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -245,9 +248,11 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        reg_template = dpd.read_mni_template()
-        mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
+
+        mapping = reg.read_mapping(_mapping(row, reg_template),
+                                   row['dwi_file'],
                                    reg_template)
+
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
@@ -260,7 +265,7 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
     return bundles_file
 
 
-def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
+def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                    directions="det", n_seeds=2, random_seeds=False,
                    force_recompute=False):
     clean_bundles_file = _get_fname(row,
@@ -270,6 +275,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
         bundles_file = _bundles(row,
                                 wm_labels,
                                 bundle_dict,
+                                reg_template,
                                 odf_model=odf_model,
                                 directions=directions,
                                 n_seeds=n_seeds,
@@ -295,7 +301,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
     return clean_bundles_file
 
 
-def _tract_profiles(row, wm_labels, bundle_dict,
+def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det",
                     scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
@@ -304,6 +310,7 @@ def _tract_profiles(row, wm_labels, bundle_dict,
         bundles_file = _bundles(row,
                                 wm_labels,
                                 bundle_dict,
+                                reg_template,
                                 odf_model=odf_model,
                                 directions=directions,
                                 force_recompute=force_recompute)
@@ -348,49 +355,118 @@ def _tract_profiles(row, wm_labels, bundle_dict,
     return profiles_file
 
 
+def _export_rois(row, bundle_dict, reg_template):
+    mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
+                               reg_template)
+
+    rois_dir = op.join(row['results_dir'], 'ROIs')
+    os.makedirs(rois_dir, exist_ok=True)
+
+    for bundle in bundle_dict:
+        for ii, roi in enumerate(bundle_dict[bundle]['ROIs']):
+
+            if bundle_dict[bundle]['rules'][ii]:
+                inclusion = 'include'
+            else:
+                inclusion = 'exclude'
+            fname = op.join(
+                rois_dir, '%s_roi%s_%s.nii.gz' % (bundle, ii + 1, inclusion))
+            warped_roi = auv.patch_up_roi(
+                (mapping.transform_inverse(
+                    roi.get_data(),
+                    interpolation='linear')) > 0).astype(int)
+            nib.save(nib.Nifti1Image(warped_roi, row['dwi_affine']),
+                     fname)
+
+
+def _export_bundles(row, wm_labels, bundle_dict, reg_template,
+                    odf_model="DTI", directions="det", n_seeds=2,
+                    random_seeds=False, force_recompute=False):
+
+    bundles_file = _clean_bundles(row,
+                                  wm_labels,
+                                  bundle_dict,
+                                  reg_template,
+                                  odf_model=odf_model,
+                                  directions=directions,
+                                  n_seeds=n_seeds,
+                                  random_seeds=random_seeds,
+                                  force_recompute=force_recompute)
+
+    bundles_dir = op.join(row['results_dir'], 'bundles')
+    os.makedirs(bundles_dir, exist_ok=True)
+    trk = nib.streamlines.load(bundles_file)
+    tg = trk.tractogram
+    streamlines = tg.streamlines
+    for bundle in bundle_dict:
+        uid = bundle_dict[bundle]['uid']
+        idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+        this_sl = (streamlines[idx])
+        fname = op.join(bundles_dir, '%s.trk' % bundle)
+        aus.write_trk(
+            fname,
+            dtu.move_streamlines(
+                this_sl,
+                np.linalg.inv(row['dwi_affine'])),
+            affine=row['dwi_affine'])
+
+
+def _get_affine(fname):
+    return nib.load(fname).get_affine()
+
+
+def _get_fname(row, suffix):
+    split_fdwi = op.split(row['dwi_file'])
+    fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0] +
+                    suffix)
+    return fname
+
+
 class AFQ(object):
     """
 
     This is file folder structure that AFQ requires in your study folder::
 
-        ├── sub01
-        │   ├── sess01
-        │   │   ├── anat
-        │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-        │   │   │   └── sub-01_sess-01_T1.nii.gz
-        │   │   └── dwi
-        │   │       ├── sub-01_sess-01_dwi.bvals
-        │   │       ├── sub-01_sess-01_dwi.bvecs
-        │   │       └── sub-01_sess-01_dwi.nii.gz
-        │   └── sess02
-        │       ├── anat
-        │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-        │       │   └── sub-01_sess-02_T1w.nii.gz
-        │       └── dwi
-        │           ├── sub-01_sess-02_dwi.bvals
-        │           ├── sub-01_sess-02_dwi.bvecs
-        │           └── sub-01_sess-02_dwi.nii.gz
-        └── sub02
-            ├── sess01
-            │   ├── anat
-            │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-            │   │   └── sub-02_sess-01_T1w.nii.gz
-            │   └── dwi
-            │       ├── sub-02_sess-01_dwi.bvals
-            │       ├── sub-02_sess-01_dwi.bvecs
-            │       └── sub-02_sess-01_dwi.nii.gz
-            └── sess02
-                ├── anat
-                │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-                │   └── sub-02_sess-02_T1w.nii.gz
-                └── dwi
-                    ├── sub-02_sess-02_dwi.bvals
-                    ├── sub-02_sess-02_dwi.bvecs
-                    └── sub-02_sess-02_dwi.nii.gz
+    study
+      ├-derivatives
+            ├-preafq
+                ├── sub01
+                │   ├── sess01
+                │   │   ├── anat
+                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
+                │   │   │   └── sub-01_sess-01_T1.nii.gz
+                │   │   └── dwi
+                │   │       ├── sub-01_sess-01_dwi.bvals
+                │   │       ├── sub-01_sess-01_dwi.bvecs
+                │   │       └── sub-01_sess-01_dwi.nii.gz
+                │   └── sess02
+                │       ├── anat
+                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
+                │       │   └── sub-01_sess-02_T1w.nii.gz
+                │       └── dwi
+                │           ├── sub-01_sess-02_dwi.bvals
+                │           ├── sub-01_sess-02_dwi.bvecs
+                │           └── sub-01_sess-02_dwi.nii.gz
+                └── sub02
+                   ├── sess01
+                   │   ├── anat
+                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
+                   │   │   └── sub-02_sess-01_T1w.nii.gz
+                   │   └── dwi
+                   │       ├── sub-02_sess-01_dwi.bvals
+                   │       ├── sub-02_sess-01_dwi.bvecs
+                   │       └── sub-02_sess-01_dwi.nii.gz
+                   └── sess02
+                       ├── anat
+                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
+                       │   └── sub-02_sess-02_T1w.nii.gz
+                       └── dwi
+                           ├── sub-02_sess-02_dwi.bvals
+                           ├── sub-02_sess-02_dwi.bvecs
+                           └── sub-02_sess-02_dwi.nii.gz
 
-    For now, it is up to users to arrange this file folder structure in their
-    data, with preprocessed data, but in the future, this structure will be
-    automatically generated from BIDS-compliant preprocessed data [1]_.
+    This structure can be automatically generated from BIDS-compliant
+    data [1]_, using the preAFQ software and BIDS app.
 
     Notes
     -----
@@ -404,7 +480,7 @@ class AFQ(object):
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
     """
-    def __init__(self, raw_path=None, preproc_path=None,
+    def __init__(self, preafq_path,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
@@ -412,8 +488,12 @@ class AFQ(object):
                  n_seeds=2, random_seeds=False,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
+                 reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
+
+        preafq_path: str
+            The path to the preprocessed diffusion data.
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -440,24 +520,29 @@ class AFQ(object):
         """
         self.directions = directions
         self.odf_model = odf_model
-        self.raw_path = raw_path
         self.bundle_dict = make_bundle_dict(bundle_list)
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
-
-        self.preproc_path = preproc_path
-        if self.preproc_path is None:
-            if self.raw_path is None:
-                e_s = "must provide either preproc_path or raw_path (or both)"
-                raise ValueError(e_s)
-            # This creates the preproc_path such that everything else works:
-            self.preproc_path = do_preprocessing(self.raw_path)
+        if reg_template is None:
+            self.reg_template = dpd.read_mni_template()
+        else:
+            if not isinstance(reg_template, nib.Nifti1Image):
+                reg_template = nib.load(reg_template)
+            self.reg_template = reg_template
         # This is the place in which each subject's full data lives
-        self.subject_dirs = glob.glob(op.join(preproc_path,
-                                              '%s*' % sub_prefix))
-        self.subjects = [op.split(p)[-1] for p in self.subject_dirs]
+        self.preafq_dirs = glob.glob(op.join(preafq_path,
+                                             '%s*' % sub_prefix))
+
+        # This is where all the outputs will go:
+        self.afq_dir = op.join(
+            op.join(*PurePath(preafq_path).parts[:-1]), 'afq')
+
+        os.makedirs(self.afq_dir, exist_ok=True)
+
+        self.subjects = [op.split(p)[-1] for p in self.preafq_dirs]
+
         sub_list = []
         sess_list = []
         dwi_file_list = []
@@ -465,9 +550,16 @@ class AFQ(object):
         bval_file_list = []
         anat_file_list = []
         seg_file_list = []
-        for subject, sub_dir in zip(self.subjects, self.subject_dirs):
+        results_dir_list = []
+        for subject, sub_dir in zip(self.subjects, self.preafq_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
+                results_dir_list.append(op.join(self.afq_dir,
+                                        subject,
+                                        PurePath(sess).parts[-1]))
+
+                os.makedirs(results_dir_list[-1], exist_ok=True)
+
                 dwi_file_list.append(glob.glob(op.join(sub_dir,
                                                        ('%s/%s/%s.nii.gz' %
                                                         (sess, dwi_folder,
@@ -506,7 +598,8 @@ class AFQ(object):
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            sess=sess_list))
+                                            sess=sess_list,
+                                            results_dir=results_dir_list))
         # Add these if they exist:
         if len(seg_file_list):
             self.data_frame['seg_file'] = seg_file_list
@@ -617,6 +710,7 @@ class AFQ(object):
         if 'mapping' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['mapping'] =\
                 self.data_frame.apply(_mapping,
+                                      args=[self.reg_template],
                                       axis=1,
                                       force_recompute=self.force_recompute)
 
@@ -650,7 +744,8 @@ class AFQ(object):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -669,7 +764,8 @@ class AFQ(object):
             self.data_frame['clean_bundles_file'] =\
                 self.data_frame.apply(_clean_bundles, axis=1,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -688,7 +784,8 @@ class AFQ(object):
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       force_recompute=self.force_recompute,
                                       axis=1)
 
@@ -698,13 +795,20 @@ class AFQ(object):
 
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
 
+    def export_rois(self):
+        self.data_frame.apply(_export_rois,
+                              args=[self.bundle_dict,
+                                    self.reg_template],
+                              axis=1)
 
-def _get_affine(fname):
-    return nib.load(fname).get_affine()
-
-
-def _get_fname(row, suffix):
-    split_fdwi = op.split(row['dwi_file'])
-    fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-                    suffix)
-    return fname
+    def export_bundles(self):
+        self.data_frame.apply(_export_bundles,
+                              args=[self.wm_labels,
+                                    self.bundle_dict,
+                                    self.reg_template,
+                                    self.odf_model,
+                                    self.directions,
+                                    self.n_seeds,
+                                    self.random_seeds,
+                                    self.force_recompute],
+                              axis=1)

@@ -296,7 +296,7 @@ def fetch_hcp(subjects):
     except botocore.exceptions.ClientError:
         bucket = s3.Bucket('hcp-openaccess-temp')
 
-    base_dir = op.join(afq_home, "HCP")
+    base_dir = op.join(afq_home, 'HCP', 'derivatives', 'preafq')
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
 
@@ -307,10 +307,8 @@ def fetch_hcp(subjects):
         sub_dir = op.join(base_dir, 'sub-%s' % subject)
         sess_dir = op.join(sub_dir, "sess-01")
         if not os.path.exists(sub_dir):
-            os.mkdir(sub_dir)
-            os.mkdir(sess_dir)
-            os.mkdir(os.path.join(sess_dir, 'dwi'))
-            os.mkdir(os.path.join(sess_dir, 'anat'))
+            os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
+            os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
             'HCP/%s/T1w/Diffusion/bvals' % subject
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
@@ -383,18 +381,17 @@ def organize_stanford_data(path=None):
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
-        base_folder = op.join(afq_home, 'stanford_hardi')
+        base_folder = op.join(afq_home, 'stanford_hardi',
+                              'derivatives', 'preafq')
     else:
-        base_folder = op.join(path, 'stanford_hardi')
+        base_folder = op.join(path, 'stanford_hardi',
+                              'derivatives', 'preafq')
 
     if not op.exists(base_folder):
-        os.mkdir(base_folder)
-        os.mkdir(op.join(base_folder, 'sub-01'))
-        os.mkdir(op.join(base_folder, 'sub-01', 'sess-01'))
         anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
-        os.mkdir(anat_folder)
+        os.makedirs(anat_folder, exist_ok=True)
         dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
-        os.mkdir(dwi_folder)
+        os.makedirs(dwi_folder, exist_ok=True)
         t1_img = dpd.read_stanford_t1()
         nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
         seg_img = dpd.read_stanford_labels()[-1]
