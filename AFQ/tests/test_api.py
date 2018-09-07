@@ -115,6 +115,6 @@ def test_AFQ_data2():
     npt.assert_equal(len(bundles['CST_R']), 2)
     # Test ROI exporting:
     myafq.export_rois()
-    assert op.exists(myafq.data_frame['results_dir'][0],
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
                     'ROIs',
-                    'CST_R_roi1_include.nii.gz')
+                    'CST_R_roi1_include.nii.gz'))
