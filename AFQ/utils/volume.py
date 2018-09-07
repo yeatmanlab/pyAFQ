@@ -1,6 +1,7 @@
 import scipy.ndimage as ndim
 from skimage.filters import gaussian
 
+
 def patch_up_roi(roi):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.

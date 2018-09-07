@@ -466,7 +466,7 @@ class AFQ(object):
 
         # This is the place in which each subject's full data lives
         self.preafq_dirs = glob.glob(op.join(preafq_path,
-                                              '%s*' % sub_prefix))
+                                             '%s*' % sub_prefix))
 
         # This is where all the outputs will go:
         self.afq_dir = op.join(
