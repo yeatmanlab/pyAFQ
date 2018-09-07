@@ -293,7 +293,7 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
 # then pass the render into the save_spin functions
 def save_spin_multibundle(bundle_list, Nframes=18,
                           savename='temp', showme=False,
-                          savespin=True, size=(100, 100)):
+                          savespin=True, size=(200, 200)):
 
     ren = window.Renderer()
     colormap = actor.create_colormap(np.arange(len(bundle_list) + 1))
@@ -319,9 +319,10 @@ def save_spin_multibundle(bundle_list, Nframes=18,
 
 def save_spin_single_bundle(bundle, Nframes=18,
                             savename='temp', showme=False,
-                            savespin=True, size=(100, 100)):
+                            savespin=True, size=(200, 200)):
 
     ren = window.Renderer()
+    ren.SetBackground(1, 1, 1)
 
     window.clear(ren)
     ren.set_camera(position=(-606.93, -153.23, 28.70),
@@ -341,15 +342,14 @@ def save_spin_single_bundle(bundle, Nframes=18,
         window.show(ren)
 
 
-def make_mosaic(base_name='temp', savename='temp_mosaic',
-                height=600, width=300,
-                h_step=100, w_step=100):
-    mosaic = pilim.new('RGB', (600, 300))
+def make_mosaic(base_name):
+    mosaic = pilim.new('RGB', (1000, 1000))
     hop = 0
-    for i in range(0, height, h_step):
-        for j in range(0, width, w_step):
-            im = pilim.open(base_name + '_' + str(hop) + '.png')
+    for j in range(0, 1000, 200):
+        for i in range(0, 1000, 200):
+            im = pilim.open(base_name + str(hop) + '.png')
             mosaic.paste(im, (i, j))
             hop += 1
 
-    mosaic.save(savename + '.png')
+    mosaic.show()
+    mosaic.save(base_name + '_mosaic.png')
