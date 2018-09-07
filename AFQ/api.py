@@ -348,6 +348,17 @@ def _tract_profiles(row, wm_labels, bundle_dict,
     return profiles_file
 
 
+def _get_affine(fname):
+    return nib.load(fname).get_affine()
+
+
+def _get_fname(row, suffix):
+    split_fdwi = op.split(row['dwi_file'])
+    fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+                    suffix)
+    return fname
+
+
 class AFQ(object):
     """
 
@@ -697,14 +708,3 @@ class AFQ(object):
         return self.data_frame['tract_profiles_file']
 
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
-
-
-def _get_affine(fname):
-    return nib.load(fname).get_affine()
-
-
-def _get_fname(row, suffix):
-    split_fdwi = op.split(row['dwi_file'])
-    fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
-                    suffix)
-    return fname
