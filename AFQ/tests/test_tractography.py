@@ -35,7 +35,8 @@ def test_csd_tracking():
                        seed_mask=None,
                        n_seeds=seeds,
                        stop_mask=None,
-                       step_size=0.5)
+                       step_size=0.5,
+                       min_length=10)
 
             npt.assert_(len(sl[0]) > 10)
 

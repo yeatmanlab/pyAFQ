@@ -4,18 +4,15 @@ import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
-import skimage.filters as sk
 
 import dipy
 import dipy.data as dpd
-# import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-# import AFQ.utils.streamlines as aus
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -289,11 +286,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_data()
             warped_roi = auv.patch_up_roi(
-                sk.gaussian(mapping.transform_inverse(
+                (mapping.transform_inverse(
                     roi,
                     interpolation='linear')) > 0)
-            # Write out ROI        
-            #nib.save(nib.Nifti1Image(warped_roi, img.affine), 'ROI.nii.gz')
 
             if rule:
                 # include ROI:
