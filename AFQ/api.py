@@ -190,7 +190,7 @@ def _mapping(row, force_recompute=False):
 
         mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                        template=reg_template,
-                                       prealign=prealign)
+                                       prealign=reg_prealign)
 
         reg.write_mapping(mapping, mapping_file)
     return mapping_file
