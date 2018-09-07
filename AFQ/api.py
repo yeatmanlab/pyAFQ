@@ -2,7 +2,9 @@
 import pandas as pd
 import dask.dataframe as ddf
 import glob
+import os
 import os.path as op
+from pathlib import PurePath
 
 import numpy as np
 
@@ -354,7 +356,7 @@ def _get_affine(fname):
 
 def _get_fname(row, suffix):
     split_fdwi = op.split(row['dwi_file'])
-    fname = op.join(split_fdwi[0], split_fdwi[1].split('.')[0] +
+    fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0] +
                     suffix)
     return fname
 
@@ -415,7 +417,7 @@ class AFQ(object):
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
     """
-    def __init__(self, raw_path=None, preproc_path=None,
+    def __init__(self, preafq_path,
                  sub_prefix="sub", dwi_folder="dwi",
                  dwi_file="*dwi", anat_folder="anat",
                  anat_file="*T1w*", seg_file='*aparc+aseg*',
@@ -425,6 +427,9 @@ class AFQ(object):
                  force_recompute=False,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
+
+        preafq_path: str
+            The path to the preprocessed diffusion data.
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -451,24 +456,24 @@ class AFQ(object):
         """
         self.directions = directions
         self.odf_model = odf_model
-        self.raw_path = raw_path
         self.bundle_dict = make_bundle_dict(bundle_list)
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
 
-        self.preproc_path = preproc_path
-        if self.preproc_path is None:
-            if self.raw_path is None:
-                e_s = "must provide either preproc_path or raw_path (or both)"
-                raise ValueError(e_s)
-            # This creates the preproc_path such that everything else works:
-            self.preproc_path = do_preprocessing(self.raw_path)
         # This is the place in which each subject's full data lives
-        self.subject_dirs = glob.glob(op.join(preproc_path,
+        self.preafq_dirs = glob.glob(op.join(preafq_path,
                                               '%s*' % sub_prefix))
-        self.subjects = [op.split(p)[-1] for p in self.subject_dirs]
+
+        # This is where all the outputs will go:
+        self.afq_dir = op.join(
+            op.join(*PurePath(preafq_path).parts[:-1]), 'afq')
+
+        os.makedirs(self.afq_dir, exist_ok=True)
+
+        self.subjects = [op.split(p)[-1] for p in self.preafq_dirs]
+
         sub_list = []
         sess_list = []
         dwi_file_list = []
@@ -476,9 +481,16 @@ class AFQ(object):
         bval_file_list = []
         anat_file_list = []
         seg_file_list = []
-        for subject, sub_dir in zip(self.subjects, self.subject_dirs):
+        results_dir_list = []
+        for subject, sub_dir in zip(self.subjects, self.preafq_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
+                results_dir_list.append(op.join(self.afq_dir,
+                                        subject,
+                                        PurePath(sess).parts[-1]))
+
+                os.makedirs(results_dir_list[-1], exist_ok=True)
+
                 dwi_file_list.append(glob.glob(op.join(sub_dir,
                                                        ('%s/%s/%s.nii.gz' %
                                                         (sess, dwi_folder,
@@ -517,7 +529,8 @@ class AFQ(object):
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            sess=sess_list))
+                                            sess=sess_list,
+                                            results_dir=results_dir_list))
         # Add these if they exist:
         if len(seg_file_list):
             self.data_frame['seg_file'] = seg_file_list
