@@ -8,11 +8,11 @@ import nibabel as nib
 
 import dipy
 import dipy.data as dpd
-# import dipy.tracking.utils as dtu
+import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
-from dipy.segment.clustering import qbx_with_merge
+from dipy.segment.clustering import qbx_and_merge
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -59,15 +59,20 @@ def build_volumetric_atlas_dict(track_name, roi_df):
 
 # combine the rois into a single "NOT" exclusion and sets of "AND" inclusion
 def combine_rois(mydict, apac):
-    include = []
-    exclude = []
+    x, y, z = apac.shape
+
+    include_coords = []
+    exclude_coords = []
+
     for i, iset in enumerate(mydict['include'].keys()):
+        include = np.zeros([x, y, z])
         for item in mydict['include'][iset].items():
-            include.append(np.array(np.where(apac == item[-1])).T)
+            include += 1 * (apac == item[-1])
+        include_coords.append(np.array(np.where(include > 0)).T)
     for j, jset in enumerate(mydict['exclude'].keys()):
         for item in mydict['exclude'][jset].items():
-            exclude.append(np.array(np.where(apac == item[-1])).T)
-    return include, exclude
+            exclude_coords.append(np.array(np.where(apac == item[-1])).T)
+    return include_coords, exclude_coords
 
 
 # targeting script to target streamlines with ROIs
@@ -77,21 +82,18 @@ def check_targets(sls, include, exclude, tol):
         is_close_include, dist = _check_sl_with_inclusion(sl, include, tol)
         if is_close_include:
             is_close_exclude = _check_sl_with_exclusion(sl, exclude, tol)
-            if not is_close_exclude:
+            if is_close_exclude:
                 keep_array[i] = 1
     return keep_array
 
 
 def calculate_volumetric_atlas_score(streamlines, csv_lookup_path,
                                      volumetric_atlas_path,
-                                     track_list_path, file_map_path, tvaff,
-                                     tol):
+                                     track_list_path, file_map_path, aff, tol):
     # Here we assume the csv column names match track_list names
     roi_df = pd.read_excel(csv_lookup_path)
     track_list_df = pd.read_excel(track_list_path, index_col='column_name')
-    track_list = list(track_list_df[track_list_df.segment_this > 0].index)[1:2]
-
-    aff = np.linalg.inv(nib.load(volumetric_atlas_path).affine)
+    track_list = list(track_list_df[track_list_df.segment_this > 0].index)
 
     # Build dictionary of include/exclude rois and freesurfer codes from csv
     roi_dict = {}
@@ -102,18 +104,19 @@ def calculate_volumetric_atlas_score(streamlines, csv_lookup_path,
     streamlines_by_bundle = np.zeros([len(streamlines), len(track_list)])
     for i, tr in enumerate(track_list):
         print(tr)
-        xfmd_sls = dts.Streamlines(dtu.move_streamlines(streamlines,
-                                                        aff))
+        xfmd_sls = dts.Streamlines(
+            dtu.move_streamlines(streamlines, np.linalg.inv(aff)))
         include, exclude = combine_rois(roi_dict[tr], atlas_data)
-        streamlines_by_bundle[:, i] = check_targets(
+        streamlines_by_bundle[:, i], test_bundle = check_targets(
             xfmd_sls, include, exclude, tol)
+
     return streamlines_by_bundle
 
 
 def calculate_bundle_atlas_score(bundle_atlas_dict, whole_brain, mni2sub_xfm,
                                  cluster_thr=5, pruning_thr=10,
                                  reduction_thr=10):
-    cluster_map = qbx_with_merge(whole_brain, thresholds=[40, 25, 20, 10])
+    cluster_map = qbx_and_merge(whole_brain, thresholds=[40, 25, 20, 10])
     rb = RecoBundles(whole_brain, cluster_map=cluster_map,
                      cluster_thr=cluster_thr)
     track_list = bundle_atlas_dict.keys()
