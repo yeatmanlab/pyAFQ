@@ -12,6 +12,8 @@ from palettable.tableau import Tableau_20
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
+import pillow.Images as pilim
+
 
 def _inline_interact(ren, inline, interact):
     """
@@ -285,3 +287,69 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
         show_m.start()
 
     return _inline_interact(ren, inline, interact)
+
+
+# TODO: Abstract this out to make simple render functions
+# then pass the render into the save_spin functions
+def save_spin_multibundle(bundle_list, Nframes=18,
+                          savename='temp', showme=False,
+                          savespin=True, size=(100, 100)):
+
+    ren = window.Renderer()
+    colormap = actor.create_colormap(np.arange(len(bundle_list) + 1))
+
+    window.clear(ren)
+    ren.set_camera(position=(-606.93, -153.23, 28.70),
+                   focal_point=(2.78, 11.06, 15.66),
+                   view_up=(0, 0, 1))
+
+    ren.SetBackground(1, 1, 1)
+    for i, clusters in enumerate(bundle_list):
+        ren.add(actor.streamtube(clusters, colormap[i], linewidth=0.4))
+    if savespin:
+        increment = int(360 / Nframes)
+        for i in range(0, Nframes):
+            ren.yaw(increment)
+            window.record(ren, out_path=savename + str(i) + '.png', size=size)
+    else:
+        window.record(ren, out_path=savename, size=size)
+    if showme:
+        window.show(ren)
+
+
+def save_spin_single_bundle(bundle, Nframes=18,
+                            savename='temp', showme=False,
+                            savespin=True, size=(100, 100)):
+
+    ren = window.Renderer()
+
+    window.clear(ren)
+    ren.set_camera(position=(-606.93, -153.23, 28.70),
+                   focal_point=(2.78, 11.06, 15.66),
+                   view_up=(0, 0, 1))
+
+    ren.add(actor.streamtube(bundle, linewidth=0.4))
+
+    if savespin:
+        increment = int(360 / Nframes)
+        for i in range(0, Nframes):
+            ren.yaw(increment)
+            window.record(ren, out_path=savename + str(i) + '.png', size=size)
+    else:
+        window.record(ren, out_path=savename, size=size)
+    if showme:
+        window.show(ren)
+
+
+def make_mosaic(base_name='temp', savename='temp_mosaic',
+                height=600, width=300,
+                h_step=100, w_step=100):
+    mosaic = pilim.new('RGB', (600, 300))
+    hop = 0
+    for i in range(0, height, h_step):
+        for j in range(0, width, w_step):
+            im = pilim.open(base_name + '_' + str(hop) + '.png')
+            mosaic.paste(im, (i, j))
+            hop += 1
+
+    mosaic.save(savename + '.png')
