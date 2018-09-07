@@ -5,6 +5,8 @@ import os.path as op
 import numpy as np
 import numpy.testing as npt
 
+import pandas as pd
+
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
@@ -113,6 +115,7 @@ def test_AFQ_data2():
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_equal(len(bundles['CST_R']), 2)
+
     # Test ROI exporting:
     myafq.export_rois()
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
@@ -124,3 +127,6 @@ def test_AFQ_data2():
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
                     'bundles',
                     'CST_R.trk'))
+
+    tract_profiles = pd.read_csv(myafq.tract_profiles[0])
+    assert profiles.shape == (1200, 5)

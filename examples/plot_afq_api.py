@@ -19,7 +19,10 @@ import AFQ.viz as afv
 afd.organize_stanford_data()
 base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 
-myafq = api.AFQ(preproc_path=op.join(afd.afq_home, 'stanford_hardi'),
+myafq = api.AFQ(op.join(afd.afq_home,
+                        'stanford_hardi',
+                        'derivatives',
+                        'preafq'),
                 sub_prefix='sub', bundle_list=["SLF", "ARC", "CST", "FP"])
 
 FA = nib.load(myafq.dti_fa[0]).get_data()
@@ -35,10 +38,5 @@ for bundle in df['bundle'].unique():
     ax.plot(df[(df['scalar'] == "dti_fa") &
             (df['bundle'] == bundle)]['profiles'])
     ax.set_title(bundle)
-    ren = afv.visualize_bundles(myafq.clean_bundles[0],
-                                bundle=myafq.bundle_dict['SLF_L']['uid'],
-                                interact=False,
-                                inline=True)
-
 
 plt.show()
