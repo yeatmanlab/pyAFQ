@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
+import skimage.filters as sk
 
 import dipy
 import dipy.data as dpd
@@ -288,9 +289,12 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_data()
             warped_roi = auv.patch_up_roi(
-                mapping.transform_inverse(
+                sk.gaussian(mapping.transform_inverse(
                     roi,
-                    interpolation='nearest')).astype(bool)
+                    interpolation='linear')) > 0)
+            # Write out ROI        
+            #nib.save(nib.Nifti1Image(warped_roi, img.affine), 'ROI.nii.gz')
+
             if rule:
                 # include ROI:
                 include_rois.append(np.array(np.where(warped_roi)).T)

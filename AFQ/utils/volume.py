@@ -16,4 +16,5 @@ def patch_up_roi(roi):
     -------
     ROI after dilation and hole-filling
     """
-    return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(int))
+    
+    return ndim.binary_fill_holes(ndim.binary_dilation(roi).astype(float))
