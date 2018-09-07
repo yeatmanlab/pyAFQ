@@ -130,7 +130,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                                    interpolation='nearest')).astype(bool)
 
     if ren is None:
-        ren = window.ren()
+        ren = window.Renderer()
 
     roi_actor = actor.contour_from_roi(roi, color=color)
     ren.add(roi_actor)
@@ -150,7 +150,7 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
     Visualize a volume
     """
     if ren is None:
-        ren = window.ren()
+        ren = window.Renderer()
 
     shape = volume.shape
     image_actor_z = actor.slicer(volume)

@@ -22,6 +22,8 @@ import dipy.reconst.dti as dpy_dti
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
+import AFQ.utils.volume as auv
+
 
 
 def do_preprocessing():
@@ -166,11 +168,10 @@ _scalar_dict = {"dti_fa": _dti_fa,
                 "dti_md": _dti_md}
 
 
-def _mapping(row, force_recompute=False):
+def _mapping(row, reg_template, force_recompute=False):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
     if not op.exists(mapping_file) or force_recompute:
         gtab = row['gtab']
-        reg_template = dpd.read_mni_template()
         mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                        template=reg_template)
 
@@ -233,8 +234,9 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
     return streamlines_file
 
 
-def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
-             n_seeds=2, random_seeds=False, force_recompute=False):
+def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
+             directions="det", n_seeds=2, random_seeds=False,
+             force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -247,8 +249,8 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        reg_template = dpd.read_mni_template()
-        mapping = reg.read_mapping(_mapping(row), row['dwi_file'],
+
+        mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
                                    reg_template)
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
@@ -262,7 +264,7 @@ def _bundles(row, wm_labels, bundle_dict, odf_model="DTI", directions="det",
     return bundles_file
 
 
-def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
+def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                    directions="det", n_seeds=2, random_seeds=False,
                    force_recompute=False):
     clean_bundles_file = _get_fname(row,
@@ -272,6 +274,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
         bundles_file = _bundles(row,
                                 wm_labels,
                                 bundle_dict,
+                                reg_template,
                                 odf_model=odf_model,
                                 directions=directions,
                                 n_seeds=n_seeds,
@@ -297,7 +300,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, odf_model="DTI",
     return clean_bundles_file
 
 
-def _tract_profiles(row, wm_labels, bundle_dict,
+def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det",
                     scalars=["dti_fa", "dti_md"], weighting=None,
                     force_recompute=False):
@@ -306,6 +309,7 @@ def _tract_profiles(row, wm_labels, bundle_dict,
         bundles_file = _bundles(row,
                                 wm_labels,
                                 bundle_dict,
+                                reg_template,
                                 odf_model=odf_model,
                                 directions=directions,
                                 force_recompute=force_recompute)
@@ -348,6 +352,29 @@ def _tract_profiles(row, wm_labels, bundle_dict,
         profile_dframe.to_csv(profiles_file)
 
     return profiles_file
+
+def _export_rois(row, bundle_dict, reg_template):
+    mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
+                                reg_template)
+
+    rois_dir = op.join(row['results_dir'], 'ROIs')
+    os.makedirs(rois_dir, exist_ok=True)
+
+    for bundle in bundle_dict:
+        for ii, roi in enumerate(bundle_dict[bundle]['ROIs']):
+
+            if bundle_dict[bundle]['rules'][ii]:
+                inclusion = 'include'
+            else:
+                inclusion = 'exclude'
+            fname = op.join(
+                rois_dir, '%s_roi%s_%s.nii.gz'%(bundle, ii+1, inclusion))
+            warped_roi = auv.patch_up_roi(
+                (mapping.transform_inverse(
+                    roi.get_data(),
+                    interpolation='linear')) > 0).astype(int)
+            nib.save(nib.Nifti1Image(warped_roi, row['dwi_affine']),
+                     fname)
 
 
 def _get_affine(fname):
@@ -427,6 +454,7 @@ class AFQ(object):
                  n_seeds=2, random_seeds=False,
                  bundle_list=BUNDLES, dask_it=False,
                  force_recompute=False,
+                 reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
 
@@ -463,7 +491,12 @@ class AFQ(object):
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
-
+        if reg_template is None:
+            self.reg_template = dpd.read_mni_template()
+        else:
+            if not isinstance(reg_template, nib.Nifti1Image):
+               reg_template = nib.load(reg_template)
+            self.reg_template = reg_template
         # This is the place in which each subject's full data lives
         self.preafq_dirs = glob.glob(op.join(preafq_path,
                                              '%s*' % sub_prefix))
@@ -643,6 +676,7 @@ class AFQ(object):
         if 'mapping' not in self.data_frame.columns or self.force_recompute:
             self.data_frame['mapping'] =\
                 self.data_frame.apply(_mapping,
+                                      args=[self.reg_template],
                                       axis=1,
                                       force_recompute=self.force_recompute)
 
@@ -676,7 +710,8 @@ class AFQ(object):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -695,7 +730,8 @@ class AFQ(object):
             self.data_frame['clean_bundles_file'] =\
                 self.data_frame.apply(_clean_bundles, axis=1,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -714,7 +750,8 @@ class AFQ(object):
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels,
-                                            self.bundle_dict],
+                                            self.bundle_dict,
+                                            self.reg_template],
                                       force_recompute=self.force_recompute,
                                       axis=1)
 
@@ -723,3 +760,9 @@ class AFQ(object):
         return self.data_frame['tract_profiles_file']
 
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
+
+    def export_rois(self):
+        self.data_frame.apply(_export_rois,
+                              args=[self.bundle_dict,
+                                    self.reg_template],
+                              axis=1)

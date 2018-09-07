@@ -113,3 +113,8 @@ def test_AFQ_data2():
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_equal(len(bundles['CST_R']), 2)
+    # Test ROI exporting:
+    myafq.export_rois()
+    assert op.exists(myafq.data_frame['results_dir'][0],
+                    'ROIs',
+                    'CST_R_roi1_include.nii.gz')
