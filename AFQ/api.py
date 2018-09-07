@@ -366,44 +366,46 @@ class AFQ(object):
 
     This is file folder structure that AFQ requires in your study folder::
 
-        ├── sub01
-        │   ├── sess01
-        │   │   ├── anat
-        │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-        │   │   │   └── sub-01_sess-01_T1.nii.gz
-        │   │   └── dwi
-        │   │       ├── sub-01_sess-01_dwi.bvals
-        │   │       ├── sub-01_sess-01_dwi.bvecs
-        │   │       └── sub-01_sess-01_dwi.nii.gz
-        │   └── sess02
-        │       ├── anat
-        │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-        │       │   └── sub-01_sess-02_T1w.nii.gz
-        │       └── dwi
-        │           ├── sub-01_sess-02_dwi.bvals
-        │           ├── sub-01_sess-02_dwi.bvecs
-        │           └── sub-01_sess-02_dwi.nii.gz
-        └── sub02
-            ├── sess01
-            │   ├── anat
-            │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-            │   │   └── sub-02_sess-01_T1w.nii.gz
-            │   └── dwi
-            │       ├── sub-02_sess-01_dwi.bvals
-            │       ├── sub-02_sess-01_dwi.bvecs
-            │       └── sub-02_sess-01_dwi.nii.gz
-            └── sess02
-                ├── anat
-                │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-                │   └── sub-02_sess-02_T1w.nii.gz
-                └── dwi
-                    ├── sub-02_sess-02_dwi.bvals
-                    ├── sub-02_sess-02_dwi.bvecs
-                    └── sub-02_sess-02_dwi.nii.gz
+    study
+      ├-derivatives
+            ├-preafq
+                ├── sub01
+                │   ├── sess01
+                │   │   ├── anat
+                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
+                │   │   │   └── sub-01_sess-01_T1.nii.gz
+                │   │   └── dwi
+                │   │       ├── sub-01_sess-01_dwi.bvals
+                │   │       ├── sub-01_sess-01_dwi.bvecs
+                │   │       └── sub-01_sess-01_dwi.nii.gz
+                │   └── sess02
+                │       ├── anat
+                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
+                │       │   └── sub-01_sess-02_T1w.nii.gz
+                │       └── dwi
+                │           ├── sub-01_sess-02_dwi.bvals
+                │           ├── sub-01_sess-02_dwi.bvecs
+                │           └── sub-01_sess-02_dwi.nii.gz
+                └── sub02
+                   ├── sess01
+                   │   ├── anat
+                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
+                   │   │   └── sub-02_sess-01_T1w.nii.gz
+                   │   └── dwi
+                   │       ├── sub-02_sess-01_dwi.bvals
+                   │       ├── sub-02_sess-01_dwi.bvecs
+                   │       └── sub-02_sess-01_dwi.nii.gz
+                   └── sess02
+                       ├── anat
+                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
+                       │   └── sub-02_sess-02_T1w.nii.gz
+                       └── dwi
+                           ├── sub-02_sess-02_dwi.bvals
+                           ├── sub-02_sess-02_dwi.bvecs
+                           └── sub-02_sess-02_dwi.nii.gz
 
-    For now, it is up to users to arrange this file folder structure in their
-    data, with preprocessed data, but in the future, this structure will be
-    automatically generated from BIDS-compliant preprocessed data [1]_.
+    This structure can be automatically generated from BIDS-compliant
+    data [1]_, using the preAFQ software and BIDS app.
 
     Notes
     -----
