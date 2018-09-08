@@ -14,7 +14,6 @@ import pandas as pd
 
 from AFQ import api
 import AFQ.data as afd
-import AFQ.viz as afv
 
 afd.organize_stanford_data()
 base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')

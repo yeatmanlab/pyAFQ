@@ -20,6 +20,7 @@ import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 
+
 def touch(fname, times=None):
     with open(fname, 'a'):
         os.utime(fname, times)
@@ -85,7 +86,6 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
-
 def test_AFQ_data2():
     """
     Test with some actual data again, this time for track segmentation
@@ -105,7 +105,7 @@ def test_AFQ_data2():
         dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
                              np.linalg.inv(myafq.dwi_affine[0])))
     sl_file = op.join(myafq.data_frame.results_dir[0],
-                     'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
     aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
@@ -119,14 +119,14 @@ def test_AFQ_data2():
     # Test ROI exporting:
     myafq.export_rois()
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                    'ROIs',
-                    'CST_R_roi1_include.nii.gz'))
+                     'ROIs',
+                     'CST_R_roi1_include.nii.gz'))
 
     # Test bundles exporting:
     myafq.export_bundles()
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                    'bundles',
-                    'CST_R.trk'))
+                     'bundles',
+                     'CST_R.trk'))
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert profiles.shape == (1200, 5)
