@@ -130,3 +130,6 @@ def test_AFQ_data2():
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (1200, 5)
+
+    combined_profiles = myafq.combine_profiles()
+    assert combined_profiles.shape == (1200, 7)
