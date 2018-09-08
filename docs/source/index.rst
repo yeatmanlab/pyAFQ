@@ -1,6 +1,12 @@
+.. _home:
+
+.. figure:: _static/BDE_Banner_revised20160211-01.jpg
+   :align: center
+   :figclass: align-center
+   :target: http://brainandeducation.com
 
 AFQ: Automated Fiber Quantification
-====================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Tractography based on diffusion weighted MRI (dMRI) is used to find  the major
 white matter fascicles (tracts) in the living human brain. The health of these
@@ -27,7 +33,6 @@ obvious from mean measures of that tract (Yeatman2012_).
        auto_examples/index
        reference/index
 
-
 .. figure:: _static/eScience_Logo_HR.png
    :align: center
    :figclass: align-center
@@ -40,4 +45,4 @@ obvious from mean measures of that tract (Yeatman2012_).
    <http://escience.washington.edu/>`_, by a
    `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
    R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by
-   an NSF grant () to Jason Yeatman.
+   an NSF grant (1551330) to Jason Yeatman.
