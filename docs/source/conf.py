@@ -48,6 +48,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
+    'autoapi.extension',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -177,3 +178,8 @@ sphinx_gallery_conf = {
      # path where to save gallery generated examples
      'gallery_dirs': 'auto_examples',
 }
+
+# Auto API
+autoapi_type = 'python'
+autoapi_dirs = ['../../AFQ']
+autoapi_ignore = ['*test*', '*_fixes*', '*version*', 'pyAFQ', 'License']
