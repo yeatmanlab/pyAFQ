@@ -5,6 +5,8 @@ from scipy.spatial.distance import mahalanobis, cdist
 import pandas as pd
 
 import nibabel as nib
+from glob import glob
+import os.path as op
 
 import dipy
 import dipy.data as dpd
@@ -32,7 +34,7 @@ def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
 
 
-# make dictionary from excel sheet
+# make dictionary of ROIs from excel sheet
 def build_volumetric_atlas_dict(track_name, roi_df):
     rois = roi_df[track_name]
     roi_groups = list(rois.value_counts().index)
@@ -113,21 +115,48 @@ def calculate_volumetric_atlas_score(streamlines, csv_lookup_path,
     return streamlines_by_bundle
 
 
-def calculate_bundle_atlas_score(bundle_atlas_dict, whole_brain, mni2sub_xfm,
+# make dictionary of bundles from excel sheet
+def build_bundle_atlas_dict(bundle_atlas_directory, wb_streamlines, df):
+    bundles = glob(bundle_atlas_directory + '/*.trk')
+    bundle_dict = {}
+    for bpath in bundles:
+        basename = op.basename(bpath)
+        bname = list(df[df['file_name'] == basename]['column_name'])[0]
+        prune = list(df[df['file_name'] == basename]['pruning_thresh'])[0]
+
+        bundle_dict[bname] = {}
+        bundle_dict[bname]['path'] = bpath
+        bundle_dict[bname]['pruning_threshold'] = prune
+    return bundle_dict
+
+
+def calculate_bundle_atlas_score(bundle_atlas_dict, whole_brain,
+                                 template2sub_xfm,
                                  cluster_thr=5, pruning_thr=10,
                                  reduction_thr=10):
-    cluster_map = qbx_and_merge(whole_brain, thresholds=[40, 25, 20, 10])
-    rb = RecoBundles(whole_brain, cluster_map=cluster_map,
-                     cluster_thr=cluster_thr)
-    track_list = bundle_atlas_dict.keys()
+
+    wb_arrayseq = nib.streamlines.ArraySequence(whole_brain)
+
+    cluster_map = qbx_and_merge(whole_brain, thresholds=[
+                                40, 25, 20, 10], verbose=False)
+
+    rb = RecoBundles(wb_arrayseq, cluster_map=cluster_map, verbose=False)
+    track_list = list(bundle_atlas_dict.keys())
     streamlines_by_bundle = np.zeros([len(whole_brain), len(track_list)])
     for i, b in enumerate(track_list):
-        bundle_xfmd = dtu.move_streamlines(bundle_atlas_dict[b], mni2sub_xfm)
+        print(b)
+        trk = nib.streamlines.trk.TrkFile.load(bundle_atlas_dict[b]['path'])
+        b_tg = trk.tractogram
+
+        bundle_xfmd = b_tg.copy().apply_affine(template2sub_xfm).streamlines
+
         b_atlassp, labels, b_subsp = rb.recognize(model_bundle=bundle_xfmd,
                                                   model_clust_thr=5.,
                                                   reduction_thr=10,
                                                   pruning_thr=pruning_thr)
-        streamlines_by_bundle[:, i] = labels
+        for l in labels:
+            streamlines_by_bundle[l, i] = 1
+
     return streamlines_by_bundle
 
 
@@ -309,26 +338,6 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
             return False
     # Either there are no exclusion ROIs, or you are not close to any:
     return True
-
-
-def recobundles_segmentation(fdata, fbval, fbvec, streamlines, bundle_dict,
-                             b0_threshold=0, **reg_kwargs):
-    """
-    Segment a set of streamlines, based on a dictionary of template bundles
-    and a set of segmentation rules encoded in a data-frame.
-
-    bundle_dict: dict with keys are names of the, and the values are trk files
-    """
-    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
-                                      b0_threshold=b0_threshold)
-
-    # Transform streamlines into the diffusion space:
-    xform_sl = dts.Streamlines(dtu.move_streamlines(sl_with_split,
-                                                    np.linalg.inv(img.affine)))
-
-    bundle_membership = np.zeros((len(xform_sl), len(bundle_dict)))
-
-    return fiber_probabilities
 
 
 def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
