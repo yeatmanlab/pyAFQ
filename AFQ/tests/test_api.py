@@ -129,4 +129,4 @@ def test_AFQ_data2():
                      'CST_R.trk'))
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert profiles.shape == (1200, 5)
+    assert tract_profiles.shape == (1200, 5)
