@@ -6,6 +6,7 @@ import numpy as np
 import numpy.testing as npt
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
@@ -133,3 +134,6 @@ def test_AFQ_data2():
 
     combined_profiles = myafq.combine_profiles()
     assert combined_profiles.shape == (1200, 7)
+
+    from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
+    assert_frame_equal(combined_profiles, from_file)
