@@ -59,13 +59,15 @@ def test_predict_dti():
 
 def test_cli():
     with nbtmp.InTemporaryDirectory() as tmpdir:
-        dwi, bval, bvec = dpd.get_data("small_25")
-        # Copy data to tmp directory
-        shutil.copyfile(dwi, "small_25.nii.gz")
-        shutil.copyfile(bval, "small_25.bval")
-        shutil.copyfile(bvec, "small_25.bvec")
-        # Call script
-        cmd = " ".join(["pyAFQ_dti", "-d" , "small_25.nii.gz",
-               "-l", "small_25.bval", "-c", "small_25.bvec"])
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
+        make_dti_data(fbval, fbvec, fdata)
+        cmd = " ".join(
+            ["pyAFQ_dti",
+             "-d", op.join(tmpdir, "dti.nii.gz"),
+             "-l", op.join(tmpdir, "dti.bval"),
+             "-c", op.join(tmpdir, "dti.bvec")])
         out = os.system(cmd)
         assert out ==  0
+        assert op.exists(op.join(tmpdir, 'dti', 'dti_params.nii.gz'))

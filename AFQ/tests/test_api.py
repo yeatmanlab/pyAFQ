@@ -93,8 +93,9 @@ def test_AFQ_data2():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(preafq_path=op.join(tmpdir.name, 'stanford_hardi',
-                                        'derivatives', 'preafq'),
+    preafq_path = op.join(tmpdir.name, 'stanford_hardi',
+                          'derivatives', 'preafq')
+    myafq = api.AFQ(preafq_path=preafq_path,
                     sub_prefix='sub',
                     bundle_list=["SLF", "ARC", "CST", "FP"])
 
@@ -132,8 +133,14 @@ def test_AFQ_data2():
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (1200, 5)
 
+    # Test the CLI:
+    print("Running the CLI:")
+    cmd = "pyAFQ " + preafq_path
+    out = os.system(cmd)
+    assert out ==  0
+    # The combined tract profiles should already exist from the CLI Run:
+    from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
+    # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
     assert combined_profiles.shape == (1200, 7)
-
-    from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
     assert_frame_equal(combined_profiles, from_file)

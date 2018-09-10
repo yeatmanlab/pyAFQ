@@ -80,7 +80,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dki')
+        out_dir = op.join(op.split(list(data_files)[0])[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
@@ -224,7 +224,7 @@ def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
     names = ['MD', 'MK', 'S0']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'mdki')
+        out_dir = op.join(op.split(list(data_files)[0])[0], 'mdki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
@@ -297,7 +297,7 @@ def fit_dkimicro(data_files, bval_files, bvec_files, mask=None,
     names = ['AWF', 'T', 'hAD', 'hRD', 'hMD', 'Da', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dkimicro')
+        out_dir = op.join(op.split(list(data_files)[0])[0], 'dkimicro')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
