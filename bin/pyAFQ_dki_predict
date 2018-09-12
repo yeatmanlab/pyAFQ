@@ -1,37 +1,13 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
-
+from AFQ.utils.bin import model_predict_input_parser
 import numpy as np
 import dipy.core.gradients as dpg
 from AFQ import dki
-from AFQ.utils.bin import parse_string
 
-usage = """pyAFQ_dki_predict [options]"""
-parser = OptionParser(usage)
-
-parser.add_option("-p", "--params", type="string", action="callback",
-                  callback=parse_string,
-                  help="A file containing DKI params")
-
-parser.add_option("-l", "--bval", type="string", action="callback",
-                  callback=parse_string,
-                  help="Comma-separated (no spaces!) list of b-value files")
-
-parser.add_option("-c", "--bvec", type="string", action="callback",
-                  callback=parse_string,
-                  help="Comma-separated (no spaces!) list of b-vector files")
-
-parser.add_option("-o", "--out_dir",
-                  help="full path to directory for files to be saved (will be created if it doesn't exist)")
-
-parser.add_option("-s", "--S0_file",
-                  help="File containing S0 measurements to use in prediction")
-
-parser.add_option('-b', '--b0_threshold', help="b0 threshold",
-                  default=0, type=float)
-
-opts, args = parser.parse_args()
+usage = """pyAFQ_dki_predict"""
+parser = model_predict_input_parser(usage)
+opts = parser.parse_args()
 
 bvals = []
 bvecs = []
@@ -40,10 +16,8 @@ for bval_file, bvec_file in zip(opts.bval, opts.bvec):
     bvecs.append(np.loadtxt(bvec_file))
 
 gtab = dpg.gradient_table(np.concatenate(bvals),
-                          np.concatenate(bvecs, -1),
-                          b0_threshold=opts.b0_threshold)
+                        np.concatenate(bvecs, -1),
+                        b0_threshold=float(opts.b0_threshold))
 
-print(opts.out_dir)
-
-dki.predict(opts.params[0], gtab, S0_file=opts.S0_file,
+dki.predict(opts.params, gtab, S0_file=opts.S0_file,
             out_dir=opts.out_dir)
