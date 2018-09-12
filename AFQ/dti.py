@@ -61,9 +61,13 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     names = ['FA', 'MD', 'AD', 'RD', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dti')
+        if isinstance(data_files, list):
+            out_dir = op.join(op.split(data_files[0])[0], 'dti')
+        else:
+            out_dir = op.join(op.split(data_files)[0], 'dti')
     if file_prefix is None:
         file_prefix = ''
+
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 

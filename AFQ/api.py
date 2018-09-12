@@ -7,7 +7,6 @@ import os.path as op
 from pathlib import PurePath
 
 import numpy as np
-
 import nibabel as nib
 
 import dipy.core.gradients as dpg
@@ -815,3 +814,15 @@ class AFQ(object):
                                     self.random_seeds,
                                     self.force_recompute],
                               axis=1)
+
+    def combine_profiles(self):
+        dfs = []
+        for ii, fname in enumerate(self.tract_profiles):
+            profiles = pd.read_csv(fname)
+            profiles['sub'] = self.data_frame['subject'].iloc[ii]
+            profiles['sess'] = op.split(self.data_frame['sess'].iloc[ii])[-1]
+            dfs.append(profiles)
+
+        df = pd.concat(dfs)
+        df.to_csv(op.join(self.afq_dir, 'tract_profiles.csv'), index=False)
+        return df
