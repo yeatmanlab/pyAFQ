@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+
+from AFQ import api
+
+
+usage = """pyAFQ"""
+parser = ArgumentParser(usage)
+
+parser.add_argument(dest='preafq_path', action="store",
+                    help="Path to preAFQ folder")
+
+parser.add_argument("-s", "--sub_prefix", dest="sub_prefix", action="store",
+                    help="Subject prefix (default: 'sub') ",
+                    default='sub')
+
+parser.add_argument("-d", "--dwi_folder", dest="dwi_folder", action="store",
+                    help="DWI folder (default: 'dwi')",
+                    default='dwi')
+
+parser.add_argument("-f", "--dwi_file", dest="dwi_file", action="store",
+                    help="DWI file pattern (default: '*dwi')",
+                    default="*dwi")
+
+parser.add_argument("-a", "--anat_folder", dest="anat_folder", action="store",
+                    help="Anat folder (default: 'anat')",
+                    default="anat")
+
+parser.add_argument("-t", "--anat_file", dest="anat_file", action="store",
+                    help="Anat file pattern (default: '*T1w*')",
+                    default="*T1w*")
+
+parser.add_argument("-g", "--seg_file", dest="seg_file", action="store",
+                    help="Segmentation file patter (default: '*aparc+aseg*')",
+                    default="*aparc+aseg*")
+
+parser.add_argument("-b", "--b0_threshold", dest="b0_threshold",
+                    action="store",
+                    help="B0 threshold (default: 0)",
+                    default=0)
+
+parser.add_argument("-o", "--odf_model", dest= "odf_model", action="store",
+                    help="ODF model (default: 'DTI')",
+                    default='DTI')
+
+parser.add_argument("-r", '--directions', dest="directions", action="store",
+                    help="Tractography method (default: 'det')",
+                    default='det')
+
+parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
+                    help="Number of seeds (default: 2 per voxel)",
+                    default=2)
+
+parser.add_argument("-m", "--random_seeds", dest="random_seeds",
+                    action="store_false",
+                    help="""Whether to use a total of `n_seeds` random seeds
+                            instead of `n_seeds` per voxel (default: False)""",
+                    default='false')
+
+parser.add_argument("-e", "--export_rois", dest="export_rois",
+                    action="store_true", default=False,
+                    help="Whether to export ROI files")
+
+parser.add_argument("-x", "--export_bundles", dest="export_bundles",
+                    action="store_true", default=False,
+                    help="Whether to export individual bundle files")
+
+
+opts = parser.parse_args()
+
+random_seeds = opts.random_seeds == 'true'
+
+myafq = api.AFQ(opts.preafq_path,
+                sub_prefix=opts.sub_prefix,
+                dwi_folder=opts.dwi_folder,
+                dwi_file=opts.dwi_file,
+                anat_folder=opts.anat_folder,
+                anat_file=opts.anat_file,
+                seg_file=opts.seg_file,
+                b0_threshold=opts.b0_threshold,
+                odf_model=opts.odf_model,
+                directions=opts.directions,
+                n_seeds=opts.n_seeds,
+                random_seeds=random_seeds,
+                bundle_list=api.BUNDLES,
+                dask_it=False,
+                force_recompute=False,
+                reg_template=None,
+                wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+
+if opts.export_rois:
+    myafq.export_rois()
+
+if opts.export_bundles:
+    myafq.export_bundles()
+
+profiles = myafq.combine_profiles()
