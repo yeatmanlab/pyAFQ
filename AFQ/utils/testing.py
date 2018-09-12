@@ -12,7 +12,7 @@ def assert_image_shape_affine(filename, shape, affine):
     npt.assert_(os.path.isfile(filename))
     image = nib.load(filename)
     npt.assert_equal(image.shape, shape)
-    npt.assert_array_almost_equal(image.get_affine(), affine)
+    npt.assert_array_almost_equal(image.affine, affine)
 
 
 def make_dti_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):

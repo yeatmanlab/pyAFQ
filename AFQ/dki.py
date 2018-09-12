@@ -88,7 +88,7 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz' % n)
@@ -235,7 +235,7 @@ def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'mdki_%s.nii.gz' % n)
@@ -311,7 +311,7 @@ def fit_dkimicro(data_files, bval_files, bvec_files, mask=None,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'dkimicro_%s.nii.gz' % n)
