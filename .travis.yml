@@ -1,17 +1,19 @@
 language: python
 sudo: false
-env:
-  global:
-  - PIP_DEPS="coveralls pytest-cov flake8"
 
+# Existing Python versions
 python:
-- '3.6'
+  - 3.6
 
-python:
-- '3.6'
+# Enable 3.7 without globally enabling sudo and dist: xenial for other build jobs
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 
 install:
-- travis_retry pip install $PIP_DEPS
+- travis_retry pip install -r requirements-dev.txt
 - travis_retry pip install -e .
 
 script:

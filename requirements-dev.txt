@@ -1,5 +1,7 @@
 sphinx
 pytest
+pytest-cov
+flake8
 sphinx_gallery
 sphinx_rtd_theme
 numpydoc
