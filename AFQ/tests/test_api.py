@@ -138,10 +138,10 @@ def test_AFQ_data2():
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
     shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
-                  'bundles')
+                  'bundles'))
 
     shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
-                  'ROIs')
+                  'ROIs'))
 
     # Test the CLI:
     print("Running the CLI:")
