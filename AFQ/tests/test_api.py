@@ -1,6 +1,7 @@
 import tempfile
 import os
 import os.path as op
+import shutil
 
 import numpy as np
 import numpy.testing as npt
@@ -133,6 +134,15 @@ def test_AFQ_data2():
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (1200, 5)
 
+
+    # Before we run the CLI, we'll remove the bundles and ROI folders, to see
+    # that the CLI generates them
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
+                  'bundles'))
+
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
+                  'ROIs'))
+
     # Test the CLI:
     print("Running the CLI:")
     cmd = "pyAFQ " + preafq_path
@@ -144,3 +154,12 @@ def test_AFQ_data2():
     combined_profiles = myafq.combine_profiles()
     assert combined_profiles.shape == (1200, 7)
     assert_frame_equal(combined_profiles, from_file)
+
+    # Make sure the CLI did indeed generate these:
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                     'ROIs',
+                     'CST_R_roi1_include.nii.gz'))
+
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                     'bundles',
+                     'CST_R.trk'))

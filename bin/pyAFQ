@@ -58,14 +58,6 @@ parser.add_argument("-m", "--random_seeds", dest="random_seeds",
                             instead of `n_seeds` per voxel (default: False)""",
                     default='false')
 
-parser.add_argument("-e", "--export_rois", dest="export_rois",
-                    action="store_true", default=False,
-                    help="Whether to export ROI files")
-
-parser.add_argument("-x", "--export_bundles", dest="export_bundles",
-                    action="store_true", default=False,
-                    help="Whether to export individual bundle files")
-
 
 opts = parser.parse_args()
 
@@ -89,10 +81,8 @@ myafq = api.AFQ(opts.preafq_path,
                 reg_template=None,
                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
-if opts.export_rois:
-    myafq.export_rois()
 
-if opts.export_bundles:
-    myafq.export_bundles()
-
-profiles = myafq.combine_profiles()
+# Do all the things:
+myafq.export_rois()
+myafq.export_bundles()
+myafq.combine_profiles()
