@@ -414,7 +414,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
 
 
 def _get_affine(fname):
-    return nib.load(fname).affine()
+    return nib.load(fname).affine
 
 
 def _get_fname(row, suffix):
