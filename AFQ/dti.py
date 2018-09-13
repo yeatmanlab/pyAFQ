@@ -71,7 +71,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, file_prefix + 'dti_%s.nii.gz' % n)
