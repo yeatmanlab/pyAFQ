@@ -377,7 +377,8 @@ def _export_rois(row, bundle_dict, reg_template):
                 (mapping.transform_inverse(
                     roi.get_data(),
                     interpolation='linear')) > 0).astype(int)
-            nib.save(nib.Nifti1Image(warped_roi, row['dwi_affine']),
+            # Cast to float32, so that it can be read in by MI-Brain:
+            nib.save(nib.Nifti1Image(warped_roi.astype(np.float32), row['dwi_affine']),
                      fname)
 
 
