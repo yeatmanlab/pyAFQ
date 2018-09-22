@@ -22,7 +22,7 @@ populations of axons enter and exit the tract, and disease can strike at local
 positions within the tract. Because of this, quantifying and understanding
 diffusion measures along each fiber tract (the tract profile) may reveal new
 insights into white matter development, function, and disease that are not
-obvious from mean measures of that tract (Yeatman2012_).
+obvious from mean measures of that tract ([Yeatman2012]_).
 
 .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman, "Tract profiles of white matter properties: automating fiber-tract quantification", PloS One, 7: e49790
 
@@ -49,5 +49,6 @@ NSF grant (1551330) to Jason Yeatman.
     :maxdepth: 2
 
     installation_guide
+    usage
     auto_examples/index
-    reference/index
+    autoapi/index

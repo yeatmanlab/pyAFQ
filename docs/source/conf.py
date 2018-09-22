@@ -49,6 +49,7 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
     'autoapi.extension',
+    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
