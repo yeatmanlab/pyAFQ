@@ -372,7 +372,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
 
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
-                      clean_threshold=6, min_sl=20):
+                      clean_threshold=3, min_sl=20):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline

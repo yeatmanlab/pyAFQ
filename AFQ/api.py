@@ -411,32 +411,35 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det", n_seeds=2,
                     random_seeds=False, force_recompute=False):
 
-    bundles_file = _clean_bundles(row,
-                                  wm_labels,
-                                  bundle_dict,
-                                  reg_template,
-                                  odf_model=odf_model,
-                                  directions=directions,
-                                  n_seeds=n_seeds,
-                                  random_seeds=random_seeds,
-                                  force_recompute=force_recompute)
 
-    bundles_dir = op.join(row['results_dir'], 'bundles')
-    os.makedirs(bundles_dir, exist_ok=True)
-    trk = nib.streamlines.load(bundles_file)
-    tg = trk.tractogram
-    streamlines = tg.streamlines
-    for bundle in bundle_dict:
-        uid = bundle_dict[bundle]['uid']
-        idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-        this_sl = (streamlines[idx])
-        fname = op.join(bundles_dir, '%s.trk' % bundle)
-        aus.write_trk(
-            fname,
-            dtu.move_streamlines(
-                this_sl,
-                np.linalg.inv(row['dwi_affine'])),
-            affine=row['dwi_affine'])
+    for func, folder in zip([_clean_bundles, _bundles],
+                            ['clean_bundles', 'bundles']):
+        bundles_file = func(row,
+                            wm_labels,
+                            bundle_dict,
+                            reg_template,
+                            odf_model=odf_model,
+                            directions=directions,
+                            n_seeds=n_seeds,
+                            random_seeds=random_seeds,
+                            force_recompute=force_recompute)
+
+        bundles_dir = op.join(row['results_dir'], folder)
+        os.makedirs(bundles_dir, exist_ok=True)
+        trk = nib.streamlines.load(bundles_file)
+        tg = trk.tractogram
+        streamlines = tg.streamlines
+        for bundle in bundle_dict:
+            uid = bundle_dict[bundle]['uid']
+            idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+            this_sl = (streamlines[idx])
+            fname = op.join(bundles_dir, '%s.trk' % bundle)
+            aus.write_trk(
+                fname,
+                dtu.move_streamlines(
+                    this_sl,
+                    np.linalg.inv(row['dwi_affine'])),
+                affine=row['dwi_affine'])
 
 
 def _get_affine(fname):
