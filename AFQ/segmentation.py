@@ -67,7 +67,8 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
     return tract_profile
 
 
-def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
+def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
+                     stat=np.mean):
     """
     Calculate weights for each streamline/node in a bundle, based on a
     Mahalanobis distance from the mean of the bundle, at that node
@@ -116,7 +117,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False):
                       [0, 0, c[2, 2]]])
         # Calculate the mean or median of this node as well
         # delta = node_coords - np.mean(node_coords, 0)
-        m = np.mean(node_coords, 0)
+        m = stat(node_coords, 0)
         # Weights are the inverse of the Mahalanobis distance
         for fn in range(bundle.shape[0]):
             # calculate Mahalanobis for node on fiber[fn]
@@ -372,7 +373,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
 
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
-                      clean_threshold=3, min_sl=20):
+                      clean_threshold=3, min_sl=20, stat=np.mean):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
@@ -380,19 +381,24 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     Parameters
     ----------
 
-    streamlines : nibabel.Streamlines class instance. The streamlines
-        constituting a fiber group.
+    streamlines : nibabel.Streamlines class instance.
+        The streamlines constituting a fiber group.
 
-    clean_rounds : int, optional. Number of rounds of cleaning based on
-        the Mahalanobis distance from the mean of extracted bundles.
-        Default: 5
+    clean_rounds : int, optional.
+        Number of rounds of cleaning based on the Mahalanobis distance from
+        the mean of extracted bundles. Default: 5
 
-    clean_threshold : float, optional. Threshold of cleaning based on the
-        Mahalanobis distance (the units are standard deviations).
-        Default: 6.
+    clean_threshold : float, optional.
+        Threshold of cleaning based on the Mahalanobis distance (the units are
+        standard deviations). Default: 6.
 
-    min_sl : int Number of streamlines in a bundle under which we will
-       not bother with cleaning outliers.
+    min_sl : int, optional.
+        Number of streamlines in a bundle under which we will
+        not bother with cleaning outliers. Default: 20.
+
+    stat : callable, optional.
+        The statistic of each node relative to which the Mahalanobis is
+        calculated. Default: `np.mean` (but can also use median, etc.)
 
     Returns
     -------
@@ -410,7 +416,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(fgarray.shape[0])
     # This calculates the Mahalanobis for each streamline/node:
-    w = gaussian_weights(fgarray, return_mahalnobis=True)
+    w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
     while (np.any(w > clean_threshold) and
