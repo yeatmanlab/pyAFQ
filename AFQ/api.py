@@ -411,7 +411,6 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det", n_seeds=2,
                     random_seeds=False, force_recompute=False):
 
-
     for func, folder in zip([_clean_bundles, _bundles],
                             ['clean_bundles', 'bundles']):
         bundles_file = func(row,
