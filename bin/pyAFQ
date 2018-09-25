@@ -84,6 +84,7 @@ myafq = api.AFQ(opts.preafq_path,
 
 
 # Do all the things:
+myafq.set_dti_cfa()
 myafq.export_rois()
 myafq.export_bundles()
 myafq.combine_profiles()
