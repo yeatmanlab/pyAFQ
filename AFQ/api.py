@@ -164,6 +164,16 @@ def _dti_cfa(row, force_recompute=False):
     return dti_cfa_file
 
 
+def _dti_pdd(row, force_recompute=False):
+    dti_pdd_file = _get_fname(row, '_dti_pdd.nii.gz')
+    if not op.exists(dti_pdd_file) or force_recompute:
+        tf = _dti_fit(row)
+        pdd = tf.directions
+        nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
+                 dti_pdd_file)
+    return dti_pdd_file
+
+
 def _dti_md(row, force_recompute=False):
     dti_md_file = _get_fname(row, '_dti_md.nii.gz')
     if not op.exists(dti_md_file) or force_recompute:
@@ -745,6 +755,20 @@ class AFQ(object):
         return self.data_frame['dti_cfa_file']
 
     dti_cfa = property(get_dti_cfa, set_dti_cfa)
+
+    def set_dti_pdd(self):
+        if ('dti_pdd_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['dti_pdd_file'] =\
+                self.data_frame.apply(_dti_pdd,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_dti_pdd(self):
+        self.set_dti_pdd()
+        return self.data_frame['dti_pdd_file']
+
+    dti_pdd = property(get_dti_pdd, set_dti_pdd)
 
     def set_dti_md(self):
         if ('dti_md_file' not in self.data_frame.columns or
