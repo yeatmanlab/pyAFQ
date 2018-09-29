@@ -1,3 +1,4 @@
+scikit_image
 dipy
 numpy
 scipy

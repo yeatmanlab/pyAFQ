@@ -28,7 +28,7 @@ def test_fit_dki():
         for n in names:
             fname = op.join(tmpdir, "dki_%s.nii.gz" % n)
             img = nib.load(fdata)
-            affine = img.get_affine()
+            affine = img.affine
             shape = img.shape[:-1]
             assert_image_shape_affine(fname, shape, affine)
 
@@ -70,7 +70,7 @@ def test_fit_dti():
         for n in names:
             fname = op.join(tmpdir, "dti_%s.nii.gz" % n)
             img = nib.load(fdata)
-            affine = img.get_affine()
+            affine = img.affine
             shape = img.shape[:-1]
             assert_image_shape_affine(fname, shape, affine)
 

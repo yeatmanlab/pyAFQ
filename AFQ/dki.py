@@ -80,12 +80,15 @@ def fit_dki(data_files, bval_files, bvec_files, mask=None,
     names = ['FA', 'MD', 'AD', 'RD', 'MK', 'AK', 'RK', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dki')
+        if isinstance(data_files, list):
+            out_dir = op.join(op.split(data_files[0])[0], 'dki')
+        else:
+            out_dir = op.join(op.split(data_files)[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'dki_%s.nii.gz' % n)
@@ -224,12 +227,15 @@ def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
     names = ['MD', 'MK', 'S0']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'mdki')
+        if isinstance(data_files, list):
+            out_dir = op.join(op.split(data_files[0])[0], 'dki')
+        else:
+            out_dir = op.join(op.split(data_files)[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'mdki_%s.nii.gz' % n)
@@ -297,12 +303,15 @@ def fit_dkimicro(data_files, bval_files, bvec_files, mask=None,
     names = ['AWF', 'T', 'hAD', 'hRD', 'hMD', 'Da', 'params']
 
     if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'dkimicro')
+        if isinstance(data_files, list):
+            out_dir = op.join(op.split(data_files[0])[0], 'dki')
+        else:
+            out_dir = op.join(op.split(data_files)[0], 'dki')
 
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     file_paths = {}
     for m, n in zip(maps, names):
         file_paths[n] = op.join(out_dir, 'dkimicro_%s.nii.gz' % n)

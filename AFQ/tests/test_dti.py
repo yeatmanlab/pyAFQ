@@ -1,4 +1,6 @@
+import os
 import os.path as op
+import shutil
 
 import numpy as np
 import numpy.testing as npt
@@ -8,7 +10,6 @@ import nibabel.tmpdirs as nbtmp
 
 import dipy.core.gradients as dpg
 import dipy.data as dpd
-
 
 from AFQ import dti
 from AFQ.utils.testing import make_dti_data
@@ -54,3 +55,19 @@ def test_predict_dti():
         prediction = nib.load(predict_fname).get_data()
         npt.assert_almost_equal(prediction[mask],
                                 nib.load(fdata).get_data()[mask])
+
+
+def test_cli():
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
+        make_dti_data(fbval, fbvec, fdata)
+        cmd = " ".join(
+            ["pyAFQ_dti",
+             "-d", op.join(tmpdir, "dti.nii.gz"),
+             "-l", op.join(tmpdir, "dti.bval"),
+             "-c", op.join(tmpdir, "dti.bvec")])
+        out = os.system(cmd)
+        assert out ==  0
+        assert op.exists(op.join(tmpdir, 'dti', 'dti_params.nii.gz'))

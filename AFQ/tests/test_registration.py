@@ -21,9 +21,9 @@ from AFQ.utils.streamlines import write_trk
 MNI_T2 = dpd.read_mni_template()
 hardi_img, gtab = dpd.read_stanford_hardi()
 MNI_T2_data = MNI_T2.get_data()
-MNI_T2_affine = MNI_T2.get_affine()
+MNI_T2_affine = MNI_T2.affine
 hardi_data = hardi_img.get_data()
-hardi_affine = hardi_img.get_affine()
+hardi_affine = hardi_img.affine
 b0 = hardi_data[..., gtab.b0s_mask]
 mean_b0 = np.mean(b0, -1)
 

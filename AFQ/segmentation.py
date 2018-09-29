@@ -19,7 +19,6 @@ from dipy.segment.clustering import qbx_and_merge
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-# import AFQ.utils.streamlines as aus
 import AFQ._fixes as fix
 
 if LooseVersion(dipy.__version__) < '0.12':
@@ -419,9 +418,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_data()
             warped_roi = auv.patch_up_roi(
-                mapping.transform_inverse(
+                (mapping.transform_inverse(
                     roi,
-                    interpolation='nearest')).astype(bool)
+                    interpolation='linear')) > 0)
+
             if rule:
                 # include ROI:
                 include_rois.append(np.array(np.where(warped_roi)).T)

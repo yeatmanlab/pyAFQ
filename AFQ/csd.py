@@ -54,7 +54,7 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     if not op.exists(out_dir):
         os.makedirs(out_dir)
 
-    aff = img.get_affine()
+    aff = img.affine
     fname = op.join(out_dir, 'csd_sh_coeff.nii.gz')
     nib.save(nib.Nifti1Image(csdfit.shm_coeff, aff), fname)
     return fname

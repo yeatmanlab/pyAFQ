@@ -1,9 +1,13 @@
 import tempfile
 import os
 import os.path as op
+import shutil
 
 import numpy as np
 import numpy.testing as npt
+
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
@@ -24,7 +28,7 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 
-def create_dummy_preproc_path(n_subjects, n_sessions):
+def create_dummy_preafq_path(n_subjects, n_sessions):
     preproc_dir = tempfile.mkdtemp()
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
     sessions = ['sess-0%s' % (d + 1) for d in range(n_sessions)]
@@ -64,9 +68,9 @@ def test_AFQ_init():
     """
     n_subjects = 3
     n_sessions = 2
-    preproc_path = create_dummy_preproc_path(n_subjects, n_sessions)
-    my_afq = api.AFQ(preproc_path=preproc_path)
-    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 9))
+    preafq_path = create_dummy_preafq_path(n_subjects, n_sessions)
+    my_afq = api.AFQ(preafq_path=preafq_path)
+    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 10))
 
 
 def test_AFQ_data():
@@ -75,7 +79,8 @@ def test_AFQ_data():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
+    myafq = api.AFQ(preafq_path=op.join(tmpdir.name, 'stanford_hardi',
+                                        'derivatives', 'preafq'),
                     sub_prefix='sub')
     npt.assert_equal(nib.load(myafq.b0[0]).shape,
                      nib.load(myafq['dwi_file'][0]).shape[:3])
@@ -89,10 +94,11 @@ def test_AFQ_data2():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(
-        preproc_path=op.join(tmpdir.name, 'stanford_hardi'),
-        sub_prefix='sub',
-        bundle_list=["SLF", "ARC", "CST", "FP"])
+    preafq_path = op.join(tmpdir.name, 'stanford_hardi',
+                          'derivatives', 'preafq')
+    myafq = api.AFQ(preafq_path=preafq_path,
+                    sub_prefix='sub',
+                    bundle_list=["SLF", "ARC", "CST", "FP"])
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -101,14 +107,58 @@ def test_AFQ_data2():
     streamlines = dts.Streamlines(
         dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
                              np.linalg.inv(myafq.dwi_affine[0])))
-    sl_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
+    sl_file = op.join(myafq.data_frame.results_dir[0],
                       'sub-01_sess-01_dwiDTI_det_streamlines.trk')
 
     aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
-    mapping_file = op.join(op.split(myafq.data_frame.dwi_file[0])[0],
+    mapping_file = op.join(myafq.data_frame.results_dir[0],
                            'sub-01_sess-01_dwi_mapping.nii.gz')
     nib.save(mapping, mapping_file)
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-    npt.assert_equal(len(bundles['CST_R']), 1)
+    npt.assert_equal(len(bundles['CST_R']), 2)
+
+    # Test ROI exporting:
+    myafq.export_rois()
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                             'ROIs',
+                             'CST_R_roi1_include.nii.gz'))
+
+    # Test bundles exporting:
+    myafq.export_bundles()
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                             'bundles',
+                             'CST_R.trk'))
+
+    tract_profiles = pd.read_csv(myafq.tract_profiles[0])
+    assert tract_profiles.shape == (1200, 5)
+
+    # Before we run the CLI, we'll remove the bundles and ROI folders, to see
+    # that the CLI generates them
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
+                          'bundles'))
+
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
+                          'ROIs'))
+
+    # Test the CLI:
+    print("Running the CLI:")
+    cmd = "pyAFQ " + preafq_path
+    out = os.system(cmd)
+    assert out == 0
+    # The combined tract profiles should already exist from the CLI Run:
+    from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
+    # And should be identical to what we would get by rerunning this:
+    combined_profiles = myafq.combine_profiles()
+    assert combined_profiles.shape == (1200, 7)
+    assert_frame_equal(combined_profiles, from_file)
+
+    # Make sure the CLI did indeed generate these:
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                             'ROIs',
+                             'CST_R_roi1_include.nii.gz'))
+
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                             'bundles',
+                             'CST_R.trk'))
