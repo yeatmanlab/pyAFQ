@@ -49,7 +49,8 @@ parser.add_argument("-r", '--directions', dest="directions", action="store",
                     default='det')
 
 parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
-                    help="Number of seeds (default: 2 per voxel)",
+                    help="""Number of seeds in each dim/voxel (default: 2,
+                            which means 8 seeds per voxel)""",
                     default=2)
 
 parser.add_argument("-m", "--random_seeds", dest="random_seeds",
