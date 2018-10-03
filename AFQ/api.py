@@ -168,7 +168,7 @@ def _dti_pdd(row, force_recompute=False):
     dti_pdd_file = _get_fname(row, '_dti_pdd.nii.gz')
     if not op.exists(dti_pdd_file) or force_recompute:
         tf = _dti_fit(row)
-        pdd = tf.evecs[..., 0, :]
+        pdd = tf.directions.squeeze()
         nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
                  dti_pdd_file)
     return dti_pdd_file
