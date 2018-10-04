@@ -169,6 +169,9 @@ def _dti_pdd(row, force_recompute=False):
     if not op.exists(dti_pdd_file) or force_recompute:
         tf = _dti_fit(row)
         pdd = tf.directions.squeeze()
+        # Invert the x coordinates:
+        pdd[..., 0] = pdd[..., 0] * -1
+
         nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
                  dti_pdd_file)
     return dti_pdd_file
@@ -399,6 +402,21 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
         profile_dframe.to_csv(profiles_file)
 
     return profiles_file
+
+
+def _template_xform(row, reg_template, force_recompute=False):
+    template_xform_file = _get_fname(row, "_template_xform.nii.gz")
+    if not op.exists(template_xform_file) or force_recompute:
+        mapping = reg.read_mapping(_mapping(row,
+                                            reg_template,
+                                            force_recompute=force_recompute),
+                                   row['dwi_file'],
+                                   reg_template)
+        template_xform = mapping.transform_inverse(reg_template.get_data())
+        nib.save(nib.Nifti1Image(template_xform,
+                                 row['dwi_affine']),
+                 template_xform_file)
+    return template_xform_file
 
 
 def _export_rois(row, bundle_dict, reg_template):
@@ -872,6 +890,21 @@ class AFQ(object):
         return self.data_frame['tract_profiles_file']
 
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
+
+    def set_template_xform(self):
+        if ('template_xform_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['template_xform_file'] = \
+                self.data_frame.apply(_template_xform,
+                                      args=[self.reg_template],
+                                      force_recompute=self.force_recompute,
+                                      axis=1)
+
+    def get_template_xform(self):
+        self.set_template_xform()
+        return self.data_frame['template_xform_file']
+
+    template_xform = property(get_template_xform, set_template_xform)
 
     def export_rois(self):
         self.data_frame.apply(_export_rois,
