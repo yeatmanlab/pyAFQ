@@ -107,17 +107,17 @@ def test_AFQ_data2():
     streamlines = dts.Streamlines(
         dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
                              np.linalg.inv(myafq.dwi_affine[0])))
+
     sl_file = op.join(myafq.data_frame.results_dir[0],
                       'sub-01_sess-01_dwiDTI_det_streamlines.trk')
-
     aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
     mapping_file = op.join(myafq.data_frame.results_dir[0],
                            'sub-01_sess-01_dwi_mapping.nii.gz')
     nib.save(mapping, mapping_file)
-    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
-                                'sub-01_sess-01_reg_prealign.npy')
-    np.save(reg_prealign_file, np.ones(4))
+    reg_prealign_file = op.join(myafq.data_frame.results_dir[0], 'sub-01_sess-01_dwi_reg_prealign.npy')
+    np.save(reg_prealign_file, np.eye(4))
+
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_equal(len(bundles['CST_R']), 2)
@@ -135,7 +135,7 @@ def test_AFQ_data2():
                      'CST_R.trk'))
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (1200, 5)
+    assert tract_profiles.shape == (800, 5)
 
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
