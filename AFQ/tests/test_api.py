@@ -155,7 +155,7 @@ def test_AFQ_data2():
     from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (1200, 7)
+    assert combined_profiles.shape == (800, 7)
     assert_frame_equal(combined_profiles, from_file)
 
     # Make sure the CLI did indeed generate these:
