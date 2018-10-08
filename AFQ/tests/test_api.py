@@ -115,6 +115,9 @@ def test_AFQ_data2():
     mapping_file = op.join(myafq.data_frame.results_dir[0],
                            'sub-01_sess-01_dwi_mapping.nii.gz')
     nib.save(mapping, mapping_file)
+    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
+                                'sub-01_sess-01_reg_prealign.npy')
+    np.save(reg_prealign_file, np.ones(4))
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_equal(len(bundles['CST_R']), 2)
