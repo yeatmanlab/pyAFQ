@@ -46,8 +46,7 @@ def test_segment():
                                hardi_fbvec,
                                streamlines,
                                bundles,
-                               mapping=mapping,
-                               as_generator=True)
+                               mapping)
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
@@ -90,8 +89,7 @@ def test_segment():
                                hardi_fbvec,
                                streamlines,
                                bundles,
-                               mapping=mapping,
-                               as_generator=True)
+                               mapping)
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)

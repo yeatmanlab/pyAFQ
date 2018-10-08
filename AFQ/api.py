@@ -216,10 +216,10 @@ def _mapping(row, reg_template, force_recompute=False):
         reg_prealign = np.load(_reg_prealign(
             row,
             force_recompute=force_recompute))
-        mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
-                                       template=reg_template,
-                                       prealign=reg_prealign)
-
+        warped_b0, mapping= reg.syn_register_dwi(row['dwi_file'], gtab,
+                                                 template=reg_template,
+                                                 prealign=reg_prealign)
+        mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
         reg.write_mapping(mapping, mapping_file)
     return mapping_file
 
@@ -295,9 +295,13 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
 
+        reg_prealign = np.load(_reg_prealign(row,
+                                             force_recompute=force_recompute))
+
         mapping = reg.read_mapping(_mapping(row, reg_template),
                                    row['dwi_file'],
-                                   reg_template)
+                                   reg_template,
+                                   prealign=np.linalg.inv(reg_prealign))
 
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
@@ -306,6 +310,7 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
+
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
@@ -407,11 +412,15 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
 def _template_xform(row, reg_template, force_recompute=False):
     template_xform_file = _get_fname(row, "_template_xform.nii.gz")
     if not op.exists(template_xform_file) or force_recompute:
+        reg_prealign = np.load(_reg_prealign(row,
+                               force_recompute=force_recompute))
         mapping = reg.read_mapping(_mapping(row,
                                             reg_template,
                                             force_recompute=force_recompute),
                                    row['dwi_file'],
-                                   reg_template)
+                                   reg_template,
+                                   prealign=np.linalg.inv(reg_prealign))
+
         template_xform = mapping.transform_inverse(reg_template.get_data())
         nib.save(nib.Nifti1Image(template_xform,
                                  row['dwi_affine']),
@@ -419,9 +428,14 @@ def _template_xform(row, reg_template, force_recompute=False):
     return template_xform_file
 
 
-def _export_rois(row, bundle_dict, reg_template):
-    mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
-                               reg_template)
+def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
+    reg_prealign = np.load(_reg_prealign(row,
+                                         force_recompute=force_recompute))
+
+    mapping = reg.read_mapping(_mapping(row, reg_template),
+                               row['dwi_file'],
+                               reg_template,
+                               prealign=np.linalg.inv(reg_prealign))
 
     rois_dir = op.join(row['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
@@ -534,7 +548,7 @@ class AFQ(object):
 |                           └── sub-02_sess-02_dwi.nii.gz
 
     This structure can be automatically generated from BIDS-compliant
-    data [1]_, using the preAFQ software and BIDS app.
+    data [1]_, using the preAFQ software [2]_ and BIDS app.
 
     Notes
     -----
@@ -546,6 +560,8 @@ class AFQ(object):
     .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
+
+    .. [2] https://github.com/akeshavan/preafq
 
     """
     def __init__(self, preafq_path,

@@ -67,8 +67,9 @@ def test_syn_registration():
 
 
 def test_syn_register_dwi():
-    mapping = syn_register_dwi(subset_dwi_data, gtab, template=subset_t2_img)
+    warped_b0, mapping = syn_register_dwi(subset_dwi_data, gtab, template=subset_t2_img)
     npt.assert_equal(isinstance(mapping, DiffeomorphicMap), True)
+    npt.assert_equal(warped_b0.shape, subset_t2_img.shape)
 
 
 def test_register_series():

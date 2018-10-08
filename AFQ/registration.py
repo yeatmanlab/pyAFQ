@@ -95,6 +95,8 @@ def syn_registration(moving, static,
 
 def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     """
+    Register DWI data to a template.
+
     Parameters
     -----------
     dwi : nifti image or str
@@ -130,7 +132,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
                                           moving_affine=dwi_affine,
                                           static_affine=template_affine,
                                           **syn_kwargs)
-    return mapping
+    return warped_b0, mapping
 
 
 def write_mapping(mapping, fname):
@@ -148,7 +150,7 @@ def write_mapping(mapping, fname):
     nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
 
 
-def read_mapping(disp, domain_img, codomain_img):
+def read_mapping(disp, domain_img, codomain_img, prealign=None):
     """
     Read a syn registration mapping from a nifti file
 
@@ -180,7 +182,8 @@ def read_mapping(disp, domain_img, codomain_img):
                                domain_shape=domain_img.shape[:3],
                                domain_grid2world=domain_img.affine,
                                codomain_shape=codomain_img.shape,
-                               codomain_grid2world=codomain_img.affine)
+                               codomain_grid2world=codomain_img.affine,
+                               prealign=prealign)
 
     disp_data = disp.get_data()
     mapping.forward = disp_data[..., 0]

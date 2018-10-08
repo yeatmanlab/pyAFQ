@@ -208,9 +208,9 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     return True
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
-            reg_template=None, mapping=None, prob_threshold=0,
-            **reg_kwargs):
+def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
+            reg_prealign=None, b0_threshold=0, reg_template=None,
+            prob_threshold=0):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
@@ -229,6 +229,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
             'rules':[True, True]},
             'prob_map': img3,
             'cross_midline': False}
+
+    mapping : a DiffeomorphicMapping object
+        Used to align the ROIs to the data.
 
     reg_template : str or nib.Nifti1Image, optional.
         Template to use for registration (defaults to the MNI T2)
@@ -257,17 +260,16 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, b0_threshold=0,
     if reg_template is None:
         reg_template = dpd.read_mni_template()
 
-    if mapping is None:
-        mapping = reg.syn_register_dwi(fdata, gtab, template=reg_template,
-                                       **reg_kwargs)
-
     # Classify the streamlines and split those that: 1) cross the
     # midline, and 2) pass under 10 mm below the mid-point of their
     # representation in the template space:
     xform_sl, crosses = split_streamlines(streamlines, img)
 
     if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
-        mapping = reg.read_mapping(mapping, img, reg_template)
+        if reg_prealign is None:
+            reg_prealign = np.eye(4)
+        mapping = reg.read_mapping(mapping, img, reg_template,
+                                   prealign=reg_prealign)
 
     fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
