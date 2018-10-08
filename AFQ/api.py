@@ -216,7 +216,7 @@ def _mapping(row, reg_template, force_recompute=False):
         reg_prealign = np.load(_reg_prealign(
             row,
             force_recompute=force_recompute))
-        warped_b0, mapping= reg.syn_register_dwi(row['dwi_file'], gtab,
+        warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                                  template=reg_template,
                                                  prealign=reg_prealign)
         mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
