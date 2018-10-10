@@ -49,9 +49,9 @@ parser.add_argument("-r", '--directions', dest="directions", action="store",
                     default='det')
 
 parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
-                    help="""Number of seeds in each dim/voxel (default: 2,
-                            which means 8 seeds per voxel)""",
-                    default=2)
+                    help="""Number of seeds in each dim/voxel (default: 1,
+                            which means 1 seed per voxel)""",
+                    default=1)
 
 parser.add_argument("-m", "--random_seeds", dest="random_seeds",
                     action="store_false",
@@ -84,6 +84,9 @@ myafq = api.AFQ(opts.preafq_path,
 
 
 # Do all the things:
+myafq.set_dti_cfa()
+myafq.set_dti_pdd()
+myafq.set_template_xform()
 myafq.export_rois()
 myafq.export_bundles()
 myafq.combine_profiles()

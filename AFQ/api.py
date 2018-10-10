@@ -154,6 +154,29 @@ def _dti_fa(row, force_recompute=False):
     return dti_fa_file
 
 
+def _dti_cfa(row, force_recompute=False):
+    dti_cfa_file = _get_fname(row, '_dti_cfa.nii.gz')
+    if not op.exists(dti_cfa_file) or force_recompute:
+        tf = _dti_fit(row)
+        cfa = tf.color_fa
+        nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
+                 dti_cfa_file)
+    return dti_cfa_file
+
+
+def _dti_pdd(row, force_recompute=False):
+    dti_pdd_file = _get_fname(row, '_dti_pdd.nii.gz')
+    if not op.exists(dti_pdd_file) or force_recompute:
+        tf = _dti_fit(row)
+        pdd = tf.directions.squeeze()
+        # Invert the x coordinates:
+        pdd[..., 0] = pdd[..., 0] * -1
+
+        nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
+                 dti_pdd_file)
+    return dti_pdd_file
+
+
 def _dti_md(row, force_recompute=False):
     dti_md_file = _get_fname(row, '_dti_md.nii.gz')
     if not op.exists(dti_md_file) or force_recompute:
@@ -193,10 +216,10 @@ def _mapping(row, reg_template, force_recompute=False):
         reg_prealign = np.load(_reg_prealign(
             row,
             force_recompute=force_recompute))
-        mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
-                                       template=reg_template,
-                                       prealign=reg_prealign)
-
+        warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
+                                                  template=reg_template,
+                                                  prealign=reg_prealign)
+        mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
         reg.write_mapping(mapping, mapping_file)
     return mapping_file
 
@@ -272,9 +295,13 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
 
+        reg_prealign = np.load(_reg_prealign(row,
+                                             force_recompute=force_recompute))
+
         mapping = reg.read_mapping(_mapping(row, reg_template),
                                    row['dwi_file'],
-                                   reg_template)
+                                   reg_template,
+                                   prealign=np.linalg.inv(reg_prealign))
 
         bundles = seg.segment(row['dwi_file'],
                               row['bval_file'],
@@ -283,6 +310,7 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
+
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
@@ -381,9 +409,33 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
     return profiles_file
 
 
-def _export_rois(row, bundle_dict, reg_template):
-    mapping = reg.read_mapping(_mapping(row, reg_template), row['dwi_file'],
-                               reg_template)
+def _template_xform(row, reg_template, force_recompute=False):
+    template_xform_file = _get_fname(row, "_template_xform.nii.gz")
+    if not op.exists(template_xform_file) or force_recompute:
+        reg_prealign = np.load(_reg_prealign(row,
+                               force_recompute=force_recompute))
+        mapping = reg.read_mapping(_mapping(row,
+                                            reg_template,
+                                            force_recompute=force_recompute),
+                                   row['dwi_file'],
+                                   reg_template,
+                                   prealign=np.linalg.inv(reg_prealign))
+
+        template_xform = mapping.transform_inverse(reg_template.get_data())
+        nib.save(nib.Nifti1Image(template_xform,
+                                 row['dwi_affine']),
+                 template_xform_file)
+    return template_xform_file
+
+
+def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
+    reg_prealign = np.load(_reg_prealign(row,
+                                         force_recompute=force_recompute))
+
+    mapping = reg.read_mapping(_mapping(row, reg_template),
+                               row['dwi_file'],
+                               reg_template,
+                               prealign=np.linalg.inv(reg_prealign))
 
     rois_dir = op.join(row['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
@@ -411,32 +463,34 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det", n_seeds=2,
                     random_seeds=False, force_recompute=False):
 
-    bundles_file = _clean_bundles(row,
-                                  wm_labels,
-                                  bundle_dict,
-                                  reg_template,
-                                  odf_model=odf_model,
-                                  directions=directions,
-                                  n_seeds=n_seeds,
-                                  random_seeds=random_seeds,
-                                  force_recompute=force_recompute)
+    for func, folder in zip([_clean_bundles, _bundles],
+                            ['clean_bundles', 'bundles']):
+        bundles_file = func(row,
+                            wm_labels,
+                            bundle_dict,
+                            reg_template,
+                            odf_model=odf_model,
+                            directions=directions,
+                            n_seeds=n_seeds,
+                            random_seeds=random_seeds,
+                            force_recompute=force_recompute)
 
-    bundles_dir = op.join(row['results_dir'], 'bundles')
-    os.makedirs(bundles_dir, exist_ok=True)
-    trk = nib.streamlines.load(bundles_file)
-    tg = trk.tractogram
-    streamlines = tg.streamlines
-    for bundle in bundle_dict:
-        uid = bundle_dict[bundle]['uid']
-        idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-        this_sl = (streamlines[idx])
-        fname = op.join(bundles_dir, '%s.trk' % bundle)
-        aus.write_trk(
-            fname,
-            dtu.move_streamlines(
-                this_sl,
-                np.linalg.inv(row['dwi_affine'])),
-            affine=row['dwi_affine'])
+        bundles_dir = op.join(row['results_dir'], folder)
+        os.makedirs(bundles_dir, exist_ok=True)
+        trk = nib.streamlines.load(bundles_file)
+        tg = trk.tractogram
+        streamlines = tg.streamlines
+        for bundle in bundle_dict:
+            uid = bundle_dict[bundle]['uid']
+            idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+            this_sl = (streamlines[idx])
+            fname = op.join(bundles_dir, '%s.trk' % bundle)
+            aus.write_trk(
+                fname,
+                dtu.move_streamlines(
+                    this_sl,
+                    np.linalg.inv(row['dwi_affine'])),
+                affine=row['dwi_affine'])
 
 
 def _get_affine(fname):
@@ -494,7 +548,7 @@ class AFQ(object):
 |                           └── sub-02_sess-02_dwi.nii.gz
 
     This structure can be automatically generated from BIDS-compliant
-    data [1]_, using the preAFQ software and BIDS app.
+    data [1]_, using the preAFQ software [2]_ and BIDS app.
 
     Notes
     -----
@@ -506,6 +560,8 @@ class AFQ(object):
     .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
+
+    .. [2] https://github.com/akeshavan/preafq
 
     """
     def __init__(self, preafq_path,
@@ -720,6 +776,34 @@ class AFQ(object):
 
     dti_fa = property(get_dti_fa, set_dti_fa)
 
+    def set_dti_cfa(self):
+        if ('dti_cfa_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['dti_cfa_file'] =\
+                self.data_frame.apply(_dti_cfa,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_dti_cfa(self):
+        self.set_dti_cfa()
+        return self.data_frame['dti_cfa_file']
+
+    dti_cfa = property(get_dti_cfa, set_dti_cfa)
+
+    def set_dti_pdd(self):
+        if ('dti_pdd_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['dti_pdd_file'] =\
+                self.data_frame.apply(_dti_pdd,
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_dti_pdd(self):
+        self.set_dti_pdd()
+        return self.data_frame['dti_pdd_file']
+
+    dti_pdd = property(get_dti_pdd, set_dti_pdd)
+
     def set_dti_md(self):
         if ('dti_md_file' not in self.data_frame.columns or
                 self.force_recompute):
@@ -822,6 +906,21 @@ class AFQ(object):
         return self.data_frame['tract_profiles_file']
 
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
+
+    def set_template_xform(self):
+        if ('template_xform_file' not in self.data_frame.columns or
+                self.force_recompute):
+            self.data_frame['template_xform_file'] = \
+                self.data_frame.apply(_template_xform,
+                                      args=[self.reg_template],
+                                      force_recompute=self.force_recompute,
+                                      axis=1)
+
+    def get_template_xform(self):
+        self.set_template_xform()
+        return self.data_frame['template_xform_file']
+
+    template_xform = property(get_template_xform, set_template_xform)
 
     def export_rois(self):
         self.data_frame.apply(_export_rois,
