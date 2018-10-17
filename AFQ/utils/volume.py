@@ -25,4 +25,4 @@ def patch_up_roi(roi, sigma=0.5, truncate=2):
     """
 
     return (ndim.binary_fill_holes(
-        gaussian(roi, sigma=sigma, truncate=truncate)).astype(float) > 0)
+        gaussian(roi, sigma=sigma, truncate=truncate)).astype(float) > 0.1)
