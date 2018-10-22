@@ -25,4 +25,4 @@ def patch_up_roi(roi, sigma=0.5, truncate=2):
     """
 
     return convex_hull_image(gaussian(ndim.binary_fill_holes(roi),
-                                      sigma=sigma, truncate=truncate) > 0.1)
+                                      sigma=sigma, truncate=truncate) > 0)
