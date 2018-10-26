@@ -53,16 +53,14 @@ parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
                             which means 1 seed per voxel)""",
                     default=1)
 
-parser.add_argument("-m", "--random_seeds", dest="random_seeds",
-                    action="store_false",
+parser.add_argument("-m", "--random_seeds", type=bool,
+                    dest="random_seeds", action="store",
                     help="""Whether to use a total of `n_seeds` random seeds
                             instead of `n_seeds` per voxel (default: False)""",
-                    default='false')
+                    default=False)
 
 
 opts = parser.parse_args()
-
-random_seeds = opts.random_seeds == 'true'
 
 myafq = api.AFQ(opts.preafq_path,
                 sub_prefix=opts.sub_prefix,
@@ -75,7 +73,7 @@ myafq = api.AFQ(opts.preafq_path,
                 odf_model=opts.odf_model,
                 directions=opts.directions,
                 n_seeds=int(opts.n_seeds),
-                random_seeds=random_seeds,
+                random_seeds=opts.random_seeds,
                 bundle_list=api.BUNDLES,
                 dask_it=False,
                 force_recompute=False,
