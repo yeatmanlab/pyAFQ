@@ -3,7 +3,6 @@ import os.path as op
 import json
 
 import boto3
-import botocore
 
 import numpy as np
 
