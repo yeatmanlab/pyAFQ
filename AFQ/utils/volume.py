@@ -2,6 +2,7 @@ import scipy.ndimage as ndim
 from skimage.filters import gaussian
 from skimage.morphology import convex_hull_image
 
+
 def patch_up_roi(roi, sigma=0.5, truncate=2):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
