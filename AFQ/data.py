@@ -306,16 +306,16 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
             os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
             os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
-            'HCP/%s/T1w/Diffusion/bvals' % subject
+            'HCP_1200/%s/T1w/Diffusion/bvals' % subject
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
-            'HCP/%s/T1w/Diffusion/bvecs' % subject
+            'HCP_1200/%s/T1w/Diffusion/bvecs' % subject
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
-            'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
+            'HCP_1200/%s/T1w/Diffusion/data.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
-            'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
+            'HCP_1200/%s/T1w/T1w_acpc_dc.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat',
                            'sub-%s_aparc+aseg.nii.gz' % subject)] =\
-            'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
+            'HCP_1200/%s/T1w/aparc+aseg.nii.gz' % subject
 
     for k in data_files.keys():
         if not op.exists(k):
