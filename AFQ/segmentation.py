@@ -15,10 +15,6 @@ import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ._fixes as fix
 
-if LooseVersion(dipy.__version__) < '0.12':
-    # Monkey patch the fix in:
-    dts.orient_by_rois = fix.orient_by_rois
-
 
 __all__ = ["segment"]
 
