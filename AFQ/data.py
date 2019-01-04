@@ -1,6 +1,7 @@
 import os
 import os.path as op
 import json
+from glob import glob
 
 import boto3
 
@@ -9,8 +10,10 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
+from dipy.io.streamline import load_trk, save_trk
+from dipy.segment.metric import AveragePointwiseEuclideanMetric, ResampleFeature
+from dipy.segment.clustering import QuickBundles
 
-from dipy.io.streamline import load_trk
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
@@ -353,7 +356,7 @@ fetch_stanford_hardi_tractography = _make_fetcher(
 
 def read_stanford_hardi_tractography():
     """
-
+    Reads a minimal tractography from the Stanford dataset.
     """
     files, folder = fetch_stanford_hardi_tractography()
     files_dict = {}
@@ -361,7 +364,8 @@ def read_stanford_hardi_tractography():
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'mapping.nii.gz'))
-    files_dict['tractography_subsampled.trk'] = load_trk(
+
+    files_dict['tractography_subsampled.trk'], _ = load_trk(
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'))
@@ -370,7 +374,7 @@ def read_stanford_hardi_tractography():
 
 def organize_stanford_data(path=None):
     """
-    Create the expected file-system structure for the Stanford HARDI data-set
+    Create the expected file-system structure for the Stanford HARDI data-set.
     """
     dpd.fetch_stanford_hardi()
 
@@ -397,3 +401,42 @@ def organize_stanford_data(path=None):
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+
+
+fetch_hcp_atlas_16_bundles = _make_fetcher(
+                            "fetch_hcp_atlas_16_bundles",
+                            op.join(afq_home,
+                                    'hcp_atlas_16_bundles'),
+                                    'https://ndownloader.figshare.com/files/',
+                            ["11921522"],
+                            ["atlas_16_bundles.zip"],
+                            md5_list=["b071f3e851f21ba1749c02fc6beb3118"],
+                            doc="Download minimal Recobundles atlas",
+                            unzip=True)
+
+def read_hcp_atlas_16_bundles():
+    bundle_dict = {}
+    _, folder = fetch_hcp_atlas_16_bundles()
+    whole_brain, _ = load_trk(op.join(folder,
+                                      'Atlas_in_MNI_Space_16_bundles',
+                                      'whole_brain',
+                                      'whole_brain_MNI.trk'))
+    bundle_dict['whole_brain'] = whole_brain
+    bundle_files = glob(
+        op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
+    for bundle_file in bundle_files:
+
+        bundle = op.splitext(op.split(bundle_file)[-1])[0]
+        bundle_dict[bundle] = {}
+        bundle_dict[bundle]['sl'] = load_trk(bundle_file)[0]
+
+        feature = ResampleFeature(nb_points=100)
+        metric = AveragePointwiseEuclideanMetric(feature)
+        qb = QuickBundles(np.inf, metric=metric)
+        cluster = qb.cluster(bundle_dict[bundle]['sl'])
+        bundle_dict[bundle]['centroid'] = cluster.centroids[0]
+
+    # For some reason, this file-name has a 0 in it, instead of an O:
+    bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
+    del bundle_dict["IF0F_R"]
+    return bundle_dict

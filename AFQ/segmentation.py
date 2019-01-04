@@ -432,3 +432,55 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         rounds_elapsed += 1
     # Select based on the variable that was keeping track of things for us:
     return streamlines[idx]
+
+
+def recobundles(streamlines, bundle_dict):
+    """
+    Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+
+    Parameters
+    ----------
+    streamlines : list or Streamlines object.
+        A whole-brain tractogram to be segmented.
+    bundle_dict: dictionary
+        Of the form:
+
+            {'whole_brain': Streamlines,
+            'CST_L': {'sl': Streamlines, 'centroid': array},
+            'CST_R': {'sl': Streamlines, 'centroid': array},
+            ...}
+
+    Returns
+    -------
+    fiber_groups : dict
+        Keys are names of the bundles, values are Streamline objects.
+        The streamlines in each object have all been oriented to have the
+        same orientation (using `dts.orient_by_streamline`).
+    """
+    fiber_groups = {}
+    # We start with whole-brain SLR:
+    atlas = bundle_dict['whole_brain']
+    moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
+                atlas, streamlines, x0='affine', verbose=False, progressive=True)
+
+    # We generate our instance of RB with the moved streamlines:
+    rb = RecoBundles(moved, verbose=False)
+
+    # Next we'll iterate over bundles, registering each one:
+    bundle_list = list(bundle_dict.keys())
+    bundle_list.remove('whole_brain')
+
+    for bundle in bundle_list:
+        model_sl = bundle_dict[bundle]['sl']
+        recognized_sl, rec_labels = rb.recognize(model_bundle=model_sl,
+                                                 model_clust_thr=5.,
+                                                 reduction_thr=10,
+                                                 reduction_distance='mam',
+                                                 slr=True,
+                                                 slr_metric='asymmetric',
+                                                 pruning_distance='mam')
+
+        standard_sl = bundle_dict[bundle]['centroid']
+        oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+        fiber_groups[bundle] = oriented_sl
+    return fiber_groups
