@@ -126,7 +126,7 @@ def test_AFQ_data2():
 
         tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
         bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-        #npt.assert_equal(len(bundles['CST_R']), 2)
+        npt.assert_(len(bundles['CST_L']) > 0)
 
         if seg_algo == "planes":
             # Test ROI exporting:
