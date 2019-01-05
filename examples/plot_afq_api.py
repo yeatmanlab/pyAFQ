@@ -21,7 +21,7 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 myafq = api.AFQ(op.join(afd.afq_home,
                         'stanford_hardi',
                         'derivatives',
-                        'preafq'),
+                        'dmriprep'),
                 sub_prefix='sub', bundle_list=["SLF", "ARC", "CST", "FP"])
 
 FA = nib.load(myafq.dti_fa[0]).get_data()

@@ -295,7 +295,7 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(hcp_bucket)
 
-    base_dir = op.join(afq_home, 'HCP', 'derivatives', 'preafq')
+    base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
 
@@ -382,10 +382,10 @@ def organize_stanford_data(path=None):
         if not op.exists(afq_home):
             os.mkdir(afq_home)
         base_folder = op.join(afq_home, 'stanford_hardi',
-                              'derivatives', 'preafq')
+                              'derivatives', 'dmriprep')
     else:
         base_folder = op.join(path, 'stanford_hardi',
-                              'derivatives', 'preafq')
+                              'derivatives', 'dmriprep')
 
     if not op.exists(base_folder):
         anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
@@ -415,6 +415,7 @@ fetch_hcp_atlas_16_bundles = _make_fetcher(
                             unzip=True)
 
 def read_hcp_atlas_16_bundles():
+
     bundle_dict = {}
     _, folder = fetch_hcp_atlas_16_bundles()
     whole_brain, _ = load_trk(op.join(folder,
@@ -424,8 +425,8 @@ def read_hcp_atlas_16_bundles():
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
         op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
-    for bundle_file in bundle_files:
 
+    for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
         bundle_dict[bundle] = {}
         bundle_dict[bundle]['sl'] = load_trk(bundle_file)[0]

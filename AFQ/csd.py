@@ -13,6 +13,21 @@ shm.spherical_harmonics = spherical_harmonics
 
 __all__ = ["fit_csd"]
 
+def _fit(gtab, data, mask, response=None, sh_order=8,
+         lambda_=1, tau=0.1):
+    """
+    Helper function that does the core of fitting a model to data.
+    """
+    if response is None:
+        response, ratio = csd.auto_response(gtab, data, roi_radius=10,
+                                            fa_thr=0.7)
+
+    csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
+                                                   sh_order=sh_order)
+    csdfit = csdmodel.fit(data, mask=mask)
+
+    return csdfit
+
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
             sh_order=8, lambda_=1, tau=0.1, out_dir=None):
@@ -41,13 +56,10 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     fname : the full path to the file containing the SH coefficients.
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
-    if response is None:
-        response, ratio = csd.auto_response(gtab, data, roi_radius=10,
-                                            fa_thr=0.7)
 
-    csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
-                                                   sh_order=sh_order)
-    csdfit = csdmodel.fit(data, mask=mask)
+    csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
+                  lambda_=lambda_, tau=tau)
+
     if out_dir is None:
         out_dir = op.join(op.split(data_files)[0], 'dki')
 
@@ -58,3 +70,4 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     fname = op.join(out_dir, 'csd_sh_coeff.nii.gz')
     nib.save(nib.Nifti1Image(csdfit.shm_coeff, aff), fname)
     return fname
+

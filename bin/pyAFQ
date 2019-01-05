@@ -8,8 +8,8 @@ from AFQ import api
 usage = """pyAFQ"""
 parser = ArgumentParser(usage)
 
-parser.add_argument(dest='preafq_path', action="store",
-                    help="Path to preAFQ folder")
+parser.add_argument(dest='dmriprep_path', action="store",
+                    help="Path to dmriprep folder")
 
 parser.add_argument("-s", "--sub_prefix", dest="sub_prefix", action="store",
                     help="Subject prefix (default: 'sub') ",
@@ -62,7 +62,7 @@ parser.add_argument("-m", "--random_seeds", type=bool,
 
 opts = parser.parse_args()
 
-myafq = api.AFQ(opts.preafq_path,
+myafq = api.AFQ(opts.dmriprep_path,
                 sub_prefix=opts.sub_prefix,
                 dwi_folder=opts.dwi_folder,
                 dwi_file=opts.dwi_file,
@@ -74,7 +74,7 @@ myafq = api.AFQ(opts.preafq_path,
                 directions=opts.directions,
                 n_seeds=int(opts.n_seeds),
                 random_seeds=opts.random_seeds,
-                bundle_list=api.BUNDLES,
+                bundle_names=api.BUNDLES,
                 dask_it=False,
                 force_recompute=False,
                 reg_template=None,

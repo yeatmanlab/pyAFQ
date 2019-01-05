@@ -12,7 +12,7 @@ should be organized as follows:
 
 |    study
 |      ├-derivatives
-|            ├-preafq
+|            ├-dmriprep
 |                ├── sub01
 |                │   ├── sess01
 |                │   │   ├── anat
@@ -49,7 +49,7 @@ should be organized as follows:
 |                           └── sub-02_sess-02_dwi.nii.gz
 
 
-Where the `raw` directory contains your raw data, and the `preafq` directory
+Where the `raw` directory contains your raw data, and the `dmriprep` directory
 contains data that has been processed to be motion-corrected, eddy-current
 corrected and so on. Anatomical data is optional. If a T1-weighted anatomical
 image and its segmentation are not provided (i.e., there is no `anat` folder),
@@ -84,9 +84,9 @@ provided in the :ref:`examples` documentation section.
 In addition, pyAFQ provides a command-line interface. After installing the
 software, and organizing the data, run::
 
-    pyAFQ <preafq_path>
+    pyAFQ <dmriprep_path>
 
-pointing the program to the location of the `preafq` folder. This will
+pointing the program to the location of the `dmriprep` folder. This will
 run whole-brain tractography, segment the tracts, and extract tract-profiles
 for each tract, generating a CSV file under
 `study/derivatives/afq/tract_profiles.csv` that contains the tract profiles
