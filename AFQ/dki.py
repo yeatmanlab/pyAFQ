@@ -1,18 +1,14 @@
 import os
 import os.path as op
-from distutils.version import LooseVersion
 
 import numpy as np
 import nibabel as nib
 
 from dipy.reconst import dki
 from dipy.reconst import dki_micro
+from dipy.core.ndindex import ndindex
 
 import AFQ.utils.models as ut
-
-import dipy
-
-from dipy.core.ndindex import ndindex
 
 
 __all__ = ["fit_dki", "predict"]

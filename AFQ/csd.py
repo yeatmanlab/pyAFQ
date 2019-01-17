@@ -13,6 +13,7 @@ shm.spherical_harmonics = spherical_harmonics
 
 __all__ = ["fit_csd"]
 
+
 def _fit(gtab, data, mask, response=None, sh_order=8,
          lambda_=1, tau=0.1):
     """
@@ -70,4 +71,3 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     fname = op.join(out_dir, 'csd_sh_coeff.nii.gz')
     nib.save(nib.Nifti1Image(csdfit.shm_coeff, aff), fname)
     return fname
-

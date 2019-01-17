@@ -1,19 +1,17 @@
-from distutils.version import LooseVersion
-
 import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
 
-import dipy
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
+from dipy.segment.bundles import RecoBundles
+from dipy.align.streamlinear import whole_brain_slr
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-import AFQ._fixes as fix
 
 
 __all__ = ["segment"]
@@ -461,7 +459,7 @@ def recobundles(streamlines, bundle_dict):
     # We start with whole-brain SLR:
     atlas = bundle_dict['whole_brain']
     moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
-                atlas, streamlines, x0='affine', verbose=False, progressive=True)
+        atlas, streamlines, x0='affine', verbose=False, progressive=True)
 
     # We generate our instance of RB with the moved streamlines:
     rb = RecoBundles(moved, verbose=False)
@@ -473,12 +471,12 @@ def recobundles(streamlines, bundle_dict):
     for bundle in bundle_list:
         model_sl = bundle_dict[bundle]['sl']
         _, rec_labels = rb.recognize(model_bundle=model_sl,
-                                                 model_clust_thr=5.,
-                                                 reduction_thr=10,
-                                                 reduction_distance='mam',
-                                                 slr=True,
-                                                 slr_metric='asymmetric',
-                                                 pruning_distance='mam')
+                                     model_clust_thr=5.,
+                                     reduction_thr=10,
+                                     reduction_distance='mam',
+                                     slr=True,
+                                     slr_metric='asymmetric',
+                                     pruning_distance='mam')
 
         # Use the streamlines in the original space:
         recognized_sl = streamlines[rec_labels]

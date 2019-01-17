@@ -49,8 +49,8 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
     if seg_algo == "planes":
         templates = afd.read_templates()
         callosal_templates = afd.read_callosum_templates()
-        # For the arcuate, we need to rename a few of these and duplicate the SLF
-        # ROI:
+        # For the arcuate, we need to rename a few of these and duplicate the
+        # SLF ROI:
         templates['ARC_roi1_L'] = templates['SLF_roi1_L']
         templates['ARC_roi1_R'] = templates['SLF_roi1_R']
         templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
@@ -65,8 +65,8 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
             if name in ["FA", "FP"]:
                 afq_bundles[name] = {
                     'ROIs': [templates[name + "_L"],
-                            templates[name + "_R"],
-                            callosal_templates["Callosum_midsag"]],
+                             templates[name + "_R"],
+                             callosal_templates["Callosum_midsag"]],
                     'rules': [True, True, True],
                     'prob_map': templates[name + "_prob_map"],
                     'cross_midline': True,
@@ -77,8 +77,8 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
                 for hemi in ['_R', '_L']:
                     afq_bundles[name + hemi] = {
                         'ROIs': [templates[name + '_roi1' + hemi],
-                                templates[name + '_roi2' + hemi],
-                                templates["SLFt_roi2" + hemi]],
+                                 templates[name + '_roi2' + hemi],
+                                 templates["SLFt_roi2" + hemi]],
                         'rules': [True, True, False],
                         'prob_map': templates[name + hemi + '_prob_map'],
                         'cross_midline': False,
@@ -88,7 +88,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
                 for hemi in ['_R', '_L']:
                     afq_bundles[name + hemi] = {
                         'ROIs': [templates[name + '_roi1' + hemi],
-                                templates[name + '_roi2' + hemi]],
+                                 templates[name + '_roi2' + hemi]],
                         'rules': [True, True],
                         'prob_map': templates[name + hemi + '_prob_map'],
                         'cross_midline': False,
@@ -112,7 +112,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
                     afq_bundles[name + hemi]['uid'] = uid
                     uid += 1
     else:
-        raise ValueError("Input: %s is not a valid input`seg_algo`"%seg_algo)
+        raise ValueError("Input: %s is not a valid input`seg_algo`" % seg_algo)
 
     return afq_bundles
 
@@ -338,6 +338,7 @@ def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
+
 
 def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
              directions="det", n_seeds=2, random_seeds=False,
@@ -959,14 +960,14 @@ class AFQ(object):
             else:
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame.apply(_clean_bundles, axis=1,
-                                        args=[self.wm_labels,
+                                          args=[self.wm_labels,
                                                 self.bundle_dict,
                                                 self.reg_template],
-                                        odf_model=self.odf_model,
-                                        directions=self.directions,
-                                        n_seeds=self.n_seeds,
-                                        random_seeds=self.random_seeds,
-                                        force_recompute=self.force_recompute)
+                                          odf_model=self.odf_model,
+                                          directions=self.directions,
+                                          n_seeds=self.n_seeds,
+                                          random_seeds=self.random_seeds,
+                                          force_recompute=self.force_recompute)
 
     def get_clean_bundles(self):
         self.set_clean_bundles()

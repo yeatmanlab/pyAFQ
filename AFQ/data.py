@@ -10,8 +10,9 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
-from dipy.io.streamline import load_trk, save_trk
-from dipy.segment.metric import AveragePointwiseEuclideanMetric, ResampleFeature
+from dipy.io.streamline import load_trk
+from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
+                                 ResampleFeature)
 from dipy.segment.clustering import QuickBundles
 
 
@@ -404,15 +405,16 @@ def organize_stanford_data(path=None):
 
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(
-                            "fetch_hcp_atlas_16_bundles",
-                            op.join(afq_home,
-                                    'hcp_atlas_16_bundles'),
-                                    'https://ndownloader.figshare.com/files/',
-                            ["11921522"],
-                            ["atlas_16_bundles.zip"],
-                            md5_list=["b071f3e851f21ba1749c02fc6beb3118"],
-                            doc="Download minimal Recobundles atlas",
-                            unzip=True)
+    "fetch_hcp_atlas_16_bundles",
+    op.join(afq_home,
+            'hcp_atlas_16_bundles'),
+    'https://ndownloader.figshare.com/files/',
+    ["11921522"],
+    ["atlas_16_bundles.zip"],
+    md5_list=["b071f3e851f21ba1749c02fc6beb3118"],
+    doc="Download minimal Recobundles atlas",
+    unzip=True)
+
 
 def read_hcp_atlas_16_bundles():
 
