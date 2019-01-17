@@ -7,7 +7,6 @@ import nibabel as nib
 
 from dipy.reconst import dki
 from dipy.reconst import dki_micro
-from ._fixes import dki_prediction
 
 import AFQ.utils.models as ut
 
@@ -15,9 +14,6 @@ import dipy
 
 from dipy.core.ndindex import ndindex
 
-if LooseVersion(dipy.__version__) < '0.12':
-    # Monkey patch the fix in:
-    dki.dki_prediction = dki_prediction
 
 __all__ = ["fit_dki", "predict"]
 
