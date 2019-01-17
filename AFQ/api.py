@@ -879,7 +879,6 @@ class AFQ(object):
         return self.data_frame['dti_pdd_file']
 
     dti_pdd = property(get_dti_pdd, set_dti_pdd)
-
     def set_dti_md(self):
         if ('dti_md_file' not in self.data_frame.columns
                 or self.force_recompute):
@@ -907,7 +906,6 @@ class AFQ(object):
         return self.data_frame['mapping']
 
     mapping = property(get_mapping, set_mapping)
-
     def set_streamlines(self):
         if ('streamlines_file' not in self.data_frame.columns
                 or self.force_recompute):
@@ -931,9 +929,8 @@ class AFQ(object):
             seg_function = _bundles
         elif self.seg_algo == "recobundles":
             seg_function = _recobundles
-
-        if ('bundles_file' not in self.data_frame.columns or
-                self.force_recompute):
+        column_exists = 'bundles_file' in self.data_frame.columns
+        if (not column_exists or self.force_recompute):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(seg_function, axis=1,
                                       args=[self.wm_labels,
@@ -952,8 +949,8 @@ class AFQ(object):
     bundles = property(get_bundles, set_bundles)
 
     def set_clean_bundles(self):
-        if ('clean_bundles_file' not in self.data_frame.columns or
-                self.force_recompute):
+        column_exists = 'clean_bundles_file' in self.data_frame.columns
+        if (not column_exists or self.force_recompute):
             if self.seg_algo == "recobundles":
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
