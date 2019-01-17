@@ -100,7 +100,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
         afq_bundles = {}
         uid = 1
         bundle_dict = afd.read_hcp_atlas_16_bundles()
-
+        afq_bundles["whole_brain"] = bundle_dict["whole_brain"]
         for name in bundle_names:
             if name in ['CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP']:
                 afq_bundles[name] = bundle_dict[name]

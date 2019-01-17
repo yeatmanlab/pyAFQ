@@ -88,7 +88,7 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
-def test_AFQ_data2():
+def test_AFQ_data_planes():
     """
     Test with some actual data again, this time for track segmentation
     """
@@ -96,53 +96,51 @@ def test_AFQ_data2():
     afd.organize_stanford_data(path=tmpdir.name)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
                           'derivatives', 'dmriprep')
-    for seg_algo, bundle_names in zip(["planes", "recobundles"],
-                                     (["SLF", "ARC", "CST", "FP"],
-                                      ["F", "CST", "AF", "CC_ForcepsMajor"])):
-        myafq = api.AFQ(dmriprep_path=dmriprep_path,
-                        sub_prefix='sub',
-                        seg_algo=seg_algo,
-                        bundle_names=bundle_names,
-                        odf_model="DTI")
+    seg_algo = "planes"
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    myafq = api.AFQ(dmriprep_path=dmriprep_path,
+                    sub_prefix='sub',
+                    seg_algo=seg_algo,
+                    bundle_names=bundle_names,
+                    odf_model="DTI")
 
-        # Replace the mapping and streamlines with precomputed:
-        file_dict = afd.read_stanford_hardi_tractography()
-        mapping = file_dict['mapping.nii.gz']
-        streamlines = file_dict['tractography_subsampled.trk']
-        streamlines = dts.Streamlines(
-                dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
-                                np.linalg.inv(myafq.dwi_affine[0])))
+    # Replace the mapping and streamlines with precomputed:
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+            dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                                 np.linalg.inv(myafq.dwi_affine[0])))
 
-        sl_file = op.join(myafq.data_frame.results_dir[0],
-                          'sub-01_sess-01_dwiDTI_det_streamlines.trk')
-        aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
+    sl_file = op.join(myafq.data_frame.results_dir[0],
+                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+    aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
-        mapping_file = op.join(myafq.data_frame.results_dir[0],
+    mapping_file = op.join(myafq.data_frame.results_dir[0],
                                 'sub-01_sess-01_dwi_mapping.nii.gz')
-        nib.save(mapping, mapping_file)
-        reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
+    nib.save(mapping, mapping_file)
+    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
                                     'sub-01_sess-01_dwi_reg_prealign.npy')
-        np.save(reg_prealign_file, np.eye(4))
+    np.save(reg_prealign_file, np.eye(4))
 
-        tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
-        bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-        npt.assert_(len(bundles['CST_L']) > 0)
+    tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
+    npt.assert_(len(bundles['CST_L']) > 0)
 
-        if seg_algo == "planes":
-            # Test ROI exporting:
-            myafq.export_rois()
-            assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                            'ROIs',
-                            'CST_R_roi1_include.nii.gz'))
+    # Test ROI exporting:
+    myafq.export_rois()
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                     'ROIs',
+                     'CST_R_roi1_include.nii.gz'))
 
-        # Test bundles exporting:
-        myafq.export_bundles()
-        assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                        'bundles',
-                        'CST_R.trk'))
+    # Test bundles exporting:
+    myafq.export_bundles()
+    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+                    'bundles',
+                    'CST_R.trk'))
 
-        tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-        assert tract_profiles.shape == (800, 5)
+    tract_profiles = pd.read_csv(myafq.tract_profiles[0])
+    assert tract_profiles.shape == (800, 5)
 
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
@@ -173,3 +171,40 @@ def test_AFQ_data2():
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
                      'bundles',
                      'CST_R.trk'))
+
+
+def test_AFQ_data_recobundles():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
+                            'derivatives', 'dmriprep')
+    seg_algo = "recobundles"
+    bundle_names = ["F", "CST", "AF", "CC_ForcepsMajor"]
+    myafq = api.AFQ(dmriprep_path=dmriprep_path,
+                    sub_prefix='sub',
+                    seg_algo=seg_algo,
+                    bundle_names=bundle_names,
+                    odf_model="DTI")
+
+    # Replace the mapping and streamlines with precomputed:
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+            dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
+                            np.linalg.inv(myafq.dwi_affine[0])))
+
+    sl_file = op.join(myafq.data_frame.results_dir[0],
+                            'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+    aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
+
+    mapping_file = op.join(myafq.data_frame.results_dir[0],
+                            'sub-01_sess-01_dwi_mapping.nii.gz')
+    nib.save(mapping, mapping_file)
+    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
+                                    'sub-01_sess-01_dwi_reg_prealign.npy')
+    np.save(reg_prealign_file, np.eye(4))
+
+    tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
+    npt.assert_(len(bundles['CST_L']) > 0)
