@@ -175,7 +175,9 @@ def test_AFQ_data_planes():
 
 def test_AFQ_data_recobundles():
     tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
+    afd.fetch(path=tmpdir.name)
+    fetch_hcp([""], hcp_bucket='hcp-openaccess', profile_name="hcp",
+              path=tmpdir)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
                             'derivatives', 'dmriprep')
     seg_algo = "recobundles"

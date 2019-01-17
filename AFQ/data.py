@@ -258,7 +258,8 @@ def read_templates():
     return template_dict
 
 
-def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
+def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
+              path=None):
     """
     Fetch HCP diffusion data and arrange it in a manner that resembles the
     BIDS [1]_ specification.
@@ -267,9 +268,11 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
     ----------
     subjects : list
         Each item is an integer, identifying one of the HCP subjects
-
     hcp_bucket : string
         The name of the HCP S3 bucket. Default: "hcp-openaccess"
+    profile_name : string
+        The name of the AWS profile used for access. Default: "hcp"
+    path
 
     Returns
     -------
@@ -296,7 +299,11 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(hcp_bucket)
 
-    base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
+    if path is None:
+        base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
+    else:
+        base_dir = op.join(path, 'HCP', 'derivatives', 'dmriprep')
+
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
 
@@ -417,7 +424,9 @@ fetch_hcp_atlas_16_bundles = _make_fetcher(
 
 
 def read_hcp_atlas_16_bundles():
-
+    """
+    XXX
+    """
     bundle_dict = {}
     _, folder = fetch_hcp_atlas_16_bundles()
     whole_brain, _ = load_trk(op.join(folder,
