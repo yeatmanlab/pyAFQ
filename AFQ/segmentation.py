@@ -472,7 +472,7 @@ def recobundles(streamlines, bundle_dict):
 
     for bundle in bundle_list:
         model_sl = bundle_dict[bundle]['sl']
-        recognized_sl, rec_labels = rb.recognize(model_bundle=model_sl,
+        _, rec_labels = rb.recognize(model_bundle=model_sl,
                                                  model_clust_thr=5.,
                                                  reduction_thr=10,
                                                  reduction_distance='mam',
@@ -480,6 +480,8 @@ def recobundles(streamlines, bundle_dict):
                                                  slr_metric='asymmetric',
                                                  pruning_distance='mam')
 
+        # Use the streamlines in the original space:
+        recognized_sl = streamlines[rec_labels]
         standard_sl = bundle_dict[bundle]['centroid']
         oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
         fiber_groups[bundle] = oriented_sl

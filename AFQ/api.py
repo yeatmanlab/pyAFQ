@@ -13,6 +13,7 @@ import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -332,8 +333,7 @@ def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        bundles = seg.segment(sl,
-                              bundle_dict)
+        bundles = seg.recobundles(sl, bundle_dict)
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
@@ -450,7 +450,7 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
                 this_sl = list(trk.streamlines[idx])
                 bundle_name = reverse_dict[b]
-                this_profile = seg.calculate_tract_profile(
+                this_profile = dts.bundle_profile(
                     scalar_data,
                     this_sl,
                     affine=row['dwi_affine'])
@@ -621,7 +621,7 @@ class AFQ(object):
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
-    .. [2] https://github.com/akeshavan/dmriprep
+    .. [2] https://github.com/nipy/dmriprep
 
     """
     def __init__(self,
