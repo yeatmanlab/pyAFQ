@@ -879,6 +879,7 @@ class AFQ(object):
         return self.data_frame['dti_pdd_file']
 
     dti_pdd = property(get_dti_pdd, set_dti_pdd)
+
     def set_dti_md(self):
         if ('dti_md_file' not in self.data_frame.columns
                 or self.force_recompute):
@@ -906,6 +907,7 @@ class AFQ(object):
         return self.data_frame['mapping']
 
     mapping = property(get_mapping, set_mapping)
+
     def set_streamlines(self):
         if ('streamlines_file' not in self.data_frame.columns
                 or self.force_recompute):

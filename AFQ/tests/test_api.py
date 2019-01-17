@@ -114,7 +114,7 @@ def test_AFQ_data2():
                                 np.linalg.inv(myafq.dwi_affine[0])))
 
         sl_file = op.join(myafq.data_frame.results_dir[0],
-                        'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+                          'sub-01_sess-01_dwiDTI_det_streamlines.trk')
         aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
 
         mapping_file = op.join(myafq.data_frame.results_dir[0],
