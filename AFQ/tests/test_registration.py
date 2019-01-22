@@ -73,7 +73,7 @@ def test_syn_register_dwi():
 
 
 def test_register_series():
-    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
     img = nib.load(fdata)
     gtab = dpg.gradient_table(fbval, fbvec)
     ref_idx = np.where(gtab.b0s_mask)
@@ -86,7 +86,7 @@ def test_register_series():
 
 
 def test_register_dwi():
-    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Use an abbreviated data-set:
         img = nib.load(fdata)

@@ -13,7 +13,7 @@ from AFQ import csd
 
 
 def test_fit_csd():
-    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Convert from npy to txt:
         bvals = np.loadtxt(fbval)
