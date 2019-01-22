@@ -175,38 +175,25 @@ def test_AFQ_data_planes():
 
 def test_AFQ_data_recobundles():
     tmpdir = nbtmp.InTemporaryDirectory()
-    afd.fetch(path=tmpdir.name)
-    fetch_hcp([""], hcp_bucket='hcp-openaccess', profile_name="hcp",
-              path=tmpdir)
-    dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
-                            'derivatives', 'dmriprep')
+    afd.fetch_hcp(["100206"], hcp_bucket='hcp-openaccess', profile_name="hcp",
+                  path=tmpdir.name)
+    dmriprep_path = op.join(tmpdir.name, 'HCP', 'derivatives', 'dmriprep')
     seg_algo = "recobundles"
     bundle_names = ["F", "CST", "AF", "CC_ForcepsMajor"]
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
                     seg_algo=seg_algo,
                     bundle_names=bundle_names,
-                    odf_model="DTI")
+                    odf_model="DTI",
+                    b0_threshold=15)
 
-    # Replace the mapping and streamlines with precomputed:
-    file_dict = afd.read_stanford_hardi_tractography()
-    mapping = file_dict['mapping.nii.gz']
-    streamlines = file_dict['tractography_subsampled.trk']
-    streamlines = dts.Streamlines(
-            dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
-                            np.linalg.inv(myafq.dwi_affine[0])))
-
-    sl_file = op.join(myafq.data_frame.results_dir[0],
-                            'sub-01_sess-01_dwiDTI_det_streamlines.trk')
-    aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
-
-    mapping_file = op.join(myafq.data_frame.results_dir[0],
-                            'sub-01_sess-01_dwi_mapping.nii.gz')
-    nib.save(mapping, mapping_file)
-    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
-                                    'sub-01_sess-01_dwi_reg_prealign.npy')
-    np.save(reg_prealign_file, np.eye(4))
-
+    # Replace the streamlines with precomputed:
+    path_to_trk = dpd.fetcher.get_target_tractogram_hcp()
+    sl_file = op.join(myafq.data_frame.results_dir[0], 'sub-100206_sess-01_dwiDTI_det_streamlines.trk')
+    shutil.copy(path_to_trk, sl_file)
+    myafq.data_frame["streamlines_file"] = sl_file
+    print("here")
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
+    print("here")
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_(len(bundles['CST_L']) > 0)

@@ -2,6 +2,7 @@ import numpy as np
 import nibabel as nib
 from nibabel import trackvis
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 
 def add_bundles(t1, t2):
@@ -128,13 +129,11 @@ def tgram_to_bundles(tgram, bundle_dict):
     """
     bundles = {}
     for b in bundle_dict.keys():
-        uid = bundle_dict[b]['uid']
-        idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
-        # sl = list(dtu.move_streamlines(tgram.streamlines[idx],
-        #                                np.linalg.inv(tgram.affine_to_rasmm)))
-        sl = list(tgram.streamlines[idx])
-
-        bundles[b] = sl
+        if not b=='whole_brain':
+            uid = bundle_dict[b]['uid']
+            idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
+            sl = dts.Streamlines(tgram.streamlines[idx])
+            bundles[b] = sl
     return bundles
 
 
