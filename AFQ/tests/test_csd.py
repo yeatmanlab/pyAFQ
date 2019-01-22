@@ -16,8 +16,8 @@ def test_fit_csd():
     fdata, fbval, fbvec = dpd.get_data('small_64D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Convert from npy to txt:
-        bvals = np.load(fbval)
-        bvecs = np.load(fbvec)
+        bvals = np.loadtxt(fbval)
+        bvecs = np.loadtxt(fbvec)
         np.savetxt(op.join(tmpdir, 'bvals.txt'), bvals)
         np.savetxt(op.join(tmpdir, 'bvecs.txt'), bvecs)
         for sh_order in [4, 6]:
