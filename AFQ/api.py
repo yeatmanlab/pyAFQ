@@ -721,7 +721,7 @@ class AFQ(object):
 
     def set_b0(self):
         if ('b0_file' not in self.data_frame.columns
-            or self.force_recompute):
+                or self.force_recompute):
             self.data_frame['b0_file'] =\
                 self.data_frame.apply(_b0,
                                       axis=1,
