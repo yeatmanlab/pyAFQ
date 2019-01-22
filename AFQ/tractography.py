@@ -134,5 +134,5 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
                             step_size=step_size)
 
     return dts.Streamlines(
-        [l for l in tracker if l.shape[0] * step_size > min_length and
-         l.shape[0] * step_size < max_length])
+        [l for l in tracker if l.shape[0] * step_size > min_length
+         and l.shape[0] * step_size < max_length])
