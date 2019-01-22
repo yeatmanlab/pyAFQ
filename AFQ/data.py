@@ -11,7 +11,7 @@ import nibabel as nib
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 
-from AFQ.utils.streamlines import read_trk
+from dipy.io.streamline import load_trk
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
@@ -365,7 +365,7 @@ def read_stanford_hardi_tractography():
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'mapping.nii.gz'))
-    files_dict['tractography_subsampled.trk'] = read_trk(
+    files_dict['tractography_subsampled.trk'] = load_trk(
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'))
