@@ -34,8 +34,8 @@ df = pd.read_csv(myafq.tract_profiles[0])
 
 for bundle in df['bundle'].unique():
     fig, ax = plt.subplots(1)
-    ax.plot(df[(df['scalar'] == "dti_fa") &
-            (df['bundle'] == bundle)]['profiles'])
+    ax.plot(df[(df['scalar'] == "dti_fa")
+            & (df['bundle'] == bundle)]['profiles'])
     ax.set_title(bundle)
 
 plt.show()
