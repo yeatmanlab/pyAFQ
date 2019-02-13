@@ -26,7 +26,7 @@ def make_dti_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
         The 3D shape of the output volum
 
     """
-    fimg, fbvals, fbvecs = dpd.get_data('small_64D')
+    fimg, fbvals, fbvecs = dpd.get_fnames('small_64D')
     img = nib.load(fimg)
     bvals, bvecs = dio.read_bvals_bvecs(fbvals, fbvecs)
     gtab = dpg.gradient_table(bvals, bvecs)
@@ -52,7 +52,7 @@ def make_dki_data(out_fbval, out_fbvec, out_fdata, out_shape=(5, 6, 7)):
 
     """
     # This is one-shell (b=1000) data:
-    fimg, fbvals, fbvecs = dpd.get_data('small_64D')
+    fimg, fbvals, fbvecs = dpd.get_fnames('small_64D')
     img = nib.load(fimg)
     bvals, bvecs = dio.read_bvals_bvecs(fbvals, fbvecs)
     # So  we create two shells out of it
@@ -262,7 +262,7 @@ class ScriptRunner(object):
 
 
 def make_tracking_data(out_fbval, out_fbvec, out_fdata):
-    fimg, fbvals, fbvecs = dpd.get_data('small_101D')
+    fimg, fbvals, fbvecs = dpd.get_fnames('small_101D')
     bvals = np.loadtxt(fbvals)
     bvecs = np.loadtxt(fbvecs)
     # We simulate an affine with no shear component:

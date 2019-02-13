@@ -336,15 +336,15 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundle_dict.keys():
-            idx = np.where(tg.data_per_streamline['bundle'] ==
-                           bundle_dict[b]['uid'])[0]
+            idx = np.where(tg.data_per_streamline['bundle']
+                           == bundle_dict[b]['uid'])[0]
             this_sl = sl[idx]
             this_sl = seg.clean_fiber_group(this_sl)
             this_tgram = nib.streamlines.Tractogram(
                 this_sl,
                 data_per_streamline={
-                    'bundle': (len(this_sl) *
-                               [bundle_dict[b]['uid']])},
+                    'bundle': (len(this_sl)
+                               * [bundle_dict[b]['uid']])},
                     affine_to_rasmm=row['dwi_affine'])
             tgram = aus.add_bundles(tgram, this_tgram)
         nib.streamlines.save(tgram, clean_bundles_file)
@@ -499,8 +499,8 @@ def _get_affine(fname):
 
 def _get_fname(row, suffix):
     split_fdwi = op.split(row['dwi_file'])
-    fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0] +
-                    suffix)
+    fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
+                    + suffix)
     return fname
 
 
@@ -720,8 +720,8 @@ class AFQ(object):
         return self.data_frame.__getitem__(k)
 
     def set_b0(self):
-        if ('b0_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('b0_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['b0_file'] =\
                 self.data_frame.apply(_b0,
                                       axis=1,
@@ -735,8 +735,8 @@ class AFQ(object):
 
     def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
                        vol_idx=None, dilate=None):
-        if ('brain_mask_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('brain_mask_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['brain_mask_file'] =\
                 self.data_frame.apply(_brain_mask,
                                       axis=1,
@@ -749,8 +749,8 @@ class AFQ(object):
     brain_mask = property(get_brain_mask, set_brain_mask)
 
     def set_dti(self):
-        if ('dti_params_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('dti_params_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['dti_params_file'] =\
                 self.data_frame.apply(_dti,
                                       axis=1,
@@ -763,8 +763,8 @@ class AFQ(object):
     dti = property(get_dti, set_dti)
 
     def set_dti_fa(self):
-        if ('dti_fa_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('dti_fa_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['dti_fa_file'] =\
                 self.data_frame.apply(_dti_fa,
                                       axis=1,
@@ -777,8 +777,8 @@ class AFQ(object):
     dti_fa = property(get_dti_fa, set_dti_fa)
 
     def set_dti_cfa(self):
-        if ('dti_cfa_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('dti_cfa_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['dti_cfa_file'] =\
                 self.data_frame.apply(_dti_cfa,
                                       axis=1,
@@ -791,8 +791,8 @@ class AFQ(object):
     dti_cfa = property(get_dti_cfa, set_dti_cfa)
 
     def set_dti_pdd(self):
-        if ('dti_pdd_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('dti_pdd_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['dti_pdd_file'] =\
                 self.data_frame.apply(_dti_pdd,
                                       axis=1,
@@ -805,8 +805,8 @@ class AFQ(object):
     dti_pdd = property(get_dti_pdd, set_dti_pdd)
 
     def set_dti_md(self):
-        if ('dti_md_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('dti_md_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['dti_md_file'] =\
                 self.data_frame.apply(_dti_md,
                                       axis=1,
@@ -833,8 +833,8 @@ class AFQ(object):
     mapping = property(get_mapping, set_mapping)
 
     def set_streamlines(self):
-        if ('streamlines_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('streamlines_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['streamlines_file'] =\
                 self.data_frame.apply(_streamlines, axis=1,
                                       args=[self.wm_labels],
@@ -851,8 +851,8 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        if ('bundles_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('bundles_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(_bundles, axis=1,
                                       args=[self.wm_labels,
@@ -871,8 +871,8 @@ class AFQ(object):
     bundles = property(get_bundles, set_bundles)
 
     def set_clean_bundles(self):
-        if ('clean_bundles_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('clean_bundles_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['clean_bundles_file'] =\
                 self.data_frame.apply(_clean_bundles, axis=1,
                                       args=[self.wm_labels,
@@ -891,8 +891,8 @@ class AFQ(object):
     clean_bundles = property(get_clean_bundles, set_clean_bundles)
 
     def set_tract_profiles(self):
-        if ('tract_profiles_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('tract_profiles_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels,
@@ -908,8 +908,8 @@ class AFQ(object):
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
 
     def set_template_xform(self):
-        if ('template_xform_file' not in self.data_frame.columns or
-                self.force_recompute):
+        if ('template_xform_file' not in self.data_frame.columns
+                or self.force_recompute):
             self.data_frame['template_xform_file'] = \
                 self.data_frame.apply(_template_xform,
                                       args=[self.reg_template],

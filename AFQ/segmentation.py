@@ -421,9 +421,9 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while (np.any(w > clean_threshold) and
-            rounds_elapsed < clean_rounds and
-            len(streamlines) > min_sl):
+    while (np.any(w > clean_threshold)
+           and rounds_elapsed < clean_rounds
+           and len(streamlines) > min_sl):
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
         idx_belong = np.where(

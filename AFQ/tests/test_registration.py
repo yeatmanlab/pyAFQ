@@ -73,7 +73,7 @@ def test_syn_register_dwi():
 
 
 def test_register_series():
-    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
     img = nib.load(fdata)
     gtab = dpg.gradient_table(fbval, fbvec)
     ref_idx = np.where(gtab.b0s_mask)
@@ -86,16 +86,16 @@ def test_register_series():
 
 
 def test_register_dwi():
-    fdata, fbval, fbvec = dpd.get_data('small_64D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Use an abbreviated data-set:
         img = nib.load(fdata)
         data = img.get_data()[..., :10]
         nib.save(nib.Nifti1Image(data, img.affine),
                  op.join(tmpdir, 'data.nii.gz'))
-        # Convert from npy to txt:
-        bvals = np.load(fbval)
-        bvecs = np.load(fbvec)
+        # Save a subset:
+        bvals = np.loadtxt(fbval)
+        bvecs = np.loadtxt(fbvec)
         np.savetxt(op.join(tmpdir, 'bvals.txt'), bvals[:10])
         np.savetxt(op.join(tmpdir, 'bvecs.txt'), bvecs[:10])
         reg_file = register_dwi(op.join(tmpdir, 'data.nii.gz'),

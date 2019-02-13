@@ -61,10 +61,10 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         p = partial(func, *func_args, **func_kwargs)
         d = [dask.delayed(p)(i) for i in in_list]
         if backend == "multiprocessing":
-            results = dask.compute(*d, get=dask.multiprocessing.get,
+            results = dask.compute(*d, scheduler="processes",
                                    workers=n_jobs)
         elif backend == "threading":
-            results = dask.compute(*d, get=dask.threaded.get,
+            results = dask.compute(*d, scheduler="threads",
                                    workers=n_jobs)
         else:
             raise ValueError("%s is not a backend for dask" % backend)

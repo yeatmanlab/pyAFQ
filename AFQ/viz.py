@@ -105,8 +105,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     if affine_or_mapping is not None:
         if isinstance(affine_or_mapping, np.ndarray):
             # This is an affine:
-            if (static_img is None or roi_affine is None or
-                    static_affine is None):
+            if (static_img is None or roi_affine is None
+                    or static_affine is None):
                 raise ValueError("If using an affine to transform an ROI, "
                                  "need to also specify all of the following",
                                  "inputs: `static_img`, `roi_affine`, ",
@@ -114,8 +114,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
             roi = reg.resample(roi, static_img, roi_affine, static_affine)
         else:
             # Assume it is  a mapping:
-            if (isinstance(affine_or_mapping, str) or
-                    isinstance(affine_or_mapping, nib.Nifti1Image)):
+            if (isinstance(affine_or_mapping, str)
+                    or isinstance(affine_or_mapping, nib.Nifti1Image)):
                 if reg_template is None or static_img is None:
                     raise ValueError(
                         "If using a mapping to transform an ROI, need to ",

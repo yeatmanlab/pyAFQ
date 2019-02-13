@@ -131,9 +131,9 @@ def tensor_odf(evals, evecs, sphere):
         The ODF will be calculated in each vertex of this sphere.
     """
     odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
-    mask = np.where((evals[..., 0] > 0) &
-                    (evals[..., 1] > 0) &
-                    (evals[..., 2] > 0))
+    mask = np.where((evals[..., 0] > 0)
+                    & (evals[..., 1] > 0)
+                    & (evals[..., 2] > 0))
 
     lower = 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
     projection = np.dot(sphere.vertices, evecs[mask])

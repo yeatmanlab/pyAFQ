@@ -13,8 +13,8 @@ def add_bundles(t1, t2):
     ----------
     t1, t2 : nib.streamlines.Tractogram class instances
     """
-    data_per_streamline = {k: (list(t1.data_per_streamline[k]) +
-                               list(t2.data_per_streamline[k]))
+    data_per_streamline = {k: (list(t1.data_per_streamline[k])
+                               + list(t2.data_per_streamline[k]))
                            for k in t2.data_per_streamline.keys()}
     return nib.streamlines.Tractogram(
         list(t1.streamlines) + list(t2.streamlines),
@@ -104,8 +104,8 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
-                'bundle': (len(this_sl) *
-                           [bundle_dict[b]['uid']])},
+                'bundle': (len(this_sl)
+                           * [bundle_dict[b]['uid']])},
                 affine_to_rasmm=affine)
         tgram = add_bundles(tgram, this_tgram)
     return tgram

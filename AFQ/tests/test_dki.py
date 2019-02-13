@@ -23,7 +23,7 @@ def test_fit_dki_inputs():
 
 
 def test_fit_dki():
-    fdata, fbval, fbvec = dpd.get_data('small_101D')
+    fdata, fbval, fbvec = dpd.get_fnames('small_101D')
     with nbtmp.InTemporaryDirectory() as tmpdir:
         file_dict = dki.fit_dki(fdata, fbval, fbvec, out_dir=tmpdir)
         for f in file_dict.values():
