@@ -24,7 +24,7 @@ def test_segment():
     hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
-    streamlines = file_dict['tractography_subsampled.trk'][0]
+    streamlines = file_dict['tractography_subsampled.trk']
     streamlines = dts.Streamlines(
             dtu.move_streamlines(streamlines[streamlines._lengths > 10],
                                  np.linalg.inv(hardi_img.affine)))
