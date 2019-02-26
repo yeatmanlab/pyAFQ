@@ -5,24 +5,6 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 
 
-def add_bundles(t1, t2):
-    """
-    Combine two bundles, using the second bundles' affine and
-    data_per_streamline keys.
-
-    Parameters
-    ----------
-    t1, t2 : nib.streamlines.Tractogram class instances
-    """
-    data_per_streamline = {k: (list(t1.data_per_streamline[k])
-                               + list(t2.data_per_streamline[k]))
-                           for k in t2.data_per_streamline.keys()}
-    return nib.streamlines.Tractogram(
-        list(t1.streamlines) + list(t2.streamlines),
-        data_per_streamline,
-        affine_to_rasmm=t2.affine_to_rasmm)
-
-
 def read_trk(fname):
     """
     Read from a .trk file, return streamlines and header
@@ -84,6 +66,24 @@ def write_trk(fname, streamlines, affine=None, shape=None):
     trackvis.write(fname, data, hdr, points_space="rasmm")
 
 
+def _generate_sl(sl, idx):
+    data = sl._data
+    offsets = sl._offsets
+    lengths = sl._lengths
+    return (data[offsets[i]:offsets[i]+lengths[i]] for i in idx)
+
+
+def index_into_tgram(tgram, idx):
+    return nib.streamlines.Tractogram(_generate_sl(tgram.streamlines, idx),
+        data_per_streamline={k: [tgram.data_per_streamline[k][i] for i in idx]
+                                 for k in tgram.data_per_streamline.keys()})
+
+
+def index_into_streamlines(sl, idx):
+    foo = _generate_sl(sl, idx)
+    return dts.Streamlines(foo)
+
+
 def bundles_to_tgram(bundles, bundle_dict, affine):
     """
     Create a nibabel trk Tractogram object from bundles and their
@@ -101,14 +101,14 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
     """
     tgram = nib.streamlines.Tractogram([], {'bundle': []})
     for b in bundles:
-        this_sl = list(bundles[b])
+        this_sl =  bundles[b]
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
                 'bundle': (len(this_sl)
                            * [bundle_dict[b]['uid']])},
                 affine_to_rasmm=affine)
-        tgram = add_bundles(tgram, this_tgram)
+        tgram.extend(this_tgram)
     return tgram
 
 
@@ -132,8 +132,7 @@ def tgram_to_bundles(tgram, bundle_dict):
         if not b=='whole_brain':
             uid = bundle_dict[b]['uid']
             idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
-            sl = dts.Streamlines(tgram.streamlines[idx])
-            bundles[b] = sl
+            bundles[b] = index_into_streamlines(tgram.streamlines, idx)
     return bundles
 
 
