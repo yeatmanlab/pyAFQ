@@ -84,6 +84,23 @@ def index_into_streamlines(sl, idx):
     return dts.Streamlines(foo)
 
 
+def add_bundles(t1, t2):
+    """
+    Combine two bundles, using the second bundles' affine and
+    data_per_streamline keys.
+     Parameters
+    ----------
+    t1, t2 : nib.streamlines.Tractogram class instances
+    """
+    data_per_streamline = {k: (list(t1.data_per_streamline[k])
+                               + list(t2.data_per_streamline[k]))
+                           for k in t2.data_per_streamline.keys()}
+    return nib.streamlines.Tractogram(
+        list(t1.streamlines) + list(t2.streamlines),
+        data_per_streamline,
+        affine_to_rasmm=t2.affine_to_rasmm)
+
+
 def bundles_to_tgram(bundles, bundle_dict, affine):
     """
     Create a nibabel trk Tractogram object from bundles and their
@@ -108,7 +125,7 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
                 'bundle': (len(this_sl)
                            * [bundle_dict[b]['uid']])},
                 affine_to_rasmm=affine)
-        tgram.extend(this_tgram)
+        tgram = add_bundles(tgram, this_tgram)
     return tgram
 
 

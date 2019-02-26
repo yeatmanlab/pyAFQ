@@ -86,3 +86,23 @@ def test_split_streamline():
                 )
         else:
             assert new_streamlines.__dict__[k] == test_streamlines.__dict__[k]
+
+
+def test_add_bundles():
+    t1 = nib.streamlines.Tractogram(
+            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    t2 = nib.streamlines.Tractogram(
+        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    added = aus.add_bundles(t1, t2)
+    test_tgram =nib.streamlines.Tractogram(
+        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]]),
+            np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    for sl1, sl2 in zip(added.streamlines, test_tgram.streamlines):
+        npt.assert_array_equal(sl1, sl2)
