@@ -13,9 +13,11 @@ import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
+import dipy.tracking.streamline as dts
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
+from AFQ.csd import _fit as csd_fit
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
 import AFQ.utils.streamlines as aus
@@ -35,7 +37,70 @@ BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
 
-def make_bundle_dict(bundle_names=BUNDLES):
+# Monkey-patch this in, until https://github.com/nipy/dipy/pull/1695 is
+# merged:
+def _bundle_profile(data, bundle, affine=None, n_points=100,
+                   weights=None):
+    """
+    Calculates a summarized profile of data for a bundle along its length.
+
+    Follows the approach outlined in [Yeatman2012]_.
+
+    Parameters
+    ----------
+    data : 3D volume
+        The statistic to sample with the streamlines.
+    bundle : StreamLines class instance
+        The collection of streamlines (possibly already resampled into an array
+         for each to have the same length) with which we are resampling. See
+         Note below about orienting the streamlines.
+    weights : 1D
+        array or 2D array (optional) Weight each streamline (1D) or each
+        node (2D) when calculating the tract-profiles. Must sum to 1 across
+        streamlines (in each node if relevant).
+
+    Returns
+    -------
+    ndarray : a 1D array with the profile of `data` along the length of
+        `bundle`
+
+    Note
+    ----
+    Before providing a bundle as input to this function, you will need to make
+    sure that the streamlines in the bundle are all oriented in the same
+    orientation relative to the bundle (use :func:`orient_by_streamline`).
+
+    References
+    ----------
+    .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J. Myall,
+       Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of White
+       Matter Properties: Automating Fiber-Tract Quantification" PloS One 7
+       (11): e49790.
+    """
+    if len(bundle) == 0:
+        raise ValueError("The bundle contains no streamlines")
+
+    # Resample each streamline to the same number of points:
+    fgarray = dts.set_number_of_points(bundle, n_points)
+
+    # Extract the values
+    values = np.array(dts.values_from_volume(data, fgarray, affine=affine))
+
+    if weights is None:
+        weights = np.ones(values.shape) / values.shape[0]
+    else:
+        # We check that weights *always sum to 1 across streamlines*:
+        if not np.allclose(np.sum(weights, 0), np.ones(n_points)):
+            raise ValueError("The sum of weights across streamlines must ",
+                             "be equal to 1")
+
+    return np.sum(weights * values, 0)
+
+
+dts.bundle_profile = _bundle_profile
+
+
+def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -44,54 +109,73 @@ def make_bundle_dict(bundle_names=BUNDLES):
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
     """
-    templates = afd.read_templates()
-    callosal_templates = afd.read_callosum_templates()
-    # For the arcuate, we need to rename a few of these and duplicate the SLF
-    # ROI:
-    templates['ARC_roi1_L'] = templates['SLF_roi1_L']
-    templates['ARC_roi1_R'] = templates['SLF_roi1_R']
-    templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
-    templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
+    if seg_algo == "planes":
+        templates = afd.read_templates()
+        callosal_templates = afd.read_callosum_templates()
+        # For the arcuate, we need to rename a few of these and duplicate the
+        # SLF ROI:
+        templates['ARC_roi1_L'] = templates['SLF_roi1_L']
+        templates['ARC_roi1_R'] = templates['SLF_roi1_R']
+        templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
+        templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
 
-    afq_bundles = {}
-    # Each bundles gets a digit identifier (to be stored in the tractogram)
-    uid = 1
-    for name in bundle_names:
-        # Consider hard coding since we might have different rules for
-        # some tracts
-        if name in ["FA", "FP"]:
-            afq_bundles[name] = {
-                'ROIs': [templates[name + "_L"],
-                         templates[name + "_R"],
-                         callosal_templates["Callosum_midsag"]],
-                'rules': [True, True, True],
-                'prob_map': templates[name + "_prob_map"],
-                'cross_midline': True,
-                'uid': uid}
-            uid += 1
-        # SLF is a special case, because it has an exclusion ROI:
-        elif name == "SLF":
-            for hemi in ['_R', '_L']:
-                afq_bundles[name + hemi] = {
-                    'ROIs': [templates[name + '_roi1' + hemi],
-                             templates[name + '_roi2' + hemi],
-                             templates["SLFt_roi2" + hemi]],
-                    'rules': [True, True, False],
-                    'prob_map': templates[name + hemi + '_prob_map'],
-                    'cross_midline': False,
+        afq_bundles = {}
+        # Each bundles gets a digit identifier (to be stored in the tractogram)
+        uid = 1
+        for name in bundle_names:
+            # Consider hard coding since we might have different rules for
+            # some tracts
+            if name in ["FA", "FP"]:
+                afq_bundles[name] = {
+                    'ROIs': [templates[name + "_L"],
+                             templates[name + "_R"],
+                             callosal_templates["Callosum_midsag"]],
+                    'rules': [True, True, True],
+                    'prob_map': templates[name + "_prob_map"],
+                    'cross_midline': True,
                     'uid': uid}
                 uid += 1
-        else:
-            for hemi in ['_R', '_L']:
-                afq_bundles[name + hemi] = {
-                    'ROIs': [templates[name + '_roi1' + hemi],
-                             templates[name + '_roi2' + hemi]],
-                    'rules': [True, True],
-                    'prob_map': templates[name + hemi + '_prob_map'],
-                    'cross_midline': False,
-                    'uid': uid}
+            # SLF is a special case, because it has an exclusion ROI:
+            elif name == "SLF":
+                for hemi in ['_R', '_L']:
+                    afq_bundles[name + hemi] = {
+                        'ROIs': [templates[name + '_roi1' + hemi],
+                                 templates[name + '_roi2' + hemi],
+                                 templates["SLFt_roi2" + hemi]],
+                        'rules': [True, True, False],
+                        'prob_map': templates[name + hemi + '_prob_map'],
+                        'cross_midline': False,
+                        'uid': uid}
+                    uid += 1
+            else:
+                for hemi in ['_R', '_L']:
+                    afq_bundles[name + hemi] = {
+                        'ROIs': [templates[name + '_roi1' + hemi],
+                                 templates[name + '_roi2' + hemi]],
+                        'rules': [True, True],
+                        'prob_map': templates[name + hemi + '_prob_map'],
+                        'cross_midline': False,
+                        'uid': uid}
 
+                    uid += 1
+
+    elif seg_algo == "recobundles":
+        afq_bundles = {}
+        uid = 1
+        bundle_dict = afd.read_hcp_atlas_16_bundles()
+        afq_bundles["whole_brain"] = bundle_dict["whole_brain"]
+        for name in bundle_names:
+            if name in ['CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP']:
+                afq_bundles[name] = bundle_dict[name]
+                afq_bundles[name]['uid'] = uid
                 uid += 1
+            else:
+                for hemi in ["_R", "_L"]:
+                    afq_bundles[name + hemi] = bundle_dict[name + hemi]
+                    afq_bundles[name + hemi]['uid'] = uid
+                    uid += 1
+    else:
+        raise ValueError("Input: %s is not a valid input`seg_algo`" % seg_algo)
 
     return afq_bundles
 
@@ -122,6 +206,14 @@ def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
     return brain_mask_file
 
 
+def _dti_fit(row):
+    dti_params_file = _dti(row)
+    dti_params = nib.load(dti_params_file).get_data()
+    tm = dpy_dti.TensorModel(row['gtab'])
+    tf = dpy_dti.TensorFit(tm, dti_params)
+    return tf
+
+
 def _dti(row, force_recompute=False):
     dti_params_file = _get_fname(row, '_dti_params.nii.gz')
     if not op.exists(dti_params_file) or force_recompute:
@@ -136,12 +228,21 @@ def _dti(row, force_recompute=False):
     return dti_params_file
 
 
-def _dti_fit(row):
-    dti_params_file = _dti(row)
-    dti_params = nib.load(dti_params_file).get_data()
-    tm = dpy_dti.TensorModel(row['gtab'])
-    tf = dpy_dti.TensorFit(tm, dti_params)
-    return tf
+def _csd(row, force_recompute=False, response=None,
+         sh_order=8, lambda_=1, tau=0.1,):
+    csd_params_file = _get_fname(row, '_csd_params.nii.gz')
+    if not op.exists(csd_params_file) or force_recompute:
+        img = nib.load(row['dwi_file'])
+        data = img.get_data()
+        gtab = row['gtab']
+        brain_mask_file = _brain_mask(row)
+        mask = nib.load(brain_mask_file).get_data()
+        csdf = csd_fit(gtab, data, mask=mask,
+                       response=response, sh_order=sh_order,
+                       lambda_=lambda_, tau=tau)
+        nib.save(nib.Nifti1Image(csdf.shm_coeff, row['dwi_affine']),
+                 csd_params_file)
+    return csd_params_file
 
 
 def _dti_fa(row, force_recompute=False):
@@ -239,8 +340,8 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
     if not op.exists(streamlines_file) or force_recompute:
         if odf_model == "DTI":
             params_file = _dti(row)
-        else:
-            raise(NotImplementedError)
+        elif odf_model == "CSD":
+            params_file = _csd(row)
 
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_data()
@@ -279,6 +380,28 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
     return streamlines_file
 
 
+def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
+                 directions="det", n_seeds=2, random_seeds=False,
+                 force_recompute=False):
+
+    bundles_file = _get_fname(row,
+                              '%s_%s_bundles.trk' % (odf_model,
+                                                     directions))
+    if not op.exists(bundles_file) or force_recompute:
+        streamlines_file = _streamlines(row, wm_labels,
+                                        odf_model=odf_model,
+                                        directions=directions,
+                                        n_seeds=n_seeds,
+                                        random_seeds=random_seeds,
+                                        force_recompute=force_recompute)
+        tg = nib.streamlines.load(streamlines_file).tractogram
+        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        bundles = seg.recobundles(sl, bundle_dict)
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
+        nib.streamlines.save(tgram, bundles_file)
+    return bundles_file
+
+
 def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
              directions="det", n_seeds=2, random_seeds=False,
              force_recompute=False):
@@ -310,7 +433,6 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                               bundle_dict,
                               reg_template=reg_template,
                               mapping=mapping)
-
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
@@ -390,7 +512,7 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
                 this_sl = list(trk.streamlines[idx])
                 bundle_name = reverse_dict[b]
-                this_profile = seg.calculate_tract_profile(
+                this_profile = dts.bundle_profile(
                     scalar_data,
                     this_sl,
                     affine=row['dwi_affine'])
@@ -511,7 +633,7 @@ class AFQ(object):
 
 |    study
 |      ├-derivatives
-|            ├-preafq
+|            ├-dmriprep
 |                ├── sub01
 |                │   ├── sess01
 |                │   │   ├── anat
@@ -548,7 +670,7 @@ class AFQ(object):
 |                           └── sub-02_sess-02_dwi.nii.gz
 
     This structure can be automatically generated from BIDS-compliant
-    data [1]_, using the preAFQ software [2]_ and BIDS app.
+    data [1]_, using the dmriprep software [2]_ and BIDS app.
 
     Notes
     -----
@@ -561,23 +683,36 @@ class AFQ(object):
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
 
-    .. [2] https://github.com/akeshavan/preafq
+    .. [2] https://github.com/nipy/dmriprep
 
     """
-    def __init__(self, preafq_path,
-                 sub_prefix="sub", dwi_folder="dwi",
-                 dwi_file="*dwi", anat_folder="anat",
-                 anat_file="*T1w*", seg_file='*aparc+aseg*',
-                 b0_threshold=0, odf_model="DTI", directions="det",
-                 n_seeds=2, random_seeds=False,
-                 bundle_list=BUNDLES, dask_it=False,
+    def __init__(self,
+                 dmriprep_path,
+                 seg_algo="planes",
+                 sub_prefix="sub",
+                 dwi_folder="dwi",
+                 dwi_file="*dwi",
+                 anat_folder="anat",
+                 anat_file="*T1w*",
+                 seg_file='*aparc+aseg*',
+                 b0_threshold=0,
+                 odf_model="CSD",
+                 directions="det",
+                 n_seeds=2,
+                 random_seeds=False,
+                 bundle_names=BUNDLES,
+                 dask_it=False,
                  force_recompute=False,
                  reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
         """
 
-        preafq_path: str
+        dmriprep_path: str
             The path to the preprocessed diffusion data.
+
+        seg_algo : str
+            Which algorithm to use for segmentation.
+            Can be one of: {"planes", "recobundles"}
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -604,7 +739,9 @@ class AFQ(object):
         """
         self.directions = directions
         self.odf_model = odf_model
-        self.bundle_dict = make_bundle_dict(bundle_list)
+        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
+                                            seg_algo=seg_algo)
+        self.seg_algo = seg_algo
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
@@ -616,16 +753,16 @@ class AFQ(object):
                 reg_template = nib.load(reg_template)
             self.reg_template = reg_template
         # This is the place in which each subject's full data lives
-        self.preafq_dirs = glob.glob(op.join(preafq_path,
-                                             '%s*' % sub_prefix))
+        self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
+                                               '%s*' % sub_prefix))
 
         # This is where all the outputs will go:
         self.afq_dir = op.join(
-            op.join(*PurePath(preafq_path).parts[:-1]), 'afq')
+            op.join(*PurePath(dmriprep_path).parts[:-1]), 'afq')
 
         os.makedirs(self.afq_dir, exist_ok=True)
 
-        self.subjects = [op.split(p)[-1] for p in self.preafq_dirs]
+        self.subjects = [op.split(p)[-1] for p in self.dmriprep_dirs]
 
         sub_list = []
         sess_list = []
@@ -635,7 +772,7 @@ class AFQ(object):
         anat_file_list = []
         seg_file_list = []
         results_dir_list = []
-        for subject, sub_dir in zip(self.subjects, self.preafq_dirs):
+        for subject, sub_dir in zip(self.subjects, self.dmriprep_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
                 results_dir_list.append(op.join(self.afq_dir,
@@ -851,10 +988,14 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        if ('bundles_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if self.seg_algo == "planes":
+            seg_function = _bundles
+        elif self.seg_algo == "recobundles":
+            seg_function = _recobundles
+        column_exists = 'bundles_file' in self.data_frame.columns
+        if (not column_exists or self.force_recompute):
             self.data_frame['bundles_file'] =\
-                self.data_frame.apply(_bundles, axis=1,
+                self.data_frame.apply(seg_function, axis=1,
                                       args=[self.wm_labels,
                                             self.bundle_dict,
                                             self.reg_template],
@@ -871,18 +1012,22 @@ class AFQ(object):
     bundles = property(get_bundles, set_bundles)
 
     def set_clean_bundles(self):
-        if ('clean_bundles_file' not in self.data_frame.columns
-                or self.force_recompute):
-            self.data_frame['clean_bundles_file'] =\
-                self.data_frame.apply(_clean_bundles, axis=1,
-                                      args=[self.wm_labels,
-                                            self.bundle_dict,
-                                            self.reg_template],
-                                      odf_model=self.odf_model,
-                                      directions=self.directions,
-                                      n_seeds=self.n_seeds,
-                                      random_seeds=self.random_seeds,
-                                      force_recompute=self.force_recompute)
+        column_exists = 'clean_bundles_file' in self.data_frame.columns
+        if (not column_exists or self.force_recompute):
+            if self.seg_algo == "recobundles":
+                self.data_frame['clean_bundles_file'] =\
+                    self.data_frame['bundles_file']
+            else:
+                self.data_frame['clean_bundles_file'] =\
+                    self.data_frame.apply(_clean_bundles, axis=1,
+                                          args=[self.wm_labels,
+                                                self.bundle_dict,
+                                                self.reg_template],
+                                          odf_model=self.odf_model,
+                                          directions=self.directions,
+                                          n_seeds=self.n_seeds,
+                                          random_seeds=self.random_seeds,
+                                          force_recompute=self.force_recompute)
 
     def get_clean_bundles(self):
         self.set_clean_bundles()

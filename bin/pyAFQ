@@ -8,8 +8,8 @@ from AFQ import api
 usage = """pyAFQ"""
 parser = ArgumentParser(usage)
 
-parser.add_argument(dest='preafq_path', action="store",
-                    help="Path to preAFQ folder")
+parser.add_argument(dest='dmriprep_path', action="store",
+                    help="Path to dmriprep folder")
 
 parser.add_argument("-s", "--sub_prefix", dest="sub_prefix", action="store",
                     help="Subject prefix (default: 'sub') ",
@@ -53,30 +53,28 @@ parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
                             which means 1 seed per voxel)""",
                     default=1)
 
-parser.add_argument("-m", "--random_seeds", dest="random_seeds",
-                    action="store_false",
+parser.add_argument("-m", "--random_seeds", type=bool,
+                    dest="random_seeds", action="store",
                     help="""Whether to use a total of `n_seeds` random seeds
                             instead of `n_seeds` per voxel (default: False)""",
-                    default='false')
+                    default=False)
 
 
 opts = parser.parse_args()
 
-random_seeds = opts.random_seeds == 'true'
-
-myafq = api.AFQ(opts.preafq_path,
+myafq = api.AFQ(opts.dmriprep_path,
                 sub_prefix=opts.sub_prefix,
                 dwi_folder=opts.dwi_folder,
                 dwi_file=opts.dwi_file,
                 anat_folder=opts.anat_folder,
                 anat_file=opts.anat_file,
                 seg_file=opts.seg_file,
-                b0_threshold=opts.b0_threshold,
+                b0_threshold=float(opts.b0_threshold),
                 odf_model=opts.odf_model,
                 directions=opts.directions,
                 n_seeds=int(opts.n_seeds),
-                random_seeds=random_seeds,
-                bundle_list=api.BUNDLES,
+                random_seeds=opts.random_seeds,
+                bundle_names=api.BUNDLES,
                 dask_it=False,
                 force_recompute=False,
                 reg_template=None,

@@ -33,10 +33,20 @@ def test_read_write_trk():
             npt.assert_almost_equal(new, old, decimal=4)
 
 def test_bundles_to_tgram():
-    bundles = {'b1': [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-                      np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])],
-               'b2': [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-                      np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])]}
+    bundles = {'b1': dts.Streamlines([np.array([[0, 0, 0],
+                                                [0, 0, 0.5],
+                                                [0, 0, 1],
+                                                [0, 0, 1.5]]),
+                                      np.array([[0, 0, 0],
+                                                [0, 0.5, 0.5],
+                                                [0, 1, 1]])]),
+               'b2': dts.Streamlines([np.array([[0, 0, 0],
+                                                [0, 0, 0.5],
+                                                [0, 0, 2],
+                                                [0, 0, 2.5]]),
+                                      np.array([[0, 0, 0],
+                                                [0, 0.5, 0.5],
+                                                [0, 2, 2]])])}
 
     bundle_dict = {'b1': {'uid': 1}, 'b2':{'uid': 2}}
     affine = np.array([[2., 0., 0., -80.],
@@ -45,27 +55,10 @@ def test_bundles_to_tgram():
                        [0., 0., 0., 1.]])
     tgram = aus.bundles_to_tgram(bundles, bundle_dict, affine)
     new_bundles = aus.tgram_to_bundles(tgram, bundle_dict)
-    npt.assert_equal(new_bundles, bundles)
-
-
-def test_add_bundles():
-    t1 = nib.streamlines.Tractogram(
-            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    t2 = nib.streamlines.Tractogram(
-            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    added = aus.add_bundles(t1, t2)
-    test_tgram =nib.streamlines.Tractogram(
-            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]]),
-             np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    for sl1, sl2 in zip(added.streamlines, test_tgram.streamlines):
-        npt.assert_array_equal(sl1, sl2)
+    for k1 in bundles.keys():
+        for k2 in bundles[k1].__dict__.keys():
+            npt.assert_equal(new_bundles[k1].__dict__[k2],
+                             bundles[k1].__dict__[k2])
 
 
 def test_split_streamline():
@@ -93,3 +86,23 @@ def test_split_streamline():
                 )
         else:
             assert new_streamlines.__dict__[k] == test_streamlines.__dict__[k]
+
+
+def test_add_bundles():
+    t1 = nib.streamlines.Tractogram(
+            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    t2 = nib.streamlines.Tractogram(
+        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    added = aus.add_bundles(t1, t2)
+    test_tgram =nib.streamlines.Tractogram(
+        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]]),
+            np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
+            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
+
+    for sl1, sl2 in zip(added.streamlines, test_tgram.streamlines):
+        npt.assert_array_equal(sl1, sl2)

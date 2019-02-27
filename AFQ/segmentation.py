@@ -1,23 +1,17 @@
-from distutils.version import LooseVersion
-
 import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
 
-import dipy
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
+from dipy.segment.bundles import RecoBundles
+from dipy.align.streamlinear import whole_brain_slr
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-import AFQ._fixes as fix
-
-if LooseVersion(dipy.__version__) < '0.12':
-    # Monkey patch the fix in:
-    dts.orient_by_rois = fix.orient_by_rois
 
 
 __all__ = ["segment"]
@@ -436,3 +430,57 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         rounds_elapsed += 1
     # Select based on the variable that was keeping track of things for us:
     return streamlines[idx]
+
+
+def recobundles(streamlines, bundle_dict):
+    """
+    Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+
+    Parameters
+    ----------
+    streamlines : list or Streamlines object.
+        A whole-brain tractogram to be segmented.
+    bundle_dict: dictionary
+        Of the form:
+
+            {'whole_brain': Streamlines,
+            'CST_L': {'sl': Streamlines, 'centroid': array},
+            'CST_R': {'sl': Streamlines, 'centroid': array},
+            ...}
+
+    Returns
+    -------
+    fiber_groups : dict
+        Keys are names of the bundles, values are Streamline objects.
+        The streamlines in each object have all been oriented to have the
+        same orientation (using `dts.orient_by_streamline`).
+    """
+    fiber_groups = {}
+    # We start with whole-brain SLR:
+    atlas = bundle_dict['whole_brain']
+    moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
+        atlas, streamlines, x0='affine', verbose=False, progressive=True)
+
+    # We generate our instance of RB with the moved streamlines:
+    rb = RecoBundles(moved, verbose=False)
+
+    # Next we'll iterate over bundles, registering each one:
+    bundle_list = list(bundle_dict.keys())
+    bundle_list.remove('whole_brain')
+
+    for bundle in bundle_list:
+        model_sl = bundle_dict[bundle]['sl']
+        _, rec_labels = rb.recognize(model_bundle=model_sl,
+                                     model_clust_thr=5.,
+                                     reduction_thr=10,
+                                     reduction_distance='mam',
+                                     slr=True,
+                                     slr_metric='asymmetric',
+                                     pruning_distance='mam')
+
+        # Use the streamlines in the original space:
+        recognized_sl = streamlines[rec_labels]
+        standard_sl = bundle_dict[bundle]['centroid']
+        oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+        fiber_groups[bundle] = oriented_sl
+    return fiber_groups

@@ -1,17 +1,20 @@
 import os
 import os.path as op
 import json
+from glob import glob
 
 import boto3
-import botocore
 
 import numpy as np
 
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
-
 from dipy.io.streamline import load_trk
+from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
+                                 ResampleFeature)
+from dipy.segment.clustering import QuickBundles
+
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
@@ -255,7 +258,8 @@ def read_templates():
     return template_dict
 
 
-def fetch_hcp(subjects):
+def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
+              path=None):
     """
     Fetch HCP diffusion data and arrange it in a manner that resembles the
     BIDS [1]_ specification.
@@ -263,7 +267,12 @@ def fetch_hcp(subjects):
     Parameters
     ----------
     subjects : list
-       Each item is an integer, identifying one of the HCP subjects
+        Each item is an integer, identifying one of the HCP subjects
+    hcp_bucket : string
+        The name of the HCP S3 bucket. Default: "hcp-openaccess"
+    profile_name : string
+        The name of the AWS profile used for access. Default: "hcp"
+    path
 
     Returns
     -------
@@ -288,15 +297,13 @@ def fetch_hcp(subjects):
     """
     boto3.setup_default_session(profile_name='hcp')
     s3 = boto3.resource('s3')
-    try:
-        bucket = s3.Bucket('hcp-openaccess')
-        # This will trigger the client error in case this S3 bucket
-        # doesn't exist
-        list(bucket.objects.all())
-    except botocore.exceptions.ClientError:
-        bucket = s3.Bucket('hcp-openaccess-temp')
+    bucket = s3.Bucket(hcp_bucket)
 
-    base_dir = op.join(afq_home, 'HCP', 'derivatives', 'preafq')
+    if path is None:
+        base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
+    else:
+        base_dir = op.join(path, 'HCP', 'derivatives', 'dmriprep')
+
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
 
@@ -310,16 +317,16 @@ def fetch_hcp(subjects):
             os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
             os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
-            'HCP/%s/T1w/Diffusion/bvals' % subject
+            'HCP_1200/%s/T1w/Diffusion/bvals' % subject
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
-            'HCP/%s/T1w/Diffusion/bvecs' % subject
+            'HCP_1200/%s/T1w/Diffusion/bvecs' % subject
         data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
-            'HCP/%s/T1w/Diffusion/data.nii.gz' % subject
+            'HCP_1200/%s/T1w/Diffusion/data.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
-            'HCP/%s/T1w/T1w_acpc_dc.nii.gz' % subject
+            'HCP_1200/%s/T1w/T1w_acpc_dc.nii.gz' % subject
         data_files[op.join(sess_dir, 'anat',
                            'sub-%s_aparc+aseg.nii.gz' % subject)] =\
-            'HCP/%s/T1w/aparc+aseg.nii.gz' % subject
+            'HCP_1200/%s/T1w/aparc+aseg.nii.gz' % subject
 
     for k in data_files.keys():
         if not op.exists(k):
@@ -357,7 +364,7 @@ fetch_stanford_hardi_tractography = _make_fetcher(
 
 def read_stanford_hardi_tractography():
     """
-
+    Reads a minimal tractography from the Stanford dataset.
     """
     files, folder = fetch_stanford_hardi_tractography()
     files_dict = {}
@@ -365,7 +372,8 @@ def read_stanford_hardi_tractography():
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'mapping.nii.gz'))
-    files_dict['tractography_subsampled.trk'] = load_trk(
+
+    files_dict['tractography_subsampled.trk'], _ = load_trk(
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'))
@@ -374,7 +382,7 @@ def read_stanford_hardi_tractography():
 
 def organize_stanford_data(path=None):
     """
-    Create the expected file-system structure for the Stanford HARDI data-set
+    Create the expected file-system structure for the Stanford HARDI data-set.
     """
     dpd.fetch_stanford_hardi()
 
@@ -382,10 +390,10 @@ def organize_stanford_data(path=None):
         if not op.exists(afq_home):
             os.mkdir(afq_home)
         base_folder = op.join(afq_home, 'stanford_hardi',
-                              'derivatives', 'preafq')
+                              'derivatives', 'dmriprep')
     else:
         base_folder = op.join(path, 'stanford_hardi',
-                              'derivatives', 'preafq')
+                              'derivatives', 'dmriprep')
 
     if not op.exists(base_folder):
         anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
@@ -401,3 +409,46 @@ def organize_stanford_data(path=None):
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+
+
+fetch_hcp_atlas_16_bundles = _make_fetcher(
+    "fetch_hcp_atlas_16_bundles",
+    op.join(afq_home,
+            'hcp_atlas_16_bundles'),
+    'https://ndownloader.figshare.com/files/',
+    ["11921522"],
+    ["atlas_16_bundles.zip"],
+    md5_list=["b071f3e851f21ba1749c02fc6beb3118"],
+    doc="Download minimal Recobundles atlas",
+    unzip=True)
+
+
+def read_hcp_atlas_16_bundles():
+    """
+    XXX
+    """
+    bundle_dict = {}
+    _, folder = fetch_hcp_atlas_16_bundles()
+    whole_brain, _ = load_trk(op.join(folder,
+                                      'Atlas_in_MNI_Space_16_bundles',
+                                      'whole_brain',
+                                      'whole_brain_MNI.trk'))
+    bundle_dict['whole_brain'] = whole_brain
+    bundle_files = glob(
+        op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
+
+    for bundle_file in bundle_files:
+        bundle = op.splitext(op.split(bundle_file)[-1])[0]
+        bundle_dict[bundle] = {}
+        bundle_dict[bundle]['sl'] = load_trk(bundle_file)[0]
+
+        feature = ResampleFeature(nb_points=100)
+        metric = AveragePointwiseEuclideanMetric(feature)
+        qb = QuickBundles(np.inf, metric=metric)
+        cluster = qb.cluster(bundle_dict[bundle]['sl'])
+        bundle_dict[bundle]['centroid'] = cluster.centroids[0]
+
+    # For some reason, this file-name has a 0 in it, instead of an O:
+    bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
+    del bundle_dict["IF0F_R"]
+    return bundle_dict
