@@ -100,7 +100,7 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
     """
     tgram = nib.streamlines.Tractogram([], {'bundle': []})
     for b in bundles:
-        this_sl =  bundles[b]
+        this_sl = bundles[b]
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
