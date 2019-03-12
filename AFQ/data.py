@@ -5,9 +5,12 @@ import os.path as op
 import json
 from glob import glob
 
-import boto3
 import s3fs
 
+import boto3
+from botocore.handlers import disable_signing
+
+from pathlib import Path
 import numpy as np
 
 import nibabel as nib
@@ -595,3 +598,118 @@ def s3fs_json_write(data, fname, fs=None):
         fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
+
+
+def get_s3_client():
+    """Return a boto3 s3 client
+    Returns
+    -------
+    s3_client : boto3.client('s3')
+    """
+    import boto3
+    from botocore import UNSIGNED
+    from botocore.client import Config
+
+    # Global s3 client to preserve anonymous config
+    s3_client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+    return s3_client
+
+def list_hbn_subjects(s3_bucket='preafq-hbn'):
+    """
+    Return a list of HBN subjects by reading from the provided s3_bucket
+
+    Returns
+    -------
+
+    subjects : list of strings that are HBN subject ids.
+    """
+
+    resource = boto3.resource('s3')
+    resource.meta.client.meta.events.register('choose-signer.s3.*', disable_signing)
+
+    bucket = resource.Bucket(s3_bucket)
+
+    subjects = []
+
+    for item in bucket.objects.all():
+        subjects.append(item.key.split('/')[0])
+
+    return list(set(subjects))
+
+def download_single_hbn_item(item, client, s3_bucket, base_dir, overwrite):
+    """
+    downloads a single file,
+
+    Inputs
+    ------
+    item : an object returned by a boto3 Bucket().objects.all() or .filter()
+    client : a boto3 client object (from get_s3_client())
+    s3_bucket : bucket name, a string
+    base_dir : a location to save data to (string)
+    overwrite : whether or not to overwrite the file if it already exists
+
+    """
+    key = item.key
+    fname_dir = op.join(base_dir, op.dirname(key))
+    fname = op.join(base_dir, key)
+    Path(fname_dir).mkdir(parents=True, exist_ok=True)
+    try:
+        Path(fname).touch(exist_ok=overwrite)
+
+        # Download the file
+        client.download_file(Bucket=s3_bucket, Key=item.key, Filename=fname)
+    except FileExistsError:
+        print(f'File {fname} already exists. Continuing...')
+
+def download_single_hbn_subject(subject, bucket, client, s3_bucket, base_dir, overwrite):
+    """
+    downloads the whole directory for a given subject from HBN
+
+    Inputs
+    ------
+    item : an object returned by a boto3 Bucket().objects.all() or .filter()
+    bucket : a boto3 Bucket object
+    client : a boto3 client object (from get_s3_client())
+    s3_bucket : bucket name, a string
+    base_dir : a location to save data to (string)
+    overwrite : whether or not to overwrite the file if it already exists
+
+    """
+    for item in bucket.objects.filter(Prefix='{}/'.format(subject)):
+        download_single_hbn_item(item, client, s3_bucket, base_dir, overwrite)
+
+
+def fetch_hbn_data(subjects, s3_bucket='preafq-hbn', path=None, overwrite=False):
+    """
+    Download HBN data from the provided S3 bucket.
+
+    Inputs
+    ------
+
+    subjects : list of subject ids from HBN. use list_hbn_subjects() to get the whole list.
+    s3_bucket : bucket name (string) where the HBN data is stored
+    path : (optional) location to store downloaded data. defaults to ~/AFQ_data
+    overwrite : whether or not to overwrite existing files (default = False)
+    """
+
+    resource = boto3.resource('s3')
+    resource.meta.client.meta.events.register('choose-signer.s3.*', disable_signing)
+
+    bucket = resource.Bucket(s3_bucket)
+
+    bucket = resource.Bucket(s3_bucket)
+    s3_client = get_s3_client()
+
+    if path is None:
+        base_dir = op.join(afq_home, 'HBN', 'derivatives')
+    else:
+        base_dir = op.join(path, 'HBN', 'derivatives')
+
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir, exist_ok=True)
+
+    for subject in subjects:
+        download_single_hbn_subject(subject, bucket, s3_client, s3_bucket, base_dir, overwrite)
+
+
+
