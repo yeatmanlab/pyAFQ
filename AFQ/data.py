@@ -322,9 +322,11 @@ def fetch_hcp(subjects,
     bucket = s3.Bucket(hcp_bucket)
 
     if path is None:
-        base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
+        my_path = afq_home
     else:
-        base_dir = op.join(path, 'HCP', 'derivatives', 'dmriprep')
+        base_dir = path
+
+    base_dir = op.join(my_path, 'HCP', 'derivatives', 'dmriprep')
 
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
@@ -360,7 +362,8 @@ def fetch_hcp(subjects,
          "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
          "Subjects": subjects}
 
-    with open(op.join(base_dir, 'dataset_description.json'), 'w') as outfile:
+    desc_file = op.join(my_path, 'HCP', 'dataset_description.json')
+    with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
 
     return data_files
