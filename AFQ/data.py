@@ -258,8 +258,12 @@ def read_templates():
     return template_dict
 
 
-def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
-              path=None):
+def fetch_hcp(subjects,
+              hcp_bucket='hcp-openaccess',
+              profile_name="hcp",
+              path=None,
+              aws_access_key_id=None,
+              aws_secret_access_key=None):
     """
     Fetch HCP diffusion data and arrange it in a manner that resembles the
     BIDS [1]_ specification.
@@ -287,7 +291,8 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
     AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
     AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX
 
-    The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
+    The keys are credentials that you can get from HCP
+    (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
 
     Local filenames are changed to match our expected conventions.
 
@@ -295,7 +300,13 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
     """
-    boto3.setup_default_session(profile_name='hcp')
+    if profile_name:
+        boto3.setup_default_session(profile_name='hcp')
+    elif aws_access_key_id is not None and aws_secret_access_key is not None:
+        boto3.setup_default_session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(hcp_bucket)
 
@@ -409,6 +420,16 @@ def organize_stanford_data(path=None):
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+
+    dataset_description = {
+         "BIDSVersion": "1.0.0",
+         "Name": "Stanford HARDI",
+         "Subjects": ["sub-01"]}
+
+    desc_file = op.join(afq_home, 'stanford_hardi', 'dataset_description.json')
+
+    with open(desc_file, 'w') as outfile:
+        json.dump(dataset_description, outfile)
 
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(
