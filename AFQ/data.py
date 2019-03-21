@@ -258,8 +258,12 @@ def read_templates():
     return template_dict
 
 
-def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
-              path=None):
+def fetch_hcp(subjects,
+              hcp_bucket='hcp-openaccess',
+              profile_name="hcp",
+              path=None,
+              aws_access_key_id=None,
+              aws_secret_access_key=None):
     """
     Fetch HCP diffusion data and arrange it in a manner that resembles the
     BIDS [1]_ specification.
@@ -268,11 +272,18 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
     ----------
     subjects : list
         Each item is an integer, identifying one of the HCP subjects
-    hcp_bucket : string
+    hcp_bucket : string, optional
         The name of the HCP S3 bucket. Default: "hcp-openaccess"
-    profile_name : string
+    profile_name : string, optional
         The name of the AWS profile used for access. Default: "hcp"
-    path
+    path : string, optional
+        Path to save files into. Default: '~/AFQ_data'
+    aws_access_key_id : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
+    aws_secret_access_key : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
 
     Returns
     -------
@@ -280,14 +291,15 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
 
     Notes
     -----
-    To use this function, you need to have a file '~/.aws/credentials', that
-    includes a section:
+    To use this function with its default setting, you need to have a
+    file '~/.aws/credentials', that includes a section:
 
     [hcp]
     AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
     AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX
 
-    The keys are credentials that you can get from HCP (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
+    The keys are credentials that you can get from HCP
+    (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
 
     Local filenames are changed to match our expected conventions.
 
@@ -295,14 +307,26 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
            a format for organizing and describing outputs of neuroimaging
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
     """
-    boto3.setup_default_session(profile_name='hcp')
+    if profile_name:
+        boto3.setup_default_session(profile_name='hcp')
+    elif aws_access_key_id is not None and aws_secret_access_key is not None:
+        boto3.setup_default_session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+    else:
+        raise ValueError("Must provide either a `profile_name` or ",
+                         "both `aws_access_key_id` and ",
+                         "`aws_secret_access_key` as input to 'fetch_hcp'")
+
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(hcp_bucket)
 
     if path is None:
-        base_dir = op.join(afq_home, 'HCP', 'derivatives', 'dmriprep')
+        my_path = afq_home
     else:
-        base_dir = op.join(path, 'HCP', 'derivatives', 'dmriprep')
+        base_dir = path
+
+    base_dir = op.join(my_path, 'HCP', 'derivatives', 'dmriprep')
 
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
@@ -338,7 +362,8 @@ def fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name="hcp",
          "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
          "Subjects": subjects}
 
-    with open(op.join(base_dir, 'dataset_description.json'), 'w') as outfile:
+    desc_file = op.join(my_path, 'HCP', 'dataset_description.json')
+    with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
 
     return data_files
@@ -389,11 +414,12 @@ def organize_stanford_data(path=None):
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
-        base_folder = op.join(afq_home, 'stanford_hardi',
-                              'derivatives', 'dmriprep')
+        my_path = afq_home
     else:
-        base_folder = op.join(path, 'stanford_hardi',
-                              'derivatives', 'dmriprep')
+        my_path = path
+
+    base_folder = op.join(my_path, 'stanford_hardi',
+                          'derivatives', 'dmriprep')
 
     if not op.exists(base_folder):
         anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
@@ -409,6 +435,16 @@ def organize_stanford_data(path=None):
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+
+    dataset_description = {
+         "BIDSVersion": "1.0.0",
+         "Name": "Stanford HARDI",
+         "Subjects": ["sub-01"]}
+
+    desc_file = op.join(my_path, 'stanford_hardi', 'dataset_description.json')
+
+    with open(desc_file, 'w') as outfile:
+        json.dump(dataset_description, outfile)
 
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(
