@@ -272,11 +272,18 @@ def fetch_hcp(subjects,
     ----------
     subjects : list
         Each item is an integer, identifying one of the HCP subjects
-    hcp_bucket : string
+    hcp_bucket : string, optional
         The name of the HCP S3 bucket. Default: "hcp-openaccess"
-    profile_name : string
+    profile_name : string, optional
         The name of the AWS profile used for access. Default: "hcp"
-    path
+    path : string, optional
+        Path to save files into. Default: '~/AFQ_data'
+    aws_access_key_id : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
+    aws_secret_access_key : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
 
     Returns
     -------
@@ -284,8 +291,8 @@ def fetch_hcp(subjects,
 
     Notes
     -----
-    To use this function, you need to have a file '~/.aws/credentials', that
-    includes a section:
+    To use this function with its default setting, you need to have a
+    file '~/.aws/credentials', that includes a section:
 
     [hcp]
     AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
