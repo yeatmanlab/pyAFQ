@@ -1,5 +1,5 @@
 scikit_image
--e git+https://github.com/arokem/nibabel@14083e8413fab935e4bc41884f40d96ec699d509#egg=nibabel
+nibabel
 dipy==0.16
 numpy==1.15.4
 scipy==1.1.0
