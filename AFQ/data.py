@@ -411,11 +411,12 @@ def organize_stanford_data(path=None):
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
-        base_folder = op.join(afq_home, 'stanford_hardi',
-                              'derivatives', 'dmriprep')
+        my_path = afq_home
     else:
-        base_folder = op.join(path, 'stanford_hardi',
-                              'derivatives', 'dmriprep')
+        my_path = path
+
+    base_folder = op.join(my_path, 'stanford_hardi',
+                          'derivatives', 'dmriprep')
 
     if not op.exists(base_folder):
         anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
@@ -437,7 +438,7 @@ def organize_stanford_data(path=None):
          "Name": "Stanford HARDI",
          "Subjects": ["sub-01"]}
 
-    desc_file = op.join(afq_home, 'stanford_hardi', 'dataset_description.json')
+    desc_file = op.join(my_path, 'stanford_hardi', 'dataset_description.json')
 
     with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
