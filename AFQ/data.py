@@ -463,9 +463,9 @@ def s3fs_nifti_write(img, fname):
     file_map = img.make_file_map({'image': bio, 'header': bio})
     img.to_file_map(file_map)
     data = gzip.compress(bio.getvalue())
-
     with fs.open(fname, 'wb') as f:
         f.write(data)
+
 
 def s3fs_nifti_read(fname):
     fs = s3fs.S3FileSystem()
@@ -475,5 +475,4 @@ def s3fs_nifti_read(fname):
         bb = BytesIO(rr)
         fh = nib.FileHolder(fileobj=bb)
         img = nib.Nifti1Image.from_file_map({'header': fh, 'image': fh})
-
     return img
