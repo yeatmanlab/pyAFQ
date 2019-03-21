@@ -313,6 +313,10 @@ def fetch_hcp(subjects,
         boto3.setup_default_session(
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key)
+    else:
+        raise ValueError("Must provide either a `profile_name` or ",
+                         "both `aws_access_key_id` and ",
+                         "`aws_secret_access_key` as input to 'fetch_hcp'")
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(hcp_bucket)
