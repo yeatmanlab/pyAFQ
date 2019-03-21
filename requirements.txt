@@ -1,4 +1,4 @@
-scikit_image
+scikit_image==0.14.0
 nibabel
 dipy==0.16
 numpy==1.15.4
