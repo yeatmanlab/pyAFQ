@@ -10,3 +10,4 @@ palettable
 cloudpickle
 toolz
 boto3
+s3fs
