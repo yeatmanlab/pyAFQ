@@ -1,4 +1,4 @@
-scikit-image==0.14.0
+scikit_image==0.14.0
 -e git+https://github.com/arokem/nibabel@14083e8413fab935e4bc41884f40d96ec699d509#egg=nibabel
 dipy==0.16
 numpy==1.15.4
