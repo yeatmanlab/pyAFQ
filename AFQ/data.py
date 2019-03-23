@@ -1,9 +1,12 @@
+from io import BytesIO
+import gzip
 import os
 import os.path as op
 import json
 from glob import glob
 
 import boto3
+import s3fs
 
 import numpy as np
 
@@ -488,3 +491,24 @@ def read_hcp_atlas_16_bundles():
     bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
     del bundle_dict["IF0F_R"]
     return bundle_dict
+
+
+def s3fs_nifti_write(img, fname):
+    fs = s3fs.S3FileSystem()
+    bio = BytesIO()
+    file_map = img.make_file_map({'image': bio, 'header': bio})
+    img.to_file_map(file_map)
+    data = gzip.compress(bio.getvalue())
+    with fs.open(fname, 'wb') as f:
+        f.write(data)
+
+
+def s3fs_nifti_read(fname):
+    fs = s3fs.S3FileSystem()
+    with fs.open(fname) as f:
+        zz = gzip.open(f)
+        rr = zz.read()
+        bb = BytesIO(rr)
+        fh = nib.FileHolder(fileobj=bb)
+        img = nib.Nifti1Image.from_file_map({'header': fh, 'image': fh})
+    return img
