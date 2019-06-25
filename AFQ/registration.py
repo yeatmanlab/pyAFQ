@@ -116,7 +116,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     if isinstance(template, str):
         template = nib.load(template)
 
-    template_data = template.get_data()
+    template_data = template.get_fdata()
     template_affine = template.affine
 
     if isinstance(dwi, str):
@@ -126,7 +126,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
         gtab = dpg.gradient_table(*gtab)
 
     dwi_affine = dwi.affine
-    dwi_data = dwi.get_data()
+    dwi_data = dwi.get_fdata()
     mean_b0 = np.mean(dwi_data[..., gtab.b0s_mask], -1)
     warped_b0, mapping = syn_registration(mean_b0, template_data,
                                           moving_affine=dwi_affine,
@@ -185,7 +185,7 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
                                codomain_grid2world=codomain_img.affine,
                                prealign=prealign)
 
-    disp_data = disp.get_data()
+    disp_data = disp.get_fdata()
     mapping.forward = disp_data[..., 0]
     mapping.backward = disp_data[..., 1]
     mapping.is_inverse = True
@@ -312,14 +312,14 @@ def register_series(series, ref, pipeline):
     """
     if isinstance(ref, nib.Nifti1Image):
         static = ref
-        static_data = static.get_data()
+        static_data = static.get_fdata()
         s_aff = static.affine
         moving = series
-        moving_data = moving.get_data()
+        moving_data = moving.get_fdata()
         m_aff = moving.affine
 
     elif isinstance(ref, int) or np.iterable(ref):
-        data = series.get_data()
+        data = series.get_fdata()
         idxer = np.zeros(data.shape[-1]).astype(bool)
         idxer[ref] = True
         static_data = data[..., idxer]

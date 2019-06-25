@@ -50,8 +50,8 @@ def test_predict_dki():
                 "-o", tmpdir, '-b', '0']
         out = runner.run_command(cmd2)
         npt.assert_equal(out[0], 0)
-        pred = nib.load(op.join(tmpdir, "dki_prediction.nii.gz")).get_data()
-        data = nib.load(op.join(tmpdir, "dki.nii.gz")).get_data()
+        pred = nib.load(op.join(tmpdir, "dki_prediction.nii.gz")).get_fdata()
+        data = nib.load(op.join(tmpdir, "dki.nii.gz")).get_fdata()
         npt.assert_array_almost_equal(pred, data)
 
 
@@ -91,6 +91,6 @@ def test_predict_dti():
                 "-o", tmpdir, '-b', '0']
         out = runner.run_command(cmd2)
         npt.assert_equal(out[0], 0)
-        pred = nib.load(op.join(tmpdir, "dti_prediction.nii.gz")).get_data()
-        data = nib.load(op.join(tmpdir, "dti.nii.gz")).get_data()
+        pred = nib.load(op.join(tmpdir, "dti_prediction.nii.gz")).get_fdata()
+        data = nib.load(op.join(tmpdir, "dti.nii.gz")).get_fdata()
         npt.assert_array_almost_equal(pred, data)
