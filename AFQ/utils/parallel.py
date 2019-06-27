@@ -67,7 +67,7 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         else:
             raise ValueError("%s is not a backend for dask" % backend)
         results = dask.compute(*d, scheduler=scheduler,
-                                   workers=n_jobs)
+                               workers=n_jobs)
 
     elif engine == "serial":
         results = []
