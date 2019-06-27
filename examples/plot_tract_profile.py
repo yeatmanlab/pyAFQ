@@ -83,9 +83,7 @@ fiber_groups = seg.segment(hardi_fdata,
                            streamlines,
                            bundles,
                            reg_template=MNI_T2_img,
-                           mapping=mapping,
-                           as_generator=False,
-                           affine=img.affine)
+                           mapping=mapping)
 
 
 print("Cleaning fiber groups...")
