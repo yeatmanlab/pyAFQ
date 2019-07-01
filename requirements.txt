@@ -11,3 +11,4 @@ cloudpickle==0.5.5
 toolz==0.9.0
 boto3==1.9.2
 s3fs==0.2.0
+tqdm==4.32.2
