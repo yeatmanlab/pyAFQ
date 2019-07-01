@@ -284,7 +284,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
                 roi = roi.get_data()
             warped_roi = auv.patch_up_roi(
                 (mapping.transform_inverse(
-                    roi,
+                    roi.astype(np.float32),
                     interpolation='linear')) > 0)
 
             if rule:

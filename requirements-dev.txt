@@ -6,3 +6,4 @@ sphinx_gallery
 sphinx_rtd_theme
 numpydoc
 sphinx-autoapi
+six==1.12.0
