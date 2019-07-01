@@ -57,11 +57,15 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
         ndim = vec.ndim
         shape = vec.shape
     
-    vec *= vec
+    np.square(vec, out=vec)
     vec_norm = vec.sum(axis)
     if delvec:
         del vec
-    vec_norm **= 0.5
+    try:
+        np.sqrt(vec_norm, out=vec_norm)
+    except TypeError:
+        vec_norm = vec_norm.astype(float)
+        np.sqrt(vec_norm, out=vec_norm)
     
     if keepdims:
         if axis is None:
