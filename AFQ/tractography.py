@@ -67,7 +67,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     else:
         params_img = params_file
 
-    model_params = params_img.get_data()
+    model_params = params_img.get_fdata()
     affine = params_img.affine
 
     if isinstance(n_seeds, int):

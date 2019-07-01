@@ -38,14 +38,14 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
 
     # Load the mask if it is a string
     if isinstance(mask, str):
-        mask = nib.load(mask).get_data().astype(bool)
+        mask = nib.load(mask).get_fdata().astype(bool)
 
     data = []
     bvals = []
     bvecs = []
     for dfile, bval_file, bvec_file in zip(data_files, bval_files, bvec_files):
         img = nib.load(dfile)
-        data.append(img.get_data())
+        data.append(img.get_fdata())
         bvals.append(np.loadtxt(bval_file))
         bvecs.append(np.loadtxt(bvec_file))
 

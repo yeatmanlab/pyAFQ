@@ -91,7 +91,7 @@ for bundle in bundles:
     fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
 
 FA_img = nib.load(dti_params['FA'])
-FA_data = FA_img.get_data()
+FA_data = FA_img.get_fdata()
 
 print("Extracting tract profiles...")
 for bundle in bundles:

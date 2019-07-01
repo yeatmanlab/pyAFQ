@@ -40,8 +40,8 @@ def test_predict_dti():
         gtab = dpg.gradient_table(fbval, fbvec)
         predict_fname = dti.predict(params_file, gtab, S0_file=fdata,
                                     out_dir=tmpdir)
-        prediction = nib.load(predict_fname).get_data()
-        npt.assert_almost_equal(prediction, nib.load(fdata).get_data())
+        prediction = nib.load(predict_fname).get_fdata()
+        npt.assert_almost_equal(prediction, nib.load(fdata).get_fdata())
 
         # If you have a mask into the volume, you will predict only that
         # part of the volume:
@@ -52,9 +52,9 @@ def test_predict_dti():
         params_file = file_dict['params']
         predict_fname = dti.predict(params_file, gtab, S0_file=fdata,
                                     out_dir=tmpdir)
-        prediction = nib.load(predict_fname).get_data()
+        prediction = nib.load(predict_fname).get_fdata()
         npt.assert_almost_equal(prediction[mask],
-                                nib.load(fdata).get_data()[mask])
+                                nib.load(fdata).get_fdata()[mask])
 
 
 def test_cli():

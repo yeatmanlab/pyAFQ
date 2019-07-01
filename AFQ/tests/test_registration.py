@@ -20,9 +20,9 @@ from AFQ.utils.streamlines import write_trk
 
 MNI_T2 = dpd.read_mni_template()
 hardi_img, gtab = dpd.read_stanford_hardi()
-MNI_T2_data = MNI_T2.get_data()
+MNI_T2_data = MNI_T2.get_fdata()
 MNI_T2_affine = MNI_T2.affine
-hardi_data = hardi_img.get_data()
+hardi_data = hardi_img.get_fdata()
 hardi_affine = hardi_img.affine
 b0 = hardi_data[..., gtab.b0s_mask]
 mean_b0 = np.mean(b0, -1)
@@ -90,7 +90,7 @@ def test_register_dwi():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # Use an abbreviated data-set:
         img = nib.load(fdata)
-        data = img.get_data()[..., :10]
+        data = img.get_fdata()[..., :10]
         nib.save(nib.Nifti1Image(data, img.affine),
                  op.join(tmpdir, 'data.nii.gz'))
         # Save a subset:
