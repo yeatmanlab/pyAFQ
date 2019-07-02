@@ -31,7 +31,7 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
         If True, the output will have the same number of dimensions as `vec`,
         with shape 1 on `axis`. Default is False.
     delvec : bool, optional
-        If True, vec is deleted as soon as possible. 
+        If True, vec is deleted as soon as possible.
         If False, vec is not deleted, but still squared. Default is True.
 
     Returns
