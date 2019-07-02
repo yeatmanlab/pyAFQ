@@ -74,6 +74,7 @@ def test_cli():
         assert out ==  0
         assert op.exists(op.join(tmpdir, 'dti', 'dti_params.nii.gz'))
 
+
 def test_inplace_norm():
     vec = [[8, 15, 0], [0, 36, 77]]
     norm1 = vector_norm(vec)
@@ -84,7 +85,7 @@ def test_inplace_norm():
     norm1 = vector_norm(vec)
     norm2 = in_place_norm(vec)
     npt.assert_equal(norm1, norm2)
-    
+
     vec = [[8, 15, 0], [0, 36, 77]]
     norm1 = vector_norm(vec, keepdims=True)
     norm2 = in_place_norm(vec, keepdims=True)

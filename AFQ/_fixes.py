@@ -14,6 +14,7 @@ def spherical_harmonics(m, n, theta, phi):
     val = val * np.exp(1j * m * theta)
     return val
 
+
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     """ Return Vectors with Euclidean (L2) norm
 
@@ -29,9 +30,9 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     keepdims : bool, optional
         If True, the output will have the same number of dimensions as `vec`,
         with shape 1 on `axis`. Default is False.
-    delvec: bool, optional
-        If True, vec is deleted as soon as possible. Default is True. 
-        If False, vec is not deleted, but still squared.
+    delvec : bool, optional
+        If True, vec is deleted as soon as possible. 
+        If False, vec is not deleted, but still squared. Default is True.
 
     Returns
     ---------
@@ -52,11 +53,11 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     array([  8.,  39.,  77.])
     """
     vec = np.asarray(vec)
-    
+
     if keepdims:
         ndim = vec.ndim
         shape = vec.shape
-    
+
     np.square(vec, out=vec)
     vec_norm = vec.sum(axis)
     if delvec:
@@ -66,7 +67,7 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     except TypeError:
         vec_norm = vec_norm.astype(float)
         np.sqrt(vec_norm, out=vec_norm)
-    
+
     if keepdims:
         if axis is None:
             shape = [1] * ndim
@@ -76,6 +77,7 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
         vec_norm = vec_norm.reshape(shape)
 
     return vec_norm
+
 
 def tensor_odf(evals, evecs, sphere):
     """
