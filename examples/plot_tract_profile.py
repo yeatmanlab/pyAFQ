@@ -76,17 +76,18 @@ if not op.exists('dti_streamlines.trk'):
         for hemi in ['_R', '_L']:
             for roi in bundles[name + hemi]['ROIs']:
                 warped_roi = patch_up_roi(
-                    (mapping.transform_inverse(roi.get_data().astype(np.float32),
-                                               interpolation='linear')) > 0)
+                    (mapping.transform_inverse(
+                        roi.get_data().astype(np.float32),
+                     interpolation='linear')) > 0)
                 seed_roi += warped_roi
 
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data > 0.2)
 
-    aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
+    save_tractogram('./dti_streamlines.trk', streamlines, img.affine)
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
-    streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
+    streamlines = tg.streamlines
 
 streamlines = dts.Streamlines(dtu.move_streamlines(
     [s for s in streamlines if s.shape[0] > 100],
