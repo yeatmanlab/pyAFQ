@@ -15,8 +15,8 @@ from AFQ.registration import (syn_registration, register_series, register_dwi,
                               read_mapping, syn_register_dwi, DiffeomorphicMap)
 
 from dipy.tracking.utils import move_streamlines
+from dipy.io.streamline import save_tractogram
 
-from AFQ.utils.streamlines import write_trk
 
 MNI_T2 = dpd.read_mni_template()
 hardi_img, gtab = dpd.read_stanford_hardi()
@@ -127,15 +127,15 @@ def test_streamline_registration():
             fname2 = op.join(tmpdir, 'sl2.trk')
             if use_aff is not None:
                 # Move the streamlines to this other space, and report it:
-                write_trk(fname1,
-                          move_streamlines(sl1, np.linalg.inv(use_aff)),
-                          use_aff)
-                write_trk(fname2,
-                          move_streamlines(sl2, np.linalg.inv(use_aff)),
-                          use_aff)
+                save_tractogram(fname1,
+                                move_streamlines(sl1, np.linalg.inv(use_aff)),
+                                use_aff)
+                save_tractogram(fname2,
+                                move_streamlines(sl2, np.linalg.inv(use_aff)),
+                                use_aff)
             else:
-                write_trk(fname1, sl1)
-                write_trk(fname2, sl2)
+                save_tractogram(fname1, sl1)
+                save_tractogram(fname2, sl2)
 
             aligned, matrix = streamline_registration(fname2, fname1)
             npt.assert_almost_equal(aligned[0], sl1[0], decimal=5)
