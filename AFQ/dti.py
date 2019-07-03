@@ -9,7 +9,7 @@ from dipy.reconst import dti
 
 import AFQ.utils.models as ut
 
-__all__ = ["fit_dti", "predict", "tensor_odf"]
+__all__ = ["fit_dti", "predict"]
 
 
 def _fit(gtab, data, mask=None):
@@ -115,28 +115,3 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
     nib.save(nib.Nifti1Image(pred, img.affine), fname)
 
     return fname
-
-
-def tensor_odf(evals, evecs, sphere):
-    """
-    Calculate the tensor Orientation Distribution Function
-
-    Parameters
-    ----------
-    evals : array (4D)
-        Eigenvalues of a tensor. Shape (x, y, z, 3).
-    evecs : array (5D)
-        Eigenvectors of a tensor. Shape (x, y, z, 3, 3)
-    sphere : sphere object
-        The ODF will be calculated in each vertex of this sphere.
-    """
-    odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
-    mask = np.where((evals[..., 0] > 0)
-                    & (evals[..., 1] > 0)
-                    & (evals[..., 2] > 0))
-
-    lower = 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
-    projection = np.dot(sphere.vertices, evecs[mask])
-    projection /= np.sqrt(evals[mask])
-    odf[mask] = ((vector_norm(projection) ** -3) / lower).T
-    return odf
