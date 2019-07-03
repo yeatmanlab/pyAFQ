@@ -79,7 +79,8 @@ if not op.exists('dti_streamlines.trk'):
                     (mapping.transform_inverse(
                         roi.get_data().astype(np.float32),
                      interpolation='linear')) > 0)
-                seed_roi += warped_roi
+                # Add voxels that aren't there yet:
+                seed_roi = np.logical_or(seed_roi, warped_roi)
 
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data > 0.2)
