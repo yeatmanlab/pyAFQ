@@ -24,7 +24,7 @@ myafq = api.AFQ(op.join(afd.afq_home,
                         'dmriprep'),
                 sub_prefix='sub', bundle_list=["SLF", "ARC", "CST", "FP"])
 
-FA = nib.load(myafq.dti_fa[0]).get_data()
+FA = nib.load(myafq.dti_fa[0]).get_fdata()
 
 fig, ax = plt.subplots(1)
 ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')

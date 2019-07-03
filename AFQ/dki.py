@@ -335,7 +335,7 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
     if S0_file is None:
         S0 = 100
     else:
-        S0 = nib.load(S0_file).get_data()
+        S0 = nib.load(S0_file).get_fdata()
         # If the S0 data is 4D, we assume it comes from an acquisition that had
         # B0 measurements in the same volumes described in the gtab:
         if len(S0.shape) == 4:
@@ -343,7 +343,7 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
         # Otherwise, we assume that it's already a 3D volume, and do nothing
 
     img = nib.load(params_file)
-    params = img.get_data()
+    params = img.get_fdata()
     pred = dki.dki_prediction(params, gtab, S0=S0)
     fname = op.join(out_dir, 'dki_prediction.nii.gz')
     nib.save(nib.Nifti1Image(pred, img.affine), fname)
