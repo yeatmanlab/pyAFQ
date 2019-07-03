@@ -23,7 +23,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
-
+from AFQ.utils.volume import patch_up_roi
 
 dpd.fetch_stanford_hardi()
 
@@ -42,17 +42,8 @@ else:
     dti_params = {'FA': './dti_FA.nii.gz',
                   'params': './dti_params.nii.gz'}
 
-print("Tracking...")
-if not op.exists('dti_streamlines.trk'):
-    streamlines = list(aft.track(dti_params['params']))
-    save_tractogram('./dti_streamlines.trk', streamlines, img.affine)
-else:
-    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
-    streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines
-
-streamlines = dts.Streamlines(dtu.move_streamlines(
-    [s for s in streamlines if s.shape[0] > 100],
-    np.linalg.inv(img.affine)))
+FA_img = nib.load(dti_params['FA'])
+FA_data = FA_img.get_fdata()
 
 templates = afd.read_templates()
 bundle_names = ["CST", "ILF"]
@@ -77,6 +68,32 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
+
+print("Tracking...")
+if not op.exists('dti_streamlines.trk'):
+    seed_roi = np.zeros(img.shape[:-1])
+    for name in bundle_names:
+        for hemi in ['_R', '_L']:
+            for roi in bundles[name + hemi]['ROIs']:
+                warped_roi = patch_up_roi(
+                    (mapping.transform_inverse(
+                        roi.get_data().astype(np.float32),
+                     interpolation='linear')) > 0)
+                # Add voxels that aren't there yet:
+                seed_roi = np.logical_or(seed_roi, warped_roi)
+
+    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
+                            stop_mask=FA_data > 0.2)
+
+    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
+else:
+    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    streamlines = tg.streamlines
+
+streamlines = dts.Streamlines(dtu.move_streamlines(
+    [s for s in streamlines if s.shape[0] > 100],
+    np.linalg.inv(img.affine)))
+
 print("Segmenting fiber groups...")
 fiber_groups = seg.segment(hardi_fdata,
                            hardi_fbval,
@@ -90,9 +107,6 @@ fiber_groups = seg.segment(hardi_fdata,
 print("Cleaning fiber groups...")
 for bundle in bundles:
     fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
-
-FA_img = nib.load(dti_params['FA'])
-FA_data = FA_img.get_fdata()
 
 print("Extracting tract profiles...")
 for bundle in bundles:
