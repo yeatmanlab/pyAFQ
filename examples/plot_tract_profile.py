@@ -84,7 +84,7 @@ if not op.exists('dti_streamlines.trk'):
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data > 0.2)
 
-    save_tractogram('./dti_streamlines.trk', streamlines, img.affine)
+    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.streamlines
