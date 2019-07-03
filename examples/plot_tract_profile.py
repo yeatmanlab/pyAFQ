@@ -71,7 +71,7 @@ MNI_T2_img = dpd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
-    mapping = reg.syn_register_dwi(hardi_fdata, gtab)
+    warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab)
     reg.write_mapping(mapping, './mapping.nii.gz')
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
