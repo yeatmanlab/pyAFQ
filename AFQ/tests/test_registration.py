@@ -45,8 +45,9 @@ def test_syn_registration():
                                                   step_length=0.1,
                                                   metric='CC',
                                                   dim=3,
-                                                  level_iters=[10, 10, 5],
+                                                  level_iters=[5, 5, 5],
                                                   sigma_diff=2.0,
+                                                  radius=1,
                                                   prealign=None)
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
@@ -67,7 +68,9 @@ def test_syn_registration():
 
 
 def test_syn_register_dwi():
-    warped_b0, mapping = syn_register_dwi(subset_dwi_data, gtab, template=subset_t2_img)
+    warped_b0, mapping = syn_register_dwi(subset_dwi_data, gtab,
+                                          template=subset_t2_img,
+                                          radius=1)
     npt.assert_equal(isinstance(mapping, DiffeomorphicMap), True)
     npt.assert_equal(warped_b0.shape, subset_t2_img.shape)
 
@@ -134,8 +137,8 @@ def test_streamline_registration():
                                 move_streamlines(sl2, np.linalg.inv(use_aff)),
                                 use_aff)
             else:
-                save_tractogram(fname1, sl1)
-                save_tractogram(fname2, sl2)
+                save_tractogram(fname1, sl1, np.eye(4))
+                save_tractogram(fname2, sl2, np.eye(4))
 
             aligned, matrix = streamline_registration(fname2, fname1)
             npt.assert_almost_equal(aligned[0], sl1[0], decimal=5)

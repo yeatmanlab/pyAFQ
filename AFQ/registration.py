@@ -46,6 +46,7 @@ def syn_registration(moving, static,
                      dim=3,
                      level_iters=[10, 10, 5],
                      sigma_diff=2.0,
+                     radius=4,
                      prealign=None):
     """Register a source image (moving) to a target image (static).
 
@@ -68,6 +69,8 @@ def syn_registration(moving, static,
         the number of iterations at each level of the Gaussian Pyramid (the
         length of the list defines the number of pyramid levels to be
         used).
+    sigma_diff, radius : float
+        Parameters for initialization of the metric.
 
     Returns
     -------
@@ -80,7 +83,8 @@ def syn_registration(moving, static,
         The vector field describing the backward warping from the target to the
         source.
     """
-    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff)
+    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff,
+                                         radius=radius)
 
     sdr = SymmetricDiffeomorphicRegistration(use_metric, level_iters,
                                              step_length=step_length)
