@@ -185,7 +185,7 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
                                codomain_grid2world=codomain_img.affine,
                                prealign=prealign)
 
-    disp_data = disp.get_fdata()
+    disp_data = disp.get_fdata().astype(np.float32)
     mapping.forward = disp_data[..., 0]
     mapping.backward = disp_data[..., 1]
     mapping.is_inverse = True
