@@ -23,6 +23,7 @@ import dipy.data as dpd
 from dipy.align.streamlinear import StreamlineLinearRegistration
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import move_streamlines
+from dipy.io.streamline import load_tractogram
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
@@ -45,6 +46,7 @@ def syn_registration(moving, static,
                      dim=3,
                      level_iters=[10, 10, 5],
                      sigma_diff=2.0,
+                     radius=4,
                      prealign=None):
     """Register a source image (moving) to a target image (static).
 
@@ -67,6 +69,8 @@ def syn_registration(moving, static,
         the number of iterations at each level of the Gaussian Pyramid (the
         length of the list defines the number of pyramid levels to be
         used).
+    sigma_diff, radius : float
+        Parameters for initialization of the metric.
 
     Returns
     -------
@@ -79,7 +83,8 @@ def syn_registration(moving, static,
         The vector field describing the backward warping from the target to the
         source.
     """
-    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff)
+    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff,
+                                         radius=radius)
 
     sdr = SymmetricDiffeomorphicRegistration(use_metric, level_iters,
                                              step_length=step_length)
@@ -423,9 +428,9 @@ def streamline_registration(moving, static, n_points=100,
     """
     # Load the streamlines, if you were given a file-name
     if isinstance(moving, str):
-        moving = sut.read_trk(moving)
+        moving = load_tractogram(moving)[0]
     if isinstance(static, str):
-        static = sut.read_trk(static)
+        static = load_tractogram(static)[0]
 
     srr = StreamlineLinearRegistration()
     srm = srr.optimize(static=set_number_of_points(static, n_points),

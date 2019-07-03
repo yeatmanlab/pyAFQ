@@ -15,6 +15,7 @@ import dipy.data as dpd
 from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
+from dipy.io.streamline import save_tractogram
 
 import AFQ.utils.streamlines as aus
 import AFQ.data as afd
@@ -44,7 +45,7 @@ else:
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
     streamlines = list(aft.track(dti_params['params']))
-    aus.write_trk('./dti_streamlines.trk', streamlines, affine=img.affine)
+    save_tractogram('./dti_streamlines.trk', streamlines, img.affine)
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.apply_affine(np.linalg.inv(img.affine)).streamlines

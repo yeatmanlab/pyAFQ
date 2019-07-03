@@ -14,6 +14,7 @@ from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
+from dipy.io.streamline import save_tractogram
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -372,10 +373,10 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 seed_mask=wm_mask,
                                 stop_mask=wm_mask)
 
-        aus.write_trk(streamlines_file,
-                      dtu.move_streamlines(streamlines,
-                                           np.linalg.inv(dwi_img.affine)),
-                      affine=dwi_img.affine)
+        save_tractogram(streamlines_file,
+                        dtu.move_streamlines(streamlines,
+                                             np.linalg.inv(dwi_img.affine)),
+                        dwi_img.affine)
 
     return streamlines_file
 
@@ -607,12 +608,12 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
             this_sl = (streamlines[idx])
             fname = op.join(bundles_dir, '%s.trk' % bundle)
-            aus.write_trk(
+            save_tractogram(
                 fname,
                 dtu.move_streamlines(
                     this_sl,
                     np.linalg.inv(row['dwi_affine'])),
-                affine=row['dwi_affine'])
+                row['dwi_affine'])
 
 
 def _get_affine(fname):
