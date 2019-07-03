@@ -3,10 +3,12 @@ import multiprocessing
 import joblib
 import dask
 import dask.multiprocessing
+from distributed import Client
+from tqdm import tqdm
 
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
-           backend="threading", func_args=[], func_kwargs={}):
+           backend="threading", client=None, func_args=[], func_kwargs={}):
     """
     Parallel for loop for numpy arrays
 
@@ -27,7 +29,10 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         The last one is useful for debugging -- runs the code without any
         parallelization.
     backend : str
-        What joblib backend to use. Irrelevant for other engines.
+        What joblib backend or dask scheduler to use.
+        One of {"threading" | "multiprocessing" | "processes" | "threads"}
+    client : a distributed.Client instance.
+        For the dask engine, a distributed client to use for mapping jobs.
     func_args : list, optional
         Positional arguments to `func`.
     func_kwargs : list, optional
@@ -59,15 +64,25 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
                 return func(in_arg, *args, **keywords)
             return newfunc
         p = partial(func, *func_args, **func_kwargs)
-        d = [dask.delayed(p)(i) for i in in_list]
-        if backend == "multiprocessing":
-            scheduler = "processes"
-        elif backend == "threading":
-            scheduler = "threads"
-        else:
-            raise ValueError("%s is not a backend for dask" % backend)
-        results = dask.compute(*d, scheduler=scheduler,
-                               workers=n_jobs)
+        if client is None:
+            client = Client()
+        results = client.map(p, in_list)
+
+        all_done = False
+        pbar = tqdm(total=len(in_list))
+        n_done = 0
+        while not all_done:
+            n_done_now = sum([r.done() for r in results])
+            if n_done_now > n_done:
+                pbar.update(n_done_now - n_done)
+                n_done = n_done_now
+
+            all_done = n_done == len(in_list)
+
+        exceptions = {}
+        for ii, rr in enumerate(results):
+            if rr.status == 'error':
+                exceptions[ii] = rr.exception()
 
     elif engine == "serial":
         results = []
