@@ -49,7 +49,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            make all
+            py.test --pyargs AFQ --cov-report term-missing --cov=AFQ
 
       - store_artifacts:
           path: test-reports
