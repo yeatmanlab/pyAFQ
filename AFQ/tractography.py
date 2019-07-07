@@ -60,23 +60,15 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The miminal length (mm) in a streamline. Default: 10
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 250
-    verbose: bool, optional
-        If true, details about what the script is doing is printed to info.
-        Default: False
 
     Returns
     -------
     list of streamlines ()
     """
 
-    # for now this is local
-    # this should be set by commandline for all files instead
-    if verbose:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig()
+    logger = logging.getLogger('AFQ.Tractography')
 
-    logging.debug("    Loading Image...")
+    logger.info("Loading Image...")
     if isinstance(params_file, str):
         params_img = nib.load(params_file)
     else:
@@ -85,7 +77,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     model_params = params_img.get_fdata()
     affine = params_img.affine
 
-    logging.debug("    Generating Seeds...")
+    logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
@@ -103,7 +95,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if sphere is None:
         sphere = dpd.default_sphere
 
-    logging.debug("    Getting Directions...")
+    logger.info("Getting Directions...")
     if directions == "det":
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
@@ -131,8 +123,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
-    logging.debug("    Tracking...")
-    logging.shutdown()
+    logger.info("Tracking...")
+
     return _local_tracking(seeds, dg, threshold_classifier, affine,
                            step_size=step_size, min_length=min_length,
                            max_length=max_length)
