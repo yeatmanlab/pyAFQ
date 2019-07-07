@@ -271,6 +271,6 @@ def make_tracking_data(out_fbval, out_fbvec, out_fdata):
                        [0., 0., 2., -60.],
                        [0., 0., 0., 1.]])
 
-    nib.save(nib.Nifti1Image(nib.load(fimg).get_data(), affine), out_fdata)
+    nib.save(nib.Nifti1Image(nib.load(fimg).get_fdata(), affine), out_fdata)
     np.savetxt(out_fbval, bvals)
     np.savetxt(out_fbvec, bvecs)

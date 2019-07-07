@@ -10,8 +10,8 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.tracking.local import ThresholdTissueClassifier
 
-from AFQ.dti import tensor_odf
 from AFQ._fixes import ParallelLocalTracking
+from AFQ._fixes import tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
@@ -82,7 +82,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     else:
         params_img = params_file
 
-    model_params = params_img.get_data()
+    model_params = params_img.get_fdata()
     affine = params_img.affine
 
     logging.debug("    Generating Seeds...")
