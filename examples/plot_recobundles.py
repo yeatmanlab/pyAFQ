@@ -16,14 +16,15 @@ from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
+from dipy.segment.bundles import RecoBundles
+from dipy.align.streamlinear import whole_brain_slr
 
-import AFQ.utils.streamlines as aus
+
 import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
-from AFQ.utils.volume import patch_up_roi
 
 dpd.fetch_stanford_hardi()
 
@@ -88,7 +89,7 @@ if not op.exists('dti_streamlines.trk'):
                 dtu.move_streamlines(sl_xform,
                                      np.linalg.inv(MNI_T2_img.affine)))
 
-            save_tractogram('./%s%s_atlas.trk'%(name, hemi),
+            save_tractogram('./%s%s_atlas.trk' % (name, hemi),
                             sl_xform, np.eye(4))
 
             sl_xform = dts.Streamlines(
@@ -109,10 +110,6 @@ if not op.exists('dti_streamlines.trk'):
 else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.streamlines
-
-
-from dipy.segment.bundles import RecoBundles
-from dipy.align.streamlinear import whole_brain_slr
 
 fiber_groups = {}
 # We start with whole-brain SLR:
@@ -162,7 +159,7 @@ for name in bundle_names:
                                               weights=weights)
         ax.plot(profile)
         ax.set_title(name + hemi)
-        save_tractogram('./%s%s_subject.trk'%(name, hemi),
+        save_tractogram('./%s%s_subject.trk' % (name, hemi),
                         streamlines, img.affine)
 
 
