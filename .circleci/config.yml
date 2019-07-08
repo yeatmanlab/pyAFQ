@@ -54,3 +54,10 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+      - run:
+          name: run examples
+          command: |
+            . venv/bin/activate
+            cd examples
+            python plot_tract_profile.py
