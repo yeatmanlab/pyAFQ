@@ -95,10 +95,14 @@ def tensor_odf(evals, evecs, sphere):
     mask = np.where((evals[..., 0] > 0)
                     & (evals[..., 1] > 0)
                     & (evals[..., 2] > 0))
+    evecs = evecs[mask]
 
-    projection = np.dot(sphere.vertices, evecs[mask])
-    projection /= np.sqrt(evals[mask])
-    proj_norm = in_place_norm(projection)
+    proj_norm = np.zeros((sphere.vertices.shape[0], evecs.shape[0]))
+    for i in tqdm(range(sphere.vertices.shape[0])):
+        proj = np.dot(sphere.vertices[i, ...], evecs)
+        proj /= np.sqrt(evals[mask])
+        proj_norm[i, :] = in_place_norm(proj)
+
     proj_norm **= -3
     proj_norm /= 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
 
