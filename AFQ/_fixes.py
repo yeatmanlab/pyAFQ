@@ -42,9 +42,7 @@ class ParallelLocalTracking(LocalTracking):
         pbar = tqdm(total=self.seeds.shape[0])
 
         client = Client(processes=False)
-        print("TEST")
         [lin, offset, F, B] = client.scatter([lin, offset, F, B])
-        print("TEST")
 
         if self.seeds.shape[0] < recent_results_size:
             recent_results_size = self.seeds.shape[0]
@@ -71,25 +69,20 @@ class ParallelLocalTracking(LocalTracking):
         pbar.close()
 
     def _generate_streamlines_helper(self, s, lin, offset, F, B):
-        sys.stderr.write("Z")
         s = np.dot(lin, s) + offset
-        sys.stderr.write("A")
         # Set the random seed in numpy and random
         if self.random_seed is not None:
             s_random_seed = hash(np.abs((np.sum(s)) + self.random_seed)) \
                 % (2**32 - 1)
             random.seed(s_random_seed)
             np.random.seed(s_random_seed)
-        sys.stderr.write("B")
         directions = self.direction_getter.initial_direction(s)
         if directions.size == 0 and self.return_all:
             # only the seed position
             return [s]
-        sys.stderr.write("C")
         directions = directions[:self.max_cross]
         for first_step in directions:
             stepsF, tissue_class = self._tracker(s, first_step, F)
-            sys.stderr.write("D")
             if not (self.return_all or
                     tissue_class == TissueTypes.ENDPOINT or
                     tissue_class == TissueTypes.OUTSIDEIMAGE):
