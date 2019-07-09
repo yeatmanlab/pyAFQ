@@ -2,12 +2,13 @@ import numpy as np
 
 from scipy.special import lpmv, gammaln
 
-from tqdm import tqdm
+#from tqdm import tqdm
 from dipy.align import Bunch
 from dipy.tracking.local import LocalTracking
 import random
 TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 from dask.distributed import Client
+from dask import delayed
 from collections import deque
 
 import sys
@@ -36,40 +37,42 @@ class ParallelLocalTracking(LocalTracking):
         lin = inv_A[:3, :3]
         offset = inv_A[:3, 3]
 
+        for s in self.seeds:
+            s = np.dot(lin, s) + offset
+            yield delayed(self._generate_streamlines_helper)(s).compute()
+
+        #pbar = tqdm(total=self.seeds.shape[0])
+
+        # client = Client(processes=False)
+        # #[lin, offset, F, B] = client.scatter([lin, offset, F, B])
+
+        # if self.seeds.shape[0] < recent_results_size:
+        #     recent_results_size = self.seeds.shape[0]
+        # recent_results = deque([])
+
+        # for s in self.seeds[:recent_results_size]:
+        #     s = np.dot(lin, s) + offset
+        #     recent_results.appendleft(client.submit(
+        #         self._generate_streamlines_helper, s))
+        
+        # for s in self.seeds[recent_results_size:]:   
+        #     s = np.dot(lin, s) + offset         
+        #     recent_results.appendleft(client.submit(
+        #         self._generate_streamlines_helper, s))
+            
+        #     #pbar.update(1)
+        #     yield recent_results.pop().result()
+            
+        # for _ in recent_results_size:
+        #     #pbar.update(1)
+        #     yield recent_results.pop().result()
+
+        # client.close()
+        # #pbar.close()
+
+    def _generate_streamlines_helper(self, s):
         F = np.empty((self.max_length + 1, 3), dtype=float)
         B = F.copy()
-
-        pbar = tqdm(total=self.seeds.shape[0])
-
-        client = Client(processes=False)
-        [lin, offset, F, B] = client.scatter([lin, offset, F, B])
-
-        if self.seeds.shape[0] < recent_results_size:
-            recent_results_size = self.seeds.shape[0]
-        recent_results = deque([])
-
-        for s in self.seeds[:recent_results_size]:
-            recent_results.appendleft(client.submit(
-                self._generate_streamlines_helper,
-                s, lin, offset, F, B, pbar))
-        
-        for s in self.seeds[recent_results_size:]:            
-            recent_results.appendleft(client.submit(
-                self._generate_streamlines_helper,
-                s, lin, offset, F, B, pbar))
-            
-            pbar.update(1)
-            yield recent_results.pop().result()
-            
-        for _ in recent_results_size:
-            pbar.update(1)
-            yield recent_results.pop().result()
-
-        client.close()
-        pbar.close()
-
-    def _generate_streamlines_helper(self, s, lin, offset, F, B):
-        s = np.dot(lin, s) + offset
         # Set the random seed in numpy and random
         if self.random_seed is not None:
             s_random_seed = hash(np.abs((np.sum(s)) + self.random_seed)) \
