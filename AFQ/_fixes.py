@@ -110,7 +110,9 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
     evecs = evecs[mask]
 
     proj_norm = np.zeros((num_vertices, evecs.shape[0]))
-    for i in (tqdm(batches) if num_batches != 1 else batches):
+
+    it = tqdm(batches) if num_batches != 1 else batches
+    for i in it:
         start = i * batch_size
         end = (i + 1) * batch_size
         if end > num_vertices:
