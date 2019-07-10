@@ -1,49 +1,53 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2 # to get this to work, had to opt-in to using third party orbs in Organization Security settings.
 jobs:
-  build:
-    docker: true
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.1
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+  AFQ:
+    parameters:
+      python_version:
+        type: string
+    docker:
+      - image: continuumio/miniconda:latest
+    environment:
+      PYTHON: << parameters.python_version >>
+      ENV_NAME: AFQ_tests
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+          key: deps-{{ .Branch }}-{{ checksum ".circleci/AFQ_tests.yml" }}
       - run:
-          name: install dependencies
+          name: configure conda environment
+          command: ./.circleci/install-circle.sh
+      - run:
+          name: install
+          # the pip install command below will install recordlinkage, which is not currently available on conda-forge
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip setuptools
-            pip install -r requirements.txt
-            pip install -r requirements-dev.txt
-            pip install -e .
-
+            source activate ${ENV_NAME}
+            pip install .
+      - run:
+          name: run AFQ tests
+          command: |
+            source activate ${ENV_NAME}
+            mkdir test-reports
+            python -m pytest AFQ -v --cov=AFQ --cov-config=.coveragerc --cov-report xml:./coverage.xml
       - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum ".circleci/AFQ_tests.yml" }}
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+            - "/opt/conda/envs/${ENV_NAME}/"
+      - store_test_results:
+          path: test-reports
+      - store_artifacts:
+          path: test-reports
+      - codecov/upload:
+          file: ./coverage.xml
 
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            make all
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - AFQ:
+          name: AFQ_3.6
+          python_version: "3.6"
+      - AFQ:
+          name: AFQ_3.7
+          python_version: "3.7"
