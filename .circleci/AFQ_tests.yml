@@ -15,4 +15,5 @@ dependencies:
   - cloudpickle
   - toolz
   - boto3
+  - six
   - s3fs
