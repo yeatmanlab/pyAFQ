@@ -17,3 +17,7 @@ dependencies:
   - boto3
   - six
   - s3fs
+  - pytest
+  - sphinx
+  - pytest-cov
+  - flake8
