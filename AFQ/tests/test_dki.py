@@ -41,8 +41,8 @@ def test_predict_dki():
         gtab = dpg.gradient_table(fbval, fbvec)
         predict_fname = dki.predict(params_file, gtab, S0_file=fdata,
                                     out_dir=tmpdir)
-        prediction = nib.load(predict_fname).get_data()
-        npt.assert_almost_equal(prediction, nib.load(fdata).get_data())
+        prediction = nib.load(predict_fname).get_fdata()
+        npt.assert_almost_equal(prediction, nib.load(fdata).get_fdata())
 
 
 def test_cli_dki():

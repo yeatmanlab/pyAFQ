@@ -16,6 +16,7 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
+from dipy.io.streamline import save_tractogram
 
 from AFQ import api
 import AFQ.data as afd
@@ -114,7 +115,7 @@ def test_AFQ_data_planes():
 
     sl_file = op.join(myafq.data_frame.results_dir[0],
                       'sub-01_sess-01_dwiDTI_det_streamlines.trk')
-    aus.write_trk(sl_file, streamlines, affine=myafq.dwi_affine[0])
+    save_tractogram(sl_file, streamlines, myafq.dwi_affine[0])
 
     mapping_file = op.join(myafq.data_frame.results_dir[0],
                                 'sub-01_sess-01_dwi_mapping.nii.gz')

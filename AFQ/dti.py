@@ -9,7 +9,7 @@ from dipy.reconst import dti
 
 import AFQ.utils.models as ut
 
-__all__ = ["fit_dti", "predict", "tensor_odf"]
+__all__ = ["fit_dti", "predict"]
 
 
 def _fit(gtab, data, mask=None):
@@ -101,7 +101,7 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
     if S0_file is None:
         S0 = 100
     else:
-        S0 = nib.load(S0_file).get_data()
+        S0 = nib.load(S0_file).get_fdata()
         # If the S0 data is 4D, we assume it comes from an acquisition that had
         # B0 measurements in the same volumes described in the gtab:
         if len(S0.shape) == 4:
@@ -109,34 +109,9 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
         # Otherwise, we assume that it's already a 3D volume, and do nothing
 
     img = nib.load(params_file)
-    params = img.get_data()
+    params = img.get_fdata()
     pred = dti.tensor_prediction(params, gtab, S0=S0)
     fname = op.join(out_dir, 'dti_prediction.nii.gz')
     nib.save(nib.Nifti1Image(pred, img.affine), fname)
 
     return fname
-
-
-def tensor_odf(evals, evecs, sphere):
-    """
-    Calculate the tensor Orientation Distribution Function
-
-    Parameters
-    ----------
-    evals : array (4D)
-        Eigenvalues of a tensor. Shape (x, y, z, 3).
-    evecs : array (5D)
-        Eigenvectors of a tensor. Shape (x, y, z, 3, 3)
-    sphere : sphere object
-        The ODF will be calculated in each vertex of this sphere.
-    """
-    odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
-    mask = np.where((evals[..., 0] > 0)
-                    & (evals[..., 1] > 0)
-                    & (evals[..., 2] > 0))
-
-    lower = 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
-    projection = np.dot(sphere.vertices, evecs[mask])
-    projection /= np.sqrt(evals[mask])
-    odf[mask] = ((vector_norm(projection) ** -3) / lower).T
-    return odf

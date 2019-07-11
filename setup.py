@@ -16,7 +16,7 @@ REQUIRES = []
 with open('requirements.txt') as f:
     l = f.readline()[:-1]
     while l:
-        REQUIRES.append(l)
+        REQUIRES.append(l.split("==")[0])
         l = f.readline()[:-1]
 
 

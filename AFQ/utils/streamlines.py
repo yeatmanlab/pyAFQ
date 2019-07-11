@@ -2,32 +2,6 @@ import numpy as np
 import nibabel as nib
 from nibabel import trackvis
 import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
-
-
-def read_trk(fname):
-    """
-    Read from a .trk file, return streamlines and header
-
-    Parameters
-    ----------
-    fname : str
-        Full path to a trk file containing
-
-    Returns
-    -------
-    list : list of streamlines (3D coordinates)
-
-    Notes
-    -----
-    We assume that all streamlines are provided with the "rasmm" points_space.
-    That is, they have been transformed to the space reported by the affine
-    associated with the image from whence it came, and saved with this affine
-    (e.g., using `write_trk`).
-
-    """
-    streams, hdr = trackvis.read(fname, points_space="rasmm")
-    return [s[0] for s in streams]
 
 
 def write_trk(fname, streamlines, affine=None, shape=None):

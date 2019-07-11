@@ -98,9 +98,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     """
     if not isinstance(roi, np.ndarray):
         if isinstance(roi, str):
-            roi = nib.load(roi).get_data()
+            roi = nib.load(roi).get_fdata()
         else:
-            roi = roi.get_data()
+            roi = roi.get_fdata()
 
     if affine_or_mapping is not None:
         if isinstance(affine_or_mapping, np.ndarray):

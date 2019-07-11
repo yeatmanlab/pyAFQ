@@ -14,6 +14,7 @@ from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
+from dipy.io.streamline import save_tractogram
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -184,7 +185,7 @@ def _b0(row, force_recompute=False):
     b0_file = _get_fname(row, '_b0.nii.gz')
     if not op.exists(b0_file) or force_recompute:
         img = nib.load(row['dwi_file'])
-        data = img.get_data()
+        data = img.get_fdata()
         gtab = row['gtab']
         mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
         mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
@@ -197,7 +198,7 @@ def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file) or force_recompute:
         mean_b0_img = nib.load(_b0(row))
-        mean_b0 = mean_b0_img.get_data()
+        mean_b0 = mean_b0_img.get_fdata()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
         be_img = nib.Nifti1Image(brain_mask.astype(int),
@@ -208,7 +209,7 @@ def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
 
 def _dti_fit(row):
     dti_params_file = _dti(row)
-    dti_params = nib.load(dti_params_file).get_data()
+    dti_params = nib.load(dti_params_file).get_fdata()
     tm = dpy_dti.TensorModel(row['gtab'])
     tf = dpy_dti.TensorFit(tm, dti_params)
     return tf
@@ -218,10 +219,10 @@ def _dti(row, force_recompute=False):
     dti_params_file = _get_fname(row, '_dti_params.nii.gz')
     if not op.exists(dti_params_file) or force_recompute:
         img = nib.load(row['dwi_file'])
-        data = img.get_data()
+        data = img.get_fdata()
         gtab = row['gtab']
         brain_mask_file = _brain_mask(row)
-        mask = nib.load(brain_mask_file).get_data()
+        mask = nib.load(brain_mask_file).get_fdata()
         dtf = dti_fit(gtab, data, mask=mask)
         nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
                  dti_params_file)
@@ -233,10 +234,10 @@ def _csd(row, force_recompute=False, response=None,
     csd_params_file = _get_fname(row, '_csd_params.nii.gz')
     if not op.exists(csd_params_file) or force_recompute:
         img = nib.load(row['dwi_file'])
-        data = img.get_data()
+        data = img.get_fdata()
         gtab = row['gtab']
         brain_mask_file = _brain_mask(row)
-        mask = nib.load(brain_mask_file).get_data()
+        mask = nib.load(brain_mask_file).get_fdata()
         csdf = csd_fit(gtab, data, mask=mask,
                        response=response, sh_order=sh_order,
                        lambda_=lambda_, tau=tau)
@@ -298,9 +299,9 @@ def _reg_prealign(row, force_recompute=False):
     if not op.exists(prealign_file) or force_recompute:
         moving = nib.load(_b0(row, force_recompute=force_recompute))
         static = dpd.read_mni_template()
-        moving_data = moving.get_data()
+        moving_data = moving.get_fdata()
         moving_affine = moving.affine
-        static_data = static.get_data()
+        static_data = static.get_fdata()
         static_affine = static.affine
         _, aff = reg.affine_registration(moving_data,
                                          static_data,
@@ -344,13 +345,13 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
             params_file = _csd(row)
 
         dwi_img = nib.load(row['dwi_file'])
-        dwi_data = dwi_img.get_data()
+        dwi_data = dwi_img.get_fdata()
 
         if 'seg_file' in row.index:
             # If we found a white matter segmentation in the
             # expected location:
             seg_img = nib.load(row['seg_file'])
-            seg_data_orig = seg_img.get_data()
+            seg_data_orig = seg_img.get_fdata()
             # For different sets of labels, extract all the voxels that
             # have any of these values:
             wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
@@ -362,7 +363,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                             dwi_img.affine)).astype(int)
         else:
             # Otherwise, we'll identify the white matter based on FA:
-            dti_fa = nib.load(_dti_fa(row)).get_data()
+            dti_fa = nib.load(_dti_fa(row)).get_fdata()
             wm_mask = dti_fa > wm_fa_thresh
 
         streamlines = aft.track(params_file,
@@ -372,10 +373,10 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 seed_mask=wm_mask,
                                 stop_mask=wm_mask)
 
-        aus.write_trk(streamlines_file,
-                      dtu.move_streamlines(streamlines,
-                                           np.linalg.inv(dwi_img.affine)),
-                      affine=dwi_img.affine)
+        save_tractogram(streamlines_file,
+                        dtu.move_streamlines(streamlines,
+                                             np.linalg.inv(dwi_img.affine)),
+                        dwi_img.affine)
 
     return streamlines_file
 
@@ -506,7 +507,7 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
         for scalar in scalars:
             scalar_file = _scalar_dict[scalar](row,
                                                force_recompute=force_recompute)
-            scalar_data = nib.load(scalar_file).get_data()
+            scalar_data = nib.load(scalar_file).get_fdata()
             for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                 idx = np.where(
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
@@ -543,7 +544,7 @@ def _template_xform(row, reg_template, force_recompute=False):
                                    reg_template,
                                    prealign=np.linalg.inv(reg_prealign))
 
-        template_xform = mapping.transform_inverse(reg_template.get_data())
+        template_xform = mapping.transform_inverse(reg_template.get_fdata())
         nib.save(nib.Nifti1Image(template_xform,
                                  row['dwi_affine']),
                  template_xform_file)
@@ -573,7 +574,7 @@ def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
                 rois_dir, '%s_roi%s_%s.nii.gz' % (bundle, ii + 1, inclusion))
             warped_roi = auv.patch_up_roi(
                 (mapping.transform_inverse(
-                    roi.get_data(),
+                    roi.get_fdata(),
                     interpolation='linear')) > 0).astype(int)
             # Cast to float32, so that it can be read in by MI-Brain:
             nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
@@ -607,12 +608,12 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
             this_sl = (streamlines[idx])
             fname = op.join(bundles_dir, '%s.trk' % bundle)
-            aus.write_trk(
+            save_tractogram(
                 fname,
                 dtu.move_streamlines(
                     this_sl,
                     np.linalg.inv(row['dwi_affine'])),
-                affine=row['dwi_affine'])
+                row['dwi_affine'])
 
 
 def _get_affine(fname):

@@ -281,10 +281,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
         for rule_idx, rule in enumerate(rules):
             roi = bundle_dict[bundle]['ROIs'][rule_idx]
             if not isinstance(roi, np.ndarray):
-                roi = roi.get_data()
+                roi = roi.get_fdata()
             warped_roi = auv.patch_up_roi(
                 (mapping.transform_inverse(
-                    roi,
+                    roi.astype(np.float32),
                     interpolation='linear')) > 0)
 
             if rule:
@@ -301,7 +301,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
         prob_map = bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
 
         if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_data()
+            prob_map = prob_map.get_fdata()
         warped_prob_map = mapping.transform_inverse(prob_map,
                                                     interpolation='nearest')
         fiber_probabilities = dts.values_from_volume(warped_prob_map,

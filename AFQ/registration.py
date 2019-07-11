@@ -23,6 +23,7 @@ import dipy.data as dpd
 from dipy.align.streamlinear import StreamlineLinearRegistration
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import move_streamlines
+from dipy.io.streamline import load_tractogram
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
@@ -45,6 +46,7 @@ def syn_registration(moving, static,
                      dim=3,
                      level_iters=[10, 10, 5],
                      sigma_diff=2.0,
+                     radius=4,
                      prealign=None):
     """Register a source image (moving) to a target image (static).
 
@@ -67,6 +69,8 @@ def syn_registration(moving, static,
         the number of iterations at each level of the Gaussian Pyramid (the
         length of the list defines the number of pyramid levels to be
         used).
+    sigma_diff, radius : float
+        Parameters for initialization of the metric.
 
     Returns
     -------
@@ -79,7 +83,8 @@ def syn_registration(moving, static,
         The vector field describing the backward warping from the target to the
         source.
     """
-    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff)
+    use_metric = syn_metric_dict[metric](dim, sigma_diff=sigma_diff,
+                                         radius=radius)
 
     sdr = SymmetricDiffeomorphicRegistration(use_metric, level_iters,
                                              step_length=step_length)
@@ -116,7 +121,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     if isinstance(template, str):
         template = nib.load(template)
 
-    template_data = template.get_data()
+    template_data = template.get_fdata()
     template_affine = template.affine
 
     if isinstance(dwi, str):
@@ -126,7 +131,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
         gtab = dpg.gradient_table(*gtab)
 
     dwi_affine = dwi.affine
-    dwi_data = dwi.get_data()
+    dwi_data = dwi.get_fdata()
     mean_b0 = np.mean(dwi_data[..., gtab.b0s_mask], -1)
     warped_b0, mapping = syn_registration(mean_b0, template_data,
                                           moving_affine=dwi_affine,
@@ -185,7 +190,7 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
                                codomain_grid2world=codomain_img.affine,
                                prealign=prealign)
 
-    disp_data = disp.get_data()
+    disp_data = disp.get_fdata().astype(np.float32)
     mapping.forward = disp_data[..., 0]
     mapping.backward = disp_data[..., 1]
     mapping.is_inverse = True
@@ -312,14 +317,14 @@ def register_series(series, ref, pipeline):
     """
     if isinstance(ref, nib.Nifti1Image):
         static = ref
-        static_data = static.get_data()
+        static_data = static.get_fdata()
         s_aff = static.affine
         moving = series
-        moving_data = moving.get_data()
+        moving_data = moving.get_fdata()
         m_aff = moving.affine
 
     elif isinstance(ref, int) or np.iterable(ref):
-        data = series.get_data()
+        data = series.get_fdata()
         idxer = np.zeros(data.shape[-1]).astype(bool)
         idxer[ref] = True
         static_data = data[..., idxer]
@@ -423,9 +428,9 @@ def streamline_registration(moving, static, n_points=100,
     """
     # Load the streamlines, if you were given a file-name
     if isinstance(moving, str):
-        moving = sut.read_trk(moving)
+        moving = load_tractogram(moving)[0]
     if isinstance(static, str):
-        static = sut.read_trk(static)
+        static = load_tractogram(static)[0]
 
     srr = StreamlineLinearRegistration()
     srm = srr.optimize(static=set_number_of_points(static, n_points),
