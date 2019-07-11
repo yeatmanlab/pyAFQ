@@ -456,6 +456,7 @@ def read_hcp_atlas_16_bundles():
     del bundle_dict["IF0F_R"]
     return bundle_dict
 
+
 def get_s3_client():
     """Return a boto3 s3 client
     Returns
@@ -470,6 +471,7 @@ def get_s3_client():
     s3_client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
     return s3_client
 
+
 def list_hbn_subjects(s3_bucket='preafq-hbn'):
     """
     Return a list of HBN subjects by reading from the provided s3_bucket
@@ -481,7 +483,8 @@ def list_hbn_subjects(s3_bucket='preafq-hbn'):
     """
 
     resource = boto3.resource('s3')
-    resource.meta.client.meta.events.register('choose-signer.s3.*', disable_signing)
+    resource.meta.client.meta.events.register('choose-signer.s3.*',
+                                              disable_signing)
 
     bucket = resource.Bucket(s3_bucket)
 
@@ -489,13 +492,14 @@ def list_hbn_subjects(s3_bucket='preafq-hbn'):
 
     for item in bucket.objects.all():
         subjects.append(item.key.split('/')[0])
-        
+
     return list(set(subjects))
+
 
 def download_single_hbn_item(item, client, s3_bucket, base_dir, overwrite):
     """
-    downloads a single file, 
-    
+    downloads a single file,
+
     Inputs
     ------
     item : an object returned by a boto3 Bucket().objects.all() or .filter()
@@ -517,10 +521,12 @@ def download_single_hbn_item(item, client, s3_bucket, base_dir, overwrite):
     except FileExistsError:
         print(f'File {fname} already exists. Continuing...')
 
-def download_single_hbn_subject(subject, bucket, client, s3_bucket, base_dir, overwrite):
+
+def download_single_hbn_subject(subject, bucket, client, s3_bucket, base_dir,
+                                overwrite):
     """
     downloads the whole directory for a given subject from HBN
-    
+
     Inputs
     ------
     item : an object returned by a boto3 Bucket().objects.all() or .filter()
@@ -533,23 +539,26 @@ def download_single_hbn_subject(subject, bucket, client, s3_bucket, base_dir, ov
     """
     for item in bucket.objects.filter(Prefix='{}/'.format(subject)):
         download_single_hbn_item(item, client, s3_bucket, base_dir, overwrite)
-    
 
-def fetch_hbn_data(subjects, s3_bucket='preafq-hbn', path=None, overwrite=False):
+
+def fetch_hbn_data(subjects, s3_bucket='preafq-hbn', path=None,
+                   overwrite=False):
     """
     Download HBN data from the provided S3 bucket.
 
     Inputs
     ------
 
-    subjects : list of subject ids from HBN. use list_hbn_subjects() to get the whole list.
+    subjects : list of subject ids from HBN. use list_hbn_subjects()
+    to get the whole list.
     s3_bucket : bucket name (string) where the HBN data is stored
     path : (optional) location to store downloaded data. defaults to ~/AFQ_data
     overwrite : whether or not to overwrite existing files (default = False)
     """
 
     resource = boto3.resource('s3')
-    resource.meta.client.meta.events.register('choose-signer.s3.*', disable_signing)
+    resource.meta.client.meta.events.register('choose-signer.s3.*',
+                                              disable_signing)
 
     bucket = resource.Bucket(s3_bucket)
 
@@ -563,9 +572,7 @@ def fetch_hbn_data(subjects, s3_bucket='preafq-hbn', path=None, overwrite=False)
 
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
-    
+
     for subject in subjects:
-        download_single_hbn_subject(subject, bucket, s3_client, s3_bucket, base_dir, overwrite)
-
-
-    
+        download_single_hbn_subject(subject, bucket, s3_client, s3_bucket,
+                                    base_dir, overwrite)
