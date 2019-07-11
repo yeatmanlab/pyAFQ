@@ -6,13 +6,10 @@ import json
 from glob import glob
 
 import boto3
-<<<<<<< HEAD
 from botocore.handlers import disable_signing
 
 from pathlib import Path
-=======
 import s3fs
->>>>>>> upstream/master
 
 import numpy as np
 
