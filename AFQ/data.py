@@ -11,6 +11,7 @@ import boto3
 from botocore.handlers import disable_signing
 
 from pathlib import Path
+
 import numpy as np
 
 import nibabel as nib
