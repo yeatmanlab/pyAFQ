@@ -7,8 +7,7 @@ from dipy.align import Bunch
 from dipy.tracking.local import LocalTracking
 import random
 TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
-from dask.distributed import Client
-from dask import delayed
+import multiprocessing as mp
 from collections import deque
 
 import sys
@@ -38,9 +37,14 @@ class ParallelLocalTracking(LocalTracking):
         lin = inv_A[:3, :3]
         offset = inv_A[:3, 3]
 
-        for s in self.seeds:
-            s = np.dot(lin, s) + offset
-            yield delayed(self._generate_streamlines_helper)(s).compute()
+        import multiprocessing as mp
+        pool = mp.Pool(mp.cpu_count())
+        for i in range(self.seeds):
+            self.seeds[i] = np.dot(lin, self.seeds[i]) + offset
+
+        for result in pool.imap_unordered(
+                    self._generate_streamlines_helper, self.seeds):
+            yield result
 
         #pbar = tqdm(total=self.seeds.shape[0])
 
