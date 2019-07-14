@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.special import lpmv, gammaln
 
-#from tqdm import tqdm
+from tqdm import tqdm
 from dipy.align import Bunch
 from dipy.tracking.local import LocalTracking
 import random
@@ -12,6 +12,7 @@ from dask import delayed
 from collections import deque
 
 import sys
+import math
 
 def spherical_harmonics(m, n, theta, phi):
     """
@@ -168,7 +169,7 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     return vec_norm
 
 
-def tensor_odf(evals, evecs, sphere):
+def tensor_odf(evals, evecs, sphere, num_batches=100):
     """
     Calculate the tensor Orientation Distribution Function
 
@@ -180,14 +181,36 @@ def tensor_odf(evals, evecs, sphere):
         Eigenvectors of a tensor. Shape (x, y, z, 3, 3)
     sphere : sphere object
         The ODF will be calculated in each vertex of this sphere.
+    num_batches : int
+        Split the calculation into batches. This reduces memory usage.
+        If memory use is not an issue, set to 1.
+        If set to -1, there will be 1 batch per vertex in the sphere.
+        Default: 100
     """
+    num_vertices = sphere.vertices.shape[0]
+    if num_batches == -1:
+        num_batches = num_vertices
+    batch_size = math.ceil(num_vertices / num_batches)
+    batches = range(num_batches)
+
     mask = np.where((evals[..., 0] > 0)
                     & (evals[..., 1] > 0)
                     & (evals[..., 2] > 0))
+    evecs = evecs[mask]
 
-    projection = np.dot(sphere.vertices, evecs[mask])
-    projection /= np.sqrt(evals[mask])
-    proj_norm = in_place_norm(projection)
+    proj_norm = np.zeros((num_vertices, evecs.shape[0]))
+
+    it = tqdm(batches) if num_batches != 1 else batches
+    for i in it:
+        start = i * batch_size
+        end = (i + 1) * batch_size
+        if end > num_vertices:
+            end = num_vertices
+
+        proj = np.dot(sphere.vertices[start:end], evecs)
+        proj /= np.sqrt(evals[mask])
+        proj_norm[start:end, :] = in_place_norm(proj)
+
     proj_norm **= -3
     proj_norm /= 4 * np.pi * np.sqrt(np.prod(evals[mask], -1))
 
