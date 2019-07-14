@@ -10,7 +10,7 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.tracking.local import ThresholdTissueClassifier
 
-from AFQ._fixes import ParallelLocalTracking, tensor_odf
+from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
@@ -136,7 +136,7 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = ParallelLocalTracking(dg,
+    tracker = VerboseLocalTracking(dg,
                             threshold_classifier,
                             seeds,
                             affine,

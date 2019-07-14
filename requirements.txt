@@ -13,4 +13,3 @@ boto3==1.9.2
 s3fs==0.2.0
 tqdm==4.32.2
 six==1.12.0
-distributed==2.0.1

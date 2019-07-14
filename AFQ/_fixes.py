@@ -7,8 +7,6 @@ from dipy.align import Bunch
 from dipy.tracking.local import LocalTracking
 import random
 TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
-import multiprocessing as mp
-from collections import deque
 
 import sys
 import math
@@ -25,11 +23,8 @@ def spherical_harmonics(m, n, theta, phi):
     val = val * np.exp(1j * m * theta)
     return val
 
-
-class ParallelLocalTracking(LocalTracking):
-    # this function is copied from https://github.com/nipy/dipy
-    # and modified for parallelization / progress bar
-    def _generate_streamlines(self, recent_results_size=20):
+class VerboseLocalTracking(LocalTracking):
+    def _generate_streamlines(self):
         """A streamline generator"""
 
         # Get inverse transform (lin/offset) for seeds
@@ -37,76 +32,39 @@ class ParallelLocalTracking(LocalTracking):
         lin = inv_A[:3, :3]
         offset = inv_A[:3, 3]
 
-        import multiprocessing as mp
-        pool = mp.Pool(mp.cpu_count())
-        for i in range(self.seeds):
-            self.seeds[i] = np.dot(lin, self.seeds[i]) + offset
-
-        for result in pool.imap_unordered(
-                    self._generate_streamlines_helper, self.seeds):
-            yield result
-
-        #pbar = tqdm(total=self.seeds.shape[0])
-
-        # client = Client(processes=False)
-        # #[lin, offset, F, B] = client.scatter([lin, offset, F, B])
-
-        # if self.seeds.shape[0] < recent_results_size:
-        #     recent_results_size = self.seeds.shape[0]
-        # recent_results = deque([])
-
-        # for s in self.seeds[:recent_results_size]:
-        #     s = np.dot(lin, s) + offset
-        #     recent_results.appendleft(client.submit(
-        #         self._generate_streamlines_helper, s))
-        
-        # for s in self.seeds[recent_results_size:]:   
-        #     s = np.dot(lin, s) + offset         
-        #     recent_results.appendleft(client.submit(
-        #         self._generate_streamlines_helper, s))
-            
-        #     #pbar.update(1)
-        #     yield recent_results.pop().result()
-            
-        # for _ in recent_results_size:
-        #     #pbar.update(1)
-        #     yield recent_results.pop().result()
-
-        # client.close()
-        # #pbar.close()
-
-    def _generate_streamlines_helper(self, s):
         F = np.empty((self.max_length + 1, 3), dtype=float)
         B = F.copy()
-        # Set the random seed in numpy and random
-        if self.random_seed is not None:
-            s_random_seed = hash(np.abs((np.sum(s)) + self.random_seed)) \
-                % (2**32 - 1)
-            random.seed(s_random_seed)
-            np.random.seed(s_random_seed)
-        directions = self.direction_getter.initial_direction(s)
-        if directions.size == 0 and self.return_all:
-            # only the seed position
-            return [s]
-        directions = directions[:self.max_cross]
-        for first_step in directions:
-            stepsF, tissue_class = self._tracker(s, first_step, F)
-            if not (self.return_all or
-                    tissue_class == TissueTypes.ENDPOINT or
-                    tissue_class == TissueTypes.OUTSIDEIMAGE):
-                continue
-            first_step = -first_step
-            stepsB, tissue_class = self._tracker(s, first_step, B)
-            if not (self.return_all or
-                    tissue_class == TissueTypes.ENDPOINT or
-                    tissue_class == TissueTypes.OUTSIDEIMAGE):
-                continue
-            if stepsB == 1:
-                streamline = F[:stepsF].copy()
-            else:
-                parts = (B[stepsB - 1:0:-1], F[:stepsF])
-                streamline = np.concatenate(parts, axis=0)
-            return streamline
+        for s in tqdm(self.seeds):
+            s = np.dot(lin, s) + offset
+            # Set the random seed in numpy and random
+            if self.random_seed is not None:
+                s_random_seed = hash(np.abs((np.sum(s)) + self.random_seed)) \
+                    % (2**32 - 1)
+                random.seed(s_random_seed)
+                np.random.seed(s_random_seed)
+            directions = self.direction_getter.initial_direction(s)
+            if directions.size == 0 and self.return_all:
+                # only the seed position
+                yield [s]
+            directions = directions[:self.max_cross]
+            for first_step in directions:
+                stepsF, tissue_class = self._tracker(s, first_step, F)
+                if not (self.return_all or
+                        tissue_class == TissueTypes.ENDPOINT or
+                        tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    continue
+                first_step = -first_step
+                stepsB, tissue_class = self._tracker(s, first_step, B)
+                if not (self.return_all or
+                        tissue_class == TissueTypes.ENDPOINT or
+                        tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    continue
+                if stepsB == 1:
+                    streamline = F[:stepsF].copy()
+                else:
+                    parts = (B[stepsB - 1:0:-1], F[:stepsF])
+                    streamline = np.concatenate(parts, axis=0)
+                yield streamline
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
