@@ -16,6 +16,9 @@ import AFQ.dti as dti
 import AFQ.segmentation as seg
 import AFQ.utils.volume as auv
 
+from fury import actor, window
+from fury.colormap import line_colors
+
 logging.basicConfig(level=logging.INFO)
 
 dpd.fetch_stanford_hardi()
@@ -59,6 +62,7 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
+
 def mask_from_bundle_ROI(bundles, mapping):
     """
     Creates Mask from ROIs in bundles
@@ -95,6 +99,7 @@ def mask_from_bundle_ROI(bundles, mapping):
 
     return np.logical_or(warped_roi1, warped_roi2)
 
+
 print("Generating Seed Masks...")
 seed_masks = mask_from_bundle_ROI(bundles, mapping)
 
@@ -110,8 +115,6 @@ streamlines = dts.Streamlines(dtu.move_streamlines(
     [s for s in streamlines if s.shape[0] > 100],
     np.linalg.inv(img.affine)))
 
-from fury import actor, window
-from fury.colormap import line_colors
 scene = window.Scene()
 scene.add(actor.line(streamlines, line_colors(streamlines)))
 scene.add(actor.contour_from_roi(seed_masks, img.affine, [0, 1, 1], 0.5))

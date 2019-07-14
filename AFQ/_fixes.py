@@ -6,7 +6,6 @@ from tqdm import tqdm
 from dipy.align import Bunch
 from dipy.tracking.local import LocalTracking
 import random
-TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 import sys
 import math
@@ -22,6 +21,10 @@ def spherical_harmonics(m, n, theta, phi):
     val *= np.exp(0.5 * (gammaln(n - m + 1) - gammaln(n + m + 1)))
     val = val * np.exp(1j * m * theta)
     return val
+
+
+TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
+
 
 class VerboseLocalTracking(LocalTracking):
     def _generate_streamlines(self):
