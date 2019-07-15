@@ -1,6 +1,13 @@
 import numpy as np
+
 from scipy.special import lpmv, gammaln
+
 from tqdm import tqdm
+from dipy.align import Bunch
+from dipy.tracking.local import LocalTracking
+import random
+
+import sys
 import math
 
 def spherical_harmonics(m, n, theta, phi):
@@ -14,6 +21,53 @@ def spherical_harmonics(m, n, theta, phi):
     val *= np.exp(0.5 * (gammaln(n - m + 1) - gammaln(n + m + 1)))
     val = val * np.exp(1j * m * theta)
     return val
+
+
+TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
+
+
+class VerboseLocalTracking(LocalTracking):
+    def _generate_streamlines(self):
+        """A streamline generator"""
+
+        # Get inverse transform (lin/offset) for seeds
+        inv_A = np.linalg.inv(self.affine)
+        lin = inv_A[:3, :3]
+        offset = inv_A[:3, 3]
+
+        F = np.empty((self.max_length + 1, 3), dtype=float)
+        B = F.copy()
+        for s in tqdm(self.seeds):
+            s = np.dot(lin, s) + offset
+            # Set the random seed in numpy and random
+            if self.random_seed is not None:
+                s_random_seed = hash(np.abs((np.sum(s)) + self.random_seed)) \
+                    % (2**32 - 1)
+                random.seed(s_random_seed)
+                np.random.seed(s_random_seed)
+            directions = self.direction_getter.initial_direction(s)
+            if directions.size == 0 and self.return_all:
+                # only the seed position
+                yield [s]
+            directions = directions[:self.max_cross]
+            for first_step in directions:
+                stepsF, tissue_class = self._tracker(s, first_step, F)
+                if not (self.return_all
+                        or tissue_class == TissueTypes.ENDPOINT
+                        or tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    continue
+                first_step = -first_step
+                stepsB, tissue_class = self._tracker(s, first_step, B)
+                if not (self.return_all
+                        or tissue_class == TissueTypes.ENDPOINT
+                        or tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    continue
+                if stepsB == 1:
+                    streamline = F[:stepsF].copy()
+                else:
+                    parts = (B[stepsB - 1:0:-1], F[:stepsF])
+                    streamline = np.concatenate(parts, axis=0)
+                yield streamline
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):

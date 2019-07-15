@@ -1,15 +1,16 @@
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
+import logging
 
 import dipy.data as dpd
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.tracking.local import ThresholdTissueClassifier, LocalTracking
+from dipy.tracking.local import ThresholdTissueClassifier
 
-from AFQ._fixes import tensor_odf
+from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
@@ -62,6 +63,10 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     -------
     list of streamlines ()
     """
+
+    logger = logging.getLogger('AFQ.Tractography')
+
+    logger.info("Loading Image...")
     if isinstance(params_file, str):
         params_img = nib.load(params_file)
     else:
@@ -70,6 +75,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     model_params = params_img.get_fdata()
     affine = params_img.affine
 
+    logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
@@ -87,6 +93,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if sphere is None:
         sphere = dpd.default_sphere
 
+    logger.info("Getting Directions...")
     if directions == "det":
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
@@ -114,6 +121,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     threshold_classifier = ThresholdTissueClassifier(stop_mask,
                                                      stop_threshold)
+    logger.info("Tracking...")
 
     return _local_tracking(seeds, dg, threshold_classifier, affine,
                            step_size=step_size, min_length=min_length,
@@ -127,7 +135,7 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = LocalTracking(dg,
+    tracker = VerboseLocalTracking(dg,
                             threshold_classifier,
                             seeds,
                             affine,
