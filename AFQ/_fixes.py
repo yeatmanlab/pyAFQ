@@ -52,15 +52,15 @@ class VerboseLocalTracking(LocalTracking):
             directions = directions[:self.max_cross]
             for first_step in directions:
                 stepsF, tissue_class = self._tracker(s, first_step, F)
-                if not (self.return_all or
-                        tissue_class == TissueTypes.ENDPOINT or
-                        tissue_class == TissueTypes.OUTSIDEIMAGE):
+                if not (self.return_all
+                        or tissue_class == TissueTypes.ENDPOINT
+                        or tissue_class == TissueTypes.OUTSIDEIMAGE):
                     continue
                 first_step = -first_step
                 stepsB, tissue_class = self._tracker(s, first_step, B)
-                if not (self.return_all or
-                        tissue_class == TissueTypes.ENDPOINT or
-                        tissue_class == TissueTypes.OUTSIDEIMAGE):
+                if not (self.return_all
+                        or tissue_class == TissueTypes.ENDPOINT
+                        or tissue_class == TissueTypes.OUTSIDEIMAGE):
                     continue
                 if stepsB == 1:
                     streamline = F[:stepsF].copy()
