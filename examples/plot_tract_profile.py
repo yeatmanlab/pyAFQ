@@ -93,21 +93,6 @@ streamlines = dts.Streamlines(dtu.move_streamlines(
     [s for s in streamlines if s.shape[0] > 100],
     np.linalg.inv(img.affine)))
 
-<<<<<<< HEAD:examples/plot_tract_profile.py
-=======
-# print average streamlines length
-total = 0
-num_streams = len(streamlines)
-for i in range(num_streams):
-    total = total + streamlines[i].shape[0]
-print(total / num_streams) # prints ~400
-
-resampled_streamlines = dps.set_number_of_points(streamlines, 400)
-
-import time
-
-start = time.process_time() 
->>>>>>> added timing:examples/working_plot_tract_profile.py
 print("Segmenting fiber groups...")
 fiber_groups = seg.segment(hardi_fdata,
                            hardi_fbval,
@@ -116,11 +101,7 @@ fiber_groups = seg.segment(hardi_fdata,
                            bundles,
                            reg_template=MNI_T2_img,
                            mapping=mapping)
-print(time.process_time() - start)
 
-streamlines = resampled_streamlines
-
-<<<<<<< HEAD:examples/plot_tract_profile.py
 print("Cleaning fiber groups...")
 for bundle in bundles:
     fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
@@ -135,15 +116,3 @@ for bundle in bundles:
     ax.set_title(bundle)
 
 plt.show()
-=======
-start = time.process_time() 
-print("Segmenting fiber groups...")
-fiber_groups = seg.segment(hardi_fdata,
-                           hardi_fbval,
-                           hardi_fbvec,
-                           streamlines,
-                           bundles,
-                           reg_template=MNI_T2_img,
-                           mapping=mapping)
-print(time.process_time() - start)
->>>>>>> added timing:examples/working_plot_tract_profile.py

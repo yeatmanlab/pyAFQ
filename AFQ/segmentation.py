@@ -206,7 +206,7 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
 
 def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
             reg_prealign=None, b0_threshold=0, reg_template=None,
-            prob_threshold=0):
+            prob_threshold=0, nb_points=-1):
     """
     Segment streamlines into bundles based on inclusion ROIs.
 
@@ -241,6 +241,11 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
         [Hua2008]_. Here, we choose an average probability that needs to be
         exceeded for an individual streamline to be retained. Default: 0.
 
+    nb_points : int
+        Integer representing number of points wanted along the curve.
+        Streamlines will be resampled to this number of points.
+        If nb_points -1, there is no resampling. Default: -1.
+
     References
     ----------
     .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -248,6 +253,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
        matter anatomy and tract-specific quantification. Neuroimage 39:
        336-347
     """
+    fgarray = _resample_bundle(streamlines, 100)
+    if nb_points != -1:
+        streamlines = _resample_bundle(streamlines, nb_points)
+
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
                                       b0_threshold=b0_threshold)
 
@@ -270,9 +279,9 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
     fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
 
     # For expedience, we approximate each streamline as a 100 point curve:
-    fgarray = _resample_bundle(xform_sl, 100)
     streamlines_in_bundles = np.zeros((len(xform_sl), len(bundle_dict)))
     min_dist_coords = np.zeros((len(xform_sl), len(bundle_dict), 2))
+    xform_sl_idx = np.asarray(range(len(xform_sl)))
 
     fiber_groups = {}
 
@@ -311,24 +320,23 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
                                                      np.eye(4))
         fiber_probabilities = np.mean(fiber_probabilities, -1)
 
-        for sl_idx, sl in enumerate(xform_sl):
-            if fiber_probabilities[sl_idx] > prob_threshold:
-                if crosses_midline is not None:
-                    if crosses[sl_idx]:
-                        # This means that the streamline does
-                        # cross the midline:
-                        if crosses_midline:
-                            # This is what we want, keep going
-                            pass
-                        else:
-                            # This is not what we want, skip to next streamline
-                            continue
+        if nb_points != -1:
+            sl_mask = (fiber_probabilities > prob_threshold)
+            sl_mask = np.logical_and(sl_mask, \
+                        np.logical_or(crosses_midline == None, \
+                            np.logical_or(np.logical_not(crosses),\
+                                crosses_midline)))
+            sls = xform_sl[sl_mask]
+            sl_idxs = xform_sl_idx[sl_mask]
+            for i in range(len(sls)):
+                sl = sls[i]
+                sl_idx = sl_idxs[i]
 
                 is_close, dist = _check_sl_with_inclusion(sl, include_rois,
-                                                          tol)
+                                                        tol)
                 if is_close:
                     is_far = _check_sl_with_exclusion(sl, exclude_rois,
-                                                      tol)
+                                                    tol)
                     if is_far:
                         min_dist_coords[sl_idx, bundle_idx, 0] =\
                             np.argmin(dist[0], 0)[0]
@@ -336,6 +344,33 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
                             np.argmin(dist[1], 0)[0]
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                             fiber_probabilities[sl_idx]
+
+        else:
+            for sl_idx, sl in enumerate(xform_sl):
+                if fiber_probabilities[sl_idx] > prob_threshold:
+                    if crosses_midline is not None:
+                        if crosses[sl_idx]:
+                            # This means that the streamline does
+                            # cross the midline:
+                            if crosses_midline:
+                                # This is what we want, keep going
+                                pass
+                            else:
+                                # This is not what we want, skip to next streamline
+                                continue
+
+                    is_close, dist = _check_sl_with_inclusion(sl, include_rois,
+                                                            tol)
+                    if is_close:
+                        is_far = _check_sl_with_exclusion(sl, exclude_rois,
+                                                        tol)
+                        if is_far:
+                            min_dist_coords[sl_idx, bundle_idx, 0] =\
+                                np.argmin(dist[0], 0)[0]
+                            min_dist_coords[sl_idx, bundle_idx, 1] =\
+                                np.argmin(dist[1], 0)[0]
+                            streamlines_in_bundles[sl_idx, bundle_idx] =\
+                                fiber_probabilities[sl_idx]
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
