@@ -317,31 +317,31 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
                                                      np.eye(4))
         fiber_probabilities = np.mean(fiber_probabilities, -1)
 
-        sl_mask = (fiber_probabilities > prob_threshold)
-        # mask for streamlines where crosses_midline is correct
-        sl_mask = np.logical_and(sl_mask,
-                                 np.logical_or(crosses_midline == None,
-                                               np.logical_or(np.logical_not(crosses),
-                                                             crosses_midline)))
+        for sl_idx, sl in enumerate(xform_sl):
+            if fiber_probabilities[sl_idx] > prob_threshold:
+                if crosses_midline is not None:
+                    if crosses[sl_idx]:
+                        # This means that the streamline does
+                        # cross the midline:
+                        if crosses_midline:
+                            # This is what we want, keep going
+                            pass
+                        else:
+                            # This is not what we want, skip to next streamline
+                            continue
 
-        sls = xform_sl[sl_mask]
-        # remember original streamline indices
-        sl_og_idxs = xform_sl_idx[sl_mask]
-        for sl_idx, sl in enumerate(sls):
-            sl_og_idx = sl_og_idxs[sl_idx]
-
-            is_close, dist = _check_sl_with_inclusion(sl, include_rois,
+                is_close, dist = _check_sl_with_inclusion(sl, include_rois,
+                                                          tol)
+                if is_close:
+                    is_far = _check_sl_with_exclusion(sl, exclude_rois,
                                                       tol)
-            if is_close:
-                is_far = _check_sl_with_exclusion(sl, exclude_rois,
-                                                  tol)
-                if is_far:
-                    min_dist_coords[sl_og_idx, bundle_idx, 0] =\
-                        np.argmin(dist[0], 0)[0]
-                    min_dist_coords[sl_og_idx, bundle_idx, 1] =\
-                        np.argmin(dist[1], 0)[0]
-                    streamlines_in_bundles[sl_og_idx, bundle_idx] =\
-                        fiber_probabilities[sl_og_idx]
+                    if is_far:
+                        min_dist_coords[sl_idx, bundle_idx, 0] =\
+                            np.argmin(dist[0], 0)[0]
+                        min_dist_coords[sl_idx, bundle_idx, 1] =\
+                            np.argmin(dist[1], 0)[0]
+                        streamlines_in_bundles[sl_idx, bundle_idx] =\
+                            fiber_probabilities[sl_idx]
 
     # Eliminate any fibers not selected using the plane ROIs:
     possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
