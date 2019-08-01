@@ -409,6 +409,7 @@ class Segment:
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
         """
+        self.logger.info("Preparing Image...")
         self.img, _, _, _ = \
             ut.prepare_data(fdata, fbval, fbvec,
                             b0_threshold=b0_threshold)
@@ -487,6 +488,7 @@ class Segment:
         self.include_rois = len(self.bundle_dict)*[None]
         self.exclude_rois = len(self.bundle_dict)*[None]
 
+        self.logger.info("Preparing Fiber Probabilites and ROIs...")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             rules = self.bundle_dict[bundle]['rules']
             include_rois = []
@@ -523,7 +525,7 @@ class Segment:
 
     def segment(self, prob_threshold=0):
         """
-        Iterate over streamlines and bundles, assigning streamlines to bundles.
+        Iterate over streamlines and bundles, assigning streamlines to fiber groups.
 
         Parameters
         ----------
@@ -536,6 +538,7 @@ class Segment:
         min_dist_coords = np.zeros((len(self.streamlines), len(self.bundle_dict), 2))
         self.fiber_groups = {}
 
+        self.logger.info("Assigning Streamlines to Fiber Groups...")
         streamlines_idx = np.asarray(range(len(self.streamlines)))
         tol = dts.dist_to_corner(self.img.affine)
         for bundle_idx, bundle in enumerate(self.bundle_dict):
@@ -571,6 +574,7 @@ class Segment:
                         streamlines_in_bundles[sl_og_idx, bundle_idx] =\
                             self.fiber_probabilities[bundle_idx][sl_og_idx]
 
+        self.logger.info("Cleaning and Re-Orienting...")
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         self.streamlines = self.streamlines[possible_fibers]
