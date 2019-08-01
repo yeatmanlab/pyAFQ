@@ -227,9 +227,6 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
             'prob_map': img3,
             'cross_midline': False}
 
-    mapping : a DiffeomorphicMapping object
-        Used to align the ROIs to the data.
-
     reg_template : str or nib.Nifti1Image, optional.
         Template to use for registration (defaults to the MNI T2)
 
@@ -380,10 +377,230 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
 
     return fiber_groups
 
-# class Segment:
-#     def __init__(self):
-#         self.logger = logging.getLogger('AFQ.Segmentation')
+class Segment:
+    def __init__(self, streamlines):
+        """
+        Segment streamlines into bundles based on inclusion ROIs.
 
+        Parameters
+        ----------
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+
+        References
+        ----------
+        .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
+        Tract probability maps in stereotaxic spaces: analyses of white
+        matter anatomy and tract-specific quantification. Neuroimage 39:
+        336-347
+        """
+        self.streamlines = streamlines
+        self.logger = logging.getLogger('AFQ.Segmentation')
+
+        # For expedience, we approximate each streamline as a 100 point curve:
+        self.fgarray = _resample_bundle(self.streamlines, 100)
+
+    def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
+        """
+        Prepare image data from DWI data.
+
+        Parameters
+        ----------
+        fdata, fbval, fbvec : str
+            Full path to data, bvals, bvecs
+        """
+        self.img, _, _, _ = \
+            ut.prepare_data(fdata, fbval, fbvec,
+                            b0_threshold=b0_threshold)
+                        
+    def set_img(self, img):
+        """
+        Set Image data if already prepared.
+
+        Parameters
+        ----------
+        img : Nifti1Image data
+        """
+        self.img = img
+
+    # Is there some way to generate this if one is not given?
+    def set_map(self, mapping, reg_prealign=None, reg_template=None):
+        """
+        Set mapping between DWI space and a template.
+
+        Parameters
+        ----------
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image
+            A mapping between DWI space and a template.
+
+        reg_template : str or nib.Nifti1Image, optional.
+            Template to use for registration (defaults to the MNI T2)
+        """
+        if reg_template is None:
+            reg_template = dpd.read_mni_template()
+
+        if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
+            if reg_prealign is None:
+                reg_prealign = np.eye(4)
+            self.mapping = reg.read_mapping(mapping, self.img, reg_template,
+                                    prealign=reg_prealign)
+        else:
+            self.mapping = mapping
+
+    def resample(self, nb_points):
+        """
+        Resample streamlines to nb_points number of points.
+
+        Parameters
+        ----------
+        nb_points : int
+            Integer representing number of points wanted along the curve.
+            Streamlines will be resampled to this number of points.
+        """
+        self.streamlines = _resample_bundle(self.streamlines, nb_points)
+        
+    def split_streamlines(self):
+        """
+        Classify the streamlines and split those that: 1) cross the
+        midline, and 2) pass under 10 mm below the mid-point of their
+        representation in the template space.
+        """
+        self.streamlines, self.crosses = \
+            split_streamlines(self.streamlines, self.img)
+
+    def create_prob(self, bundle_dict):
+        """
+        Get fiber probabilites and ROIs for each bundle. 
+
+        Parameters
+        ----------
+        bundle_dict: dict
+            The format is something like::
+
+                {'name': {'ROIs':[img1, img2],
+                'rules':[True, True]},
+                'prob_map': img3,
+                'cross_midline': False}
+        """
+        self.bundle_dict = bundle_dict
+        self.fiber_probabilities = len(self.bundle_dict)*[None]
+        self.include_rois = len(self.bundle_dict)*[None]
+        self.exclude_rois = len(self.bundle_dict)*[None]
+
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
+            rules = self.bundle_dict[bundle]['rules']
+            include_rois = []
+            exclude_rois = []
+            for rule_idx, rule in enumerate(rules):
+                roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
+                if not isinstance(roi, np.ndarray):
+                    roi = roi.get_fdata()
+                warped_roi = auv.patch_up_roi(
+                    (self.mapping.transform_inverse(
+                        roi.astype(np.float32),
+                        interpolation='linear')) > 0)
+
+                if rule:
+                    # include ROI:
+                    include_rois.append(np.array(np.where(warped_roi)).T)
+                else:
+                    # Exclude ROI:
+                    exclude_rois.append(np.array(np.where(warped_roi)).T)
+            self.include_rois[bundle_idx] = include_rois
+            self.exclude_rois[bundle_idx] = exclude_rois
+
+            # The probability map if doesn't exist is all ones with the same
+            # shape as the ROIs:
+            prob_map = self.bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
+
+            if not isinstance(prob_map, np.ndarray):
+                prob_map = prob_map.get_fdata()
+            warped_prob_map = self.mapping.transform_inverse(prob_map,
+                                                        interpolation='nearest')
+            fiber_probabilities = dts.values_from_volume(warped_prob_map,
+                                                        self.fgarray)
+            self.fiber_probabilities[bundle_idx] = np.mean(fiber_probabilities, -1)
+
+    def segment(self, prob_threshold=0):
+        """
+        Iterate over streamlines and bundles, assigning streamlines to bundles.
+
+        Parameters
+        ----------
+        prob_threshold : float.
+            Initial cleaning of fiber groups is done using probability maps from
+            [Hua2008]_. Here, we choose an average probability that needs to be
+            exceeded for an individual streamline to be retained. Default: 0.
+        """
+        streamlines_in_bundles = np.zeros((len(self.streamlines), len(self.bundle_dict)))
+        min_dist_coords = np.zeros((len(self.streamlines), len(self.bundle_dict), 2))
+        self.fiber_groups = {}
+
+        streamlines_idx = np.asarray(range(len(self.streamlines)))
+        tol = dts.dist_to_corner(self.img.affine)
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
+            crosses_midline = self.bundle_dict[bundle]['cross_midline']
+            sl_mask = (self.fiber_probabilities[bundle_idx] > prob_threshold)
+
+            # mask for streamlines where crosses_midline is correct
+            # only if self.crosses set in split_streamlines
+            try:
+                sl_mask = np.logical_and(sl_mask, \
+                            np.logical_or(crosses_midline == None, \
+                                np.logical_or(np.logical_not(self.crosses),\
+                                    crosses_midline)))
+            except NameError:
+                pass
+
+            sls = self.streamlines[sl_mask]
+            # remember original streamline indices
+            sl_og_idxs = streamlines_idx[sl_mask]
+            for sl_idx, sl in enumerate(sls):
+                sl_og_idx = sl_og_idxs[sl_idx]
+
+                is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
+                                                        tol)
+                if is_close:
+                    is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
+                                                    tol)
+                    if is_far:
+                        min_dist_coords[sl_og_idx, bundle_idx, 0] =\
+                            np.argmin(dist[0], 0)[0]
+                        min_dist_coords[sl_og_idx, bundle_idx, 1] =\
+                            np.argmin(dist[1], 0)[0]
+                        streamlines_in_bundles[sl_og_idx, bundle_idx] =\
+                            self.fiber_probabilities[bundle_idx][sl_og_idx]
+
+        # Eliminate any fibers not selected using the plane ROIs:
+        possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
+        self.streamlines = self.streamlines[possible_fibers]
+        streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
+        min_dist_coords = min_dist_coords[possible_fibers]
+        bundle_choice = np.argmax(streamlines_in_bundles, -1)
+
+        # We do another round through, so that we can orient all the
+        # streamlines within a bundle in the same orientation with respect to
+        # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
+        # to ROI1).
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
+            select_idx = np.where(bundle_choice == bundle_idx)
+            # Use a list here, because Streamlines don't support item assignment:
+            select_sl = list(self.streamlines[select_idx])
+            if len(select_sl) == 0:
+                self.fiber_groups[bundle] = dts.Streamlines([])
+                # There's nothing here, move to the next bundle:
+                continue
+
+            # Sub-sample min_dist_coords:
+            min_dist_coords_bundle = min_dist_coords[select_idx]
+            for idx in range(len(select_sl)):
+                min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
+                min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+                if min0 > min1:
+                    select_sl[idx] = select_sl[idx][::-1]
+            # Set this to nibabel.Streamlines object for output:
+            select_sl = dts.Streamlines(select_sl)
+            self.fiber_groups[bundle] = select_sl
 
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
