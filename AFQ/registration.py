@@ -22,7 +22,7 @@ import dipy.core.gradients as dpg
 import dipy.data as dpd
 from dipy.align.streamlinear import StreamlineLinearRegistration
 from dipy.tracking.streamline import set_number_of_points
-from dipy.tracking.utils import move_streamlines
+from dipy.tracking.utils import transform_tracking_output
 from dipy.io.streamline import load_tractogram
 
 import AFQ.utils.models as mut
@@ -439,6 +439,6 @@ def streamline_registration(moving, static, n_points=100,
     aligned = srm.transform(moving)
     if native_resampled:
         aligned = set_number_of_points(aligned, n_points)
-        aligned = move_streamlines(aligned, np.linalg.inv(srm.matrix))
+        aligned = transform_tracking_output(aligned, np.linalg.inv(srm.matrix))
 
     return aligned, srm.matrix

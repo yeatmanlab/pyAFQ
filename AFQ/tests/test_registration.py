@@ -14,8 +14,9 @@ from AFQ.registration import (syn_registration, register_series, register_dwi,
                               streamline_registration, write_mapping,
                               read_mapping, syn_register_dwi, DiffeomorphicMap)
 
-from dipy.tracking.utils import move_streamlines
+from dipy.tracking.utils import transform_tracking_output
 from dipy.io.streamline import save_tractogram
+from dipy.io.stateful_tractogram import StatefulTractogram
 
 
 MNI_T2 = dpd.read_mni_template()
@@ -112,7 +113,7 @@ def test_streamline_registration():
            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])]
     affine = np.eye(4)
     affine[:3, 3] = np.random.randn(3)
-    sl2 = list(move_streamlines(sl1, affine))
+    sl2 = list(transform_tracking_output(sl1, affine))
     aligned, matrix = streamline_registration(sl2, sl1)
     npt.assert_almost_equal(matrix, np.linalg.inv(affine))
     npt.assert_almost_equal(aligned[0], sl1[0])
@@ -124,21 +125,26 @@ def test_streamline_registration():
     base_aff[:3, 3] = np.array([1, 2, 3])
     base_aff[3, 3] = 1
 
+    hdr = nib.Nifti1Header()
     with nbtmp.InTemporaryDirectory() as tmpdir:
         for use_aff in [None, base_aff]:
             fname1 = op.join(tmpdir, 'sl1.trk')
             fname2 = op.join(tmpdir, 'sl2.trk')
             if use_aff is not None:
                 # Move the streamlines to this other space, and report it:
-                save_tractogram(fname1,
-                                move_streamlines(sl1, np.linalg.inv(use_aff)),
-                                use_aff)
-                save_tractogram(fname2,
-                                move_streamlines(sl2, np.linalg.inv(use_aff)),
-                                use_aff)
+                save_tractogram(
+                    fname1,
+                    transform_tracking_output(sl1, np.linalg.inv(use_aff)),
+                    use_aff)
+                save_tractogram(
+                    fname2,
+                    transform_tracking_output(sl2, np.linalg.inv(use_aff)),
+                    use_aff)
             else:
-                save_tractogram(fname1, sl1, np.eye(4))
-                save_tractogram(fname2, sl2, np.eye(4))
+                sl1 = StatefulTractogram(sl1, hdr)
+                sl2 = StatefulTractogram(sl2, hdr)
+                save_tractogram(sl1, fname1)
+                save_tractogram(sl2, fname2)
 
             aligned, matrix = streamline_registration(fname2, fname1)
             npt.assert_almost_equal(aligned[0], sl1[0], decimal=5)
