@@ -14,7 +14,6 @@ import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 
-
 __all__ = ["segment"]
 
 
@@ -171,7 +170,7 @@ def split_streamlines(streamlines, template, low_coord=10):
             #                               np.array([False]),
             #                               crosses[sl_idx+1:]])
             # else:
-                crosses[sl_idx] = True
+            crosses[sl_idx] = True
         else:
             crosses[sl_idx] = False
 
@@ -320,10 +319,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
 
         sl_mask = (fiber_probabilities > prob_threshold)
         # mask for streamlines where crosses_midline is correct
-        sl_mask = np.logical_and(sl_mask, \
-                    np.logical_or(crosses_midline == None, \
-                        np.logical_or(np.logical_not(crosses),\
-                            crosses_midline)))
+        sl_mask = np.logical_and(sl_mask,
+                                 np.logical_or(crosses_midline == None,
+                                               np.logical_or(np.logical_not(crosses),
+                                                             crosses_midline)))
 
         sls = xform_sl[sl_mask]
         # remember original streamline indices
@@ -332,10 +331,10 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
             sl_og_idx = sl_og_idxs[sl_idx]
 
             is_close, dist = _check_sl_with_inclusion(sl, include_rois,
-                                                    tol)
+                                                      tol)
             if is_close:
                 is_far = _check_sl_with_exclusion(sl, exclude_rois,
-                                                tol)
+                                                  tol)
                 if is_far:
                     min_dist_coords[sl_og_idx, bundle_idx, 0] =\
                         np.argmin(dist[0], 0)[0]
@@ -377,6 +376,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
 
     return fiber_groups
 
+
 class Segment:
     def __init__(self, streamlines):
         """
@@ -413,7 +413,7 @@ class Segment:
         self.img, _, _, _ = \
             ut.prepare_data(fdata, fbval, fbvec,
                             b0_threshold=b0_threshold)
-                        
+
     def set_img(self, img):
         """
         Set Image data if already prepared.
@@ -444,7 +444,7 @@ class Segment:
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
             self.mapping = reg.read_mapping(mapping, self.img, reg_template,
-                                    prealign=reg_prealign)
+                                            prealign=reg_prealign)
         else:
             self.mapping = mapping
 
@@ -459,7 +459,7 @@ class Segment:
             Streamlines will be resampled to this number of points.
         """
         self.streamlines = _resample_bundle(self.streamlines, nb_points)
-        
+
     def split_streamlines(self):
         """
         Classify the streamlines and split those that: 1) cross the
@@ -484,9 +484,9 @@ class Segment:
                 'cross_midline': False}
         """
         self.bundle_dict = bundle_dict
-        self.fiber_probabilities = len(self.bundle_dict)*[None]
-        self.include_rois = len(self.bundle_dict)*[None]
-        self.exclude_rois = len(self.bundle_dict)*[None]
+        self.fiber_probabilities = len(self.bundle_dict) * [None]
+        self.include_rois = len(self.bundle_dict) * [None]
+        self.exclude_rois = len(self.bundle_dict) * [None]
 
         self.logger.info("Preparing Fiber Probabilites and ROIs...")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
@@ -513,15 +513,17 @@ class Segment:
 
             # The probability map if doesn't exist is all ones with the same
             # shape as the ROIs:
-            prob_map = self.bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
+            prob_map = self.bundle_dict[bundle].get(
+                'prob_map', np.ones(roi.shape))
 
             if not isinstance(prob_map, np.ndarray):
                 prob_map = prob_map.get_fdata()
             warped_prob_map = self.mapping.transform_inverse(prob_map,
-                                                        interpolation='nearest')
+                                                             interpolation='nearest')
             fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                        self.fgarray)
-            self.fiber_probabilities[bundle_idx] = np.mean(fiber_probabilities, -1)
+                                                         self.fgarray)
+            self.fiber_probabilities[bundle_idx] = np.mean(
+                fiber_probabilities, -1)
 
     def segment(self, prob_threshold=0):
         """
@@ -534,8 +536,10 @@ class Segment:
             [Hua2008]_. Here, we choose an average probability that needs to be
             exceeded for an individual streamline to be retained. Default: 0.
         """
-        streamlines_in_bundles = np.zeros((len(self.streamlines), len(self.bundle_dict)))
-        min_dist_coords = np.zeros((len(self.streamlines), len(self.bundle_dict), 2))
+        streamlines_in_bundles = np.zeros(
+            (len(self.streamlines), len(self.bundle_dict)))
+        min_dist_coords = np.zeros(
+            (len(self.streamlines), len(self.bundle_dict), 2))
         self.fiber_groups = {}
 
         self.logger.info("Assigning Streamlines to Fiber Groups...")
@@ -548,10 +552,10 @@ class Segment:
             # mask for streamlines where crosses_midline is correct
             # only if self.crosses set in split_streamlines
             try:
-                sl_mask = np.logical_and(sl_mask, \
-                            np.logical_or(crosses_midline == None, \
-                                np.logical_or(np.logical_not(self.crosses),\
-                                    crosses_midline)))
+                sl_mask = np.logical_and(sl_mask,
+                                         np.logical_or(crosses_midline == None,
+                                                       np.logical_or(np.logical_not(self.crosses),
+                                                                     crosses_midline)))
             except NameError:
                 pass
 
@@ -562,10 +566,10 @@ class Segment:
                 sl_og_idx = sl_og_idxs[sl_idx]
 
                 is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
-                                                        tol)
+                                                          tol)
                 if is_close:
                     is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
-                                                    tol)
+                                                      tol)
                     if is_far:
                         min_dist_coords[sl_og_idx, bundle_idx, 0] =\
                             np.argmin(dist[0], 0)[0]
