@@ -20,9 +20,9 @@ jobs:
           command: ./.circleci/install-circle.sh
       - run:
           name: install
-          # the pip install command below will install recordlinkage, which is not currently available on conda-forge
           command: |
             source activate ${ENV_NAME}
+            pip install -r requirements-dev.txt
             pip install .
       - run:
           name: run AFQ tests
