@@ -4,7 +4,7 @@ from scipy.special import lpmv, gammaln
 
 from tqdm import tqdm
 from dipy.align import Bunch
-from dipy.tracking.local import LocalTracking
+from dipy.tracking.local_tracking import LocalTracking
 import random
 
 import sys
