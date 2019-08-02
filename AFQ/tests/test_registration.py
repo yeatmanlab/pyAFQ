@@ -141,8 +141,8 @@ def test_streamline_registration():
                     transform_tracking_output(sl2, np.linalg.inv(use_aff)),
                     use_aff)
             else:
-                sl1 = StatefulTractogram(sl1, hdr)
-                sl2 = StatefulTractogram(sl2, hdr)
+                sl1 = StatefulTractogram(sl1, hdr, 'vox')
+                sl2 = StatefulTractogram(sl2, hdr, 'vox')
                 save_tractogram(sl1, fname1)
                 save_tractogram(sl2, fname2)
 
