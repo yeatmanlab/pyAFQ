@@ -9,7 +9,6 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
-from dipy.tracking.local_tracking import LocalTracking
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
@@ -120,8 +119,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
 
-    threshold_classifier = ThresholdTissueClassifier(stop_mask,
-                                                     stop_threshold)
+    threshold_classifier = ThresholdStoppingCriterion(stop_mask,
+                                                      stop_threshold)
     logger.info("Tracking...")
 
     return _local_tracking(seeds, dg, threshold_classifier, affine,
@@ -136,11 +135,12 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(dg,
-                            threshold_classifier,
-                            seeds,
-                            affine,
-                            step_size=step_size)
+    tracker = VerboseLocalTracking(
+                        dg,
+                        threshold_classifier,
+                        seeds,
+                        affine,
+                        step_size=step_size)
 
     streamlines = dts.Streamlines(tracker)
     streamlines = streamlines[streamlines._lengths * step_size > min_length]

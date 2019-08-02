@@ -15,9 +15,8 @@ from AFQ.registration import (syn_registration, register_series, register_dwi,
                               read_mapping, syn_register_dwi, DiffeomorphicMap)
 
 from dipy.tracking.utils import transform_tracking_output
-from dipy.io.streamline import save_tractogram
-from dipy.io.stateful_tractogram import StatefulTractogram
-
+from dipy.io.streamline import load_trk, save_trk
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 MNI_T2 = dpd.read_mni_template()
 hardi_img, gtab = dpd.read_stanford_hardi()
@@ -125,26 +124,33 @@ def test_streamline_registration():
     base_aff[:3, 3] = np.array([1, 2, 3])
     base_aff[3, 3] = 1
 
-    hdr = nib.Nifti1Header()
     with nbtmp.InTemporaryDirectory() as tmpdir:
         for use_aff in [None, base_aff]:
             fname1 = op.join(tmpdir, 'sl1.trk')
             fname2 = op.join(tmpdir, 'sl2.trk')
             if use_aff is not None:
+                img = nib.Nifti1Image(np.zeros((2,2,2)), use_aff)
                 # Move the streamlines to this other space, and report it:
-                save_tractogram(
-                    fname1,
+                tgm1 = StatefulTractogram(
                     transform_tracking_output(sl1, np.linalg.inv(use_aff)),
-                    use_aff)
-                save_tractogram(
-                    fname2,
+                    img,
+                    Space.VOX)
+
+                save_trk(tgm1, fname1, bbox_valid_check=False)
+
+                tgm2 = StatefulTractogram(
                     transform_tracking_output(sl2, np.linalg.inv(use_aff)),
-                    use_aff)
+                    img,
+                    Space.VOX)
+
+                save_trk(tgm2, fname2, bbox_valid_check=False)
+
             else:
-                sl1 = StatefulTractogram(sl1, hdr, 'vox')
-                sl2 = StatefulTractogram(sl2, hdr, 'vox')
-                save_tractogram(sl1, fname1)
-                save_tractogram(sl2, fname2)
+                img = nib.Nifti1Image(np.zeros((2,2,2)), np.eye(4))
+                tgm1 = StatefulTractogram(sl1, img, Space.RASMM)
+                tgm2 = StatefulTractogram(sl2, img, Space.RASMM)
+                save_trk(tgm1, fname1, bbox_valid_check=False)
+                save_trk(tgm2, fname2, bbox_valid_check=False)
 
             aligned, matrix = streamline_registration(fname2, fname1)
             npt.assert_almost_equal(aligned[0], sl1[0], decimal=5)
