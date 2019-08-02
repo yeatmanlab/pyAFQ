@@ -17,6 +17,7 @@ import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
 from dipy.io.streamline import save_tractogram
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 from AFQ import api
 import AFQ.data as afd
@@ -71,7 +72,7 @@ def test_AFQ_init():
     n_sessions = 2
     dmriprep_path = create_dummy_dmriprep_path(n_subjects, n_sessions)
     my_afq = api.AFQ(dmriprep_path=dmriprep_path)
-    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 10))
+    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
 
 
 def test_AFQ_data():
@@ -110,12 +111,15 @@ def test_AFQ_data_planes():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     streamlines = dts.Streamlines(
-            dtu.move_streamlines([s for s in streamlines if s.shape[0] > 100],
-                                 np.linalg.inv(myafq.dwi_affine[0])))
+            dtu.transform_tracking_output(
+                [s for s in streamlines if s.shape[0] > 100],
+                 np.linalg.inv(myafq.dwi_affine[0])))
 
     sl_file = op.join(myafq.data_frame.results_dir[0],
                       'sub-01_sess-01_dwiDTI_det_streamlines.trk')
-    save_tractogram(sl_file, streamlines, myafq.dwi_affine[0])
+    sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
+                             Space.VOX)
+    save_tractogram(sft, sl_file, bbox_valid_check=False)
 
     mapping_file = op.join(myafq.data_frame.results_dir[0],
                                 'sub-01_sess-01_dwi_mapping.nii.gz')

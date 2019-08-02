@@ -37,6 +37,8 @@ def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
         relevant).
 
     """
+    if affine is None:
+        affine = np.eye(4)
     # It's already an array
     if isinstance(streamlines, np.ndarray):
         fgarray = streamlines
@@ -305,7 +307,8 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
         warped_prob_map = mapping.transform_inverse(prob_map,
                                                     interpolation='nearest')
         fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                     fgarray)
+                                                     fgarray,
+                                                     np.eye(4))
         fiber_probabilities = np.mean(fiber_probabilities, -1)
 
         for sl_idx, sl in enumerate(xform_sl):

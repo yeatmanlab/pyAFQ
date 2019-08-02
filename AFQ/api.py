@@ -15,6 +15,7 @@ import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -606,14 +607,13 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
         for bundle in bundle_dict:
             uid = bundle_dict[bundle]['uid']
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            this_sl = (streamlines[idx])
+            this_sl = dtu.transform_tracking_output(
+                streamlines[idx],
+                np.linalg.inv(row['dwi_affine']))
+
+            this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
             fname = op.join(bundles_dir, '%s.trk' % bundle)
-            save_tractogram(
-                fname,
-                dtu.move_streamlines(
-                    this_sl,
-                    np.linalg.inv(row['dwi_affine'])),
-                row['dwi_affine'])
+            save_tractogram(this_tgm, fname, bbox_valid_check=False)
 
 
 def _get_affine(fname):
@@ -833,6 +833,7 @@ class AFQ(object):
                                               npartitions=len(sub_list))
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
+        self.set_dwi_img()
 
     def set_gtab(self, b0_threshold):
         self.data_frame['gtab'] = self.data_frame.apply(
@@ -853,6 +854,15 @@ class AFQ(object):
         return self.data_frame['dwi_affine']
 
     dwi_affine = property(get_dwi_affine, set_dwi_affine)
+
+    def set_dwi_img(self):
+        self.data_frame['dwi_img'] =\
+            self.data_frame['dwi_file'].apply(nib.load)
+
+    def get_dwi_img(self):
+        return self.data_frame['dwi_img']
+
+    dwi_img = property(get_dwi_img, set_dwi_img)
 
     def __getitem__(self, k):
         return self.data_frame.__getitem__(k)
