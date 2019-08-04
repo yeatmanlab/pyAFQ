@@ -185,7 +185,7 @@ def _check_sl_with_inclusion(sl, include_rois, tol):
     """
     dist = []
     for roi in include_rois:
-        dist.append(cdist(sl, roi, 'euclidean'))
+        dist.append(cdist(sl, roi, 'sqeuclidean'))
         if np.min(dist[-1]) > tol:
             # Too far from one of them:
             return False, []
@@ -198,7 +198,7 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     of exclusion ROIs.
     """
     for roi in exclude_rois:
-        if np.min(cdist(sl, roi, 'euclidean')) < tol:
+        if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
             return False
     # Either there are no exclusion ROIs, or you are not close to any:
     return True
@@ -257,7 +257,7 @@ def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
     img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
                                       b0_threshold=b0_threshold)
 
-    tol = dts.dist_to_corner(img.affine)
+    tol = dts.dist_to_corner(img.affine)**2
 
     if reg_template is None:
         reg_template = dpd.read_mni_template()
@@ -544,7 +544,7 @@ class Segment:
 
         self.logger.info("Assigning Streamlines to Fiber Groups...")
         streamlines_idx = np.asarray(range(len(self.streamlines)))
-        tol = dts.dist_to_corner(self.img.affine)
+        tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             sl_mask = (self.fiber_probabilities[bundle_idx] > prob_threshold)
