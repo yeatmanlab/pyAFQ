@@ -204,188 +204,10 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
     return True
 
 
-def segment(fdata, fbval, fbvec, streamlines, bundle_dict, mapping,
-            reg_prealign=None, b0_threshold=0, reg_template=None,
-            prob_threshold=0, nb_points=-1):
-    """
-    Segment streamlines into bundles based on inclusion ROIs.
-
-    Parameters
-    ----------
-    fdata, fbval, fbvec : str
-        Full path to data, bvals, bvecs
-
-    streamlines : list of 2D arrays
-        Each array is a streamline, shape (3, N).
-
-    bundle_dict: dict
-        The format is something like::
-
-            {'name': {'ROIs':[img1, img2],
-            'rules':[True, True]},
-            'prob_map': img3,
-            'cross_midline': False}
-
-    reg_template : str or nib.Nifti1Image, optional.
-        Template to use for registration (defaults to the MNI T2)
-
-    mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional
-        A mapping between DWI space and a template. Defaults to generate
-        this.
-
-    prob_threshold : float.
-        Initial cleaning of fiber groups is done using probability maps from
-        [Hua2008]_. Here, we choose an average probability that needs to be
-        exceeded for an individual streamline to be retained. Default: 0.
-
-    nb_points : int
-        Integer representing number of points wanted along the curve.
-        Streamlines will be resampled to this number of points.
-        If nb_points -1, there is no resampling. Default: -1.
-
-    References
-    ----------
-    .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
-       Tract probability maps in stereotaxic spaces: analyses of white
-       matter anatomy and tract-specific quantification. Neuroimage 39:
-       336-347
-    """
-    fgarray = _resample_bundle(streamlines, 100)
-    if nb_points != -1:
-        streamlines = _resample_bundle(streamlines, nb_points)
-
-    img, _, gtab, _ = ut.prepare_data(fdata, fbval, fbvec,
-                                      b0_threshold=b0_threshold)
-
-    tol = dts.dist_to_corner(img.affine)**2
-
-    if reg_template is None:
-        reg_template = dpd.read_mni_template()
-
-    # Classify the streamlines and split those that: 1) cross the
-    # midline, and 2) pass under 10 mm below the mid-point of their
-    # representation in the template space:
-    xform_sl, crosses = split_streamlines(streamlines, img)
-
-    if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
-        if reg_prealign is None:
-            reg_prealign = np.eye(4)
-        mapping = reg.read_mapping(mapping, img, reg_template,
-                                   prealign=reg_prealign)
-
-    fiber_probabilities = np.zeros((len(xform_sl), len(bundle_dict)))
-
-    # For expedience, we approximate each streamline as a 100 point curve:
-    streamlines_in_bundles = np.zeros((len(xform_sl), len(bundle_dict)))
-    min_dist_coords = np.zeros((len(xform_sl), len(bundle_dict), 2))
-    xform_sl_idx = np.asarray(range(len(xform_sl)))
-
-    fiber_groups = {}
-
-    for bundle_idx, bundle in enumerate(bundle_dict):
-        rules = bundle_dict[bundle]['rules']
-        include_rois = []
-        exclude_rois = []
-        for rule_idx, rule in enumerate(rules):
-            roi = bundle_dict[bundle]['ROIs'][rule_idx]
-            if not isinstance(roi, np.ndarray):
-                roi = roi.get_fdata()
-            warped_roi = auv.patch_up_roi(
-                (mapping.transform_inverse(
-                    roi.astype(np.float32),
-                    interpolation='linear')) > 0)
-
-            if rule:
-                # include ROI:
-                include_rois.append(np.array(np.where(warped_roi)).T)
-            else:
-                # Exclude ROI:
-                exclude_rois.append(np.array(np.where(warped_roi)).T)
-
-        crosses_midline = bundle_dict[bundle]['cross_midline']
-
-        # The probability map if doesn't exist is all ones with the same
-        # shape as the ROIs:
-        prob_map = bundle_dict[bundle].get('prob_map', np.ones(roi.shape))
-
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_fdata()
-        warped_prob_map = mapping.transform_inverse(prob_map,
-                                                    interpolation='nearest')
-        fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                     fgarray,
-                                                     np.eye(4))
-        fiber_probabilities = np.mean(fiber_probabilities, -1)
-
-        for sl_idx, sl in enumerate(xform_sl):
-            if fiber_probabilities[sl_idx] > prob_threshold:
-                if crosses_midline is not None:
-                    if crosses[sl_idx]:
-                        # This means that the streamline does
-                        # cross the midline:
-                        if crosses_midline:
-                            # This is what we want, keep going
-                            pass
-                        else:
-                            # This is not what we want, skip to next streamline
-                            continue
-
-                is_close, dist = _check_sl_with_inclusion(sl, include_rois,
-                                                          tol)
-                if is_close:
-                    is_far = _check_sl_with_exclusion(sl, exclude_rois,
-                                                      tol)
-                    if is_far:
-                        min_dist_coords[sl_idx, bundle_idx, 0] =\
-                            np.argmin(dist[0], 0)[0]
-                        min_dist_coords[sl_idx, bundle_idx, 1] =\
-                            np.argmin(dist[1], 0)[0]
-                        streamlines_in_bundles[sl_idx, bundle_idx] =\
-                            fiber_probabilities[sl_idx]
-
-    # Eliminate any fibers not selected using the plane ROIs:
-    possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
-    xform_sl = xform_sl[possible_fibers]
-    streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
-    min_dist_coords = min_dist_coords[possible_fibers]
-    bundle_choice = np.argmax(streamlines_in_bundles, -1)
-
-    # We do another round through, so that we can orient all the
-    # streamlines within a bundle in the same orientation with respect to
-    # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
-    # to ROI1).
-    for bundle_idx, bundle in enumerate(bundle_dict):
-        select_idx = np.where(bundle_choice == bundle_idx)
-        # Use a list here, because Streamlines don't support item assignment:
-        select_sl = list(xform_sl[select_idx])
-        if len(select_sl) == 0:
-            fiber_groups[bundle] = dts.Streamlines([])
-            # There's nothing here, move to the next bundle:
-            continue
-
-        # Sub-sample min_dist_coords:
-        min_dist_coords_bundle = min_dist_coords[select_idx]
-        for idx in range(len(select_sl)):
-            min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
-            min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
-            if min0 > min1:
-                select_sl[idx] = select_sl[idx][::-1]
-        # Set this to nibabel.Streamlines object for output:
-        select_sl = dts.Streamlines(select_sl)
-        fiber_groups[bundle] = select_sl
-
-    return fiber_groups
-
-
 class Segment:
-    def __init__(self, streamlines):
+    def __init__(self):
         """
         Segment streamlines into bundles based on inclusion ROIs.
-
-        Parameters
-        ----------
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
 
         References
         ----------
@@ -394,11 +216,7 @@ class Segment:
         matter anatomy and tract-specific quantification. Neuroimage 39:
         336-347
         """
-        self.streamlines = streamlines
         self.logger = logging.getLogger('AFQ.Segmentation')
-
-        # For expedience, we approximate each streamline as a 100 point curve:
-        self.fgarray = _resample_bundle(self.streamlines, 100)
 
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
@@ -448,27 +266,6 @@ class Segment:
         else:
             self.mapping = mapping
 
-    def resample(self, nb_points):
-        """
-        Resample streamlines to nb_points number of points.
-
-        Parameters
-        ----------
-        nb_points : int
-            Integer representing number of points wanted along the curve.
-            Streamlines will be resampled to this number of points.
-        """
-        self.streamlines = _resample_bundle(self.streamlines, nb_points)
-
-    def split_streamlines(self):
-        """
-        Classify the streamlines and split those that: 1) cross the
-        midline, and 2) pass under 10 mm below the mid-point of their
-        representation in the template space.
-        """
-        self.streamlines, self.crosses = \
-            split_streamlines(self.streamlines, self.img)
-
     def create_prob(self, bundle_dict):
         """
         Get fiber probabilites and ROIs for each bundle. 
@@ -484,7 +281,7 @@ class Segment:
                 'cross_midline': False}
         """
         self.bundle_dict = bundle_dict
-        self.fiber_probabilities = len(self.bundle_dict) * [None]
+        self.warped_prob_map = len(self.bundle_dict) * [None]
         self.include_rois = len(self.bundle_dict) * [None]
         self.exclude_rois = len(self.bundle_dict) * [None]
 
@@ -518,70 +315,105 @@ class Segment:
 
             if not isinstance(prob_map, np.ndarray):
                 prob_map = prob_map.get_fdata()
-            warped_prob_map = self.mapping.transform_inverse(prob_map,
+            self.warped_prob_map[bundle_idx] = self.mapping.transform_inverse(prob_map,
                                                              interpolation='nearest')
-            fiber_probabilities = dts.values_from_volume(warped_prob_map,
-                                                         self.fgarray)
-            self.fiber_probabilities[bundle_idx] = np.mean(
-                fiber_probabilities, -1)
 
-    def segment(self, prob_threshold=0):
+    def resample(self, nb_points, streamlines=None):
+        """
+        Resample streamlines to nb_points number of points.
+
+        Parameters
+        ----------
+        nb_points : int
+            Integer representing number of points wanted along the curve.
+            Streamlines will be resampled to this number of points.
+        """
+        if streamlines == None:
+            streamlines = self.streamlines
+
+        self.streamlines = _resample_bundle(streamlines, nb_points)
+
+    def split_sls(self, streamlines=None):
+        """
+        Classify the streamlines and split those that: 1) cross the
+        midline, and 2) pass under 10 mm below the mid-point of their
+        representation in the template space.
+        """
+        if streamlines == None:
+            streamlines = self.streamlines
+
+        self.streamlines, self.crosses = \
+            split_streamlines(streamlines, self.img)
+
+    def segment_sls(self, streamlines=None, prob_threshold=0):
         """
         Iterate over streamlines and bundles, assigning streamlines to fiber groups.
 
         Parameters
         ----------
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
+            Default: None.
+
         prob_threshold : float.
             Initial cleaning of fiber groups is done using probability maps from
             [Hua2008]_. Here, we choose an average probability that needs to be
             exceeded for an individual streamline to be retained. Default: 0.
         """
+        if streamlines == None:
+            streamlines = self.streamlines
+
+        # For expedience, we approximate each streamline as a 100 point curve:
+        fgarray = _resample_bundle(streamlines, 100)
+
         streamlines_in_bundles = np.zeros(
-            (len(self.streamlines), len(self.bundle_dict)))
+            (len(streamlines), len(self.bundle_dict)))
         min_dist_coords = np.zeros(
-            (len(self.streamlines), len(self.bundle_dict), 2))
+            (len(streamlines), len(self.bundle_dict), 2))
         self.fiber_groups = {}
 
         self.logger.info("Assigning Streamlines to Fiber Groups...")
-        streamlines_idx = np.asarray(range(len(self.streamlines)))
         tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            fiber_probabilities = dts.values_from_volume(self.warped_prob_map[bundle_idx],
+                                                         fgarray)
+            fiber_probabilities = np.mean(fiber_probabilities, -1)
+
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            sl_mask = (self.fiber_probabilities[bundle_idx] > prob_threshold)
+            for sl_idx, sl in enumerate(streamlines):
+                if fiber_probabilities[sl_idx] > prob_threshold:
+                    if crosses_midline is not None:
+                        try:
+                            if self.crosses[sl_idx]:
+                                # This means that the streamline does
+                                # cross the midline:
+                                if crosses_midline:
+                                    # This is what we want, keep going
+                                    pass
+                                else:
+                                    # This is not what we want, skip to next streamline
+                                    continue
+                        except NameError:
+                            pass
 
-            # mask for streamlines where crosses_midline is correct
-            # only if self.crosses set in split_streamlines
-            try:
-                sl_mask = np.logical_and(sl_mask,
-                                         np.logical_or(crosses_midline == None,
-                                                       np.logical_or(np.logical_not(self.crosses),
-                                                                     crosses_midline)))
-            except NameError:
-                pass
-
-            sls = self.streamlines[sl_mask]
-            # remember original streamline indices
-            sl_og_idxs = streamlines_idx[sl_mask]
-            for sl_idx, sl in enumerate(sls):
-                sl_og_idx = sl_og_idxs[sl_idx]
-
-                is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
-                                                          tol)
-                if is_close:
-                    is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
-                                                      tol)
-                    if is_far:
-                        min_dist_coords[sl_og_idx, bundle_idx, 0] =\
-                            np.argmin(dist[0], 0)[0]
-                        min_dist_coords[sl_og_idx, bundle_idx, 1] =\
-                            np.argmin(dist[1], 0)[0]
-                        streamlines_in_bundles[sl_og_idx, bundle_idx] =\
-                            self.fiber_probabilities[bundle_idx][sl_og_idx]
+                    is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
+                                                            tol)
+                    if is_close:
+                        is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
+                                                        tol)
+                        if is_far:
+                            min_dist_coords[sl_idx, bundle_idx, 0] =\
+                                np.argmin(dist[0], 0)[0]
+                            min_dist_coords[sl_idx, bundle_idx, 1] =\
+                                np.argmin(dist[1], 0)[0]
+                            streamlines_in_bundles[sl_idx, bundle_idx] =\
+                                fiber_probabilities[sl_idx]
 
         self.logger.info("Cleaning and Re-Orienting...")
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
-        self.streamlines = self.streamlines[possible_fibers]
+        streamlines = streamlines[possible_fibers]
         streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
         min_dist_coords = min_dist_coords[possible_fibers]
         bundle_choice = np.argmax(streamlines_in_bundles, -1)
@@ -593,7 +425,7 @@ class Segment:
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, because Streamlines don't support item assignment:
-            select_sl = list(self.streamlines[select_idx])
+            select_sl = list(streamlines[select_idx])
             if len(select_sl) == 0:
                 self.fiber_groups[bundle] = dts.Streamlines([])
                 # There's nothing here, move to the next bundle:
