@@ -280,7 +280,6 @@ class Segment:
             self.split_sls()
 
         self.segment_sls(None, prob_threshold)
-        
 
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
@@ -377,7 +376,7 @@ class Segment:
             if not isinstance(prob_map, np.ndarray):
                 prob_map = prob_map.get_fdata()
             self.warped_prob_map[bundle_idx] = self.mapping.transform_inverse(prob_map,
-                                                             interpolation='nearest')
+                                                                              interpolation='nearest')
 
     def resample(self, nb_points, streamlines=None):
         """
@@ -472,10 +471,10 @@ class Segment:
                             pass
 
                     is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
-                                                            tol)
+                                                              tol)
                     if is_close:
                         is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
-                                                        tol)
+                                                          tol)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]

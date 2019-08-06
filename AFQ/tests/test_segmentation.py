@@ -45,11 +45,11 @@ def test_segment():
     segment = seg.Segment()
     segment.setup()
     segment.segment(hardi_fdata,
-                        hardi_fbval,
-                        hardi_fbvec,
-                        bundles,
-                        streamlines,
-                        mapping=mapping)
+                    hardi_fbval,
+                    hardi_fbvec,
+                    bundles,
+                    streamlines,
+                    mapping=mapping)
     fiber_groups = segment.fiber_groups
 
     # We asked for 2 fiber groups:
@@ -92,11 +92,11 @@ def test_segment():
     segment = seg.Segment()
     segment.setup()
     segment.segment(hardi_fdata,
-                        hardi_fbval,
-                        hardi_fbvec,
-                        bundles,
-                        streamlines,
-                        mapping=mapping)
+                    hardi_fbval,
+                    hardi_fbvec,
+                    bundles,
+                    streamlines,
+                    mapping=mapping)
     fiber_groups = segment.fiber_groups
 
     # This condition should still hold
