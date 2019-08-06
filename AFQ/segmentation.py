@@ -241,7 +241,7 @@ class Segment:
                 b0_threshold=0, mapping=None, reg_prealign=None,
                 reg_template=None, prob_threshold=0):
         """
-        Prepare image data from DWI data, 
+        Prepare image data from DWI data,
         Set mapping between DWI space and a template,
         Get fiber probabilites and ROIs for each bundle,
         And iterate over streamlines and bundles,
@@ -315,7 +315,7 @@ class Segment:
         if reg_template is None:
             reg_template = dpd.read_mni_template()
 
-        if mapping == None:
+        if mapping is None:
             gtab = dpg.gradient_table(self.fbval, self.fbvec)
             self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
@@ -328,7 +328,7 @@ class Segment:
 
     def create_prob(self, bundle_dict):
         """
-        Get fiber probabilites and ROIs for each bundle. 
+        Get fiber probabilites and ROIs for each bundle.
 
         Parameters
         ----------
@@ -375,8 +375,9 @@ class Segment:
 
             if not isinstance(prob_map, np.ndarray):
                 prob_map = prob_map.get_fdata()
-            self.warped_prob_map[bundle_idx] = self.mapping.transform_inverse(prob_map,
-                                                                              interpolation='nearest')
+            self.warped_prob_map[bundle_idx] = \
+                self.mapping.transform_inverse(prob_map,
+                                               interpolation='nearest')
 
     def resample(self, nb_points, streamlines=None):
         """
@@ -392,7 +393,7 @@ class Segment:
             If streamlines is None, will use previously given streamlines.
             Default: None.
         """
-        if streamlines == None:
+        if streamlines is None:
             streamlines = self.streamlines
 
         self.streamlines = _resample_bundle(streamlines, nb_points)
@@ -410,7 +411,7 @@ class Segment:
             If streamlines is None, will use previously given streamlines.
             Default: None.
         """
-        if streamlines == None:
+        if streamlines is None:
             streamlines = self.streamlines
 
         self.streamlines, self.crosses = \
@@ -418,7 +419,8 @@ class Segment:
 
     def segment_sls(self, streamlines=None, prob_threshold=0):
         """
-        Iterate over streamlines and bundles, assigning streamlines to fiber groups.
+        Iterate over streamlines and bundles,
+        assigning streamlines to fiber groups.
 
         Parameters
         ----------
@@ -428,11 +430,12 @@ class Segment:
             Default: None.
 
         prob_threshold : float.
-            Initial cleaning of fiber groups is done using probability maps from
-            [Hua2008]_. Here, we choose an average probability that needs to be
-            exceeded for an individual streamline to be retained. Default: 0.
+            Initial cleaning of fiber groups is done using probability maps
+            from [Hua2008]_. Here, we choose an average probability that
+            needs to be exceeded for an individual streamline to be retained.
+            Default: 0.
         """
-        if streamlines == None:
+        if streamlines is None:
             streamlines = self.streamlines
         else:
             self.streamlines = streamlines
@@ -449,8 +452,9 @@ class Segment:
         self.logger.info("Assigning Streamlines to Fiber Groups...")
         tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
-            fiber_probabilities = dts.values_from_volume(self.warped_prob_map[bundle_idx],
-                                                         fgarray)
+            fiber_probabilities = dts.values_from_volume(
+                                            self.warped_prob_map[bundle_idx],
+                                            fgarray)
             fiber_probabilities = np.mean(fiber_probabilities, -1)
 
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
@@ -465,16 +469,19 @@ class Segment:
                                     # This is what we want, keep going
                                     pass
                                 else:
-                                    # This is not what we want, skip to next streamline
+                                    # This is not what we want,
+                                    # skip to next streamline
                                     continue
                         except NameError:
                             pass
 
-                    is_close, dist = _check_sl_with_inclusion(sl, self.include_rois[bundle_idx],
-                                                              tol)
+                    is_close, dist = _check_sl_with_inclusion(sl,
+                                            self.include_rois[bundle_idx],
+                                            tol)
                     if is_close:
-                        is_far = _check_sl_with_exclusion(sl, self.exclude_rois[bundle_idx],
-                                                          tol)
+                        is_far = _check_sl_with_exclusion(sl,
+                                            self.exclude_rois[bundle_idx],
+                                            tol)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]
@@ -497,7 +504,7 @@ class Segment:
         # to ROI1).
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             select_idx = np.where(bundle_choice == bundle_idx)
-            # Use a list here, because Streamlines don't support item assignment:
+            # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
             if len(select_sl) == 0:
                 self.fiber_groups[bundle] = dts.Streamlines([])
