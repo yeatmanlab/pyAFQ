@@ -9,12 +9,13 @@ import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
+import dipy.core.gradients as dpg
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 
-__all__ = ["segment"]
+__all__ = ["Segment"]
 
 
 def _resample_bundle(streamlines, n_points):
@@ -218,6 +219,69 @@ class Segment:
         """
         self.logger = logging.getLogger('AFQ.Segmentation')
 
+    def setup(self, split=True, resample_np=0):
+        """
+        Define parameters for segment function
+
+        Parameters
+        ----------
+        split : boolean
+            If true, classify the streamlines and split those that:
+            1) cross the midline, and 2) pass under 10 mm below
+            the mid-point of their representation in the template space.
+            Default: False
+        resample_np : int
+            Resample streamlines to resample_np number of points.
+            If 0, no resampling is done. Default: 0
+        """
+        self.split = split
+        self.resample_np = resample_np
+
+    def segment(self, fdata, fbval, fbvec, bundle_dict, streamlines,
+                b0_threshold=0, mapping=None, reg_prealign=None,
+                reg_template=None, prob_threshold=0):
+        """
+        Prepare image data from DWI data, 
+        Set mapping between DWI space and a template,
+        Get fiber probabilites and ROIs for each bundle,
+        And iterate over streamlines and bundles,
+        assigning streamlines to fiber groups.
+
+        Parameters
+        ----------
+        fdata, fbval, fbvec : str
+            Full path to data, bvals, bvecs
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+            A mapping between DWI space and a template.
+            If None, mapping will be registered from data used in prepare_img.
+            Default: None.
+        reg_template : str or nib.Nifti1Image, optional.
+            Template to use for registration (defaults to the MNI T2)
+        bundle_dict: dict
+            The format is something like::
+
+                {'name': {'ROIs':[img1, img2],
+                'rules':[True, True]},
+                'prob_map': img3,
+                'cross_midline': False}
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
+            Default: None.
+        """
+        self.prepare_img(fdata, fbval, fbvec, b0_threshold)
+        self.prepare_map(mapping, reg_prealign, reg_template)
+        self.create_prob(bundle_dict)
+
+        self.streamlines = streamlines
+        if self.resample_np > 0:
+            self.resample(self.resample_np)
+        if self.split:
+            self.split_sls()
+
+        self.segment_sls(None, prob_threshold)
+        
+
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
         Prepare image data from DWI data.
@@ -231,26 +295,20 @@ class Segment:
         self.img, _, _, _ = \
             ut.prepare_data(fdata, fbval, fbvec,
                             b0_threshold=b0_threshold)
+        self.fdata = fdata
+        self.fbval = fbval
+        self.fbvec = fbvec
 
-    def set_img(self, img):
-        """
-        Set Image data if already prepared.
-
-        Parameters
-        ----------
-        img : Nifti1Image data
-        """
-        self.img = img
-
-    # Is there some way to generate this if one is not given?
-    def set_map(self, mapping, reg_prealign=None, reg_template=None):
+    def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None):
         """
         Set mapping between DWI space and a template.
 
         Parameters
         ----------
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
             A mapping between DWI space and a template.
+            If None, mapping will be registered from data used in prepare_img.
+            Default: None.
 
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration (defaults to the MNI T2)
@@ -258,7 +316,10 @@ class Segment:
         if reg_template is None:
             reg_template = dpd.read_mni_template()
 
-        if isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
+        if mapping == None:
+            gtab = dpg.gradient_table(self.fbval, self.fbvec)
+            self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
+        elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
             self.mapping = reg.read_mapping(mapping, self.img, reg_template,
@@ -327,6 +388,10 @@ class Segment:
         nb_points : int
             Integer representing number of points wanted along the curve.
             Streamlines will be resampled to this number of points.
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
+            Default: None.
         """
         if streamlines == None:
             streamlines = self.streamlines
@@ -338,6 +403,13 @@ class Segment:
         Classify the streamlines and split those that: 1) cross the
         midline, and 2) pass under 10 mm below the mid-point of their
         representation in the template space.
+
+        Parameters
+        ----------
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
+            Default: None.
         """
         if streamlines == None:
             streamlines = self.streamlines
@@ -363,6 +435,8 @@ class Segment:
         """
         if streamlines == None:
             streamlines = self.streamlines
+        else:
+            self.streamlines = streamlines
 
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = _resample_bundle(streamlines, 100)

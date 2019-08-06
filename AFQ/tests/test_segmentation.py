@@ -42,12 +42,15 @@ def test_segment():
                          'prob_map': templates['CST_R_prob_map'],
                          'cross_midline': None}}
 
-    fiber_groups = seg.segment(hardi_fdata,
-                               hardi_fbval,
-                               hardi_fbvec,
-                               streamlines,
-                               bundles,
-                               mapping)
+    segment = seg.Segment()
+    segment.setup()
+    segment.segment(hardi_fdata,
+                        hardi_fbval,
+                        hardi_fbvec,
+                        bundles,
+                        streamlines,
+                        mapping=mapping)
+    fiber_groups = segment.fiber_groups
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
@@ -86,12 +89,15 @@ def test_segment():
                          'rules': [True, True],
                          'cross_midline': False}}
 
-    fiber_groups = seg.segment(hardi_fdata,
-                               hardi_fbval,
-                               hardi_fbvec,
-                               streamlines,
-                               bundles,
-                               mapping)
+    segment = seg.Segment()
+    segment.setup()
+    segment.segment(hardi_fdata,
+                        hardi_fbval,
+                        hardi_fbvec,
+                        bundles,
+                        streamlines,
+                        mapping=mapping)
+    fiber_groups = segment.fiber_groups
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
