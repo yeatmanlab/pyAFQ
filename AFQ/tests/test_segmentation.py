@@ -43,7 +43,6 @@ def test_segment():
                          'cross_midline': None}}
 
     segment = seg.Segment()
-    segment.setup()
     segment.segment(hardi_fdata,
                     hardi_fbval,
                     hardi_fbvec,
@@ -90,7 +89,6 @@ def test_segment():
                          'cross_midline': False}}
 
     segment = seg.Segment()
-    segment.setup()
     segment.segment(hardi_fdata,
                     hardi_fbval,
                     hardi_fbvec,

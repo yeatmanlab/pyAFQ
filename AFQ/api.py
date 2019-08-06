@@ -428,13 +428,15 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                    reg_template,
                                    prealign=np.linalg.inv(reg_prealign))
 
-        bundles = seg.segment(row['dwi_file'],
+        segment = seg.Segment()
+        bundles = segment.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
-                              sl,
                               bundle_dict,
+                              sl,
                               reg_template=reg_template,
                               mapping=mapping)
+
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file

@@ -206,9 +206,20 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol):
 
 
 class Segment:
-    def __init__(self):
+    def __init__(self, split=True, nb_points=0):
         """
         Segment streamlines into bundles based on inclusion ROIs.
+
+        Parameters
+        ----------
+        split : boolean
+            If true, classify the streamlines and split those that:
+            1) cross the midline, and 2) pass under 10 mm below
+            the mid-point of their representation in the template space.
+            Default: False
+        nb_points : int
+            Resample streamlines to nb_points number of points.
+            If 0, no resampling is done. Default: 0
 
         References
         ----------
@@ -218,24 +229,8 @@ class Segment:
         336-347
         """
         self.logger = logging.getLogger('AFQ.Segmentation')
-
-    def setup(self, split=True, resample_np=0):
-        """
-        Define parameters for segment function
-
-        Parameters
-        ----------
-        split : boolean
-            If true, classify the streamlines and split those that:
-            1) cross the midline, and 2) pass under 10 mm below
-            the mid-point of their representation in the template space.
-            Default: False
-        resample_np : int
-            Resample streamlines to resample_np number of points.
-            If 0, no resampling is done. Default: 0
-        """
         self.split = split
-        self.resample_np = resample_np
+        self.nb_points = nb_points
 
     def segment(self, fdata, fbval, fbvec, bundle_dict, streamlines,
                 b0_threshold=0, mapping=None, reg_prealign=None,
@@ -274,8 +269,8 @@ class Segment:
         self.create_prob(bundle_dict)
 
         self.streamlines = streamlines
-        if self.resample_np > 0:
-            self.resample(self.resample_np)
+        if self.nb_points > 0:
+            self.resample(self.nb_points)
         if self.split:
             self.split_sls()
 
@@ -524,6 +519,7 @@ class Segment:
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
             self.fiber_groups[bundle] = select_sl
+        return self.fiber_groups
 
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
