@@ -456,7 +456,8 @@ class Segment:
                                             self.warped_prob_map[bundle_idx],
                                             fgarray)
             fiber_probabilities = np.mean(fiber_probabilities, -1)
-
+            include_roi = self.include_rois[bundle_idx]
+            exclude_roi = self.exclude_rois[bundle_idx]
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx, sl in enumerate(streamlines):
                 if fiber_probabilities[sl_idx] > prob_threshold:
@@ -475,13 +476,15 @@ class Segment:
                         except NameError:
                             pass
 
-                    is_close, dist = _check_sl_with_inclusion(sl,
-                                            self.include_rois[bundle_idx],
-                                            tol)
+                    is_close, dist = \
+                        _check_sl_with_inclusion(sl,
+                                                include_roi,
+                                                tol)
                     if is_close:
-                        is_far = _check_sl_with_exclusion(sl,
-                                            self.exclude_rois[bundle_idx],
-                                            tol)
+                        is_far = \
+                            _check_sl_with_exclusion(sl,
+                                                    exclude_roi,
+                                                    tol)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]
