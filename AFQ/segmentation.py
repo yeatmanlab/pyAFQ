@@ -274,7 +274,7 @@ class Segment:
         if self.split:
             self.split_sls()
 
-        self.segment_sls(None, prob_threshold)
+        return self.segment_sls(None, prob_threshold)
 
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
