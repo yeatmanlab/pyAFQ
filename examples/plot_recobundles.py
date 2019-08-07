@@ -114,9 +114,9 @@ if not op.exists('csd_streamlines.trk'):
     streamlines = aft.track(csd_params, seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
 
-    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
+    save_tractogram('./csd_streamlines.trk', streamlines, np.eye(4))
 else:
-    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    tg = nib.streamlines.load('./csd_streamlines.trk').tractogram
     streamlines = tg.streamlines
 
 fiber_groups = {}
