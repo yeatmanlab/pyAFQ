@@ -25,6 +25,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
+import AFQ.csd as csd
 
 dpd.fetch_stanford_hardi()
 
@@ -46,6 +47,15 @@ else:
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
+
+print("Calculating CSD...")
+if not op.exists('./csd_sh_coeff.nii.gz'):
+    dti_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
+                             out_dir='.')
+else:
+    csd_params = './csd_sh_coeff.nii.gz'
+
+csd_params_img = nib.load(csd_params)
 
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
@@ -73,7 +83,7 @@ for name in bundle_names:
         uid += 1
 
 print("Tracking...")
-if not op.exists('dti_streamlines.trk'):
+if not op.exists('csd_streamlines.trk'):
     seed_roi = np.zeros(img.shape[:-1])
     for name in bundle_names:
         for hemi in ['_R', '_L']:
@@ -103,7 +113,7 @@ if not op.exists('dti_streamlines.trk'):
                          sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
+    streamlines = aft.track(csd_params, seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
 
     save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
