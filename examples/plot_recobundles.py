@@ -55,8 +55,6 @@ if not op.exists('./csd_sh_coeff.nii.gz'):
 else:
     csd_params = './csd_sh_coeff.nii.gz'
 
-csd_params_img = nib.load(csd_params)
-
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
