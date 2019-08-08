@@ -13,7 +13,7 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
-from dipy.io.streamline import load_trk
+from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
                                  ResampleFeature)
 from dipy.segment.clustering import QuickBundles
@@ -401,10 +401,14 @@ def read_stanford_hardi_tractography():
                 'stanford_hardi_tractography',
                 'mapping.nii.gz'))
 
-    files_dict['tractography_subsampled.trk'], _ = load_trk(
+    files_dict['tractography_subsampled.trk'] = load_trk(
         op.join(afq_home,
                 'stanford_hardi_tractography',
-                'tractography_subsampled.trk'))
+                'tractography_subsampled.trk'),
+        nib.Nifti1Image(np.zeros((10, 10, 10)), np.eye(4)),
+        bbox_valid_check=False,
+        trk_header_check=False).streamlines
+
     return files_dict
 
 
@@ -468,10 +472,10 @@ def read_hcp_atlas_16_bundles():
     """
     bundle_dict = {}
     _, folder = fetch_hcp_atlas_16_bundles()
-    whole_brain, _ = load_trk(op.join(folder,
-                                      'Atlas_in_MNI_Space_16_bundles',
-                                      'whole_brain',
-                                      'whole_brain_MNI.trk'))
+    whole_brain, _ = load_tractogram(op.join(folder,
+                                             'Atlas_in_MNI_Space_16_bundles',
+                                             'whole_brain',
+                                             'whole_brain_MNI.trk'))
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
         op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
@@ -479,7 +483,7 @@ def read_hcp_atlas_16_bundles():
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
         bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_trk(bundle_file)[0]
+        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file)[0]
 
         feature = ResampleFeature(nb_points=100)
         metric = AveragePointwiseEuclideanMetric(feature)
