@@ -18,6 +18,7 @@ import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
+from dipy.stats.analysis import afq_profile
 
 
 import AFQ.data as afd
@@ -154,9 +155,10 @@ for name in bundle_names:
                 np.linalg.inv(img.affine)))
 
         weights = seg.gaussian_weights(streamlines)
-        profile = seg.calculate_tract_profile(FA_data,
-                                              streamlines,
-                                              weights=weights)
+        profile = afq_profile(FA_data,
+                              streamlines,
+                              np.eye(4),
+                              weights=weights)
         ax.plot(profile)
         ax.set_title(name + hemi)
         save_tractogram('./%s%s_subject.trk' % (name, hemi),

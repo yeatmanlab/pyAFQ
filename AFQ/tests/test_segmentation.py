@@ -10,6 +10,7 @@ import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 import dipy.tracking.streamline as dts
 import dipy.tracking.utils as dtu
+from dipy.stats.analysis import afq_profile
 
 import AFQ.data as afd
 import AFQ.segmentation as seg
@@ -58,15 +59,15 @@ def test_segment():
     # Let's make sure there are streamlines in there:
     npt.assert_(len(CST_R_sl) > 0)
     # Calculate the tract profile for a volume of all-ones:
-    tract_profile = seg.calculate_tract_profile(
+    tract_profile = afq_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
-        CST_R_sl)
+        CST_R_sl, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
-    # Test providing an array input to calculate_tract_profile:
-    tract_profile = seg.calculate_tract_profile(
+    # Test providing an array input to afq_profile:
+    tract_profile = afq_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
-        seg._resample_bundle(CST_R_sl, 100))
+        seg._resample_bundle(CST_R_sl, 100), np.eye(4))
 
     npt.assert_almost_equal(tract_profile, np.ones(100))
     clean_sl = seg.clean_fiber_group(CST_R_sl)

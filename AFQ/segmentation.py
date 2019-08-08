@@ -17,52 +17,8 @@ import AFQ.utils.volume as auv
 
 __all__ = ["Segment"]
 
-
 def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
-
-
-def calculate_tract_profile(img, streamlines, affine=None, n_points=100,
-                            weights=None):
-    """
-
-    Parameters
-    ----------
-    img : 3D volume
-
-    streamlines : list of arrays, or array
-
-    weights : 1D array or 2D array (optional)
-        Weight each streamline (1D) or each node (2D) when calculating the
-        tract-profiles. Must sum to 1 across streamlines (in each node if
-        relevant).
-
-    """
-    if affine is None:
-        affine = np.eye(4)
-    # It's already an array
-    if isinstance(streamlines, np.ndarray):
-        fgarray = streamlines
-    else:
-        # It's some other kind of thing (list, Streamlines, etc.).
-        # Resample each streamline to the same number of points
-        # list => np.array
-        # Setting the number of points should happen in a streamline template
-        # space, rather than in the subject native space, but for now we do
-        # everything as in the Matlab version -- in native space.
-        # In the future, an SLR object can be passed here, and then it would
-        # move these streamlines into the template space before resampling...
-        fgarray = _resample_bundle(streamlines, n_points)
-    # ...and move them back to native space before indexing into the volume:
-    values = dts.values_from_volume(img, fgarray, affine=affine)
-
-    # We assume that weights *always sum to 1 across streamlines*:
-    if weights is None:
-        weights = np.ones(values.shape) / values.shape[0]
-
-    tract_profile = np.sum(weights * values, 0)
-    return tract_profile
-
 
 def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
                      stat=np.mean):
@@ -127,84 +83,6 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
     # Normalize before returning, so that the weights in each node sum to 1:
     return w / np.sum(w, 0)
 
-
-def split_streamlines(streamlines, template, low_coord=10):
-    """
-    Classify streamlines and split sl passing the mid-point below some height.
-    Parameters
-    ----------
-    streamlines : list or Streamlines class instance.
-    template : nibabel.Nifti1Image class instance
-        An affine transformation into a template space.
-    low_coords: int
-        How many coordinates below the 0,0,0 point should a streamline be to
-        be split if it passes the midline.
-    Returns
-    -------
-    streamlines that have been processed, a boolean array of whether they
-    cross the midline or not, a boolean array that for those who do not cross
-    designates whether they are strictly in the left hemisphere, and a boolean
-    that tells us whether the streamline has superior-inferior parts that pass
-    below `low_coord` steps below the middle of the image (which should also
-    be `low_coord` mms for templates with 1 mm resolution)
-    """
-    # What is the x,y,z coordinate of 0,0,0 in the template space?
-    zero_coord = np.dot(np.linalg.inv(template.affine),
-                        np.array([0, 0, 0, 1]))
-
-    # cross_below = zero_coord[2] - low_coord
-    crosses = np.zeros(len(streamlines), dtype=bool)
-    # already_split = 0
-    for sl_idx, sl in enumerate(streamlines):
-        if np.any(sl[:, 0] > zero_coord[0]) and \
-           np.any(sl[:, 0] < zero_coord[0]):
-            # if np.any(sl[:, 2] < cross_below):
-            #     # This is a streamline that needs to be split where it
-            #     # crosses the midline:
-            #     split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
-            #     streamlines = aus.split_streamline(
-            #         streamlines, sl_idx + already_split, split_idx)
-            #     already_split = already_split + 1
-            #     # Now that it's been split, neither cross the midline:
-            #     crosses[sl_idx] = False
-            #     crosses = np.concatenate([crosses[:sl_idx+1],
-            #                               np.array([False]),
-            #                               crosses[sl_idx+1:]])
-            # else:
-            crosses[sl_idx] = True
-        else:
-            crosses[sl_idx] = False
-
-    # Move back to the original space:
-    return streamlines, crosses
-
-
-def _check_sl_with_inclusion(sl, include_rois, tol):
-    """
-    Helper function to check that a streamline is close to a list of
-    inclusion ROIS.
-    """
-    dist = []
-    for roi in include_rois:
-        dist.append(cdist(sl, roi, 'sqeuclidean'))
-        if np.min(dist[-1]) > tol:
-            # Too far from one of them:
-            return False, []
-    # Apparently you checked all the ROIs and it was close to all of them
-    return True, dist
-
-
-def _check_sl_with_exclusion(sl, exclude_rois, tol):
-    """ Helper function to check that a streamline is not too close to a list
-    of exclusion ROIs.
-    """
-    for roi in exclude_rois:
-        if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
-            return False
-    # Either there are no exclusion ROIs, or you are not close to any:
-    return True
-
-
 class Segment:
     def __init__(self, split=True, nb_points=0):
         """
@@ -264,15 +142,17 @@ class Segment:
             If streamlines is None, will use previously given streamlines.
             Default: None.
         """
+        self.logger.info("Preparing Segmentation Parameters...")
         self.prepare_img(fdata, fbval, fbvec, b0_threshold)
         self.prepare_map(mapping, reg_prealign, reg_template)
-        self.create_prob(bundle_dict)
+        self.bundle_dict = bundle_dict
 
+        self.logger.info("Preprocessing Streamlines...")
         self.streamlines = streamlines
         if self.nb_points > 0:
             self.resample(self.nb_points)
         if self.split:
-            self.split_sls()
+            self.split_streamlines()
 
         return self.segment_sls(None, prob_threshold)
 
@@ -321,59 +201,6 @@ class Segment:
         else:
             self.mapping = mapping
 
-    def create_prob(self, bundle_dict):
-        """
-        Get fiber probabilites and ROIs for each bundle.
-
-        Parameters
-        ----------
-        bundle_dict: dict
-            The format is something like::
-
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
-        """
-        self.bundle_dict = bundle_dict
-        self.warped_prob_map = len(self.bundle_dict) * [None]
-        self.include_rois = len(self.bundle_dict) * [None]
-        self.exclude_rois = len(self.bundle_dict) * [None]
-
-        self.logger.info("Preparing Fiber Probabilites and ROIs...")
-        for bundle_idx, bundle in enumerate(self.bundle_dict):
-            rules = self.bundle_dict[bundle]['rules']
-            include_rois = []
-            exclude_rois = []
-            for rule_idx, rule in enumerate(rules):
-                roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
-                if not isinstance(roi, np.ndarray):
-                    roi = roi.get_fdata()
-                warped_roi = auv.patch_up_roi(
-                    (self.mapping.transform_inverse(
-                        roi.astype(np.float32),
-                        interpolation='linear')) > 0)
-
-                if rule:
-                    # include ROI:
-                    include_rois.append(np.array(np.where(warped_roi)).T)
-                else:
-                    # Exclude ROI:
-                    exclude_rois.append(np.array(np.where(warped_roi)).T)
-            self.include_rois[bundle_idx] = include_rois
-            self.exclude_rois[bundle_idx] = exclude_rois
-
-            # The probability map if doesn't exist is all ones with the same
-            # shape as the ROIs:
-            prob_map = self.bundle_dict[bundle].get(
-                'prob_map', np.ones(roi.shape))
-
-            if not isinstance(prob_map, np.ndarray):
-                prob_map = prob_map.get_fdata()
-            self.warped_prob_map[bundle_idx] = \
-                self.mapping.transform_inverse(prob_map,
-                                               interpolation='nearest')
-
     def resample(self, nb_points, streamlines=None):
         """
         Resample streamlines to nb_points number of points.
@@ -391,26 +218,128 @@ class Segment:
         if streamlines is None:
             streamlines = self.streamlines
 
-        self.streamlines = _resample_bundle(streamlines, nb_points)
+        self.streamlines = np.array(\
+            dps.set_number_of_points(streamlines, nb_points))
 
-    def split_sls(self, streamlines=None):
+    def split_streamlines(self, streamlines=None,
+                          template=None, low_coord=10):
         """
         Classify the streamlines and split those that: 1) cross the
-        midline, and 2) pass under 10 mm below the mid-point of their
+        midline, and 2) pass under low_coord mm below the mid-point of their
         representation in the template space.
 
         Parameters
         ----------
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
+        streamlines : list or Streamlines class instance.
+        template : nibabel.Nifti1Image class instance
+            An affine transformation into a template space.
+        low_coords: int
+            How many coordinates below the 0,0,0 point should a streamline be to
+            be split if it passes the midline.
+        Returns
+        -------
+        streamlines that have been processed, a boolean array of whether they
+        cross the midline or not, a boolean array that for those who do not
+        cross designates whether they are strictly in the left hemisphere,
+        and a boolean that tells us whether the streamline has
+        superior-inferior parts that pass below `low_coord` steps below the
+        middle of the image (which should also be `low_coord` mms for
+        templates with 1 mm resolution)
         """
         if streamlines is None:
             streamlines = self.streamlines
+        if template is None:
+            template = self.img
 
-        self.streamlines, self.crosses = \
-            split_streamlines(streamlines, self.img)
+        # What is the x,y,z coordinate of 0,0,0 in the template space?
+        zero_coord = np.dot(np.linalg.inv(template.affine),
+                            np.array([0, 0, 0, 1]))
+
+        # cross_below = zero_coord[2] - low_coord
+        self.crosses = np.zeros(len(streamlines), dtype=bool)
+        # already_split = 0
+        for sl_idx, sl in enumerate(streamlines):
+            if np.any(sl[:, 0] > zero_coord[0]) and \
+            np.any(sl[:, 0] < zero_coord[0]):
+                # if np.any(sl[:, 2] < cross_below):
+                #     # This is a streamline that needs to be split where it
+                #     # self.crosses the midline:
+                #     split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
+                #     streamlines = aus.split_streamline(
+                #         streamlines, sl_idx + already_split, split_idx)
+                #     already_split = already_split + 1
+                #     # Now that it's been split, neither cross the midline:
+                #     self.crosses[sl_idx] = False
+                #     self.crosses = np.concatenate([self.crosses[:sl_idx+1],
+                #                               np.array([False]),
+                #                               self.crosses[sl_idx+1:]])
+                # else:
+                self.crosses[sl_idx] = True
+            else:
+                self.crosses[sl_idx] = False
+
+        # Move back to the original space:
+        self.streamlines = streamlines
+
+    def get_bundle_info(self, bundle_idx, bundle):
+        """
+        Get fiber probabilites and ROIs for a given bundle.
+        """
+        rules = self.bundle_dict[bundle]['rules']
+        include_rois = []
+        exclude_rois = []
+        for rule_idx, rule in enumerate(rules):
+            roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
+            if not isinstance(roi, np.ndarray):
+                roi = roi.get_fdata()
+            warped_roi = auv.patch_up_roi(
+                (self.mapping.transform_inverse(
+                    roi.astype(np.float32),
+                    interpolation='linear')) > 0)
+
+            if rule:
+                # include ROI:
+                include_rois.append(np.array(np.where(warped_roi)).T)
+            else:
+                # Exclude ROI:
+                exclude_rois.append(np.array(np.where(warped_roi)).T)
+
+        # The probability map if doesn't exist is all ones with the same
+        # shape as the ROIs:
+        prob_map = self.bundle_dict[bundle].get(
+            'prob_map', np.ones(roi.shape))
+
+        if not isinstance(prob_map, np.ndarray):
+            prob_map = prob_map.get_fdata()
+        warped_prob_map = \
+            self.mapping.transform_inverse(prob_map,
+                                            interpolation='nearest')
+        return warped_prob_map, include_rois, exclude_rois
+
+    def check_sl_with_inclusion(self, sl, include_rois, tol):
+        """
+        Helper function to check that a streamline is close to a list of
+        inclusion ROIS.
+        """
+        dist = []
+        for roi in include_rois:
+            dist.append(cdist(sl, roi, 'sqeuclidean'))
+            if np.min(dist[-1]) > tol:
+                # Too far from one of them:
+                return False, []
+        # Apparently you checked all the ROIs and it was close to all of them
+        return True, dist
+
+
+    def check_sl_with_exclusion(self, sl, exclude_rois, tol):
+        """ Helper function to check that a streamline is not too close to a list
+        of exclusion ROIs.
+        """
+        for roi in exclude_rois:
+            if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
+                return False
+        # Either there are no exclusion ROIs, or you are not close to any:
+        return True
 
     def segment_sls(self, streamlines=None, prob_threshold=0):
         """
@@ -444,15 +373,15 @@ class Segment:
             (len(streamlines), len(self.bundle_dict), 2))
         self.fiber_groups = {}
 
-        self.logger.info("Assigning Streamlines to Fiber Groups...")
+        self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            warped_prob_map, include_roi, exclude_roi = \
+                self.get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
                                             self.warped_prob_map[bundle_idx],
-                                            fgarray)
+                                            fgarray, np.eye(4))
             fiber_probabilities = np.mean(fiber_probabilities, -1)
-            include_roi = self.include_rois[bundle_idx]
-            exclude_roi = self.exclude_rois[bundle_idx]
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx, sl in enumerate(streamlines):
                 if fiber_probabilities[sl_idx] > prob_threshold:
@@ -472,14 +401,14 @@ class Segment:
                             pass
 
                     is_close, dist = \
-                        _check_sl_with_inclusion(sl,
-                                                 include_roi,
-                                                 tol)
+                        self.check_sl_with_inclusion(sl,
+                                                    include_roi,
+                                                    tol)
                     if is_close:
                         is_far = \
-                            _check_sl_with_exclusion(sl,
-                                                     exclude_roi,
-                                                     tol)
+                            self.check_sl_with_exclusion(sl,
+                                                         exclude_roi,
+                                                         tol)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]
