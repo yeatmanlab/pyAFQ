@@ -98,7 +98,7 @@ streamlines = dts.Streamlines(dtu.move_streamlines(
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation()
 segmentation.segment(hardi_fdata, hardi_fbval, hardi_fbvec, bundles,
-                streamlines, mapping=mapping, reg_template=MNI_T2_img)
+                     streamlines, mapping=mapping, reg_template=MNI_T2_img)
 fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")

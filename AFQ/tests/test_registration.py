@@ -129,7 +129,7 @@ def test_streamline_registration():
             fname1 = op.join(tmpdir, 'sl1.trk')
             fname2 = op.join(tmpdir, 'sl2.trk')
             if use_aff is not None:
-                img = nib.Nifti1Image(np.zeros((2,2,2)), use_aff)
+                img = nib.Nifti1Image(np.zeros((2, 2, 2)), use_aff)
                 # Move the streamlines to this other space, and report it:
                 tgm1 = StatefulTractogram(
                     transform_tracking_output(sl1, np.linalg.inv(use_aff)),
@@ -146,7 +146,7 @@ def test_streamline_registration():
                 save_trk(tgm2, fname2, bbox_valid_check=False)
 
             else:
-                img = nib.Nifti1Image(np.zeros((2,2,2)), np.eye(4))
+                img = nib.Nifti1Image(np.zeros((2, 2, 2)), np.eye(4))
                 tgm1 = StatefulTractogram(sl1, img, Space.RASMM)
                 tgm2 = StatefulTractogram(sl2, img, Space.RASMM)
                 save_trk(tgm1, fname1, bbox_valid_check=False)

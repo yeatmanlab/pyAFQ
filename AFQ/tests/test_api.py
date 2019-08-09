@@ -82,7 +82,7 @@ def test_AFQ_data():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
     myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                        'derivatives', 'dmriprep'),
+                                          'derivatives', 'dmriprep'),
                     sub_prefix='sub')
     npt.assert_equal(nib.load(myafq.b0[0]).shape,
                      nib.load(myafq['dwi_file'][0]).shape[:3])
@@ -97,7 +97,7 @@ def test_AFQ_data_planes():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
-                          'derivatives', 'dmriprep')
+                            'derivatives', 'dmriprep')
     seg_algo = "planes"
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
@@ -111,9 +111,9 @@ def test_AFQ_data_planes():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     streamlines = dts.Streamlines(
-            dtu.transform_tracking_output(
-                [s for s in streamlines if s.shape[0] > 100],
-                 np.linalg.inv(myafq.dwi_affine[0])))
+        dtu.transform_tracking_output(
+            [s for s in streamlines if s.shape[0] > 100],
+            np.linalg.inv(myafq.dwi_affine[0])))
 
     sl_file = op.join(myafq.data_frame.results_dir[0],
                       'sub-01_sess-01_dwiDTI_det_streamlines.trk')
@@ -122,10 +122,10 @@ def test_AFQ_data_planes():
     save_tractogram(sft, sl_file, bbox_valid_check=False)
 
     mapping_file = op.join(myafq.data_frame.results_dir[0],
-                                'sub-01_sess-01_dwi_mapping.nii.gz')
+                           'sub-01_sess-01_dwi_mapping.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
-                                    'sub-01_sess-01_dwi_reg_prealign.npy')
+                                'sub-01_sess-01_dwi_reg_prealign.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
@@ -135,32 +135,31 @@ def test_AFQ_data_planes():
     # Test ROI exporting:
     myafq.export_rois()
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                     'ROIs',
-                     'CST_R_roi1_include.nii.gz'))
+                             'ROIs',
+                             'CST_R_roi1_include.nii.gz'))
 
     # Test bundles exporting:
     myafq.export_bundles()
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                    'bundles',
-                    'CST_R.trk'))
+                             'bundles',
+                             'CST_R.trk'))
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (800, 5)
 
-
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
     shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
-                  'bundles'))
+                          'bundles'))
 
     shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
-                  'ROIs'))
+                          'ROIs'))
 
     # Test the CLI:
     print("Running the CLI:")
     cmd = "pyAFQ " + dmriprep_path
     out = os.system(cmd)
-    assert out ==  0
+    assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
@@ -170,12 +169,12 @@ def test_AFQ_data_planes():
 
     # Make sure the CLI did indeed generate these:
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                     'ROIs',
-                     'CST_R_roi1_include.nii.gz'))
+                             'ROIs',
+                             'CST_R_roi1_include.nii.gz'))
 
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                     'bundles',
-                     'CST_R.trk'))
+                             'bundles',
+                             'CST_R.trk'))
 
 
 # def test_AFQ_data_recobundles():

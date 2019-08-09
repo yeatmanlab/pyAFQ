@@ -15,10 +15,12 @@ import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 
-__all__ = ["Segment"]
+__all__ = ["Segmentation"]
+
 
 def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
+
 
 def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
                      stat=np.mean):
@@ -82,6 +84,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
     w = 1 / w
     # Normalize before returning, so that the weights in each node sum to 1:
     return w / np.sum(w, 0)
+
 
 class Segmentation:
     def __init__(self, split=True, nb_points=0, method='ROI'):
@@ -150,8 +153,8 @@ class Segmentation:
         return self.segment_roi()
 
     def _seg_roi(self, fdata, fbval, fbvec, bundle_dict, streamlines,
-                b0_threshold=0, mapping=None, reg_prealign=None,
-                reg_template=None, prob_threshold=0):
+                 b0_threshold=0, mapping=None, reg_prealign=None,
+                 reg_template=None, prob_threshold=0):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -258,7 +261,7 @@ class Segmentation:
         if streamlines is None:
             streamlines = self.streamlines
 
-        self.streamlines = np.array(\
+        self.streamlines = np.array(
             dps.set_number_of_points(streamlines, nb_points))
 
     def split_streamlines(self, streamlines=None,
@@ -274,8 +277,8 @@ class Segmentation:
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
         low_coords: int
-            How many coordinates below the 0,0,0 point should a streamline be to
-            be split if it passes the midline.
+            How many coordinates below the 0,0,0 point should a streamline be
+            to be split if it passes the midline.
         Returns
         -------
         streamlines that have been processed, a boolean array of whether they
@@ -300,7 +303,7 @@ class Segmentation:
         # already_split = 0
         for sl_idx, sl in enumerate(streamlines):
             if np.any(sl[:, 0] > zero_coord[0]) and \
-            np.any(sl[:, 0] < zero_coord[0]):
+                    np.any(sl[:, 0] < zero_coord[0]):
                 # if np.any(sl[:, 2] < cross_below):
                 #     # This is a streamline that needs to be split where it
                 #     # self.crosses the midline:
@@ -353,7 +356,7 @@ class Segmentation:
             prob_map = prob_map.get_fdata()
         warped_prob_map = \
             self.mapping.transform_inverse(prob_map,
-                                            interpolation='nearest')
+                                           interpolation='nearest')
         return warped_prob_map, include_rois, exclude_rois
 
     def check_sl_with_inclusion(self, sl, include_rois, tol):
@@ -370,10 +373,9 @@ class Segmentation:
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
 
-
     def check_sl_with_exclusion(self, sl, exclude_rois, tol):
-        """ Helper function to check that a streamline is not too close to a list
-        of exclusion ROIs.
+        """ Helper function to check that a streamline is not too close to a
+        list of exclusion ROIs.
         """
         for roi in exclude_rois:
             if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
@@ -442,8 +444,8 @@ class Segmentation:
 
                     is_close, dist = \
                         self.check_sl_with_inclusion(sl,
-                                                    include_roi,
-                                                    tol)
+                                                     include_roi,
+                                                     tol)
                     if is_close:
                         is_far = \
                             self.check_sl_with_exclusion(sl,
@@ -530,12 +532,12 @@ class Segmentation:
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
             _, rec_labels = rb.recognize(model_bundle=model_sl,
-                                        model_clust_thr=5.,
-                                        reduction_thr=10,
-                                        reduction_distance='mam',
-                                        slr=True,
-                                        slr_metric='asymmetric',
-                                        pruning_distance='mam')
+                                         model_clust_thr=5.,
+                                         reduction_thr=10,
+                                         reduction_distance='mam',
+                                         slr=True,
+                                         slr_metric='asymmetric',
+                                         pruning_distance='mam')
 
             # Use the streamlines in the original space:
             recognized_sl = streamlines[rec_labels]
@@ -544,6 +546,7 @@ class Segmentation:
             fiber_groups[bundle] = oriented_sl
         self.fiber_groups = fiber_groups
         return fiber_groups
+
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
                       clean_threshold=3, min_sl=20, stat=np.mean):

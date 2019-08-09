@@ -27,9 +27,9 @@ def test_segment():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     streamlines = dts.Streamlines(
-            dtu.transform_tracking_output(
-                streamlines[streamlines._lengths > 10],
-                np.linalg.inv(hardi_img.affine)))
+        dtu.transform_tracking_output(
+            streamlines[streamlines._lengths > 10],
+            np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -45,11 +45,11 @@ def test_segment():
 
     segmentation = seg.Segmentation()
     segmentation.segment(hardi_fdata,
-                    hardi_fbval,
-                    hardi_fbvec,
-                    bundles,
-                    streamlines,
-                    mapping=mapping)
+                         hardi_fbval,
+                         hardi_fbvec,
+                         bundles,
+                         streamlines,
+                         mapping=mapping)
     fiber_groups = segmentation.fiber_groups
 
     # We asked for 2 fiber groups:
@@ -85,11 +85,11 @@ def test_segment():
 
     segmentation = seg.Segmentation()
     segmentation.segment(hardi_fdata,
-                    hardi_fbval,
-                    hardi_fbvec,
-                    bundles,
-                    streamlines,
-                    mapping=mapping)
+                         hardi_fbval,
+                         hardi_fbvec,
+                         bundles,
+                         streamlines,
+                         mapping=mapping)
     fiber_groups = segmentation.fiber_groups
 
     # This condition should still hold
