@@ -165,7 +165,6 @@ class Segment:
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
         """
-        self.logger.info("Preparing Image...")
         self.img, _, _, _ = \
             ut.prepare_data(fdata, fbval, fbvec,
                             b0_threshold=b0_threshold)

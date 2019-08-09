@@ -64,12 +64,6 @@ def test_segment():
         CST_R_sl, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
-    # Test providing an array input to afq_profile:
-    tract_profile = afq_profile(
-        np.ones(nib.load(hardi_fdata).shape[:3]),
-        seg._resample_bundle(CST_R_sl, 100), np.eye(4))
-
-    npt.assert_almost_equal(tract_profile, np.ones(100))
     clean_sl = seg.clean_fiber_group(CST_R_sl)
     # Since there are only 8 streamlines here, nothing should happen:
     npt.assert_equal(clean_sl, CST_R_sl)
