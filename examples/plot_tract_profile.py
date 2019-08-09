@@ -96,10 +96,10 @@ streamlines = dts.Streamlines(dtu.move_streamlines(
     np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
-segment = seg.Segment()
-segment.segment(hardi_fdata, hardi_fbval, hardi_fbvec, bundles,
+segmentation = seg.Segmentation()
+segmentation.segment(hardi_fdata, hardi_fbval, hardi_fbvec, bundles,
                 streamlines, mapping=mapping, reg_template=MNI_T2_img)
-fiber_groups = segment.fiber_groups
+fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
 for bundle in bundles:

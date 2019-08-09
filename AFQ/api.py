@@ -398,7 +398,7 @@ def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        segmentation = seg.Segment(method='Reco')
+        segmentation = seg.Segmentation(method='Reco')
         bundles = segmentation.segment(bundle_dict, sl)
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
@@ -429,8 +429,8 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                    reg_template,
                                    prealign=np.linalg.inv(reg_prealign))
 
-        segment = seg.Segment()
-        bundles = segment.segment(row['dwi_file'],
+        segmentation = seg.Segmentation()
+        bundles = segmentation.segment(row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
                               bundle_dict,

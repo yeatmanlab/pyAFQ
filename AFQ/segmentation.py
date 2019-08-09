@@ -83,7 +83,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
     # Normalize before returning, so that the weights in each node sum to 1:
     return w / np.sum(w, 0)
 
-class Segment:
+class Segmentation:
     def __init__(self, split=True, nb_points=0, method='ROI'):
         """
         Segment streamlines into bundles.
