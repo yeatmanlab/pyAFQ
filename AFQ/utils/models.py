@@ -4,7 +4,7 @@ import dipy.core.gradients as dpg
 
 
 def prepare_data(data_files, bval_files, bvec_files, mask=None,
-                 b0_threshold=0):
+                 b0_threshold=50):
     """
     Parameters
     ----------
