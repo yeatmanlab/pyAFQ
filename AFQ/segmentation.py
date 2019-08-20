@@ -93,7 +93,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 
 
 class Segmentation:
-    def __init__(self, split=True, nb_points=0, method='ROI'):
+    def __init__(self, split=True, nb_points=0, method='AFQ'):
         """
         Segment streamlines into bundles.
 
@@ -109,10 +109,10 @@ class Segmentation:
             If 0, no resampling is done. Default: 0
         method : string
             Method for segmentation (case-insensitive):
-            'ROI': Segment streamlines into bundles based on inclusion ROIs.
+            'AFQ': Segment streamlines into bundles based on inclusion/exclusion ROIs.
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
-            Default: 'ROI'
+            Default: 'AFQ'
 
         References
         ----------
@@ -129,7 +129,7 @@ class Segmentation:
         if method == 'reco':
             self.segment = self._seg_reco
         else:
-            self.segment = self._seg_roi
+            self.segment = self._seg_afq
 
     def _seg_reco(self, bundle_dict, streamlines):
         """
@@ -158,7 +158,7 @@ class Segmentation:
         self.streamlines = streamlines
         return self.segment_roi()
 
-    def _seg_roi(self, fdata, fbval, fbvec, bundle_dict, streamlines,
+    def _seg_afq(self, fdata, fbval, fbvec, bundle_dict, streamlines,
                  b0_threshold=0, mapping=None, reg_prealign=None,
                  reg_template=None, prob_threshold=0):
         """
