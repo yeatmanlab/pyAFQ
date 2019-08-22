@@ -430,11 +430,11 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                    prealign=np.linalg.inv(reg_prealign))
 
         segmentation = seg.Segmentation()
-        bundles = segmentation.segment(row['dwi_file'],
+        bundles = segmentation.segment(bundle_dict,
+                              sl,
+                              row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
-                              bundle_dict,
-                              sl,
                               reg_template=reg_template,
                               mapping=mapping)
 

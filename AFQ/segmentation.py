@@ -93,20 +93,20 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 
 
 class Segmentation:
-    def __init__(self, split=True, nb_points=0, method='AFQ'):
+    def __init__(self, cross=True, nb_points=False, method='AFQ'):
         """
         Segment streamlines into bundles.
 
         Parameters
         ----------
-        split : boolean
-            If true, classify the streamlines and split those that:
+        cross : boolean
+            If true, classify the streamlines based whether they:
             1) cross the midline, and 2) pass under 10 mm below
             the mid-point of their representation in the template space.
-            Default: False
-        nb_points : int
+            Default: True
+        nb_points : int, boolean
             Resample streamlines to nb_points number of points.
-            If 0, no resampling is done. Default: 0
+            If False, no resampling is done. Default: False
         method : string
             Method for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles based on inclusion/exclusion ROIs.
@@ -122,7 +122,7 @@ class Segmentation:
         336-347
         """
         self.logger = logging.getLogger('AFQ.Segmentation')
-        self.split = split
+        self.cross = cross
         self.nb_points = nb_points
 
         method = method.lower()
@@ -131,7 +131,8 @@ class Segmentation:
         else:
             self.segment = self._seg_afq
 
-    def _seg_reco(self, bundle_dict, streamlines):
+    def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
+                  fbvec=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
@@ -156,10 +157,10 @@ class Segmentation:
         """
         self.bundle_dict = bundle_dict
         self.streamlines = streamlines
-        return self.segment_roi()
+        return self.segment_reco()
 
-    def _seg_afq(self, fdata, fbval, fbvec, bundle_dict, streamlines,
-                 b0_threshold=0, mapping=None, reg_prealign=None,
+    def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
+                 fbvec=None, b0_threshold=0, mapping=None, reg_prealign=None,
                  reg_template=None, prob_threshold=0):
         """
         Segment streamlines into bundles based on inclusion ROIs.
@@ -199,12 +200,12 @@ class Segmentation:
 
         self.logger.info("Preprocessing Streamlines...")
         self.streamlines = streamlines
-        if self.nb_points > 0:
+        if self.nb_points:
             self.resample(self.nb_points)
-        if self.split:
-            self.split_streamlines()
+        if self.cross:
+            self.cross_streamlines()
 
-        return self.segment_roi(None, prob_threshold)
+        return self.segment_afq(None, prob_threshold)
 
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
@@ -270,7 +271,7 @@ class Segmentation:
         self.streamlines = np.array(
             dps.set_number_of_points(streamlines, nb_points))
 
-    def split_streamlines(self, streamlines=None,
+    def cross_streamlines(self, streamlines=None,
                           template=None, low_coord=10):
         """
         Classify the streamlines and split those that: 1) cross the
@@ -389,7 +390,7 @@ class Segmentation:
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
 
-    def segment_roi(self, streamlines=None, prob_threshold=0):
+    def segment_afq(self, streamlines=None, prob_threshold=0):
         """
         Iterate over streamlines and bundles,
         assigning streamlines to fiber groups.

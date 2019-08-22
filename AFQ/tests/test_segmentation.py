@@ -44,11 +44,11 @@ def test_segment():
                          'cross_midline': None}}
 
     segmentation = seg.Segmentation()
-    segmentation.segment(hardi_fdata,
+    segmentation.segment(bundles,
+                         streamlines,
+                         hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         bundles,
-                         streamlines,
                          mapping=mapping)
     fiber_groups = segmentation.fiber_groups
 
@@ -84,11 +84,11 @@ def test_segment():
                          'cross_midline': False}}
 
     segmentation = seg.Segmentation()
-    segmentation.segment(hardi_fdata,
+    segmentation.segment(bundles,
+                         streamlines,
+                         hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         bundles,
-                         streamlines,
                          mapping=mapping)
     fiber_groups = segmentation.fiber_groups
 
