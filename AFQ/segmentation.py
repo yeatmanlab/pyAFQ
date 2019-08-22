@@ -93,7 +93,9 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 
 
 class Segmentation:
-    def __init__(self, cross=True, nb_points=False, method='AFQ'):
+    def __init__(self, cross=True, nb_points=False, method='AFQ',
+                 progressive=True, greater_than=50, rm_small_clusters=50,
+                 prob_threshold=0):
         """
         Segment streamlines into bundles.
 
@@ -114,6 +116,13 @@ class Segmentation:
             [Garyfallidis2017].
             Default: 'AFQ'
 
+        prob_threshold : float.
+            Using AFQ Method.
+            Initial cleaning of fiber groups is done using probability maps
+            from [Hua2008]_. Here, we choose an average probability that
+            needs to be exceeded for an individual streamline to be retained.
+            Default: 0.
+
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -130,6 +139,11 @@ class Segmentation:
             self.segment = self._seg_reco
         else:
             self.segment = self._seg_afq
+
+        self.prob_threshold = prob_threshold
+        self.progressive = progressive
+        self.greater_than = greater_than
+        self.rm_small_clusters = rm_small_clusters
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None):
@@ -161,7 +175,7 @@ class Segmentation:
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, b0_threshold=0, mapping=None, reg_prealign=None,
-                 reg_template=None, prob_threshold=0):
+                 reg_template=None):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -205,7 +219,7 @@ class Segmentation:
         if self.cross:
             self.cross_streamlines()
 
-        return self.segment_afq(None, prob_threshold)
+        return self.segment_afq()
 
     def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
         """
@@ -390,7 +404,7 @@ class Segmentation:
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
 
-    def segment_afq(self, streamlines=None, prob_threshold=0):
+    def segment_afq(self, streamlines=None):
         """
         Iterate over streamlines and bundles,
         assigning streamlines to fiber groups.
@@ -401,12 +415,6 @@ class Segmentation:
             Each array is a streamline, shape (3, N).
             If streamlines is None, will use previously given streamlines.
             Default: None.
-
-        prob_threshold : float.
-            Initial cleaning of fiber groups is done using probability maps
-            from [Hua2008]_. Here, we choose an average probability that
-            needs to be exceeded for an individual streamline to be retained.
-            Default: 0.
         """
         if streamlines is None:
             streamlines = self.streamlines
@@ -433,7 +441,7 @@ class Segmentation:
             fiber_probabilities = np.mean(fiber_probabilities, -1)
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx, sl in enumerate(streamlines):
-                if fiber_probabilities[sl_idx] > prob_threshold:
+                if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         try:
                             if self.crosses[sl_idx]:
@@ -499,7 +507,7 @@ class Segmentation:
             self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def segment_reco(self, streamlines=None):
+    def segment_reco(self, streamlines=None, progressive=False):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
@@ -525,7 +533,10 @@ class Segmentation:
         # We start with whole-brain SLR:
         atlas = self.bundle_dict['whole_brain']
         moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
-            atlas, streamlines, x0='affine', verbose=False, progressive=True)
+            atlas, streamlines, x0='affine', verbose=False,
+            progressive=self.progressive,
+            greater_than=self.greater_than,
+            rm_small_clusters=self.rm_small_clusters)
 
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles...")

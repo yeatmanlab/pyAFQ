@@ -83,7 +83,6 @@ def test_segment():
                          'rules': [True, True],
                          'cross_midline': False}}
 
-    segmentation = seg.Segmentation()
     segmentation.segment(bundles,
                          streamlines,
                          hardi_fdata,
@@ -96,6 +95,23 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
 
+    # get bundles for reco method
+    bundles = afd.read_hcp_atlas_16_bundles()
+    bundle_names = ['whole_brain', 'CST_R', 'CST_L']
+    for key in list(bundles):
+            if key not in bundle_names:
+                bundles.pop(key, None)
+
+    # Try recobundles method
+    segmentation = seg.Segmentation(method = 'Reco',
+                                    progressive=False,
+                                    greater_than=10,
+                                    rm_small_clusters=2)
+    fiber_groups = segmentation.segment(bundles, streamlines)
+
+    # This condition should still hold
+    npt.assert_equal(len(fiber_groups), 2)
+    npt.assert_(len(fiber_groups['CST_R']) > 0)
 
 def test_gaussian_weights():
     # Some bogus x,y,z coordinates
