@@ -161,7 +161,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
 
                     uid += 1
 
-    elif seg_algo == "recobundles":
+    elif seg_algo == "reco":
         afq_bundles = {}
         uid = 1
         bundle_dict = afd.read_hcp_atlas_16_bundles()
@@ -381,33 +381,9 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 
     return streamlines_file
 
-
-def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
-                 directions="det", n_seeds=2, random_seeds=False,
-                 force_recompute=False):
-
-    bundles_file = _get_fname(row,
-                              '%s_%s_bundles.trk' % (odf_model,
-                                                     directions))
-    if not op.exists(bundles_file) or force_recompute:
-        streamlines_file = _streamlines(row, wm_labels,
-                                        odf_model=odf_model,
-                                        directions=directions,
-                                        n_seeds=n_seeds,
-                                        random_seeds=random_seeds,
-                                        force_recompute=force_recompute)
-        tg = nib.streamlines.load(streamlines_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        segmentation = seg.Segmentation(method='Reco')
-        bundles = segmentation.segment(bundle_dict, sl)
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
-        nib.streamlines.save(tgram, bundles_file)
-    return bundles_file
-
-
-def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
-             directions="det", n_seeds=2, random_seeds=False,
-             force_recompute=False):
+def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
+             odf_model="DTI", directions="det", n_seeds=2,
+             random_seeds=False, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -423,20 +399,15 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
 
         reg_prealign = np.load(_reg_prealign(row,
                                              force_recompute=force_recompute))
-
-        mapping = reg.read_mapping(_mapping(row, reg_template),
-                                   row['dwi_file'],
-                                   reg_template,
-                                   prealign=np.linalg.inv(reg_prealign))
-
-        segmentation = seg.Segmentation()
+        segmentation = seg.Segmentation(method=method)
         bundles = segmentation.segment(bundle_dict,
                               sl,
                               row['dwi_file'],
                               row['bval_file'],
                               row['bvec_file'],
                               reg_template=reg_template,
-                              mapping=mapping)
+                              mapping=_mapping(row, reg_template),
+                              reg_prealign=reg_prealign)
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
@@ -450,7 +421,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
     if not op.exists(clean_bundles_file) or force_recompute:
-        bundles_file = _bundles(row,
+        bundles_file = _segment(row,
                                 wm_labels,
                                 bundle_dict,
                                 reg_template,
@@ -590,7 +561,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det", n_seeds=2,
                     random_seeds=False, force_recompute=False):
 
-    for func, folder in zip([_clean_bundles, _bundles],
+    for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
         bundles_file = func(row,
                             wm_labels,
@@ -716,7 +687,7 @@ class AFQ(object):
 
         seg_algo : str
             Which algorithm to use for segmentation.
-            Can be one of: {"afq", "recobundles"}
+            Can be one of: {"afq", "reco"}
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -1002,17 +973,14 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        if self.seg_algo == "afq":
-            seg_function = _bundles
-        elif self.seg_algo == "recobundles":
-            seg_function = _recobundles
         column_exists = 'bundles_file' in self.data_frame.columns
         if (not column_exists or self.force_recompute):
             self.data_frame['bundles_file'] =\
-                self.data_frame.apply(seg_function, axis=1,
+                self.data_frame.apply(_segment, axis=1,
                                       args=[self.wm_labels,
                                             self.bundle_dict,
                                             self.reg_template],
+                                      method=self.seg_algo,
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -1028,7 +996,7 @@ class AFQ(object):
     def set_clean_bundles(self):
         column_exists = 'clean_bundles_file' in self.data_frame.columns
         if (not column_exists or self.force_recompute):
-            if self.seg_algo == "recobundles":
+            if self.seg_algo == "reco":
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
             else:
