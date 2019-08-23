@@ -140,6 +140,8 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
                         threshold_classifier,
                         seeds,
                         affine,
-                        step_size=step_size)
+                        step_size=step_size,
+                        min_length=min_length,
+                        max_length=max_length)
 
     return dts.Streamlines(tracker)
