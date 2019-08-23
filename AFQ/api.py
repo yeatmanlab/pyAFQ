@@ -102,7 +102,7 @@ def _bundle_profile(data, bundle, affine=None, n_points=100,
 dts.bundle_profile = _bundle_profile
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
+def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -111,7 +111,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
     """
-    if seg_algo == "planes":
+    if seg_algo == "afq":
         templates = afd.read_templates()
         callosal_templates = afd.read_callosum_templates()
         # For the arcuate, we need to rename a few of these and duplicate the
@@ -375,7 +375,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 stop_mask=wm_mask)
 
         save_tractogram(streamlines_file,
-                        dtu.move_streamlines(streamlines,
+                        dtu.transform_tracking_output(streamlines,
                                              np.linalg.inv(dwi_img.affine)),
                         dwi_img.affine)
 
@@ -692,7 +692,7 @@ class AFQ(object):
     """
     def __init__(self,
                  dmriprep_path,
-                 seg_algo="planes",
+                 seg_algo="afq",
                  sub_prefix="sub",
                  dwi_folder="dwi",
                  dwi_file="*dwi",
@@ -716,7 +716,7 @@ class AFQ(object):
 
         seg_algo : str
             Which algorithm to use for segmentation.
-            Can be one of: {"planes", "recobundles"}
+            Can be one of: {"afq", "recobundles"}
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -1002,7 +1002,7 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        if self.seg_algo == "planes":
+        if self.seg_algo == "afq":
             seg_function = _bundles
         elif self.seg_algo == "recobundles":
             seg_function = _recobundles
