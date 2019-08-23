@@ -67,7 +67,12 @@ class VerboseLocalTracking(LocalTracking):
                 else:
                     parts = (B[stepsB - 1:0:-1], F[:stepsF])
                     streamline = np.concatenate(parts, axis=0)
-                yield streamline
+
+                len_sl = len(streamline)
+                if len_sl < 10 or len_sl > 250:
+                    continue
+                else:
+                    yield streamline
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
