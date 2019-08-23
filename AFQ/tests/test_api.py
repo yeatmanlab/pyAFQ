@@ -98,7 +98,7 @@ def test_AFQ_data_planes():
     afd.organize_stanford_data(path=tmpdir.name)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
                             'derivatives', 'dmriprep')
-    seg_algo = "planes"
+    seg_algo = "afq"
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
@@ -182,7 +182,7 @@ def test_AFQ_data_planes():
 #     afd.fetch_hcp(["100206"], hcp_bucket='hcp-openaccess', profile_name="hcp",
 #                   path=tmpdir.name)
 #     dmriprep_path = op.join(tmpdir.name, 'HCP', 'derivatives', 'dmriprep')
-#     seg_algo = "recobundles"
+#     seg_algo = "reco"
 #     bundle_names = ["F", "CST", "AF", "CC_ForcepsMajor"]
 #     myafq = api.AFQ(dmriprep_path=dmriprep_path,
 #                     sub_prefix='sub',
