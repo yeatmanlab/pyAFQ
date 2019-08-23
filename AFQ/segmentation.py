@@ -465,13 +465,13 @@ class Segmentation:
 
                     is_close, dist = \
                         self._check_sl_with_inclusion(sl,
-                                                     include_roi,
-                                                     tol)
+                                                      include_roi,
+                                                      tol)
                     if is_close:
                         is_far = \
                             self._check_sl_with_exclusion(sl,
-                                                         exclude_roi,
-                                                         tol)
+                                                          exclude_roi,
+                                                          tol)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]
