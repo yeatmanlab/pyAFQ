@@ -95,7 +95,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 class Segmentation:
     def __init__(self, cross=True, nb_points=False, method='AFQ',
                  progressive=True, greater_than=50, rm_small_clusters=50,
-                 prob_threshold=0):
+                 b0_threshold=0, prob_threshold=0):
         """
         Segment streamlines into bundles.
 
@@ -141,40 +141,45 @@ class Segmentation:
             self.segment = self._seg_afq
 
         self.prob_threshold = prob_threshold
+        self.b0_threshold = b0_threshold
         self.progressive = progressive
         self.greater_than = greater_than
         self.rm_small_clusters = rm_small_clusters
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
-                  fbvec=None):
+                  fbvec=None, mapping=None, reg_prealign=None,
+                  reg_template=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
         Parameters
         ----------
-        streamlines : list or Streamlines object.
-            A whole-brain tractogram to be segmented.
-        bundle_dict: dictionary
-            Of the form:
+        fdata, fbval, fbvec : str
+            Full path to data, bvals, bvecs
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+            A mapping between DWI space and a template.
+            If None, mapping will be registered from data used in prepare_img.
+            Default: None.
+        reg_template : str or nib.Nifti1Image, optional.
+            Template to use for registration (defaults to the MNI T2)
+        bundle_dict: dict
+            The format is something like::
 
-                {'whole_brain': Streamlines,
-                'CST_L': {'sl': Streamlines, 'centroid': array},
-                'CST_R': {'sl': Streamlines, 'centroid': array},
-                ...}
-
-        Returns
-        -------
-        fiber_groups : dict
-            Keys are names of the bundles, values are Streamline objects.
-            The streamlines in each object have all been oriented to have the
-            same orientation (using `dts.orient_by_streamline`).
+                {'name': {'ROIs':[img1, img2],
+                'rules':[True, True]},
+                'prob_map': img3,
+                'cross_midline': False}
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
+            Default: None.
         """
         self.bundle_dict = bundle_dict
         self.streamlines = streamlines
         return self.segment_reco()
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
-                 fbvec=None, b0_threshold=0, mapping=None, reg_prealign=None,
+                 fbvec=None, mapping=None, reg_prealign=None,
                  reg_template=None):
         """
         Segment streamlines into bundles based on inclusion ROIs.
@@ -208,7 +213,7 @@ class Segmentation:
             Default: None.
         """
         self.logger.info("Preparing Segmentation Parameters...")
-        self.prepare_img(fdata, fbval, fbvec, b0_threshold)
+        self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
 
@@ -221,7 +226,7 @@ class Segmentation:
 
         return self.segment_afq()
 
-    def prepare_img(self, fdata, fbval, fbvec, b0_threshold=0):
+    def prepare_img(self, fdata, fbval, fbvec):
         """
         Prepare image data from DWI data.
 
@@ -232,7 +237,7 @@ class Segmentation:
         """
         self.img, _, _, _ = \
             ut.prepare_data(fdata, fbval, fbvec,
-                            b0_threshold=b0_threshold)
+                            b0_threshold=self.b0_threshold)
         self.fdata = fdata
         self.fbval = fbval
         self.fbvec = fbvec
@@ -345,7 +350,7 @@ class Segmentation:
         # Move back to the original space:
         self.streamlines = streamlines
 
-    def get_bundle_info(self, bundle_idx, bundle):
+    def _get_bundle_info(self, bundle_idx, bundle):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
@@ -380,7 +385,7 @@ class Segmentation:
                                            interpolation='nearest')
         return warped_prob_map, include_rois, exclude_rois
 
-    def check_sl_with_inclusion(self, sl, include_rois, tol):
+    def _check_sl_with_inclusion(self, sl, include_rois, tol):
         """
         Helper function to check that a streamline is close to a list of
         inclusion ROIS.
@@ -394,7 +399,7 @@ class Segmentation:
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
 
-    def check_sl_with_exclusion(self, sl, exclude_rois, tol):
+    def _check_sl_with_exclusion(self, sl, exclude_rois, tol):
         """ Helper function to check that a streamline is not too close to a
         list of exclusion ROIs.
         """
@@ -434,7 +439,7 @@ class Segmentation:
         tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             warped_prob_map, include_roi, exclude_roi = \
-                self.get_bundle_info(bundle_idx, bundle)
+                self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
                                             self.warped_prob_map[bundle_idx],
                                             fgarray, np.eye(4))
@@ -458,12 +463,12 @@ class Segmentation:
                             pass
 
                     is_close, dist = \
-                        self.check_sl_with_inclusion(sl,
+                        self._check_sl_with_inclusion(sl,
                                                      include_roi,
                                                      tol)
                     if is_close:
                         is_far = \
-                            self.check_sl_with_exclusion(sl,
+                            self._check_sl_with_exclusion(sl,
                                                          exclude_roi,
                                                          tol)
                         if is_far:
@@ -507,7 +512,7 @@ class Segmentation:
             self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def segment_reco(self, streamlines=None, progressive=False):
+    def segment_reco(self, streamlines=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
