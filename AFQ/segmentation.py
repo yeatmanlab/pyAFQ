@@ -21,9 +21,9 @@ __all__ = ["Segmentation"]
 def _resample_bundle(streamlines, n_points):
     # reformat for dipy's set_number_of_points
     if isinstance(streamlines, np.ndarray):
-       if len(streamlines.shape) > 2:
-           streamlines = streamlines.tolist()
-           streamlines=[np.asarray(item) for item in streamlines]
+        if len(streamlines.shape) > 2:
+            streamlines = streamlines.tolist()
+            streamlines = [np.asarray(item) for item in streamlines]
 
     return np.array(dps.set_number_of_points(streamlines, n_points))
 
@@ -111,7 +111,8 @@ class Segmentation:
             If False, no resampling is done. Default: False
         method : string
             Method for segmentation (case-insensitive):
-            'AFQ': Segment streamlines into bundles based on inclusion/exclusion ROIs.
+            'AFQ': Segment streamlines into bundles,
+                based on inclusion/exclusion ROIs.
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'

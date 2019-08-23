@@ -476,7 +476,7 @@ def read_hcp_atlas_16_bundles():
                                           'Atlas_in_MNI_Space_16_bundles',
                                           'whole_brain',
                                           'whole_brain_MNI.trk'), 'same',
-                                           bbox_valid_check=False).streamlines
+                                          bbox_valid_check=False).streamlines
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
         op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
@@ -486,7 +486,7 @@ def read_hcp_atlas_16_bundles():
         bundle_dict[bundle]['sl'] = load_tractogram(bundle_file,
                                                     'same',
                                                     bbox_valid_check=False)\
-                                                    .streamlines
+                                                        .streamlines
 
         feature = ResampleFeature(nb_points=100)
         metric = AveragePointwiseEuclideanMetric(feature)

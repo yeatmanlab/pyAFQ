@@ -381,6 +381,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 
     return streamlines_file
 
+
 def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
              odf_model="DTI", directions="det", n_seeds=2,
              random_seeds=False, force_recompute=False):
@@ -401,13 +402,13 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                              force_recompute=force_recompute))
         segmentation = seg.Segmentation(method=method)
         bundles = segmentation.segment(bundle_dict,
-                              sl,
-                              row['dwi_file'],
-                              row['bval_file'],
-                              row['bvec_file'],
-                              reg_template=reg_template,
-                              mapping=_mapping(row, reg_template),
-                              reg_prealign=reg_prealign)
+                                       sl,
+                                       row['dwi_file'],
+                                       row['bval_file'],
+                                       row['bvec_file'],
+                                       reg_template=reg_template,
+                                       mapping=_mapping(row, reg_template),
+                                       reg_prealign=reg_prealign)
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)

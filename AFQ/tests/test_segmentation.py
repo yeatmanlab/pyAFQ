@@ -99,11 +99,11 @@ def test_segment():
     bundles = afd.read_hcp_atlas_16_bundles()
     bundle_names = ['whole_brain', 'CST_R', 'CST_L']
     for key in list(bundles):
-            if key not in bundle_names:
-                bundles.pop(key, None)
+        if key not in bundle_names:
+            bundles.pop(key, None)
 
     # Try recobundles method
-    segmentation = seg.Segmentation(method = 'Reco',
+    segmentation = seg.Segmentation(method='Reco',
                                     progressive=False,
                                     greater_than=10,
                                     rm_small_clusters=1)
