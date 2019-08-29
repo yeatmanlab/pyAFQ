@@ -27,10 +27,12 @@ TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 
 class VerboseLocalTracking(LocalTracking):
-    def __init__(self, *args, min_length=10, max_length=250, **kwargs):
+    def __init__(self, *args, min_length=10, max_length=250, step_size=0.5,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         self.min_length = min_length
         self.max_length = max_length
+        self.step_size = self.step_size
 
     def _generate_streamlines(self):
         """A streamline generator"""
@@ -74,7 +76,8 @@ class VerboseLocalTracking(LocalTracking):
                     streamline = np.concatenate(parts, axis=0)
 
                 len_sl = len(streamline)
-                if len_sl < self.min_length or len_sl > self.max_length:
+                if len_sl < self.min_length * self.step_size \
+                    or len_sl > self.max_length * self.step_size:
                     continue
                 else:
                     yield streamline
