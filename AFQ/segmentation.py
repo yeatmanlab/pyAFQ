@@ -447,8 +447,8 @@ class Segmentation:
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
-                                            self.warped_prob_map[bundle_idx],
-                                            fgarray, np.eye(4))
+                warped_prob_map[bundle_idx],
+                fgarray, np.eye(4))
             fiber_probabilities = np.mean(fiber_probabilities, -1)
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx, sl in enumerate(streamlines):
