@@ -10,6 +10,7 @@ import random
 import sys
 import math
 
+
 def spherical_harmonics(m, n, theta, phi):
     """
     An implementation of spherical harmonics that overcomes conda compilation
@@ -27,6 +28,11 @@ TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 
 class VerboseLocalTracking(LocalTracking):
+    def __init__(self, *args, min_length=10, max_length=250, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.min_length = min_length
+        self.max_length = max_length
+
     def _generate_streamlines(self):
         """A streamline generator"""
 
@@ -67,7 +73,13 @@ class VerboseLocalTracking(LocalTracking):
                 else:
                     parts = (B[stepsB - 1:0:-1], F[:stepsF])
                     streamline = np.concatenate(parts, axis=0)
-                yield streamline
+
+                len_sl = len(streamline)
+                if len_sl < self.min_length * self.step_size \
+                        or len_sl > self.max_length * self.step_size:
+                    continue
+                else:
+                    yield streamline
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
