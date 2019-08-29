@@ -10,6 +10,7 @@ import random
 import sys
 import math
 
+
 def spherical_harmonics(m, n, theta, phi):
     """
     An implementation of spherical harmonics that overcomes conda compilation
@@ -77,7 +78,7 @@ class VerboseLocalTracking(LocalTracking):
 
                 len_sl = len(streamline)
                 if len_sl < self.min_length * self.step_size \
-                    or len_sl > self.max_length * self.step_size:
+                        or len_sl > self.max_length * self.step_size:
                     continue
                 else:
                     yield streamline
