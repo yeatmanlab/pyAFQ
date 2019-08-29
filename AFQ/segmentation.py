@@ -29,7 +29,7 @@ def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
 
 class Segmentation:
-    def __init__(self, nb_points=False, method='AFQ',
+    def __init__(self, nb_points=False, algo='AFQ',
                  progressive=True, greater_than=50, rm_small_clusters=50,
                  b0_threshold=0, prob_threshold=0, rng=None):
         """
@@ -40,20 +40,48 @@ class Segmentation:
         nb_points : int, boolean
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
-        method : string
-            Method for segmentation (case-insensitive):
+        algo : string
+            Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
                 based on inclusion/exclusion ROIs.
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
 
+        rm_small_clusters : int
+            Using RecoBundles Algorithm.
+            Remove clusters that have less than this value
+                during whole brain SLR.
+            Default: 50
+
+        progressive : boolean, optional
+            Using RecoBundles Algorithm.
+            Whether or not to use progressive technique
+                during whole brain SLR.
+            Default: True.
+
+        greater_than : int, optional
+            Using RecoBundles Algorithm.
+            Keep streamlines that have length greater than this value
+                during whole brain SLR.
+            Default: 50.
+
+        b0_theshold : float.
+            Using AFQ Algorithm.
+            All b-values with values less than or equal to `bo_threshold` are
+            considered as b0s i.e. without diffusion weighting.
+            Default: 0.
+
         prob_threshold : float.
-            Using AFQ Method.
+            Using AFQ Algorithm.
             Initial cleaning of fiber groups is done using probability maps
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
+
+        rng : RandomState
+            If None, creates RandomState. Used in RecoBundles Algorithm.
+            Default: None.
 
         References
         ----------
@@ -70,8 +98,8 @@ class Segmentation:
         else:
             self.rng = rng
 
-        method = method.lower()
-        if method == 'reco':
+        algo = algo.lower()
+        if algo == 'reco':
             self.segment = self._seg_reco
         else:
             self.segment = self._seg_afq
@@ -90,14 +118,10 @@ class Segmentation:
 
         Parameters
         ----------
-        fdata, fbval, fbvec : str
-            Full path to data, bvals, bvecs
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
             Default: None.
-        reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
         bundle_dict: dict
             The format is something like::
 
@@ -105,10 +129,26 @@ class Segmentation:
                 'rules':[True, True]},
                 'prob_map': img3,
                 'cross_midline': False}
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
+
+        fdata, fbval, fbvec : str
+            Full path to data, bvals, bvecs
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+            A mapping between DWI space and a template.
+            If None, mapping will be registered from data used in prepare_img.
             Default: None.
+        reg_prealign : array, optional.
+            The linear transformation to be applied to align input images to
+            the reference space before warping under the deformation field.
+            Default: None.
+        reg_template : str or nib.Nifti1Image, optional.
+            Template to use for registration (defaults to the MNI T2)
+            Default: None.
+
+        References
+        ----------
+        .. [Garyfallidis17] Garyfallidis et al. Recognition of white matter
+        bundles using local and global streamline-based registration and
+        clustering, Neuroimage, 2017.
         """
         self.bundle_dict = bundle_dict
         self.streamlines = streamlines
@@ -128,14 +168,10 @@ class Segmentation:
 
         Parameters
         ----------
-        fdata, fbval, fbvec : str
-            Full path to data, bvals, bvecs
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
+        streamlines : list of 2D arrays
+            Each array is a streamline, shape (3, N).
+            If streamlines is None, will use previously given streamlines.
             Default: None.
-        reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
         bundle_dict: dict
             The format is something like::
 
@@ -143,10 +179,27 @@ class Segmentation:
                 'rules':[True, True]},
                 'prob_map': img3,
                 'cross_midline': False}
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
+
+        fdata, fbval, fbvec : str
+            Full path to data, bvals, bvecs
+        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+            A mapping between DWI space and a template.
+            If None, mapping will be registered from data used in prepare_img.
             Default: None.
+        reg_prealign : array, optional.
+            The linear transformation to be applied to align input images to
+            the reference space before warping under the deformation field.
+            Default: None.
+        reg_template : str or nib.Nifti1Image, optional.
+            Template to use for registration (defaults to the MNI T2)
+            Default: None.
+
+        References
+        ----------
+        .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty,
+        Nathaniel J. Myall, Brian A. Wandell, and Heidi M. Feldman. 2012.
+        "Tract Profiles of White Matter Properties: Automating Fiber-Tract
+        Quantification" PloS One 7 (11): e49790.
         """
         self.logger.info("Preparing Segmentation Parameters...")
         self.prepare_img(fdata, fbval, fbvec)
@@ -190,6 +243,12 @@ class Segmentation:
 
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration (defaults to the MNI T2)
+            Default: None.
+
+        reg_prealign : array, optional.
+            The linear transformation to be applied to align input images to
+            the reference space before warping under the deformation field.
+            Default: None.
         """
         if reg_template is None:
             reg_template = dpd.read_mni_template()
@@ -228,27 +287,20 @@ class Segmentation:
     def cross_streamlines(self, streamlines=None,
                           template=None, low_coord=10):
         """
-        Classify the streamlines and split those that: 1) cross the
-        midline, and 2) pass under low_coord mm below the mid-point of their
-        representation in the template space.
+        Classify the streamlines by whether they cross the midline.
+        Creates a crosses attribute which is an array of booleans.
+        Each boolean corresponds to a streamline,
+        and is whether or not that streamline crosses the midline.
 
         Parameters
         ----------
         streamlines : list or Streamlines class instance.
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
-        low_coords: int
+        low_coords: int, optional.
             How many coordinates below the 0,0,0 point should a streamline be
             to be split if it passes the midline.
-        Returns
-        -------
-        streamlines that have been processed, a boolean array of whether they
-        cross the midline or not, a boolean array that for those who do not
-        cross designates whether they are strictly in the left hemisphere,
-        and a boolean that tells us whether the streamline has
-        superior-inferior parts that pass below `low_coord` steps below the
-        middle of the image (which should also be `low_coord` mms for
-        templates with 1 mm resolution)
+            Default: 10
         """
         if streamlines is None:
             streamlines = self.streamlines
