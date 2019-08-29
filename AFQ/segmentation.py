@@ -95,7 +95,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 class Segmentation:
     def __init__(self, cross=True, nb_points=False, method='AFQ',
                  progressive=True, greater_than=50, rm_small_clusters=50,
-                 b0_threshold=0, prob_threshold=0):
+                 b0_threshold=0, prob_threshold=0, rng=None):
         """
         Segment streamlines into bundles.
 
@@ -134,6 +134,11 @@ class Segmentation:
         self.logger = logging.getLogger('AFQ.Segmentation')
         self.cross = cross
         self.nb_points = nb_points
+
+        if rng is None:
+            self.rng = np.random.RandomState()
+        else:
+            self.rng = rng
 
         method = method.lower()
         if method == 'reco':
@@ -542,7 +547,8 @@ class Segmentation:
             atlas, streamlines, x0='affine', verbose=False,
             progressive=self.progressive,
             greater_than=self.greater_than,
-            rm_small_clusters=self.rm_small_clusters)
+            rm_small_clusters=self.rm_small_clusters,
+            rng=self.rng)
 
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles...")

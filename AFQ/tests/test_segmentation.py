@@ -106,7 +106,8 @@ def test_segment():
     segmentation = seg.Segmentation(method='Reco',
                                     progressive=False,
                                     greater_than=10,
-                                    rm_small_clusters=1)
+                                    rm_small_clusters=1,
+                                    rng=np.random.RandomState(seed=8))
     fiber_groups = segmentation.segment(bundles, streamlines)
 
     # This condition should still hold
