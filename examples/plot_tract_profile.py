@@ -110,7 +110,7 @@ for bundle in bundles:
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(fiber_groups[bundle])
     profile = afq_profile(FA_data, fiber_groups[bundle],
-                              np.eye(4), weights=weights)
+                          np.eye(4), weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)
 

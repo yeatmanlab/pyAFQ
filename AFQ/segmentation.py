@@ -28,6 +28,7 @@ def _resample_bundle(streamlines, n_points):
 
     return dps.set_number_of_points(streamlines, n_points)
 
+
 class Segmentation:
     def __init__(self, nb_points=False, algo='AFQ',
                  progressive=True, greater_than=50, rm_small_clusters=50,
