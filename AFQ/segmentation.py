@@ -600,7 +600,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     # Resample once up-front:
     fgarray = _resample_bundle(streamlines, n_points)
     # Keep this around, so you can use it for indexing at the very end:
-    idx = np.arange(fgarray.shape[0])
+    idx = np.arange(len(fgarray))
     # This calculates the Mahalanobis for each streamline/node:
     w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
     # We'll only do this for clean_rounds
