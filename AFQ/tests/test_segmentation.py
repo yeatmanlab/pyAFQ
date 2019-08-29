@@ -103,7 +103,7 @@ def test_segment():
             bundles.pop(key, None)
 
     # Try recobundles method
-    segmentation = seg.Segmentation(method='Reco',
+    segmentation = seg.Segmentation(algo='Reco',
                                     progressive=False,
                                     greater_than=10,
                                     rm_small_clusters=1,

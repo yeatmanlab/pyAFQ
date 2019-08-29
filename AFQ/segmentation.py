@@ -26,7 +26,7 @@ def _resample_bundle(streamlines, n_points):
             streamlines = streamlines.tolist()
             streamlines = [np.asarray(item) for item in streamlines]
 
-    return np.array(dps.set_number_of_points(streamlines, n_points))
+    return dps.set_number_of_points(streamlines, n_points)
 
 class Segmentation:
     def __init__(self, nb_points=False, algo='AFQ',

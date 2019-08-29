@@ -400,7 +400,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
 
         reg_prealign = np.load(_reg_prealign(row,
                                              force_recompute=force_recompute))
-        segmentation = seg.Segmentation(method=method)
+        segmentation = seg.Segmentation(algo=method)
         bundles = segmentation.segment(bundle_dict,
                                        sl,
                                        row['dwi_file'],
