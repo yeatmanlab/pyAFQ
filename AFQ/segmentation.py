@@ -29,7 +29,7 @@ def _resample_bundle(streamlines, n_points):
     return np.array(dps.set_number_of_points(streamlines, n_points))
 
 class Segmentation:
-    def __init__(self, cross=True, nb_points=False, method='AFQ',
+    def __init__(self, nb_points=False, method='AFQ',
                  progressive=True, greater_than=50, rm_small_clusters=50,
                  b0_threshold=0, prob_threshold=0, rng=None):
         """
@@ -37,11 +37,6 @@ class Segmentation:
 
         Parameters
         ----------
-        cross : boolean
-            If true, classify the streamlines based whether they:
-            1) cross the midline, and 2) pass under 10 mm below
-            the mid-point of their representation in the template space.
-            Default: True
         nb_points : int, boolean
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
@@ -68,7 +63,6 @@ class Segmentation:
         336-347
         """
         self.logger = logging.getLogger('AFQ.Segmentation')
-        self.cross = cross
         self.nb_points = nb_points
 
         if rng is None:
@@ -162,9 +156,8 @@ class Segmentation:
         self.logger.info("Preprocessing Streamlines...")
         self.streamlines = streamlines
         if self.nb_points:
-            self.resample(self.nb_points)
-        if self.cross:
-            self.cross_streamlines()
+            self.resample_streamlines(self.nb_points)
+        self.cross_streamlines()
 
         return self.segment_afq()
 
@@ -212,7 +205,7 @@ class Segmentation:
         else:
             self.mapping = mapping
 
-    def resample(self, nb_points, streamlines=None):
+    def resample_streamlines(self, nb_points, streamlines=None):
         """
         Resample streamlines to nb_points number of points.
 
@@ -390,19 +383,16 @@ class Segmentation:
             for sl_idx, sl in enumerate(streamlines):
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
-                        try:
-                            if self.crosses[sl_idx]:
-                                # This means that the streamline does
-                                # cross the midline:
-                                if crosses_midline:
-                                    # This is what we want, keep going
-                                    pass
-                                else:
-                                    # This is not what we want,
-                                    # skip to next streamline
-                                    continue
-                        except NameError:
-                            pass
+                        if self.crosses[sl_idx]:
+                            # This means that the streamline does
+                            # cross the midline:
+                            if crosses_midline:
+                                # This is what we want, keep going
+                                pass
+                            else:
+                                # This is not what we want,
+                                # skip to next streamline
+                                continue
 
                     is_close, dist = \
                         self._check_sl_with_inclusion(sl,
