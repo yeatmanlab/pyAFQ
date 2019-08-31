@@ -102,7 +102,7 @@ def _bundle_profile(data, bundle, affine=None, n_points=100,
 dts.bundle_profile = _bundle_profile
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
+def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -111,7 +111,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
     """
-    if seg_algo == "planes":
+    if seg_algo == "afq":
         templates = afd.read_templates()
         callosal_templates = afd.read_callosum_templates()
         # For the arcuate, we need to rename a few of these and duplicate the
@@ -161,7 +161,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="planes"):
 
                     uid += 1
 
-    elif seg_algo == "recobundles":
+    elif seg_algo == "reco":
         afq_bundles = {}
         uid = 1
         bundle_dict = afd.read_hcp_atlas_16_bundles()
@@ -375,38 +375,16 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 stop_mask=wm_mask)
 
         save_tractogram(streamlines_file,
-                        dtu.move_streamlines(streamlines,
+                        dtu.transform_tracking_output(streamlines,
                                              np.linalg.inv(dwi_img.affine)),
                         dwi_img.affine)
 
     return streamlines_file
 
 
-def _recobundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
-                 directions="det", n_seeds=2, random_seeds=False,
-                 force_recompute=False):
-
-    bundles_file = _get_fname(row,
-                              '%s_%s_bundles.trk' % (odf_model,
-                                                     directions))
-    if not op.exists(bundles_file) or force_recompute:
-        streamlines_file = _streamlines(row, wm_labels,
-                                        odf_model=odf_model,
-                                        directions=directions,
-                                        n_seeds=n_seeds,
-                                        random_seeds=random_seeds,
-                                        force_recompute=force_recompute)
-        tg = nib.streamlines.load(streamlines_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
-        bundles = seg.recobundles(sl, bundle_dict)
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
-        nib.streamlines.save(tgram, bundles_file)
-    return bundles_file
-
-
-def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
-             directions="det", n_seeds=2, random_seeds=False,
-             force_recompute=False):
+def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
+             odf_model="DTI", directions="det", n_seeds=2,
+             random_seeds=False, force_recompute=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -422,19 +400,16 @@ def _bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
 
         reg_prealign = np.load(_reg_prealign(row,
                                              force_recompute=force_recompute))
+        segmentation = seg.Segmentation(algo=method)
+        bundles = segmentation.segment(bundle_dict,
+                                       sl,
+                                       row['dwi_file'],
+                                       row['bval_file'],
+                                       row['bvec_file'],
+                                       reg_template=reg_template,
+                                       mapping=_mapping(row, reg_template),
+                                       reg_prealign=reg_prealign)
 
-        mapping = reg.read_mapping(_mapping(row, reg_template),
-                                   row['dwi_file'],
-                                   reg_template,
-                                   prealign=np.linalg.inv(reg_prealign))
-
-        bundles = seg.segment(row['dwi_file'],
-                              row['bval_file'],
-                              row['bvec_file'],
-                              sl,
-                              bundle_dict,
-                              reg_template=reg_template,
-                              mapping=mapping)
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
     return bundles_file
@@ -447,7 +422,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
     if not op.exists(clean_bundles_file) or force_recompute:
-        bundles_file = _bundles(row,
+        bundles_file = _segment(row,
                                 wm_labels,
                                 bundle_dict,
                                 reg_template,
@@ -587,7 +562,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det", n_seeds=2,
                     random_seeds=False, force_recompute=False):
 
-    for func, folder in zip([_clean_bundles, _bundles],
+    for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
         bundles_file = func(row,
                             wm_labels,
@@ -689,7 +664,7 @@ class AFQ(object):
     """
     def __init__(self,
                  dmriprep_path,
-                 seg_algo="planes",
+                 seg_algo="afq",
                  sub_prefix="sub",
                  dwi_folder="dwi",
                  dwi_file="*dwi",
@@ -713,7 +688,7 @@ class AFQ(object):
 
         seg_algo : str
             Which algorithm to use for segmentation.
-            Can be one of: {"planes", "recobundles"}
+            Can be one of: {"afq", "reco"}
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
@@ -999,17 +974,14 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        if self.seg_algo == "planes":
-            seg_function = _bundles
-        elif self.seg_algo == "recobundles":
-            seg_function = _recobundles
         column_exists = 'bundles_file' in self.data_frame.columns
         if (not column_exists or self.force_recompute):
             self.data_frame['bundles_file'] =\
-                self.data_frame.apply(seg_function, axis=1,
+                self.data_frame.apply(_segment, axis=1,
                                       args=[self.wm_labels,
                                             self.bundle_dict,
                                             self.reg_template],
+                                      method=self.seg_algo,
                                       odf_model=self.odf_model,
                                       directions=self.directions,
                                       n_seeds=self.n_seeds,
@@ -1025,7 +997,7 @@ class AFQ(object):
     def set_clean_bundles(self):
         column_exists = 'clean_bundles_file' in self.data_frame.columns
         if (not column_exists or self.force_recompute):
-            if self.seg_algo == "recobundles":
+            if self.seg_algo == "reco":
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
             else:

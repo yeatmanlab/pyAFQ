@@ -444,9 +444,9 @@ def organize_stanford_data(path=None):
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
 
     dataset_description = {
-         "BIDSVersion": "1.0.0",
-         "Name": "Stanford HARDI",
-         "Subjects": ["sub-01"]}
+        "BIDSVersion": "1.0.0",
+        "Name": "Stanford HARDI",
+        "Subjects": ["sub-01"]}
 
     desc_file = op.join(my_path, 'stanford_hardi', 'dataset_description.json')
 
@@ -472,18 +472,21 @@ def read_hcp_atlas_16_bundles():
     """
     bundle_dict = {}
     _, folder = fetch_hcp_atlas_16_bundles()
-    whole_brain, _ = load_tractogram(op.join(folder,
-                                             'Atlas_in_MNI_Space_16_bundles',
-                                             'whole_brain',
-                                             'whole_brain_MNI.trk'))
+    whole_brain = load_tractogram(op.join(folder,
+                                          'Atlas_in_MNI_Space_16_bundles',
+                                          'whole_brain',
+                                          'whole_brain_MNI.trk'),
+                                  'same', bbox_valid_check=False).streamlines
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
         op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
-
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
         bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file)[0]
+        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file,
+                                                    'same',
+                                                    bbox_valid_check=False)\
+            .streamlines
 
         feature = ResampleFeature(nb_points=100)
         metric = AveragePointwiseEuclideanMetric(feature)

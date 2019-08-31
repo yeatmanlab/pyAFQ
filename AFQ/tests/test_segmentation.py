@@ -10,6 +10,7 @@ import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 import dipy.tracking.streamline as dts
 import dipy.tracking.utils as dtu
+from dipy.stats.analysis import afq_profile
 
 import AFQ.data as afd
 import AFQ.segmentation as seg
@@ -26,9 +27,9 @@ def test_segment():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     streamlines = dts.Streamlines(
-            dtu.transform_tracking_output(
-                streamlines[streamlines._lengths > 10],
-                np.linalg.inv(hardi_img.affine)))
+        dtu.transform_tracking_output(
+            streamlines[streamlines._lengths > 10],
+            np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -42,12 +43,14 @@ def test_segment():
                          'prob_map': templates['CST_R_prob_map'],
                          'cross_midline': None}}
 
-    fiber_groups = seg.segment(hardi_fdata,
-                               hardi_fbval,
-                               hardi_fbvec,
-                               streamlines,
-                               bundles,
-                               mapping)
+    segmentation = seg.Segmentation()
+    segmentation.segment(bundles,
+                         streamlines,
+                         hardi_fdata,
+                         hardi_fbval,
+                         hardi_fbvec,
+                         mapping=mapping)
+    fiber_groups = segmentation.fiber_groups
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
@@ -56,17 +59,11 @@ def test_segment():
     # Let's make sure there are streamlines in there:
     npt.assert_(len(CST_R_sl) > 0)
     # Calculate the tract profile for a volume of all-ones:
-    tract_profile = seg.calculate_tract_profile(
+    tract_profile = afq_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
-        CST_R_sl)
+        CST_R_sl, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
-    # Test providing an array input to calculate_tract_profile:
-    tract_profile = seg.calculate_tract_profile(
-        np.ones(nib.load(hardi_fdata).shape[:3]),
-        seg._resample_bundle(CST_R_sl, 100))
-
-    npt.assert_almost_equal(tract_profile, np.ones(100))
     clean_sl = seg.clean_fiber_group(CST_R_sl)
     # Since there are only 8 streamlines here, nothing should happen:
     npt.assert_equal(clean_sl, CST_R_sl)
@@ -86,39 +83,33 @@ def test_segment():
                          'rules': [True, True],
                          'cross_midline': False}}
 
-    fiber_groups = seg.segment(hardi_fdata,
-                               hardi_fbval,
-                               hardi_fbvec,
-                               streamlines,
-                               bundles,
-                               mapping)
+    segmentation.segment(bundles,
+                         streamlines,
+                         hardi_fdata,
+                         hardi_fbval,
+                         hardi_fbvec,
+                         mapping=mapping)
+    fiber_groups = segmentation.fiber_groups
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
 
+    # get bundles for reco method
+    bundles = afd.read_hcp_atlas_16_bundles()
+    bundle_names = ['whole_brain', 'CST_R', 'CST_L']
+    for key in list(bundles):
+        if key not in bundle_names:
+            bundles.pop(key, None)
 
-def test_gaussian_weights():
-    # Some bogus x,y,z coordinates
-    x = np.arange(10)
-    y = np.arange(10)
-    z = np.arange(10)
-    # Create a distribution for which we can predict the weights we would
-    # expect to get:
-    bundle = np.array([np.array([x, y, z]).T + 1,
-                       np.array([x, y, z]).T - 1])
-    # In this case, all nodes receives an equal weight of 0.5:
-    w = seg.gaussian_weights(bundle)
-    npt.assert_equal(w, np.ones(bundle.shape[:-1]) * 0.5)
+    # Try recobundles method
+    segmentation = seg.Segmentation(algo='Reco',
+                                    progressive=False,
+                                    greater_than=10,
+                                    rm_small_clusters=1,
+                                    rng=np.random.RandomState(seed=8))
+    fiber_groups = segmentation.segment(bundles, streamlines)
 
-    # Here, some nodes are twice as far from the mean as others
-    bundle = np.array([np.array([x, y, z]).T + 2,
-                       np.array([x, y, z]).T + 1,
-                       np.array([x, y, z]).T - 1,
-                       np.array([x, y, z]).T - 2])
-    w = seg.gaussian_weights(bundle)
-
-    # And their weights should be halved
-    # XXX Need to check how to transform this through the
-    # Gaussian distribution!
-    npt.assert_almost_equal(w[0], w[1] / 2)
+    # This condition should still hold
+    npt.assert_equal(len(fiber_groups), 2)
+    npt.assert_(len(fiber_groups['CST_R']) > 0)

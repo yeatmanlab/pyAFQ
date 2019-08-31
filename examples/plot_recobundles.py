@@ -18,6 +18,7 @@ import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
+from dipy.stats.analysis import afq_profile, gaussian_weights
 
 
 import AFQ.data as afd
@@ -78,22 +79,22 @@ if not op.exists('dti_streamlines.trk'):
     for name in bundle_names:
         for hemi in ['_R', '_L']:
             sl_xform = dts.Streamlines(
-                dtu.move_streamlines(bundles[name + hemi]['sl'],
+                dtu.transform_tracking_output(bundles[name + hemi]['sl'],
                                      MNI_T2_img.affine))
 
             delta = dts.values_from_volume(mapping.backward,
-                                           sl_xform)
+                                           sl_xform, np.eye(4))
             sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
 
             sl_xform = dts.Streamlines(
-                dtu.move_streamlines(sl_xform,
+                dtu.transform_tracking_output(sl_xform,
                                      np.linalg.inv(MNI_T2_img.affine)))
 
             save_tractogram('./%s%s_atlas.trk' % (name, hemi),
                             sl_xform, np.eye(4))
 
             sl_xform = dts.Streamlines(
-                dtu.move_streamlines(sl_xform,
+                dtu.transform_tracking_output(sl_xform,
                                      np.linalg.inv(img.affine)))
 
             for sl in sl_xform:
@@ -149,14 +150,15 @@ for name in bundle_names:
     for hemi in ["_R", "_L"]:
         fig, ax = plt.subplots(1)
         streamlines = dts.Streamlines(
-            dtu.move_streamlines(
+            dtu.transform_tracking_output(
                 [s for s in fiber_groups[name + hemi] if s.shape[0] > 100],
                 np.linalg.inv(img.affine)))
 
-        weights = seg.gaussian_weights(streamlines)
-        profile = seg.calculate_tract_profile(FA_data,
-                                              streamlines,
-                                              weights=weights)
+        weights = gaussian_weights(streamlines)
+        profile = afq_profile(FA_data,
+                              streamlines,
+                              np.eye(4),
+                              weights=weights)
         ax.plot(profile)
         ax.set_title(name + hemi)
         save_tractogram('./%s%s_subject.trk' % (name, hemi),

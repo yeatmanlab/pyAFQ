@@ -16,6 +16,7 @@ from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
+from dipy.stats.analysis import afq_profile, gaussian_weights
 
 import AFQ.utils.streamlines as aus
 import AFQ.data as afd
@@ -90,19 +91,15 @@ else:
     tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
     streamlines = tg.streamlines
 
-streamlines = dts.Streamlines(dtu.move_streamlines(
+streamlines = dts.Streamlines(dtu.transform_tracking_output(
     [s for s in streamlines if s.shape[0] > 100],
     np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
-fiber_groups = seg.segment(hardi_fdata,
-                           hardi_fbval,
-                           hardi_fbvec,
-                           streamlines,
-                           bundles,
-                           reg_template=MNI_T2_img,
-                           mapping=mapping)
-
+segmentation = seg.Segmentation()
+segmentation.segment(hardi_fdata, hardi_fbval, hardi_fbvec, bundles,
+                     streamlines, mapping=mapping, reg_template=MNI_T2_img)
+fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
 for bundle in bundles:
@@ -111,9 +108,9 @@ for bundle in bundles:
 print("Extracting tract profiles...")
 for bundle in bundles:
     fig, ax = plt.subplots(1)
-    weights = seg.gaussian_weights(fiber_groups[bundle])
-    profile = seg.calculate_tract_profile(FA_data, fiber_groups[bundle],
-                                          weights=weights)
+    weights = gaussian_weights(fiber_groups[bundle])
+    profile = afq_profile(FA_data, fiber_groups[bundle],
+                          np.eye(4), weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)
 
