@@ -15,8 +15,10 @@ import dipy.data as dpd
 from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.io.stateful_tractogram import StatefulTractogram
+from dipy.io.stateful_tractogram import Space
 
 import AFQ.utils.streamlines as aus
 import AFQ.data as afd
@@ -80,15 +82,19 @@ if not op.exists('dti_streamlines.trk'):
                     (mapping.transform_inverse(
                         roi.get_data().astype(np.float32),
                      interpolation='linear')) > 0)
+
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
 
+    nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            stop_mask=FA_data > 0.2)
+                            stop_mask=FA_data, stop_threshold=0.1)
 
-    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
+    sft = StatefulTractogram(streamlines, img, Space.RASMM)
+    save_tractogram(sft, './dti_streamlines.trk',
+                    bbox_valid_check=False)
 else:
-    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    tg = load_tractogram('./dti_streamlines.trk', img)
     streamlines = tg.streamlines
 
 streamlines = dts.Streamlines(dtu.transform_tracking_output(
@@ -97,8 +103,15 @@ streamlines = dts.Streamlines(dtu.transform_tracking_output(
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation()
-segmentation.segment(hardi_fdata, hardi_fbval, hardi_fbvec, bundles,
-                     streamlines, mapping=mapping, reg_template=MNI_T2_img)
+segmentation.segment(bundles,
+                     streamlines,
+                     fdata=hardi_fdata,
+                     fbval=hardi_fbval,
+                     fbvec=hardi_fbvec,
+                     mapping=mapping,
+                     reg_template=MNI_T2_img)
+
+
 fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
