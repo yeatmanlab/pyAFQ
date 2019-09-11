@@ -15,10 +15,12 @@ import dipy.data as dpd
 from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.io.stateful_tractogram import StatefulTractogram
+from dipy.io.stateful_tractogram import Space
 
 
 import AFQ.data as afd
@@ -74,13 +76,13 @@ for name in bundle_names:
         uid += 1
 
 print("Tracking...")
-if not op.exists('dti_streamlines.trk'):
+if not op.exists('dti_streamlines_reco.trk'):
     seed_roi = np.zeros(img.shape[:-1])
     for name in bundle_names:
         for hemi in ['_R', '_L']:
             sl_xform = dts.Streamlines(
                 dtu.transform_tracking_output(bundles[name + hemi]['sl'],
-                                     MNI_T2_img.affine))
+                MNI_T2_img.affine))
 
             delta = dts.values_from_volume(mapping.backward,
                                            sl_xform, np.eye(4))
@@ -88,10 +90,10 @@ if not op.exists('dti_streamlines.trk'):
 
             sl_xform = dts.Streamlines(
                 dtu.transform_tracking_output(sl_xform,
-                                     np.linalg.inv(MNI_T2_img.affine)))
+                np.linalg.inv(MNI_T2_img.affine)))
 
-            save_tractogram('./%s%s_atlas.trk' % (name, hemi),
-                            sl_xform, np.eye(4))
+            sft = StatefulTractogram(sl_xform, img, Space.RASMM)
+            save_tractogram(sft, './%s%s_atlas.trk' % (name, hemi))
 
             sl_xform = dts.Streamlines(
                 dtu.transform_tracking_output(sl_xform,
@@ -106,44 +108,24 @@ if not op.exists('dti_streamlines.trk'):
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
-
-    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
+    sft = StatefulTractogram(streamlines, img, Space.RASMM)
+    save_tractogram(sft, './dti_streamlines_reco.trk',
+                    bbox_valid_check=False)
 else:
-    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    tg = load_tractogram('./dti_streamlines_reco.trk', img)
     streamlines = tg.streamlines
 
-fiber_groups = {}
-# We start with whole-brain SLR:
-atlas = bundle_dict['whole_brain']
-moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
-    atlas, streamlines, x0='affine', verbose=False, progressive=True)
-
-# We generate our instance of RB with the moved streamlines:
-rb = RecoBundles(moved, verbose=False)
-
-# Next we'll iterate over bundles, registering each one:
-bundle_list = list(bundles.keys())
-bundle_list.remove('whole_brain')
-
-for bundle in bundle_list:
-    model_sl = bundle_dict[bundle]['sl']
-    _, rec_labels = rb.recognize(model_bundle=model_sl,
-                                 model_clust_thr=20.,
-                                 reduction_thr=40,
-                                 reduction_distance='mam',
-                                 slr=True,
-                                 slr_metric='asymmetric',
-                                 pruning_distance='mam')
-
-    # Use the streamlines in the original space:
-    recognized_sl = streamlines[rec_labels]
-    standard_sl = bundle_dict[bundle]['centroid']
-    oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
-    fiber_groups[bundle] = oriented_sl
-
+print("Segmenting fiber groups...")
+segmentation = seg.Segmentation(algo='reco', rng=np.random.RandomState(2001))
+segmentation.segment(bundles, streamlines)
+fiber_groups = segmentation.fiber_groups
 
 for kk in fiber_groups:
     print(kk, len(fiber_groups[kk]))
+    sft = StatefulTractogram(fiber_groups[kk], img, Space.RASMM)
+    save_tractogram(sft, './%s_reco.trk'%kk,
+                    bbox_valid_check=False)
+
 
 print("Extracting tract profiles...")
 for name in bundle_names:
@@ -161,8 +143,5 @@ for name in bundle_names:
                               weights=weights)
         ax.plot(profile)
         ax.set_title(name + hemi)
-        save_tractogram('./%s%s_subject.trk' % (name, hemi),
-                        streamlines, img.affine)
-
 
 plt.show()
