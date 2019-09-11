@@ -27,6 +27,7 @@ import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
+import AFQ.csd as csd
 import AFQ.segmentation as seg
 
 dpd.fetch_stanford_hardi()
@@ -49,7 +50,6 @@ else:
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
-
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
@@ -60,6 +60,15 @@ if not op.exists('mapping.nii.gz'):
     reg.write_mapping(mapping, './mapping.nii.gz')
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
+
+
+print("Calculating CSD...")
+if not op.exists('./csd_sh_coeff.nii.gz'):
+    csd_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
+                             out_dir='.')
+else:
+    csd_params = './csd_sh_coeff.nii.gz'
+
 
 templates = afd.read_templates()
 bundle_names = ["CST", "AF"]
@@ -76,7 +85,7 @@ for name in bundle_names:
         uid += 1
 
 print("Tracking...")
-if not op.exists('dti_streamlines_reco.trk'):
+if not op.exists('csd_streamlines_reco.trk'):
     seed_roi = np.zeros(img.shape[:-1])
     for name in bundle_names:
         for hemi in ['_R', '_L']:
@@ -106,13 +115,15 @@ if not op.exists('dti_streamlines_reco.trk'):
                          sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
+    streamlines = aft.track(csd_params, seed_mask=seed_roi,
+                            directions='prob',
                             stop_mask=FA_data, stop_threshold=0.1)
+    print(len(streamlines))
     sft = StatefulTractogram(streamlines, img, Space.RASMM)
-    save_tractogram(sft, './dti_streamlines_reco.trk',
+    save_tractogram(sft, './csd_streamlines_reco.trk',
                     bbox_valid_check=False)
 else:
-    tg = load_tractogram('./dti_streamlines_reco.trk', img)
+    tg = load_tractogram('./csd_streamlines_reco.trk', img)
     streamlines = tg.streamlines
 
 print("Segmenting fiber groups...")
