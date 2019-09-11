@@ -30,9 +30,17 @@ def _resample_bundle(streamlines, n_points):
 
 
 class Segmentation:
-    def __init__(self, nb_points=False, algo='AFQ',
-                 progressive=True, greater_than=50, rm_small_clusters=50,
-                 b0_threshold=0, prob_threshold=0, rng=None):
+    def __init__(self,
+                 nb_points=False,
+                 algo='AFQ',
+                 progressive=True,
+                 greater_than=10,
+                 rm_small_clusters=50,
+                 model_clust_thr=40.,
+                 reduction_thr=40,
+                 b0_threshold=0,
+                 prob_threshold=0,
+                 rng=None):
         """
         Segment streamlines into bundles.
 
@@ -110,6 +118,8 @@ class Segmentation:
         self.progressive = progressive
         self.greater_than = greater_than
         self.rm_small_clusters = rm_small_clusters
+        self.model_clust_thr = model_clust_thr
+        self.reduction_thr = reduction_thr
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -541,8 +551,8 @@ class Segmentation:
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
             _, rec_labels = rb.recognize(model_bundle=model_sl,
-                                         model_clust_thr=5.,
-                                         reduction_thr=10,
+                                         model_clust_thr=self.model_clust_thr,
+                                         reduction_thr=self.reduction_thr,
                                          reduction_distance='mam',
                                          slr=True,
                                          slr_metric='asymmetric',
