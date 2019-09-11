@@ -135,13 +135,12 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(
-                        dg,
-                        threshold_classifier,
-                        seeds,
-                        affine,
-                        step_size=step_size,
-                        min_length=min_length,
-                        max_length=max_length)
+    tracker = VerboseLocalTracking(dg,
+                                   threshold_classifier,
+                                   seeds,
+                                   affine,
+                                   step_size=step_size,
+                                   min_length=min_length,
+                                   max_length=max_length)
 
     return dts.Streamlines(tracker)
