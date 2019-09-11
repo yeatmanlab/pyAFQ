@@ -16,8 +16,6 @@ from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram, load_tractogram
-from dipy.segment.bundles import RecoBundles
-from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
@@ -27,7 +25,6 @@ import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
-import AFQ.csd as csd
 import AFQ.segmentation as seg
 
 dpd.fetch_stanford_hardi()
@@ -62,14 +59,6 @@ else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
 
-print("Calculating CSD...")
-if not op.exists('./csd_sh_coeff.nii.gz'):
-    csd_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
-                             out_dir='.')
-else:
-    csd_params = './csd_sh_coeff.nii.gz'
-
-
 templates = afd.read_templates()
 bundle_names = ["CST", "AF"]
 
@@ -85,7 +74,7 @@ for name in bundle_names:
         uid += 1
 
 print("Tracking...")
-if not op.exists('csd_streamlines_reco.trk'):
+if not op.exists('dti_streamlines_reco.trk'):
     seed_roi = np.zeros(img.shape[:-1])
     for name in bundle_names:
         for hemi in ['_R', '_L']:
@@ -115,15 +104,15 @@ if not op.exists('csd_streamlines_reco.trk'):
                          sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(csd_params, seed_mask=seed_roi,
-                            directions='prob',
-                            stop_mask=FA_data, stop_threshold=0.1)
+    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
+                            directions='det', stop_mask=FA_data,
+                            stop_threshold=0.1)
     print(len(streamlines))
     sft = StatefulTractogram(streamlines, img, Space.RASMM)
-    save_tractogram(sft, './csd_streamlines_reco.trk',
+    save_tractogram(sft, './dti_streamlines_reco.trk',
                     bbox_valid_check=False)
 else:
-    tg = load_tractogram('./csd_streamlines_reco.trk', img)
+    tg = load_tractogram('./dti_streamlines_reco.trk', img)
     streamlines = tg.streamlines
 
 print("Segmenting fiber groups...")
