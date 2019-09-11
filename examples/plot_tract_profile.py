@@ -97,9 +97,9 @@ else:
     tg = load_tractogram('./dti_streamlines.trk', img)
     streamlines = tg.streamlines
 
-streamlines = dts.Streamlines(dtu.transform_tracking_output(
-    [s for s in streamlines if s.shape[0] > 100],
-    np.linalg.inv(img.affine)))
+streamlines = dts.Streamlines(
+    dtu.transform_tracking_output(streamlines,
+                                  np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation()
@@ -117,6 +117,16 @@ fiber_groups = segmentation.fiber_groups
 print("Cleaning fiber groups...")
 for bundle in bundles:
     fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
+
+for kk in fiber_groups:
+    print(kk, len(fiber_groups[kk]))
+
+    sft = StatefulTractogram(
+        dtu.transform_tracking_output(fiber_groups[kk], img.affine),
+        img, Space.RASMM)
+
+    save_tractogram(sft, './%s_afq.trk'%kk,
+                    bbox_valid_check=False)
 
 print("Extracting tract profiles...")
 for bundle in bundles:
