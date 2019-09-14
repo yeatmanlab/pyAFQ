@@ -21,6 +21,9 @@ fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
 make_tracking_data(fbval, fbvec, fdata)
 
+min_length = 20
+step_size = 0.5
+
 
 def test_csd_tracking():
     for sh_order in [4, 8, 10]:
@@ -35,10 +38,10 @@ def test_csd_tracking():
                        seed_mask=None,
                        n_seeds=seeds,
                        stop_mask=None,
-                       step_size=0.5,
-                       min_length=10)
+                       step_size=step_size,
+                       min_length=min_length)
 
-            npt.assert_(len(sl[0]) > 10)
+            npt.assert_(len(sl[0]) >= step_size * min_length)
 
 
 def test_dti_tracking():
@@ -50,5 +53,6 @@ def test_dti_tracking():
                    sphere=None,
                    seed_mask=None,
                    n_seeds=1,
-                   step_size=0.5)
-        npt.assert_(len(sl[0]) > 10)
+                   step_size=step_size,
+                   min_length=min_length)
+        npt.assert_(len(sl[0]) >= min_length * step_size)

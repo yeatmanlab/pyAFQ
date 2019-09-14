@@ -16,7 +16,7 @@ from AFQ._fixes import VerboseLocalTracking, tensor_odf
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, n_seeds=1, random_seeds=False,
           stop_mask=None, stop_threshold=0,
-          step_size=0.5, min_length=30, max_length=250):
+          step_size=0.5, min_length=10, max_length=1000):
     """
     Tractography
 
@@ -129,19 +129,18 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
 
 def _local_tracking(seeds, dg, threshold_classifier, affine,
-                    step_size=0.5, min_length=10, max_length=250):
+                    step_size=0.5, min_length=10, max_length=1000):
     """
     Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(
-                        dg,
-                        threshold_classifier,
-                        seeds,
-                        affine,
-                        step_size=step_size,
-                        min_length=min_length,
-                        max_length=max_length)
+    tracker = VerboseLocalTracking(dg,
+                                   threshold_classifier,
+                                   seeds,
+                                   affine,
+                                   step_size=step_size,
+                                   min_length=min_length,
+                                   max_length=max_length)
 
     return dts.Streamlines(tracker)

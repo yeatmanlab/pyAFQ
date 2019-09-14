@@ -30,9 +30,17 @@ def _resample_bundle(streamlines, n_points):
 
 
 class Segmentation:
-    def __init__(self, nb_points=False, algo='AFQ',
-                 progressive=True, greater_than=50, rm_small_clusters=50,
-                 b0_threshold=0, prob_threshold=0, rng=None):
+    def __init__(self,
+                 nb_points=False,
+                 algo='AFQ',
+                 progressive=True,
+                 greater_than=50,
+                 rm_small_clusters=50,
+                 model_clust_thr=40.,
+                 reduction_thr=40,
+                 b0_threshold=0,
+                 prob_threshold=0,
+                 rng=None):
         """
         Segment streamlines into bundles.
 
@@ -110,6 +118,8 @@ class Segmentation:
         self.progressive = progressive
         self.greater_than = greater_than
         self.rm_small_clusters = rm_small_clusters
+        self.model_clust_thr = model_clust_thr
+        self.reduction_thr = reduction_thr
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -531,7 +541,7 @@ class Segmentation:
 
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles...")
-        rb = RecoBundles(moved, verbose=False)
+        rb = RecoBundles(moved, verbose=False, rng=self.rng)
 
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
@@ -541,8 +551,8 @@ class Segmentation:
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
             _, rec_labels = rb.recognize(model_bundle=model_sl,
-                                         model_clust_thr=5.,
-                                         reduction_thr=10,
+                                         model_clust_thr=self.model_clust_thr,
+                                         reduction_thr=self.reduction_thr,
                                          reduction_distance='mam',
                                          slr=True,
                                          slr_metric='asymmetric',
@@ -577,7 +587,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
 
     clean_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
-        standard deviations). Default: 6.
+        standard deviations). Default: 3.
 
     min_sl : int, optional.
         Number of streamlines in a bundle under which we will
