@@ -105,8 +105,8 @@ if not op.exists('dti_streamlines_reco.trk'):
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            directions='det', stop_mask=FA_data,
-                            stop_threshold=0.1)
+                            stop_mask=FA_data, stop_threshold=0.1)
+
     print(len(streamlines))
     sft = StatefulTractogram(streamlines, img, Space.RASMM)
     save_tractogram(sft, './dti_streamlines_reco.trk',
@@ -117,7 +117,14 @@ else:
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(algo='reco', rng=np.random.RandomState(2001))
-segmentation.segment(bundles, streamlines)
+segmentation.segment(bundles,
+                     streamlines,
+                     fdata=hardi_fdata,
+                     fbval=hardi_fbval,
+                     fbvec=hardi_fbvec,
+                     mapping=mapping,
+                     reg_template=MNI_T2_img)
+
 fiber_groups = segmentation.fiber_groups
 
 for kk in fiber_groups:

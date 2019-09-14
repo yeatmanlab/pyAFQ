@@ -11,6 +11,8 @@ from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
+import dipy.tracking.utils as dtu
+
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -75,7 +77,7 @@ class Segmentation:
                 during whole brain SLR.
             Default: 50.
 
-        b0_theshold : float.
+        b0_threshold : float.
             Using AFQ Algorithm.
             All b-values with values less than or equal to `bo_threshold` are
             considered as b0s i.e. without diffusion weighting.
@@ -161,9 +163,13 @@ class Segmentation:
         bundles using local and global streamline-based registration and
         clustering, Neuroimage, 2017.
         """
+        self.logger.info("Preparing Segmentation Parameters...")
+        self.prepare_img(fdata, fbval, fbvec)
+        self.prepare_map(mapping, reg_prealign, reg_template)
+
         self.bundle_dict = bundle_dict
         self.streamlines = streamlines
-        return self.segment_reco()
+        return self.segment_reco_syn()
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
@@ -264,13 +270,16 @@ class Segmentation:
         if reg_template is None:
             reg_template = dpd.read_mni_template()
 
+        self.reg_template = reg_template
+
         if mapping is None:
             gtab = dpg.gradient_table(self.fbval, self.fbvec)
             self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
-            self.mapping = reg.read_mapping(mapping, self.img, reg_template,
+            self.mapping = reg.read_mapping(mapping, self.img,
+                                            self.reg_template,
                                             prealign=reg_prealign)
         else:
             self.mapping = mapping
@@ -507,9 +516,11 @@ class Segmentation:
             self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def segment_reco(self, streamlines=None):
+    def segment_reco_slr(self, streamlines=None):
         """
-        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017].
+        User SLR on the entire streamline collection to align the atlas to
+        the subject anatomy
 
         Parameters
         ----------
@@ -560,6 +571,65 @@ class Segmentation:
 
             # Use the streamlines in the original space:
             recognized_sl = streamlines[rec_labels]
+            standard_sl = self.bundle_dict[bundle]['centroid']
+            oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+            fiber_groups[bundle] = oriented_sl
+        self.fiber_groups = fiber_groups
+        return fiber_groups
+
+    def segment_reco_syn(self, streamlines=None):
+        """
+        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017].
+        User SyN on the B0 to align the atlas to the subject anatomy
+
+        Parameters
+        ----------
+        streamlines : list or Streamlines object.
+            A whole-brain tractogram to be segmented.
+
+        Returns
+        -------
+        fiber_groups : dict
+            Keys are names of the bundles, values are Streamline objects.
+            The streamlines in each object have all been oriented to have the
+            same orientation (using `dts.orient_by_streamline`).
+        """
+        if streamlines is None:
+            streamlines = self.streamlines
+        else:
+            self.streamlines = streamlines
+
+        fiber_groups = {}
+        # We generate our instance of RB with the original streamlines:
+        self.logger.info("Extracting Bundles...")
+        rb = RecoBundles(streamlines, verbose=False)
+
+        # Next we'll iterate over bundles, registering each one:
+        bundle_list = list(self.bundle_dict.keys())
+        bundle_list.remove('whole_brain')
+
+        self.logger.info("Assigning Streamlines to Bundles...")
+        for bundle in bundle_list:
+            model_sl = self.bundle_dict[bundle]['sl']
+
+            sl_xform = dts.Streamlines(
+                dtu.transform_tracking_output(model_sl,
+                                              self.reg_template.affine))
+
+            delta = dts.values_from_volume(self.mapping.backward,
+                                           sl_xform, np.eye(4))
+            sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
+            recognized_sl, rec_labels = rb.recognize(
+                model_bundle=sl_xform,
+                model_clust_thr=self.model_clust_thr,
+                reduction_thr=self.reduction_thr,
+                reduction_distance='mam',
+                #slr=True,
+                #slr_metric='asymmetric',
+                #pruning_distance='mam'
+                )
+
+            # Use the streamlines in the original space:
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
             fiber_groups[bundle] = oriented_sl
