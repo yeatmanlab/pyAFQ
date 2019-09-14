@@ -587,7 +587,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
 
     clean_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
-        standard deviations). Default: 6.
+        standard deviations). Default: 3.
 
     min_sl : int, optional.
         Number of streamlines in a bundle under which we will
