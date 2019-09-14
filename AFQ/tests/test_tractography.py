@@ -41,7 +41,7 @@ def test_csd_tracking():
                        step_size=step_size,
                        min_length=min_length)
 
-            npt.assert_(len(sl[0]) > step_size * min_length)
+            npt.assert_(len(sl[0]) >= step_size * min_length)
 
 
 def test_dti_tracking():
@@ -55,4 +55,4 @@ def test_dti_tracking():
                    n_seeds=1,
                    step_size=step_size,
                    min_length=min_length)
-        npt.assert_(len(sl[0]) > min_length * step_size)
+        npt.assert_(len(sl[0]) >= min_length * step_size)
