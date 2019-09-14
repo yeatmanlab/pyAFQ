@@ -34,7 +34,7 @@ class Segmentation:
                  nb_points=False,
                  algo='AFQ',
                  progressive=True,
-                 greater_than=10,
+                 greater_than=50,
                  rm_small_clusters=50,
                  model_clust_thr=40.,
                  reduction_thr=40,
@@ -541,7 +541,7 @@ class Segmentation:
 
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles...")
-        rb = RecoBundles(moved, verbose=False)
+        rb = RecoBundles(moved, verbose=False, rng=self.rng)
 
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
