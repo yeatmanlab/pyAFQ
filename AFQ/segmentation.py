@@ -167,7 +167,7 @@ class Segmentation:
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None):
+                 reg_template=None, b0_threshold=0):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -213,7 +213,7 @@ class Segmentation:
         Quantification" PloS One 7 (11): e49790.
         """
         self.logger.info("Preparing Segmentation Parameters...")
-        self.prepare_img(fdata, fbval, fbvec)
+        self.prepare_img(fdata, fbval, fbvec, b0_threshold=b0_threshold)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
 
