@@ -501,21 +501,85 @@ def read_hcp_atlas_16_bundles():
 
 
 def s3fs_nifti_write(img, fname):
+    """
+    Write a nifti file straight to S3
+
+    Paramters
+    ---------
+    img : nib.Nifti1Image class instance
+        The image containing data to be written into S3
+    fname : string
+        Full path (including bucket name and extension) to the S3 location
+        where the file is to be saved.
+    """
     fs = s3fs.S3FileSystem()
     bio = BytesIO()
     file_map = img.make_file_map({'image': bio, 'header': bio})
     img.to_file_map(file_map)
     data = gzip.compress(bio.getvalue())
-    with fs.open(fname, 'wb') as f:
-        f.write(data)
+    with fs.open(fname, 'wb') as ff:
+        ff.write(data)
 
 
 def s3fs_nifti_read(fname):
+    """
+    Lazily reads a nifti image from S3.
+
+    Paramters
+    ---------
+    fname : string
+        Full path (including bucket name and extension) to the S3 location
+        of the file to be read.
+
+    Returns
+    -------
+    nib.Nifti1Image class instance
+
+    Note
+    ----
+    Because the image is lazily loaded, data stored in the file
+    is not transferred until `get_fdata` is called.
+
+    """
     fs = s3fs.S3FileSystem()
-    with fs.open(fname) as f:
-        zz = gzip.open(f)
+    with fs.open(fname) as ff:
+        zz = gzip.open(ff)
         rr = zz.read()
         bb = BytesIO(rr)
         fh = nib.FileHolder(fileobj=bb)
         img = nib.Nifti1Image.from_file_map({'header': fh, 'image': fh})
     return img
+
+
+
+def s3fs_json_read(fname):
+    """
+    Reads json directly from S3
+
+    Paramters
+    ---------
+    fname : str
+        Full path (including bucket name and extension) to the file on S3.
+    """
+    fs = s3fs.S3FileSystem()
+    with fs.open(fname) as ff:
+        data = json.load(ff)
+    return data
+
+
+def s3fs_json_write(data, fname):
+    """
+    Writes json from a dict directly into S3
+
+    Parameters
+    ----------
+    data : dict
+        The json to be written out
+    fname : str
+        Full path (including bucket name and extension) to the file to
+        be written out on S3
+    """
+    fs = s3fs.S3FileSystem()
+    with fs.open(fname, 'w') as ff:
+        json.dumps(ff, data)
+
