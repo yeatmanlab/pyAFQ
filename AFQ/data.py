@@ -311,7 +311,7 @@ def fetch_hcp(subjects,
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
     """
     if profile_name:
-        boto3.setup_default_session(profile_name='hcp')
+        boto3.setup_default_session(profile_name=profile_name)
     elif aws_access_key_id is not None and aws_secret_access_key is not None:
         boto3.setup_default_session(
             aws_access_key_id=aws_access_key_id,
@@ -582,4 +582,3 @@ def s3fs_json_write(data, fname):
     fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
         json.dumps(ff, data)
-
