@@ -551,7 +551,6 @@ def s3fs_nifti_read(fname):
     return img
 
 
-
 def s3fs_json_read(fname):
     """
     Reads json directly from S3
