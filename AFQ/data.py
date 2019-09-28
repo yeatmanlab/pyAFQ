@@ -543,7 +543,8 @@ def s3fs_nifti_read(fname):
     """
     fs = s3fs.S3FileSystem()
     with fs.open(fname) as ff:
-        zz = gzip.open(ff)
+        if fname.endswith('gz'):
+            zz = gzip.open(ff)
         rr = zz.read()
         bb = BytesIO(rr)
         fh = nib.FileHolder(fileobj=bb)
