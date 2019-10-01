@@ -39,7 +39,7 @@ gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
 print("Calculating white matter mask")
 if not op.exists('./wm_mask.nii.gz'):
     anat_dir = op.join(afd.afq_home, 'HCP', 'derivatives',
-                      'dmriprep', f'sub-{subject}', 'sess-01/anat')
+                       'dmriprep', f'sub-{subject}', 'sess-01/anat')
     wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
     seg_img = nib.load(op.join(anat_dir, f"sub-{subject}_aparc+aseg.nii.gz"))
     seg_data_orig = seg_img.get_fdata()
@@ -112,8 +112,9 @@ else:
 print("Tracking...")
 if not op.exists('csd_streamlines_reco.trk'):
     seed_roi = np.zeros(img.shape[:-1])
-    seed_roi[FA_data > 0.4] = 1
-
+    seed_roi[wm_mask > 0] = 1
+    # Filter down in addition, to make the whole thing a bit more zippy:
+    seed_roi[FA_data < 0.4] = 0  # Comment out or adjust in real use.
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(csd_params, seed_mask=seed_roi,
                             directions='det', stop_mask=FA_data,
