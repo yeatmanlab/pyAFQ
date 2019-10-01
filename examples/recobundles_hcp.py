@@ -56,7 +56,8 @@ if not op.exists('./wm_mask.nii.gz'):
                                     img.affine)).astype(int)
 
     wm_img = nib.Nifti1Image(wm_mask.astype(int),
-                                img.affine)
+                             img.affine)
+    nib.save(wm_img, './wm_mask.nii.gz')
 else:
     wm_img = nib.load('./wm_mask.nii.gz')
     wm_mask = wm_img.get_data()
@@ -68,7 +69,7 @@ if not op.exists('./dti_FA.nii.gz'):
                             mask='./wm_mask.nii.gz')
 else:
     dti_params = {'FA': './dti_FA.nii.gz',
-                'params': './dti_params.nii.gz'}
+                  'params': './dti_params.nii.gz'}
 
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
