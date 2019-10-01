@@ -1,3 +1,4 @@
+import warnings
 import os.path as op
 import numpy as np
 import nibabel as nib
@@ -17,6 +18,8 @@ import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
 
+warnings.warn(
+    "This example requires a reasonably large amount of memory and takes approximately 3-4 hours to run")
 
 afd.fetch_hcp([subject])
 afd.afq_home
