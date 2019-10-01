@@ -21,6 +21,8 @@ import AFQ.segmentation as seg
 warnings.warn(
     "This example requires a reasonably large amount of memory and takes approximately 3-4 hours to run")
 
+subject = 100307
+
 afd.fetch_hcp([subject])
 afd.afq_home
 
@@ -34,22 +36,36 @@ hardi_fbvec = op.join(dwi_dir, f"sub-{subject}_dwi.bvec")
 img = nib.load(hardi_fdata)
 gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
 
-print("Calculating brain-mask")
-if not op.exists('./brain_mask.nii.gz'):
-    mean_b0 = np.mean(img.get_data()[..., gtab.b0s_mask], -1)
-    _, brain_mask = median_otsu(mean_b0, median_radius=4,
-                                numpass=1, autocrop=False,
-                                vol_idx=None, dilate=10)
-    be_img = nib.Nifti1Image(brain_mask.astype(int),
-                            img.affine)
-    nib.save(be_img, './brain_mask.nii.gz')
+print("Calculating white matter mask")
+if not op.exists('./wm_mask.nii.gz'):
+    anat_dir = op.join(afd.afq_home, 'HCP', 'derivatives',
+                      'dmriprep', f'sub-{subject}', 'sess-01/anat')
+    wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+    seg_img = nib.load(op.join(anat_dir, f"sub-{subject}_aparc+aseg.nii.gz"))
+    seg_data_orig = seg_img.get_fdata()
+    # For different sets of labels, extract all the voxels that
+    # have any of these values:
+    wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
+                                    for l in wm_labels], -1), -1)
 
+    # Resample to DWI data:
+    dwi_data = img.get_fdata()
+    wm_mask = np.round(reg.resample(wm_mask,
+                                    dwi_data[..., 0],
+                                    seg_img.affine,
+                                    img.affine)).astype(int)
+
+    wm_img = nib.Nifti1Image(wm_mask.astype(int),
+                                img.affine)
+else:
+    wm_img = nib.load('./wm_mask.nii.gz')
+    wm_mask = wm_img.get_data()
 
 print("Calculating DTI...")
 if not op.exists('./dti_FA.nii.gz'):
     dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
                             out_dir='.', b0_threshold=50,
-                            mask='./brain_mask.nii.gz')
+                            mask='./wm_mask.nii.gz')
 else:
     dti_params = {'FA': './dti_FA.nii.gz',
                 'params': './dti_params.nii.gz'}
@@ -89,7 +105,7 @@ print("Calculating CSD...")
 if not op.exists('./csd_sh_coeff.nii.gz'):
     csd_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
                             out_dir='.', b0_threshold=50,
-                            mask='./brain_mask.nii.gz')
+                            mask='./wm_mask.nii.gz')
 else:
     csd_params = './csd_sh_coeff.nii.gz'
 
