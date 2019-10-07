@@ -580,4 +580,4 @@ def s3fs_json_write(data, fname):
     """
     fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
-        json.dump(ff, data)
+        json.dump(data, ff)
