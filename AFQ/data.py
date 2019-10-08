@@ -500,7 +500,7 @@ def read_hcp_atlas_16_bundles():
     return bundle_dict
 
 
-def s3fs_nifti_write(img, fname):
+def s3fs_nifti_write(img, fname, fs=None):
     """
     Write a nifti file straight to S3
 
@@ -511,8 +511,12 @@ def s3fs_nifti_write(img, fname):
     fname : string
         Full path (including bucket name and extension) to the S3 location
         where the file is to be saved.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system
     """
-    fs = s3fs.S3FileSystem()
+    if fs is None:
+        fs = s3fs.S3FileSystem()
+
     bio = BytesIO()
     file_map = img.make_file_map({'image': bio, 'header': bio})
     img.to_file_map(file_map)
@@ -521,7 +525,7 @@ def s3fs_nifti_write(img, fname):
         ff.write(data)
 
 
-def s3fs_nifti_read(fname):
+def s3fs_nifti_read(fname, fs=None):
     """
     Lazily reads a nifti image from S3.
 
@@ -530,6 +534,8 @@ def s3fs_nifti_read(fname):
     fname : string
         Full path (including bucket name and extension) to the S3 location
         of the file to be read.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
 
     Returns
     -------
@@ -541,7 +547,8 @@ def s3fs_nifti_read(fname):
     is not transferred until `get_fdata` is called.
 
     """
-    fs = s3fs.S3FileSystem()
+    if fs is None:
+        fs = s3fs.S3FileSystem()
     with fs.open(fname) as ff:
         zz = gzip.open(ff)
         rr = zz.read()
@@ -551,7 +558,7 @@ def s3fs_nifti_read(fname):
     return img
 
 
-def s3fs_json_read(fname):
+def s3fs_json_read(fname, fs=None):
     """
     Reads json directly from S3
 
@@ -559,14 +566,18 @@ def s3fs_json_read(fname):
     ---------
     fname : str
         Full path (including bucket name and extension) to the file on S3.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
+
     """
-    fs = s3fs.S3FileSystem()
+    if fs is None:
+        fs = s3fs.S3FileSystem()
     with fs.open(fname) as ff:
         data = json.load(ff)
     return data
 
 
-def s3fs_json_write(data, fname):
+def s3fs_json_write(data, fname, fs=None):
     """
     Writes json from a dict directly into S3
 
@@ -577,7 +588,10 @@ def s3fs_json_write(data, fname):
     fname : str
         Full path (including bucket name and extension) to the file to
         be written out on S3
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
     """
-    fs = s3fs.S3FileSystem()
+    if fs is None:
+        fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
