@@ -40,7 +40,8 @@ class Segmentation:
                  reduction_thr=40,
                  b0_threshold=0,
                  prob_threshold=0,
-                 rng=None):
+                 rng=None,
+                 return_idx=False):
         """
         Segment streamlines into bundles.
 
@@ -92,6 +93,10 @@ class Segmentation:
             If None, creates RandomState. Used in RecoBundles Algorithm.
             Default: None.
 
+        return_idx : bool
+            Whether to return the indices in the original streamlines as part
+            of the output of segmentation.
+
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -120,6 +125,7 @@ class Segmentation:
         self.rm_small_clusters = rm_small_clusters
         self.model_clust_thr = model_clust_thr
         self.reduction_thr = reduction_thr
+        self.return_idx = return_idx
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -167,7 +173,7 @@ class Segmentation:
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None):
+                 reg_template=None, b0_threshold=0):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -504,7 +510,12 @@ class Segmentation:
                     select_sl[idx] = select_sl[idx][::-1]
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
-            self.fiber_groups[bundle] = select_sl
+            if self.return_idx:
+                self.fiber_groups[bundle] = {}
+                self.fiber_groups[bundle]['sl'] = select_sl
+                self.fiber_groups[bundle]['idx'] = select_idx
+            else:
+                self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
     def segment_reco(self, streamlines=None):
@@ -562,7 +573,12 @@ class Segmentation:
             recognized_sl = streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
-            fiber_groups[bundle] = oriented_sl
+            if self.return_idx:
+                fiber_groups[bundle] = {}
+                fiber_groups[bundle]['idx'] = rec_labels
+                fiber_groups[bundle]['sl'] = oriented_sl
+            else:
+                fiber_groups[bundle] = oriented_sl
         self.fiber_groups = fiber_groups
         return fiber_groups
 

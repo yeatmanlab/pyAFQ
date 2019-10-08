@@ -95,6 +95,21 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
 
+    # Test with the return_idx kwarg set to True:
+    segmentation = seg.Segmentation(return_idx=True)
+    segmentation.segment(bundles,
+                         streamlines,
+                         hardi_fdata,
+                         hardi_fbval,
+                         hardi_fbvec,
+                         mapping=mapping)
+    fiber_groups = segmentation.fiber_groups
+
+    npt.assert_equal(len(fiber_groups), 2)
+    npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
+    npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
+
+
     # get bundles for reco method
     bundles = afd.read_hcp_atlas_16_bundles()
     bundle_names = ['whole_brain', 'CST_R', 'CST_L']
@@ -113,3 +128,18 @@ def test_segment():
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
+
+    # Test with the return_idx kwarg set to True:
+    segmentation = seg.Segmentation(algo='Reco',
+                                    progressive=False,
+                                    greater_than=10,
+                                    rm_small_clusters=1,
+                                    rng=np.random.RandomState(seed=8),
+                                    return_idx=True)
+
+    fiber_groups = segmentation.segment(bundles, streamlines)
+    fiber_groups = segmentation.fiber_groups
+
+    npt.assert_equal(len(fiber_groups), 2)
+    npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
+    npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)

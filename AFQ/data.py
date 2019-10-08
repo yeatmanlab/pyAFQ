@@ -311,7 +311,7 @@ def fetch_hcp(subjects,
            experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
     """
     if profile_name:
-        boto3.setup_default_session(profile_name='hcp')
+        boto3.setup_default_session(profile_name=profile_name)
     elif aws_access_key_id is not None and aws_secret_access_key is not None:
         boto3.setup_default_session(
             aws_access_key_id=aws_access_key_id,
@@ -500,22 +500,98 @@ def read_hcp_atlas_16_bundles():
     return bundle_dict
 
 
-def s3fs_nifti_write(img, fname):
-    fs = s3fs.S3FileSystem()
+def s3fs_nifti_write(img, fname, fs=None):
+    """
+    Write a nifti file straight to S3
+
+    Paramters
+    ---------
+    img : nib.Nifti1Image class instance
+        The image containing data to be written into S3
+    fname : string
+        Full path (including bucket name and extension) to the S3 location
+        where the file is to be saved.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system
+    """
+    if fs is None:
+        fs = s3fs.S3FileSystem()
+
     bio = BytesIO()
     file_map = img.make_file_map({'image': bio, 'header': bio})
     img.to_file_map(file_map)
     data = gzip.compress(bio.getvalue())
-    with fs.open(fname, 'wb') as f:
-        f.write(data)
+    with fs.open(fname, 'wb') as ff:
+        ff.write(data)
 
 
-def s3fs_nifti_read(fname):
-    fs = s3fs.S3FileSystem()
-    with fs.open(fname) as f:
-        zz = gzip.open(f)
+def s3fs_nifti_read(fname, fs=None):
+    """
+    Lazily reads a nifti image from S3.
+
+    Paramters
+    ---------
+    fname : string
+        Full path (including bucket name and extension) to the S3 location
+        of the file to be read.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
+
+    Returns
+    -------
+    nib.Nifti1Image class instance
+
+    Note
+    ----
+    Because the image is lazily loaded, data stored in the file
+    is not transferred until `get_fdata` is called.
+
+    """
+    if fs is None:
+        fs = s3fs.S3FileSystem()
+    with fs.open(fname) as ff:
+        zz = gzip.open(ff)
         rr = zz.read()
         bb = BytesIO(rr)
         fh = nib.FileHolder(fileobj=bb)
         img = nib.Nifti1Image.from_file_map({'header': fh, 'image': fh})
     return img
+
+
+def s3fs_json_read(fname, fs=None):
+    """
+    Reads json directly from S3
+
+    Paramters
+    ---------
+    fname : str
+        Full path (including bucket name and extension) to the file on S3.
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
+
+    """
+    if fs is None:
+        fs = s3fs.S3FileSystem()
+    with fs.open(fname) as ff:
+        data = json.load(ff)
+    return data
+
+
+def s3fs_json_write(data, fname, fs=None):
+    """
+    Writes json from a dict directly into S3
+
+    Parameters
+    ----------
+    data : dict
+        The json to be written out
+    fname : str
+        Full path (including bucket name and extension) to the file to
+        be written out on S3
+    fs : an s3fs.S3FileSystem class instance, optional
+        A file-system to refer to. Default to create a new file-system.
+    """
+    if fs is None:
+        fs = s3fs.S3FileSystem()
+    with fs.open(fname, 'w') as ff:
+        json.dump(data, ff)
