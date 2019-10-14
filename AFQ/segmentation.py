@@ -2,6 +2,8 @@ import numpy as np
 import logging
 from scipy.spatial.distance import mahalanobis, cdist
 
+from tqdm import tqdm
+
 import nibabel as nib
 
 import dipy.data as dpd
@@ -15,6 +17,7 @@ import dipy.core.gradients as dpg
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
+
 
 __all__ = ["Segmentation"]
 
@@ -218,9 +221,10 @@ class Segmentation:
         "Tract Profiles of White Matter Properties: Automating Fiber-Tract
         Quantification" PloS One 7 (11): e49790.
         """
-        self.logger.info("Preparing Segmentation Parameters...")
+        self.logger.info("Preparing image, bvals, bvecs...")
         self.prepare_img(fdata, fbval, fbvec)
-        self.prepare_map(mapping, reg_prealign, reg_template)
+        self.logger.info("Preparing mapping...")
+        self.prepare_map(mapping, reg_prealign, reg_template, b0_threshold)
         self.bundle_dict = bundle_dict
 
         self.logger.info("Preprocessing Streamlines...")
@@ -240,14 +244,15 @@ class Segmentation:
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
         """
-        self.img, _, _, _ = \
-            ut.prepare_data(fdata, fbval, fbvec,
-                            b0_threshold=self.b0_threshold)
-        self.fdata = fdata
         self.fbval = fbval
         self.fbvec = fbvec
+        self.fdata = fdata
+        if isinstance(self.fdata, str):
+            self.img = nib.load(fdata)
+        else:
+            self.img = self.fdata
 
-    def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None):
+    def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=0):
         """
         Set mapping between DWI space and a template.
 
@@ -271,7 +276,7 @@ class Segmentation:
             reg_template = dpd.read_mni_template()
 
         if mapping is None:
-            gtab = dpg.gradient_table(self.fbval, self.fbvec)
+            gtab = dpg.gradient_table(self.fbval, self.fbvec, b0_threshold=b0_threshold)
             self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
@@ -442,6 +447,7 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img.affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Bundle: {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
@@ -449,7 +455,8 @@ class Segmentation:
                 fgarray, np.eye(4))
             fiber_probabilities = np.mean(fiber_probabilities, -1)
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx, sl in enumerate(streamlines):
+            for sl_idx, sl in enumerate(tqdm(streamlines)):
+                
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
