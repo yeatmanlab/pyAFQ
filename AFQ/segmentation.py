@@ -222,10 +222,11 @@ class Segmentation:
         Quantification" PloS One 7 (11): e49790.
         """
         if img_affine is not None:
-            if mapping is None or \
-                    fdata is not None or \
-                fbval is not None or \
-                    fbvec is not None:
+            if (mapping is None or
+                fdata is not None or
+                fbval is not None or
+                    fbvec is not None):
+
                 self.logger.error(
                     "Provide either the full path to data, bvals, bvecs," +
                     "or provide the affine of the image and the mapping")
