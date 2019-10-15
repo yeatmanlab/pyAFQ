@@ -173,7 +173,7 @@ class Segmentation:
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None, b0_threshold=0):
+                 reg_template=None, b0_threshold=0, img_affine=None):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -210,6 +210,9 @@ class Segmentation:
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration (defaults to the MNI T2)
             Default: None.
+        img_affine : array, optional.
+            The spatial transformation from the measurement to the scanner
+            space.
 
         References
         ----------
@@ -219,6 +222,7 @@ class Segmentation:
         Quantification" PloS One 7 (11): e49790.
         """
         self.logger.info("Preparing Segmentation Parameters...")
+        self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
@@ -240,9 +244,12 @@ class Segmentation:
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
         """
-        self.img, _, _, _ = \
-            ut.prepare_data(fdata, fbval, fbvec,
-                            b0_threshold=self.b0_threshold)
+        if self.img_affine is None:
+            self.img, _, _, _ = \
+                ut.prepare_data(fdata, fbval, fbvec,
+                                b0_threshold=self.b0_threshold)
+            self.img_affine = self.img.affine
+
         self.fdata = fdata
         self.fbval = fbval
         self.fbvec = fbvec
@@ -276,6 +283,12 @@ class Segmentation:
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
+            if self.img is None:
+                self.img, _, _, _ = \
+                    ut.prepare_data(self.fdata,
+                                    self.fbval,
+                                    self.fbvec,
+                                    b0_threshold=self.b0_threshold)
             self.mapping = reg.read_mapping(mapping, self.img, reg_template,
                                             prealign=reg_prealign)
         else:
@@ -440,7 +453,7 @@ class Segmentation:
         self.fiber_groups = {}
 
         self.logger.info("Assigning Streamlines to Bundles...")
-        tol = dts.dist_to_corner(self.img.affine)**2
+        tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
