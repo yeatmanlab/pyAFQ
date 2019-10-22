@@ -228,8 +228,8 @@ class Segmentation:
                     or fbvec is not None):
 
                 self.logger.error(
-                    "Provide either the full path to data, bvals, bvecs," +
-                    "or provide the affine of the image and the mapping")
+                    "Provide either the full path to data, bvals, bvecs,"
+                    + "or provide the affine of the image and the mapping")
 
         self.logger.info("Preparing Segmentation Parameters...")
         self.img_affine = img_affine
