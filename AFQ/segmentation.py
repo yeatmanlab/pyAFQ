@@ -472,8 +472,8 @@ class Segmentation:
 
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img_affine)**2
-        for bundle_idx, bundle in enumerate(tqdm(self.bundle_dict)):
-            self.logger.info(f"Segmenting {bundle}")
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
@@ -485,7 +485,7 @@ class Segmentation:
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold"))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx in idx_above_prob[0]:
+            for sl_idx in enumerate(tqdm(idx_above_prob[0])):
                 sl = streamlines[sl_idx]
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
@@ -532,7 +532,7 @@ class Segmentation:
         # streamlines within a bundle in the same orientation with respect to
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
-        for bundle_idx, bundle in enumerate(tqdm(self.bundle_dict)):
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
