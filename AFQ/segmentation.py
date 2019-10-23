@@ -3,7 +3,7 @@ import logging
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
-from tqdm.auto import tqdm
+#from tqdm.auto import tqdm
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
