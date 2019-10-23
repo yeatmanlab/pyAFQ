@@ -3,7 +3,7 @@ import logging
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
-from tqdm.auto import tqdm
+#from tqdm.auto import tqdm
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
@@ -479,7 +479,7 @@ class Segmentation:
                 fgarray, np.eye(4))
             fiber_probabilities = np.mean(fiber_probabilities, -1)
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx, sl in enumerate(tqdm(streamlines)):
+            for sl_idx, sl in enumerate((streamlines)): #tqdm
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
