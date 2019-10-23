@@ -3,7 +3,7 @@ import logging
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
-#from tqdm.auto import tqdm
+from tqdm.auto import tqdm
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
@@ -464,7 +464,7 @@ class Segmentation:
         streamlines_in_bundles = np.zeros(
             (n_streamlines, len(self.bundle_dict)))
         min_dist_coords = np.zeros(
-            (n_streamlines, len(self.bundle_dict), 2))
+            (n_streamlines, len(self.bundle_dict), 2), dtype=int)
         self.fiber_groups = {}
 
         if self.return_idx:
