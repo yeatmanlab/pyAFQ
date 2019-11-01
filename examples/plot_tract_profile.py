@@ -27,6 +27,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 from AFQ.utils.volume import patch_up_roi
+import AFQ.utils.volume as auv
 
 import logging
 logging.basicConfig(level=logging.INFO)
