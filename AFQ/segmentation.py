@@ -607,7 +607,8 @@ class Segmentation:
 
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
-                      clean_threshold=3, min_sl=20, stat=np.mean):
+                      clean_threshold=3, min_sl=20, stat=np.mean,
+                      using_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
@@ -636,6 +637,10 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
 
+    using_idx : bool
+        Whether 'streamlines' contains indices in the original streamlines.
+        Default: False.
+
     Returns
     -------
     A nibabel.Streamlines class instance containing only the streamlines
@@ -648,7 +653,11 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return streamlines
 
     # Resample once up-front:
-    fgarray = _resample_bundle(streamlines, n_points)
+    if using_idx:
+        fgarray = _resample_bundle(streamlines[:]['sl'], n_points)
+    else:
+        fgarray = _resample_bundle(streamlines, n_points)
+
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
     # This calculates the Mahalanobis for each streamline/node:
