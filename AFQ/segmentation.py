@@ -587,10 +587,10 @@ class Segmentation:
             _, rec_labels = rb.recognize(model_bundle=model_sl,
                                          model_clust_thr=self.model_clust_thr,
                                          reduction_thr=self.reduction_thr,
-                                         reduction_distance='mam',
+                                         reduction_distance='mdf',
                                          slr=True,
                                          slr_metric='asymmetric',
-                                         pruning_distance='mam')
+                                         pruning_distance='mdf')
 
             # Use the streamlines in the original space:
             recognized_sl = streamlines[rec_labels]
