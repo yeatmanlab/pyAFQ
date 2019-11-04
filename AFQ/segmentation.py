@@ -456,11 +456,16 @@ class Segmentation:
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = _resample_bundle(streamlines, 100)
 
+        n_streamlines = len(streamlines)
+
         streamlines_in_bundles = np.zeros(
-            (len(streamlines), len(self.bundle_dict)))
+            (n_streamlines, len(self.bundle_dict)))
         min_dist_coords = np.zeros(
-            (len(streamlines), len(self.bundle_dict), 2))
+            (n_streamlines, len(self.bundle_dict), 2))
         self.fiber_groups = {}
+
+        if self.return_idx:
+            out_idx = np.arange(n_streamlines, dtype=int)
 
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img_affine)**2
@@ -507,6 +512,9 @@ class Segmentation:
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         streamlines = streamlines[possible_fibers]
+        if self.return_idx:
+            out_idx = out_idx[possible_fibers]
+
         streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
         min_dist_coords = min_dist_coords[possible_fibers]
         bundle_choice = np.argmax(streamlines_in_bundles, -1)
@@ -536,7 +544,7 @@ class Segmentation:
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
-                self.fiber_groups[bundle]['idx'] = select_idx
+                self.fiber_groups[bundle]['idx'] = out_idx[select_idx]
             else:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
@@ -608,7 +616,7 @@ class Segmentation:
 
 def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
                       clean_threshold=3, min_sl=20, stat=np.mean,
-                      using_idx=False):
+                      return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
@@ -653,10 +661,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return streamlines
 
     # Resample once up-front:
-    if using_idx:
-        fgarray = _resample_bundle(streamlines[:]['sl'], n_points)
-    else:
-        fgarray = _resample_bundle(streamlines, n_points)
+    fgarray = _resample_bundle(streamlines, n_points)
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
@@ -678,4 +683,8 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         w = gaussian_weights(fgarray, return_mahalnobis=True)
         rounds_elapsed += 1
     # Select based on the variable that was keeping track of things for us:
-    return streamlines[idx]
+    out = streamlines[idx]
+    if return_idx:
+        return out, idx
+    else:
+        return out

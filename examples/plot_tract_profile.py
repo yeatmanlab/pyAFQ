@@ -102,7 +102,7 @@ streamlines = dts.Streamlines(
                                   np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation()
+segmentation = seg.Segmentation(return_idx=True)
 segmentation.segment(bundles,
                      streamlines,
                      fdata=hardi_fdata,
@@ -116,13 +116,17 @@ fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
 for bundle in bundles:
-    fiber_groups[bundle] = seg.clean_fiber_group(fiber_groups[bundle])
+    new_fibers, idx_in_bundle = seg.clean_fiber_group(
+        fiber_groups[bundle]['sl'],
+        return_idx=True)
+
+    idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
 
 for kk in fiber_groups:
-    print(kk, len(fiber_groups[kk]))
+    print(kk, len(fiber_groups[kk]['sl']))
 
     sft = StatefulTractogram(
-        dtu.transform_tracking_output(fiber_groups[kk], img.affine),
+        dtu.transform_tracking_output(fiber_groups[kk]['sl'], img.affine),
         img, Space.RASMM)
 
     save_tractogram(sft, './%s_afq.trk'%kk,
@@ -131,8 +135,8 @@ for kk in fiber_groups:
 print("Extracting tract profiles...")
 for bundle in bundles:
     fig, ax = plt.subplots(1)
-    weights = gaussian_weights(fiber_groups[bundle])
-    profile = afq_profile(FA_data, fiber_groups[bundle],
+    weights = gaussian_weights(fiber_groups[bundle]['sl'])
+    profile = afq_profile(FA_data, fiber_groups[bundle]['sl'],
                           np.eye(4), weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)
