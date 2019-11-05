@@ -528,7 +528,12 @@ class Segmentation:
             # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
             if len(select_sl) == 0:
-                self.fiber_groups[bundle] = dts.Streamlines([])
+                if self.return_idx:
+                    self.fiber_groups[bundle] = {}
+                    self.fiber_groups[bundle]['sl'] = dts.Streamlines([])
+                    self.fiber_groups[bundle]['idx'] = np.array([])
+                else:
+                    self.fiber_groups[bundle] = dts.Streamlines([])
                 # There's nothing here, move to the next bundle:
                 continue
 
