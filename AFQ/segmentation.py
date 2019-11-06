@@ -479,7 +479,8 @@ class Segmentation:
             fiber_probabilities = np.mean(fiber_probabilities, -1)
             idx_above_prob = np.where(
                 fiber_probabilities > self.prob_threshold)
-            self.logger.info(f"{len(idx_above_prob[0])} streamlines exceed the probability threshold")
+            self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
+                              " the probability threshold"))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx in idx_above_prob[0]:
                 sl = streamlines[sl_idx]
