@@ -345,10 +345,12 @@ class Segmentation:
         if streamlines is None:
             streamlines = self.streamlines
         if template is None:
-            template = self.img
+            template_affine = self.img_affine
+        else:
+            template_affine = template.affine
 
         # What is the x,y,z coordinate of 0,0,0 in the template space?
-        zero_coord = np.dot(np.linalg.inv(template.affine),
+        zero_coord = np.dot(np.linalg.inv(template_affine),
                             np.array([0, 0, 0, 1]))
 
         # cross_below = zero_coord[2] - low_coord
