@@ -1,22 +1,96 @@
-language: python
-sudo: false
-matrix:
-  include:
-  - python: 3.7
-    dist: xenial
-    sudo: true
-  - python: 3.6
-before_install:
-    - ./aws_credentials.sh
-install:
-- travis_retry pip install -e .
 
-script:
-- flake8 --ignore N802,N806,W503 --select W504 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py | grep -v /docs/`
-- py.test --pyargs AFQ --cov-report term-missing --cov=AFQ
-after_success:
-- coveralls
+# vim ft=yaml
+dist: xenial
+sudo: true
+language: python
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.cache/data
+
+python:
+  - 3.6
+  - 3.7
+
 env:
   global:
-  - secure: eLhWismG4oDpQfw6ytZCdTO5fkw06JCyKE8Qe6Nr3ACVTrhYPRyFS+zBzeoMaKq6XrNhlRT2Zn++4y4OPQnp7crRDS1JH4ADC1uq1CCDT/dbvRNkbSq0NUJ1s33zLyU+7aGcVD6WzThyYhiSf6FxqQZCyL5Xq+/+UneQXyF1A/eaDYpfWgRqiRDIA0nRdCC4dJpK5Or8bE7FwYuXxWOaiTEuzWCW8vJSyD/FQZfqo6tygPqLIFWBuyhiS2SpfqgQTm87Ha+dLrBRV9bUWWeE4Hr2SCNiosY10UzZrNg0mm2m7rak4EAhPk6/KJUE4ElRz3dWslS8eOHKTB5o5rpH3hm8FzQQN4orh2IsryE7aJEjwTjxCqZAyElEoY/T9YznA43BrigMLy1P+ByP33BpKJA4EwWBNJrNOmWvxUIMl4cyjiE3uZD4JIKOJDaeIXEWO9NG/X5Xpi9y+mcvqXIe1RsaUdHGWJd0/RvxFTpyYtUHY2dwF3oEMY5m9UE+0uQqOcRAHoZiR3LrVKyeqRPy9SQxeQd+g2XutKDJDVXyaInN/h8kXt3qcAyxx7kiuAfLrw/ZyWui8zhBXyGGbWMfUuC/rozr/N9dX4ZROTa9y9dy385DaXhcffNzz70UYJjzK1h06sPph3Zrj+1QNkFneCEhydH7lLH3I4bvstMycuM=
-  - secure: LthWYUSsl9H54Fob1aOCzvv9C6PFLhIWnFkNHF43CFBO/xybNGSHBnYzyRlCOYT5qq9WdCxplMVyCy7cy+O9H3NGFeIgFos7bskKvRU+y4IcA5GBwIemHMr+dnYvEkAJZ9awwUB4YXBVdnTHYXwNRNkuAIUI9Gw0UD4PNMbuhWlls6mmv+Y+kVXiyHnLWr99wFD1jiso08is2BglAddYCSZ1BD07yjp3p7W7XymqndQZf911RM70TtjaCSEO3wMp3CDIw8a1y7PNa2QWLC8VZa7ARNJ5PE7kd8GulWm8vcQedPcOrT/4x/lp0HmUyTXrE4bQ7Ek1gGRTW4RxSvBRTD8FGhATtnU4YiUr/OfRq3B3UTPcQmJYghoWJsLYkgfLK56gId6J19SKKgRpPM9Lk8z/g56CE8zoTteisPVnDW8/R8xecsXCcd4Q37Q/TFRXsEHjHCclzffZzO+r82BQ3RX9qFYm4FZMlhtxI/3Iz4d18lvG8gBisxUJd40wYY4Iecs2DwrKDg1ens3vTO78FPPYh3NTbTqwIpJzRl7lILQk80/WuJi6FR5vKWeBR1C7Zw6Y42g8/ssNMNuAUdBSWjIfK5TRVwwEIFan+0V6Y4SkvrFK1G/by/aZqS4U2MBsg/NZJNkQ89FVwwJSrWasTeS3JJBWXHqoi4diYHyfTMk=
+    - CHECK_TYPE="install"
+    - INSTALL_TYPE="pip"
+    - INSTALL_DEPENDS="pip setuptools"
+    - secure: eLhWismG4oDpQfw6ytZCdTO5fkw06JCyKE8Qe6Nr3ACVTrhYPRyFS+zBzeoMaKq6XrNhlRT2Zn++4y4OPQnp7crRDS1JH4ADC1uq1CCDT/dbvRNkbSq0NUJ1s33zLyU+7aGcVD6WzThyYhiSf6FxqQZCyL5Xq+/+UneQXyF1A/eaDYpfWgRqiRDIA0nRdCC4dJpK5Or8bE7FwYuXxWOaiTEuzWCW8vJSyD/FQZfqo6tygPqLIFWBuyhiS2SpfqgQTm87Ha+dLrBRV9bUWWeE4Hr2SCNiosY10UzZrNg0mm2m7rak4EAhPk6/KJUE4ElRz3dWslS8eOHKTB5o5rpH3hm8FzQQN4orh2IsryE7aJEjwTjxCqZAyElEoY/T9YznA43BrigMLy1P+ByP33BpKJA4EwWBNJrNOmWvxUIMl4cyjiE3uZD4JIKOJDaeIXEWO9NG/X5Xpi9y+mcvqXIe1RsaUdHGWJd0/RvxFTpyYtUHY2dwF3oEMY5m9UE+0uQqOcRAHoZiR3LrVKyeqRPy9SQxeQd+g2XutKDJDVXyaInN/h8kXt3qcAyxx7kiuAfLrw/ZyWui8zhBXyGGbWMfUuC/rozr/N9dX4ZROTa9y9dy385DaXhcffNzz70UYJjzK1h06sPph3Zrj+1QNkFneCEhydH7lLH3I4bvstMycuM=
+    - secure: LthWYUSsl9H54Fob1aOCzvv9C6PFLhIWnFkNHF43CFBO/xybNGSHBnYzyRlCOYT5qq9WdCxplMVyCy7cy+O9H3NGFeIgFos7bskKvRU+y4IcA5GBwIemHMr+dnYvEkAJZ9awwUB4YXBVdnTHYXwNRNkuAIUI9Gw0UD4PNMbuhWlls6mmv+Y+kVXiyHnLWr99wFD1jiso08is2BglAddYCSZ1BD07yjp3p7W7XymqndQZf911RM70TtjaCSEO3wMp3CDIw8a1y7PNa2QWLC8VZa7ARNJ5PE7kd8GulWm8vcQedPcOrT/4x/lp0HmUyTXrE4bQ7Ek1gGRTW4RxSvBRTD8FGhATtnU4YiUr/OfRq3B3UTPcQmJYghoWJsLYkgfLK56gId6J19SKKgRpPM9Lk8z/g56CE8zoTteisPVnDW8/R8xecsXCcd4Q37Q/TFRXsEHjHCclzffZzO+r82BQ3RX9qFYm4FZMlhtxI/3Iz4d18lvG8gBisxUJd40wYY4Iecs2DwrKDg1ens3vTO78FPPYh3NTbTqwIpJzRl7lILQk80/WuJi6FR5vKWeBR1C7Zw6Y42g8/ssNMNuAUdBSWjIfK5TRVwwEIFan+0V6Y4SkvrFK1G/by/aZqS4U2MBsg/NZJNkQ89FVwwJSrWasTeS3JJBWXHqoi4diYHyfTMk=
+
+  matrix:
+    - CHECK_TYPE="style"
+    - CHECK_TYPE="test"
+    - INSTALL_TYPE="install"
+    - INSTALL_TYPE="develop"
+    - INSTALL_TYPE="sdist"
+    - INSTALL_TYPE="wheel"
+    - INSTALL_DEPENDS="pip==18.1 setuptools==30.2.1"
+    - INSTALL_DEPENDS="pip==10.0.1 setuptools==30.4.0"
+
+matrix:
+  exclude:
+  - python: 3.7
+    env: CHECK_TYPE="style"
+  allow_failures:
+  - python: 3.6
+    env: INSTALL_DEPENDS="pip==10.0.1 setuptools==30.4.0"
+  - python: 3.7
+    env: INSTALL_DEPENDS="pip==10.0.1 setuptools==30.4.0"
+
+before_install:
+  - ./aws_credentials.sh
+  - python -m pip install --upgrade pip virtualenv
+  - virtualenv --python=python /tmp/venv
+  - source /tmp/venv/bin/activate
+  - python --version
+  - python -m pip --version
+  - python -m pip install --upgrade $INSTALL_DEPENDS
+  - python -m pip --version
+  - |
+    if [ "$INSTALL_TYPE" == "pip" ]; then
+        PACKAGE="."
+    elif [ "$INSTALL_TYPE" == "sdist" ]; then
+        python setup.py sdist
+        PACKAGE="$( ls dist/*.tar.gz )"
+    elif [ "$INSTALL_TYPE" == "wheel" ]; then
+        python setup.py bdist_wheel
+        PACKAGE="$( ls dist/*.whl )"
+    fi
+install:
+  - |
+    if [ "$INSTALL_TYPE" == "install" ]; then
+        python setup.py install
+    elif [ "$INSTALL_TYPE" == "develop" ]; then
+        python setup.py develop
+    else
+        python -m pip install $PACKAGE
+    fi
+  - |
+    INTENDED_VERSION="$(python -c 'import versioneer; print(versioneer.get_version())')"
+    pushd /tmp
+    INSTALLED_VERSION="$(python -c 'import AFQ; print(AFQ.__version__)')"
+    python -c 'import AFQ; print(AFQ.__file__)'
+    echo "Intended: $INTENDED_VERSION"
+    echo "Installed: $INSTALLED_VERSION"
+    test "$INTENDED_VERSION" == "$INSTALLED_VERSION"
+    popd
+  - if [ "$CHECK_TYPE" = "install" ]; then exit 0; fi
+
+before_script:
+  - travis_retry python -m pip install "AFQ[$CHECK_TYPE]"
+script:
+  - |
+    if [ "$CHECK_TYPE" == "style" ]; then
+      flake8 AFQ
+    elif [ "$CHECK_TYPE" == "test" ]; then
+      pytest -n 2 -vv --doctest-modules --cov AFQ --cov-config .coveragerc --cov-report xml:cov.xml AFQ
+    else
+      false
+    fi
+after_script:
+  - python -m pip install codecov
+  - codecov
