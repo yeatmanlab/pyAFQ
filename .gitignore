@@ -1,5 +1,10 @@
 *.pyc
 *.ipynb_checkpoints
 .coverage*
-doc/_build
-doc/auto_examples
+docs/_build
+docs/build
+docs/auto_examples
+docs/source/auto_examples
+examples/*.nii.gz
+examples/*.trk
+.DS_Store
