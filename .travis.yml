@@ -9,7 +9,6 @@ matrix:
 before_install:
     - ./aws_credentials.sh
 install:
-- travis_retry pip install -r requirements-dev.txt
 - travis_retry pip install -e .
 
 script:
