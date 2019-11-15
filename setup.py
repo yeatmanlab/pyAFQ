@@ -19,8 +19,6 @@ with open('requirements.txt') as f:
         REQUIRES.append(l)
         l = f.readline()[:-1]
 
-print(REQUIRES)
-
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
             maintainer_email=MAINTAINER_EMAIL,
