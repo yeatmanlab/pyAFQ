@@ -110,14 +110,14 @@ def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
     --------
     >>> vec = [[8, 15, 0], [0, 36, 77]]
     >>> in_place_norm(vec)
-    array([ 17.,  85.])
+    array([17.,  85.])
     >>> vec = [[8, 15, 0], [0, 36, 77]]
     >>> in_place_norm(vec, keepdims=True)
-    array([[ 17.],
-           [ 85.]])
+    array([[17.],
+           [85.]])
     >>> vec = [[8, 15, 0], [0, 36, 77]]
     >>> in_place_norm(vec, axis=0)
-    array([  8.,  39.,  77.])
+    array([ 8., 39., 77.])
     """
     vec = np.asarray(vec)
 
