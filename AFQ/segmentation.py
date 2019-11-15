@@ -470,14 +470,20 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Segmenting {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
                 warped_prob_map,
                 fgarray, np.eye(4))
             fiber_probabilities = np.mean(fiber_probabilities, -1)
+            idx_above_prob = np.where(
+                fiber_probabilities > self.prob_threshold)
+            self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
+                              " the probability threshold"))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx, sl in enumerate(streamlines):
+            for sl_idx in idx_above_prob[0]:
+                sl = streamlines[sl_idx]
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
@@ -528,7 +534,12 @@ class Segmentation:
             # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
             if len(select_sl) == 0:
-                self.fiber_groups[bundle] = dts.Streamlines([])
+                if self.return_idx:
+                    self.fiber_groups[bundle] = {}
+                    self.fiber_groups[bundle]['sl'] = dts.Streamlines([])
+                    self.fiber_groups[bundle]['idx'] = np.array([])
+                else:
+                    self.fiber_groups[bundle] = dts.Streamlines([])
                 # There's nothing here, move to the next bundle:
                 continue
 
@@ -658,7 +669,10 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
 
     # We don't even bother if there aren't enough streamlines:
     if len(streamlines) < min_sl:
-        return streamlines
+        if return_idx:
+            return streamlines, np.arange(len(streamlines))
+        else:
+            return streamlines
 
     # Resample once up-front:
     fgarray = _resample_bundle(streamlines, n_points)
