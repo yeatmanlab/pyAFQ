@@ -54,19 +54,17 @@ FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
 templates = afd.read_templates()
-# bundle_names = ["CST", "ILF"]
+bundle_names = ["CST", "ILF"]
 
-# bundles = {}
-# for name in bundle_names:
-#     for hemi in ['_R', '_L']:
-#         bundles[name + hemi] = {
-#             'ROIs': [templates[name + '_roi1' + hemi],
-#                     templates[name + '_roi2' + hemi]],
-#             'rules': [True, True],
-#             'prob_map': templates[name + hemi + '_prob_map'],
-#             'cross_midline': False}
-
-bundles = api.make_bundle_dict()
+bundles = {}
+for name in bundle_names:
+    for hemi in ['_R', '_L']:
+        bundles[name + hemi] = {
+            'ROIs': [templates[name + '_roi1' + hemi],
+                    templates[name + '_roi2' + hemi]],
+            'rules': [True, True],
+            'prob_map': templates[name + hemi + '_prob_map'],
+            'cross_midline': False}
 
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
@@ -141,13 +139,13 @@ for bundle in bundles:
                     bbox_valid_check=False)
 
 
-# print("Extracting tract profiles...")
-# for bundle in bundles:
-#     fig, ax = plt.subplots(1)
-#     weights = gaussian_weights(fiber_groups[bundle]['sl'])
-#     profile = afq_profile(FA_data, fiber_groups[bundle]['sl'],
-#                           np.eye(4), weights=weights)
-#     ax.plot(profile)
-#     ax.set_title(bundle)
+print("Extracting tract profiles...")
+for bundle in bundles:
+    fig, ax = plt.subplots(1)
+    weights = gaussian_weights(fiber_groups[bundle]['sl'])
+    profile = afq_profile(FA_data, fiber_groups[bundle]['sl'],
+                          np.eye(4), weights=weights)
+    ax.plot(profile)
+    ax.set_title(bundle)
 
-# plt.show()
+plt.show()
