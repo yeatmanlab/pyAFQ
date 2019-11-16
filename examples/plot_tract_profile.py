@@ -20,6 +20,7 @@ from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 
+from AFQ import api
 import AFQ.utils.streamlines as aus
 import AFQ.data as afd
 import AFQ.tractography as aft
@@ -27,6 +28,10 @@ import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
 from AFQ.utils.volume import patch_up_roi
+
+import logging
+logging.basicConfig(level=logging.INFO)
+
 
 dpd.fetch_stanford_hardi()
 
@@ -56,7 +61,7 @@ for name in bundle_names:
     for hemi in ['_R', '_L']:
         bundles[name + hemi] = {
             'ROIs': [templates[name + '_roi1' + hemi],
-                     templates[name + '_roi2' + hemi]],
+                    templates[name + '_roi2' + hemi]],
             'rules': [True, True],
             'prob_map': templates[name + hemi + '_prob_map'],
             'cross_midline': False}
@@ -102,7 +107,8 @@ streamlines = dts.Streamlines(
                                   np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(return_idx=True)
+segmentation = seg.Segmentation(return_idx=True,
+                                prob_threshold=15)
 segmentation.segment(bundles,
                      streamlines,
                      fdata=hardi_fdata,
@@ -116,21 +122,22 @@ fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
 for bundle in bundles:
+    print(f"Cleaning {bundle}")
+    print(f"Before cleaning: {len(fiber_groups[bundle]['sl'])} streamlines")
     new_fibers, idx_in_bundle = seg.clean_fiber_group(
         fiber_groups[bundle]['sl'],
         return_idx=True)
+    print(f"Afer cleaning: {len(new_fibers)} streamlines")
 
     idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
 
-for kk in fiber_groups:
-    print(kk, len(fiber_groups[kk]['sl']))
-
     sft = StatefulTractogram(
-        dtu.transform_tracking_output(fiber_groups[kk]['sl'], img.affine),
+        dtu.transform_tracking_output(new_fibers, img.affine),
         img, Space.RASMM)
 
-    save_tractogram(sft, './%s_afq.trk'%kk,
+    save_tractogram(sft, f'./{bundle}_afq.trk',
                     bbox_valid_check=False)
+
 
 print("Extracting tract profiles...")
 for bundle in bundles:

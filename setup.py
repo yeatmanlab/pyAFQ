@@ -16,9 +16,8 @@ REQUIRES = []
 with open('requirements.txt') as f:
     l = f.readline()[:-1]
     while l:
-        REQUIRES.append(l.split("==")[0])
+        REQUIRES.append(l)
         l = f.readline()[:-1]
-
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
@@ -35,7 +34,6 @@ opts = dict(name=NAME,
             version=VERSION,
             packages=find_packages(),
             install_requires=REQUIRES,
-            requires=REQUIRES,
             scripts=SCRIPTS)
 
 
