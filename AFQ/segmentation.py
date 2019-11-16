@@ -471,7 +471,6 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
-            self.logger.info("Finding Streamlines for " + bundle + "...")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
