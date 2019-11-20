@@ -1,6 +1,9 @@
 test:
 	py.test --pyargs AFQ --cov-report term-missing --cov=AFQ
 
+devtest:
+	py.test -x --pyargs AFQ --cov-report term-missing --cov=AFQ
+
 pdb:
 	py.test --pyargs AFQ --cov-report term-missing --cov=AFQ --pdb
 
