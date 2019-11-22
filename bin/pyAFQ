@@ -40,7 +40,7 @@ parser.add_argument("-b", "--b0_threshold", dest="b0_threshold",
                     help="B0 threshold (default: 0)",
                     default=0)
 
-parser.add_argument("-o", "--odf_model", dest= "odf_model", action="store",
+parser.add_argument("-o", "--odf_model", dest="odf_model", action="store",
                     help="ODF model (default: 'DTI')",
                     default='DTI')
 

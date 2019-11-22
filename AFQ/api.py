@@ -373,11 +373,10 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
                                 random_seeds=random_seeds,
                                 seed_mask=wm_mask,
                                 stop_mask=wm_mask)
-
-        save_tractogram(streamlines_file,
-                        dtu.transform_tracking_output(streamlines,
-                                             np.linalg.inv(dwi_img.affine)),
-                        dwi_img.affine)
+        this_sl = dtu.transform_tracking_output(streamlines,
+                                                np.linalg.inv(dwi_img.affine))
+        this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
+        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
 
     return streamlines_file
 
