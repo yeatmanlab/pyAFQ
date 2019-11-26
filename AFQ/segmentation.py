@@ -467,7 +467,7 @@ class Segmentation:
         if self.auto_transform:
             streamlines = dts.Streamlines(
                 dtu.transform_tracking_output(streamlines,
-                                    np.linalg.inv(self.img_affine)))
+                                              np.linalg.inv(self.img_affine)))
 
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = _resample_bundle(streamlines, 100)
