@@ -12,6 +12,7 @@ from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
+import dipy.tracking.utils as dtu
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -555,6 +556,10 @@ class Segmentation:
                     select_sl[idx] = select_sl[idx][::-1]
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
+
+            select_sl =  dtu.transform_tracking_output(select_sl,
+                                                       self.img_affine)
+
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl

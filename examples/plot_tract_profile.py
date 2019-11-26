@@ -131,9 +131,7 @@ for bundle in bundles:
 
     idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
 
-    sft = StatefulTractogram(
-        dtu.transform_tracking_output(new_fibers, img.affine),
-        img, Space.RASMM)
+    sft = StatefulTractogram(new_fibers, img, Space.RASMM)
 
     save_tractogram(sft, f'./{bundle}_afq.trk',
                     bbox_valid_check=False)
