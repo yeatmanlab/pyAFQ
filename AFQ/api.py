@@ -407,7 +407,8 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        row['bvec_file'],
                                        reg_template=reg_template,
                                        mapping=_mapping(row, reg_template),
-                                       reg_prealign=reg_prealign)
+                                       reg_prealign=reg_prealign,
+                                       auto_transform=False)
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)

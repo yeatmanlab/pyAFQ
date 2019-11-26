@@ -175,7 +175,8 @@ class Segmentation:
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None, b0_threshold=0, img_affine=None):
+                 reg_template=None, b0_threshold=0, img_affine=None,
+                 auto_transform=True):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -215,6 +216,10 @@ class Segmentation:
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
+        auto_transform : bool, optional.
+            Automatically transform the streamlines in to and out of
+            the reference space.
+            Default: True.
 
         References
         ----------
@@ -238,6 +243,7 @@ class Segmentation:
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
+        self.auto_transform = auto_transform
 
         self.logger.info("Preprocessing Streamlines...")
         self.streamlines = streamlines
@@ -457,6 +463,12 @@ class Segmentation:
         else:
             self.streamlines = streamlines
 
+        # transform input
+        if self.auto_transform:
+            streamlines = dts.Streamlines(
+                dtu.transform_tracking_output(streamlines,
+                                    np.linalg.inv(self.img_affine)))
+
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = _resample_bundle(streamlines, 100)
 
@@ -556,8 +568,9 @@ class Segmentation:
                     select_sl[idx] = select_sl[idx][::-1]
 
             # Transform output
-            select_sl = dtu.transform_tracking_output(select_sl,
-                                            self.img_affine)
+            if self.auto_transform:
+                select_sl = dtu.transform_tracking_output(select_sl,
+                                                          self.img_affine)
 
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)

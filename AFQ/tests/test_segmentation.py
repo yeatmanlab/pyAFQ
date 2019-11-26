@@ -26,10 +26,10 @@ def test_segment():
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
-    streamlines = dts.Streamlines(
-        dtu.transform_tracking_output(
-            streamlines[streamlines._lengths > 10],
-            np.linalg.inv(hardi_img.affine)))
+    streamlines = streamlines[streamlines._lengths > 10]
+    sls_transformed = dts.Streamlines(
+        dtu.transform_tracking_output(streamlines,
+                                      np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -45,11 +45,12 @@ def test_segment():
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
-                         streamlines,
+                         sls_transformed,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         mapping=mapping)
+                         mapping=mapping,
+                         auto_transform=False)
     fiber_groups = segmentation.fiber_groups
 
     # We asked for 2 fiber groups:

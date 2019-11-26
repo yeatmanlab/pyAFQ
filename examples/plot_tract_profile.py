@@ -13,7 +13,6 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
-import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
@@ -101,10 +100,6 @@ if not op.exists('dti_streamlines.trk'):
 else:
     tg = load_tractogram('./dti_streamlines.trk', img)
     streamlines = tg.streamlines
-
-streamlines = dts.Streamlines(
-    dtu.transform_tracking_output(streamlines,
-                                  np.linalg.inv(img.affine)))
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
