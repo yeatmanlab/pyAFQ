@@ -554,11 +554,13 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
+
+            # Transform output
+            select_sl = dtu.transform_tracking_output(select_sl,
+                                            self.img_affine)
+
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
-
-            select_sl = dtu.transform_tracking_output(select_sl,
-                                                      self.img_affine)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
