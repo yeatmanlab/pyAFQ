@@ -557,8 +557,8 @@ class Segmentation:
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
 
-            select_sl =  dtu.transform_tracking_output(select_sl,
-                                                       self.img_affine)
+            select_sl = dtu.transform_tracking_output(select_sl,
+                                                      self.img_affine)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
