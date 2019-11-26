@@ -176,7 +176,7 @@ class Segmentation:
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
                  reg_template=None, b0_threshold=0, img_affine=None,
-                 auto_transform=True):
+                 xform_to_dwi=True):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -216,9 +216,9 @@ class Segmentation:
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
-        auto_transform : bool, optional.
+        xform_to_dwi : bool, optional.
             Automatically transform the streamlines in to and out of
-            the reference space.
+            the dwi space.
             Default: True.
 
         References
@@ -243,7 +243,7 @@ class Segmentation:
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.auto_transform = auto_transform
+        self.xform_to_dwi = xform_to_dwi
 
         self.logger.info("Preprocessing Streamlines...")
         self.streamlines = streamlines
@@ -464,7 +464,7 @@ class Segmentation:
             self.streamlines = streamlines
 
         # transform input
-        if self.auto_transform:
+        if self.xform_to_dwi:
             streamlines = dts.Streamlines(
                 dtu.transform_tracking_output(streamlines,
                                               np.linalg.inv(self.img_affine)))
@@ -568,7 +568,7 @@ class Segmentation:
                     select_sl[idx] = select_sl[idx][::-1]
 
             # Transform output
-            if self.auto_transform:
+            if self.xform_to_dwi:
                 select_sl = dtu.transform_tracking_output(select_sl,
                                                           self.img_affine)
 
