@@ -3,6 +3,7 @@ import logging
 from scipy.spatial.distance import mahalanobis, cdist
 
 import nibabel as nib
+from tqdm.auto import tqdm
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
@@ -463,7 +464,7 @@ class Segmentation:
         streamlines_in_bundles = np.zeros(
             (n_streamlines, len(self.bundle_dict)))
         min_dist_coords = np.zeros(
-            (n_streamlines, len(self.bundle_dict), 2))
+            (n_streamlines, len(self.bundle_dict), 2), dtype=int)
         self.fiber_groups = {}
 
         if self.return_idx:
@@ -472,7 +473,7 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles...")
         tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
-            self.logger.info(f"Segmenting {bundle}")
+            self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             fiber_probabilities = dts.values_from_volume(
@@ -484,7 +485,7 @@ class Segmentation:
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold"))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx in idx_above_prob[0]:
+            for sl_idx in tqdm(idx_above_prob[0]):
                 sl = streamlines[sl_idx]
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
