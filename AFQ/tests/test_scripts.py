@@ -1,3 +1,4 @@
+import os
 import os.path as op
 
 import numpy.testing as npt
@@ -12,7 +13,13 @@ runner = ScriptRunner(script_sdir='bin',
                       module_sdir='AFQ',
                       debug_print_var='AFQ_DEBUG_PRINT')
 
+if os.name == 'nt':
+    windows = True
+else:
+    windows = False
 
+
+@pytest.mark.skipif(windows, reason="CLI does not run on Windows")
 def test_fit_dki():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         fbval = op.join(tmpdir, 'dki.bval')
@@ -33,6 +40,7 @@ def test_fit_dki():
             assert_image_shape_affine(fname, shape, affine)
 
 
+@pytest.mark.skipif(windows, reason="CLI does not run on Windows")
 def test_predict_dki():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         fbval = op.join(tmpdir, 'dki.bval')
@@ -55,6 +63,7 @@ def test_predict_dki():
         npt.assert_array_almost_equal(pred, data)
 
 
+@pytest.mark.skipif(windows, reason="CLI does not run on Windows")
 def test_fit_dti():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         fbval = op.join(tmpdir, 'dti.bval')
@@ -75,6 +84,7 @@ def test_fit_dti():
             assert_image_shape_affine(fname, shape, affine)
 
 
+@pytest.mark.skipif(windows, reason="CLI does not run on Windows")
 def test_predict_dti():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         fbval = op.join(tmpdir, 'dti.bval')
