@@ -3,7 +3,7 @@ name: Python package
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -29,7 +29,7 @@ jobs:
     - name: Test
       run: |
         make all
-  build:
+  docs:
     name: Build docs
     runs-on: ubuntu-latest
     strategy:
