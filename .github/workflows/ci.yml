@@ -1,4 +1,4 @@
-name: Python package
+name: pyAFQ CI
 
 on: [push, pull_request]
 
