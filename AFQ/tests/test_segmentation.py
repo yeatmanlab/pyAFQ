@@ -125,9 +125,23 @@ def test_segment():
                                     rng=np.random.RandomState(seed=8))
     fiber_groups = segmentation.segment(bundles, streamlines)
 
-    # This condition should still hold
+    for bundle in ['CST_R', 'CST_L']:
+        fiber_groups[bundle] = dts.Streamlines(
+            dtu.transform_tracking_output(fiber_groups[bundle],
+                                          np.linalg.inv(hardi_img.affine)))
+
+    # The same conditions should hold for recobundles
+    # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_(len(fiber_groups['CST_R']) > 0)
+    # Here's one of them:
+    CST_R_sl = fiber_groups['CST_R']
+    # Let's make sure there are streamlines in there:
+    npt.assert_(len(CST_R_sl) > 0)
+    # Calculate the tract profile for a volume of all-ones:
+    tract_profile = afq_profile(
+        np.ones(nib.load(hardi_fdata).shape[:3]),
+        CST_R_sl, np.eye(4))
+    npt.assert_almost_equal(tract_profile, np.ones(100))
 
     # Test with the return_idx kwarg set to True:
     segmentation = seg.Segmentation(algo='Reco',
