@@ -32,10 +32,14 @@ import AFQ.utils.volume as auv
 import logging
 logging.basicConfig(level=logging.INFO)
 
+<<<<<<< HEAD
 
 ##########################################################################
 # Get example data:
 # -------------------------
+=======
+dpd.fetch_stanford_hardi()
+>>>>>>> Don't need this if we're using API bundle names.
 
 dpd.fetch_stanford_hardi()
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
