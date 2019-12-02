@@ -51,7 +51,7 @@ def test_segment():
     for bundle in bundles:
         fiber_groups[bundle] = dts.Streamlines(
             dtu.transform_tracking_output(fiber_groups[bundle],
-                                            np.linalg.inv(hardi_img.affine)))
+                                          np.linalg.inv(hardi_img.affine)))
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:
