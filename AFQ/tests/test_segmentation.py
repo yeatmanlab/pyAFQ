@@ -27,9 +27,6 @@ def test_segment():
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
     streamlines = streamlines[streamlines._lengths > 10]
-    sls_transformed = dts.Streamlines(
-        dtu.transform_tracking_output(streamlines,
-                                      np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -45,14 +42,16 @@ def test_segment():
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
-                         sls_transformed,
+                         streamlines,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         mapping=mapping,
-                         auto_transform=False)
+                         mapping=mapping)
     fiber_groups = segmentation.fiber_groups
-
+    for bundle in bundles:
+        fiber_groups[bundle] = dts.Streamlines(
+            dtu.transform_tracking_output(fiber_groups[bundle],
+                                            np.linalg.inv(hardi_img.affine)))
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:

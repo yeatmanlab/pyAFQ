@@ -13,6 +13,7 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
+import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
@@ -112,8 +113,12 @@ segmentation.segment(bundles,
                      mapping=mapping,
                      reg_template=MNI_T2_img)
 
-
 fiber_groups = segmentation.fiber_groups
+
+for bundle in bundles:
+    fiber_groups[bundle]['sl'] = dts.Streamlines(
+        dtu.transform_tracking_output(fiber_groups[bundle]['sl'],
+                                        np.linalg.inv(FA_img.affine)))
 
 print("Cleaning fiber groups...")
 for bundle in bundles:

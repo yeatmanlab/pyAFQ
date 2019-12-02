@@ -395,7 +395,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                         random_seeds=random_seeds,
                                         force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        sl = tg.streamlines
 
         reg_prealign = np.load(_reg_prealign(row,
                                              force_recompute=force_recompute))
@@ -407,8 +407,12 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        row['bvec_file'],
                                        reg_template=reg_template,
                                        mapping=_mapping(row, reg_template),
-                                       reg_prealign=reg_prealign,
-                                       auto_transform=False)
+                                       reg_prealign=reg_prealign)
+        for bundle in bundle_dict:
+            bundles[bundle] = dts.Streamlines(
+                dtu.transform_tracking_output(bundles[bundle],
+                                              np.linalg.inv(row['dwi_affine'])))
+             
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)
