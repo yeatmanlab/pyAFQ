@@ -145,6 +145,7 @@ def test_AFQ_data_planes():
                              'CST_R.trk'))
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
+    # Bundles are only found in ARC_L, CST_L, CST_R, FP
     assert tract_profiles.shape == (800, 5)
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
