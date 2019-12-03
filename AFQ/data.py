@@ -9,6 +9,7 @@ import boto3
 import s3fs
 
 import numpy as np
+import pandas as pd
 
 import nibabel as nib
 import dipy.data as dpd
@@ -498,6 +499,41 @@ def read_hcp_atlas_16_bundles():
     bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
     del bundle_dict["IF0F_R"]
     return bundle_dict
+
+
+fetch_aal_atlas = _make_fetcher(
+    "fetch_aal_atlas",
+    op.join(afq_home,
+            'aal_atlas'),
+    'https://digital.lib.washington.edu/researchworks/bitstream/handle/1773/44951/',
+    ["MNI_AAL_AndMore.nii.gz",
+    "MNI_AAL.txt"],
+    ["MNI_AAL_AndMore.nii.gz",
+    "MNI_AAL.txt"],
+    md5_list=["69395b75a16f00294a80eb9428bf7855",
+              "59fd3284b17de2fbe411ca1c7afe8c65"],
+    doc="Download the AAL atlas",
+    unzip=False)
+
+
+def read_aal_atlas():
+    """
+    Reads the AAL atlas [1]_.
+
+    .. [1] Tzourio-Mazoyer N, Landeau B, Papathanassiou D, Crivello F, Etard O,
+           Delcroix N, Mazoyer B, Joliot M. (2002). Automated anatomical
+           labeling of activations in SPM using a macroscopic anatomical
+           parcellation of the MNI MRI single-subject brain. Neuroimage. 2002;
+           15(1):273-89.
+    """
+    file_dict, folder = fetch_aal_atlas()
+    out_dict = {}
+    for f in file_dict:
+        if f.endswith('.txt'):
+            out_dict['labels'] = pd.read_csv(op.join(folder, f))
+        else:
+            out_dict['atlas'] = nib.load(op.join(folder, f))
+    return out_dict
 
 
 def s3fs_nifti_write(img, fname, fs=None):
