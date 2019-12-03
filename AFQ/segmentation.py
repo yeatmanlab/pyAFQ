@@ -17,10 +17,10 @@ import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
-from dipy.stats.analysis import gaussian_weights
+from dipy.stats.analysis import afq_profile, gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -993,3 +993,70 @@ class FiberGroups:
 
     # TODO: load_fiber_groups
     # TODO: tract_profiles
+    def load_fiber_groups(self, fg_names, reference,
+                          space=Space.RASMM, affine=np.eye(4),
+                          file_path='./', file_suffix='.trk',
+                          bbox_valid_check=False):
+        """
+        Save tractograms in fiber groups.
+
+        Parameters
+        ----------
+        fg_names : list of strings
+            Names of fiber groups to load.
+        reference : Nifti or Trk filename, Nifti1Image or TrkFile,
+            Nifti1Header, trk.header (dict) or another Stateful Tractogram
+            Reference that provides the spatial attribute.
+            Typically a nifti-related object from the native diffusion used for
+            streamlines generation
+        affine : array (4, 4), optional.
+            The mapping between voxel indices and the point space for seeds.
+            The voxel_to_rasmm matrix, typically from a NIFTI file.
+            Default: np.eye(4)
+        space : string, optional.
+            Current space in which the streamlines are (vox, voxmm or rasmm)
+            Typically after tracking the space is VOX, after nibabel loading
+            the space is RASMM
+            Default: Space.RASMM
+        file_path : string, optional.
+            Path to load trk files from.
+            Default: './'
+        file_suffix : string, optional.
+            File name will be the fiber group name + file_suffix.
+            Default: '.trk'
+        bbox_valid_check : boolean, optional.
+            Whether to verify that the bounding box is valid in voxel space.
+            Default: False
+        """
+        for fg_name in fg_names:
+            sft = load_tractogram(f'{file_path}{fg_name}{file_suffix}',
+                                  reference,
+                                  to_space=space,
+                                  bbox_valid_check=bbox_valid_check)
+
+            streamlines = dts.Streamlines(
+                dtu.transform_tracking_output(sft.streamlines,
+                                              affine))
+            self.add_fiber_group(fg_name, streamlines)
+
+    def tract_profiles(self, data, affine=np.eye(4)):
+        """
+        Calculate a summarized profile of data for each bundle along
+        its length.
+
+        Follows the approach outlined in [Yeatman2012]_.
+
+        Parameters
+        ----------
+        data : 3D volume
+            The statistic to sample with the streamlines.
+
+        affine : array_like (4, 4), optional.
+            The mapping from voxel coordinates to streamline points.
+            The voxel_to_rasmm matrix, typically from a NIFTI file.
+            Default: np.eye(4)
+        """
+        for _, fiber_group in self.fiber_groups:
+            weights = gaussian_weights(fiber_group['sl'])
+            fiber_group['profile'] = afq_profile(data, fiber_group['sl'],
+                                                 affine, weights=weights)
