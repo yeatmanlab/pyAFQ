@@ -187,3 +187,10 @@ def test_clean_by_endpoints():
     # If tol=1, the third streamline also gets included
     clean_sl = seg.clean_by_endpoints(sl, atlas, [1, 2], [3, 4], tol=1)
     npt.assert_equal(list(clean_sl), sl[:3])
+
+    # Provide the Nx3 array of indices instead.
+    idx_start = np.array(np.where(atlas==1)).T
+    idx_end = np.array(np.where(atlas==3)).T
+
+    clean_sl = seg.clean_by_endpoints(sl, atlas, idx_start, idx_end)
+    npt.assert_equal(list(clean_sl), np.array([sl[0]]))
