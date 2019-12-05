@@ -157,3 +157,33 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
+
+def test_clean_by_endpoints():
+    sl = [np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1],
+                    [4, 1, 1]]),
+          np.array([[1, 1, 2],
+                    [2, 1, 2],
+                    [3, 1, 2],
+                    [4, 1, 2]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1]])]
+
+    atlas = np.zeros((20, 20, 20))
+
+    # Targets:
+    atlas[1, 1, 1] = 1
+    atlas[1, 1, 2] = 2
+    atlas[4, 1, 1] = 3
+    atlas[4, 1, 2] = 4
+
+    clean_sl = seg.clean_by_endpoints(sl, atlas, [1, 2], [3, 4])
+    npt.assert_equal(list(clean_sl), sl[:2])
+
+    # If tol=1, the third streamline also gets included
+    clean_sl = seg.clean_by_endpoints(sl, atlas, [1, 2], [3, 4], tol=1)
+    npt.assert_equal(list(clean_sl), sl[:3])

@@ -429,6 +429,7 @@ class Segmentation:
         """
         dist = []
         for roi in include_rois:
+            # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
             if np.min(dist[-1]) > tol:
                 # Too far from one of them:
@@ -441,6 +442,7 @@ class Segmentation:
         list of exclusion ROIs.
         """
         for roi in exclude_rois:
+            # Use squared Euclidean distance, because it's faster:
             if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
@@ -484,6 +486,9 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         self.logger.info("Assigning Streamlines to Bundles...")
+        # Tolerance is set to the square of the distance to the corner
+        # because we are using the squared Euclidean distance in calls to
+        # `cdist` to make those calls faster.
         tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
@@ -530,7 +535,6 @@ class Segmentation:
                             streamlines_in_bundles[sl_idx, bundle_idx] =\
                                 fiber_probabilities[sl_idx]
 
-        self.logger.info("Cleaning and Re-Orienting...")
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         streamlines = streamlines[possible_fibers]
@@ -545,6 +549,7 @@ class Segmentation:
         # streamlines within a bundle in the same orientation with respect to
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
+        self.logger.info("Re-orienting streamlines to consistent directions")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, Streamlines don't support item assignment:
@@ -725,3 +730,57 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return out, idx
     else:
         return out
+
+
+def clean_by_endpoints(streamlines, atlas, startpoint_targets,
+                       endpoint_targets, tol=None):
+    """
+    Clean a collection of streamlines based on startpoints and endpointse
+
+    Filters down to only include items that have their starting points close to
+    the startpoint_targets and ending points close to endpoint_targets
+
+    Parameters
+    ----------
+    streamlines : sequence of 3XN_i arrays The collection of streamlines to
+        filter down to.
+
+    atlas : 3D array or Nifti1Image class instance with a 3D array. Contains
+        numerical values for ROIs.
+
+    startpoint_targets, endpoint_targets: sequences The targets (numerical
+        values in the atlas array for start points and end points.
+
+    tol : float, optional A distance tolerance (in units that the coordinates
+        of the streamlines are represented in). Default: 0, which means that
+        the endpoint is exactly in the coordinate of the target ROI.
+
+    Yields
+    -------
+    Generator of the filtered collection
+    """
+    if tol is None:
+        tol = 0
+
+    # We square the tolerance
+    tol = tol ** 2
+
+    startpoint_roi = np.zeros(atlas.shape, dtype=bool)
+    for targ in startpoint_targets:
+        startpoint_roi[atlas == targ] = 1
+    endpoint_roi = np.zeros(atlas.shape, dtype=bool)
+    for targ in endpoint_targets:
+        endpoint_roi[atlas == targ] = 1
+
+    for sl in streamlines:
+        dist1 = np.min(
+            cdist(np.array([sl[0]]),
+                  np.array(np.where(startpoint_roi)).T,
+                  'sqeuclidean'))
+        if dist1 <= tol:
+            dist2 = np.min(
+                cdist(np.array([sl[-1]]),
+                      np.array(np.where(endpoint_roi)).T,
+                      'sqeuclidean'))
+            if dist2 <= tol:
+                yield sl
