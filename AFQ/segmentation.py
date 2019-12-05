@@ -712,13 +712,12 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return out
 
 
-def clean_by_endpoints(streamlines, atlas, startpoint_targets,
-                       endpoint_targets, tol=None):
+def clean_by_endpoints(streamlines, atlas, targets0, targets1, tol=None):
     """
-    Clean a collection of streamlines based on startpoints and endpointse
+    Clean a collection of streamlines based on their two endpoints
 
     Filters down to only include items that have their starting points close to
-    the startpoint_targets and ending points close to endpoint_targets
+    the targets0 and ending points close to targets1
 
     Parameters
     ----------
@@ -728,14 +727,16 @@ def clean_by_endpoints(streamlines, atlas, startpoint_targets,
     atlas : 3D array or Nifti1Image class instance with a 3D array. Contains
         numerical values for ROIs.
 
-    startpoint_targets, endpoint_targets: sequences or Nx3 arrays.
-        The targets. Numerical values in the atlas array for start points
-        and end points, or NX3 arrays with each row containing the indices for
-        these locations in the atlas.
+    targets0, target1: sequences or Nx3 arrays or None.
+        The targets. Numerical values in the atlas array for targets for the
+        first and last node in each streamline respectively, or NX3 arrays with
+        each row containing the indices for these locations in the atlas.
+        If provided a None, this means no restriction on that end.
 
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
+
 
     Yields
     -------
@@ -749,37 +750,46 @@ def clean_by_endpoints(streamlines, atlas, startpoint_targets,
     tol = tol ** 2
 
     # Check whether it's already in the right format:
-    sp_is_idx = (isinstance(startpoint_targets, np.ndarray)
-                 and startpoint_targets.shape[1] == 3)
+    sp_is_idx = (targets0 is None
+                 or(isinstance(targets0, np.ndarray)
+                    and targets0.shape[1] == 3))
     if sp_is_idx:
-        startpoint_idxes = startpoint_targets
+        idxes0 = targets0
 
     # Otherwise, we'll need to derive it:
     else:
         startpoint_roi = np.zeros(atlas.shape, dtype=bool)
-        for targ in startpoint_targets:
+        for targ in targets0:
             startpoint_roi[atlas == targ] = 1
-        startpoint_idxes = np.array(np.where(startpoint_roi)).T
+        idxes0 = np.array(np.where(startpoint_roi)).T
 
-    ep_is_idx = (isinstance(endpoint_targets, np.ndarray)
-                 and endpoint_targets.shape[1] == 3)
+    ep_is_idx = (targets1 is None
+                 or (isinstance(targets1, np.ndarray)
+                     and targets1.shape[1] == 3))
     if ep_is_idx:
-        endpoint_idxes = endpoint_targets
+        idxes1 = targets1
     else:
         endpoint_roi = np.zeros(atlas.shape, dtype=bool)
-        for targ in endpoint_targets:
+        for targ in targets1:
             endpoint_roi[atlas == targ] = 1
-        endpoint_idxes = np.array(np.where(endpoint_roi)).T
+        idxes1 = np.array(np.where(endpoint_roi)).T
 
     for sl in streamlines:
-        dist1 = np.min(
-            cdist(np.array([sl[0]]),
-                  startpoint_idxes,
-                  'sqeuclidean'))
-        if dist1 <= tol:
-            dist2 = np.min(
-                cdist(np.array([sl[-1]]),
-                      endpoint_idxes,
-                      'sqeuclidean'))
-            if dist2 <= tol:
+        if targets0 is None:
+            # Nothing to check
+            dist0ok = True
+        else:
+            dist0ok = False
+            dist0 = np.min(cdist(np.array([sl[0]]), idxes0, 'sqeuclidean'))
+            if dist0 <= tol:
+                dist0ok = True
+        # Only proceed if conditions for one side are fulfilled:
+        if dist0ok:
+            if targets1 is None:
+                # Nothing to check on this end:
                 yield sl
+            else:
+                dist2 = np.min(cdist(np.array([sl[-1]]), idxes1,
+                                     'sqeuclidean'))
+                if dist2 <= tol:
+                    yield sl
