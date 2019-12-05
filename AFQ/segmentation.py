@@ -44,7 +44,8 @@ class Segmentation:
                  prob_threshold=0,
                  rng=None,
                  return_idx=False,
-                 filter_by_endpoints=True):
+                 filter_by_endpoints=True,
+                 dist_to_aal=4):
         """
         Segment streamlines into bundles.
 
@@ -105,6 +106,10 @@ class Segmentation:
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
 
+        dist_to_aal : float
+            If filter_by_endpoints is True, this is the distance from the
+            endpoints to the AAL atlas ROIs that is required.
+
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -135,6 +140,8 @@ class Segmentation:
         self.reduction_thr = reduction_thr
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
+        self.dist_to_aal = dist_to_aal
+
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -590,12 +597,11 @@ class Segmentation:
                     else:
                         aal_idx.append(None)
 
-                dist_to_endpoints = 4
                 self.logger.info(f"Before filtering {len(select_sl)} streamlines")
                 select_sl = clean_by_endpoints(select_sl,
                                                aal_idx[0],
                                                aal_idx[1],
-                                               tol=dist_to_endpoints)
+                                               tol=self.dist_to_aal)
                 select_sl = dts.Streamlines(select_sl)
                 self.logger.info(f"After filtering {len(select_sl)} streamlines")
 
