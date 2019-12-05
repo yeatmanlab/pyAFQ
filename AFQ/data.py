@@ -653,38 +653,47 @@ def aal_to_regions(regions, atlas=None):
     return np.concatenate(idxes, axis=0)
 
 
-# def aal_to_bundles(bundles):
-#     out_dict = {}
-#     aal_dict = read_aal_atlas()
-#     {"ATR_L": [None, ['leftfrontal']]}
+def bundles_to_aal(bundles, atlas=None):
+    """
+    Given a sequence of AFQ bundle names, give back a sequence of lists
+    with [target0, target1] being each NX3 arrays of the endpoint indices
+    for the first and last node of the streamlines in this bundle.
+    """
+    if atlas is None:
+        atlas = read_aal_atlas()['atlas']
 
-#     for bundle in bundles:
+    endpoint_dict = {
+        "ATR_L": [None, ['leftfrontal']],
+        "ATR_R": [None, ['rightfrontal']],
+        "CST_L": [['cstinferior'], ['cstsuperior']],
+        "CST_R": [['cstinferior'], ['cstsuperior']],
+        "CGC_L": [['leftcingpost'], None],
+        "CGC_R": [['rightcingpost'], None],
+        "HCC_L": [None, None],
+        "HCC_R": [None, None],
+        "FP": [['leftoccipital'], ['rightoccipital']],
+        "FA": [['leftfrontal'], ['rightfrontal']],
+        "IFOF_L": [['leftoccipital'], ['leftifoffront']],
+        "IFOF_R": [['rightoccipital'], ['rightifoffront']],
+        "ILF_L": [['leftoccipital'], ['leftilftemporal']],
+        "ILF_R": [['rightoccipital'], ['rightilftemporal']],
+        "SLF_L": [['leftinfparietal'], ['leftslffront']],
+        "SLF_R": [['rightinfparietal'],['rightslffront']],
+        "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
+        "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
+        "ARC_L": [['leftfrontal'], ['leftarctemp']],
+        "ARC_R": [['rightfrontal'], ['rightarctemp']]}
 
+    targets = []
+    for bundle in bundles:
+        targets.append([])
+        for region in endpoint_dict[bundle]:
+            if region is None:
+                targets[-1].append(None)
+            else:
+                targets[-1].append(aal_to_regions(region, atlas=atlas))
 
-# labels = {'Left Thalamic Radiation','Right Thalamic Radiation', ...
-#           'Left Corticospinal','Right Corticospinal', ...
-#           'Left Cingulum Cingulate', 'Right Cingulum Cingulate', ...
-#           'Left Cingulum Hippocampus','Right Cingulum Hippocampus', ...
-#           'Callosum Forceps Major', 'Callosum Forceps Minor', ...
-#           'Left IFOF','Right IFOF', ...
-#           'Left ILF','Right ILF', ...
-#           'Left SLF','Right SLF', ...
-#           'Left Uncinate','Right Uncinate', ...
-#           'Left Arcuate','Right Arcuate'};
-
-# def map_to_enpoints():
-#     {"ATR_L": [[], 'leftfrontal']}
-
-# startpoint = {[], [], 'cstinferior' 'cstinferior' ...
-#     'leftcingpost', 'rightcingpost', [], [],...
-#     'leftoccipital' 'leftfrontal' 'leftoccipital' 'rightoccipital' ...
-#     'leftoccipital' 'rightoccipital' 'leftinfparietal' 'rightinfparietal'...
-#     'leftanttemporal' 'rightanttemporal' 'leftfrontal' 'rightfrontal'};
-# endpoint = {'leftfrontal', 'rightfrontal', 'cstsuperior', 'cstsuperior',...
-#     [], [], [], [], 'rightoccipital', 'rightfrontal', 'leftifoffront',...
-#     'rightifoffront','leftilftemporal', 'rightilftemporal','leftslffront'...
-#     'rightslffront', 'leftuncinatefront', 'rightuncinatefront',...
-#     'leftarctemp','rightarctemp'};
+    return targets
 
 
 def s3fs_nifti_write(img, fname, fs=None):
