@@ -17,6 +17,7 @@ import dipy.tracking.utils as dtu
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
+import AFQ.data as afd
 
 __all__ = ["Segmentation"]
 
@@ -43,7 +44,8 @@ class Segmentation:
                  b0_threshold=0,
                  prob_threshold=0,
                  rng=None,
-                 return_idx=False):
+                 return_idx=False,
+                 filter_by_endpoints=True):
         """
         Segment streamlines into bundles.
 
@@ -99,6 +101,11 @@ class Segmentation:
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
 
+        filter_by_endpoints: bool
+            Whether to filter the bundles based on their endpoints relative
+            to regions defined in the AAL atlas. Applies only to the waypoint
+            approach (XXX for now). Default: True.
+
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -128,6 +135,7 @@ class Segmentation:
         self.model_clust_thr = model_clust_thr
         self.reduction_thr = reduction_thr
         self.return_idx = return_idx
+        self.filter_by_endpoints = filter_by_endpoints
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -485,6 +493,9 @@ class Segmentation:
         if self.return_idx:
             out_idx = np.arange(n_streamlines, dtype=int)
 
+        if self.filter_by_endpoints:
+            aal_atlas = afd.read_aal_atlas()['atlas'].get_fdata()
+
         self.logger.info("Assigning Streamlines to Bundles...")
         # Tolerance is set to the square of the distance to the corner
         # because we are using the squared Euclidean distance in calls to
@@ -551,6 +562,8 @@ class Segmentation:
         # to ROI1).
         self.logger.info("Re-orienting streamlines to consistent directions")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Processing {bundle}")
+
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
@@ -579,6 +592,31 @@ class Segmentation:
 
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
+
+            if self.filter_by_endpoints:
+                self.logger.info("Filtering by endpoints")
+                # Create binary masks and warp these into subject's DWI space:
+                aal_targets = afd.bundles_to_aal([bundle], atlas=aal_atlas)[0]
+                aal_idx = []
+                for targ in aal_targets:
+                    if targ is not None:
+                        aal_roi = np.zeros(aal_atlas.shape[:3])
+                        aal_roi[targ] = 1
+                        warped_roi = self.mapping.transform_inverse(
+                            aal_roi,
+                            interpolation='nearest')
+                        aal_idx.append(np.array(np.where(warped_roi > 0)).T)
+                    else:
+                        aal_idx.append(None)
+
+                dist_to_endpoints = 4
+                self.logger.info(f"Before filtering {len(select_sl)} streamlines")
+                select_sl = clean_by_endpoints(select_sl,
+                                               aal_idx[0],
+                                               aal_idx[1],
+                                               tol=dist_to_endpoints)
+                select_sl = dts.Streamlines(select_sl)
+                self.logger.info(f"After filtering {len(select_sl)} streamlines")
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
@@ -732,7 +770,7 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return out
 
 
-def clean_by_endpoints(streamlines, atlas, targets0, targets1, tol=None):
+def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None):
     """
     Clean a collection of streamlines based on their two endpoints
 
@@ -744,9 +782,6 @@ def clean_by_endpoints(streamlines, atlas, targets0, targets1, tol=None):
     streamlines : sequence of 3XN_i arrays The collection of streamlines to
         filter down to.
 
-    atlas : 3D array or Nifti1Image class instance with a 3D array. Contains
-        numerical values for ROIs.
-
     targets0, target1: sequences or Nx3 arrays or None.
         The targets. Numerical values in the atlas array for targets for the
         first and last node in each streamline respectively, or NX3 arrays with
@@ -756,6 +791,11 @@ def clean_by_endpoints(streamlines, atlas, targets0, targets1, tol=None):
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
+
+    atlas : 3D array or Nifti1Image class instance with a 3D array, optional.
+        Contains numerical values for ROIs. Default: if not provided, assume
+        that targets0 and targets1 are both arrays of indices, and this
+        information is not needed.
 
 
     Yields
@@ -773,19 +813,23 @@ def clean_by_endpoints(streamlines, atlas, targets0, targets1, tol=None):
     sp_is_idx = (targets0 is None
                  or(isinstance(targets0, np.ndarray)
                     and targets0.shape[1] == 3))
+
+    ep_is_idx = (targets1 is None
+                 or (isinstance(targets1, np.ndarray)
+                     and targets1.shape[1] == 3))
+
+    if atlas is None and not (ep_is_idx and sp_is_idx):
+        raise ValueError()
+
     if sp_is_idx:
         idxes0 = targets0
-
-    # Otherwise, we'll need to derive it:
     else:
+        # Otherwise, we'll need to derive it:
         startpoint_roi = np.zeros(atlas.shape, dtype=bool)
         for targ in targets0:
             startpoint_roi[atlas == targ] = 1
         idxes0 = np.array(np.where(startpoint_roi)).T
 
-    ep_is_idx = (targets1 is None
-                 or (isinstance(targets1, np.ndarray)
-                     and targets1.shape[1] == 3))
     if ep_is_idx:
         idxes1 = targets1
     else:

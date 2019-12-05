@@ -104,7 +104,7 @@ else:
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
-                                prob_threshold=15)
+                                filter_by_endpoints=True)
 segmentation.segment(bundles,
                      streamlines,
                      fdata=hardi_fdata,
