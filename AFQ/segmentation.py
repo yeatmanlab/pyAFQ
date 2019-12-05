@@ -728,8 +728,10 @@ def clean_by_endpoints(streamlines, atlas, startpoint_targets,
     atlas : 3D array or Nifti1Image class instance with a 3D array. Contains
         numerical values for ROIs.
 
-    startpoint_targets, endpoint_targets: sequences The targets (numerical
-        values in the atlas array for start points and end points.
+    startpoint_targets, endpoint_targets: sequences or Nx3 arrays.
+        The targets. Numerical values in the atlas array for start points
+        and end points, or NX3 arrays with each row containing the indices for
+        these locations in the atlas.
 
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
@@ -746,22 +748,38 @@ def clean_by_endpoints(streamlines, atlas, startpoint_targets,
     # distance which is slightly faster:
     tol = tol ** 2
 
-    startpoint_roi = np.zeros(atlas.shape, dtype=bool)
-    for targ in startpoint_targets:
-        startpoint_roi[atlas == targ] = 1
-    endpoint_roi = np.zeros(atlas.shape, dtype=bool)
-    for targ in endpoint_targets:
-        endpoint_roi[atlas == targ] = 1
+    # Check whether it's already in the right format:
+    sp_is_idx = (isinstance(startpoint_targets, np.ndarray)
+                 and startpoint_targets.shape[1] == 3)
+    if sp_is_idx:
+        startpoint_idxes = startpoint_targets
+
+    # Otherwise, we'll need to derive it:
+    else:
+        startpoint_roi = np.zeros(atlas.shape, dtype=bool)
+        for targ in startpoint_targets:
+            startpoint_roi[atlas == targ] = 1
+        startpoint_idxes = np.array(np.where(startpoint_roi)).T
+
+    ep_is_idx = (isinstance(endpoint_targets, np.ndarray)
+                 and endpoint_targets.shape[1] == 3)
+    if ep_is_idx:
+        endpoint_idxes = endpoint_targets
+    else:
+        endpoint_roi = np.zeros(atlas.shape, dtype=bool)
+        for targ in endpoint_targets:
+            endpoint_roi[atlas == targ] = 1
+        endpoint_idxes = np.array(np.where(endpoint_roi)).T
 
     for sl in streamlines:
         dist1 = np.min(
             cdist(np.array([sl[0]]),
-                  np.array(np.where(startpoint_roi)).T,
+                  startpoint_idxes,
                   'sqeuclidean'))
         if dist1 <= tol:
             dist2 = np.min(
                 cdist(np.array([sl[-1]]),
-                      np.array(np.where(endpoint_roi)).T,
+                      endpoint_idxes,
                       'sqeuclidean'))
             if dist2 <= tol:
                 yield sl
