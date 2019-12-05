@@ -17,6 +17,8 @@ from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
                                  ResampleFeature)
+
+
 from dipy.segment.clustering import QuickBundles
 
 
@@ -535,6 +537,154 @@ def read_aal_atlas():
         else:
             out_dict['atlas'] = nib.load(op.join(folder, f))
     return out_dict
+
+
+def aal_to_regions(regions, atlas=None):
+    """
+    Queries for large regions containing multiple AAL ROIs
+
+    Parameters
+    ----------
+    regions : string or list of strings
+        The name of the requested region. This can either be an AAL-defined ROI
+        name (e.g, 'Occipital_Sup_L') or one of:
+        {'leftfrontal' | 'leftoccipital' | 'lefttemporal' | 'leftparietal'
+        | 'leftanttemporal' | 'leftparietal' | 'leftanttemporal'
+        | 'leftuncinatefront' | 'leftifoffront' | 'leftinfparietal'
+        | 'cerebellum' | 'leftarcfrontal' | 'leftarctemporal' | 'leftcingpost'}
+        each of which there is an equivalent 'right' region for. In addition,
+        there are a few bilateral regions: {'occipital' | 'temporal'}, which
+        encompass both the right and left region of this name, as well as:
+        {'cstinferior' | 'cstsuperior'}
+
+    atlas : 4D array
+       Contains the AAL atlas in the correct coordinate frame with additional
+       volumes for CST and cingulate ROIs ("AAL and more").
+
+    Returns
+    ------
+    3D indices to the requested region in the atlas volume
+
+    Notes
+    -----
+    Several regions can be referred to by multiple names:
+           'leftuncinatetemp' = 'leftilftemp'= 'leftanttemporal'
+           'rightuncinatetemp' = 'rightilftemp' = 'rightanttemporal'
+           'leftslfpar'] = 'leftinfparietal'
+           'rightslfpar' = 'rightinfparietal'
+           'leftslffrontal' = 'leftarcfrontal'
+           'rightslffrontal' = 'rightarcfrontal'
+    """
+    if atlas is None:
+        atlas = read_aal_atlas()['atlas']
+    atlas_vals = {'leftfrontal': np.arange(1, 26, 2),
+                  # Occipital regions do not include fusiform:
+                  'leftoccipital': np.arange(43, 54, 2),
+                  # Temporal regions include fusiform:
+                  'lefttemporal': np.concatenate([np.arange(37, 42, 2),
+                                                  np.array([55]),
+                                                  np.arange(79, 90, 2)]),
+                  'leftparietal': np.array([57, 67, 2]),
+                  'leftanttemporal': np.array([41, 83, 87]),
+                  'leftuncinatefront': np.array([5, 9, 15, 25]),
+                  'leftifoffront': np.array([3, 5, 7, 9, 13, 15, 25]),
+                  'leftinfparietal': np.array([61, 63, 65]),
+                  'cerebellum': np.arange(91, 117),
+                  'leftarcfrontal': np.array([1, 11, 13]),
+                  'leftarctemporal': np.array([79, 81, 85, 89]),
+           }
+
+    # Right symmetrical is off by one:
+    atlas_vals['rightfrontal'] = atlas_vals['leftfrontal'] + 1
+    atlas_vals['rightoccipital'] = atlas_vals['leftoccipital'] + 1
+    atlas_vals['righttemporal'] = atlas_vals['lefttemporal'] + 1
+    atlas_vals['rightparietal'] = atlas_vals['leftparietal'] + 1
+    atlas_vals['rightanttemporal'] = atlas_vals['leftanttemporal'] + 1
+    atlas_vals['rightuncinatefront'] = atlas_vals['leftuncinatefront'] + 1
+    atlas_vals['rightifoffront'] = atlas_vals['leftifoffront'] + 1
+    atlas_vals['rightinfparietal'] = atlas_vals['leftinfparietal'] + 1
+    atlas_vals['rightarcfrontal'] = atlas_vals['leftarcfrontal'] + 1
+    atlas_vals['rightarctemporal'] = atlas_vals['leftarctemporal'] + 1
+
+    # Multiply named regions:
+    atlas_vals['leftuncinatetemp'] = atlas_vals['leftilftemp'] =\
+        atlas_vals['leftanttemporal']
+    atlas_vals['rightuncinatetemp'] = atlas_vals['rightilftemp'] =\
+        atlas_vals['rightanttemporal']
+    atlas_vals['leftslfpar'] = atlas_vals['leftinfparietal']
+    atlas_vals['rightslfpar'] = atlas_vals['rightinfparietal']
+    atlas_vals['leftslffrontal'] = atlas_vals['leftarcfrontal']
+    atlas_vals['rightslffrontal'] = atlas_vals['rightarcfrontal']
+
+    # Bilateral regions:
+    atlas_vals['occipital'] = np.union1d(atlas_vals['leftoccipital'],
+                                         atlas_vals['rightoccipital'])
+    atlas_vals['temporal'] = np.union1d(atlas_vals['lefttemporal'],
+                                        atlas_vals['righttemporal'])
+
+    if isinstance(regions, str):
+        regions = [regions]
+
+    idxes = []
+    for region in regions:
+        region = region.lower()  # Just to be sure
+        if region in atlas_vals.keys():
+            vol_idx = 0
+            vals = atlas_vals[region]
+        elif region == 'cstinferior':
+            vol_idx = 1
+            vals = np.array([1])
+        elif region == 'cstsuperior':
+            vol_idx = 2
+            vals = np.array([1])
+        elif region == 'leftcingpost':
+            vol_idx = 3
+            vals = np.array([1])
+        elif region == 'rightcingpost':
+            vol_idx = 4
+            vals = np.array([1])
+
+        # Broadcast vals, to test for equality over all three dimensions:
+        is_in = atlas[..., vol_idx] == vals[:, None, None, None]
+        # Then collapse the 4th dimension (each val), to get the 3D array:
+        is_in = np.sum(is_in, 0)
+        idxes.append(np.array(np.where(is_in)).T)
+
+    return np.concatenate(idxes, axis=0)
+
+
+# def aal_to_bundles(bundles):
+#     out_dict = {}
+#     aal_dict = read_aal_atlas()
+#     {"ATR_L": [None, ['leftfrontal']]}
+
+#     for bundle in bundles:
+
+
+# labels = {'Left Thalamic Radiation','Right Thalamic Radiation', ...
+#           'Left Corticospinal','Right Corticospinal', ...
+#           'Left Cingulum Cingulate', 'Right Cingulum Cingulate', ...
+#           'Left Cingulum Hippocampus','Right Cingulum Hippocampus', ...
+#           'Callosum Forceps Major', 'Callosum Forceps Minor', ...
+#           'Left IFOF','Right IFOF', ...
+#           'Left ILF','Right ILF', ...
+#           'Left SLF','Right SLF', ...
+#           'Left Uncinate','Right Uncinate', ...
+#           'Left Arcuate','Right Arcuate'};
+
+# def map_to_enpoints():
+#     {"ATR_L": [[], 'leftfrontal']}
+
+# startpoint = {[], [], 'cstinferior' 'cstinferior' ...
+#     'leftcingpost', 'rightcingpost', [], [],...
+#     'leftoccipital' 'leftfrontal' 'leftoccipital' 'rightoccipital' ...
+#     'leftoccipital' 'rightoccipital' 'leftinfparietal' 'rightinfparietal'...
+#     'leftanttemporal' 'rightanttemporal' 'leftfrontal' 'rightfrontal'};
+# endpoint = {'leftfrontal', 'rightfrontal', 'cstsuperior', 'cstsuperior',...
+#     [], [], [], [], 'rightoccipital', 'rightfrontal', 'leftifoffront',...
+#     'rightifoffront','leftilftemporal', 'rightilftemporal','leftslffront'...
+#     'rightslffront', 'leftuncinatefront', 'rightuncinatefront',...
+#     'leftarctemp','rightarctemp'};
 
 
 def s3fs_nifti_write(img, fname, fs=None):
