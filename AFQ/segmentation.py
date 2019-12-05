@@ -742,7 +742,8 @@ def clean_by_endpoints(streamlines, atlas, startpoint_targets,
     if tol is None:
         tol = 0
 
-    # We square the tolerance
+    # We square the tolerance, because below we are using the squared Euclidean
+    # distance which is slightly faster:
     tol = tol ** 2
 
     startpoint_roi = np.zeros(atlas.shape, dtype=bool)
