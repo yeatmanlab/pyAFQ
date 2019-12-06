@@ -247,13 +247,13 @@ class Segmentation:
                     "Provide either the full path to data, bvals, bvecs,"
                     + "or provide the affine of the image and the mapping")
 
-        self.logger.info("Preparing Segmentation Parameters...")
+        self.logger.info("Preparing Segmentation Parameters")
         self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
 
-        self.logger.info("Preprocessing Streamlines...")
+        self.logger.info("Preprocessing Streamlines")
         self.streamlines = streamlines
         if self.nb_points:
             self.resample_streamlines(self.nb_points)
@@ -489,8 +489,14 @@ class Segmentation:
 
         if self.filter_by_endpoints:
             aal_atlas = afd.read_aal_atlas()['atlas'].get_fdata()
+            # We need to calculate the size of a voxel, so we can transform
+            # from mm to voxel units:
+            R = self.img_affine[0:3, 0:3]
+            vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+            dist_to_aal = self.dist_to_aal / vox_dim
 
-        self.logger.info("Assigning Streamlines to Bundles...")
+
+        self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
         # because we are using the squared Euclidean distance in calls to
         # `cdist` to make those calls faster.
@@ -601,7 +607,7 @@ class Segmentation:
                 select_sl = clean_by_endpoints(select_sl,
                                                aal_idx[0],
                                                aal_idx[1],
-                                               tol=self.dist_to_aal)
+                                               tol=dist_to_aal)
                 select_sl = dts.Streamlines(select_sl)
                 self.logger.info(f"After filtering {len(select_sl)} streamlines")
 
@@ -635,7 +641,7 @@ class Segmentation:
             self.streamlines = streamlines
 
         fiber_groups = {}
-        self.logger.info("Registering Whole-brain with SLR...")
+        self.logger.info("Registering Whole-brain with SLR")
         # We start with whole-brain SLR:
         atlas = self.bundle_dict['whole_brain']
         moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
@@ -646,14 +652,14 @@ class Segmentation:
             rng=self.rng)
 
         # We generate our instance of RB with the moved streamlines:
-        self.logger.info("Extracting Bundles...")
+        self.logger.info("Extracting Bundles")
         rb = RecoBundles(moved, verbose=False, rng=self.rng)
 
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         bundle_list.remove('whole_brain')
 
-        self.logger.info("Assigning Streamlines to Bundles...")
+        self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
             _, rec_labels = rb.recognize(model_bundle=model_sl,
