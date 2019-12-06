@@ -551,7 +551,7 @@ def aal_to_regions(regions, atlas=None):
         {'leftfrontal' | 'leftoccipital' | 'lefttemporal' | 'leftparietal'
         | 'leftanttemporal' | 'leftparietal' | 'leftanttemporal'
         | 'leftuncinatefront' | 'leftifoffront' | 'leftinfparietal'
-        | 'cerebellum' | 'leftarcfrontal' | 'leftarctemporal' | 'leftcingpost'}
+        | 'cerebellum' | 'leftarcfrontal' | 'leftarctemp' | 'leftcingpost'}
         each of which there is an equivalent 'right' region for. In addition,
         there are a few bilateral regions: {'occipital' | 'temporal'}, which
         encompass both the right and left region of this name, as well as:
@@ -591,8 +591,8 @@ def aal_to_regions(regions, atlas=None):
                   'leftinfparietal': np.array([61, 63, 65]),
                   'cerebellum': np.arange(91, 117),
                   'leftarcfrontal': np.array([1, 11, 13]),
-                  'leftarctemporal': np.array([79, 81, 85, 89]),
-           }
+                  'leftarctemp': np.array([79, 81, 85, 89]),
+                  }
 
     # Right symmetrical is off by one:
     atlas_vals['rightfrontal'] = atlas_vals['leftfrontal'] + 1
@@ -604,7 +604,7 @@ def aal_to_regions(regions, atlas=None):
     atlas_vals['rightifoffront'] = atlas_vals['leftifoffront'] + 1
     atlas_vals['rightinfparietal'] = atlas_vals['leftinfparietal'] + 1
     atlas_vals['rightarcfrontal'] = atlas_vals['leftarcfrontal'] + 1
-    atlas_vals['rightarctemporal'] = atlas_vals['leftarctemporal'] + 1
+    atlas_vals['rightarctemp'] = atlas_vals['leftarctemp'] + 1
 
     # Multiply named regions:
     atlas_vals['leftuncinatetemp'] = atlas_vals['leftilftemp'] =\
