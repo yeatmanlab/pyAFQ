@@ -53,18 +53,7 @@ else:
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
-templates = afd.read_templates()
-bundle_names = ["CST", "ILF"]
-
-bundles = {}
-for name in bundle_names:
-    for hemi in ['_R', '_L']:
-        bundles[name + hemi] = {
-            'ROIs': [templates[name + '_roi1' + hemi],
-                    templates[name + '_roi2' + hemi]],
-            'rules': [True, True],
-            'prob_map': templates[name + hemi + '_prob_map'],
-            'cross_midline': False}
+bundles = api.make_bundle_dict()
 
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
@@ -76,17 +65,16 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
-
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
     seed_roi = np.zeros(img.shape[:-1])
-    for name in bundle_names:
-        for hemi in ['_R', '_L']:
-            for roi in bundles[name + hemi]['ROIs']:
+    for bundle in bundles:
+        for idx, roi in enumerate(bundles[bundle]['ROIs']):
+            if bundles[bundle]['rules'][idx]:
                 warped_roi = patch_up_roi(
-                    (mapping.transform_inverse(
+                    mapping.transform_inverse(
                         roi.get_data().astype(np.float32),
-                     interpolation='linear')) > 0)
+                        interpolation='linear') > 0)
 
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
@@ -117,14 +105,13 @@ segmentation.segment(bundles,
                      mapping=mapping,
                      reg_template=MNI_T2_img)
 
-
 fiber_groups = segmentation.fiber_groups
 
 print("Cleaning fiber groups...")
 for bundle in bundles:
     print(f"Cleaning {bundle}")
     print(f"Before cleaning: {len(fiber_groups[bundle]['sl'])} streamlines")
-    new_fibers, idx_in_bundle = seg.clean_fiber_group(
+    new_fibers, idx_in_bundle = seg.clean_bundle(
         fiber_groups[bundle]['sl'],
         return_idx=True)
     print(f"Afer cleaning: {len(new_fibers)} streamlines")

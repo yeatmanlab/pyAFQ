@@ -759,9 +759,8 @@ def clean_bundle(streamlines, n_points=100, clean_rounds=5,
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
         idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
-        1/0.
         idx_len = np.where(zscore(lengths) < length_threshold)[0]
-        idx_belong = np.union1d(idx_dist, idx_len)
+        idx_belong = np.intersect1d(idx_dist, idx_len)
         idx = idx[idx_belong.astype(int)]
         # Update by selection:
         fgarray = fgarray[idx_belong.astype(int)]
