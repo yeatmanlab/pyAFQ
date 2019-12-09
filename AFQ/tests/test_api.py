@@ -90,7 +90,7 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
-def test_AFQ_data_planes():
+def test_AFQ_data_waypoint():
     """
     Test with some actual data again, this time for track segmentation
     """
