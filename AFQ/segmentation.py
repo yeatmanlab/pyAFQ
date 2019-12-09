@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 from scipy.spatial.distance import mahalanobis, cdist
+from scipy.stats import zscore
 
 import nibabel as nib
 from tqdm.auto import tqdm
@@ -525,7 +526,7 @@ class Segmentation:
             idx_above_prob = np.where(
                 fiber_probabilities > self.prob_threshold)
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
-                              " the probability threshold"))
+                              " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx in tqdm(idx_above_prob[0]):
                 sl = streamlines[sl_idx]
@@ -614,7 +615,7 @@ class Segmentation:
                 for targ in aal_targets:
                     if targ is not None:
                         aal_roi = np.zeros(aal_atlas.shape[:3])
-                        aal_roi[targ] = 1
+                        aal_roi[targ[:, 0], targ[:, 1], targ[:, 2]] = 1
                         warped_roi = self.mapping.transform_inverse(
                             aal_roi,
                             interpolation='nearest')
@@ -622,13 +623,15 @@ class Segmentation:
                     else:
                         aal_idx.append(None)
 
-                self.logger.info(f"Before filtering {len(select_sl)} streamlines")
+                self.logger.info("Before filtering"
+                                 f"{len(select_sl)} streamlines")
                 select_sl = clean_by_endpoints(select_sl,
                                                aal_idx[0],
                                                aal_idx[1],
                                                tol=dist_to_aal)
                 select_sl = dts.Streamlines(select_sl)
-                self.logger.info(f"After filtering {len(select_sl)} streamlines")
+                self.logger.info("After filtering"
+                                 f"{len(select_sl)} streamlines")
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
@@ -703,9 +706,10 @@ class Segmentation:
         return fiber_groups
 
 
-def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
-                      clean_threshold=3, min_sl=20, stat=np.mean,
-                      return_idx=False):
+def clean_bundle(streamlines, n_points=100, clean_rounds=5,
+                 distance_threshold=5, length_threshold=4,
+                 min_sl=20, stat=np.mean,
+                 return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
@@ -722,9 +726,14 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
 
-    clean_threshold : float, optional.
+    distance_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
-        standard deviations). Default: 3.
+        standard deviations). Default: 5.
+
+    length_threshold: float, optional
+        Threshold for cleaning based on length (in standard deviations). Length
+        of any streamline should not be *more* than this number of stdevs from
+        the mean length.
 
     min_sl : int, optional.
         Number of streamlines in a bundle under which we will
@@ -759,18 +768,23 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     idx = np.arange(len(fgarray))
     # This calculates the Mahalanobis for each streamline/node:
     w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+    lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while (np.any(w > clean_threshold)
+    while ((np.any(w > distance_threshold) or
+            np.any(zscore(lengths) > length_threshold))
            and rounds_elapsed < clean_rounds
            and len(streamlines) > min_sl):
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
-        idx_belong = np.where(
-            np.all(w < clean_threshold, axis=-1))[0]
+        idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
+        1/0.
+        idx_len = np.where(zscore(lengths) < length_threshold)[0]
+        idx_belong = np.union1d(idx_dist, idx_len)
         idx = idx[idx_belong.astype(int)]
         # Update by selection:
         fgarray = fgarray[idx_belong.astype(int)]
+        lengths = lengths[idx_belong.astype(int)]
         # Repeat:
         w = gaussian_weights(fgarray, return_mahalnobis=True)
         rounds_elapsed += 1
