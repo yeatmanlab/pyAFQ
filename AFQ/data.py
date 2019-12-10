@@ -21,6 +21,8 @@ from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
 
 from dipy.segment.clustering import QuickBundles
 
+import AFQ.registration as reg
+
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
@@ -83,7 +85,7 @@ fetch_callosum_templates = _make_fetcher("fetch_callosum_templates",
                                          doc="Download AFQ callosum templates")
 
 
-def read_callosum_templates():
+def read_callosum_templates(resample_to=False):
     """Load AFQ callosum templates from file
 
     Returns
@@ -94,7 +96,14 @@ def read_callosum_templates():
     files, folder = fetch_callosum_templates()
     template_dict = {}
     for f in files:
-        template_dict[f.split('.')[0]] = nib.load(op.join(folder, f))
+        img = nib.load(op.join(folder, f))
+        if resample_to:
+            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
+                                               resample_to,
+                                               img.affine,
+                                               resample_to.affine),
+                                  resample_to.affine)
+        template_dict[f.split('.')[0]] = img
     return template_dict
 
 
@@ -249,7 +258,7 @@ fetch_templates = _make_fetcher("fetch_templates",
                                 doc="Download AFQ templates")
 
 
-def read_templates():
+def read_templates(resample_to=False):
     """Load AFQ templates from file
 
     Returns
@@ -260,7 +269,15 @@ def read_templates():
     files, folder = fetch_templates()
     template_dict = {}
     for f in files:
-        template_dict[f.split('.')[0]] = nib.load(op.join(folder, f))
+        img = nib.load(op.join(folder, f))
+        if resample_to:
+            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
+                                               resample_to,
+                                               img.affine,
+                                               resample_to.affine),
+                                  resample_to.affine)
+        template_dict[f.split('.')[0]] = img
+
     return template_dict
 
 

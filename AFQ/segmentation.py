@@ -46,7 +46,7 @@ class Segmentation:
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
-                 dist_to_aal=2):
+                 dist_to_aal=4):
         """
         Segment streamlines into bundles.
 
