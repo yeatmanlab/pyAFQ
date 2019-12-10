@@ -51,14 +51,20 @@ def test_segment():
     hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
     hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
     file_dict = afd.read_stanford_hardi_tractography()
+
+    # We avoid recalculating the mapping:
     mapping = file_dict['mapping.nii.gz']
     MNI_T2_img = dpd.read_mni_template()
     mapping = reg.read_mapping(mapping, hardi_img, MNI_T2_img)
+
+    # But calculate FA from the data:
     dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
                              out_dir='.')
 
     FA_img = nib.load(dti_params['FA'])
     FA_data = FA_img.get_fdata()
+
+    # And generate tracks anew:
     seed_roi = np.zeros(hardi_img.shape[:-1])
     for bundle in bundles:
         for roi in bundles[bundle]['ROIs']:
@@ -69,6 +75,8 @@ def test_segment():
 
             # Add voxels that aren't there yet:
             seed_roi = np.logical_or(seed_roi, warped_roi)
+
+    # We don't want too many seeds:
     seed_roi[FA_data < 0.6] = 0
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
@@ -107,14 +115,18 @@ def test_segment():
     # Setting distance_threshold to a small number will exclude some
     # streamlines:
     clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2)
+    npt.assert_equal(len(clean_sl), 20)
+    clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2, min_sl=3)
     npt.assert_equal(len(clean_sl), 3)
+
     # Same with length:
     clean_sl = seg.clean_bundle(CST_R_sl, length_threshold=1)
-    npt.assert_equal(len(clean_sl), 9)
+    npt.assert_equal(len(clean_sl), 20)
+
+    # And with both:
     clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2,
                                 length_threshold=1)
-    npt.assert_equal(len(clean_sl), 9)
-
+    npt.assert_equal(len(clean_sl), 20)
 
     # What if you don't have probability maps?
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -151,7 +163,6 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
-
 
     # get bundles for reco method
     bundles = afd.read_hcp_atlas_16_bundles()
