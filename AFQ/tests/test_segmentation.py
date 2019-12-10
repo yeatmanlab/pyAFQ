@@ -21,6 +21,20 @@ from AFQ.utils.volume import patch_up_roi
 
 
 def test_segment():
+    dpd.fetch_stanford_hardi()
+    hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
+    hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
+    hardi_img = nib.load(hardi_fdata)
+    hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
+    hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    streamlines = file_dict['tractography_subsampled.trk']
+    streamlines = dts.Streamlines(
+        dtu.transform_tracking_output(
+            streamlines[streamlines._lengths > 10],
+            np.linalg.inv(hardi_img.affine)))
+
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
                                   templates['CST_roi2_L']],
@@ -32,47 +46,6 @@ def test_segment():
                          'rules': [True, True],
                          'prob_map': templates['CST_R_prob_map'],
                          'cross_midline': None}}
-
-    dpd.fetch_stanford_hardi()
-    hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-    hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
-    hardi_img = nib.load(hardi_fdata)
-    hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
-    hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
-    file_dict = afd.read_stanford_hardi_tractography()
-
-    # We avoid recalculating the mapping:
-    mapping = file_dict['mapping.nii.gz']
-    MNI_T2_img = dpd.read_mni_template()
-    mapping = reg.read_mapping(mapping, hardi_img, MNI_T2_img)
-
-    # But calculate FA from the data:
-    dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
-                             out_dir='.')
-
-    FA_img = nib.load(dti_params['FA'])
-    FA_data = FA_img.get_fdata()
-
-    # And generate tracks anew:
-    seed_roi = np.zeros(hardi_img.shape[:-1])
-    for bundle in bundles:
-        for roi in bundles[bundle]['ROIs']:
-            warped_roi = patch_up_roi(
-                (mapping.transform_inverse(
-                    roi.get_data().astype(np.float32),
-                 interpolation='linear')) > 0)
-
-            # Add voxels that aren't there yet:
-            seed_roi = np.logical_or(seed_roi, warped_roi)
-
-    # We don't want too many seeds:
-    seed_roi[FA_data < 0.6] = 0
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            stop_mask=FA_data, stop_threshold=0.1)
-
-    streamlines = dts.Streamlines(
-        dtu.transform_tracking_output(streamlines,
-                                      np.linalg.inv(hardi_img.affine)))
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
@@ -97,22 +70,6 @@ def test_segment():
 
     clean_sl = seg.clean_bundle(CST_R_sl)
     npt.assert_equal(len(clean_sl), len(CST_R_sl))
-
-    # Setting distance_threshold to a small number will exclude some
-    # streamlines:
-    clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2)
-    npt.assert_equal(len(clean_sl), 20)
-    clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2, min_sl=3)
-    npt.assert_equal(len(clean_sl), 3)
-
-    # Same with length:
-    clean_sl = seg.clean_bundle(CST_R_sl, length_threshold=1)
-    npt.assert_equal(len(clean_sl), 20)
-
-    # And with both:
-    clean_sl = seg.clean_bundle(CST_R_sl, distance_threshold=2,
-                                length_threshold=1)
-    npt.assert_equal(len(clean_sl), 20)
 
     # What if you don't have probability maps?
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
