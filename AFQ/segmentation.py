@@ -47,7 +47,7 @@ class Segmentation:
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
-                 dist_to_aal=4):
+                 dist_to_aal=2):
         """
         Segment streamlines into bundles.
 
@@ -623,14 +623,14 @@ class Segmentation:
                     else:
                         aal_idx.append(None)
 
-                self.logger.info("Before filtering"
+                self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
                 select_sl = clean_by_endpoints(select_sl,
                                                aal_idx[0],
                                                aal_idx[1],
                                                tol=dist_to_aal)
                 select_sl = dts.Streamlines(select_sl)
-                self.logger.info("After filtering"
+                self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
             if self.return_idx:
