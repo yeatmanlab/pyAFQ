@@ -752,8 +752,8 @@ def clean_bundle(streamlines, n_points=100, clean_rounds=5,
     lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while ((np.any(w > distance_threshold) or
-            np.any(zscore(lengths) > length_threshold))
+    while ((np.any(w > distance_threshold)
+            or np.any(zscore(lengths) > length_threshold))
            and rounds_elapsed < clean_rounds
            and len(streamlines) > min_sl):
         # Select the fibers that have Mahalanobis smaller than the
