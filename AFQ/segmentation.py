@@ -761,6 +761,11 @@ def clean_bundle(streamlines, n_points=100, clean_rounds=5,
         idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
         idx_len = np.where(zscore(lengths) < length_threshold)[0]
         idx_belong = np.intersect1d(idx_dist, idx_len)
+
+        if len(idx_belong) < min_sl:
+            # need to sort and return exactly min_sl:
+            idx_belong = np.argsort(np.sum(w, axis=-1))[:min_sl]
+
         idx = idx[idx_belong.astype(int)]
         # Update by selection:
         fgarray = fgarray[idx_belong.astype(int)]
