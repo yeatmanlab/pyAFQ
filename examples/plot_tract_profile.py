@@ -53,8 +53,6 @@ else:
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
-bundles = api.make_bundle_dict()
-
 print("Registering to template...")
 MNI_T2_img = dpd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
@@ -65,6 +63,7 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
+bundles = api.make_bundle_dict(resample_to=MNI_T2_img)
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
     seed_roi = np.zeros(img.shape[:-1])

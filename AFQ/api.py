@@ -42,7 +42,7 @@ BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
 # Monkey-patch this in, until https://github.com/nipy/dipy/pull/1695 is
 # merged:
 def _bundle_profile(data, bundle, affine=None, n_points=100,
-                   weights=None):
+                    weights=None):
     """
     Calculates a summarized profile of data for a bundle along its length.
 
@@ -102,7 +102,7 @@ def _bundle_profile(data, bundle, affine=None, n_points=100,
 dts.bundle_profile = _bundle_profile
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
+def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -110,10 +110,15 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
     ----------
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
+
+    resample_to : Nifti1Image, optional
+        If set, templates will be resampled to the affine and size of this
+        image.
     """
     if seg_algo == "afq":
-        templates = afd.read_templates()
-        callosal_templates = afd.read_callosum_templates()
+        templates = afd.read_templates(resample_to=resample_to)
+        callosal_templates = afd.read_callosum_templates(
+            resample_to=resample_to)
         # For the arcuate, we need to rename a few of these and duplicate the
         # SLF ROI:
         templates['ARC_roi1_L'] = templates['SLF_roi1_L']
