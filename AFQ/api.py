@@ -42,7 +42,7 @@ BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
 # Monkey-patch this in, until https://github.com/nipy/dipy/pull/1695 is
 # merged:
 def _bundle_profile(data, bundle, affine=None, n_points=100,
-                   weights=None):
+                    weights=None):
     """
     Calculates a summarized profile of data for a bundle along its length.
 
@@ -102,7 +102,7 @@ def _bundle_profile(data, bundle, affine=None, n_points=100,
 dts.bundle_profile = _bundle_profile
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
+def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -110,10 +110,15 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq"):
     ----------
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
+
+    resample_to : Nifti1Image, optional
+        If set, templates will be resampled to the affine and shape of this
+        image.
     """
     if seg_algo == "afq":
-        templates = afd.read_templates()
-        callosal_templates = afd.read_callosum_templates()
+        templates = afd.read_templates(resample_to=resample_to)
+        callosal_templates = afd.read_callosum_templates(
+            resample_to=resample_to)
         # For the arcuate, we need to rename a few of these and duplicate the
         # SLF ROI:
         templates['ARC_roi1_L'] = templates['SLF_roi1_L']
@@ -383,23 +388,28 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 
 def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
              odf_model="DTI", directions="det", n_seeds=2,
-             random_seeds=False, force_recompute=False):
+             random_seeds=False, force_recompute=False,
+             filter_by_endpoints=False):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
     if not op.exists(bundles_file) or force_recompute:
-        streamlines_file = _streamlines(row, wm_labels,
-                                        odf_model=odf_model,
-                                        directions=directions,
-                                        n_seeds=n_seeds,
-                                        random_seeds=random_seeds,
-                                        force_recompute=force_recompute)
+        streamlines_file = _streamlines(
+            row,
+            wm_labels,
+            odf_model=odf_model,
+            directions=directions,
+            n_seeds=n_seeds,
+            random_seeds=random_seeds,
+            force_recompute=force_recompute)
         tg = nib.streamlines.load(streamlines_file).tractogram
         sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
 
         reg_prealign = np.load(_reg_prealign(row,
                                              force_recompute=force_recompute))
-        segmentation = seg.Segmentation(algo=method)
+        segmentation = seg.Segmentation(
+            algo=method,
+            filter_by_endpoints=filter_by_endpoints)
         bundles = segmentation.segment(bundle_dict,
                                        sl,
                                        row['dwi_file'],
@@ -437,7 +447,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
             idx = np.where(tg.data_per_streamline['bundle']
                            == bundle_dict[b]['uid'])[0]
             this_sl = sl[idx]
-            this_sl = seg.clean_fiber_group(this_sl)
+            this_sl = seg.clean_bundle(this_sl)
             this_tgram = nib.streamlines.Tractogram(
                 this_sl,
                 data_per_streamline={
@@ -679,7 +689,8 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  reg_template=None,
-                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]):
+                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 filter_by_endpoints=False):
         """
 
         dmriprep_path: str
@@ -721,6 +732,7 @@ class AFQ(object):
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
+        self.filter_by_endpoints = filter_by_endpoints
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
         else:
@@ -976,16 +988,19 @@ class AFQ(object):
         column_exists = 'bundles_file' in self.data_frame.columns
         if (not column_exists or self.force_recompute):
             self.data_frame['bundles_file'] =\
-                self.data_frame.apply(_segment, axis=1,
-                                      args=[self.wm_labels,
-                                            self.bundle_dict,
-                                            self.reg_template],
-                                      method=self.seg_algo,
-                                      odf_model=self.odf_model,
-                                      directions=self.directions,
-                                      n_seeds=self.n_seeds,
-                                      random_seeds=self.random_seeds,
-                                      force_recompute=self.force_recompute)
+                self.data_frame.apply(
+                    _segment,
+                    axis=1,
+                    args=[self.wm_labels,
+                          self.bundle_dict,
+                          self.reg_template],
+                    method=self.seg_algo,
+                    odf_model=self.odf_model,
+                    directions=self.directions,
+                    n_seeds=self.n_seeds,
+                    random_seeds=self.random_seeds,
+                    force_recompute=self.force_recompute,
+                    filter_by_endpoints=self.filter_by_endpoints)
 
     def get_bundles(self):
         self.set_bundles()

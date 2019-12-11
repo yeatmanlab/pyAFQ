@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 from scipy.spatial.distance import mahalanobis, cdist
+from scipy.stats import zscore
 
 import nibabel as nib
 from tqdm.auto import tqdm
@@ -16,6 +17,7 @@ import dipy.core.gradients as dpg
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
+import AFQ.data as afd
 
 __all__ = ["Segmentation"]
 
@@ -42,7 +44,9 @@ class Segmentation:
                  b0_threshold=0,
                  prob_threshold=0,
                  rng=None,
-                 return_idx=False):
+                 return_idx=False,
+                 filter_by_endpoints=True,
+                 dist_to_aal=4):
         """
         Segment streamlines into bundles.
 
@@ -98,6 +102,15 @@ class Segmentation:
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
 
+        filter_by_endpoints: bool
+            Whether to filter the bundles based on their endpoints relative
+            to regions defined in the AAL atlas. Applies only to the waypoint
+            approach (XXX for now). Default: True.
+
+        dist_to_aal : float
+            If filter_by_endpoints is True, this is the distance from the
+            endpoints to the AAL atlas ROIs that is required.
+
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -127,6 +140,9 @@ class Segmentation:
         self.model_clust_thr = model_clust_thr
         self.reduction_thr = reduction_thr
         self.return_idx = return_idx
+        self.filter_by_endpoints = filter_by_endpoints
+        self.dist_to_aal = dist_to_aal
+
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
@@ -232,13 +248,13 @@ class Segmentation:
                     "Provide either the full path to data, bvals, bvecs,"
                     + "or provide the affine of the image and the mapping")
 
-        self.logger.info("Preparing Segmentation Parameters...")
+        self.logger.info("Preparing Segmentation Parameters")
         self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
 
-        self.logger.info("Preprocessing Streamlines...")
+        self.logger.info("Preprocessing Streamlines")
         self.streamlines = streamlines
         if self.nb_points:
             self.resample_streamlines(self.nb_points)
@@ -422,6 +438,7 @@ class Segmentation:
         """
         dist = []
         for roi in include_rois:
+            # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
             if np.min(dist[-1]) > tol:
                 # Too far from one of them:
@@ -434,6 +451,7 @@ class Segmentation:
         list of exclusion ROIs.
         """
         for roi in exclude_rois:
+            # Use squared Euclidean distance, because it's faster:
             if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
@@ -470,7 +488,19 @@ class Segmentation:
         if self.return_idx:
             out_idx = np.arange(n_streamlines, dtype=int)
 
-        self.logger.info("Assigning Streamlines to Bundles...")
+        if self.filter_by_endpoints:
+            aal_atlas = afd.read_aal_atlas()['atlas'].get_fdata()
+            # We need to calculate the size of a voxel, so we can transform
+            # from mm to voxel units:
+            R = self.img_affine[0:3, 0:3]
+            vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+            dist_to_aal = self.dist_to_aal / vox_dim
+
+
+        self.logger.info("Assigning Streamlines to Bundles")
+        # Tolerance is set to the square of the distance to the corner
+        # because we are using the squared Euclidean distance in calls to
+        # `cdist` to make those calls faster.
         tol = dts.dist_to_corner(self.img_affine)**2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
@@ -483,7 +513,7 @@ class Segmentation:
             idx_above_prob = np.where(
                 fiber_probabilities > self.prob_threshold)
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
-                              " the probability threshold"))
+                              " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx in tqdm(idx_above_prob[0]):
                 sl = streamlines[sl_idx]
@@ -517,7 +547,6 @@ class Segmentation:
                             streamlines_in_bundles[sl_idx, bundle_idx] =\
                                 fiber_probabilities[sl_idx]
 
-        self.logger.info("Cleaning and Re-Orienting...")
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         streamlines = streamlines[possible_fibers]
@@ -532,7 +561,10 @@ class Segmentation:
         # streamlines within a bundle in the same orientation with respect to
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
+        self.logger.info("Re-orienting streamlines to consistent directions")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Processing {bundle}")
+
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, Streamlines don't support item assignment:
             select_sl = list(streamlines[select_idx])
@@ -555,6 +587,33 @@ class Segmentation:
                     select_sl[idx] = select_sl[idx][::-1]
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
+
+            if self.filter_by_endpoints:
+                self.logger.info("Filtering by endpoints")
+                # Create binary masks and warp these into subject's DWI space:
+                aal_targets = afd.bundles_to_aal([bundle], atlas=aal_atlas)[0]
+                aal_idx = []
+                for targ in aal_targets:
+                    if targ is not None:
+                        aal_roi = np.zeros(aal_atlas.shape[:3])
+                        aal_roi[targ[:, 0], targ[:, 1], targ[:, 2]] = 1
+                        warped_roi = self.mapping.transform_inverse(
+                            aal_roi,
+                            interpolation='nearest')
+                        aal_idx.append(np.array(np.where(warped_roi > 0)).T)
+                    else:
+                        aal_idx.append(None)
+
+                self.logger.info("Before filtering "
+                                 f"{len(select_sl)} streamlines")
+                select_sl = clean_by_endpoints(select_sl,
+                                               aal_idx[0],
+                                               aal_idx[1],
+                                               tol=dist_to_aal)
+                select_sl = dts.Streamlines(select_sl)
+                self.logger.info("After filtering "
+                                 f"{len(select_sl)} streamlines")
+
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
@@ -585,7 +644,7 @@ class Segmentation:
             self.streamlines = streamlines
 
         fiber_groups = {}
-        self.logger.info("Registering Whole-brain with SLR...")
+        self.logger.info("Registering Whole-brain with SLR")
         # We start with whole-brain SLR:
         atlas = self.bundle_dict['whole_brain']
         moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
@@ -596,14 +655,14 @@ class Segmentation:
             rng=self.rng)
 
         # We generate our instance of RB with the moved streamlines:
-        self.logger.info("Extracting Bundles...")
+        self.logger.info("Extracting Bundles")
         rb = RecoBundles(moved, verbose=False, rng=self.rng)
 
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         bundle_list.remove('whole_brain')
 
-        self.logger.info("Assigning Streamlines to Bundles...")
+        self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
             _, rec_labels = rb.recognize(model_bundle=model_sl,
@@ -628,9 +687,10 @@ class Segmentation:
         return fiber_groups
 
 
-def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
-                      clean_threshold=3, min_sl=20, stat=np.mean,
-                      return_idx=False):
+def clean_bundle(streamlines, n_points=100, clean_rounds=5,
+                 distance_threshold=5, length_threshold=4,
+                 min_sl=20, stat=np.mean,
+                 return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
@@ -647,9 +707,14 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
 
-    clean_threshold : float, optional.
+    distance_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
-        standard deviations). Default: 3.
+        standard deviations). Default: 5.
+
+    length_threshold: float, optional
+        Threshold for cleaning based on length (in standard deviations). Length
+        of any streamline should not be *more* than this number of stdevs from
+        the mean length.
 
     min_sl : int, optional.
         Number of streamlines in a bundle under which we will
@@ -684,18 +749,27 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
     idx = np.arange(len(fgarray))
     # This calculates the Mahalanobis for each streamline/node:
     w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+    lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while (np.any(w > clean_threshold)
+    while ((np.any(w > distance_threshold)
+            or np.any(zscore(lengths) > length_threshold))
            and rounds_elapsed < clean_rounds
            and len(streamlines) > min_sl):
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
-        idx_belong = np.where(
-            np.all(w < clean_threshold, axis=-1))[0]
+        idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
+        idx_len = np.where(zscore(lengths) < length_threshold)[0]
+        idx_belong = np.intersect1d(idx_dist, idx_len)
+
+        if len(idx_belong) < min_sl:
+            # need to sort and return exactly min_sl:
+            idx_belong = np.argsort(np.sum(w, axis=-1))[:min_sl]
+
         idx = idx[idx_belong.astype(int)]
         # Update by selection:
         fgarray = fgarray[idx_belong.astype(int)]
+        lengths = lengths[idx_belong.astype(int)]
         # Repeat:
         w = gaussian_weights(fgarray, return_mahalnobis=True)
         rounds_elapsed += 1
@@ -705,3 +779,92 @@ def clean_fiber_group(streamlines, n_points=100, clean_rounds=5,
         return out, idx
     else:
         return out
+
+
+def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None):
+    """
+    Clean a collection of streamlines based on their two endpoints
+
+    Filters down to only include items that have their starting points close to
+    the targets0 and ending points close to targets1
+
+    Parameters
+    ----------
+    streamlines : sequence of 3XN_i arrays The collection of streamlines to
+        filter down to.
+
+    targets0, target1: sequences or Nx3 arrays or None.
+        The targets. Numerical values in the atlas array for targets for the
+        first and last node in each streamline respectively, or NX3 arrays with
+        each row containing the indices for these locations in the atlas.
+        If provided a None, this means no restriction on that end.
+
+    tol : float, optional A distance tolerance (in units that the coordinates
+        of the streamlines are represented in). Default: 0, which means that
+        the endpoint is exactly in the coordinate of the target ROI.
+
+    atlas : 3D array or Nifti1Image class instance with a 3D array, optional.
+        Contains numerical values for ROIs. Default: if not provided, assume
+        that targets0 and targets1 are both arrays of indices, and this
+        information is not needed.
+
+
+    Yields
+    -------
+    Generator of the filtered collection
+    """
+    if tol is None:
+        tol = 0
+
+    # We square the tolerance, because below we are using the squared Euclidean
+    # distance which is slightly faster:
+    tol = tol ** 2
+
+    # Check whether it's already in the right format:
+    sp_is_idx = (targets0 is None
+                 or(isinstance(targets0, np.ndarray)
+                    and targets0.shape[1] == 3))
+
+    ep_is_idx = (targets1 is None
+                 or (isinstance(targets1, np.ndarray)
+                     and targets1.shape[1] == 3))
+
+    if atlas is None and not (ep_is_idx and sp_is_idx):
+        raise ValueError()
+
+    if sp_is_idx:
+        idxes0 = targets0
+    else:
+        # Otherwise, we'll need to derive it:
+        startpoint_roi = np.zeros(atlas.shape, dtype=bool)
+        for targ in targets0:
+            startpoint_roi[atlas == targ] = 1
+        idxes0 = np.array(np.where(startpoint_roi)).T
+
+    if ep_is_idx:
+        idxes1 = targets1
+    else:
+        endpoint_roi = np.zeros(atlas.shape, dtype=bool)
+        for targ in targets1:
+            endpoint_roi[atlas == targ] = 1
+        idxes1 = np.array(np.where(endpoint_roi)).T
+
+    for sl in streamlines:
+        if targets0 is None:
+            # Nothing to check
+            dist0ok = True
+        else:
+            dist0ok = False
+            dist0 = np.min(cdist(np.array([sl[0]]), idxes0, 'sqeuclidean'))
+            if dist0 <= tol:
+                dist0ok = True
+        # Only proceed if conditions for one side are fulfilled:
+        if dist0ok:
+            if targets1 is None:
+                # Nothing to check on this end:
+                yield sl
+            else:
+                dist2 = np.min(cdist(np.array([sl[-1]]), idxes1,
+                                     'sqeuclidean'))
+                if dist2 <= tol:
+                    yield sl

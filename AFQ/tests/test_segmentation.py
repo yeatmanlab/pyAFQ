@@ -13,7 +13,11 @@ import dipy.tracking.utils as dtu
 from dipy.stats.analysis import afq_profile
 
 import AFQ.data as afd
+import AFQ.tractography as aft
+import AFQ.registration as reg
 import AFQ.segmentation as seg
+import AFQ.dti as dti
+from AFQ.utils.volume import patch_up_roi
 
 
 def test_segment():
@@ -64,14 +68,8 @@ def test_segment():
         CST_R_sl, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
-    clean_sl = seg.clean_fiber_group(CST_R_sl)
-    # Since there are only 8 streamlines here, nothing should happen:
-    npt.assert_equal(clean_sl, CST_R_sl)
-
-    # Setting minimum number of streamlines to a smaller number and
-    # threshold to a relatively small number will exclude some streamlines:
-    clean_sl = seg.clean_fiber_group(CST_R_sl, min_sl=2, clean_threshold=2)
-    npt.assert_equal(len(clean_sl), 3)
+    clean_sl = seg.clean_bundle(CST_R_sl)
+    npt.assert_equal(len(clean_sl), len(CST_R_sl))
 
     # What if you don't have probability maps?
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -109,7 +107,6 @@ def test_segment():
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
 
-
     # get bundles for reco method
     bundles = afd.read_hcp_atlas_16_bundles()
     bundle_names = ['whole_brain', 'CST_R', 'CST_L']
@@ -143,3 +140,45 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
+
+def test_clean_by_endpoints():
+    sl = [np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1],
+                    [4, 1, 1]]),
+          np.array([[1, 1, 2],
+                    [2, 1, 2],
+                    [3, 1, 2],
+                    [4, 1, 2]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1]])]
+
+    atlas = np.zeros((20, 20, 20))
+
+    # Targets:
+    atlas[1, 1, 1] = 1
+    atlas[1, 1, 2] = 2
+    atlas[4, 1, 1] = 3
+    atlas[4, 1, 2] = 4
+
+    clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], atlas=atlas)
+    npt.assert_equal(list(clean_sl), sl[:2])
+
+    # If tol=1, the third streamline also gets included
+    clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], tol=1, atlas=atlas)
+    npt.assert_equal(list(clean_sl), sl[:3])
+
+    # Provide the Nx3 array of indices instead.
+    idx_start = np.array(np.where(atlas==1)).T
+    idx_end = np.array(np.where(atlas==3)).T
+
+    clean_sl = seg.clean_by_endpoints(sl, idx_start, idx_end, atlas=atlas)
+    npt.assert_equal(list(clean_sl), np.array([sl[0]]))
+
+    # Sometimes no requirement for one side:
+    clean_sl = seg.clean_by_endpoints(sl, [1], None, atlas=atlas)
+    npt.assert_equal(list(clean_sl), [sl[0], sl[2], sl[3]])
+
