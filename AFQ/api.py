@@ -112,7 +112,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
         A list of the bundles to be used in this case. Default: all of them
 
     resample_to : Nifti1Image, optional
-        If set, templates will be resampled to the affine and size of this
+        If set, templates will be resampled to the affine and shape of this
         image.
     """
     if seg_algo == "afq":
