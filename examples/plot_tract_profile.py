@@ -70,10 +70,8 @@ if not op.exists('dti_streamlines.trk'):
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
             if bundles[bundle]['rules'][idx]:
-                warped_roi = patch_up_roi(
-                    mapping.transform_inverse(
-                        roi.get_data().astype(np.float32),
-                        interpolation='linear') > 0)
+                warped_roi = patch_up_roi(mapping.transform_inverse(
+                roi.get_data().astype(np.float32), interpolation='linear'))
                 nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
                          f"{bundle}_{idx+1}.nii.gz")
                 # Add voxels that aren't there yet:
