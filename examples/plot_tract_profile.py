@@ -74,10 +74,10 @@ if not op.exists('dti_streamlines.trk'):
                     mapping.transform_inverse(
                         roi.get_data().astype(np.float32),
                         interpolation='linear') > 0)
-
+                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                         f"{bundle}_{idx+1}.nii.gz")
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
-
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
@@ -86,18 +86,15 @@ if not op.exists('dti_streamlines.trk'):
     save_tractogram(sft, './dti_streamlines.trk',
                     bbox_valid_check=False)
 else:
-    tg = load_tractogram('./dti_streamlines.trk', img)
-    streamlines = tg.streamlines
+    sft = load_tractogram('./dti_streamlines.trk', img)
 
-streamlines = dts.Streamlines(
-    dtu.transform_tracking_output(streamlines,
-                                  np.linalg.inv(img.affine)))
+sft.to_vox()
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
                                 filter_by_endpoints=True)
 segmentation.segment(bundles,
-                     streamlines,
+                     sft.streamlines,
                      fdata=hardi_fdata,
                      fbval=hardi_fbval,
                      fbvec=hardi_fbvec,

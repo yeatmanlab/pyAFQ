@@ -3,7 +3,7 @@ from skimage.filters import gaussian
 from skimage.morphology import convex_hull_image
 
 
-def patch_up_roi(roi, sigma=0.5, truncate=2):
+def patch_up_roi(roi):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
     We perform a couple of computational geometry operations on the ROI to
@@ -25,5 +25,4 @@ def patch_up_roi(roi, sigma=0.5, truncate=2):
     ROI after dilation and hole-filling
     """
 
-    return convex_hull_image(gaussian(ndim.binary_fill_holes(roi),
-                                      sigma=sigma, truncate=truncate) > 0)
+    return convex_hull_image(ndim.binary_fill_holes(roi > 0))
