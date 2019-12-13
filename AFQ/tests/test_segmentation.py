@@ -11,6 +11,7 @@ import dipy.data.fetcher as fetcher
 import dipy.tracking.streamline as dts
 import dipy.tracking.utils as dtu
 from dipy.stats.analysis import afq_profile
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data as afd
 import AFQ.tractography as aft
@@ -20,20 +21,26 @@ import AFQ.dti as dti
 from AFQ.utils.volume import patch_up_roi
 
 
+dpd.fetch_stanford_hardi()
+hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
+hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
+hardi_img = nib.load(hardi_fdata)
+hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
+hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+file_dict = afd.read_stanford_hardi_tractography()
+mapping = file_dict['mapping.nii.gz']
+streamlines = file_dict['tractography_subsampled.trk']
+tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
+tg.to_vox()
+streamlines = tg.streamlines
+
+# streamlines = dts.Streamlines(
+#     dtu.transform_tracking_output(
+#         streamlines[streamlines._lengths > 10],
+#         np.linalg.inv(hardi_img.affine)))
+
+
 def test_segment():
-    dpd.fetch_stanford_hardi()
-    hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-    hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
-    hardi_img = nib.load(hardi_fdata)
-    hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
-    hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
-    file_dict = afd.read_stanford_hardi_tractography()
-    mapping = file_dict['mapping.nii.gz']
-    streamlines = file_dict['tractography_subsampled.trk']
-    streamlines = dts.Streamlines(
-        dtu.transform_tracking_output(
-            streamlines[streamlines._lengths > 10],
-            np.linalg.inv(hardi_img.affine)))
 
     templates = afd.read_templates()
     bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -49,7 +56,7 @@ def test_segment():
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
-                         streamlines,
+                         tg,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
@@ -65,7 +72,7 @@ def test_segment():
     # Calculate the tract profile for a volume of all-ones:
     tract_profile = afq_profile(
         np.ones(nib.load(hardi_fdata).shape[:3]),
-        CST_R_sl, np.eye(4))
+        CST_R_sl.streamlines, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
     clean_sl = seg.clean_bundle(CST_R_sl)
@@ -82,7 +89,7 @@ def test_segment():
                          'cross_midline': False}}
 
     segmentation.segment(bundles,
-                         streamlines,
+                         tg,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
@@ -96,7 +103,7 @@ def test_segment():
     # Test with the return_idx kwarg set to True:
     segmentation = seg.Segmentation(return_idx=True)
     segmentation.segment(bundles,
-                         streamlines,
+                         tg,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
@@ -120,7 +127,10 @@ def test_segment():
                                     greater_than=10,
                                     rm_small_clusters=1,
                                     rng=np.random.RandomState(seed=8))
-    fiber_groups = segmentation.segment(bundles, streamlines)
+    fiber_groups = segmentation.segment(bundles, tg,
+                                        hardi_fdata,
+                                        hardi_fbval,
+                                        hardi_fbvec)
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
@@ -134,7 +144,11 @@ def test_segment():
                                     rng=np.random.RandomState(seed=8),
                                     return_idx=True)
 
-    fiber_groups = segmentation.segment(bundles, streamlines)
+    fiber_groups = segmentation.segment(bundles,
+                                        tg,
+                                        hardi_fdata,
+                                        hardi_fbval,
+                                        hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     npt.assert_equal(len(fiber_groups), 2)

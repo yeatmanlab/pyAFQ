@@ -13,6 +13,7 @@ from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -22,14 +23,16 @@ import AFQ.data as afd
 __all__ = ["Segmentation"]
 
 
-def _resample_bundle(streamlines, n_points):
+def _resample_tg(tg, n_points):
     # reformat for dipy's set_number_of_points
-    if isinstance(streamlines, np.ndarray):
-        if len(streamlines.shape) > 2:
-            streamlines = streamlines.tolist()
+    if isinstance(tg, np.ndarray):
+        if len(tg.shape) > 2:
+            streamlines = tg.tolist()
             streamlines = [np.asarray(item) for item in streamlines]
+    else:
+        streamlines = tg.streamlines
 
-    return dps.set_number_of_points(streamlines, n_points)
+    return np.array(dps.set_number_of_points(streamlines, n_points))
 
 
 class Segmentation:
@@ -126,12 +129,7 @@ class Segmentation:
         else:
             self.rng = rng
 
-        algo = algo.lower()
-        if algo == 'reco':
-            self.segment = self._seg_reco
-        else:
-            self.segment = self._seg_afq
-
+        self.algo = algo.lower()
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -143,100 +141,56 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
 
+    def segment(self, bundle_dict, tg, fdata=None, fbval=None,
+                fbvec=None, mapping=None, reg_prealign=None,
+                reg_template=None, b0_threshold=0, img_affine=None):
 
-    def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
-                  fbvec=None, mapping=None, reg_prealign=None,
-                  reg_template=None):
         """
-        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+        Segment streamlines into bundles based on either waypoint ROIs
+        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
 
         Parameters
         ----------
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
         bundle_dict: dict
-            The format is something like::
+            Meta-data for the segmentation. The format is something like::
 
                 {'name': {'ROIs':[img1, img2],
                 'rules':[True, True]},
                 'prob_map': img3,
                 'cross_midline': False}
 
+        tg : StatefulTractogram
+            Bundles to segment
+
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
+
         mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
-            Default: None.
+            A mapping between DWI space and a template. If None, mapping will
+            be registered from data used in prepare_img. Default: None.
+
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
             Default: None.
+
         reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
-            Default: None.
+            Template to use for registration. Default: MNI T2.
 
-        References
-        ----------
-        .. [Garyfallidis17] Garyfallidis et al. Recognition of white matter
-        bundles using local and global streamline-based registration and
-        clustering, Neuroimage, 2017.
-        """
-        self.bundle_dict = bundle_dict
-        self.streamlines = streamlines
-        return self.segment_reco()
-
-    def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
-                 fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None, b0_threshold=0, img_affine=None):
-        """
-        Segment streamlines into bundles based on inclusion ROIs.
-
-        Prepare image data from DWI data,
-        Set mapping between DWI space and a template,
-        Get fiber probabilites and ROIs for each bundle,
-        And iterate over streamlines and bundles,
-        assigning streamlines to fiber groups.
-
-        Parameters
-        ----------
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
-        bundle_dict: dict
-            The format is something like::
-
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
-
-        fdata, fbval, fbvec : str
-            Full path to data, bvals, bvecs
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
-            Default: None.
-        reg_prealign : array, optional.
-            The linear transformation to be applied to align input images to
-            the reference space before warping under the deformation field.
-            Default: None.
-        reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
-            Default: None.
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
 
         References
         ----------
-        .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty,
-        Nathaniel J. Myall, Brian A. Wandell, and Heidi M. Feldman. 2012.
-        "Tract Profiles of White Matter Properties: Automating Fiber-Tract
-        Quantification" PloS One 7 (11): e49790.
+        .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
+        Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of
+        White Matter Properties: Automating Fiber-Tract Quantification"
+        PloS One 7 (11): e49790.
+
+        .. [Garyfallidis17] Garyfallidis et al. Recognition of white matter
+        bundles using local and global streamline-based registration and
+        clustering, Neuroimage, 2017.
         """
         if img_affine is not None:
             if (mapping is None
@@ -251,16 +205,20 @@ class Segmentation:
         self.logger.info("Preparing Segmentation Parameters")
         self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
-        self.prepare_map(mapping, reg_prealign, reg_template)
-        self.bundle_dict = bundle_dict
-
         self.logger.info("Preprocessing Streamlines")
-        self.streamlines = streamlines
+        self.tg = tg
+
         if self.nb_points:
             self.resample_streamlines(self.nb_points)
+
+        self.prepare_map(mapping, reg_prealign, reg_template)
+        self.bundle_dict = bundle_dict
         self.cross_streamlines()
 
-        return self.segment_afq()
+        if self.algo == "afq":
+            return self.segment_afq()
+        elif self.algo == "reco":
+            return self.segment_reco()
 
     def prepare_img(self, fdata, fbval, fbvec):
         """
@@ -330,8 +288,8 @@ class Segmentation:
         nb_points : int
             Integer representing number of points wanted along the curve.
             Streamlines will be resampled to this number of points.
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
+
+        streamlines : StatefulTractogram
             If streamlines is None, will use previously given streamlines.
             Default: None.
         """
@@ -341,26 +299,23 @@ class Segmentation:
         self.streamlines = np.array(
             dps.set_number_of_points(streamlines, nb_points))
 
-    def cross_streamlines(self, streamlines=None,
-                          template=None, low_coord=10):
+    def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """
         Classify the streamlines by whether they cross the midline.
-        Creates a crosses attribute which is an array of booleans.
-        Each boolean corresponds to a streamline,
-        and is whether or not that streamline crosses the midline.
+
+        Creates a crosses attribute which is an array of booleans. Each boolean
+        corresponds to a streamline, and is whether or not that streamline
+        crosses the midline.
 
         Parameters
         ----------
-        streamlines : list or Streamlines class instance.
+        tg : StatefulTractogram class instance.
+
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
-        low_coords: int, optional.
-            How many coordinates below the 0,0,0 point should a streamline be
-            to be split if it passes the midline.
-            Default: 10
         """
-        if streamlines is None:
-            streamlines = self.streamlines
+        if tg is None:
+            tg = self.tg
         if template is None:
             template_affine = self.img_affine
         else:
@@ -370,31 +325,14 @@ class Segmentation:
         zero_coord = np.dot(np.linalg.inv(template_affine),
                             np.array([0, 0, 0, 1]))
 
-        # cross_below = zero_coord[2] - low_coord
-        self.crosses = np.zeros(len(streamlines), dtype=bool)
+        self.crosses = np.zeros(len(tg), dtype=bool)
         # already_split = 0
-        for sl_idx, sl in enumerate(streamlines):
+        for sl_idx, sl in enumerate(tg.streamlines):
             if np.any(sl[:, 0] > zero_coord[0]) and \
                     np.any(sl[:, 0] < zero_coord[0]):
-                # if np.any(sl[:, 2] < cross_below):
-                #     # This is a streamline that needs to be split where it
-                #     # self.crosses the midline:
-                #     split_idx = np.argmin(np.abs(sl[:, 0] - zero_coord[0]))
-                #     streamlines = aus.split_streamline(
-                #         streamlines, sl_idx + already_split, split_idx)
-                #     already_split = already_split + 1
-                #     # Now that it's been split, neither cross the midline:
-                #     self.crosses[sl_idx] = False
-                #     self.crosses = np.concatenate([self.crosses[:sl_idx+1],
-                #                               np.array([False]),
-                #                               self.crosses[sl_idx+1:]])
-                # else:
                 self.crosses[sl_idx] = True
             else:
                 self.crosses[sl_idx] = False
-
-        # Move back to the original space:
-        self.streamlines = streamlines
 
     def _get_bundle_info(self, bundle_idx, bundle):
         """
@@ -455,27 +393,23 @@ class Segmentation:
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
 
-    def segment_afq(self, streamlines=None):
+    def segment_afq(self, tg=None):
         """
-        Iterate over streamlines and bundles,
-        assigning streamlines to fiber groups.
+        Assign streamlines to bundles using the waypoint ROI approach
 
         Parameters
         ----------
-        streamlines : list of 2D arrays
-            Each array is a streamline, shape (3, N).
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
+        tg : StatefulTractogram class instance
         """
-        if streamlines is None:
-            streamlines = self.streamlines
+        if tg is None:
+            tg = self.tg
         else:
-            self.streamlines = streamlines
+            self.tg = tg
 
         # For expedience, we approximate each streamline as a 100 point curve:
-        fgarray = _resample_bundle(streamlines, 100)
+        fgarray = _resample_tg(tg, 100)
 
-        n_streamlines = len(streamlines)
+        n_streamlines = fgarray.shape[0]
 
         streamlines_in_bundles = np.zeros(
             (n_streamlines, len(self.bundle_dict)))
@@ -493,7 +427,6 @@ class Segmentation:
             R = self.img_affine[0:3, 0:3]
             vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
             dist_to_aal = self.dist_to_aal / vox_dim
-
 
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
@@ -514,7 +447,7 @@ class Segmentation:
                               " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
             for sl_idx in tqdm(idx_above_prob[0]):
-                sl = streamlines[sl_idx]
+                sl = tg.streamlines[sl_idx]
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
@@ -547,7 +480,9 @@ class Segmentation:
 
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
-        streamlines = streamlines[possible_fibers]
+        tg = StatefulTractogram(tg.streamlines[possible_fibers],
+                                self.img,
+                                Space.VOX)
         if self.return_idx:
             out_idx = out_idx[possible_fibers]
 
@@ -565,14 +500,18 @@ class Segmentation:
 
             select_idx = np.where(bundle_choice == bundle_idx)
             # Use a list here, Streamlines don't support item assignment:
-            select_sl = list(streamlines[select_idx])
-            if len(select_sl) == 0:
+            select_sl = StatefulTractogram(tg.streamlines[select_idx],
+                                           self.img,
+                                           Space.VOX)
+            if len(select_sl.streamlines) == 0:
                 if self.return_idx:
                     self.fiber_groups[bundle] = {}
-                    self.fiber_groups[bundle]['sl'] = dts.Streamlines([])
+                    self.fiber_groups[bundle]['sl'] = StatefulTractogram(
+                        [], self.img, space.VOX)
                     self.fiber_groups[bundle]['idx'] = np.array([])
                 else:
-                    self.fiber_groups[bundle] = dts.Streamlines([])
+                    self.fiber_groups[bundle] = StatefulTractogram(
+                        [], self.img, space.VOX)
                 # There's nothing here, move to the next bundle:
                 continue
 
@@ -583,8 +522,13 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
-            # Set this to nibabel.Streamlines object for output:
-            select_sl = dts.Streamlines(select_sl)
+
+            select_sl = StatefulTractogram(select_sl.streamlines,
+                                           self.img,
+                                           Space.VOX)
+
+            # Set this to StatefulTractogram object for output:
+            # select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
 
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
@@ -604,11 +548,14 @@ class Segmentation:
 
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
-                select_sl = clean_by_endpoints(select_sl,
+                select_sl = clean_by_endpoints(select_sl.streamlines,
                                                aal_idx[0],
                                                aal_idx[1],
                                                tol=dist_to_aal)
-                select_sl = dts.Streamlines(select_sl)
+                select_sl = StatefulTractogram(select_sl,
+                                               self.img,
+                                               Space.VOX)
+
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
@@ -620,13 +567,13 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def segment_reco(self, streamlines=None):
+    def segment_reco(self, tg=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
         Parameters
         ----------
-        streamlines : list or Streamlines object.
+        tg : StatefulTractogram class instance
             A whole-brain tractogram to be segmented.
 
         Returns
@@ -636,17 +583,17 @@ class Segmentation:
             The streamlines in each object have all been oriented to have the
             same orientation (using `dts.orient_by_streamline`).
         """
-        if streamlines is None:
-            streamlines = self.streamlines
+        if tg is None:
+            tg = self.tg
         else:
-            self.streamlines = streamlines
+            self.tg = tg
 
         fiber_groups = {}
         self.logger.info("Registering Whole-brain with SLR")
         # We start with whole-brain SLR:
         atlas = self.bundle_dict['whole_brain']
         moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
-            atlas, streamlines, x0='affine', verbose=False,
+            atlas, self.tg.streamlines, x0='affine', verbose=False,
             progressive=self.progressive,
             greater_than=self.greater_than,
             rm_small_clusters=self.rm_small_clusters,
@@ -672,22 +619,25 @@ class Segmentation:
                                          pruning_distance='mdf')
 
             # Use the streamlines in the original space:
-            recognized_sl = streamlines[rec_labels]
+            recognized_sl = tg.streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels
-                fiber_groups[bundle]['sl'] = oriented_sl
+                fiber_groups[bundle]['sl'] = StatefulTractogram(oriented_sl,
+                                                                self.img,
+                                                                Space.RASMM)
             else:
-                fiber_groups[bundle] = oriented_sl
+                fiber_groups[bundle] = StatefulTractogram(oriented_sl,
+                                                          self.img,
+                                                          Space.RASMM)
         self.fiber_groups = fiber_groups
         return fiber_groups
 
 
-def clean_bundle(streamlines, n_points=100, clean_rounds=5,
-                 distance_threshold=5, length_threshold=4,
-                 min_sl=20, stat=np.mean,
+def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
+                 length_threshold=4, min_sl=20, stat=np.mean,
                  return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
@@ -734,26 +684,26 @@ def clean_bundle(streamlines, n_points=100, clean_rounds=5,
     """
 
     # We don't even bother if there aren't enough streamlines:
-    if len(streamlines) < min_sl:
+    if len(tg.streamlines) < min_sl:
         if return_idx:
-            return streamlines, np.arange(len(streamlines))
+            return tg, np.arange(len(tg.streamlines))
         else:
-            return streamlines
+            return tg
 
     # Resample once up-front:
-    fgarray = _resample_bundle(streamlines, n_points)
+    fgarray = _resample_tg(tg, n_points)
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
     # This calculates the Mahalanobis for each streamline/node:
     w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
-    lengths = np.array([sl.shape[0] for sl in streamlines])
+    lengths = np.array([sl.shape[0] for sl in tg.streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
     while ((np.any(w > distance_threshold)
             or np.any(zscore(lengths) > length_threshold))
            and rounds_elapsed < clean_rounds
-           and len(streamlines) > min_sl):
+           and len(tg.streamlines) > min_sl):
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
         idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
