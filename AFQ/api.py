@@ -14,7 +14,7 @@ from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data as afd
@@ -26,6 +26,9 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 __all__ = ["AFQ", "make_bundle_dict"]
@@ -402,16 +405,18 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
             n_seeds=n_seeds,
             random_seeds=random_seeds,
             force_recompute=force_recompute)
-        tg = nib.streamlines.load(streamlines_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
 
-        reg_prealign = np.load(_reg_prealign(row,
-                                             force_recompute=force_recompute))
+        tg = load_tractogram(streamlines_file, nib.load(row['dwi_file']))
+        tg.to_vox()
+
+        reg_prealign = np.load(
+            _reg_prealign(row, force_recompute=force_recompute))
+
         segmentation = seg.Segmentation(
             algo=method,
             filter_by_endpoints=filter_by_endpoints)
         bundles = segmentation.segment(bundle_dict,
-                                       sl,
+                                       tg,
                                        row['dwi_file'],
                                        row['bval_file'],
                                        row['bvec_file'],

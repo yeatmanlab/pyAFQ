@@ -499,22 +499,21 @@ class Segmentation:
             self.logger.info(f"Processing {bundle}")
 
             select_idx = np.where(bundle_choice == bundle_idx)
-            # Use a list here, Streamlines don't support item assignment:
-            select_sl = StatefulTractogram(tg.streamlines[select_idx],
-                                           self.img,
-                                           Space.VOX)
-            if len(select_sl.streamlines) == 0:
+
+            if len(select_idx[0]) == 0:
                 if self.return_idx:
                     self.fiber_groups[bundle] = {}
                     self.fiber_groups[bundle]['sl'] = StatefulTractogram(
-                        [], self.img, space.VOX)
+                        [], self.img, Space.VOX)
                     self.fiber_groups[bundle]['idx'] = np.array([])
                 else:
                     self.fiber_groups[bundle] = StatefulTractogram(
-                        [], self.img, space.VOX)
+                        [], self.img, Space.VOX)
                 # There's nothing here, move to the next bundle:
                 continue
 
+            # Use a list here, Streamlines don't support item assignment:
+            select_sl = list(tg.streamlines[select_idx])
             # Sub-sample min_dist_coords:
             min_dist_coords_bundle = min_dist_coords[select_idx]
             for idx in range(len(select_sl)):
@@ -522,13 +521,6 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
-
-            select_sl = StatefulTractogram(select_sl.streamlines,
-                                           self.img,
-                                           Space.VOX)
-
-            # Set this to StatefulTractogram object for output:
-            # select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
 
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
@@ -552,12 +544,12 @@ class Segmentation:
                                                aal_idx[0],
                                                aal_idx[1],
                                                tol=dist_to_aal)
-                select_sl = StatefulTractogram(select_sl,
-                                               self.img,
-                                               Space.VOX)
 
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
+
+            # Set this to StatefulTractogram object for output:
+            select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
