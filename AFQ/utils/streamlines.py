@@ -1,5 +1,6 @@
 import numpy as np
 import nibabel as nib
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 
 def add_bundles(t1, t2):
@@ -19,7 +20,7 @@ def add_bundles(t1, t2):
         affine_to_rasmm=t2.affine_to_rasmm)
 
 
-def bundles_to_tgram(bundles, bundle_dict, affine):
+def bundles_to_tgram(bundles, bundle_dict, reference):
     """
     Create a nibabel trk Tractogram object from bundles and their
     specification.
@@ -31,20 +32,20 @@ def bundles_to_tgram(bundles, bundle_dict, affine):
     bundle_dict: dict
         A bundle specification dictionary. Each item includes in particular a
         `uid` key that is a unique integer for that bundle.
-    affine : array
+    reference : Nifti
         The affine_to_rasmm input to `nib.streamlines.Tractogram`
     """
     tgram = nib.streamlines.Tractogram([], {'bundle': []})
     for b in bundles:
-        this_sl = bundles[b]
+        this_sl = bundles[b].streamlines
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
                 'bundle': (len(this_sl)
                            * [bundle_dict[b]['uid']])},
-                affine_to_rasmm=affine)
+                affine_to_rasmm=reference.affine)
         tgram = add_bundles(tgram, this_tgram)
-    return tgram
+    return StatefulTractogram(tgram.streamlines, reference, Space.VOX)
 
 
 def tgram_to_bundles(tgram, bundle_dict):

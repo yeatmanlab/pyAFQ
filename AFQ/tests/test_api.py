@@ -16,7 +16,7 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 from AFQ import api
@@ -128,7 +128,8 @@ def test_AFQ_data_waypoint():
                                 'sub-01_sess-01_dwi_reg_prealign.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
+    tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
+
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
     npt.assert_(len(bundles['CST_L']) > 0)
 

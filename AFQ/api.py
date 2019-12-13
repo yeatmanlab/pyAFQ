@@ -405,9 +405,8 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
             n_seeds=n_seeds,
             random_seeds=random_seeds,
             force_recompute=force_recompute)
-
-        tg = load_tractogram(streamlines_file, nib.load(row['dwi_file']))
-        tg.to_vox()
+        img = nib.load(row['dwi_file'])
+        tg = load_tractogram(streamlines_file, img, Space.VOX)
 
         reg_prealign = np.load(
             _reg_prealign(row, force_recompute=force_recompute))
@@ -424,8 +423,8 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        mapping=_mapping(row, reg_template),
                                        reg_prealign=reg_prealign)
 
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
-        nib.streamlines.save(tgram, bundles_file)
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
+        save_tractogram(tgram, bundles_file)
     return bundles_file
 
 
