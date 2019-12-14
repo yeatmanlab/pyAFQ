@@ -104,7 +104,8 @@ def test_AFQ_data_waypoint():
                     sub_prefix='sub',
                     seg_algo=seg_algo,
                     bundle_names=bundle_names,
-                    odf_model="DTI")
+                    odf_model="DTI",
+                    filter_by_endpoints=False)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()

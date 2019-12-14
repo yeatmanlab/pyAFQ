@@ -512,7 +512,8 @@ class Segmentation:
                 # There's nothing here, move to the next bundle:
                 continue
 
-            # Use a list here, Streamlines don't support item assignment:
+            # Use a list here, because ArraySequence doesn't support item
+            # assignment:
             select_sl = list(tg.streamlines[select_idx])
             # Sub-sample min_dist_coords:
             min_dist_coords_bundle = min_dist_coords[select_idx]
@@ -521,6 +522,9 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
+
+            # Set this to StatefulTractogram object for filtering/output:
+            select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
 
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
@@ -540,16 +544,18 @@ class Segmentation:
 
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
+
                 select_sl = clean_by_endpoints(select_sl.streamlines,
                                                aal_idx[0],
                                                aal_idx[1],
                                                tol=dist_to_aal)
+                # Generate immediately:
+                select_sl = StatefulTractogram(select_sl,
+                                               self.img,
+                                               Space.RASMM)
 
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
-
-            # Set this to StatefulTractogram object for output:
-            select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}

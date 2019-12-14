@@ -392,7 +392,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
              odf_model="DTI", directions="det", n_seeds=2,
              random_seeds=False, force_recompute=False,
-             filter_by_endpoints=False):
+             **segmentation_params):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -412,7 +412,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
 
         segmentation = seg.Segmentation(
             algo=method,
-            filter_by_endpoints=filter_by_endpoints)
+            **segmentation_params)
         bundles = segmentation.segment(bundle_dict,
                                        tg,
                                        row['dwi_file'],
@@ -705,7 +705,7 @@ class AFQ(object):
                  force_recompute=False,
                  reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
-                 filter_by_endpoints=False):
+                 **segmentation_params):
         """
 
         dmriprep_path: str
@@ -747,7 +747,7 @@ class AFQ(object):
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
-        self.filter_by_endpoints = filter_by_endpoints
+        self.segmentation_params = segmentation_params
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
         else:
@@ -1015,7 +1015,7 @@ class AFQ(object):
                     n_seeds=self.n_seeds,
                     random_seeds=self.random_seeds,
                     force_recompute=self.force_recompute,
-                    filter_by_endpoints=self.filter_by_endpoints)
+                    **self.segmentation_params)
 
     def get_bundles(self):
         self.set_bundles()
