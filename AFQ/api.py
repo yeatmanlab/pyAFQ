@@ -445,8 +445,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                 force_recompute=force_recompute)
 
         sft = load_tractogram(bundles_file,
-                             row['dwi_img'],
-                             Space.VOX)
+                              row['dwi_img'],
+                              Space.VOX)
 
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
 
@@ -478,7 +478,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det",
                     n_seeds=2, random_seeds=False,
-                    scalars=["dti_fa", "dti_md"], weighting=None,
+                    scalars=_scalar_dict.keys(), weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
