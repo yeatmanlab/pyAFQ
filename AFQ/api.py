@@ -405,9 +405,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
             n_seeds=n_seeds,
             random_seeds=random_seeds,
             force_recompute=force_recompute)
-        img = nib.load(row['dwi_file'])
-        tg = load_tractogram(streamlines_file, img, Space.VOX)
-
+        tg = load_tractogram(streamlines_file, row['dwi_file'], Space.VOX)
         reg_prealign = np.load(
             _reg_prealign(row, force_recompute=force_recompute))
 
@@ -423,7 +421,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        mapping=_mapping(row, reg_template),
                                        reg_prealign=reg_prealign)
 
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_file'])
         save_tractogram(tgram, bundles_file)
     return bundles_file
 
@@ -444,22 +442,32 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                 n_seeds=n_seeds,
                                 random_seeds=random_seeds,
                                 force_recompute=False)
-        tg = nib.streamlines.load(bundles_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        tg = load_tractogram(bundles_file,
+                             row['dwi_img'],
+                             Space.VOX)
+
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         for b in bundle_dict.keys():
             idx = np.where(tg.data_per_streamline['bundle']
                            == bundle_dict[b]['uid'])[0]
-            this_sl = sl[idx]
-            this_sl = seg.clean_bundle(this_sl)
+            this_tg = StatefulTractogram(
+                tg.streamlines[idx],
+                row['dwi_img'],
+                Space.VOX)
+            this_tg = seg.clean_bundle(this_tg)
             this_tgram = nib.streamlines.Tractogram(
-                this_sl,
+                this_tg.streamlines,
                 data_per_streamline={
                     'bundle': (len(this_sl)
                                * [bundle_dict[b]['uid']])},
                     affine_to_rasmm=row['dwi_affine'])
             tgram = aus.add_bundles(tgram, this_tgram)
-        nib.streamlines.save(tgram, clean_bundles_file)
+        save_tractogram(
+            StatefulTractogram(tgram.streamlines,
+                               tg,
+                               Space.VOX,
+                               data_per_streamline=tgram.data_per_streamline),
+            clean_bundles_file)
 
     return clean_bundles_file
 

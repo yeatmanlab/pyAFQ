@@ -22,7 +22,7 @@ def add_bundles(t1, t2):
 
 def bundles_to_tgram(bundles, bundle_dict, reference):
     """
-    Create a nibabel trk Tractogram object from bundles and their
+    Create a StatefulTractogram object from bundles and their
     specification.
 
     Parameters
@@ -45,18 +45,18 @@ def bundles_to_tgram(bundles, bundle_dict, reference):
                            * [bundle_dict[b]['uid']])},
                 affine_to_rasmm=reference.affine)
         tgram = add_bundles(tgram, this_tgram)
-    return StatefulTractogram(tgram.streamlines, reference, Space.VOX)
+    return StatefulTractogram(tgram.streamlines, reference, Space.VOX,
+                              data_per_streamline=tgram.data_per_streamline)
 
 
-def tgram_to_bundles(tgram, bundle_dict):
+def tgram_to_bundles(tgram, bundle_dict, reference):
     """
-    Convert a nib.streamlines.Tractogram object to a dict with items
-    holding the streamlines in each bundle.
+    Convert a StatefulTractogram object to a dict with StatefulTractogram
+    objects for each bundle.
 
     Parameters
     ----------
-    tgram : nib.streamlines.Tractogram class instance.
-
+    tgram : StatefulTractogram class instance.
         Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
 
     bundle_dict: dict
@@ -68,7 +68,8 @@ def tgram_to_bundles(tgram, bundle_dict):
         if not bb == 'whole_brain':
             uid = bundle_dict[bb]['uid']
             idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
-            bundles[bb] = tgram[idx].streamlines.copy()
+            bundles[bb] = StatefulTractogram(
+                tgram.streamlines[idx].copy(), reference, Space.VOX)
     return bundles
 
 

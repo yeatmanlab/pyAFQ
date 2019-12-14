@@ -713,8 +713,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         # Repeat:
         w = gaussian_weights(fgarray, return_mahalnobis=True)
         rounds_elapsed += 1
+
     # Select based on the variable that was keeping track of things for us:
-    out = streamlines[idx]
+    out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
     if return_idx:
         return out, idx
     else:
