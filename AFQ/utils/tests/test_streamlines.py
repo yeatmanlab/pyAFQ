@@ -6,35 +6,43 @@ import nibabel.tmpdirs as nbtmp
 from AFQ.utils import streamlines as aus
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 
 def test_bundles_to_tgram():
-    bundles = {'b1': dts.Streamlines([np.array([[0, 0, 0],
-                                                [0, 0, 0.5],
-                                                [0, 0, 1],
-                                                [0, 0, 1.5]]),
-                                      np.array([[0, 0, 0],
-                                                [0, 0.5, 0.5],
-                                                [0, 1, 1]])]),
-               'b2': dts.Streamlines([np.array([[0, 0, 0],
-                                                [0, 0, 0.5],
-                                                [0, 0, 2],
-                                                [0, 0, 2.5]]),
-                                      np.array([[0, 0, 0],
-                                                [0, 0.5, 0.5],
-                                                [0, 2, 2]])])}
 
-    bundle_dict = {'b1': {'uid': 1}, 'b2':{'uid': 2}}
     affine = np.array([[2., 0., 0., -80.],
                        [0., 2., 0., -120.],
                        [0., 0., 2., -60.],
                        [0., 0., 0., 1.]])
-    tgram = aus.bundles_to_tgram(bundles, bundle_dict, affine)
-    new_bundles = aus.tgram_to_bundles(tgram, bundle_dict)
+    img = nib.Nifti1Image(np.ones((10, 10, 10, 30)), affine)
+
+    bundles = {'b1': StatefulTractogram([np.array([[0, 0, 0],
+                                                   [0, 0, 0.5],
+                                                   [0, 0, 1],
+                                                   [0, 0, 1.5]]),
+                                         np.array([[0, 0, 0],
+                                                   [0, 0.5, 0.5],
+                                                   [0, 1, 1]])],
+                                         img,
+                                         Space.VOX),
+               'b2': StatefulTractogram([np.array([[0, 0, 0],
+                                                   [0, 0, 0.5],
+                                                   [0, 0, 2],
+                                                   [0, 0, 2.5]]),
+                                         np.array([[0, 0, 0],
+                                                   [0, 0.5, 0.5],
+                                                   [0, 2, 2]])],
+                                         img,
+                                         Space.VOX)}
+
+    bundle_dict = {'b1': {'uid': 1}, 'b2':{'uid': 2}}
+    tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
+    new_bundles = aus.tgram_to_bundles(tgram, bundle_dict, img)
     for k1 in bundles.keys():
         for k2 in bundles[k1].__dict__.keys():
-            npt.assert_equal(new_bundles[k1].__dict__[k2],
-                             bundles[k1].__dict__[k2])
+            for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
+                npt.assert_equal(sl1, sl2)
 
 
 def test_split_streamline():
