@@ -32,7 +32,7 @@ def _resample_tg(tg, n_points):
     else:
         streamlines = tg.streamlines
 
-    return np.array(dps.set_number_of_points(streamlines, n_points))
+    return dps.set_number_of_points(streamlines, n_points)
 
 
 class Segmentation:
@@ -407,7 +407,7 @@ class Segmentation:
             self.tg = tg
 
         # For expedience, we approximate each streamline as a 100 point curve:
-        fgarray = _resample_tg(tg, 100)
+        fgarray = np.array(_resample_tg(tg, 100))
 
         n_streamlines = fgarray.shape[0]
 
