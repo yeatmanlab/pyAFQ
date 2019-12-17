@@ -47,7 +47,8 @@ class Segmentation:
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
-                 dist_to_aal=4):
+                 dist_to_aal=4,
+                 xform_to_dwi=True):
         """
         Segment streamlines into bundles.
 
@@ -111,6 +112,10 @@ class Segmentation:
         dist_to_aal : float
             If filter_by_endpoints is True, this is the distance from the
             endpoints to the AAL atlas ROIs that is required.
+        xform_to_dwi : bool, optional.
+            Automatically transform the streamlines in to and out of
+            the dwi space.
+            Default: True.
 
         References
         ----------
@@ -144,10 +149,11 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
 
+        self.xform_to_dwi = xform_to_dwi
 
     def _seg_reco(self, bundle_dict, streamlines, fdata=None, fbval=None,
                   fbvec=None, mapping=None, reg_prealign=None,
-                  reg_template=None):
+                  reg_template=None, img_affine=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
 
@@ -178,6 +184,11 @@ class Segmentation:
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration (defaults to the MNI T2)
             Default: None.
+        img_affine : array, optional.
+            The spatial transformation from the measurement to the scanner
+            space.
+            Inverse is used to transform to DWI space after segmentation.
+            Default: None.
 
         References
         ----------
@@ -185,14 +196,18 @@ class Segmentation:
         bundles using local and global streamline-based registration and
         clustering, Neuroimage, 2017.
         """
+        if img_affine is None and xform_to_dwi is True:
+            self.logger.error(
+                    "Provide the affine of the image if xform_to_dwi is true")
+
+        self.img_affine = img_affine
         self.bundle_dict = bundle_dict
         self.streamlines = streamlines
         return self.segment_reco()
 
     def _seg_afq(self, bundle_dict, streamlines, fdata=None, fbval=None,
                  fbvec=None, mapping=None, reg_prealign=None,
-                 reg_template=None, b0_threshold=0, img_affine=None,
-                 xform_to_dwi=True):
+                 reg_template=None, b0_threshold=0, img_affine=None):
         """
         Segment streamlines into bundles based on inclusion ROIs.
 
@@ -232,10 +247,6 @@ class Segmentation:
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
-        xform_to_dwi : bool, optional.
-            Automatically transform the streamlines in to and out of
-            the dwi space.
-            Default: True.
 
         References
         ----------
@@ -259,7 +270,6 @@ class Segmentation:
         self.prepare_img(fdata, fbval, fbvec)
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.xform_to_dwi = xform_to_dwi
 
         self.logger.info("Preprocessing Streamlines")
         self.streamlines = streamlines
@@ -599,11 +609,6 @@ class Segmentation:
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
 
-            # Transform output
-            if self.xform_to_dwi:
-                select_sl = dtu.transform_tracking_output(select_sl,
-                                                          self.img_affine)
-
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
 
@@ -696,6 +701,11 @@ class Segmentation:
             recognized_sl = streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+
+            if self.xform_to_dwi and self.img_affine != None:
+                oriented_sl = dts.Streamlines(
+                    dtu.transform_tracking_output(oriented_sl,
+                                                np.linalg.inv(self.img_affine)))
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels
