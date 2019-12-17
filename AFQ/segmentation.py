@@ -706,8 +706,9 @@ class Segmentation:
             if self.xform_to_dwi:
                 self.logger.info("Transforming Bundles to DWI")
                 oriented_sl = dts.Streamlines(
-                    dtu.transform_tracking_output(oriented_sl,
-                                                np.linalg.inv(self.img_affine)))
+                    dtu.transform_tracking_output(
+                        oriented_sl,
+                        np.linalg.inv(self.img_affine)))
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels
