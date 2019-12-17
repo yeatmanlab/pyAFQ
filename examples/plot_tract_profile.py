@@ -93,7 +93,7 @@ sft.to_vox()
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
-                                filter_by_endpoints=True)
+                                filter_by_endpoints=False)
 segmentation.segment(bundles,
                      sft,
                      fdata=hardi_fdata,
@@ -119,16 +119,16 @@ for bundle in bundles:
                              img,
                              Space.VOX)
     sft.to_rasmm()
-
     save_tractogram(sft, f'./{bundle}_afq.trk',
                     bbox_valid_check=False)
 
 
 print("Extracting tract profiles...")
 for bundle in bundles:
+    sft = load_tractogram(f'./{bundle}_afq.trk', img, to_space=Space.VOX)
     fig, ax = plt.subplots(1)
-    weights = gaussian_weights(fiber_groups[bundle]['sl'].streamlines)
-    profile = afq_profile(FA_data, fiber_groups[bundle]['sl'].streamlines,
+    weights = gaussian_weights(sft.streamlines)
+    profile = afq_profile(FA_data, sft.streamlines,
                           np.eye(4), weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)
