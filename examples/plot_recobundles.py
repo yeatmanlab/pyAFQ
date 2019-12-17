@@ -122,9 +122,7 @@ fiber_groups = segmentation.fiber_groups
 
 for kk in fiber_groups:
     print(kk, len(fiber_groups[kk]))
-    sft = StatefulTractogram(
-        dtu.transform_tracking_output(fiber_groups[kk], img.affine),
-        img, Space.RASMM)
+    sft = StatefulTractogram(fiber_groups[kk], img, Space.VOX)
     save_tractogram(sft, './%s_reco.trk'%kk,
                     bbox_valid_check=False)
 
