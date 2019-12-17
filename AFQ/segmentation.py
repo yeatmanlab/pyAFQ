@@ -520,7 +520,6 @@ class Segmentation:
             vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
             dist_to_aal = self.dist_to_aal / vox_dim
 
-
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
         # because we are using the squared Euclidean distance in calls to
