@@ -14,7 +14,7 @@ from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data as afd
@@ -26,6 +26,9 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 __all__ = ["AFQ", "make_bundle_dict"]
@@ -389,7 +392,7 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
 def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
              odf_model="DTI", directions="det", n_seeds=2,
              random_seeds=False, force_recompute=False,
-             filter_by_endpoints=False):
+             **segmentation_params):
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -402,16 +405,16 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
             n_seeds=n_seeds,
             random_seeds=random_seeds,
             force_recompute=force_recompute)
-        tg = nib.streamlines.load(streamlines_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+        img = nib.load(row['dwi_file'])
+        tg = load_tractogram(streamlines_file, img, Space.VOX)
+        reg_prealign = np.load(
+            _reg_prealign(row, force_recompute=force_recompute))
 
-        reg_prealign = np.load(_reg_prealign(row,
-                                             force_recompute=force_recompute))
         segmentation = seg.Segmentation(
             algo=method,
-            filter_by_endpoints=filter_by_endpoints)
+            **segmentation_params)
         bundles = segmentation.segment(bundle_dict,
-                                       sl,
+                                       tg,
                                        row['dwi_file'],
                                        row['bval_file'],
                                        row['bvec_file'],
@@ -419,8 +422,8 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        mapping=_mapping(row, reg_template),
                                        reg_prealign=reg_prealign)
 
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
-        nib.streamlines.save(tgram, bundles_file)
+        tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
+        save_tractogram(tgram, bundles_file)
     return bundles_file
 
 
@@ -439,23 +442,35 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                 directions=directions,
                                 n_seeds=n_seeds,
                                 random_seeds=random_seeds,
-                                force_recompute=False)
-        tg = nib.streamlines.load(bundles_file).tractogram
-        sl = tg.apply_affine(np.linalg.inv(row['dwi_affine'])).streamlines
+                                force_recompute=force_recompute)
+
+        sft = load_tractogram(bundles_file,
+                              row['dwi_img'],
+                              Space.VOX)
+
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
+
         for b in bundle_dict.keys():
-            idx = np.where(tg.data_per_streamline['bundle']
+            idx = np.where(sft.data_per_streamline['bundle']
                            == bundle_dict[b]['uid'])[0]
-            this_sl = sl[idx]
-            this_sl = seg.clean_bundle(this_sl)
+            this_tg = StatefulTractogram(
+                sft.streamlines[idx],
+                row['dwi_img'],
+                Space.VOX)
+            this_tg = seg.clean_bundle(this_tg)
             this_tgram = nib.streamlines.Tractogram(
-                this_sl,
+                this_tg.streamlines,
                 data_per_streamline={
-                    'bundle': (len(this_sl)
+                    'bundle': (len(this_tg)
                                * [bundle_dict[b]['uid']])},
                     affine_to_rasmm=row['dwi_affine'])
             tgram = aus.add_bundles(tgram, this_tgram)
-        nib.streamlines.save(tgram, clean_bundles_file)
+        save_tractogram(
+            StatefulTractogram(tgram.streamlines,
+                               sft,
+                               Space.VOX,
+                               data_per_streamline=tgram.data_per_streamline),
+            clean_bundles_file)
 
     return clean_bundles_file
 
@@ -463,7 +478,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     odf_model="DTI", directions="det",
                     n_seeds=2, random_seeds=False,
-                    scalars=["dti_fa", "dti_md"], weighting=None,
+                    scalars=_scalar_dict.keys(), weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
@@ -690,7 +705,7 @@ class AFQ(object):
                  force_recompute=False,
                  reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
-                 filter_by_endpoints=False):
+                 **segmentation_params):
         """
 
         dmriprep_path: str
@@ -732,7 +747,7 @@ class AFQ(object):
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
-        self.filter_by_endpoints = filter_by_endpoints
+        self.segmentation_params = segmentation_params
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
         else:
@@ -1000,7 +1015,7 @@ class AFQ(object):
                     n_seeds=self.n_seeds,
                     random_seeds=self.random_seeds,
                     force_recompute=self.force_recompute,
-                    filter_by_endpoints=self.filter_by_endpoints)
+                    **self.segmentation_params)
 
     def get_bundles(self):
         self.set_bundles()

@@ -73,11 +73,12 @@ if not op.exists('dti_streamlines.trk'):
                 warped_roi = patch_up_roi(
                     mapping.transform_inverse(
                         roi.get_data().astype(np.float32),
-                        interpolation='linear') > 0)
+                        interpolation='linear'))
 
+                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                         f"{bundle}_{idx+1}.nii.gz")
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
-
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
@@ -86,18 +87,15 @@ if not op.exists('dti_streamlines.trk'):
     save_tractogram(sft, './dti_streamlines.trk',
                     bbox_valid_check=False)
 else:
-    tg = load_tractogram('./dti_streamlines.trk', img)
-    streamlines = tg.streamlines
+    sft = load_tractogram('./dti_streamlines.trk', img)
 
-streamlines = dts.Streamlines(
-    dtu.transform_tracking_output(streamlines,
-                                  np.linalg.inv(img.affine)))
+sft.to_vox()
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
-                                filter_by_endpoints=True)
+                                filter_by_endpoints=False)
 segmentation.segment(bundles,
-                     streamlines,
+                     sft,
                      fdata=hardi_fdata,
                      fbval=hardi_fbval,
                      fbvec=hardi_fbvec,
@@ -117,19 +115,20 @@ for bundle in bundles:
 
     idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
 
-    sft = StatefulTractogram(
-        dtu.transform_tracking_output(new_fibers, img.affine),
-        img, Space.RASMM)
-
+    sft = StatefulTractogram(new_fibers.streamlines,
+                             img,
+                             Space.VOX)
+    sft.to_rasmm()
     save_tractogram(sft, f'./{bundle}_afq.trk',
                     bbox_valid_check=False)
 
 
 print("Extracting tract profiles...")
 for bundle in bundles:
+    sft = load_tractogram(f'./{bundle}_afq.trk', img, to_space=Space.VOX)
     fig, ax = plt.subplots(1)
-    weights = gaussian_weights(fiber_groups[bundle]['sl'])
-    profile = afq_profile(FA_data, fiber_groups[bundle]['sl'],
+    weights = gaussian_weights(sft.streamlines)
+    profile = afq_profile(FA_data, sft.streamlines,
                           np.eye(4), weights=weights)
     ax.plot(profile)
     ax.set_title(bundle)

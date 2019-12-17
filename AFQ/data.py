@@ -695,7 +695,7 @@ def bundles_to_aal(bundles, atlas=None):
         "ILF_L": [['leftoccipital'], ['leftilftemp']],
         "ILF_R": [['rightoccipital'], ['rightilftemp']],
         "SLF_L": [['leftinfparietal'], ['leftslffrontal']],
-        "SLF_R": [['rightinfparietal'],['rightslffrontal']],
+        "SLF_R": [['rightinfparietal'], ['rightslffrontal']],
         "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
         "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
         "ARC_L": [['leftfrontal'], ['leftarctemp']],
