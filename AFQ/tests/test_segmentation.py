@@ -52,10 +52,7 @@ def test_segment():
                          hardi_fbvec,
                          mapping=mapping)
     fiber_groups = segmentation.fiber_groups
-    for bundle in bundles:
-        fiber_groups[bundle] = dts.Streamlines(
-            dtu.transform_tracking_output(fiber_groups[bundle],
-                                          np.linalg.inv(hardi_img.affine)))
+
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:
@@ -120,12 +117,8 @@ def test_segment():
                                     greater_than=10,
                                     rm_small_clusters=1,
                                     rng=np.random.RandomState(seed=8))
-    fiber_groups = segmentation.segment(bundles, streamlines)
-
-    for bundle in ['CST_R', 'CST_L']:
-        fiber_groups[bundle] = dts.Streamlines(
-            dtu.transform_tracking_output(fiber_groups[bundle],
-                                          np.linalg.inv(hardi_img.affine)))
+    fiber_groups = segmentation.segment(bundles, streamlines,
+                                        img_affine=hardi_img.affine)
 
     # The same conditions should hold for recobundles
     # We asked for 2 fiber groups:
@@ -148,7 +141,8 @@ def test_segment():
                                     rng=np.random.RandomState(seed=8),
                                     return_idx=True)
 
-    fiber_groups = segmentation.segment(bundles, streamlines)
+    fiber_groups = segmentation.segment(bundles, streamlines,
+                                        img_affine=hardi_img.affine)
     fiber_groups = segmentation.fiber_groups
 
     npt.assert_equal(len(fiber_groups), 2)

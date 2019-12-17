@@ -418,11 +418,6 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
                                        reg_template=reg_template,
                                        mapping=_mapping(row, reg_template),
                                        reg_prealign=reg_prealign)
-        for bundle in bundle_dict:
-            bundles[bundle] = dts.Streamlines(
-                dtu.transform_tracking_output(bundles[bundle],
-                                              np.linalg.inv(
-                                                  row['dwi_affine'])))
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, row['dwi_affine'])
         nib.streamlines.save(tgram, bundles_file)

@@ -122,7 +122,9 @@ fiber_groups = segmentation.fiber_groups
 
 for kk in fiber_groups:
     print(kk, len(fiber_groups[kk]))
-    sft = StatefulTractogram(fiber_groups[kk], img, Space.RASMM)
+    sft = StatefulTractogram(
+        dtu.transform_tracking_output(fiber_groups[kk], img.affine),
+        img, Space.RASMM)
     save_tractogram(sft, './%s_reco.trk'%kk,
                     bbox_valid_check=False)
 
@@ -132,9 +134,7 @@ for name in bundle_names:
     for hemi in ["_R", "_L"]:
         fig, ax = plt.subplots(1)
         streamlines = dts.Streamlines(
-            dtu.transform_tracking_output(
-                [s for s in fiber_groups[name + hemi] if s.shape[0] > 100],
-                np.linalg.inv(img.affine)))
+            [s for s in fiber_groups[name + hemi] if s.shape[0] > 100])
 
         weights = gaussian_weights(streamlines)
         profile = afq_profile(FA_data,

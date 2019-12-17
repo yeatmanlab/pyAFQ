@@ -102,11 +102,6 @@ segmentation.segment(bundles,
 
 fiber_groups = segmentation.fiber_groups
 
-for bundle in bundles:
-    fiber_groups[bundle]['sl'] = dts.Streamlines(
-        dtu.transform_tracking_output(fiber_groups[bundle]['sl'],
-                                      np.linalg.inv(FA_img.affine)))
-
 print("Cleaning fiber groups...")
 for bundle in bundles:
     print(f"Cleaning {bundle}")

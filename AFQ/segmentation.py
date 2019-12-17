@@ -196,7 +196,7 @@ class Segmentation:
         bundles using local and global streamline-based registration and
         clustering, Neuroimage, 2017.
         """
-        if img_affine is None and xform_to_dwi is True:
+        if img_affine is None and self.xform_to_dwi is True:
             self.logger.error(
                     "Provide the affine of the image if xform_to_dwi is true")
 
@@ -493,6 +493,7 @@ class Segmentation:
 
         # transform input
         if self.xform_to_dwi:
+            self.logger.info("Transforming Bundles to DWI")
             streamlines = dts.Streamlines(
                 dtu.transform_tracking_output(streamlines,
                                               np.linalg.inv(self.img_affine)))
@@ -702,7 +703,8 @@ class Segmentation:
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
-            if self.xform_to_dwi and self.img_affine != None:
+            if self.xform_to_dwi:
+                self.logger.info("Transforming Bundles to DWI")
                 oriented_sl = dts.Streamlines(
                     dtu.transform_tracking_output(oriented_sl,
                                                 np.linalg.inv(self.img_affine)))
