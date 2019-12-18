@@ -406,6 +406,7 @@ class Segmentation:
         else:
             self.tg = tg
 
+        self.tg.to_vox()
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = np.array(_resample_tg(tg, 100))
 
