@@ -42,7 +42,7 @@ class Segmentation:
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
-                 model_clust_thr=40.,
+                 model_clust_thr=40,
                  reduction_thr=40,
                  b0_threshold=0,
                  prob_threshold=0,

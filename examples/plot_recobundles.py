@@ -26,6 +26,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
 import AFQ.segmentation as seg
+import AFQ.api as api
 
 dpd.fetch_stanford_hardi()
 
@@ -59,31 +60,25 @@ else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
 
-templates = afd.read_templates()
-bundle_names = ["CST", "AF"]
+bundle_names = ["CST", "C", "F", "UF", "MCP", "AF", "CCMid", "CC_ForcepsMajor",
+                "CC_ForcepsMinor", "IFOF"]
 
-bundles = {}
-uid = 1
+bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco")
+
 bundle_dict = afd.read_hcp_atlas_16_bundles()
 bundles["whole_brain"] = bundle_dict["whole_brain"]
-
-for name in bundle_names:
-    for hemi in ["_R", "_L"]:
-        bundles[name + hemi] = bundle_dict[name + hemi]
-        bundles[name + hemi]['uid'] = uid
-        uid += 1
 
 print("Tracking...")
 if not op.exists('dti_streamlines_reco.trk'):
     seed_roi = np.zeros(img.shape[:-1])
-    for name in bundle_names:
-        for hemi in ['_R', '_L']:
+    for bundle in bundles:
+        if bundle != 'whole_brain':
             sl_xform = dts.Streamlines(
-                dtu.transform_tracking_output(bundles[name + hemi]['sl'],
-                MNI_T2_img.affine))
+                dtu.transform_tracking_output(bundles[bundle]['sl'],
+                                            MNI_T2_img.affine))
 
             delta = dts.values_from_volume(mapping.backward,
-                                           sl_xform, np.eye(4))
+                                            sl_xform, np.eye(4))
             sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
 
             sl_xform = dts.Streamlines(
@@ -91,57 +86,68 @@ if not op.exists('dti_streamlines_reco.trk'):
                 np.linalg.inv(MNI_T2_img.affine)))
 
             sft = StatefulTractogram(sl_xform, img, Space.RASMM)
-            save_tractogram(sft, './%s%s_atlas.trk' % (name, hemi))
+            save_tractogram(sft, f'./{bundle}_atlas.trk')
 
             sl_xform = dts.Streamlines(
                 dtu.transform_tracking_output(sl_xform,
-                                     np.linalg.inv(img.affine)))
+                                        np.linalg.inv(img.affine)))
 
             for sl in sl_xform:
                 sl_as_idx = sl.astype(int)
                 seed_roi[sl_as_idx[:, 0],
-                         sl_as_idx[:, 1],
-                         sl_as_idx[:, 2]] = 1
+                            sl_as_idx[:, 1],
+                            sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
     streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            directions='det', stop_mask=FA_data,
+                            directions='det', n_seeds=2, stop_mask=FA_data,
                             stop_threshold=0.1)
     print(len(streamlines))
     sft = StatefulTractogram(streamlines, img, Space.RASMM)
     save_tractogram(sft, './dti_streamlines_reco.trk',
                     bbox_valid_check=False)
 else:
-    tg = load_tractogram('./dti_streamlines_reco.trk', img)
-    streamlines = tg.streamlines
+    sft = load_tractogram('./dti_streamlines_reco.trk', img)
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(algo='reco', rng=np.random.RandomState(2001))
-segmentation.segment(bundles, streamlines)
+segmentation = seg.Segmentation(algo='reco',
+                                rng=np.random.RandomState(2001),
+                                greater_than=60,
+                                rm_small_clusters=60,
+                                model_clust_thr=60,
+                                reduction_thr=60)
+
+segmentation.segment(bundles,
+                     sft,
+                     fdata=hardi_fdata,
+                     fbval=hardi_fbval,
+                     fbvec=hardi_fbvec,
+                     mapping=mapping,
+                     reg_template=MNI_T2_img)
+
+
 fiber_groups = segmentation.fiber_groups
 
 for kk in fiber_groups:
     print(kk, len(fiber_groups[kk]))
-    sft = StatefulTractogram(fiber_groups[kk], img, Space.RASMM)
+    sft = StatefulTractogram(fiber_groups[kk].streamlines,
+                             img,
+                             Space.RASMM)
     save_tractogram(sft, './%s_reco.trk'%kk,
                     bbox_valid_check=False)
 
 
 print("Extracting tract profiles...")
-for name in bundle_names:
-    for hemi in ["_R", "_L"]:
-        fig, ax = plt.subplots(1)
-        streamlines = dts.Streamlines(
-            dtu.transform_tracking_output(
-                [s for s in fiber_groups[name + hemi] if s.shape[0] > 100],
-                np.linalg.inv(img.affine)))
+for bundle in bundles:
+    if bundle != 'whole_brain':
 
-        weights = gaussian_weights(streamlines)
-        profile = afq_profile(FA_data,
-                              streamlines,
-                              np.eye(4),
-                              weights=weights)
+        fig, ax = plt.subplots(1)
+        sft = load_tractogram(f'./{bundle}_reco.trk', img, to_space=Space.VOX)
+        weights = gaussian_weights(sft.streamlines)
+        profile = afq_profile(FA_data, sft.streamlines,
+                            np.eye(4), weights=weights)
+
         ax.plot(profile)
-        ax.set_title(name + hemi)
+        ax.set_title(bundle)
 
 plt.show()
