@@ -125,6 +125,7 @@ for bundle in bundles:
 
 print("Extracting tract profiles...")
 for bundle in bundles:
+    fig, ax = plot.subplots()
     sft = load_tractogram(f'./{bundle}_afq.trk', img, to_space=Space.VOX)
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(sft.streamlines)
