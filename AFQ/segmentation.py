@@ -44,6 +44,8 @@ class Segmentation:
                  rm_small_clusters=50,
                  model_clust_thr=40,
                  reduction_thr=40,
+                 refine=False,
+                 pruning_thr=6,
                  b0_threshold=0,
                  prob_threshold=0,
                  rng=None,
@@ -58,6 +60,7 @@ class Segmentation:
         nb_points : int, boolean
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
+
         algo : string
             Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
@@ -137,9 +140,12 @@ class Segmentation:
         self.rm_small_clusters = rm_small_clusters
         self.model_clust_thr = model_clust_thr
         self.reduction_thr = reduction_thr
+        self.refine = refine
+        self.pruning_thr = pruning_thr
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
+
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
@@ -619,6 +625,13 @@ class Segmentation:
 
             # Use the streamlines in the original space:
             recognized_sl = tg.streamlines[rec_labels]
+            if self.refine:
+                _, rec_labels = rb.refine(model_sl, recognized_sl,
+                                          self.model_clust_thr,
+                                          reduction_thr=self.reduction_thr,
+                                          pruning_thr=self.pruning_thr)
+                recognized_sl = tg.streamlines[rec_labels]
+
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
             if self.return_idx:
