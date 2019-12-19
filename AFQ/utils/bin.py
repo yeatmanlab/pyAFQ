@@ -1,4 +1,5 @@
 
+import inspect
 from argparse import ArgumentParser
 
 
@@ -55,3 +56,12 @@ def model_predict_input_parser(usage):
                         help="b0 threshold (default: 0)",
                         action="store", default=0)
     return parser
+
+
+def get_default_args(func):
+    signature = inspect.signature(func)
+    return {
+        k: v.default
+        for k, v in signature.parameters.items()
+        if v.default is not inspect.Parameter.empty
+    }

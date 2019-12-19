@@ -26,6 +26,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+from AFQ.utils.bin import get_default_args
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -335,8 +336,7 @@ def _mapping(row, reg_template, force_recompute=False):
     return mapping_file
 
 
-def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
-                 n_seeds=2, random_seeds=False, force_recompute=False,
+def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False,
                  wm_fa_thresh=0.2):
     """
     wm_labels : list
@@ -344,6 +344,12 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
         will use this part of the image both to seed tracking (seeding
         throughout), and for stopping.
     """
+    if tracking_params is None:
+        tracking_params = get_default_args(aft.track)
+
+    odf_model = tracking_params["odf_model"]
+    directions = tracking_params["directions"]
+
     streamlines_file = _get_fname(row,
                                   '%s_%s_streamlines.trk' % (odf_model,
                                                              directions))
@@ -375,12 +381,11 @@ def _streamlines(row, wm_labels, odf_model="DTI", directions="det",
             dti_fa = nib.load(_dti_fa(row)).get_fdata()
             wm_mask = dti_fa > wm_fa_thresh
 
+        tracking_params['seed_mask'] = wm_mask
+        tracking_params['stop_mask'] = wm_mask
         streamlines = aft.track(params_file,
-                                directions=directions,
-                                n_seeds=n_seeds,
-                                random_seeds=random_seeds,
-                                seed_mask=wm_mask,
-                                stop_mask=wm_mask)
+                                **tracking_params)
+
         this_sl = dtu.transform_tracking_output(streamlines,
                                                 np.linalg.inv(dwi_img.affine))
         this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
@@ -696,16 +701,13 @@ class AFQ(object):
                  anat_file="*T1w*",
                  seg_file='*aparc+aseg*',
                  b0_threshold=0,
-                 odf_model="CSD",
-                 directions="det",
-                 n_seeds=2,
-                 random_seeds=False,
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
                  reg_template=None,
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
-                 **segmentation_params):
+                 tracking_params=None,
+                 segmentation_params=None):
         """
 
         dmriprep_path: str
@@ -735,8 +737,16 @@ class AFQ(object):
         wm_labels : list, optional
             A list of the labels of the white matter in the segmentation file
             used. Default: the white matter values for the segmentation
-            provided with the HCP data, including labels for midbraing:
+            provided with the HCP data, including labels for midbrain:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+
+        segmentation_params : dict, optional
+            The parameters for segmentation. Default: use the default behavior
+            of the seg.Segmentation object
+
+        tracking_params: dict, optional
+            The parameters for tracking. Default: use the default behavior of
+            the aft.track function.
         """
         self.directions = directions
         self.odf_model = odf_model
@@ -747,6 +757,14 @@ class AFQ(object):
         self.wm_labels = wm_labels
         self.n_seeds = n_seeds
         self.random_seeds = random_seeds
+        if tracking_params is None:
+            tracking_params = get_default_args(aft.track)
+
+        self.tracking_params = tracking_params
+        self.segmentation_params = segmentation_params
+
+        if segmentation_params is None:
+            segmentation_params = get_default_args(seg.Segmentation.__init__)
         self.segmentation_params = segmentation_params
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
