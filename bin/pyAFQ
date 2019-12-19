@@ -6,9 +6,25 @@ from configparser import ConfigParser
 from AFQ import api
 from AFQ.utils.bin import get_default_args
 import AFQ.segmentation as seg
+import AFQ.tracking as aft
+
+usage = """pyAFQ
+
+Provide path to config file. With sections:
+
+[files]
+dmriprep_path = '/path/to/dmriprep/folder'
+
+[bundles]
+
+[tracking]
+
+[segmentation]
 
 
-usage = """pyAFQ"""
+Only the `files` section is strictly required. If other sections are not
+included in the config file, default behavior for these parts will kick in.
+"""
 parser = ArgumentParser(usage)
 
 parser.add_argument(dest='config', action="store",
@@ -29,16 +45,18 @@ seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
 b0_threshold = CP.get("b0_threshold", fallback=0)
 
 
-CP.get("tracking", "odf_model", fallback="DTI")
-CP.get("tracking", "directions", fallback="det")
-CP.get("tracking", "n_seeds", fallback=1)
-CP.get("tracking", "random_seeds", fallback=False)
-CP.get("tracking", "wm_labels",
-        fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+track_defaults = get_default_args(aft.track)
+tracking_params = {}
+for k, v in track_defaults:
+    tracking_params[k] = CP.get("tracking", k, fallback=v)
+
+wm_labels = CP.get("tracking", "wm_labels",
+                    fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
 seg_defaults = get_default_args(seg.Segmentation.__init__)
+segmentation_params = {}
 for k, v in seg_defaults:
-    CP.get("segmentation", k, fallback=v)
+    segmentation_params[k] = CP.get("segmentation", k, fallback=v)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
@@ -56,7 +74,9 @@ myafq = api.AFQ(dmriprep_path,
                 dask_it=False,
                 force_recompute=False,
                 reg_template=None,
-                wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+                wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                segmentation_params=segmentation_params,
+                tracking_params=tracking_params)
 
 
 # Do all the things:
