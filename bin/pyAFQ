@@ -2,15 +2,16 @@
 
 from argparse import ArgumentParser
 from configparser import ConfigParser
+import ast
 
 from AFQ import api
 from AFQ.utils.bin import get_default_args
 import AFQ.segmentation as seg
-import AFQ.tracking as aft
+import AFQ.tractography as aft
 
 usage = """pyAFQ
 
-Provide path to config file. With sections:
+Provide path to config file. With sections (XXX spell out all the defaults):
 
 [files]
 dmriprep_path = '/path/to/dmriprep/folder'
@@ -24,57 +25,59 @@ dmriprep_path = '/path/to/dmriprep/folder'
 
 Only the `files` section is strictly required. If other sections are not
 included in the config file, default behavior for these parts will kick in.
+
+
 """
 parser = ArgumentParser(usage)
 
-parser.add_argument(dest='config', action="store",
+parser.add_argument(dest='config', action="store", type=str,
                     help="Path to config file")
 
 opts = parser.parse_args()
 
 CP = ConfigParser()
-CP.read_file(opts.config)
+CP.read(opts.config)
 
 dmriprep_path = CP.get("files", "dmriprep_path")
 sub_prefix = CP.get("files", "sub_prefix", fallback="sub")
 dwi_folder = CP.get("files", "dwi_folder", fallback="dwi")
-dwi_folder = CP.get("files", "dwi_file", fallback="*dwi")
+dwi_file = CP.get("files", "dwi_file", fallback="*dwi")
 anat_folder = CP.get("files", "anat_folder", fallback="anat")
 anat_file = CP.get("files", "anat_file", fallback="*T1w*")
 seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
-b0_threshold = CP.get("b0_threshold", fallback=0)
+b0_threshold = CP.get("files", "b0_threshold", fallback=0)
 
+scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
+scalars = CP.get("profiles", "scalars", fallback=["fa", "md"])
+
+bundles = ast.literal_eval(CP.get("bundles", "bundles", fallback=None))
 
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
-for k, v in track_defaults:
+for k, v in track_defaults.items():
     tracking_params[k] = CP.get("tracking", k, fallback=v)
 
 wm_labels = CP.get("tracking", "wm_labels",
-                    fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+                   fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}
-for k, v in seg_defaults:
+for k, v in seg_defaults.items():
     segmentation_params[k] = CP.get("segmentation", k, fallback=v)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
-                dwi_folder=opts.dwi_folder,
-                dwi_file=opts.dwi_file,
-                anat_folder=opts.anat_folder,
-                anat_file=opts.anat_file,
-                seg_file=opts.seg_file,
-                b0_threshold=float(opts.b0_threshold),
-                odf_model=opts.odf_model,
-                directions=opts.directions,
-                n_seeds=int(opts.n_seeds),
-                random_seeds=opts.random_seeds,
-                bundle_names=api.BUNDLES,
+                dwi_folder=dwi_folder,
+                dwi_file=dwi_file,
+                anat_folder=anat_folder,
+                anat_file=anat_file,
+                seg_file=seg_file,
+                b0_threshold=float(b0_threshold),
+                bundle_names=bundles,
                 dask_it=False,
                 force_recompute=False,
                 reg_template=None,
-                wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                wm_labels=wm_labels,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params)
 

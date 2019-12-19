@@ -748,15 +748,12 @@ class AFQ(object):
             The parameters for tracking. Default: use the default behavior of
             the aft.track function.
         """
-        self.directions = directions
-        self.odf_model = odf_model
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=seg_algo)
+
         self.seg_algo = seg_algo
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
-        self.n_seeds = n_seeds
-        self.random_seeds = random_seeds
         if tracking_params is None:
             tracking_params = get_default_args(aft.track)
 
