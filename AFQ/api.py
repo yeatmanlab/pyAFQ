@@ -737,7 +737,8 @@ class AFQ(object):
             the aft.track function.
         """
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
-                                            seg_algo=seg_algo)
+                                            seg_algo=seg_algo,
+                                            resample_to=reg_template)
 
         self.seg_algo = seg_algo
         self.force_recompute = force_recompute

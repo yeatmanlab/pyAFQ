@@ -56,6 +56,7 @@ anat_folder = CP.get("files", "anat_folder", fallback="anat")
 anat_file = CP.get("files", "anat_file", fallback="*T1w*")
 seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
 b0_threshold = CP.get("files", "b0_threshold", fallback=0)
+reg_template = CP.get("files", "reg_template", fallback=None)
 
 scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
 
@@ -65,6 +66,7 @@ scalars = CP.getlist("profiles", "scalars", fallback=["fa", "md"])
 bundles = CP.getlist("bundles", "bundles", fallback=None)
 wm_labels = CP.getlist("tracking", "wm_labels",
                        fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+wm_labels = [int(w) for w in wm_labels]
 
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
@@ -76,8 +78,12 @@ tracking_params['random_seeds'] = CP['tracking'].getboolean("random_seeds")
 
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}
+segmentation_params[] = CP.getboolean
 for k, v in seg_defaults.items():
     segmentation_params[k] = CP.get("segmentation", k, fallback=v)
+
+dask_it = CP.getboolean("compute", "dask_it", fallback=False)
+force_recompute = CP.getboolean("compute", "force_recompute", fallback=False)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
@@ -88,9 +94,9 @@ myafq = api.AFQ(dmriprep_path,
                 seg_file=seg_file,
                 b0_threshold=float(b0_threshold),
                 bundle_names=bundles,
-                dask_it=False,
-                force_recompute=False,
-                reg_template=None,
+                dask_it=dask_it,
+                force_recompute=force_recompute,
+                reg_template=reg_template,
                 wm_labels=wm_labels,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params)
