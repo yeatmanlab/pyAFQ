@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
-from configparser import ConfigParser
+import toml
 
 from AFQ import api
 from AFQ.utils.bin import get_default_args
@@ -38,52 +38,49 @@ parser.add_argument(dest='config', action="store", type=str,
 
 opts = parser.parse_args()
 
-CP = ConfigParser(
-    converters={'list': lambda x: [i.strip() for i in x.split(',')]})
+config = toml.load(opts.config)
 
-CP.read(opts.config)
+files = config.get("files", {})
 
-dmriprep_path = CP.get("files", "dmriprep_path")
-print("----------------------")
-print("Analyzing data in:")
-print(dmriprep_path)
-print("----------------------")
 
-sub_prefix = CP.get("files", "sub_prefix", fallback="sub")
-dwi_folder = CP.get("files", "dwi_folder", fallback="dwi")
-dwi_file = CP.get("files", "dwi_file", fallback="*dwi")
-anat_folder = CP.get("files", "anat_folder", fallback="anat")
-anat_file = CP.get("files", "anat_file", fallback="*T1w*")
-seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
-b0_threshold = CP.get("files", "b0_threshold", fallback=0)
-reg_template = CP.get("files", "reg_template", fallback=None)
+dmriprep_path = files.get("dmriprep_path")
 
-scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
+if dmriprep_path is None:
+    raise RuntimeError("Config file must provide dmriprep_path")
 
-# This is the way to get lists out
-# (see https://stackoverflow.com/a/53274707/3532933):
-scalars = CP.getlist("profiles", "scalars", fallback=["fa", "md"])
-bundles = CP.getlist("bundles", "bundles", fallback=None)
-wm_labels = CP.getlist("tracking", "wm_labels",
-                       fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
-wm_labels = [int(w) for w in wm_labels]
+sub_prefix = files.get("sub_prefix", "sub")
+dwi_folder = files.get("dwi_folder","dwi")
+dwi_file = files.get("dwi_file", "*dwi")
+anat_folder = files.get("anat_folder", "anat")
+anat_file = files.get("anat_file", "*T1w*")
+seg_file = files.get("seg_file", "*aparc+aseg*")
+b0_threshold = files.get("b0_threshold", 0)
+reg_template = files.get("reg_template", None)
 
+tracking = config.get("tracking")
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
 for k, v in track_defaults.items():
-    tracking_params[k] = CP.get("tracking", k, fallback=v)
+    tracking_params[k] = tracking.get(k, v)
 
-tracking_params['n_seeds'] = int(tracking_params['n_seeds'])
-tracking_params['random_seeds'] = CP['tracking'].getboolean("random_seeds")
+wm_labels = tracking.get(
+    "wm_labels",
+    [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
+segmentation = config.get("segmentation")
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}
-segmentation_params[] = CP.getboolean
 for k, v in seg_defaults.items():
-    segmentation_params[k] = CP.get("segmentation", k, fallback=v)
+    segmentation_params[k] = segmentation.get(k, v)
 
-dask_it = CP.getboolean("compute", "dask_it", fallback=False)
-force_recompute = CP.getboolean("compute", "force_recompute", fallback=False)
+bundles = config.get("bundles", {})
+bundle_names = bundles.get("bundles", api.BUNDLES)
+scalars_model = bundles.get("scalars_model", "DTI")
+scalars = bundles.get("scalars", ["fa", "md"])
+
+compute = config.get("compute", {})
+dask_it = compute.get("dask_it", False)
+force_recompute = compute.get("force_recompute", False)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
@@ -93,7 +90,7 @@ myafq = api.AFQ(dmriprep_path,
                 anat_file=anat_file,
                 seg_file=seg_file,
                 b0_threshold=float(b0_threshold),
-                bundle_names=bundles,
+                bundle_names=bundle_names,
                 dask_it=dask_it,
                 force_recompute=force_recompute,
                 reg_template=reg_template,
