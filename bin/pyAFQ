@@ -9,6 +9,10 @@ from AFQ.utils.bin import get_default_args
 import AFQ.segmentation as seg
 import AFQ.tractography as aft
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
 usage = """pyAFQ
 
 Provide path to config file. With sections (XXX spell out all the defaults):
@@ -39,6 +43,10 @@ CP = ConfigParser()
 CP.read(opts.config)
 
 dmriprep_path = CP.get("files", "dmriprep_path")
+print("----------------------")
+print(dmriprep_path)
+print("----------------------")
+
 sub_prefix = CP.get("files", "sub_prefix", fallback="sub")
 dwi_folder = CP.get("files", "dwi_folder", fallback="dwi")
 dwi_file = CP.get("files", "dwi_file", fallback="*dwi")
@@ -48,7 +56,8 @@ seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
 b0_threshold = CP.get("files", "b0_threshold", fallback=0)
 
 scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
-scalars = CP.get("profiles", "scalars", fallback=["fa", "md"])
+scalars = ast.literal_eval(
+    CP.get("profiles", "scalars", fallback=["fa", "md"]))
 
 bundles = ast.literal_eval(CP.get("bundles", "bundles", fallback=None))
 
@@ -57,8 +66,12 @@ tracking_params = {}
 for k, v in track_defaults.items():
     tracking_params[k] = CP.get("tracking", k, fallback=v)
 
-wm_labels = CP.get("tracking", "wm_labels",
-                   fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+tracking_params['n_seeds'] = int(tracking_params['n_seeds'])
+tracking_params['random_seeds'] = CP['tracking'].getboolean("random_seeds")
+
+wm_labels = ast.literal_eval(
+    CP.get("tracking", "wm_labels",
+    fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]))
 
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}

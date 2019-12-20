@@ -28,9 +28,6 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 from AFQ.utils.bin import get_default_args
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
 
 __all__ = ["AFQ", "make_bundle_dict"]
 
@@ -394,10 +391,11 @@ def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False,
     return streamlines_file
 
 
-def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
-             odf_model="DTI", directions="det", n_seeds=2,
-             random_seeds=False, force_recompute=False,
-             **segmentation_params):
+def _segment(row, wm_labels, bundle_dict, reg_template,
+             tracking_params, segmentation_params,
+             force_recompute=False):
+    odf_model = tracking_params["odf_model"]
+    directions = tracking_params["directions"]
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
@@ -405,19 +403,15 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
         streamlines_file = _streamlines(
             row,
             wm_labels,
-            odf_model=odf_model,
-            directions=directions,
-            n_seeds=n_seeds,
-            random_seeds=random_seeds,
+            tracking_params,
             force_recompute=force_recompute)
+
         img = nib.load(row['dwi_file'])
         tg = load_tractogram(streamlines_file, img, Space.VOX)
         reg_prealign = np.load(
             _reg_prealign(row, force_recompute=force_recompute))
 
-        segmentation = seg.Segmentation(
-            algo=method,
-            **segmentation_params)
+        segmentation = seg.Segmentation(segmentation_params)
         bundles = segmentation.segment(bundle_dict,
                                        tg,
                                        row['dwi_file'],
@@ -432,9 +426,10 @@ def _segment(row, wm_labels, bundle_dict, reg_template, method="AFQ",
     return bundles_file
 
 
-def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
-                   directions="det", n_seeds=2, random_seeds=False,
-                   force_recompute=False):
+def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
+                   segmentation_params, force_recompute=False):
+    odf_model = tracking_params['odf_model']
+    directions = tracking_params['directions']
     clean_bundles_file = _get_fname(row,
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
@@ -443,10 +438,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
                                 wm_labels,
                                 bundle_dict,
                                 reg_template,
-                                odf_model=odf_model,
-                                directions=directions,
-                                n_seeds=n_seeds,
-                                random_seeds=random_seeds,
+                                tracking_params,
+                                segmentation_params,
                                 force_recompute=force_recompute)
 
         sft = load_tractogram(bundles_file,
@@ -481,8 +474,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, odf_model="DTI",
 
 
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
-                    odf_model="DTI", directions="det",
-                    n_seeds=2, random_seeds=False,
+                    tracking_params, segmentation_params,
                     scalars=_scalar_dict.keys(), weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
@@ -491,10 +483,8 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                                       wm_labels,
                                       bundle_dict,
                                       reg_template,
-                                      odf_model=odf_model,
-                                      directions=directions,
-                                      n_seeds=n_seeds,
-                                      random_seeds=random_seeds,
+                                      tracking_params,
+                                      segmentation_params,
                                       force_recompute=force_recompute)
         keys = []
         vals = []
@@ -588,8 +578,8 @@ def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
 
 
 def _export_bundles(row, wm_labels, bundle_dict, reg_template,
-                    odf_model="DTI", directions="det", n_seeds=2,
-                    random_seeds=False, force_recompute=False):
+                    tracking_params, segmentation_params,
+                    force_recompute=False):
 
     for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
@@ -597,10 +587,8 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                             wm_labels,
                             bundle_dict,
                             reg_template,
-                            odf_model=odf_model,
-                            directions=directions,
-                            n_seeds=n_seeds,
-                            random_seeds=random_seeds,
+                            tracking_params,
+                            segmentation_params,
                             force_recompute=force_recompute)
 
         bundles_dir = op.join(row['results_dir'], folder)
@@ -754,15 +742,19 @@ class AFQ(object):
         self.seg_algo = seg_algo
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
+
         if tracking_params is None:
             tracking_params = get_default_args(aft.track)
+        # Default ODF model to DTI:
+        odf_model = tracking_params.get("odf_model", "DTI")
+        tracking_params['odf_model'] = odf_model
 
         self.tracking_params = tracking_params
-        self.segmentation_params = segmentation_params
 
         if segmentation_params is None:
             segmentation_params = get_default_args(seg.Segmentation.__init__)
         self.segmentation_params = segmentation_params
+
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
         else:
@@ -1069,7 +1061,9 @@ class AFQ(object):
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels,
                                             self.bundle_dict,
-                                            self.reg_template],
+                                            self.reg_template,
+                                            self.tracking_params,
+                                            self.segmentation_params],
                                       force_recompute=self.force_recompute,
                                       axis=1)
 
@@ -1105,10 +1099,7 @@ class AFQ(object):
                               args=[self.wm_labels,
                                     self.bundle_dict,
                                     self.reg_template,
-                                    self.odf_model,
-                                    self.directions,
-                                    self.n_seeds,
-                                    self.random_seeds,
+                                    self.tracking_params,
                                     self.force_recompute],
                               axis=1)
 

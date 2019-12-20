@@ -14,9 +14,9 @@ from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, n_seeds=1, random_seeds=False,
-          stop_mask=None, stop_threshold=0,
-          step_size=0.5, min_length=10, max_length=1000):
+          seed_mask=None, n_seeds=1, random_seeds=False, stop_mask=None,
+          stop_threshold=0, step_size=0.5, min_length=10, max_length=1000,
+          odf_model="DTI"):
     """
     Tractography
 
@@ -58,7 +58,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The miminal length (mm) in a streamline. Default: 10
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 250
-
+    odf_model : str, optional
+        One of {"DTI", "CSD"}. Defaults to use "DTI"
     Returns
     -------
     list of streamlines ()
@@ -99,22 +100,13 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
 
-    # These are models that have ODFs (there might be others in the future...)
-    if model_params.shape[-1] == 12 or model_params.shape[-1] == 27:
-        model = "ODF"
-    # Could this be an SHM model? If the max order is a whole even number, it
-    # might be:
-    elif shm.calculate_max_order(model_params.shape[-1]) % 2 == 0:
-        model = "SHM"
-
-    if model == "SHM":
-        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
-
-    elif model == "ODF":
+    if odf_model == "DTI":
         evals = model_params[..., :3]
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
         dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
+    elif odf_model == "CSD":
+        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
