@@ -2,7 +2,6 @@
 
 from argparse import ArgumentParser
 from configparser import ConfigParser
-import ast
 
 from AFQ import api
 from AFQ.utils.bin import get_default_args
@@ -46,6 +45,7 @@ CP.read(opts.config)
 
 dmriprep_path = CP.get("files", "dmriprep_path")
 print("----------------------")
+print("Analyzing data in:")
 print(dmriprep_path)
 print("----------------------")
 
@@ -63,6 +63,8 @@ scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
 # (see https://stackoverflow.com/a/53274707/3532933):
 scalars = CP.getlist("profiles", "scalars", fallback=["fa", "md"])
 bundles = CP.getlist("bundles", "bundles", fallback=None)
+wm_labels = CP.getlist("tracking", "wm_labels",
+                       fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
@@ -71,10 +73,6 @@ for k, v in track_defaults.items():
 
 tracking_params['n_seeds'] = int(tracking_params['n_seeds'])
 tracking_params['random_seeds'] = CP['tracking'].getboolean("random_seeds")
-
-wm_labels = ast.literal_eval(
-    CP.get("tracking", "wm_labels",
-    fallback=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77]))
 
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}

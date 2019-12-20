@@ -1100,6 +1100,7 @@ class AFQ(object):
                                     self.bundle_dict,
                                     self.reg_template,
                                     self.tracking_params,
+                                    self.segmentation_params,
                                     self.force_recompute],
                               axis=1)
 
