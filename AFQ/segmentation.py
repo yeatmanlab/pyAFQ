@@ -146,7 +146,6 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
 
-
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=0, img_affine=None):
@@ -214,7 +213,12 @@ class Segmentation:
         self.logger.info("Preprocessing Streamlines")
         self.tg = tg
 
+        # If resampling over-write the sft:
         if self.nb_points:
+            self.tg = StatefulTractogram(
+                dps.set_number_of_points(self.tg.streamlines, self.nb_points),
+                self.tg, self.tg.space)
+
             self.resample_streamlines(self.nb_points)
 
         self.prepare_map(mapping, reg_prealign, reg_template)
@@ -284,26 +288,6 @@ class Segmentation:
                                             prealign=reg_prealign)
         else:
             self.mapping = mapping
-
-    def resample_streamlines(self, nb_points, streamlines=None):
-        """
-        Resample streamlines to nb_points number of points.
-
-        Parameters
-        ----------
-        nb_points : int
-            Integer representing number of points wanted along the curve.
-            Streamlines will be resampled to this number of points.
-
-        streamlines : StatefulTractogram
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
-        """
-        if streamlines is None:
-            streamlines = self.streamlines
-
-        self.streamlines = np.array(
-            dps.set_number_of_points(streamlines, nb_points))
 
     def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """

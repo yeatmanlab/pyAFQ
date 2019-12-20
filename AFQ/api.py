@@ -411,7 +411,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
         reg_prealign = np.load(
             _reg_prealign(row, force_recompute=force_recompute))
 
-        segmentation = seg.Segmentation(segmentation_params)
+        segmentation = seg.Segmentation(**segmentation_params)
         bundles = segmentation.segment(bundle_dict,
                                        tg,
                                        row['dwi_file'],
@@ -743,17 +743,21 @@ class AFQ(object):
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
 
-        if tracking_params is None:
-            tracking_params = get_default_args(aft.track)
-        # Default ODF model to DTI:
-        odf_model = tracking_params.get("odf_model", "DTI")
-        tracking_params['odf_model'] = odf_model
+        default_tracking_params = get_default_args(aft.track)
+        # Replace the defaults only for kwargs for which a non-default value was
+        # given:
+        if tracking_params is not None:
+            for k in tracking_params:
+                default_tracking_params[k] = tracking_params[k]
 
-        self.tracking_params = tracking_params
+        self.tracking_params = default_tracking_params
 
-        if segmentation_params is None:
-            segmentation_params = get_default_args(seg.Segmentation.__init__)
-        self.segmentation_params = segmentation_params
+        default_seg_params = get_default_args(seg.Segmentation.__init__)
+        if segmentation_params is not None:
+            for k in segmentation_params:
+                default_seg_params[k] = segmentation_params[k]
+
+        self.segmentation_params = default_seg_params
 
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
@@ -1015,14 +1019,10 @@ class AFQ(object):
                     axis=1,
                     args=[self.wm_labels,
                           self.bundle_dict,
-                          self.reg_template],
-                    method=self.seg_algo,
-                    odf_model=self.odf_model,
-                    directions=self.directions,
-                    n_seeds=self.n_seeds,
-                    random_seeds=self.random_seeds,
-                    force_recompute=self.force_recompute,
-                    **self.segmentation_params)
+                          self.reg_template,
+                          self.tracking_params,
+                          self.segmentation_params],
+                    force_recompute=self.force_recompute)
 
     def get_bundles(self):
         self.set_bundles()

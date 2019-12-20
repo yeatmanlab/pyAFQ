@@ -100,12 +100,14 @@ def test_AFQ_data_waypoint():
                             'derivatives', 'dmriprep')
     seg_algo = "afq"
     bundle_names = ["SLF", "ARC", "CST", "FP"]
+    tracking_params = dict(odf_model="DTI")
+    segmentation_params = dict(filter_by_endpoints=False)
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
                     seg_algo=seg_algo,
                     bundle_names=bundle_names,
-                    odf_model="DTI",
-                    filter_by_endpoints=False)
+                    tracking_params=tracking_params,
+                    segmentation_params=segmentation_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()

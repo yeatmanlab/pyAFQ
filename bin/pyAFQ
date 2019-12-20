@@ -39,7 +39,9 @@ parser.add_argument(dest='config', action="store", type=str,
 
 opts = parser.parse_args()
 
-CP = ConfigParser()
+CP = ConfigParser(
+    converters={'list': lambda x: [i.strip() for i in x.split(',')]})
+
 CP.read(opts.config)
 
 dmriprep_path = CP.get("files", "dmriprep_path")
@@ -56,10 +58,11 @@ seg_file = CP.get("files", "seg_file", fallback="*aparc+aseg*")
 b0_threshold = CP.get("files", "b0_threshold", fallback=0)
 
 scalars_model = CP.get("profiles", "scalars_model", fallback="DTI")
-scalars = ast.literal_eval(
-    CP.get("profiles", "scalars", fallback=["fa", "md"]))
 
-bundles = ast.literal_eval(CP.get("bundles", "bundles", fallback=None))
+# This is the way to get lists out
+# (see https://stackoverflow.com/a/53274707/3532933):
+scalars = CP.getlist("profiles", "scalars", fallback=["fa", "md"])
+bundles = CP.getlist("bundles", "bundles", fallback=None)
 
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
