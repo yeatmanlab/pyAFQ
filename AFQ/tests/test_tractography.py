@@ -33,6 +33,7 @@ def test_csd_tracking():
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
             sl = track(fname, directions,
+                       odf_model="CSD",
                        max_angle=30.,
                        sphere=None,
                        seed_mask=None,
