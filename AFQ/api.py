@@ -8,6 +8,8 @@ from pathlib import PurePath
 
 import numpy as np
 import nibabel as nib
+from scipy.ndimage.morphology import binary_dilation
+
 
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
@@ -333,29 +335,9 @@ def _mapping(row, reg_template, force_recompute=False):
     return mapping_file
 
 
-def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False,
-                 wm_fa_thresh=0.2):
-    """
-    wm_labels : list
-        The values within the segmentation that are considered white matter. We
-        will use this part of the image both to seed tracking (seeding
-        throughout), and for stopping.
-    """
-    if tracking_params is None:
-        tracking_params = get_default_args(aft.track)
-
-    odf_model = tracking_params["odf_model"]
-    directions = tracking_params["directions"]
-
-    streamlines_file = _get_fname(row,
-                                  '%s_%s_streamlines.trk' % (odf_model,
-                                                             directions))
-    if not op.exists(streamlines_file) or force_recompute:
-        if odf_model == "DTI":
-            params_file = _dti(row)
-        elif odf_model == "CSD":
-            params_file = _csd(row)
-
+def _wm_mask(row, wm_labels, wm_fa_thresh=0.2, force_recompute=False):
+    wm_mask_file = _get_fname(row, '_wm_mask.nii.gz')
+    if not op.exists(wm_mask_file) or force_recompute:
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_fdata()
 
@@ -378,15 +360,48 @@ def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False,
             dti_fa = nib.load(_dti_fa(row)).get_fdata()
             wm_mask = dti_fa > wm_fa_thresh
 
+        # Dilate to be sure to reach the gray matter:
+        wm_mask = binary_dilation(wm_mask) > 0
+
+        nib.save(nib.Nifti1Image(wm_mask.astype(int), row['dwi_affine']),
+                 wm_mask_file)
+
+    return wm_mask_file
+
+
+def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False):
+    """
+    wm_labels : list
+        The values within the segmentation that are considered white matter. We
+        will use this part of the image both to seed tracking (seeding
+        throughout), and for stopping.
+    """
+    if tracking_params is None:
+        tracking_params = get_default_args(aft.track)
+
+    odf_model = tracking_params["odf_model"]
+    directions = tracking_params["directions"]
+
+    streamlines_file = _get_fname(row,
+                                  '%s_%s_streamlines.trk' % (odf_model,
+                                                             directions))
+    if not op.exists(streamlines_file) or force_recompute:
+        if odf_model == "DTI":
+            params_file = _dti(row)
+        elif odf_model == "CSD":
+            params_file = _csd(row)
+
+        wm_mask = nib.load(_wm_mask(row, wm_labels)).get_fdata().astype(bool)
+
         tracking_params['seed_mask'] = wm_mask
         tracking_params['stop_mask'] = wm_mask
-        streamlines = aft.track(params_file,
-                                **tracking_params)
 
-        this_sl = dtu.transform_tracking_output(streamlines,
-                                                np.linalg.inv(dwi_img.affine))
-        this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
-        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
+        dwi_img = nib.load(row['dwi_file'])
+        tg = StatefulTractogram(aft.track(params_file,
+                                          **tracking_params),
+                                dwi_img, Space.RASMM)
+        tg.to_vox()
+        save_tractogram(tg, streamlines_file, bbox_valid_check=False)
 
     return streamlines_file
 
@@ -897,8 +912,7 @@ class AFQ(object):
 
     b0 = property(get_b0, set_b0)
 
-    def set_brain_mask(self, median_radius=4, numpass=4, autocrop=False,
-                       vol_idx=None, dilate=None):
+    def set_brain_mask(self):
         if ('brain_mask_file' not in self.data_frame.columns
                 or self.force_recompute):
             self.data_frame['brain_mask_file'] =\
@@ -911,6 +925,21 @@ class AFQ(object):
         return self.data_frame['brain_mask_file']
 
     brain_mask = property(get_brain_mask, set_brain_mask)
+
+    def set_wm_mask(self):
+        if ('wm_mask_file' not in self.data_frame.columns
+            or self.force_recompute):
+            self.data_frame['wm_mask_file'] =\
+                self.data_frame.apply(_wm_mask,
+                                      args=[self.wm_labels],
+                                      axis=1,
+                                      force_recompute=self.force_recompute)
+
+    def get_wm_mask(self):
+        self.set_wm_mask()
+        return self.data_frame['wm_mask_file']
+
+    wm_mask = property(get_wm_mask, set_wm_mask)
 
     def set_dti(self):
         if ('dti_params_file' not in self.data_frame.columns
@@ -1001,11 +1030,8 @@ class AFQ(object):
                 or self.force_recompute):
             self.data_frame['streamlines_file'] =\
                 self.data_frame.apply(_streamlines, axis=1,
-                                      args=[self.wm_labels],
-                                      odf_model=self.odf_model,
-                                      directions=self.directions,
-                                      n_seeds=self.n_seeds,
-                                      random_seeds=self.random_seeds,
+                                      args=[self.wm_labels,
+                                            self.tracking_params],
                                       force_recompute=self.force_recompute)
 
     def get_streamlines(self):
