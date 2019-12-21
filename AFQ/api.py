@@ -475,7 +475,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
 
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     tracking_params, segmentation_params,
-                    scalars=_scalar_dict.keys(), weighting=None,
+                    scalars, weighting=None,
                     force_recompute=False):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file) or force_recompute:
@@ -693,6 +693,7 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  reg_template=None,
+                 scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  tracking_params=None,
                  segmentation_params=None):
@@ -743,6 +744,8 @@ class AFQ(object):
         self.seg_algo = seg_algo
         self.force_recompute = force_recompute
         self.wm_labels = wm_labels
+
+        self.scalars = scalars
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
@@ -1064,7 +1067,8 @@ class AFQ(object):
                                             self.bundle_dict,
                                             self.reg_template,
                                             self.tracking_params,
-                                            self.segmentation_params],
+                                            self.segmentation_params,
+                                            self.scalars],
                                       force_recompute=self.force_recompute,
                                       axis=1)
 

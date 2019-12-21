@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
+import os
+import os.path as op
 import toml
+import json
+import datetime
+import platform
 
+import AFQ
 from AFQ import api
 from AFQ.utils.bin import get_default_args
 import AFQ.segmentation as seg
@@ -42,14 +48,26 @@ config = toml.load(opts.config)
 
 files = config.get("files", {})
 
-
 dmriprep_path = files.get("dmriprep_path")
 
 if dmriprep_path is None:
     raise RuntimeError("Config file must provide dmriprep_path")
 
+config['pyAFQ'] = {}
+config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
+config['pyAFQ']['version'] = AFQ.__version__
+config['pyAFQ']['platform'] = platform.system()
+
+afq_path = op.join(op.split(dmriprep_path)[0], 'afq')
+os.makedirs(afq_path, exist_ok=True)
+
+afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+
+with open(afq_metadata_file, 'w') as ff:
+    toml.dump(config, ff)
+
 sub_prefix = files.get("sub_prefix", "sub")
-dwi_folder = files.get("dwi_folder","dwi")
+dwi_folder = files.get("dwi_folder", "dwi")
 dwi_file = files.get("dwi_file", "*dwi")
 anat_folder = files.get("anat_folder", "anat")
 anat_file = files.get("anat_file", "*T1w*")
@@ -106,3 +124,9 @@ myafq.set_template_xform()
 myafq.export_rois()
 myafq.export_bundles()
 myafq.combine_profiles()
+
+# If you got this far, you can report on time ended and record that:
+config['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+
+with open(afq_metadata_file, 'w') as ff:
+    toml.dump(config, ff)
