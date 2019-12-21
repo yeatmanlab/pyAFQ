@@ -468,6 +468,9 @@ class Segmentation:
                                 np.argmin(dist[1], 0)[0]
                             streamlines_in_bundles[sl_idx, bundle_idx] =\
                                 fiber_probabilities[sl_idx]
+            self.logger.info(
+                (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
+                 "streamlines selected with waypoint ROIs"))
 
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
