@@ -3,6 +3,8 @@ import os
 import os.path as op
 import shutil
 
+import toml
+
 import numpy as np
 import numpy.testing as npt
 
@@ -161,7 +163,16 @@ def test_AFQ_data_waypoint():
 
     # Test the CLI:
     print("Running the CLI:")
-    cmd = "pyAFQ " + dmriprep_path
+
+    # Bare bones config only points to the files
+    config = dict(files=dict(dmriprep_path=dmriprep_path),
+                  tracking={}, segmentation={}, bundles={}, compute={})
+
+    config_file = op.join(tmpdir.name, "afq_config.toml")
+    with open(config_file, 'w') as ff:
+        toml.dump(config, ff)
+
+    cmd = "pyAFQ " + config_file
     out = os.system(cmd)
     assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
