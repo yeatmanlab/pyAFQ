@@ -323,7 +323,7 @@ def _mapping(row, reg_template):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
     if not op.exists(mapping_file):
         gtab = row['gtab']
-        reg_prealign = np.load(_reg_prealign(row)
+        reg_prealign = np.load(_reg_prealign(row))
         warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                                   template=reg_template,
                                                   prealign=reg_prealign)
@@ -417,8 +417,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
 
         img = nib.load(row['dwi_file'])
         tg = load_tractogram(streamlines_file, img, Space.VOX)
-        reg_prealign = np.load(
-            _reg_prealign(row)
+        reg_prealign = np.load(_reg_prealign(row))
 
         segmentation = seg.Segmentation(**segmentation_params)
         bundles = segmentation.segment(bundle_dict,
@@ -1020,7 +1019,7 @@ class AFQ(object):
     bundles = property(get_bundles, set_bundles)
 
     def set_clean_bundles(self):
-        if 'clean_bundles_file' not in self.data_frame.columns
+        if 'clean_bundles_file' not in self.data_frame.columns:
             if self.seg_algo == "reco":
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
@@ -1050,7 +1049,7 @@ class AFQ(object):
                                             self.reg_template,
                                             self.tracking_params,
                                             self.segmentation_params,
-                                            self.scalars]
+                                            self.scalars],
                                       axis=1)
 
     def get_tract_profiles(self):
