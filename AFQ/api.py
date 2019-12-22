@@ -190,9 +190,9 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     return afq_bundles
 
 
-def _b0(row, force_recompute=False):
+def _b0(row):
     b0_file = _get_fname(row, '_b0.nii.gz')
-    if not op.exists(b0_file) or force_recompute:
+    if not op.exists(b0_file):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
         gtab = row['gtab']
@@ -203,9 +203,9 @@ def _b0(row, force_recompute=False):
 
 
 def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
-                vol_idx=None, dilate=10, force_recompute=False):
+                vol_idx=None, dilate=10):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
-    if not op.exists(brain_mask_file) or force_recompute:
+    if not op.exists(brain_mask_file):
         mean_b0_img = nib.load(_b0(row))
         mean_b0 = mean_b0_img.get_fdata()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
@@ -224,9 +224,9 @@ def _dti_fit(row):
     return tf
 
 
-def _dti(row, force_recompute=False):
+def _dti(row):
     dti_params_file = _get_fname(row, '_dti_params.nii.gz')
-    if not op.exists(dti_params_file) or force_recompute:
+    if not op.exists(dti_params_file):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
         gtab = row['gtab']
@@ -238,10 +238,9 @@ def _dti(row, force_recompute=False):
     return dti_params_file
 
 
-def _csd(row, force_recompute=False, response=None,
-         sh_order=8, lambda_=1, tau=0.1,):
+def _csd(row, response=None, sh_order=8, lambda_=1, tau=0.1,):
     csd_params_file = _get_fname(row, '_csd_params.nii.gz')
-    if not op.exists(csd_params_file) or force_recompute:
+    if not op.exists(csd_params_file):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
         gtab = row['gtab']
@@ -255,9 +254,9 @@ def _csd(row, force_recompute=False, response=None,
     return csd_params_file
 
 
-def _dti_fa(row, force_recompute=False):
+def _dti_fa(row):
     dti_fa_file = _get_fname(row, '_dti_fa.nii.gz')
-    if not op.exists(dti_fa_file) or force_recompute:
+    if not op.exists(dti_fa_file):
         tf = _dti_fit(row)
         fa = tf.fa
         nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
@@ -265,9 +264,9 @@ def _dti_fa(row, force_recompute=False):
     return dti_fa_file
 
 
-def _dti_cfa(row, force_recompute=False):
+def _dti_cfa(row):
     dti_cfa_file = _get_fname(row, '_dti_cfa.nii.gz')
-    if not op.exists(dti_cfa_file) or force_recompute:
+    if not op.exists(dti_cfa_file):
         tf = _dti_fit(row)
         cfa = tf.color_fa
         nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
@@ -275,9 +274,9 @@ def _dti_cfa(row, force_recompute=False):
     return dti_cfa_file
 
 
-def _dti_pdd(row, force_recompute=False):
+def _dti_pdd(row):
     dti_pdd_file = _get_fname(row, '_dti_pdd.nii.gz')
-    if not op.exists(dti_pdd_file) or force_recompute:
+    if not op.exists(dti_pdd_file):
         tf = _dti_fit(row)
         pdd = tf.directions.squeeze()
         # Invert the x coordinates:
@@ -288,9 +287,9 @@ def _dti_pdd(row, force_recompute=False):
     return dti_pdd_file
 
 
-def _dti_md(row, force_recompute=False):
+def _dti_md(row):
     dti_md_file = _get_fname(row, '_dti_md.nii.gz')
-    if not op.exists(dti_md_file) or force_recompute:
+    if not op.exists(dti_md_file):
         tf = _dti_fit(row)
         md = tf.md
         nib.save(nib.Nifti1Image(md, row['dwi_affine']),
@@ -303,10 +302,10 @@ _scalar_dict = {"dti_fa": _dti_fa,
                 "dti_md": _dti_md}
 
 
-def _reg_prealign(row, force_recompute=False):
+def _reg_prealign(row):
     prealign_file = _get_fname(row, '_reg_prealign.npy')
-    if not op.exists(prealign_file) or force_recompute:
-        moving = nib.load(_b0(row, force_recompute=force_recompute))
+    if not op.exists(prealign_file):
+        moving = nib.load(_b0(row))
         static = dpd.read_mni_template()
         moving_data = moving.get_fdata()
         moving_affine = moving.affine
@@ -320,13 +319,11 @@ def _reg_prealign(row, force_recompute=False):
     return prealign_file
 
 
-def _mapping(row, reg_template, force_recompute=False):
+def _mapping(row, reg_template):
     mapping_file = _get_fname(row, '_mapping.nii.gz')
-    if not op.exists(mapping_file) or force_recompute:
+    if not op.exists(mapping_file):
         gtab = row['gtab']
-        reg_prealign = np.load(_reg_prealign(
-            row,
-            force_recompute=force_recompute))
+        reg_prealign = np.load(_reg_prealign(row)
         warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                                   template=reg_template,
                                                   prealign=reg_prealign)
@@ -335,9 +332,9 @@ def _mapping(row, reg_template, force_recompute=False):
     return mapping_file
 
 
-def _wm_mask(row, wm_labels, wm_fa_thresh=0.2, force_recompute=False):
+def _wm_mask(row, wm_labels, wm_fa_thresh=0.2):
     wm_mask_file = _get_fname(row, '_wm_mask.nii.gz')
-    if not op.exists(wm_mask_file) or force_recompute:
+    if not op.exists(wm_mask_file):
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_fdata()
 
@@ -369,7 +366,7 @@ def _wm_mask(row, wm_labels, wm_fa_thresh=0.2, force_recompute=False):
     return wm_mask_file
 
 
-def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False):
+def _streamlines(row, wm_labels, tracking_params=None):
     """
     wm_labels : list
         The values within the segmentation that are considered white matter. We
@@ -385,14 +382,13 @@ def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False):
     streamlines_file = _get_fname(row,
                                   '%s_%s_streamlines.trk' % (odf_model,
                                                              directions))
-    if not op.exists(streamlines_file) or force_recompute:
+    if not op.exists(streamlines_file):
         if odf_model == "DTI":
             params_file = _dti(row)
         elif odf_model == "CSD":
             params_file = _csd(row)
 
         wm_mask = nib.load(_wm_mask(row, wm_labels)).get_fdata().astype(bool)
-
         tracking_params['seed_mask'] = wm_mask
         tracking_params['stop_mask'] = wm_mask
 
@@ -407,24 +403,22 @@ def _streamlines(row, wm_labels, tracking_params=None, force_recompute=False):
 
 
 def _segment(row, wm_labels, bundle_dict, reg_template,
-             tracking_params, segmentation_params,
-             force_recompute=False):
+             tracking_params, segmentation_params):
     odf_model = tracking_params["odf_model"]
     directions = tracking_params["directions"]
     bundles_file = _get_fname(row,
                               '%s_%s_bundles.trk' % (odf_model,
                                                      directions))
-    if not op.exists(bundles_file) or force_recompute:
+    if not op.exists(bundles_file):
         streamlines_file = _streamlines(
             row,
             wm_labels,
-            tracking_params,
-            force_recompute=force_recompute)
+            tracking_params)
 
         img = nib.load(row['dwi_file'])
         tg = load_tractogram(streamlines_file, img, Space.VOX)
         reg_prealign = np.load(
-            _reg_prealign(row, force_recompute=force_recompute))
+            _reg_prealign(row)
 
         segmentation = seg.Segmentation(**segmentation_params)
         bundles = segmentation.segment(bundle_dict,
@@ -442,20 +436,19 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
 
 
 def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
-                   segmentation_params, force_recompute=False):
+                   segmentation_params):
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
     clean_bundles_file = _get_fname(row,
                                     '%s_%s_clean_bundles.trk' % (odf_model,
                                                                  directions))
-    if not op.exists(clean_bundles_file) or force_recompute:
+    if not op.exists(clean_bundles_file):
         bundles_file = _segment(row,
                                 wm_labels,
                                 bundle_dict,
                                 reg_template,
                                 tracking_params,
-                                segmentation_params,
-                                force_recompute=force_recompute)
+                                segmentation_params)
 
         sft = load_tractogram(bundles_file,
                               row['dwi_img'],
@@ -490,17 +483,15 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
 
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                     tracking_params, segmentation_params,
-                    scalars, weighting=None,
-                    force_recompute=False):
+                    scalars, weighting=None):
     profiles_file = _get_fname(row, '_profiles.csv')
-    if not op.exists(profiles_file) or force_recompute:
+    if not op.exists(profiles_file):
         bundles_file = _clean_bundles(row,
                                       wm_labels,
                                       bundle_dict,
                                       reg_template,
                                       tracking_params,
-                                      segmentation_params,
-                                      force_recompute=force_recompute)
+                                      segmentation_params)
         keys = []
         vals = []
         for k in bundle_dict.keys():
@@ -515,8 +506,7 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
 
         trk = nib.streamlines.load(bundles_file)
         for scalar in scalars:
-            scalar_file = _scalar_dict[scalar](row,
-                                               force_recompute=force_recompute)
+            scalar_file = _scalar_dict[scalar](row)
             scalar_data = nib.load(scalar_file).get_fdata()
             for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                 idx = np.where(
@@ -542,14 +532,12 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
     return profiles_file
 
 
-def _template_xform(row, reg_template, force_recompute=False):
+def _template_xform(row, reg_template):
     template_xform_file = _get_fname(row, "_template_xform.nii.gz")
-    if not op.exists(template_xform_file) or force_recompute:
-        reg_prealign = np.load(_reg_prealign(row,
-                               force_recompute=force_recompute))
+    if not op.exists(template_xform_file):
+        reg_prealign = np.load(_reg_prealign(row))
         mapping = reg.read_mapping(_mapping(row,
-                                            reg_template,
-                                            force_recompute=force_recompute),
+                                            reg_template),
                                    row['dwi_file'],
                                    reg_template,
                                    prealign=np.linalg.inv(reg_prealign))
@@ -561,9 +549,8 @@ def _template_xform(row, reg_template, force_recompute=False):
     return template_xform_file
 
 
-def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
-    reg_prealign = np.load(_reg_prealign(row,
-                                         force_recompute=force_recompute))
+def _export_rois(row, bundle_dict, reg_template):
+    reg_prealign = np.load(_reg_prealign(row))
 
     mapping = reg.read_mapping(_mapping(row, reg_template),
                                row['dwi_file'],
@@ -593,8 +580,7 @@ def _export_rois(row, bundle_dict, reg_template, force_recompute=False):
 
 
 def _export_bundles(row, wm_labels, bundle_dict, reg_template,
-                    tracking_params, segmentation_params,
-                    force_recompute=False):
+                    tracking_params, segmentation_params):
 
     for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
@@ -603,8 +589,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                             bundle_dict,
                             reg_template,
                             tracking_params,
-                            segmentation_params,
-                            force_recompute=force_recompute)
+                            segmentation_params)
 
         bundles_dir = op.join(row['results_dir'], folder)
         os.makedirs(bundles_dir, exist_ok=True)
@@ -706,7 +691,6 @@ class AFQ(object):
                  b0_threshold=0,
                  bundle_names=BUNDLES,
                  dask_it=False,
-                 force_recompute=False,
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
@@ -735,9 +719,6 @@ class AFQ(object):
         dask_it : bool, optional
             Whether to use a dask DataFrame object
 
-        force_recompute : bool, optional
-            Whether to ignore previous results, and recompute all, or not.
-
         wm_labels : list, optional
             A list of the labels of the white matter in the segmentation file
             used. Default: the white matter values for the segmentation
@@ -757,7 +738,6 @@ class AFQ(object):
                                             resample_to=reg_template)
 
         self.seg_algo = seg_algo
-        self.force_recompute = force_recompute
         self.wm_labels = wm_labels
 
         self.scalars = scalars
@@ -899,12 +879,10 @@ class AFQ(object):
         return self.data_frame.__getitem__(k)
 
     def set_b0(self):
-        if ('b0_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'b0_file' not in self.data_frame.columns:
             self.data_frame['b0_file'] =\
                 self.data_frame.apply(_b0,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_b0(self):
         self.set_b0()
@@ -913,12 +891,10 @@ class AFQ(object):
     b0 = property(get_b0, set_b0)
 
     def set_brain_mask(self):
-        if ('brain_mask_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'brain_mask_file' not in self.data_frame.columns:
             self.data_frame['brain_mask_file'] =\
                 self.data_frame.apply(_brain_mask,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_brain_mask(self):
         self.set_brain_mask()
@@ -927,13 +903,11 @@ class AFQ(object):
     brain_mask = property(get_brain_mask, set_brain_mask)
 
     def set_wm_mask(self):
-        if ('wm_mask_file' not in self.data_frame.columns
-            or self.force_recompute):
+        if 'wm_mask_file' not in self.data_frame.columns:
             self.data_frame['wm_mask_file'] =\
                 self.data_frame.apply(_wm_mask,
                                       args=[self.wm_labels],
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_wm_mask(self):
         self.set_wm_mask()
@@ -942,12 +916,10 @@ class AFQ(object):
     wm_mask = property(get_wm_mask, set_wm_mask)
 
     def set_dti(self):
-        if ('dti_params_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'dti_params_file' not in self.data_frame.columns:
             self.data_frame['dti_params_file'] =\
                 self.data_frame.apply(_dti,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_dti(self):
         self.set_dti()
@@ -956,12 +928,10 @@ class AFQ(object):
     dti = property(get_dti, set_dti)
 
     def set_dti_fa(self):
-        if ('dti_fa_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'dti_fa_file' not in self.data_frame.columns:
             self.data_frame['dti_fa_file'] =\
                 self.data_frame.apply(_dti_fa,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_dti_fa(self):
         self.set_dti_fa()
@@ -970,12 +940,10 @@ class AFQ(object):
     dti_fa = property(get_dti_fa, set_dti_fa)
 
     def set_dti_cfa(self):
-        if ('dti_cfa_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'dti_cfa_file' not in self.data_frame.columns:
             self.data_frame['dti_cfa_file'] =\
                 self.data_frame.apply(_dti_cfa,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_dti_cfa(self):
         self.set_dti_cfa()
@@ -984,12 +952,10 @@ class AFQ(object):
     dti_cfa = property(get_dti_cfa, set_dti_cfa)
 
     def set_dti_pdd(self):
-        if ('dti_pdd_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'dti_pdd_file' not in self.data_frame.columns:
             self.data_frame['dti_pdd_file'] =\
                 self.data_frame.apply(_dti_pdd,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_dti_pdd(self):
         self.set_dti_pdd()
@@ -998,12 +964,10 @@ class AFQ(object):
     dti_pdd = property(get_dti_pdd, set_dti_pdd)
 
     def set_dti_md(self):
-        if ('dti_md_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'dti_md_file' not in self.data_frame.columns:
             self.data_frame['dti_md_file'] =\
                 self.data_frame.apply(_dti_md,
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_dti_md(self):
         self.set_dti_md()
@@ -1012,12 +976,11 @@ class AFQ(object):
     dti_md = property(get_dti_md, set_dti_md)
 
     def set_mapping(self):
-        if 'mapping' not in self.data_frame.columns or self.force_recompute:
+        if 'mapping' not in self.data_frame.columns:
             self.data_frame['mapping'] =\
                 self.data_frame.apply(_mapping,
                                       args=[self.reg_template],
-                                      axis=1,
-                                      force_recompute=self.force_recompute)
+                                      axis=1)
 
     def get_mapping(self):
         self.set_mapping()
@@ -1026,13 +989,11 @@ class AFQ(object):
     mapping = property(get_mapping, set_mapping)
 
     def set_streamlines(self):
-        if ('streamlines_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'streamlines_file' not in self.data_frame.columns:
             self.data_frame['streamlines_file'] =\
                 self.data_frame.apply(_streamlines, axis=1,
                                       args=[self.wm_labels,
-                                            self.tracking_params],
-                                      force_recompute=self.force_recompute)
+                                            self.tracking_params])
 
     def get_streamlines(self):
         self.set_streamlines()
@@ -1041,8 +1002,7 @@ class AFQ(object):
     streamlines = property(get_streamlines, set_streamlines)
 
     def set_bundles(self):
-        column_exists = 'bundles_file' in self.data_frame.columns
-        if (not column_exists or self.force_recompute):
+        if 'bundles_file' not in self.data_frame.columns:
             self.data_frame['bundles_file'] =\
                 self.data_frame.apply(
                     _segment,
@@ -1051,8 +1011,7 @@ class AFQ(object):
                           self.bundle_dict,
                           self.reg_template,
                           self.tracking_params,
-                          self.segmentation_params],
-                    force_recompute=self.force_recompute)
+                          self.segmentation_params])
 
     def get_bundles(self):
         self.set_bundles()
@@ -1061,8 +1020,7 @@ class AFQ(object):
     bundles = property(get_bundles, set_bundles)
 
     def set_clean_bundles(self):
-        column_exists = 'clean_bundles_file' in self.data_frame.columns
-        if (not column_exists or self.force_recompute):
+        if 'clean_bundles_file' not in self.data_frame.columns
             if self.seg_algo == "reco":
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
@@ -1075,8 +1033,7 @@ class AFQ(object):
                                           odf_model=self.odf_model,
                                           directions=self.directions,
                                           n_seeds=self.n_seeds,
-                                          random_seeds=self.random_seeds,
-                                          force_recompute=self.force_recompute)
+                                          random_seeds=self.random_seeds)
 
     def get_clean_bundles(self):
         self.set_clean_bundles()
@@ -1085,8 +1042,7 @@ class AFQ(object):
     clean_bundles = property(get_clean_bundles, set_clean_bundles)
 
     def set_tract_profiles(self):
-        if ('tract_profiles_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'tract_profiles_file' not in self.data_frame.columns:
             self.data_frame['tract_profiles_file'] =\
                 self.data_frame.apply(_tract_profiles,
                                       args=[self.wm_labels,
@@ -1094,8 +1050,7 @@ class AFQ(object):
                                             self.reg_template,
                                             self.tracking_params,
                                             self.segmentation_params,
-                                            self.scalars],
-                                      force_recompute=self.force_recompute,
+                                            self.scalars]
                                       axis=1)
 
     def get_tract_profiles(self):
@@ -1105,12 +1060,10 @@ class AFQ(object):
     tract_profiles = property(get_tract_profiles, set_tract_profiles)
 
     def set_template_xform(self):
-        if ('template_xform_file' not in self.data_frame.columns
-                or self.force_recompute):
+        if 'template_xform_file' not in self.data_frame.columns:
             self.data_frame['template_xform_file'] = \
                 self.data_frame.apply(_template_xform,
                                       args=[self.reg_template],
-                                      force_recompute=self.force_recompute,
                                       axis=1)
 
     def get_template_xform(self):
@@ -1131,8 +1084,7 @@ class AFQ(object):
                                     self.bundle_dict,
                                     self.reg_template,
                                     self.tracking_params,
-                                    self.segmentation_params,
-                                    self.force_recompute],
+                                    self.segmentation_params],
                               axis=1)
 
     def combine_profiles(self):
