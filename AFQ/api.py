@@ -387,11 +387,11 @@ def _streamlines(row, wm_labels, tracking_params=None):
         tracking_params['stop_mask'] = wm_mask
 
         dwi_img = nib.load(row['dwi_file'])
-        tg = StatefulTractogram(aft.track(params_file,
-                                          **tracking_params),
-                                dwi_img, Space.RASMM)
-        tg.to_vox()
-        save_tractogram(tg, streamlines_file, bbox_valid_check=False)
+        streamlines = aft.track(params_file, **tracking_params)
+        this_sl = dtu.transform_tracking_output(streamlines,
+                                                np.linalg.inv(dwi_img.affine))
+        this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
+        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
 
         _meta_directions = {"det": "deterministic",
                             "prob": "probabilistic"}
