@@ -150,7 +150,7 @@ def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file):
         b0_file = _b0(row)
-        mean_b0_img = nib.load()
+        mean_b0_img = nib.load(b0_file)
         mean_b0 = mean_b0_img.get_fdata()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
