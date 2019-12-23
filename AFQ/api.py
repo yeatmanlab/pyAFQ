@@ -5,6 +5,7 @@ import glob
 import os
 import os.path as op
 from pathlib import PurePath
+import json
 
 import numpy as np
 import nibabel as nib
@@ -41,6 +42,7 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
+DIPY_GH = "https://github.com/nipy/dipy/blob/master/dipy/"
 
 def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     """
@@ -136,6 +138,10 @@ def _b0(row):
         mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
         mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
         nib.save(mean_b0_img, b0_file)
+        meta = dict(b0_threshold=gtab.b0_threshold,
+                    source=row['dwi_file'])
+        meta_fname = _get_fname(row, '_b0.json')
+        afd.write_json(meta_fname, meta)
     return b0_file
 
 
@@ -143,13 +149,21 @@ def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
                 vol_idx=None, dilate=10):
     brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
     if not op.exists(brain_mask_file):
-        mean_b0_img = nib.load(_b0(row))
+        b0_file = _b0(row)
+        mean_b0_img = nib.load()
         mean_b0 = mean_b0_img.get_fdata()
         _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
                                     autocrop, dilate=dilate)
         be_img = nib.Nifti1Image(brain_mask.astype(int),
                                  mean_b0_img.affine)
         nib.save(be_img, brain_mask_file)
+        meta = dict(source=b0_file,
+                    median_radius=median_radius,
+                    numpass=numpass,
+                    autocrop=autocrop,
+                    vol_idx=vol_idx)
+        meta_fname = _get_fname(row, '_brain_mask.json')
+        afd.write_json(meta_fname, meta)
     return brain_mask_file
 
 
@@ -162,7 +176,7 @@ def _dti_fit(row):
 
 
 def _dti(row):
-    dti_params_file = _get_fname(row, '_dti_params.nii.gz')
+    dti_params_file = _get_fname(row, '_model-DTI_diffmodel.nii.gz')
     if not op.exists(dti_params_file):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
@@ -172,11 +186,18 @@ def _dti(row):
         dtf = dti_fit(gtab, data, mask=mask)
         nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
                  dti_params_file)
+        meta_fname = _get_fname(row, '_model-DTI_diffmodel.json')
+        meta = dict(
+            Parameters=dict(
+                FitMethod="WLS"),
+            OutlierRejection=False,
+            ModelURL=f"{DIPY_GH}reconst/dti.py")
+        afd.write_json(meta_fname, meta)
     return dti_params_file
 
 
 def _csd(row, response=None, sh_order=8, lambda_=1, tau=0.1,):
-    csd_params_file = _get_fname(row, '_csd_params.nii.gz')
+    csd_params_file = _get_fname(row, '_model-CSD_diffmodel.nii.gz')
     if not op.exists(csd_params_file):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
@@ -188,31 +209,45 @@ def _csd(row, response=None, sh_order=8, lambda_=1, tau=0.1,):
                        lambda_=lambda_, tau=tau)
         nib.save(nib.Nifti1Image(csdf.shm_coeff, row['dwi_affine']),
                  csd_params_file)
+        meta_fname = _get_fname(row, '_model-CSD_diffmodel.json')
+        meta = dict(SphericalHarmonicDegree=sh_order,
+                    ResponseFunctionTensor=response,
+                    SphericalHarmonicBasis="DESCOTEAUX",
+                    ModelURL=f"{DIPY_GH}reconst/csdeconv.py",
+                    lambda_=lambda_,
+                    tau=tau)
+        afd.write_json(meta_fname, meta)
     return csd_params_file
 
 
 def _dti_fa(row):
-    dti_fa_file = _get_fname(row, '_dti_fa.nii.gz')
+    dti_fa_file = _get_fname(row, '_model-DTI_FA.nii.gz')
     if not op.exists(dti_fa_file):
         tf = _dti_fit(row)
         fa = tf.fa
         nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
                  dti_fa_file)
+        meta_fname = _get_fname(row, '_model-DTI_FA.json')
+        meta = dict()
+        afd.write_json(meta_fname, meta)
     return dti_fa_file
 
 
 def _dti_cfa(row):
-    dti_cfa_file = _get_fname(row, '_dti_cfa.nii.gz')
+    dti_cfa_file = _get_fname(row, '_model-DTI_desc-DEC_FA.nii.gz')
     if not op.exists(dti_cfa_file):
         tf = _dti_fit(row)
         cfa = tf.color_fa
         nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
                  dti_cfa_file)
+        meta_fname = _get_fname(row, '_model-DTI_desc-DEC_FA.json')
+        meta = dict()
+        afd.write_json(meta_fname, meta)
     return dti_cfa_file
 
 
 def _dti_pdd(row):
-    dti_pdd_file = _get_fname(row, '_dti_pdd.nii.gz')
+    dti_pdd_file = _get_fname(row, '_model-DTI_PDD.nii.gz')
     if not op.exists(dti_pdd_file):
         tf = _dti_fit(row)
         pdd = tf.directions.squeeze()
@@ -221,16 +256,22 @@ def _dti_pdd(row):
 
         nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
                  dti_pdd_file)
+        meta_fname = _get_fname(row, '_model-DTI_PDD.json')
+        meta = dict()
+        afd.write_json(meta_fname, meta)
     return dti_pdd_file
 
 
 def _dti_md(row):
-    dti_md_file = _get_fname(row, '_dti_md.nii.gz')
+    dti_md_file = _get_fname(row, '_model-DTI_MD.nii.gz')
     if not op.exists(dti_md_file):
         tf = _dti_fit(row)
         md = tf.md
         nib.save(nib.Nifti1Image(md, row['dwi_affine']),
                  dti_md_file)
+        meta_fname = _get_fname(row, '_model-DTI_MD.json')
+        meta = dict()
+        afd.write_json(meta_fname, meta)
     return dti_md_file
 
 
@@ -240,7 +281,7 @@ _scalar_dict = {"dti_fa": _dti_fa,
 
 
 def _reg_prealign(row):
-    prealign_file = _get_fname(row, '_reg_prealign.npy')
+    prealign_file = _get_fname(row, '_prealign_from-DWI_to-MNI_xfm.npy')
     if not op.exists(prealign_file):
         moving = nib.load(_b0(row))
         static = dpd.read_mni_template()
@@ -253,11 +294,14 @@ def _reg_prealign(row):
                                          moving_affine,
                                          static_affine)
         np.save(prealign_file, aff)
+        meta_fname = _get_fname(row, 'prealign_from-DWI_to-MNI_xfm.json')
+        meta = dict(type="rigid")
+        afd.write_json(meta_fname, meta)
     return prealign_file
 
 
 def _mapping(row, reg_template):
-    mapping_file = _get_fname(row, '_mapping.nii.gz')
+    mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
     if not op.exists(mapping_file):
         gtab = row['gtab']
         reg_prealign = np.load(_reg_prealign(row))
@@ -266,6 +310,10 @@ def _mapping(row, reg_template):
                                                   prealign=reg_prealign)
         mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
         reg.write_mapping(mapping, mapping_file)
+        meta_fname = _get_fname(row, '_mapping_reg_prealign.json')
+        meta = dict(type="displacementfield")
+        afd.write_json(meta_fname, meta)
+
     return mapping_file
 
 
@@ -289,16 +337,24 @@ def _wm_mask(row, wm_labels, wm_fa_thresh=0.2):
             wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
                                             seg_img.affine,
                                             dwi_img.affine)).astype(int)
+            meta = dict(source=row['seg_file'],
+                        wm_labels=wm_labels)
         else:
             # Otherwise, we'll identify the white matter based on FA:
-            dti_fa = nib.load(_dti_fa(row)).get_fdata()
+            fa_fname = _dti_fa(row)
+            dti_fa = nib.load(fa_fname).get_fdata()
             wm_mask = dti_fa > wm_fa_thresh
+            meta = dict(source=fa_fname,
+                        fa_threshold=wm_fa_thresh)
 
         # Dilate to be sure to reach the gray matter:
         wm_mask = binary_dilation(wm_mask) > 0
 
         nib.save(nib.Nifti1Image(wm_mask.astype(int), row['dwi_affine']),
                  wm_mask_file)
+
+        meta_fname = _get_fname(row, '_wm_mask.json')
+        afd.write_json(meta_fname, meta)
 
     return wm_mask_file
 
@@ -316,16 +372,17 @@ def _streamlines(row, wm_labels, tracking_params=None):
     odf_model = tracking_params["odf_model"]
     directions = tracking_params["directions"]
 
-    streamlines_file = _get_fname(row,
-                                  '%s_%s_streamlines.trk' % (odf_model,
-                                                             directions))
+    streamlines_file = _get_fname(
+        row,
+        f'_space-RASMM_{odf_model}_desc-{directions}_tractography.trk')
+
     if not op.exists(streamlines_file):
         if odf_model == "DTI":
             params_file = _dti(row)
         elif odf_model == "CSD":
             params_file = _csd(row)
-
-        wm_mask = nib.load(_wm_mask(row, wm_labels)).get_fdata().astype(bool)
+        wm_mask_fname = _wm_mask(row, wm_labels)
+        wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
         tracking_params['seed_mask'] = wm_mask
         tracking_params['stop_mask'] = wm_mask
 
@@ -336,6 +393,29 @@ def _streamlines(row, wm_labels, tracking_params=None):
         tg.to_vox()
         save_tractogram(tg, streamlines_file, bbox_valid_check=False)
 
+        _meta_directions = {"det": "deterministic",
+                            "prob": "probabilistic"}
+
+        meta = dict(
+            TractographyClass="local",
+            TractographyMethod=_meta_directions[tracking_params["directions"]],
+            Count=len(tg.streamlines),
+            Seeding=dict(
+                ROI=wm_mask_fname,
+                n_seeds=tracking_params["n_seeds"],
+                random_seeds=tracking_params["random_seed"]),
+            Constraints=dict(AnatomicalImage=wm_mask_fname),
+            Parameters=dict(Units="mm",
+                            StepSize=tracking_params["step_size"],
+                            MinimumLength=tracking_params["min_length"],
+                            MaximumLength=track_params["max_length"],
+                            Unidirectional=False))
+
+        meta_fname = _get_fname(
+            row,
+            f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
+        afd.write_json(meta_fname, meta)
+
     return streamlines_file
 
 
@@ -343,9 +423,12 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
              tracking_params, segmentation_params):
     odf_model = tracking_params["odf_model"]
     directions = tracking_params["directions"]
-    bundles_file = _get_fname(row,
-                              '%s_%s_bundles.trk' % (odf_model,
-                                                     directions))
+    algo = segmentation_params["algo"]
+    bundles_file = _get_fname(
+        row,
+        f'_space-RASMM_{odf_model}_desc-{directions}'
+        f'_desc-{algo}_tractography.trk')
+
     if not op.exists(bundles_file):
         streamlines_file = _streamlines(
             row,
@@ -368,6 +451,11 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
 
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
         save_tractogram(tgram, bundles_file)
+        meta = dict(source=streamlines_file,
+                    Parameters=segmentation_params)
+        meta_fname = bundles_file.split('.')[0] + '.json'
+        afd.write_json(meta_fname, meta)
+
     return bundles_file
 
 
@@ -375,9 +463,12 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                    segmentation_params):
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
-    clean_bundles_file = _get_fname(row,
-                                    '%s_%s_clean_bundles.trk' % (odf_model,
-                                                                 directions))
+    algo = tracking_params['algo']
+    clean_bundles_file = _get_fname(
+        row,
+        f'_space-RASMM_{odf_model}_desc-{directions}'
+        f'_desc-{algo}_desc-clean_tractography.trk')
+
     if not op.exists(clean_bundles_file):
         bundles_file = _segment(row,
                                 wm_labels,
@@ -413,6 +504,11 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                                Space.VOX,
                                data_per_streamline=tgram.data_per_streamline),
             clean_bundles_file)
+
+        meta = dict(source=bundles_file,
+                    Parameters=get_default_args(seg.clean_bundle))
+        meta_fname = clean_bundles_file.split('.')[0] + '.json'
+        afd.write_json(meta_fname, meta)
 
     return clean_bundles_file
 
@@ -464,6 +560,10 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                                            node=node_numbers,
                                            scalar=scalar_names))
         profile_dframe.to_csv(profiles_file)
+        meta = dict(source=bundles_file,
+                    parameters=get_default_args(afq_profile))
+        meta_fname = profiles_file.split('.')[0] + '.json'
+        afd.write_json(meta_fname, meta)
 
     return profiles_file
 
@@ -482,6 +582,7 @@ def _template_xform(row, reg_template):
         nib.save(nib.Nifti1Image(template_xform,
                                  row['dwi_affine']),
                  template_xform_file)
+
     return template_xform_file
 
 
@@ -503,20 +604,34 @@ def _export_rois(row, bundle_dict, reg_template):
                 inclusion = 'include'
             else:
                 inclusion = 'exclude'
-            fname = op.join(
-                rois_dir, '%s_roi%s_%s.nii.gz' % (bundle, ii + 1, inclusion))
+
             warped_roi = auv.patch_up_roi(
                 (mapping.transform_inverse(
                     roi.get_fdata(),
                     interpolation='linear')) > 0).astype(int)
+
+            fname = op.split(
+                _get_fname(
+                    row,
+                    f'_ROI-{bundle}_desc-{ii}_desc{inclusion}.nii.gz'))
+
+            fname = op.join(fname[0], rois_dir, fname[1])
+
             # Cast to float32, so that it can be read in by MI-Brain:
             nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
                                      row['dwi_affine']),
                      fname)
+            meta = dict()
+            meta_fname = fname.split('.')[0] + '.json'
+            afd.write_json(meta_fname, meta)
 
 
 def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                     tracking_params, segmentation_params):
+
+    odf_model = tracking_params['odf_model']
+    directions = tracking_params['directions']
+    algo = tracking_params['algo']
 
     for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
@@ -535,13 +650,19 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
         for bundle in bundle_dict:
             uid = bundle_dict[bundle]['uid']
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            this_sl = dtu.transform_tracking_output(
-                streamlines[idx],
-                np.linalg.inv(row['dwi_affine']))
-
-            this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
-            fname = op.join(bundles_dir, '%s.trk' % bundle)
+            this_tgm = StatefulTractogram(streamlines[idx], row['dwi_img'],
+                                          Space.RASMM)
+            this_tgm.to_vox()
+            fname = op.split(
+                _get_fname(
+                    row,
+                    f'_space-RASMM_{odf_model}_desc-{directions}'
+                    f'_desc-{algo}_bundle-{bundle}_tractography.trk'))
+            fname = op.join(fname[0], bundles_dir, fname[1])
             save_tractogram(this_tgm, fname, bbox_valid_check=False)
+            meta = dict(source=bundles_file)
+            meta_fname = fname.split('.')[0] + '.json'
+            afd.write_json(meta_fname, meta)
 
 
 def _get_affine(fname):
