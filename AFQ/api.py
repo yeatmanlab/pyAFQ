@@ -15,9 +15,9 @@ import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
 import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.stats.analysis import afq_profile
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -40,69 +40,6 @@ def do_preprocessing():
 
 BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
-
-
-# Monkey-patch this in, until https://github.com/nipy/dipy/pull/1695 is
-# merged:
-def _bundle_profile(data, bundle, affine=None, n_points=100,
-                    weights=None):
-    """
-    Calculates a summarized profile of data for a bundle along its length.
-
-    Follows the approach outlined in [Yeatman2012]_.
-
-    Parameters
-    ----------
-    data : 3D volume
-        The statistic to sample with the streamlines.
-    bundle : StreamLines class instance
-        The collection of streamlines (possibly already resampled into an array
-         for each to have the same length) with which we are resampling. See
-         Note below about orienting the streamlines.
-    weights : 1D
-        array or 2D array (optional) Weight each streamline (1D) or each
-        node (2D) when calculating the tract-profiles. Must sum to 1 across
-        streamlines (in each node if relevant).
-
-    Returns
-    -------
-    ndarray : a 1D array with the profile of `data` along the length of
-        `bundle`
-
-    Note
-    ----
-    Before providing a bundle as input to this function, you will need to make
-    sure that the streamlines in the bundle are all oriented in the same
-    orientation relative to the bundle (use :func:`orient_by_streamline`).
-
-    References
-    ----------
-    .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J. Myall,
-       Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of White
-       Matter Properties: Automating Fiber-Tract Quantification" PloS One 7
-       (11): e49790.
-    """
-    if len(bundle) == 0:
-        raise ValueError("The bundle contains no streamlines")
-
-    # Resample each streamline to the same number of points:
-    fgarray = dts.set_number_of_points(bundle, n_points)
-
-    # Extract the values
-    values = np.array(dts.values_from_volume(data, fgarray, affine=affine))
-
-    if weights is None:
-        weights = np.ones(values.shape) / values.shape[0]
-    else:
-        # We check that weights *always sum to 1 across streamlines*:
-        if not np.allclose(np.sum(weights, 0), np.ones(n_points)):
-            raise ValueError("The sum of weights across streamlines must ",
-                             "be equal to 1")
-
-    return np.sum(weights * values, 0)
-
-
-dts.bundle_profile = _bundle_profile
 
 
 def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
@@ -510,12 +447,12 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
             for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                 idx = np.where(
                     trk.tractogram.data_per_streamline['bundle'] == b)[0]
-                this_sl = list(trk.streamlines[idx])
+                this_sl = trk.streamlines[idx]
                 bundle_name = reverse_dict[b]
-                this_profile = dts.bundle_profile(
+                this_profile = afq_profile(
                     scalar_data,
                     this_sl,
-                    affine=row['dwi_affine'])
+                    row["dwi_affine"])
                 nodes = list(np.arange(this_profile.shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
                 node_numbers.extend(nodes)
