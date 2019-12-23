@@ -3,8 +3,14 @@
 Plotting tract profiles using RecoBundles
 =========================================
 
-An example of tracking and segmenting two tracts with RecoBundles, and
-plotting their tract profiles for FA (calculated with DTI).
+An example of tracking and segmenting two tracts with RecoBundles
+[Garyfallidis2017]_, and plotting their tract profiles for FA (calculated with
+DTI).
+
+See `plot_tract_profile` for explanations of each stage here. The main
+difference here is that segmentation uses the RecoBundles algorithm, instead of
+the AFQ waypoint ROI approach.
+
 """
 
 import os.path as op
@@ -104,12 +110,14 @@ else:
     sft = load_tractogram('./dti_streamlines_reco.trk', img)
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(algo='reco', rng=np.random.RandomState(2),
+segmentation = seg.Segmentation(algo='reco',
+                                rng=np.random.RandomState(2),
                                 greater_than=50,
                                 rm_small_clusters=10,
                                 model_clust_thr=5,
                                 reduction_thr=20,
                                 refine=True)
+
 segmentation.segment(bundles,
                      sft,
                      fdata=hardi_fdata,
@@ -117,7 +125,6 @@ segmentation.segment(bundles,
                      fbvec=hardi_fbvec,
                      mapping=mapping,
                      reg_template=MNI_T2_img)
-
 
 fiber_groups = segmentation.fiber_groups
 
@@ -144,3 +151,13 @@ for bundle in bundles:
         ax.set_title(bundle)
 
 plt.show()
+
+##########################################################################
+# References:
+# -------------------------
+#  .. [Garyfallidis2017] Garyfallidis, Eleftherios, Marc-Alexandre Côté,
+#                      Francois Rheault, Jasmeen Sidhu, Janice Hau, Laurent
+#                      Petit, David Fortin, Stephen Cunanne, and Maxime
+#                      Descoteaux. 2017.“Recognition of White Matter Bundles
+#                      Using Local and Global Streamline-Based Registration and
+#                      Clustering.”NeuroImage 170: 283-295.
