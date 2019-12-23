@@ -45,14 +45,10 @@ usage = f"""pyAFQ /path/to/afq_config.toml
 
 Runs full AFQ processing as specified in the configuration file.
 
-Documentation
-=============
-The configuration file `afq_config.toml` is a toml file that specifies the
-configuration of this run of pyAFQ. The following is an example, with all the
-default settings. The only configuration required is the `[files]` section,
-and within it the `dmriprep_path` key, pointing to an appropriately organized
-folder (see online documentation for details) If any of the other sections/keys
-is omitted, the following defaults are used:
+For details about configuration, see instructions in:
+https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+
+The default values of the configuration are:
 
 ```
 [files]
@@ -75,6 +71,7 @@ wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 dask_it = false
 ```
 """
+
 parser = ArgumentParser(usage)
 
 parser.add_argument(dest='config', action="store", type=str,
