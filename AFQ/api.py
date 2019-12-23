@@ -463,7 +463,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                    segmentation_params):
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
-    algo = tracking_params['algo']
+    algo = segmentation_params['algo']
     clean_bundles_file = _get_fname(
         row,
         f'_space-RASMM_{odf_model}_desc-{directions}'
@@ -631,7 +631,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
 
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
-    algo = tracking_params['algo']
+    algo = segmentation_params['algo']
 
     for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
