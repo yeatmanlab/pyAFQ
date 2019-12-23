@@ -84,35 +84,77 @@ provided in the :ref:`examples` documentation section.
 In addition, pyAFQ provides a command-line interface. After installing the
 software, and organizing the data, run::
 
-    pyAFQ <dmriprep_path>
+    pyAFQ /path/to/config.toml
 
-pointing the program to the location of the `dmriprep` folder. This will
-run whole-brain tractography, segment the tracts, and extract tract-profiles
-for each tract, generating a CSV file under
-`study/derivatives/afq/tract_profiles.csv` that contains the tract profiles
-for all participants/tracts/statistics
+pointing the program to the location of a configuration file. This will run
+whole-brain tractography, segment the tracts, and extract tract-profiles for
+each tract, generating a CSV file under
+`study/derivatives/afq/tract_profiles.csv` that contains the tract profiles for
+all participants/tracts/statistics.
 
-The CLI has several additional optional inputs::
+The pyAFQ configuration file
+----------------------------
 
-  -s SUB_PREFIX, --sub_prefix SUB_PREFIX
-                        Subject prefix (default: 'sub')
-  -d DWI_FOLDER, --dwi_folder DWI_FOLDER
-                        DWI folder (default: 'dwi')
-  -f DWI_FILE, --dwi_file DWI_FILE
-                        DWI file pattern (default: '*dwi')
-  -a ANAT_FOLDER, --anat_folder ANAT_FOLDER
-                        Anat folder (default: 'anat')
-  -t ANAT_FILE, --anat_file ANAT_FILE
-                        Anat file pattern (default: '*T1w*')
-  -g SEG_FILE, --seg_file SEG_FILE
-                        Segmentation file patter (default: '*aparc+aseg*')
-  -b B0_THRESHOLD, --b0_threshold B0_THRESHOLD
-                        B0 threshold (default: 0)
-  -o ODF_MODEL, --odf_model ODF_MODEL
-                        ODF model (default: 'DTI')
-  -r DIRECTIONS, --directions DIRECTIONS
-                        Tractography method (default: 'det')
-  -n N_SEEDS, --n_seeds N_SEEDS
-                        Number of seeds (default: 2 per voxel)
-  -m, --random_seeds    Whether to use a total of `n_seeds` random seeds
-                        instead of `n_seeds` per voxel (default: False)
+This file should be a `toml <https://github.com/toml-lang/toml>`_ file. At
+minimum, the file should contain information about the location of the
+`dmriprep` folder::
+
+    [files]
+    dmriprep_folder = '/path/to/study/derivatives/dmriprep'
+
+
+But additional configuration options can be provided for the following values:
+
+    title = "My AFQ analysis"
+
+    [files]
+    dmriprep_path = '/path/to/dmriprep/folder'
+
+    [bundles]
+    bundles = ['ATR', 'CGC', 'CST', 'HCC', 'IFO', 'ILF', 'SLF', 'ARC', 'UNC', 'FA', 'FP']
+    seg_algo = 'AFQ'
+    scalars_model = 'DTI'
+    scalars = ['dti_fa', 'dti_md']
+
+    [tracking]
+    directions = 'det'
+    max_angle = 30.0
+    sphere = None
+    seed_mask = None
+    n_seeds = 1
+    random_seeds = false
+    stop_mask = None
+    stop_threshold = 0
+    step_size = 0.5
+    min_length = 10
+    max_length = 1000
+    odf_model = 'DTI'
+    wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+
+    [segmentation]
+    nb_points = false
+    algo = 'AFQ'
+    progressive = true
+    greater_than = 50
+    rm_small_clusters = 50
+    model_clust_thr = 40
+    reduction_thr = 40
+    refine = false
+    pruning_thr = 6
+    b0_threshold = 0
+    prob_threshold = 0
+    rng = None
+    return_idx = false
+    filter_by_endpoints = true
+    dist_to_aal = 4
+
+    [compute]
+    dask_it = false
+
+    [metadata]
+    a_string = "A string with some description"
+    list_of_values = ["val1", 1, 2, 3]
+    some_boolean = true
+
+Note that the `title` variable and `[metadata]` section are both for users to
+enter any title/metadata they would like and pyAFQ will generally ignore them.
