@@ -128,7 +128,7 @@ for k, v in seg_defaults.items():
     segmentation_params[k] = segmentation.get(k, v)
 
 bundles = config.get("bundles", {})
-seg_algo = bundle.get("seg_algo", "AFQ")
+seg_algo = bundles.get("seg_algo", "afq")
 bundle_names = bundles.get("bundles", api.BUNDLES)
 scalars_model = bundles.get("scalars_model", "DTI")
 scalars = bundles.get("scalars", ["fa", "md"])
