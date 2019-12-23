@@ -75,7 +75,7 @@ seg_file = files.get("seg_file", "*aparc+aseg*")
 b0_threshold = files.get("b0_threshold", 0)
 reg_template = files.get("reg_template", None)
 
-tracking = config.get("tracking")
+tracking = config.get("tracking", {})
 track_defaults = get_default_args(aft.track)
 tracking_params = {}
 for k, v in track_defaults.items():
@@ -85,7 +85,7 @@ wm_labels = tracking.get(
     "wm_labels",
     [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
-segmentation = config.get("segmentation")
+segmentation = config.get("segmentation", {})
 seg_defaults = get_default_args(seg.Segmentation.__init__)
 segmentation_params = {}
 for k, v in seg_defaults.items():

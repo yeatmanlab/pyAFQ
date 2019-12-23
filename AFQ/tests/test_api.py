@@ -165,8 +165,7 @@ def test_AFQ_data_waypoint():
     print("Running the CLI:")
 
     # Bare bones config only points to the files
-    config = dict(files=dict(dmriprep_path=dmriprep_path),
-                  tracking={}, segmentation={}, bundles={}, compute={})
+    config = dict(files=dict(dmriprep_path=dmriprep_path))
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:
