@@ -636,7 +636,7 @@ class Segmentation:
 
 
 def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
-                 length_threshold=4, min_sl=20, stat=np.mean,
+                 length_threshold=4, min_sl=20, stat='mean',
                  return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
@@ -667,7 +667,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         Number of streamlines in a bundle under which we will
         not bother with cleaning outliers. Default: 20.
 
-    stat : callable, optional.
+    stat : callable or str, optional.
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
 
@@ -681,7 +681,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     that have a Mahalanobis distance smaller than `clean_threshold` from
     the mean of each one of the nodes.
     """
-
+    # Convert string to callable, if that's what you got.
+    if isinstance(stat, str):
+        getattr(np, stat)
     # We don't even bother if there aren't enough streamlines:
     if len(tg.streamlines) < min_sl:
         if return_idx:

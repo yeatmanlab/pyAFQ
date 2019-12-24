@@ -408,16 +408,18 @@ def _streamlines(row, wm_labels, tracking_params=None):
 
         meta_fname = _get_fname(
             row,
-            f'_space-RASMM_model-{odf_model}_desc-{directions}_tractography.json')
+            f'_space-RASMM_model-{odf_model}_desc-'
+            f'{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
-        print("finally here!")
         save_tractogram(sft, streamlines_file, bbox_valid_check=False)
 
     return streamlines_file
 
 
 def _segment(row, wm_labels, bundle_dict, reg_template,
-             tracking_params, segmentation_params):
+             tracking_params, segmentation_params, clean_params):
+    # We pass `clean_params` here, but do not use it, so we have the
+    # same signature as `_clean_bundles`.
     odf_model = tracking_params["odf_model"]
     directions = tracking_params["directions"]
     seg_algo = segmentation_params["seg_algo"]
@@ -457,7 +459,7 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
 
 
 def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
-                   segmentation_params):
+                   segmentation_params, clean_params):
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
     seg_algo = segmentation_params['seg_algo']
@@ -472,7 +474,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                                 bundle_dict,
                                 reg_template,
                                 tracking_params,
-                                segmentation_params)
+                                segmentation_params,
+                                clean_params)
 
         sft = load_tractogram(bundles_file,
                               row['dwi_img'],
@@ -488,12 +491,12 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     sft.streamlines[idx],
                     row['dwi_img'],
                     Space.VOX)
-                this_tg = seg.clean_bundle(this_tg)
+                this_tg = seg.clean_bundle(this_tg, clean_params)
                 this_tgram = nib.streamlines.Tractogram(
                     this_tg.streamlines,
                     data_per_streamline={
                         'bundle': (len(this_tg)
-                                * [bundle_dict[b]['uid']])},
+                                   * [bundle_dict[b]['uid']])},
                         affine_to_rasmm=row['dwi_affine'])
                 tgram = aus.add_bundles(tgram, this_tgram)
         save_tractogram(
@@ -517,7 +520,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
 
 
 def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
-                    tracking_params, segmentation_params,
+                    tracking_params, segmentation_params, clean_params,
                     scalars, weighting=None):
     profiles_file = _get_fname(row, '_profiles.csv')
     if not op.exists(profiles_file):
@@ -526,7 +529,8 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
                                       bundle_dict,
                                       reg_template,
                                       tracking_params,
-                                      segmentation_params)
+                                      segmentation_params,
+                                      clean_params)
         keys = []
         vals = []
         for k in bundle_dict.keys():
@@ -631,7 +635,7 @@ def _export_rois(row, bundle_dict, reg_template):
 
 
 def _export_bundles(row, wm_labels, bundle_dict, reg_template,
-                    tracking_params, segmentation_params):
+                    tracking_params, segmentation_params, clean_params):
 
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
@@ -644,7 +648,8 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                             bundle_dict,
                             reg_template,
                             tracking_params,
-                            segmentation_params)
+                            segmentation_params,
+                            clean_params)
 
         bundles_dir = op.join(row['results_dir'], folder)
         os.makedirs(bundles_dir, exist_ok=True)
@@ -760,7 +765,8 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  tracking_params=None,
-                 segmentation_params=None):
+                 segmentation_params=None,
+                 clean_params=None):
         """
 
         dmriprep_path: str
@@ -822,6 +828,13 @@ class AFQ(object):
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=reg_template)
+
+        default_clean_params = get_default_args(seg.clean_bundle)
+        if clean_params is not None:
+            for k in clean_params:
+                default_clean_params[k] = clean_params[k]
+
+        self.clean_params = default_clean_params
 
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
@@ -1076,7 +1089,8 @@ class AFQ(object):
                           self.bundle_dict,
                           self.reg_template,
                           self.tracking_params,
-                          self.segmentation_params])
+                          self.segmentation_params,
+                          self.clean_params])
 
     def get_bundles(self):
         self.set_bundles()
@@ -1096,7 +1110,8 @@ class AFQ(object):
                                                 self.bundle_dict,
                                                 self.reg_template,
                                                 self.tracking_params,
-                                                self.segmentation_params])
+                                                self.segmentation_params,
+                                                self.clean_params])
 
     def get_clean_bundles(self):
         self.set_clean_bundles()
@@ -1113,6 +1128,7 @@ class AFQ(object):
                                             self.reg_template,
                                             self.tracking_params,
                                             self.segmentation_params,
+                                            self.clean_params,
                                             self.scalars],
                                       axis=1)
 
@@ -1147,7 +1163,8 @@ class AFQ(object):
                                     self.bundle_dict,
                                     self.reg_template,
                                     self.tracking_params,
-                                    self.segmentation_params],
+                                    self.segmentation_params,
+                                    self.clean_params],
                               axis=1)
 
     def combine_profiles(self):
