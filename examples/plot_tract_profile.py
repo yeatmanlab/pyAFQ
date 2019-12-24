@@ -122,10 +122,8 @@ if not op.exists('dti_streamlines.trk'):
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            stop_mask=FA_data, stop_threshold=0.1)
-
-    sft = StatefulTractogram(streamlines, img, Space.RASMM)
+    sft = aft.track(dti_params['params'], seed_mask=seed_roi,
+                    stop_mask=FA_data, stop_threshold=0.1)
     save_tractogram(sft, './dti_streamlines.trk',
                     bbox_valid_check=False)
 else:

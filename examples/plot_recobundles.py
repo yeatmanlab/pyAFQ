@@ -99,11 +99,10 @@ if not op.exists('dti_streamlines_reco.trk'):
                          sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
-                            directions='det', stop_mask=FA_data,
-                            stop_threshold=0.1)
-    print(len(streamlines))
-    sft = StatefulTractogram(streamlines, img, Space.RASMM)
+    sft = aft.track(dti_params['params'], seed_mask=seed_roi,
+                    directions='det', stop_mask=FA_data,
+                    stop_threshold=0.1)
+    print(len(sft.streamlines))
     save_tractogram(sft, './dti_streamlines_reco.trk',
                     bbox_valid_check=False)
 else:

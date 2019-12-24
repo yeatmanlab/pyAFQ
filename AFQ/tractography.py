@@ -8,6 +8,7 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
@@ -115,12 +116,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                       stop_threshold)
     logger.info("Tracking...")
 
-    return _local_tracking(seeds, dg, threshold_classifier, affine,
+    return _local_tracking(seeds, dg, threshold_classifier, params_img,
                            step_size=step_size, min_length=min_length,
                            max_length=max_length)
 
 
-def _local_tracking(seeds, dg, threshold_classifier, affine,
+def _local_tracking(seeds, dg, threshold_classifier, params_img,
                     step_size=0.5, min_length=10, max_length=1000):
     """
     Helper function
@@ -130,9 +131,9 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     tracker = VerboseLocalTracking(dg,
                                    threshold_classifier,
                                    seeds,
-                                   affine,
+                                   params_img.affine,
                                    step_size=step_size,
                                    min_length=min_length,
                                    max_length=max_length)
 
-    return dts.Streamlines(tracker)
+    return StatefulTractogram(tracker, params_img, Space.RASMM)

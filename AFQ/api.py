@@ -392,10 +392,9 @@ def _streamlines(row, wm_labels, tracking_params=None):
         this_sl = dtu.transform_tracking_output(streamlines,
                                                 np.linalg.inv(dwi_img.affine))
         this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
-        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
 
         meta_directions = {"det": "deterministic",
-                            "prob": "probabilistic"}
+                           "prob": "probabilistic"}
 
         meta = dict(
             TractographyClass="local",
@@ -404,7 +403,7 @@ def _streamlines(row, wm_labels, tracking_params=None):
             Seeding=dict(
                 ROI=wm_mask_fname,
                 n_seeds=tracking_params["n_seeds"],
-                random_seeds=tracking_params["random_seed"]),
+                random_seeds=tracking_params["random_seeds"]),
             Constraints=dict(AnatomicalImage=wm_mask_fname),
             Parameters=dict(Units="mm",
                             StepSize=tracking_params["step_size"],
@@ -416,6 +415,9 @@ def _streamlines(row, wm_labels, tracking_params=None):
             row,
             f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
+
+        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
+
     return streamlines_file
 
 
