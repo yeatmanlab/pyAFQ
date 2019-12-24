@@ -109,7 +109,7 @@ else:
     sft = load_tractogram('./dti_streamlines_reco.trk', img)
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(algo='reco',
+segmentation = seg.Segmentation(seg_algo='reco',
                                 rng=np.random.RandomState(2),
                                 greater_than=50,
                                 rm_small_clusters=10,

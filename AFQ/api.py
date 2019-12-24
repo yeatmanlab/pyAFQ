@@ -386,20 +386,15 @@ def _streamlines(row, wm_labels, tracking_params=None):
         wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
         tracking_params['seed_mask'] = wm_mask
         tracking_params['stop_mask'] = wm_mask
-
-        dwi_img = nib.load(row['dwi_file'])
-        streamlines = aft.track(params_file, **tracking_params)
-        this_sl = dtu.transform_tracking_output(streamlines,
-                                                np.linalg.inv(dwi_img.affine))
-        this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
-
+        sft = aft.track(params_file, **tracking_params)
+        sft.to_vox()
         meta_directions = {"det": "deterministic",
                            "prob": "probabilistic"}
 
         meta = dict(
             TractographyClass="local",
             TractographyMethod=meta_directions[tracking_params["directions"]],
-            Count=len(this_tgm.streamlines),
+            Count=len(sft.streamlines),
             Seeding=dict(
                 ROI=wm_mask_fname,
                 n_seeds=tracking_params["n_seeds"],
@@ -415,8 +410,7 @@ def _streamlines(row, wm_labels, tracking_params=None):
             row,
             f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
-
-        save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
+        save_tractogram(sft, streamlines_file, bbox_valid_check=False)
 
     return streamlines_file
 

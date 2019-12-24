@@ -7,7 +7,6 @@ import dipy.data as dpd
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
@@ -65,7 +64,6 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     -------
     list of streamlines ()
     """
-
     logger = logging.getLogger('AFQ.Tractography')
 
     logger.info("Loading Image...")
