@@ -121,7 +121,7 @@ def test_AFQ_data_waypoint():
 
     sl_file = op.join(
         myafq.data_frame.results_dir[0],
-        'sub-01_sess-01_dwi_space-RASMM_DTI_desc-det_tractography.trk')
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
     sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
                              Space.VOX)
     save_tractogram(sft, sl_file, bbox_valid_check=False)
@@ -145,14 +145,14 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'ROIs',
-        'sub-01_sess-01_dwi_ROI-CST_R_desc-0_desc-include.json'))
+        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
     myafq.export_bundles()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_sess-01_dwi_space-RASMM_DTI_desc-det_desc-AFQ_bundle-CST_R_tractography.trk'))  # noqa
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-afq-CST_L_tractography.trk'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (800, 5)
@@ -186,14 +186,17 @@ def test_AFQ_data_waypoint():
     assert_frame_equal(combined_profiles, from_file)
 
     # Make sure the CLI did indeed generate these:
+    myafq.export_rois()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'ROIs',
-        'sub-01_sess-01_dwi_ROI-CST_R_desc-0_desc-include.nii.gz'))
+        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
+    myafq.export_bundles()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_sess-01_dwi_space-RASMM_DTI_desc-det_desc-AFQ_bundle-CST_R_tractography.trk'))  # noqa
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-afq-CST_L_tractography.trk'))  # noqa
 
 
 # def test_AFQ_data_recobundles():

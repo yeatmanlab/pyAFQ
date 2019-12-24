@@ -375,7 +375,7 @@ def _streamlines(row, wm_labels, tracking_params=None):
 
     streamlines_file = _get_fname(
         row,
-        f'_space-RASMM_{odf_model}_desc-{directions}_tractography.trk')
+        f'_space-RASMM_model-{odf_model}_desc-{directions}_tractography.trk')
 
     if not op.exists(streamlines_file):
         if odf_model == "DTI":
@@ -408,7 +408,7 @@ def _streamlines(row, wm_labels, tracking_params=None):
 
         meta_fname = _get_fname(
             row,
-            f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
+            f'_space-RASMM_model-{odf_model}_desc-{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
         print("finally here!")
         save_tractogram(sft, streamlines_file, bbox_valid_check=False)
@@ -423,8 +423,8 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
     seg_algo = segmentation_params["seg_algo"]
     bundles_file = _get_fname(
         row,
-        f'_space-RASMM_{odf_model}_desc-{directions}'
-        f'_desc-{seg_algo}_tractography.trk')
+        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
+        f'{seg_algo}_tractography.trk')
 
     if not op.exists(bundles_file):
         streamlines_file = _streamlines(
@@ -463,8 +463,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
     seg_algo = segmentation_params['seg_algo']
     clean_bundles_file = _get_fname(
         row,
-        f'_space-RASMM_{odf_model}_desc-{directions}'
-        f'_desc-{seg_algo}_desc-clean_tractography.trk')
+        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
+        f'{seg_algo}-clean_tractography.trk')
 
     if not op.exists(clean_bundles_file):
         bundles_file = _segment(row,
@@ -617,7 +617,7 @@ def _export_rois(row, bundle_dict, reg_template):
             fname = op.split(
                 _get_fname(
                     row,
-                    f'_ROI-{bundle}_desc-{ii}_desc-{inclusion}.nii.gz'))
+                    f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
 
             fname = op.join(fname[0], rois_dir, fname[1])
 
@@ -665,8 +665,8 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
                 fname = op.split(
                     _get_fname(
                         row,
-                        f'_space-RASMM_{odf_model}_desc-{directions}'
-                        f'_desc-{seg_algo}_bundle-{bundle}_tractography.trk'))
+                        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
+                        f'{seg_algo}-{bundle}_tractography.trk'))
                 fname = op.join(fname[0], bundles_dir, fname[1])
                 save_tractogram(this_tgm, fname, bbox_valid_check=False)
                 meta = dict(source=bundles_file)
