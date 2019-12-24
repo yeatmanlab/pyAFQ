@@ -394,13 +394,13 @@ def _streamlines(row, wm_labels, tracking_params=None):
         this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
         save_tractogram(this_tgm, streamlines_file, bbox_valid_check=False)
 
-        _meta_directions = {"det": "deterministic",
+        meta_directions = {"det": "deterministic",
                             "prob": "probabilistic"}
 
         meta = dict(
             TractographyClass="local",
-            TractographyMethod=_meta_directions[tracking_params["directions"]],
-            Count=len(tg.streamlines),
+            TractographyMethod=meta_directions[tracking_params["directions"]],
+            Count=len(this_tgm.streamlines),
             Seeding=dict(
                 ROI=wm_mask_fname,
                 n_seeds=tracking_params["n_seeds"],
@@ -409,14 +409,13 @@ def _streamlines(row, wm_labels, tracking_params=None):
             Parameters=dict(Units="mm",
                             StepSize=tracking_params["step_size"],
                             MinimumLength=tracking_params["min_length"],
-                            MaximumLength=track_params["max_length"],
+                            MaximumLength=tracking_params["max_length"],
                             Unidirectional=False))
 
         meta_fname = _get_fname(
             row,
             f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
-
     return streamlines_file
 
 
@@ -822,7 +821,7 @@ class AFQ(object):
                 default_seg_params[k] = segmentation_params[k]
 
         self.segmentation_params = default_seg_params
-        self.seg_algo = self.segmentation_params["seg_algo"]
+        self.seg_algo = self.segmentation_params["seg_algo"].lower()
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=reg_template)
