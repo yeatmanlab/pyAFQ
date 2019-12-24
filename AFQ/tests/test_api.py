@@ -100,13 +100,12 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
                             'derivatives', 'dmriprep')
-    seg_algo = "afq"
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI")
-    segmentation_params = dict(filter_by_endpoints=False)
+    segmentation_params = dict(filter_by_endpoints=False,
+                               seg_algo = "afq")
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
-                    seg_algo=seg_algo,
                     bundle_names=bundle_names,
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params)

@@ -410,6 +410,7 @@ def _streamlines(row, wm_labels, tracking_params=None):
             row,
             f'_space-RASMM_{odf_model}_desc-{directions}_tractography.json')
         afd.write_json(meta_fname, meta)
+        print("finally here!")
         save_tractogram(sft, streamlines_file, bbox_valid_check=False)
 
     return streamlines_file
