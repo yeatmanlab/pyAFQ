@@ -190,7 +190,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'ROIs',
-        'sub-01_sess-01_dwi_ROI-CST_R_desc-0_descinclude.nii.gz'))
+        'sub-01_sess-01_dwi_ROI-CST_R_desc-0_desc-include.nii.gz'))
 
     assert op.exists(op.join(myafq.data_frame['results_dir'][0],
         'bundles',
