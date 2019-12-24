@@ -103,12 +103,16 @@ def test_AFQ_data_waypoint():
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI")
     segmentation_params = dict(filter_by_endpoints=False,
-                               seg_algo = "afq")
+                               seg_algo = "afq",
+                               return_idx=True)
+    clean_params = dict(return_idx=True)
+
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
                     bundle_names=bundle_names,
                     tracking_params=tracking_params,
-                    segmentation_params=segmentation_params)
+                    segmentation_params=segmentation_params,
+                    clean_params=clean_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -153,6 +157,11 @@ def test_AFQ_data_waypoint():
         myafq.data_frame['results_dir'][0],
         'bundles',
         'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-afq-CST_L_tractography.trk'))  # noqa
+
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'bundles',
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-afq-CST_L_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (800, 5)

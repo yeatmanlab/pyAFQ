@@ -448,6 +448,13 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
                                        mapping=_mapping(row, reg_template),
                                        reg_prealign=reg_prealign)
 
+        if segmentation_params['return_idx']:
+            idx = {bundle: bundles[bundle]['idx'].tolist()
+                   for bundle in bundle_dict}
+            afd.write_json(bundles_file.split('.')[0] + '_idx.json',
+                           idx)
+            bundles = {bundle: bundles[bundle]['sl'] for bundle in bundle_dict}
+
         tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
         save_tractogram(tgram, bundles_file)
         meta = dict(source=streamlines_file,
@@ -482,6 +489,8 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                               Space.VOX)
 
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
+        if clean_params['return_idx']:
+            idx = {}
 
         for b in bundle_dict.keys():
             if b != "whole_brain":
@@ -492,6 +501,12 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     row['dwi_img'],
                     Space.VOX)
                 this_tg = seg.clean_bundle(this_tg, clean_params)
+                if clean_params['return_idx']:
+                    this_tg, this_idx = this_tge
+                    idx_file = bundles_file.split('.')[0] + '_idx.json'
+                    with open(idx_file) as ff:
+                        bundle_idx = json.loads(ff)[b]
+                    idx[b] = bundle_idx[this_idx]
                 this_tgram = nib.streamlines.Tractogram(
                     this_tg.streamlines,
                     data_per_streamline={
@@ -515,6 +530,10 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     Parameters=seg_args)
         meta_fname = clean_bundles_file.split('.')[0] + '.json'
         afd.write_json(meta_fname, meta)
+
+        if clean_params['return_idx']:
+            afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
+                           idx)
 
     return clean_bundles_file
 
