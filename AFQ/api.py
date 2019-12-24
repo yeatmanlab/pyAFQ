@@ -505,7 +505,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     this_tg, this_idx = this_tg
                     idx_file = bundles_file.split('.')[0] + '_idx.json'
                     with open(idx_file) as ff:
-                        bundle_idx = json.loads(ff)[b]
+                        bundle_idx = json.load(ff)[b]
                     idx[b] = bundle_idx[this_idx]
                 this_tgram = nib.streamlines.Tractogram(
                     this_tg.streamlines,
