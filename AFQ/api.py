@@ -506,9 +506,9 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
             clean_bundles_file)
 
         seg_args = get_default_args(seg.clean_bundle)
-        for k, v in seg_args:
-            if callable(v):
-                seg_args[k] = v.__name__
+        for k in seg_args:
+            if callable(seg_args[k]):
+                seg_args[k] = seg_args[k].__name__
 
         meta = dict(source=bundles_file,
                     Parameters=seg_args)
@@ -655,9 +655,12 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
         for bundle in bundle_dict:
             uid = bundle_dict[bundle]['uid']
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            this_tgm = StatefulTractogram(streamlines[idx], row['dwi_img'],
-                                          Space.RASMM)
-            this_tgm.to_vox()
+            this_sl = dtu.transform_tracking_output(
+                streamlines[idx],
+                np.linalg.inv(row['dwi_affine']))
+
+            this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
+
             fname = op.split(
                 _get_fname(
                     row,
