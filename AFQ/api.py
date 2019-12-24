@@ -505,8 +505,13 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                                data_per_streamline=tgram.data_per_streamline),
             clean_bundles_file)
 
+        seg_args = get_default_args(seg.clean_bundle)
+        for k, v in seg_args:
+            if callable(v):
+                seg_args[k] = v.__name__
+
         meta = dict(source=bundles_file,
-                    Parameters=get_default_args(seg.clean_bundle))
+                    Parameters=seg_args)
         meta_fname = clean_bundles_file.split('.')[0] + '.json'
         afd.write_json(meta_fname, meta)
 
@@ -613,7 +618,7 @@ def _export_rois(row, bundle_dict, reg_template):
             fname = op.split(
                 _get_fname(
                     row,
-                    f'_ROI-{bundle}_desc-{ii}_desc{inclusion}.nii.gz'))
+                    f'_ROI-{bundle}_desc-{ii}_desc-{inclusion}.nii.gz'))
 
             fname = op.join(fname[0], rois_dir, fname[1])
 
