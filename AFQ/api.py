@@ -829,8 +829,8 @@ class AFQ(object):
         self.scalars = scalars
 
         default_tracking_params = get_default_args(aft.track)
-        # Replace the defaults only for kwargs for which a non-default value was
-        # given:
+        # Replace the defaults only for kwargs for which a non-default value
+        # was given:
         if tracking_params is not None:
             for k in tracking_params:
                 default_tracking_params[k] = tracking_params[k]
