@@ -38,7 +38,7 @@ def _resample_tg(tg, n_points):
 class Segmentation:
     def __init__(self,
                  nb_points=False,
-                 algo='AFQ',
+                 seg_algo='AFQ',
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -61,7 +61,7 @@ class Segmentation:
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
 
-        algo : string
+        seg_algo : string
             Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
                 based on inclusion/exclusion ROIs.
@@ -132,7 +132,7 @@ class Segmentation:
         else:
             self.rng = rng
 
-        self.algo = algo.lower()
+        self.seg_algo = seg_algo.lower()
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -225,9 +225,9 @@ class Segmentation:
         self.bundle_dict = bundle_dict
         self.cross_streamlines()
 
-        if self.algo == "afq":
+        if self.seg_algo == "afq":
             return self.segment_afq()
-        elif self.algo == "reco":
+        elif self.seg_algo == "reco":
             return self.segment_reco()
 
     def prepare_img(self, fdata, fbval, fbvec):

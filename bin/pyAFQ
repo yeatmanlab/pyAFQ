@@ -125,7 +125,6 @@ for k, v in seg_defaults.items():
     segmentation_params[k] = segmentation.get(k, v)
 
 bundles = config.get("bundles", {})
-seg_algo = bundles.get("seg_algo", "afq")
 bundle_names = bundles.get("bundles", api.BUNDLES)
 scalars_model = bundles.get("scalars_model", "DTI")
 scalars = bundles.get("scalars", ["fa", "md"])
@@ -134,7 +133,6 @@ compute = config.get("compute", {})
 dask_it = compute.get("dask_it", False)
 
 myafq = api.AFQ(dmriprep_path,
-                seg_algo=seg_algo,
                 sub_prefix=sub_prefix,
                 dwi_folder=dwi_folder,
                 dwi_file=dwi_file,
@@ -154,7 +152,8 @@ myafq = api.AFQ(dmriprep_path,
 myafq.set_dti_cfa()
 myafq.set_dti_pdd()
 myafq.set_template_xform()
-myafq.export_rois()
+if segmentation_params["seg_algo"].lower() == "afq":
+    myafq.export_rois()
 myafq.export_bundles()
 myafq.combine_profiles()
 

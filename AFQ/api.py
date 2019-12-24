@@ -44,6 +44,7 @@ BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
 
 DIPY_GH = "https://github.com/nipy/dipy/blob/master/dipy/"
 
+
 def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     """
     Create a bundle dictionary, needed for the segmentation
@@ -423,11 +424,11 @@ def _segment(row, wm_labels, bundle_dict, reg_template,
              tracking_params, segmentation_params):
     odf_model = tracking_params["odf_model"]
     directions = tracking_params["directions"]
-    algo = segmentation_params["algo"]
+    seg_algo = segmentation_params["seg_algo"]
     bundles_file = _get_fname(
         row,
         f'_space-RASMM_{odf_model}_desc-{directions}'
-        f'_desc-{algo}_tractography.trk')
+        f'_desc-{seg_algo}_tractography.trk')
 
     if not op.exists(bundles_file):
         streamlines_file = _streamlines(
@@ -463,11 +464,11 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                    segmentation_params):
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
-    algo = segmentation_params['algo']
+    seg_algo = segmentation_params['seg_algo']
     clean_bundles_file = _get_fname(
         row,
         f'_space-RASMM_{odf_model}_desc-{directions}'
-        f'_desc-{algo}_desc-clean_tractography.trk')
+        f'_desc-{seg_algo}_desc-clean_tractography.trk')
 
     if not op.exists(clean_bundles_file):
         bundles_file = _segment(row,
@@ -484,20 +485,21 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
 
         for b in bundle_dict.keys():
-            idx = np.where(sft.data_per_streamline['bundle']
-                           == bundle_dict[b]['uid'])[0]
-            this_tg = StatefulTractogram(
-                sft.streamlines[idx],
-                row['dwi_img'],
-                Space.VOX)
-            this_tg = seg.clean_bundle(this_tg)
-            this_tgram = nib.streamlines.Tractogram(
-                this_tg.streamlines,
-                data_per_streamline={
-                    'bundle': (len(this_tg)
-                               * [bundle_dict[b]['uid']])},
-                    affine_to_rasmm=row['dwi_affine'])
-            tgram = aus.add_bundles(tgram, this_tgram)
+            if b != "whole_brain":
+                idx = np.where(sft.data_per_streamline['bundle']
+                            == bundle_dict[b]['uid'])[0]
+                this_tg = StatefulTractogram(
+                    sft.streamlines[idx],
+                    row['dwi_img'],
+                    Space.VOX)
+                this_tg = seg.clean_bundle(this_tg)
+                this_tgram = nib.streamlines.Tractogram(
+                    this_tg.streamlines,
+                    data_per_streamline={
+                        'bundle': (len(this_tg)
+                                * [bundle_dict[b]['uid']])},
+                        affine_to_rasmm=row['dwi_affine'])
+                tgram = aus.add_bundles(tgram, this_tgram)
         save_tractogram(
             StatefulTractogram(tgram.streamlines,
                                sft,
@@ -532,8 +534,9 @@ def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
         keys = []
         vals = []
         for k in bundle_dict.keys():
-            keys.append(bundle_dict[k]['uid'])
-            vals.append(k)
+            if k != "whole_brain":
+                keys.append(bundle_dict[k]['uid'])
+                vals.append(k)
         reverse_dict = dict(zip(keys, vals))
 
         bundle_names = []
@@ -636,7 +639,7 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
 
     odf_model = tracking_params['odf_model']
     directions = tracking_params['directions']
-    algo = segmentation_params['algo']
+    seg_algo = segmentation_params['seg_algo']
 
     for func, folder in zip([_clean_bundles, _segment],
                             ['clean_bundles', 'bundles']):
@@ -653,24 +656,26 @@ def _export_bundles(row, wm_labels, bundle_dict, reg_template,
         tg = trk.tractogram
         streamlines = tg.streamlines
         for bundle in bundle_dict:
-            uid = bundle_dict[bundle]['uid']
-            idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            this_sl = dtu.transform_tracking_output(
-                streamlines[idx],
-                np.linalg.inv(row['dwi_affine']))
+            if bundle != "whole_brain":
+                uid = bundle_dict[bundle]['uid']
+                idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+                this_sl = dtu.transform_tracking_output(
+                    streamlines[idx],
+                    np.linalg.inv(row['dwi_affine']))
 
-            this_tgm = StatefulTractogram(this_sl, row['dwi_img'], Space.VOX)
+                this_tgm = StatefulTractogram(this_sl, row['dwi_img'],
+                                              Space.VOX)
 
-            fname = op.split(
-                _get_fname(
-                    row,
-                    f'_space-RASMM_{odf_model}_desc-{directions}'
-                    f'_desc-{algo}_bundle-{bundle}_tractography.trk'))
-            fname = op.join(fname[0], bundles_dir, fname[1])
-            save_tractogram(this_tgm, fname, bbox_valid_check=False)
-            meta = dict(source=bundles_file)
-            meta_fname = fname.split('.')[0] + '.json'
-            afd.write_json(meta_fname, meta)
+                fname = op.split(
+                    _get_fname(
+                        row,
+                        f'_space-RASMM_{odf_model}_desc-{directions}'
+                        f'_desc-{seg_algo}_bundle-{bundle}_tractography.trk'))
+                fname = op.join(fname[0], bundles_dir, fname[1])
+                save_tractogram(this_tgm, fname, bbox_valid_check=False)
+                meta = dict(source=bundles_file)
+                meta_fname = fname.split('.')[0] + '.json'
+                afd.write_json(meta_fname, meta)
 
 
 def _get_affine(fname):
@@ -746,7 +751,6 @@ class AFQ(object):
     """
     def __init__(self,
                  dmriprep_path,
-                 seg_algo="afq",
                  sub_prefix="sub",
                  dwi_folder="dwi",
                  dwi_file="*dwi",
@@ -798,11 +802,7 @@ class AFQ(object):
             The parameters for tracking. Default: use the default behavior of
             the aft.track function.
         """
-        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
-                                            seg_algo=seg_algo,
-                                            resample_to=reg_template)
 
-        self.seg_algo = seg_algo
         self.wm_labels = wm_labels
 
         self.scalars = scalars
@@ -822,6 +822,10 @@ class AFQ(object):
                 default_seg_params[k] = segmentation_params[k]
 
         self.segmentation_params = default_seg_params
+        self.seg_algo = self.segmentation_params["seg_algo"]
+        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
+                                            seg_algo=self.seg_algo,
+                                            resample_to=reg_template)
 
         if reg_template is None:
             self.reg_template = dpd.read_mni_template()
@@ -1094,11 +1098,9 @@ class AFQ(object):
                     self.data_frame.apply(_clean_bundles, axis=1,
                                           args=[self.wm_labels,
                                                 self.bundle_dict,
-                                                self.reg_template],
-                                          odf_model=self.odf_model,
-                                          directions=self.directions,
-                                          n_seeds=self.n_seeds,
-                                          random_seeds=self.random_seeds)
+                                                self.reg_template,
+                                                self.tracking_params,
+                                                self.segmentation_params])
 
     def get_clean_bundles(self):
         self.set_clean_bundles()
