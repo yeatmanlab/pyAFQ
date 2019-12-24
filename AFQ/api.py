@@ -500,7 +500,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     sft.streamlines[idx],
                     row['dwi_img'],
                     Space.VOX)
-                this_tg = seg.clean_bundle(this_tg, clean_params)
+                this_tg = seg.clean_bundle(this_tg, **clean_params)
                 if clean_params['return_idx']:
                     this_tg, this_idx = this_tg
                     idx_file = bundles_file.split('.')[0] + '_idx.json'
