@@ -1,9 +1,9 @@
-name: pyAFQ CI
+name: Python package
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -50,7 +50,7 @@ jobs:
     - name: Install software
       run: |
         pip install .
-    - name: Build docs
+    - name: Upload docs
       uses: actions/upload-artifact@v1
       run: |
         cd docs
