@@ -490,12 +490,12 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
 
         tgram = nib.streamlines.Tractogram([], {'bundle': []})
         if clean_params['return_idx']:
-            idx = {}
+            return_idx = {}
 
         for b in bundle_dict.keys():
             if b != "whole_brain":
                 idx = np.where(sft.data_per_streamline['bundle']
-                            == bundle_dict[b]['uid'])[0]
+                               == bundle_dict[b]['uid'])[0]
                 this_tg = StatefulTractogram(
                     sft.streamlines[idx],
                     row['dwi_img'],
@@ -506,7 +506,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
                     idx_file = bundles_file.split('.')[0] + '_idx.json'
                     with open(idx_file) as ff:
                         bundle_idx = json.load(ff)[b]
-                    idx[b] = (np.array(bundle_idx)[this_idx]).tolist()
+                    return_idx[b] = bundle_idx[this_idx]
                 this_tgram = nib.streamlines.Tractogram(
                     this_tg.streamlines,
                     data_per_streamline={
@@ -533,7 +533,7 @@ def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
 
         if clean_params['return_idx']:
             afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
-                           idx)
+                           return_idx)
 
     return clean_bundles_file
 
