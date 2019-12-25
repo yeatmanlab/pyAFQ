@@ -683,7 +683,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     """
     # Convert string to callable, if that's what you got.
     if isinstance(stat, str):
-        getattr(np, stat)
+        stat = getattr(np, stat)
     # We don't even bother if there aren't enough streamlines:
     if len(tg.streamlines) < min_sl:
         if return_idx:
