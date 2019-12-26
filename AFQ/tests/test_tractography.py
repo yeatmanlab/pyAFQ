@@ -33,13 +33,14 @@ def test_csd_tracking():
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
             sl = track(fname, directions,
+                       odf_model="CSD",
                        max_angle=30.,
                        sphere=None,
                        seed_mask=None,
                        n_seeds=seeds,
                        stop_mask=None,
                        step_size=step_size,
-                       min_length=min_length)
+                       min_length=min_length).streamlines
 
             npt.assert_(len(sl[0]) >= step_size * min_length)
 
@@ -54,5 +55,5 @@ def test_dti_tracking():
                    seed_mask=None,
                    n_seeds=1,
                    step_size=step_size,
-                   min_length=min_length)
+                   min_length=min_length).streamlines
         npt.assert_(len(sl[0]) >= min_length * step_size)

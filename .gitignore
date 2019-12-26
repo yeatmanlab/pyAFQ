@@ -7,4 +7,5 @@ docs/auto_examples
 docs/source/auto_examples
 examples/*.nii.gz
 examples/*.trk
+examples/*.npy
 .DS_Store

@@ -1,90 +1,177 @@
 #!/usr/bin/env python
 
-from argparse import ArgumentParser
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from argparse import ArgumentParser
+    import os
+    import os.path as op
+    import toml
+    import json
+    import datetime
+    import platform
 
-from AFQ import api
+    import AFQ
+    from AFQ import api
+    from AFQ.utils.bin import get_default_args
+    import AFQ.segmentation as seg
+    import AFQ.tractography as aft
+
+    import logging
+    logging.basicConfig(level=logging.INFO)
 
 
-usage = """pyAFQ"""
+def process_defaults(defaults_dict):
+    defaults_list = []
+    for k, v in defaults_dict.items():
+        if isinstance(v, str):
+            defaults_list.append(f"{k} = '{v}'")
+        elif isinstance(v, bool):
+            if v:
+                defaults_list.append(f"{k} = true")
+            else:
+                defaults_list.append(f"{k} = false")
+        elif callable(v):
+            defaults_list.append(f"{k} = '{v.__name__}'")
+        else:
+            defaults_list.append(f"{k} = {v}")
+    return defaults_list
+
+
+track_defaults = get_default_args(aft.track)
+track_defaults_list = process_defaults(track_defaults)
+seg_defaults = get_default_args(seg.Segmentation.__init__)
+seg_defaults_list = process_defaults(seg_defaults)
+clean_defaults = get_default_args(seg.clean_bundle)
+clean_defaults_list = process_defaults(clean_defaults)
+
+usage = f"""pyAFQ /path/to/afq_config.toml
+
+Runs full AFQ processing as specified in the configuration file.
+
+For details about configuration, see instructions in:
+https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+
+The default values of the configuration are:
+
+```
+[files]
+dmriprep_path = '/path/to/dmriprep/folder'
+
+[bundles]
+bundles = {api.BUNDLES}
+seg_algo = 'AFQ'
+scalars_model = 'DTI'
+scalars = ['dti_fa', 'dti_md']
+
+[tracking]
+{chr(10).join(track_defaults_list)}
+wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+
+[segmentation]
+{chr(10).join(seg_defaults_list)}
+
+[cleaning]
+{chr(10).join(clean_defaults_list)}
+
+[compute]
+dask_it = false
+```
+"""
+
 parser = ArgumentParser(usage)
 
-parser.add_argument(dest='dmriprep_path', action="store",
-                    help="Path to dmriprep folder")
-
-parser.add_argument("-s", "--sub_prefix", dest="sub_prefix", action="store",
-                    help="Subject prefix (default: 'sub') ",
-                    default='sub')
-
-parser.add_argument("-d", "--dwi_folder", dest="dwi_folder", action="store",
-                    help="DWI folder (default: 'dwi')",
-                    default='dwi')
-
-parser.add_argument("-f", "--dwi_file", dest="dwi_file", action="store",
-                    help="DWI file pattern (default: '*dwi')",
-                    default="*dwi")
-
-parser.add_argument("-a", "--anat_folder", dest="anat_folder", action="store",
-                    help="Anat folder (default: 'anat')",
-                    default="anat")
-
-parser.add_argument("-t", "--anat_file", dest="anat_file", action="store",
-                    help="Anat file pattern (default: '*T1w*')",
-                    default="*T1w*")
-
-parser.add_argument("-g", "--seg_file", dest="seg_file", action="store",
-                    help="Segmentation file patter (default: '*aparc+aseg*')",
-                    default="*aparc+aseg*")
-
-parser.add_argument("-b", "--b0_threshold", dest="b0_threshold",
-                    action="store",
-                    help="B0 threshold (default: 0)",
-                    default=0)
-
-parser.add_argument("-o", "--odf_model", dest="odf_model", action="store",
-                    help="ODF model (default: 'DTI')",
-                    default='DTI')
-
-parser.add_argument("-r", '--directions', dest="directions", action="store",
-                    help="Tractography method (default: 'det')",
-                    default='det')
-
-parser.add_argument("-n", "--n_seeds", dest="n_seeds", action="store",
-                    help="""Number of seeds in each dim/voxel (default: 1,
-                            which means 1 seed per voxel)""",
-                    default=1)
-
-parser.add_argument("-m", "--random_seeds", type=bool,
-                    dest="random_seeds", action="store",
-                    help="""Whether to use a total of `n_seeds` random seeds
-                            instead of `n_seeds` per voxel (default: False)""",
-                    default=False)
-
+parser.add_argument(dest='config', action="store", type=str,
+                    help="Path to config file")
 
 opts = parser.parse_args()
 
-myafq = api.AFQ(opts.dmriprep_path,
-                sub_prefix=opts.sub_prefix,
-                dwi_folder=opts.dwi_folder,
-                dwi_file=opts.dwi_file,
-                anat_folder=opts.anat_folder,
-                anat_file=opts.anat_file,
-                seg_file=opts.seg_file,
-                b0_threshold=float(opts.b0_threshold),
-                odf_model=opts.odf_model,
-                directions=opts.directions,
-                n_seeds=int(opts.n_seeds),
-                random_seeds=opts.random_seeds,
-                bundle_names=api.BUNDLES,
-                dask_it=False,
-                force_recompute=False,
-                reg_template=None,
-                wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+config = toml.load(opts.config)
+
+files = config.get("files", {})
+
+dmriprep_path = files.get("dmriprep_path")
+
+if dmriprep_path is None:
+    raise RuntimeError("Config file must provide dmriprep_path")
+
+config['pyAFQ'] = {}
+config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
+config['pyAFQ']['version'] = AFQ.__version__
+config['pyAFQ']['platform'] = platform.system()
+
+afq_path = op.join(op.split(dmriprep_path)[0], 'afq')
+os.makedirs(afq_path, exist_ok=True)
+
+afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+
+with open(afq_metadata_file, 'w') as ff:
+    toml.dump(config, ff)
+
+sub_prefix = files.get("sub_prefix", "sub")
+dwi_folder = files.get("dwi_folder", "dwi")
+dwi_file = files.get("dwi_file", "*dwi")
+anat_folder = files.get("anat_folder", "anat")
+anat_file = files.get("anat_file", "*T1w*")
+seg_file = files.get("seg_file", "*aparc+aseg*")
+b0_threshold = files.get("b0_threshold", 0)
+reg_template = files.get("reg_template", None)
+
+tracking = config.get("tracking", {})
+tracking_params = {}
+for k, v in track_defaults.items():
+    tracking_params[k] = tracking.get(k, v)
+
+wm_labels = tracking.get(
+    "wm_labels",
+    [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+
+segmentation = config.get("segmentation", {})
+segmentation_params = {}
+for k, v in seg_defaults.items():
+    segmentation_params[k] = segmentation.get(k, v)
+
+bundles = config.get("bundles", {})
+bundle_names = bundles.get("bundles", api.BUNDLES)
+scalars_model = bundles.get("scalars_model", "DTI")
+scalars = bundles.get("scalars", ["fa", "md"])
+
+cleaning = config.get("cleaning", {})
+clean_params = {}
+for k, v in clean_defaults.items():
+    clean_params[k] = cleaning.get(k, v)
+
+compute = config.get("compute", {})
+dask_it = compute.get("dask_it", False)
+
+myafq = api.AFQ(dmriprep_path,
+                sub_prefix=sub_prefix,
+                dwi_folder=dwi_folder,
+                dwi_file=dwi_file,
+                anat_folder=anat_folder,
+                anat_file=anat_file,
+                seg_file=seg_file,
+                b0_threshold=float(b0_threshold),
+                bundle_names=bundle_names,
+                dask_it=dask_it,
+                reg_template=reg_template,
+                wm_labels=wm_labels,
+                segmentation_params=segmentation_params,
+                tracking_params=tracking_params,
+                clean_params=clean_params)
 
 
 # Do all the things:
 myafq.set_dti_cfa()
 myafq.set_dti_pdd()
 myafq.set_template_xform()
-myafq.export_rois()
+if segmentation_params["seg_algo"].lower() == "afq":
+    myafq.export_rois()
 myafq.export_bundles()
 myafq.combine_profiles()
+
+# If you got this far, you can report on time ended and record that:
+config['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+
+with open(afq_metadata_file, 'w') as ff:
+    toml.dump(config, ff)

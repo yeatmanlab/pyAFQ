@@ -1,6 +1,7 @@
 import scipy.ndimage as ndim
 from skimage.filters import gaussian
 from skimage.morphology import convex_hull_image
+from scipy.spatial.qhull import QhullError
 
 
 def patch_up_roi(roi):
@@ -25,4 +26,8 @@ def patch_up_roi(roi):
     ROI after dilation and hole-filling
     """
 
-    return convex_hull_image(ndim.binary_fill_holes(roi > 0))
+    hole_filled = ndim.binary_fill_holes(roi > 0)
+    try:
+        return convex_hull_image(hole_filled)
+    except QhullError:
+        return hole_filled

@@ -122,7 +122,7 @@ def test_segment():
             bundles.pop(key, None)
 
     # Try recobundles method
-    segmentation = seg.Segmentation(algo='Reco',
+    segmentation = seg.Segmentation(seg_algo='Reco',
                                     progressive=False,
                                     greater_than=10,
                                     rm_small_clusters=1,
@@ -137,7 +137,7 @@ def test_segment():
     npt.assert_(len(fiber_groups['CST_R']) > 0)
 
     # Test with the return_idx kwarg set to True:
-    segmentation = seg.Segmentation(algo='Reco',
+    segmentation = seg.Segmentation(seg_algo='Reco',
                                     progressive=False,
                                     greater_than=10,
                                     rm_small_clusters=1,

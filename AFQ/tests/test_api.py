@@ -3,6 +3,8 @@ import os
 import os.path as op
 import shutil
 
+import toml
+
 import numpy as np
 import numpy.testing as npt
 
@@ -98,14 +100,20 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
                             'derivatives', 'dmriprep')
-    seg_algo = "afq"
     bundle_names = ["SLF", "ARC", "CST", "FP"]
+    tracking_params = dict(odf_model="DTI")
+    segmentation_params = dict(filter_by_endpoints=False,
+                               seg_algo = "AFQ",
+                               return_idx=True)
+
+    clean_params = dict(return_idx=True)
+
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
-                    seg_algo=seg_algo,
                     bundle_names=bundle_names,
-                    odf_model="DTI",
-                    filter_by_endpoints=False)
+                    tracking_params=tracking_params,
+                    segmentation_params=segmentation_params,
+                    clean_params=clean_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -116,17 +124,20 @@ def test_AFQ_data_waypoint():
             [s for s in streamlines if s.shape[0] > 100],
             np.linalg.inv(myafq.dwi_affine[0])))
 
-    sl_file = op.join(myafq.data_frame.results_dir[0],
-                      'sub-01_sess-01_dwiDTI_det_streamlines.trk')
+    sl_file = op.join(
+        myafq.data_frame.results_dir[0],
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
     sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
                              Space.VOX)
     save_tractogram(sft, sl_file, bbox_valid_check=False)
 
-    mapping_file = op.join(myafq.data_frame.results_dir[0],
-                           'sub-01_sess-01_dwi_mapping.nii.gz')
+    mapping_file = op.join(
+        myafq.data_frame.results_dir[0],
+        'sub-01_sess-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
-    reg_prealign_file = op.join(myafq.data_frame.results_dir[0],
-                                'sub-01_sess-01_dwi_reg_prealign.npy')
+    reg_prealign_file = op.join(
+        myafq.data_frame.results_dir[0],
+        'sub-01_sess-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
@@ -136,15 +147,22 @@ def test_AFQ_data_waypoint():
 
     # Test ROI exporting:
     myafq.export_rois()
-    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                             'ROIs',
-                             'CST_R_roi1_include.nii.gz'))
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'ROIs',
+        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
     myafq.export_bundles()
-    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                             'bundles',
-                             'CST_R.trk'))
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'bundles',
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+
+    # Test creation of file with bundle indices:
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (800, 5)
@@ -159,7 +177,15 @@ def test_AFQ_data_waypoint():
 
     # Test the CLI:
     print("Running the CLI:")
-    cmd = "pyAFQ " + dmriprep_path
+
+    # Bare bones config only points to the files
+    config = dict(files=dict(dmriprep_path=dmriprep_path))
+
+    config_file = op.join(tmpdir.name, "afq_config.toml")
+    with open(config_file, 'w') as ff:
+        toml.dump(config, ff)
+
+    cmd = "pyAFQ " + config_file
     out = os.system(cmd)
     assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
@@ -170,13 +196,17 @@ def test_AFQ_data_waypoint():
     assert_frame_equal(combined_profiles, from_file)
 
     # Make sure the CLI did indeed generate these:
-    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                             'ROIs',
-                             'CST_R_roi1_include.nii.gz'))
+    myafq.export_rois()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'ROIs',
+        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    assert op.exists(op.join(myafq.data_frame['results_dir'][0],
-                             'bundles',
-                             'CST_R.trk'))
+    myafq.export_bundles()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'bundles',
+        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
 
 # def test_AFQ_data_recobundles():

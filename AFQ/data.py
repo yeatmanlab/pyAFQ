@@ -98,6 +98,8 @@ def read_callosum_templates(resample_to=False):
     for f in files:
         img = nib.load(op.join(folder, f))
         if resample_to:
+            if isinstance(resample_to, str):
+                resample_to = nib.load(resample_to)
             img = nib.Nifti1Image(reg.resample(img.get_fdata(),
                                                resample_to,
                                                img.affine,
@@ -271,6 +273,8 @@ def read_templates(resample_to=False):
     for f in files:
         img = nib.load(op.join(folder, f))
         if resample_to:
+            if isinstance(resample_to, str):
+                resample_to = nib.load(resample_to)
             img = nib.Nifti1Image(reg.resample(img.get_fdata(),
                                                resample_to,
                                                img.affine,
@@ -769,6 +773,44 @@ def s3fs_nifti_read(fname, fs=None):
         fh = nib.FileHolder(fileobj=bb)
         img = nib.Nifti1Image.from_file_map({'header': fh, 'image': fh})
     return img
+
+
+def write_json(fname, data):
+    """
+    Write data to JSON file.
+
+    Parameters
+    ----------
+    fname : str
+        Full path to the file to write.
+
+    data : dict
+        A dict containing the data to write.
+
+    Returns
+    -------
+    None
+    """
+    with open(fname, 'w') as ff:
+        json.dump(data, ff)
+
+
+def read_json(fname):
+    """
+    Read data from a JSON file.
+
+    Parameters
+    ----------
+    fname : str
+        Full path to the data-containing file
+
+    Returns
+    -------
+    dict
+    """
+    with open(fname, 'w') as ff:
+        out = json.load(ff)
+    return out
 
 
 def s3fs_json_read(fname, fs=None):

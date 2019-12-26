@@ -38,7 +38,7 @@ def _resample_tg(tg, n_points):
 class Segmentation:
     def __init__(self,
                  nb_points=False,
-                 algo='AFQ',
+                 seg_algo='AFQ',
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -61,7 +61,7 @@ class Segmentation:
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
 
-        algo : string
+        seg_algo : string
             Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
                 based on inclusion/exclusion ROIs.
@@ -132,7 +132,7 @@ class Segmentation:
         else:
             self.rng = rng
 
-        self.algo = algo.lower()
+        self.seg_algo = seg_algo.lower()
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -145,7 +145,6 @@ class Segmentation:
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
-
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
@@ -214,16 +213,21 @@ class Segmentation:
         self.logger.info("Preprocessing Streamlines")
         self.tg = tg
 
+        # If resampling over-write the sft:
         if self.nb_points:
+            self.tg = StatefulTractogram(
+                dps.set_number_of_points(self.tg.streamlines, self.nb_points),
+                self.tg, self.tg.space)
+
             self.resample_streamlines(self.nb_points)
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
         self.cross_streamlines()
 
-        if self.algo == "afq":
+        if self.seg_algo == "afq":
             return self.segment_afq()
-        elif self.algo == "reco":
+        elif self.seg_algo == "reco":
             return self.segment_reco()
 
     def prepare_img(self, fdata, fbval, fbvec):
@@ -284,26 +288,6 @@ class Segmentation:
                                             prealign=reg_prealign)
         else:
             self.mapping = mapping
-
-    def resample_streamlines(self, nb_points, streamlines=None):
-        """
-        Resample streamlines to nb_points number of points.
-
-        Parameters
-        ----------
-        nb_points : int
-            Integer representing number of points wanted along the curve.
-            Streamlines will be resampled to this number of points.
-
-        streamlines : StatefulTractogram
-            If streamlines is None, will use previously given streamlines.
-            Default: None.
-        """
-        if streamlines is None:
-            streamlines = self.streamlines
-
-        self.streamlines = np.array(
-            dps.set_number_of_points(streamlines, nb_points))
 
     def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """
@@ -484,6 +468,9 @@ class Segmentation:
                                 np.argmin(dist[1], 0)[0]
                             streamlines_in_bundles[sl_idx, bundle_idx] =\
                                 fiber_probabilities[sl_idx]
+            self.logger.info(
+                (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
+                 "streamlines selected with waypoint ROIs"))
 
         # Eliminate any fibers not selected using the plane ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
@@ -649,7 +636,7 @@ class Segmentation:
 
 
 def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
-                 length_threshold=4, min_sl=20, stat=np.mean,
+                 length_threshold=4, min_sl=20, stat='mean',
                  return_idx=False):
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
@@ -680,7 +667,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         Number of streamlines in a bundle under which we will
         not bother with cleaning outliers. Default: 20.
 
-    stat : callable, optional.
+    stat : callable or str, optional.
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
 
@@ -694,7 +681,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     that have a Mahalanobis distance smaller than `clean_threshold` from
     the mean of each one of the nodes.
     """
-
+    # Convert string to callable, if that's what you got.
+    if isinstance(stat, str):
+        stat = getattr(np, stat)
     # We don't even bother if there aren't enough streamlines:
     if len(tg.streamlines) < min_sl:
         if return_idx:

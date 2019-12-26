@@ -7,16 +7,16 @@ import dipy.data as dpd
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, n_seeds=1, random_seeds=False,
-          stop_mask=None, stop_threshold=0,
-          step_size=0.5, min_length=10, max_length=1000):
+          seed_mask=None, n_seeds=1, random_seeds=False, stop_mask=None,
+          stop_threshold=0, step_size=0.5, min_length=10, max_length=1000,
+          odf_model="DTI"):
     """
     Tractography
 
@@ -58,12 +58,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The miminal length (mm) in a streamline. Default: 10
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 250
-
+    odf_model : str, optional
+        One of {"DTI", "CSD"}. Defaults to use "DTI"
     Returns
     -------
     list of streamlines ()
     """
-
     logger = logging.getLogger('AFQ.Tractography')
 
     logger.info("Loading Image...")
@@ -99,22 +99,13 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
 
-    # These are models that have ODFs (there might be others in the future...)
-    if model_params.shape[-1] == 12 or model_params.shape[-1] == 27:
-        model = "ODF"
-    # Could this be an SHM model? If the max order is a whole even number, it
-    # might be:
-    elif shm.calculate_max_order(model_params.shape[-1]) % 2 == 0:
-        model = "SHM"
-
-    if model == "SHM":
-        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
-
-    elif model == "ODF":
+    if odf_model == "DTI":
         evals = model_params[..., :3]
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
         dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
+    elif odf_model == "CSD":
+        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
@@ -123,12 +114,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                       stop_threshold)
     logger.info("Tracking...")
 
-    return _local_tracking(seeds, dg, threshold_classifier, affine,
+    return _local_tracking(seeds, dg, threshold_classifier, params_img,
                            step_size=step_size, min_length=min_length,
                            max_length=max_length)
 
 
-def _local_tracking(seeds, dg, threshold_classifier, affine,
+def _local_tracking(seeds, dg, threshold_classifier, params_img,
                     step_size=0.5, min_length=10, max_length=1000):
     """
     Helper function
@@ -138,9 +129,9 @@ def _local_tracking(seeds, dg, threshold_classifier, affine,
     tracker = VerboseLocalTracking(dg,
                                    threshold_classifier,
                                    seeds,
-                                   affine,
+                                   params_img.affine,
                                    step_size=step_size,
                                    min_length=min_length,
                                    max_length=max_length)
 
-    return dts.Streamlines(tracker)
+    return StatefulTractogram(tracker, params_img, Space.RASMM)

@@ -30,11 +30,11 @@ obvious from mean measures of that tract ([Yeatman2012]_).
 Acknowledgements
 ~~~~~~~~~~~~~~~~
 
-This work was supported by a grant from the
+Work on this software is supported through grant `1RF1MH121868-01 <https://projectreporter.nih.gov/project_info_details.cfm?aid=9886761&icde=46874320&ddparam=&ddvalue=&ddsub=&cr=2&csb=default&cs=ASC&pball=>`_ from the `National Institutes for Mental Health <https://www.nimh.nih.gov/index.shtml>`_ / `The BRAIN Initiative <https://braininitiative.nih.gov>`_
+and by a grant from the
 `Gordon & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
 `Alfred P. Sloan Foundation <http://www.sloan.org/>`_ to the
-`University of Washington eScience Institute <http://escience.washington.edu/>`_,
-by a `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
+`University of Washington eScience Institute <http://escience.washington.edu/>`_, by a `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
 R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by an
 NSF grant (1551330) to Jason Yeatman.
 
