@@ -30,6 +30,11 @@ jobs:
       run: |
         make all
     - name: Docs
+      uses: actions/upload-artifact@v1
       run: |
         cd docs
         make html
+        tar -czvf build/html html_docs.tar.gz
+        with:
+          name: built docs
+          path: html_docs.tar.gz
