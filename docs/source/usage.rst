@@ -103,7 +103,7 @@ minimum, the file should contain information about the location of the
     dmriprep_folder = '/path/to/study/derivatives/dmriprep'
 
 
-But additional configuration options can be provided for the following values:
+But additional configuration options can be provided for the following values::
 
     title = "My AFQ analysis"
 
