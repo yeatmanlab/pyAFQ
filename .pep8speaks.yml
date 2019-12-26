@@ -1,0 +1,4 @@
+pycodestyle:
+    exclude:
+        - docs
+        - examples
