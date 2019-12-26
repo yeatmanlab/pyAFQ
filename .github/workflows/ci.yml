@@ -12,7 +12,8 @@ jobs:
         python-version: [3.6, 3.7]
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout repo
+      uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -29,13 +30,13 @@ jobs:
     - name: Test
       run: |
         make all
-    - name: Docs
+    - name: Build docs
       run: |
         cd docs
         make html
         tar -czvf build/html html_docs.tar.gz
     - name: Upload docs
       uses: actions/upload-artifact@v1
-        with:
-          name: built docs
-          path: html_docs.tar.gz
+      with:
+        name: docs
+        path: html_docs.tar.gz
