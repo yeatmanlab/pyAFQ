@@ -29,8 +29,8 @@ jobs:
     - name: Test
       run: |
         make all
-    - name: Docs
     - uses: actions/upload-artifact@v1
+    - name: Docs
       run: |
         cd docs
         make html
