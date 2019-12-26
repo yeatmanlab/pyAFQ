@@ -133,7 +133,7 @@ But additional configuration options can be provided for the following values::
 
     [segmentation]
     nb_points = false
-    algo = 'AFQ'
+    seg_algo = 'AFQ'
     progressive = true
     greater_than = 50
     rm_small_clusters = 50
@@ -148,6 +148,15 @@ But additional configuration options can be provided for the following values::
     filter_by_endpoints = true
     dist_to_aal = 4
 
+    [cleaning]
+    n_points = 100
+    clean_rounds = 5
+    distance_threshold = 5
+    length_threshold = 4
+    min_sl = 20
+    stat = 'mean'
+    return_idx = false
+
     [compute]
     dask_it = false
 
@@ -156,5 +165,7 @@ But additional configuration options can be provided for the following values::
     list_of_values = ["val1", 1, 2, 3]
     some_boolean = true
 
-Note that the `title` variable and `[metadata]` section are both for users to
-enter any title/metadata they would like and pyAFQ will generally ignore them.
+pyAFQ will store a copy of the configuration file alongside the computed
+results. Note that the `title` variable and `[metadata]` section are both for
+users to enter any title/metadata they would like and pyAFQ will generally
+ignore them.
