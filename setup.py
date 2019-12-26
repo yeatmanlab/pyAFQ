@@ -1,4 +1,5 @@
 from setuptools import find_packages
+import versioneer
 
 import os
 try:
@@ -6,11 +7,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
-# Get version and release info, which is all stored in AFQ/version.py
-ver_file = os.path.join('AFQ', 'version.py')
+# Get metadata from the AFQ/_meta.py file:
+ver_file = os.path.join('AFQ', '_meta.py')
 with open(ver_file) as f:
     exec(f.read())
-
 
 REQUIRES = []
 with open('requirements.txt') as f:
@@ -31,10 +31,11 @@ opts = dict(name=NAME,
             author=AUTHOR,
             author_email=AUTHOR_EMAIL,
             platforms=PLATFORMS,
-            version=VERSION,
             packages=find_packages(),
             install_requires=REQUIRES,
-            scripts=SCRIPTS)
+            scripts=SCRIPTS,
+            version=versioneer.get_version(),
+            cmdclass=versioneer.get_cmdclass())
 
 
 if __name__ == '__main__':
