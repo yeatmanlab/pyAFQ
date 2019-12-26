@@ -287,7 +287,7 @@ import os
 import re
 import subprocess
 import sys
-
+import toml
 
 class VersioneerConfig:
     """Container for Versioneer configuration parameters."""
@@ -338,26 +338,23 @@ def get_config_from_root(root):
     # configparser.NoSectionError (if it lacks a [versioneer] section), or
     # configparser.NoOptionError (if it lacks "VCS="). See the docstring at
     # the top of versioneer.py for instructions on writing your setup.cfg .
-    setup_cfg = os.path.join(root, "setup.cfg")
-    parser = configparser.SafeConfigParser()
-    with open(setup_cfg, "r") as f:
-        parser.readfp(f)
-    VCS = parser.get("versioneer", "VCS")  # mandatory
+    setup_cfg = os.path.join(root, "pyproject.toml")
+    # parser = configparser.SafeConfigParser()
+    # with open(setup_cfg, "r") as f:
+    #     parser.readfp(f)
+    parser = toml.load(setup_cfg)['tools']['versioneer']
+    VCS = parser["VCS"]  # mandatory
 
-    def get(parser, name):
-        if parser.has_option("versioneer", name):
-            return parser.get("versioneer", name)
-        return None
     cfg = VersioneerConfig()
     cfg.VCS = VCS
-    cfg.style = get(parser, "style") or ""
-    cfg.versionfile_source = get(parser, "versionfile_source")
-    cfg.versionfile_build = get(parser, "versionfile_build")
-    cfg.tag_prefix = get(parser, "tag_prefix")
+    cfg.style = parser.get("style", "")
+    cfg.versionfile_source = parser.get("versionfile_source", None)
+    cfg.versionfile_build = parser.get("versionfile_build", None)
+    cfg.tag_prefix = parser.get("tag_prefix", None)
     if cfg.tag_prefix in ("''", '""'):
         cfg.tag_prefix = ""
-    cfg.parentdir_prefix = get(parser, "parentdir_prefix")
-    cfg.verbose = get(parser, "verbose")
+    cfg.parentdir_prefix = parser.get("parentdir_prefix", None)
+    cfg.verbose = parser.get("verbose", None)
     return cfg
 
 
