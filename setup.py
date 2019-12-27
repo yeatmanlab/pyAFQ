@@ -1,27 +1,29 @@
 from setuptools import find_packages
-import sys
-import os
-sys.path.append(os.path.dirname(__file__))
-import versioneer
 
+import os.path as op
 
-import os
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-# Get metadata from the AFQ/_meta.py file:
-ver_file = os.path.join('AFQ', '_meta.py')
+here = op.abspath(op.dirname(__file__))
+
+# Get metadata from the AFQ/version.py file:
+ver_file = op.join(here, 'AFQ', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
+
 REQUIRES = []
-with open('requirements.txt') as f:
+with open(op.join(here, 'requirements.txt')) as f:
     l = f.readline()[:-1]
     while l:
         REQUIRES.append(l)
         l = f.readline()[:-1]
+
+with open(op.join(here, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
@@ -38,8 +40,8 @@ opts = dict(name=NAME,
             packages=find_packages(),
             install_requires=REQUIRES,
             scripts=SCRIPTS,
-            version=versioneer.get_version(),
-            cmdclass=versioneer.get_cmdclass())
+            version=VERSION,
+            python_requires=PYTHON_REQUIRES)
 
 
 if __name__ == '__main__':

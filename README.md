@@ -1,4 +1,5 @@
 # pyAFQ
-Automated Fiber Quantification ... in Python
+Automated Fiber Quantification ... in Python.
 
-[Documentation](https://yeatmanlab.github.io/pyAFQ)
+
+For details, see [Documentation](https://yeatmanlab.github.io/pyAFQ)
