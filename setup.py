@@ -14,13 +14,12 @@ ver_file = op.join(here, 'AFQ', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
-
 REQUIRES = []
 with open(op.join(here, 'requirements.txt')) as f:
-    l = f.readline()[:-1]
-    while l:
+    ll = f.readline()[:-1]
+    while ll:
         REQUIRES.append(l)
-        l = f.readline()[:-1]
+        ll = f.readline()[:-1]
 
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
