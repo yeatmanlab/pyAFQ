@@ -18,7 +18,7 @@ REQUIRES = []
 with open(op.join(here, 'requirements.txt')) as f:
     ll = f.readline()[:-1]
     while ll:
-        REQUIRES.append(l)
+        REQUIRES.append(ll)
         ll = f.readline()[:-1]
 
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
