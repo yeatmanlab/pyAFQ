@@ -27,9 +27,6 @@ jobs:
     - name: Install software
       run: |
         pip install .
-    - name: Test
-      run: |
-        make all
     - name: Build docs
       run: |
         cd docs
