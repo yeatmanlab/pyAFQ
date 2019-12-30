@@ -1,23 +1,28 @@
 from setuptools import find_packages
 
-import os
+import os.path as op
+
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-# Get version and release info, which is all stored in AFQ/version.py
-ver_file = os.path.join('AFQ', 'version.py')
+here = op.abspath(op.dirname(__file__))
+
+# Get metadata from the AFQ/version.py file:
+ver_file = op.join(here, 'AFQ', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
-
 REQUIRES = []
-with open('requirements.txt') as f:
-    l = f.readline()[:-1]
-    while l:
-        REQUIRES.append(l)
-        l = f.readline()[:-1]
+with open(op.join(here, 'requirements.txt')) as f:
+    ll = f.readline()[:-1]
+    while ll:
+        REQUIRES.append(ll)
+        ll = f.readline()[:-1]
+
+with open(op.join(here, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
@@ -31,10 +36,11 @@ opts = dict(name=NAME,
             author=AUTHOR,
             author_email=AUTHOR_EMAIL,
             platforms=PLATFORMS,
-            version=VERSION,
             packages=find_packages(),
             install_requires=REQUIRES,
-            scripts=SCRIPTS)
+            scripts=SCRIPTS,
+            version=VERSION,
+            python_requires=PYTHON_REQUIRES)
 
 
 if __name__ == '__main__':

@@ -66,6 +66,13 @@ ax.axis("off")
 # The computation below is quite time-consuming. For this reason, we have
 # commented it out for now. If you want to run it through, uncomment then next
 # few lines and go get a cup of coffee:
+#
+# .. note::
+#     Note that because of a quirk in the way that brain segmentation was
+#     generated in this data, some bundles will not be detected using the
+#     detected using the default values. For example, the corticospinal tracts
+#     on both sides will not be properly detected because the waypoint ROIs for
+#     these tracts fall into parts of the white matter that were not segmented.
 
 # df = pd.read_csv(myafq.tract_profiles[0])
 # for bundle in df['bundle'].unique():
