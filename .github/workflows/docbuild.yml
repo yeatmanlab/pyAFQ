@@ -35,4 +35,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: docs
-        path: docs/build/html/*
+        path: /home/runner/work/pyAFQ/docs/build/html/*
