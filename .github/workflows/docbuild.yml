@@ -31,9 +31,8 @@ jobs:
       run: |
         cd docs
         make html
-        tar -vczf build/html html_docs.tar.gz
     - name: Upload docs
       uses: actions/upload-artifact@v1
       with:
         name: docs
-        path: html_docs.tar.gz
+        path: docs/build/html
