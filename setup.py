@@ -40,7 +40,9 @@ opts = dict(name=NAME,
             install_requires=REQUIRES,
             scripts=SCRIPTS,
             version=VERSION,
-            python_requires=PYTHON_REQUIRES)
+            python_requires=PYTHON_REQUIRES,
+            use_scm_version=True,
+            setup_requires=['setuptools_scm'])
 
 
 if __name__ == '__main__':
