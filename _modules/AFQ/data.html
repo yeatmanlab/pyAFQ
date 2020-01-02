@@ -32,12 +32,12 @@
           <div class="body" role="main">
             
   <h1>Source code for AFQ.data</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 
 <span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">s3fs</span>
@@ -47,13 +47,13 @@
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
-<span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="k">import</span> <span class="n">_make_fetcher</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="k">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
-<span class="kn">from</span> <span class="nn">dipy.segment.metric</span> <span class="k">import</span> <span class="p">(</span><span class="n">AveragePointwiseEuclideanMetric</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="kn">import</span> <span class="n">_make_fetcher</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.metric</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AveragePointwiseEuclideanMetric</span><span class="p">,</span>
                                  <span class="n">ResampleFeature</span><span class="p">)</span>
 
 
-<span class="kn">from</span> <span class="nn">dipy.segment.clustering</span> <span class="k">import</span> <span class="n">QuickBundles</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.clustering</span> <span class="kn">import</span> <span class="n">QuickBundles</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 
@@ -911,6 +911,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
@@ -951,7 +953,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

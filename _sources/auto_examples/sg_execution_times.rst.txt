@@ -5,8 +5,12 @@
 
 Computation times
 =================
-**00:02.844** total execution time for **auto_examples** files:
+**17:02.873** total execution time for **auto_examples** files:
 
-- **00:02.844**: :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)
-- **00:00.000**: :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)
-- **00:00.000**: :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)
++---------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``) | 08:11.156 | 0.0 MB |
++---------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)     | 05:39.311 | 0.0 MB |
++---------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)             | 03:12.407 | 0.0 MB |
++---------------------------------------------------------------------------------+-----------+--------+

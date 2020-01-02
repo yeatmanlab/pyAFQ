@@ -19,9 +19,9 @@ Introductory examples.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_afq_api.py`
+     :ref:`sphx_glr_auto_examples_plot_afq_api.py`
 
 .. raw:: html
 
@@ -39,9 +39,9 @@ Introductory examples.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_tract_profile_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_tract_profile_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_tract_profile.py`
+     :ref:`sphx_glr_auto_examples_plot_tract_profile.py`
 
 .. raw:: html
 
@@ -59,9 +59,9 @@ Introductory examples.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_recobundles_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_recobundles_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_recobundles.py`
+     :ref:`sphx_glr_auto_examples_plot_recobundles.py`
 
 .. raw:: html
 
@@ -74,7 +74,7 @@ Introductory examples.
    /auto_examples/plot_recobundles
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -86,13 +86,13 @@ Introductory examples.
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/arokem/source/pyAFQ/docs/source/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/runner/work/pyAFQ/pyAFQ/docs/source/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/arokem/source/pyAFQ/docs/source/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/runner/work/pyAFQ/pyAFQ/docs/source/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

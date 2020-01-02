@@ -39,25 +39,25 @@
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">from</span> <span class="nn">dipy.align.metrics</span> <span class="k">import</span> <span class="n">CCMetric</span><span class="p">,</span> <span class="n">EMMetric</span><span class="p">,</span> <span class="n">SSDMetric</span>
-<span class="kn">from</span> <span class="nn">dipy.align.imwarp</span> <span class="k">import</span> <span class="p">(</span><span class="n">SymmetricDiffeomorphicRegistration</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">dipy.align.metrics</span> <span class="kn">import</span> <span class="n">CCMetric</span><span class="p">,</span> <span class="n">EMMetric</span><span class="p">,</span> <span class="n">SSDMetric</span>
+<span class="kn">from</span> <span class="nn">dipy.align.imwarp</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SymmetricDiffeomorphicRegistration</span><span class="p">,</span>
                                <span class="n">DiffeomorphicMap</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">dipy.align.imaffine</span> <span class="k">import</span> <span class="p">(</span><span class="n">transform_centers_of_mass</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">dipy.align.imaffine</span> <span class="kn">import</span> <span class="p">(</span><span class="n">transform_centers_of_mass</span><span class="p">,</span>
                                  <span class="n">AffineMap</span><span class="p">,</span>
                                  <span class="n">MutualInformationMetric</span><span class="p">,</span>
                                  <span class="n">AffineRegistration</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">dipy.align.transforms</span> <span class="k">import</span> <span class="p">(</span><span class="n">TranslationTransform3D</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">dipy.align.transforms</span> <span class="kn">import</span> <span class="p">(</span><span class="n">TranslationTransform3D</span><span class="p">,</span>
                                    <span class="n">RigidTransform3D</span><span class="p">,</span>
                                    <span class="n">AffineTransform3D</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
-<span class="kn">from</span> <span class="nn">dipy.align.streamlinear</span> <span class="k">import</span> <span class="n">StreamlineLinearRegistration</span>
-<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">import</span> <span class="n">set_number_of_points</span>
-<span class="kn">from</span> <span class="nn">dipy.tracking.utils</span> <span class="k">import</span> <span class="n">transform_tracking_output</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="k">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
+<span class="kn">from</span> <span class="nn">dipy.align.streamlinear</span> <span class="kn">import</span> <span class="n">StreamlineLinearRegistration</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">set_number_of_points</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.utils</span> <span class="kn">import</span> <span class="n">transform_tracking_output</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">mut</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.streamlines</span> <span class="k">as</span> <span class="nn">sut</span>
@@ -503,6 +503,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
@@ -543,7 +545,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
