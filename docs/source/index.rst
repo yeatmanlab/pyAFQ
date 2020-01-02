@@ -51,4 +51,6 @@ NSF grant (1551330) to Jason Yeatman.
     installation_guide
     usage
     auto_examples/index
+    getting_help
+    contributing
     autoapi/index
