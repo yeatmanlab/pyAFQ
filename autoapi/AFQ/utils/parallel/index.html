@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.utils.parallel &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="AFQ.utils.streamlines" href="../streamlines/index.html" />
+    <link rel="prev" title="AFQ.utils.models" href="../models/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.utils.parallel">
+<span id="afq-utils-parallel"></span><h1><a class="reference internal" href="#module-AFQ.utils.parallel" title="AFQ.utils.parallel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.parallel</span></code></a><a class="headerlink" href="#module-AFQ.utils.parallel" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AFQ.utils.parallel.parfor">
+<code class="sig-prename descclassname">AFQ.utils.parallel.</code><code class="sig-name descname">parfor</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">in_list</em>, <em class="sig-param">out_shape=None</em>, <em class="sig-param">n_jobs=-1</em>, <em class="sig-param">engine='joblib'</em>, <em class="sig-param">backend='threading'</em>, <em class="sig-param">func_args=[]</em>, <em class="sig-param">func_kwargs={}</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/parallel.html#parfor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.parallel.parfor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parallel for loop for numpy arrays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>func</strong><span class="classifier">callable</span></dt><dd><p>The function to apply to each item in the array. Must have the form:
+func(arr, idx, <a href="#id1"><span class="problematic" id="id2">*</span></a>args, <a href="#id3"><span class="problematic" id="id4">*</span></a>kwargs) where arr is an ndarray and idx is an
+index into that array (a tuple). The Return of <cite>func</cite> needs to be one
+item (e.g. float, int) per input item.</p>
+</dd>
+<dt><strong>in_list</strong><span class="classifier">list</span></dt><dd><p>All legitimate inputs to the function to operate over.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">integer, optional</span></dt><dd><p>The number of jobs to perform in parallel. -1 to use all cpus.
+Default: 1</p>
+</dd>
+<dt><strong>engine</strong><span class="classifier">str</span></dt><dd><p>{“dask”, “joblib”, “serial”}
+The last one is useful for debugging – runs the code without any
+parallelization.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">str</span></dt><dd><p>What joblib backend to use. Irrelevant for other engines.</p>
+</dd>
+<dt><strong>func_args</strong><span class="classifier">list, optional</span></dt><dd><p>Positional arguments to <cite>func</cite>.</p>
+</dd>
+<dt><strong>func_kwargs</strong><span class="classifier">list, optional</span></dt><dd><p>Keyword arguments to <cite>func</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>ndarray of identical shape to <cite>arr</cite></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><ul>
+      <li>Previous: <a href="../models/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
+      <li>Next: <a href="../streamlines/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/AFQ/utils/parallel/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

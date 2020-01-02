@@ -1,0 +1,136 @@
+:mod:`AFQ.utils.streamlines`
+============================
+
+.. py:module:: AFQ.utils.streamlines
+
+
+Module Contents
+---------------
+
+.. function:: add_bundles(t1, t2)
+
+   Combine two bundles, using the second bundles' affine and
+   data_per_streamline keys.
+    Parameters
+   ----------
+   t1, t2 : nib.streamlines.Tractogram class instances
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: bundles_to_tgram(bundles, bundle_dict, reference)
+
+   Create a StatefulTractogram object from bundles and their
+   specification.
+
+
+   :Parameters:
+
+       **bundles: dict**
+           Each item in the dict is the streamlines of a particular bundle.
+
+       **bundle_dict: dict**
+           A bundle specification dictionary. Each item includes in particular a
+           `uid` key that is a unique integer for that bundle.
+
+       **reference** : Nifti
+           The affine_to_rasmm input to `nib.streamlines.Tractogram`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: tgram_to_bundles(tgram, bundle_dict, reference)
+
+   Convert a StatefulTractogram object to a dict with StatefulTractogram
+   objects for each bundle.
+
+
+   :Parameters:
+
+       **tgram** : StatefulTractogram class instance.
+           Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
+
+       **bundle_dict: dict**
+           A bundle specification dictionary. Each item includes in particular a
+           `uid` key that is a unique integer for that bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: split_streamline(streamlines, sl_to_split, split_idx)
+
+   Given a Streamlines object, split one of the underlying streamlines
+
+
+   :Parameters:
+
+       **streamlines** : a Streamlines class instance
+           The group of streamlines, one of which is being split.
+
+       **sl_to_split** : int
+           The index of the streamline that is being split
+
+       **split_idx** : int
+           Where is the streamline being split
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

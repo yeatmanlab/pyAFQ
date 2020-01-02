@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Plotting tract profiles using RecoBundles &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../autoapi/index.html" />
+    <link rel="prev" title="Plotting tract profiles" href="plot_tract_profile.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-recobundles-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="plotting-tract-profiles-using-recobundles">
+<span id="sphx-glr-auto-examples-plot-recobundles-py"></span><h1>Plotting tract profiles using RecoBundles<a class="headerlink" href="#plotting-tract-profiles-using-recobundles" title="Permalink to this headline">¶</a></h1>
+<p>An example of tracking and segmenting two tracts with RecoBundles
+<a class="reference internal" href="#garyfallidis2017" id="id1"><span>[Garyfallidis2017]</span></a>, and plotting their tract profiles for FA (calculated with
+DTI).</p>
+<p>See <cite>plot_tract_profile</cite> for explanations of each stage here. The main
+difference here is that segmentation uses the RecoBundles algorithm, instead of
+the AFQ waypoint ROI approach.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="k">import</span> <span class="n">fetcher</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="k">import</span> <span class="n">save_tractogram</span><span class="p">,</span> <span class="n">load_tractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="k">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="k">import</span> <span class="n">StatefulTractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="k">import</span> <span class="n">Space</span>
+
+
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">import</span> <span class="nn">AFQ.dti</span> <span class="k">as</span> <span class="nn">dti</span>
+<span class="kn">import</span> <span class="nn">AFQ.segmentation</span> <span class="k">as</span> <span class="nn">seg</span>
+<span class="kn">import</span> <span class="nn">AFQ.api</span> <span class="k">as</span> <span class="nn">api</span>
+
+<span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span><span class="p">()</span>
+
+<span class="n">hardi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
+<span class="n">hardi_fdata</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbval</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbvec</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">):</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
+                             <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_params.nii.gz&#39;</span><span class="p">}</span>
+
+<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
+<span class="n">FA_data</span> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
+<span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
+    <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
+    <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
+                                                 <span class="n">template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
+
+<span class="n">bundle_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;UF&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">]</span>
+<span class="n">bundles</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span> <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;reco&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;dti_streamlines_reco.trk&#39;</span><span class="p">):</span>
+    <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bundle</span> <span class="o">!=</span> <span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span>
+            <span class="n">sl_xform</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span><span class="p">(</span>
+                <span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
+                                            <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">))</span>
+
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">backward</span><span class="p">,</span>
+                                            <span class="n">sl_xform</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+            <span class="n">sl_xform</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">sl_xform</span><span class="p">)]</span>
+
+            <span class="n">sl_xform</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span><span class="p">(</span>
+                <span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">sl_xform</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)))</span>
+
+            <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">sl_xform</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+            <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;./</span><span class="si">{bundle}</span><span class="s1">_atlas.trk&#39;</span><span class="p">)</span>
+
+            <span class="n">sl_xform</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span><span class="p">(</span>
+                <span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">sl_xform</span><span class="p">,</span>
+                                        <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)))</span>
+
+            <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">sl_xform</span><span class="p">:</span>
+                <span class="n">sl_as_idx</span> <span class="o">=</span> <span class="n">sl</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="n">seed_roi</span><span class="p">[</span><span class="n">sl_as_idx</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+                         <span class="n">sl_as_idx</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+                         <span class="n">sl_as_idx</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">seed_roi</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><span class="n">seed_roi</span><span class="p">,</span>
+                    <span class="n">directions</span><span class="o">=</span><span class="s1">&#39;det&#39;</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="n">FA_data</span><span class="p">,</span>
+                    <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">))</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;./dti_streamlines_reco.trk&#39;</span><span class="p">,</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="s1">&#39;./dti_streamlines_reco.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segmenting fiber groups...&quot;</span><span class="p">)</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;reco&#39;</span><span class="p">,</span>
+                                <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                                <span class="n">greater_than</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                                <span class="n">rm_small_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                <span class="n">model_clust_thr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                <span class="n">reduction_thr</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                <span class="n">refine</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
+                     <span class="n">sft</span><span class="p">,</span>
+                     <span class="n">fdata</span><span class="o">=</span><span class="n">hardi_fdata</span><span class="p">,</span>
+                     <span class="n">fbval</span><span class="o">=</span><span class="n">hardi_fbval</span><span class="p">,</span>
+                     <span class="n">fbvec</span><span class="o">=</span><span class="n">hardi_fbvec</span><span class="p">,</span>
+                     <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+                     <span class="n">reg_template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+
+<span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span>
+
+<span class="k">for</span> <span class="n">kk</span> <span class="ow">in</span> <span class="n">fiber_groups</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">kk</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">kk</span><span class="p">]))</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                             <span class="n">img</span><span class="p">,</span>
+                             <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;./</span><span class="si">%s</span><span class="s1">_reco.trk&#39;</span><span class="o">%</span><span class="n">kk</span><span class="p">,</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">bundle</span> <span class="o">!=</span> <span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./</span><span class="si">{bundle}</span><span class="s1">_reco.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../_images/sphx_glr_plot_recobundles_001.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_001.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_recobundles_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_002.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_recobundles_003.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_003.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_recobundles_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_004.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_recobundles_005.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_005.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_recobundles_006.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_recobundles_006.png" />
+</li>
+</ul>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/.dipy/stanford_hardi
+Calculating DTI...
+Registering to template...
+Data size is approximately 70MB
+Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/.dipy/mni_template
+Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/AFQ_data/hcp_atlas_16_bundles
+Tracking...
+Segmenting fiber groups...
+ Resampled to 20 points
+ Size is 28.353 MB
+ Duration of resampling is 0.061 sec.
+ QBX phase starting...
+ Merging phase starting ...
+ QuickBundlesX time for 123874 random streamlines
+ Duration 2.729 sec.
+
+ Resampled to 20 points
+ Size is 2.587 MB
+ Duration of resampling is 0.005 sec.
+ QBX phase starting...
+ Merging phase starting ...
+ QuickBundlesX time for 11303 random streamlines
+ Duration 0.348 sec.
+
+Progressive Registration is Enabled
+ Translation  (3 parameters)...
+ Rigid  (6 parameters) ...
+ Similarity (7 parameters) ...
+ Scaling (9 parameters) ...
+ Affine (12 parameters) ...
+CST_R 277
+CST_L 139
+UF_R 36
+UF_L 79
+CC_ForcepsMajor 667
+CC_ForcepsMinor 1012
+Extracting tract profiles...
+/Users/arokem/source/pyAFQ/examples/plot_recobundles.py:152: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
+</pre></div>
+</div>
+<div class="section" id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="citation">
+<dt class="label" id="garyfallidis2017"><span class="brackets"><a class="fn-backref" href="#id1">Garyfallidis2017</a></span></dt>
+<dd><p>Garyfallidis, Eleftherios, Marc-Alexandre Côté,
+Francois Rheault, Jasmeen Sidhu, Janice Hau, Laurent
+Petit, David Fortin, Stephen Cunanne, and Maxime
+Descoteaux. 2017.“Recognition of White Matter Bundles
+Using Local and Global Streamline-Based Registration and
+Clustering.”NeuroImage 170: 283-295.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  18.739 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-recobundles-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/23a22bcd63f859ad6c035e382907c1ff/plot_recobundles.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_recobundles.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/95b22d420e8e41ba321a8b6521566d23/plot_recobundles.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_recobundles.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles using RecoBundles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_tract_profile.html" title="previous chapter">Plotting tract profiles</a></li>
+      <li>Next: <a href="../autoapi/index.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/plot_recobundles.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

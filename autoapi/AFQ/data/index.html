@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AFQ.dki" href="../dki/index.html" />
+    <link rel="prev" title="AFQ.csd" href="../csd/index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.data">
+<span id="afq-data"></span><h1><a class="reference internal" href="#module-AFQ.data" title="AFQ.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><a class="headerlink" href="#module-AFQ.data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="AFQ.data.fetch_callosum_templates">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_callosum_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_callosum_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.data.read_callosum_templates">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_callosum_templates</code><span class="sig-paren">(</span><em class="sig-param">resample_to=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_callosum_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load AFQ callosum templates from file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict with: keys: names of template ROIs and values: nibabel Nifti1Image</dt><dd></dd>
+<dt>objects from each of the ROI nifti files.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
+<dt id="AFQ.data.fetch_templates">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.data.read_templates">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_templates</code><span class="sig-paren">(</span><em class="sig-param">resample_to=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load AFQ templates from file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict with: keys: names of template ROIs and values: nibabel Nifti1Image</dt><dd></dd>
+<dt>objects from each of the ROI nifti files.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.data.fetch_hcp">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param">subjects</em>, <em class="sig-param">hcp_bucket='hcp-openaccess'</em>, <em class="sig-param">profile_name='hcp'</em>, <em class="sig-param">path=None</em>, <em class="sig-param">aws_access_key_id=None</em>, <em class="sig-param">aws_secret_access_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch HCP diffusion data and arrange it in a manner that resembles the
+BIDS <a class="reference internal" href="../index.html#r8494a6c36190-1" id="id1">[1]</a> specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subjects</strong><span class="classifier">list</span></dt><dd><p>Each item is an integer, identifying one of the HCP subjects</p>
+</dd>
+<dt><strong>hcp_bucket</strong><span class="classifier">string, optional</span></dt><dd><p>The name of the HCP S3 bucket. Default: “hcp-openaccess”</p>
+</dd>
+<dt><strong>profile_name</strong><span class="classifier">string, optional</span></dt><dd><p>The name of the AWS profile used for access. Default: “hcp”</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">string, optional</span></dt><dd><p>Path to save files into. Default: ‘~/AFQ_data’</p>
+</dd>
+<dt><strong>aws_access_key_id</strong><span class="classifier">string, optional</span></dt><dd><p>AWS credentials to HCP AWS S3. Will only be used if <cite>profile_name</cite> is
+set to False.</p>
+</dd>
+<dt><strong>aws_secret_access_key</strong><span class="classifier">string, optional</span></dt><dd><p>AWS credentials to HCP AWS S3. Will only be used if <cite>profile_name</cite> is
+set to False.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict with remote and local names of these files.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To use this function with its default setting, you need to have a
+file ‘~/.aws/credentials’, that includes a section:</p>
+<p>[hcp]
+AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
+AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX</p>
+<p>The keys are credentials that you can get from HCP
+(see <a class="reference external" href="https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS">https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS</a>)  # noqa</p>
+<p>Local filenames are changed to match our expected conventions.</p>
+<dl class="citation">
+<dt class="label" id="r8494a6c36190-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Gorgolewski et al. (2016). The brain imaging data structure,
+a format for organizing and describing outputs of neuroimaging
+experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
+<dt id="AFQ.data.fetch_stanford_hardi_tractography">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_stanford_hardi_tractography</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.data.read_stanford_hardi_tractography">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_stanford_hardi_tractography</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a minimal tractography from the Stanford dataset.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.data.organize_stanford_data">
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the expected file-system structure for the Stanford HARDI data-set.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+      <li>Previous: <a href="../csd/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.csd</span></code></a></li>
+      <li>Next: <a href="../dki/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.dki</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../_sources/autoapi/AFQ/data/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,374 @@
+:mod:`AFQ.registration`
+=======================
+
+.. py:module:: AFQ.registration
+
+.. autoapi-nested-parse::
+
+   Registration tools
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+Module Contents
+---------------
+
+.. function:: syn_registration(moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric='CC', dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None)
+
+   Register a source image (moving) to a target image (static).
+
+
+   :Parameters:
+
+       **moving** : ndarray
+           The source image data to be registered
+
+       **moving_affine** : array, shape (4,4)
+           The affine matrix associated with the moving (source) data.
+
+       **static** : ndarray
+           The target image data for registration
+
+       **static_affine** : array, shape (4,4)
+           The affine matrix associated with the static (target) data
+
+       **metric** : string, optional
+           The metric to be optimized. One of `CC`, `EM`, `SSD`,
+           Default: CCMetric.
+
+       **dim: int (either 2 or 3), optional**
+           The dimensions of the image domain. Default: 3
+
+       **level_iters** : list of int, optional
+           the number of iterations at each level of the Gaussian Pyramid (the
+           length of the list defines the number of pyramid levels to be
+           used).
+
+       **sigma_diff, radius** : float
+           Parameters for initialization of the metric.
+
+   :Returns:
+
+       **warped_moving** : ndarray
+           The data in `moving`, warped towards the `static` data.
+
+       **forward** : ndarray (..., 3)
+           The vector field describing the forward warping from the source to the
+           target.
+
+       **backward** : ndarray (..., 3)
+           The vector field describing the backward warping from the target to the
+           source.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: syn_register_dwi(dwi, gtab, template=None, **syn_kwargs)
+
+   Register DWI data to a template.
+
+
+   :Parameters:
+
+       **dwi** : nifti image or str
+           Image containing DWI data, or full path to a nifti file with DWI.
+
+       **gtab** : GradientTable or list of strings
+           The gradients associated with the DWI data, or a string with [fbcal, ]
+
+       **template** : nifti image or str, optional
+           ..
+
+       **syn_kwargs** : key-word arguments for :func:`syn_registration`
+           ..
+
+   :Returns:
+
+       DiffeomorphicMap object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: write_mapping(mapping, fname)
+
+   Write out a syn registration mapping to file
+
+
+   :Parameters:
+
+       **mapping** : a DiffeomorphicMap object derived from :func:`syn_registration`
+           ..
+
+       **fname** : str
+           Full path to the nifti file storing the mapping
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: read_mapping(disp, domain_img, codomain_img, prealign=None)
+
+   Read a syn registration mapping from a nifti file
+
+
+   :Parameters:
+
+       **disp** : str or Nifti1Image
+           A file of image containing the mapping displacement field in each voxel
+           Shape (x, y, z, 3, 2)
+
+       **domain_img** : str or Nifti1Image
+           ..
+
+       **codomain_img** : str or Nifti1Image
+           ..
+
+   :Returns:
+
+       A :class:`DiffeomorphicMap` object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: resample(moving, static, moving_affine, static_affine)
+
+   Resample an image from one space to another.
+
+
+   :Parameters:
+
+       **moving** : array
+           The image to be resampled
+
+       **static** : array
+           ..
+
+       **moving_affine**
+           ..
+
+       **static_affine**
+           ..
+
+   :Returns:
+
+       **resampled** : the moving array resampled into the static array's space.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: c_of_mass(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)
+
+
+.. function:: translation(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)
+
+
+.. function:: rigid(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)
+
+
+.. function:: affine(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)
+
+
+.. function:: affine_registration(moving, static, moving_affine=None, static_affine=None, nbins=32, sampling_prop=None, metric='MI', pipeline=[c_of_mass, translation, rigid, affine], level_iters=[10000, 1000, 100], sigmas=[5.0, 2.5, 0.0], factors=[4, 2, 1], params0=None)
+
+   Find the affine transformation between two 3D images.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: register_series(series, ref, pipeline)
+
+   Register a series to a reference image.
+
+
+   :Parameters:
+
+       **series** : Nifti1Image object
+           The data is 4D with the last dimension separating different 3D volumes
+
+       **ref** : Nifti1Image or integer or iterable
+           ..
+
+   :Returns:
+
+       transformed_list, affine_list
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: register_dwi(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[c_of_mass, translation, rigid, affine], out_dir=None)
+
+   Register a DWI data-set
+
+
+   :Parameters:
+
+       **data_files** : str or list
+           Files containing DWI data. If this is a str, that's the full path to a
+           single file. If it's a list, each entry is a full path.
+
+       **bval_files** : str or list
+           Equivalent to `data_files`.
+
+       **bvec_files** : str or list
+           Equivalent to `data_files`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: streamline_registration(moving, static, n_points=100, native_resampled=False)
+
+   Register two collections of streamlines ('bundles') to each other
+
+
+   :Parameters:
+
+       **moving, static** : lists of 3 by n, or str
+           The two bundles to be registered. Given either as lists of arrays with
+           3D coordinates, or strings containing full paths to these files.
+
+       **n_points** : int, optional
+           How many points to resample to. Default: 100.
+
+       **native_resampled** : bool, optional
+           Whether to return the moving bundle in the original space, but
+           resampled in the static space to n_points.
+
+   :Returns:
+
+       **aligned** : list
+           Streamlines from the moving group, moved to be closely matched to
+           the static group.
+
+       **matrix** : array (4, 4)
+           The affine transformation that takes us from 'moving' to 'static'
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

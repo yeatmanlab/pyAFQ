@@ -1,0 +1,19 @@
+:mod:`AFQ.utils`
+================
+
+.. py:module:: AFQ.utils
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   bin/index.rst
+   models/index.rst
+   parallel/index.rst
+   streamlines/index.rst
+   volume/index.rst
+
+

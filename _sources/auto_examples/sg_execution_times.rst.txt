@@ -1,0 +1,12 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+Computation times
+=================
+**00:02.844** total execution time for **auto_examples** files:
+
+- **00:02.844**: :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)
+- **00:00.000**: :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)
+- **00:00.000**: :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)

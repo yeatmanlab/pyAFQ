@@ -1,0 +1,354 @@
+:mod:`AFQ.api`
+==============
+
+.. py:module:: AFQ.api
+
+
+Module Contents
+---------------
+
+.. function:: make_bundle_dict(bundle_names=BUNDLES, seg_algo='afq', resample_to=False)
+
+   Create a bundle dictionary, needed for the segmentation
+
+
+   :Parameters:
+
+       **bundle_names** : list, optional
+           A list of the bundles to be used in this case. Default: all of them
+
+       **resample_to** : Nifti1Image, optional
+           If set, templates will be resampled to the affine and shape of this
+           image.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: AFQ(dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], tracking_params=None, segmentation_params=None, clean_params=None)
+
+   Bases: :class:`object`
+
+       This is file folder structure that AFQ requires in your study folder::
+
+   |    study
+   |      ├-derivatives
+   |            ├-dmriprep
+   |                ├── sub01
+   |                │   ├── sess01
+   |                │   │   ├── anat
+   |                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
+   |                │   │   │   └── sub-01_sess-01_T1.nii.gz
+   |                │   │   └── dwi
+   |                │   │       ├── sub-01_sess-01_dwi.bvals
+   |                │   │       ├── sub-01_sess-01_dwi.bvecs
+   |                │   │       └── sub-01_sess-01_dwi.nii.gz
+   |                │   └── sess02
+   |                │       ├── anat
+   |                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
+   |                │       │   └── sub-01_sess-02_T1w.nii.gz
+   |                │       └── dwi
+   |                │           ├── sub-01_sess-02_dwi.bvals
+   |                │           ├── sub-01_sess-02_dwi.bvecs
+   |                │           └── sub-01_sess-02_dwi.nii.gz
+   |                └── sub02
+   |                   ├── sess01
+   |                   │   ├── anat
+   |                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
+   |                   │   │   └── sub-02_sess-01_T1w.nii.gz
+   |                   │   └── dwi
+   |                   │       ├── sub-02_sess-01_dwi.bvals
+   |                   │       ├── sub-02_sess-01_dwi.bvecs
+   |                   │       └── sub-02_sess-01_dwi.nii.gz
+   |                   └── sess02
+   |                       ├── anat
+   |                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
+   |                       │   └── sub-02_sess-02_T1w.nii.gz
+   |                       └── dwi
+   |                           ├── sub-02_sess-02_dwi.bvals
+   |                           ├── sub-02_sess-02_dwi.bvecs
+   |                           └── sub-02_sess-02_dwi.nii.gz
+
+       This structure can be automatically generated from BIDS-compliant
+       data [R63cbc1df923a-1]_, using the dmriprep software [R63cbc1df923a-2]_ and BIDS app.
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Notes
+
+   The structure of the file-system required here resembles that specified
+   by BIDS [R63cbc1df923a-1]_. In the future, this will be organized according to the
+   BIDS derivatives specification, as we require preprocessed, rather than
+   raw data.
+
+   .. [R63cbc1df923a-1] Gorgolewski et al. (2016). The brain imaging data structure,
+          a format for organizing and describing outputs of neuroimaging
+          experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
+
+   .. [R63cbc1df923a-2] https://github.com/nipy/dmriprep
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. attribute:: gtab
+      
+
+      
+
+   .. attribute:: dwi_affine
+      
+
+      
+
+   .. attribute:: dwi_img
+      
+
+      
+
+   .. attribute:: b0
+      
+
+      
+
+   .. attribute:: brain_mask
+      
+
+      
+
+   .. attribute:: wm_mask
+      
+
+      
+
+   .. attribute:: dti
+      
+
+      
+
+   .. attribute:: dti_fa
+      
+
+      
+
+   .. attribute:: dti_cfa
+      
+
+      
+
+   .. attribute:: dti_pdd
+      
+
+      
+
+   .. attribute:: dti_md
+      
+
+      
+
+   .. attribute:: mapping
+      
+
+      
+
+   .. attribute:: streamlines
+      
+
+      
+
+   .. attribute:: bundles
+      
+
+      
+
+   .. attribute:: clean_bundles
+      
+
+      
+
+   .. attribute:: tract_profiles
+      
+
+      
+
+   .. attribute:: template_xform
+      
+
+      
+
+   .. method:: set_gtab(self, b0_threshold)
+
+
+
+   .. method:: get_gtab(self)
+
+
+
+   .. method:: set_dwi_affine(self)
+
+
+
+   .. method:: get_dwi_affine(self)
+
+
+
+   .. method:: set_dwi_img(self)
+
+
+
+   .. method:: get_dwi_img(self)
+
+
+
+   .. method:: __getitem__(self, k)
+
+
+
+   .. method:: set_b0(self)
+
+
+
+   .. method:: get_b0(self)
+
+
+
+   .. method:: set_brain_mask(self)
+
+
+
+   .. method:: get_brain_mask(self)
+
+
+
+   .. method:: set_wm_mask(self)
+
+
+
+   .. method:: get_wm_mask(self)
+
+
+
+   .. method:: set_dti(self)
+
+
+
+   .. method:: get_dti(self)
+
+
+
+   .. method:: set_dti_fa(self)
+
+
+
+   .. method:: get_dti_fa(self)
+
+
+
+   .. method:: set_dti_cfa(self)
+
+
+
+   .. method:: get_dti_cfa(self)
+
+
+
+   .. method:: set_dti_pdd(self)
+
+
+
+   .. method:: get_dti_pdd(self)
+
+
+
+   .. method:: set_dti_md(self)
+
+
+
+   .. method:: get_dti_md(self)
+
+
+
+   .. method:: set_mapping(self)
+
+
+
+   .. method:: get_mapping(self)
+
+
+
+   .. method:: set_streamlines(self)
+
+
+
+   .. method:: get_streamlines(self)
+
+
+
+   .. method:: set_bundles(self)
+
+
+
+   .. method:: get_bundles(self)
+
+
+
+   .. method:: set_clean_bundles(self)
+
+
+
+   .. method:: get_clean_bundles(self)
+
+
+
+   .. method:: set_tract_profiles(self)
+
+
+
+   .. method:: get_tract_profiles(self)
+
+
+
+   .. method:: set_template_xform(self)
+
+
+
+   .. method:: get_template_xform(self)
+
+
+
+   .. method:: export_rois(self)
+
+
+
+   .. method:: export_bundles(self)
+
+
+
+   .. method:: combine_profiles(self)
+
+
+
+

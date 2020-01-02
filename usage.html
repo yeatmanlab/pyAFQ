@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Using pyAFQ &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="auto_examples/index.html" />
+    <link rel="prev" title="Installing pyAFQ" href="installation_guide.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="using-pyafq">
+<h1>Using pyAFQ<a class="headerlink" href="#using-pyafq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="organizing-your-data">
+<h2>Organizing your data<a class="headerlink" href="#organizing-your-data" title="Permalink to this headline">¶</a></h2>
+<p>The pyAFQ software assumes that your data is organized according to a format
+that emulates the <a class="reference external" href="http://bids.neuroimaging.io/">BIDS</a> format.</p>
+<p>Preprocessed diffusion MRI data, as well as anatomical and segmentation data
+should be organized as follows:</p>
+<div class="line-block">
+<div class="line">study</div>
+<div class="line-block">
+<div class="line">├-derivatives</div>
+<div class="line-block">
+<div class="line">├-dmriprep</div>
+<div class="line-block">
+<div class="line">├── sub01</div>
+<div class="line">│   ├── sess01</div>
+<div class="line">│   │   ├── anat</div>
+<div class="line">│   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz</div>
+<div class="line">│   │   │   └── sub-01_sess-01_T1.nii.gz</div>
+<div class="line">│   │   └── dwi</div>
+<div class="line">│   │       ├── sub-01_sess-01_dwi.bvals</div>
+<div class="line">│   │       ├── sub-01_sess-01_dwi.bvecs</div>
+<div class="line">│   │       └── sub-01_sess-01_dwi.nii.gz</div>
+<div class="line">│   └── sess02</div>
+<div class="line">│       ├── anat</div>
+<div class="line">│       │   ├── sub-01_sess-02_aparc+aseg.nii.gz</div>
+<div class="line">│       │   └── sub-01_sess-02_T1w.nii.gz</div>
+<div class="line">│       └── dwi</div>
+<div class="line">│           ├── sub-01_sess-02_dwi.bvals</div>
+<div class="line">│           ├── sub-01_sess-02_dwi.bvecs</div>
+<div class="line">│           └── sub-01_sess-02_dwi.nii.gz</div>
+<div class="line">└── sub02</div>
+<div class="line">   ├── sess01</div>
+<div class="line">   │   ├── anat</div>
+<div class="line">   │       ├── sub-02_sess-01_aparc+aseg.nii.gz</div>
+<div class="line">   │   │   └── sub-02_sess-01_T1w.nii.gz</div>
+<div class="line">   │   └── dwi</div>
+<div class="line">   │       ├── sub-02_sess-01_dwi.bvals</div>
+<div class="line">   │       ├── sub-02_sess-01_dwi.bvecs</div>
+<div class="line">   │       └── sub-02_sess-01_dwi.nii.gz</div>
+<div class="line">   └── sess02</div>
+<div class="line">       ├── anat</div>
+<div class="line-block">
+<div class="line">│   ├── sub-02_sess-02_aparc+aseg.nii.gz</div>
+</div>
+<div class="line">       │   └── sub-02_sess-02_T1w.nii.gz</div>
+<div class="line">       └── dwi</div>
+<div class="line">           ├── sub-02_sess-02_dwi.bvals</div>
+<div class="line">           ├── sub-02_sess-02_dwi.bvecs</div>
+<div class="line">           └── sub-02_sess-02_dwi.nii.gz</div>
+</div>
+</div>
+</div>
+</div>
+<p>Where the <cite>raw</cite> directory contains your raw data, and the <cite>dmriprep</cite> directory
+contains data that has been processed to be motion-corrected, eddy-current
+corrected and so on. Anatomical data is optional. If a T1-weighted anatomical
+image and its segmentation are not provided (i.e., there is no <cite>anat</cite> folder),
+the software will use the diffusion data to estimate the parts of the image that
+comprise the white matter.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The structure within the <cite>raw</cite> directory doesn’t matter much to the <cite>pyAFQ</cite>
+software, as the software will not touch this data at all.</p>
+</div>
+<p>As part of its operation, the software will create another directory, under
+<cite>study/derivatives/afq</cite>, which will contain all of the derivatives created by
+the software.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the BIDS format for derivatives matures, we intend to update the pyAFQ
+software to support a fully BIDS-compliant set of derivatives. Both as
+inputs, as well as outputs.</p>
+</div>
+</div>
+<div class="section" id="running-the-pyafq-pipeline">
+<h2>Running the pyAFQ pipeline<a class="headerlink" href="#running-the-pyafq-pipeline" title="Permalink to this headline">¶</a></h2>
+<p><cite>pyAFQ</cite> provides a programmatic application programming interface that can
+be used to integrate pyAFQ functionality into Python programs or into
+interactive analysis sessions (e.g., using
+<a class="reference external" href="https://jupyter.org">Jupyter</a> notebooks). Examples of using the API are
+provided in the <span class="xref std std-ref">examples</span> documentation section.</p>
+<p>In addition, pyAFQ provides a command-line interface. After installing the
+software, and organizing the data, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyAFQ</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">toml</span>
+</pre></div>
+</div>
+<p>pointing the program to the location of a configuration file. This will run
+whole-brain tractography, segment the tracts, and extract tract-profiles for
+each tract, generating a CSV file under
+<cite>study/derivatives/afq/tract_profiles.csv</cite> that contains the tract profiles for
+all participants/tracts/statistics.</p>
+<div class="section" id="the-pyafq-configuration-file">
+<h3>The pyAFQ configuration file<a class="headerlink" href="#the-pyafq-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>This file should be a <a class="reference external" href="https://github.com/toml-lang/toml">toml</a> file. At
+minimum, the file should contain information about the location of the
+<cite>dmriprep</cite> folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">files</span><span class="p">]</span>
+<span class="n">dmriprep_folder</span> <span class="o">=</span> <span class="s1">&#39;/path/to/study/derivatives/dmriprep&#39;</span>
+</pre></div>
+</div>
+<p>But additional configuration options can be provided for the following values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My AFQ analysis&quot;</span>
+
+<span class="p">[</span><span class="n">files</span><span class="p">]</span>
+<span class="n">dmriprep_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/dmriprep/folder&#39;</span>
+
+<span class="p">[</span><span class="n">bundles</span><span class="p">]</span>
+<span class="n">bundles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ATR&#39;</span><span class="p">,</span> <span class="s1">&#39;CGC&#39;</span><span class="p">,</span> <span class="s1">&#39;CST&#39;</span><span class="p">,</span> <span class="s1">&#39;HCC&#39;</span><span class="p">,</span> <span class="s1">&#39;IFO&#39;</span><span class="p">,</span> <span class="s1">&#39;ILF&#39;</span><span class="p">,</span> <span class="s1">&#39;SLF&#39;</span><span class="p">,</span> <span class="s1">&#39;ARC&#39;</span><span class="p">,</span> <span class="s1">&#39;UNC&#39;</span><span class="p">,</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span> <span class="s1">&#39;FP&#39;</span><span class="p">]</span>
+<span class="n">seg_algo</span> <span class="o">=</span> <span class="s1">&#39;AFQ&#39;</span>
+<span class="n">scalars_model</span> <span class="o">=</span> <span class="s1">&#39;DTI&#39;</span>
+<span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dti_fa&#39;</span><span class="p">,</span> <span class="s1">&#39;dti_md&#39;</span><span class="p">]</span>
+
+<span class="p">[</span><span class="n">tracking</span><span class="p">]</span>
+<span class="n">directions</span> <span class="o">=</span> <span class="s1">&#39;det&#39;</span>
+<span class="n">max_angle</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">seed_mask</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">n_seeds</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">random_seeds</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">stop_mask</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">stop_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">min_length</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">max_length</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">odf_model</span> <span class="o">=</span> <span class="s1">&#39;DTI&#39;</span>
+<span class="n">wm_labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">252</span><span class="p">,</span> <span class="mi">253</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">77</span><span class="p">]</span>
+
+<span class="p">[</span><span class="n">segmentation</span><span class="p">]</span>
+<span class="n">nb_points</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">seg_algo</span> <span class="o">=</span> <span class="s1">&#39;AFQ&#39;</span>
+<span class="n">progressive</span> <span class="o">=</span> <span class="n">true</span>
+<span class="n">greater_than</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">rm_small_clusters</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">model_clust_thr</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">reduction_thr</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">refine</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">pruning_thr</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">prob_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">true</span>
+<span class="n">dist_to_aal</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="p">[</span><span class="n">cleaning</span><span class="p">]</span>
+<span class="n">n_points</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">clean_rounds</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">distance_threshold</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">length_threshold</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">min_sl</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="p">[</span><span class="n">compute</span><span class="p">]</span>
+<span class="n">dask_it</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="p">[</span><span class="n">metadata</span><span class="p">]</span>
+<span class="n">a_string</span> <span class="o">=</span> <span class="s2">&quot;A string with some description&quot;</span>
+<span class="n">list_of_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;val1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">some_boolean</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
+<p>pyAFQ will store a copy of the configuration file alongside the computed
+results. Note that the <cite>title</cite> variable and <cite>[metadata]</cite> section are both for
+users to enter any title/metadata they would like and pyAFQ will generally
+ignore them.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using pyAFQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#organizing-your-data">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-pyafq-pipeline">Running the pyAFQ pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation_guide.html" title="previous chapter">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+      <li>Next: <a href="auto_examples/index.html" title="next chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

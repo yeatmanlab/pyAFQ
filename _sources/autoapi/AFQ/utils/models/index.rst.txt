@@ -1,0 +1,56 @@
+:mod:`AFQ.utils.models`
+=======================
+
+.. py:module:: AFQ.utils.models
+
+
+Module Contents
+---------------
+
+.. function:: prepare_data(data_files, bval_files, bvec_files, mask=None, b0_threshold=0)
+
+   :Parameters:
+
+       **data_files** : str or list
+           Files containing DWI data. If this is a str, that's the full path to a
+           single file. If it's a list, each entry is a full path.
+
+       **bval_files** : str or list
+           Equivalent to `data_files`.
+
+       **bvec_files** : str or list
+           Equivalent to `data_files`.
+
+       **mask** : str or Nifti1Image object
+           ..
+
+   :Returns:
+
+       **img** : Nifti1Image
+           ..
+
+       **data** : ndarray
+           ..
+
+       **gtab** : GradientTable
+           ..
+
+       **mask** : ndarray
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

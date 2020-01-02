@@ -1,0 +1,931 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for AFQ.segmentation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="k">import</span> <span class="n">mahalanobis</span><span class="p">,</span> <span class="n">cdist</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">zscore</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.bundles</span> <span class="k">import</span> <span class="n">RecoBundles</span>
+<span class="kn">from</span> <span class="nn">dipy.align.streamlinear</span> <span class="k">import</span> <span class="n">whole_brain_slr</span>
+<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="k">import</span> <span class="n">gaussian_weights</span>
+<span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="k">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Segmentation&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_resample_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
+    <span class="c1"># reformat for dipy&#39;s set_number_of_points</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">streamlines</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">streamlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">streamlines</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">streamlines</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span>
+
+    <span class="k">return</span> <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Segmentation"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation">[docs]</a><span class="k">class</span> <span class="nc">Segmentation</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">nb_points</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;AFQ&#39;</span><span class="p">,</span>
+                 <span class="n">progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">greater_than</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">rm_small_clusters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">model_clust_thr</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+                 <span class="n">reduction_thr</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+                 <span class="n">refine</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">pruning_thr</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                 <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">prob_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">filter_by_endpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">dist_to_aal</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Segment streamlines into bundles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nb_points : int, boolean</span>
+<span class="sd">            Resample streamlines to nb_points number of points.</span>
+<span class="sd">            If False, no resampling is done. Default: False</span>
+
+<span class="sd">        seg_algo : string</span>
+<span class="sd">            Algorithm for segmentation (case-insensitive):</span>
+<span class="sd">            &#39;AFQ&#39;: Segment streamlines into bundles,</span>
+<span class="sd">                based on inclusion/exclusion ROIs.</span>
+<span class="sd">            &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
+<span class="sd">            [Garyfallidis2017].</span>
+<span class="sd">            Default: &#39;AFQ&#39;</span>
+
+<span class="sd">        rm_small_clusters : int</span>
+<span class="sd">            Using RecoBundles Algorithm.</span>
+<span class="sd">            Remove clusters that have less than this value</span>
+<span class="sd">                during whole brain SLR.</span>
+<span class="sd">            Default: 50</span>
+
+<span class="sd">        progressive : boolean, optional</span>
+<span class="sd">            Using RecoBundles Algorithm.</span>
+<span class="sd">            Whether or not to use progressive technique</span>
+<span class="sd">                during whole brain SLR.</span>
+<span class="sd">            Default: True.</span>
+
+<span class="sd">        greater_than : int, optional</span>
+<span class="sd">            Using RecoBundles Algorithm.</span>
+<span class="sd">            Keep streamlines that have length greater than this value</span>
+<span class="sd">                during whole brain SLR.</span>
+<span class="sd">            Default: 50.</span>
+
+<span class="sd">        b0_theshold : float.</span>
+<span class="sd">            Using AFQ Algorithm.</span>
+<span class="sd">            All b-values with values less than or equal to `bo_threshold` are</span>
+<span class="sd">            considered as b0s i.e. without diffusion weighting.</span>
+<span class="sd">            Default: 0.</span>
+
+<span class="sd">        prob_threshold : float.</span>
+<span class="sd">            Using AFQ Algorithm.</span>
+<span class="sd">            Initial cleaning of fiber groups is done using probability maps</span>
+<span class="sd">            from [Hua2008]_. Here, we choose an average probability that</span>
+<span class="sd">            needs to be exceeded for an individual streamline to be retained.</span>
+<span class="sd">            Default: 0.</span>
+
+<span class="sd">        rng : RandomState</span>
+<span class="sd">            If None, creates RandomState. Used in RecoBundles Algorithm.</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        return_idx : bool</span>
+<span class="sd">            Whether to return the indices in the original streamlines as part</span>
+<span class="sd">            of the output of segmentation.</span>
+
+<span class="sd">        filter_by_endpoints: bool</span>
+<span class="sd">            Whether to filter the bundles based on their endpoints relative</span>
+<span class="sd">            to regions defined in the AAL atlas. Applies only to the waypoint</span>
+<span class="sd">            approach (XXX for now). Default: True.</span>
+
+<span class="sd">        dist_to_aal : float</span>
+<span class="sd">            If filter_by_endpoints is True, this is the distance from the</span>
+<span class="sd">            endpoints to the AAL atlas ROIs that is required.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)</span>
+<span class="sd">        Tract probability maps in stereotaxic spaces: analyses of white</span>
+<span class="sd">        matter anatomy and tract-specific quantification. Neuroimage 39:</span>
+<span class="sd">        336-347</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.Segmentation&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span> <span class="o">=</span> <span class="n">nb_points</span>
+
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">=</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span> <span class="o">=</span> <span class="n">prob_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressive</span> <span class="o">=</span> <span class="n">progressive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span> <span class="o">=</span> <span class="n">greater_than</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rm_small_clusters</span> <span class="o">=</span> <span class="n">rm_small_clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span> <span class="o">=</span> <span class="n">model_clust_thr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span> <span class="o">=</span> <span class="n">reduction_thr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refine</span> <span class="o">=</span> <span class="n">refine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pruning_thr</span> <span class="o">=</span> <span class="n">pruning_thr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span> <span class="o">=</span> <span class="n">return_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">filter_by_endpoints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_aal</span> <span class="o">=</span> <span class="n">dist_to_aal</span>
+
+<div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">fdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">fbvec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Segment streamlines into bundles based on either waypoint ROIs</span>
+<span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bundle_dict: dict</span>
+<span class="sd">            Meta-data for the segmentation. The format is something like::</span>
+
+<span class="sd">                {&#39;name&#39;: {&#39;ROIs&#39;:[img1, img2],</span>
+<span class="sd">                &#39;rules&#39;:[True, True]},</span>
+<span class="sd">                &#39;prob_map&#39;: img3,</span>
+<span class="sd">                &#39;cross_midline&#39;: False}</span>
+
+<span class="sd">        tg : StatefulTractogram</span>
+<span class="sd">            Bundles to segment</span>
+
+<span class="sd">        fdata, fbval, fbvec : str</span>
+<span class="sd">            Full path to data, bvals, bvecs</span>
+
+<span class="sd">        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span>
+<span class="sd">            A mapping between DWI space and a template. If None, mapping will</span>
+<span class="sd">            be registered from data used in prepare_img. Default: None.</span>
+
+<span class="sd">        reg_prealign : array, optional.</span>
+<span class="sd">            The linear transformation to be applied to align input images to</span>
+<span class="sd">            the reference space before warping under the deformation field.</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        reg_template : str or nib.Nifti1Image, optional.</span>
+<span class="sd">            Template to use for registration. Default: MNI T2.</span>
+
+<span class="sd">        img_affine : array, optional.</span>
+<span class="sd">            The spatial transformation from the measurement to the scanner</span>
+<span class="sd">            space.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.</span>
+<span class="sd">        Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. &quot;Tract Profiles of</span>
+<span class="sd">        White Matter Properties: Automating Fiber-Tract Quantification&quot;</span>
+<span class="sd">        PloS One 7 (11): e49790.</span>
+
+<span class="sd">        .. [Garyfallidis17] Garyfallidis et al. Recognition of white matter</span>
+<span class="sd">        bundles using local and global streamline-based registration and</span>
+<span class="sd">        clustering, Neuroimage, 2017.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">img_affine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">fdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">fbval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">or</span> <span class="n">fbvec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Provide either the full path to data, bvals, bvecs,&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;or provide the affine of the image and the mapping&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing Segmentation Parameters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="n">img_affine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_img</span><span class="p">(</span><span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preprocessing Streamlines&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
+
+        <span class="c1"># If resampling over-write the sft:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">resample_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_map</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_streamlines</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_afq</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_reco</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Segmentation.prepare_img"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.prepare_img">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare image data from DWI data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fdata, fbval, fbvec : str</span>
+<span class="sd">            Full path to data, bvals, bvecs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+                <span class="n">ut</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">,</span>
+                                <span class="n">b0_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span> <span class="o">=</span> <span class="n">fdata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span> <span class="o">=</span> <span class="n">fbval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span> <span class="o">=</span> <span class="n">fbvec</span></div>
+
+<div class="viewcode-block" id="Segmentation.prepare_map"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.prepare_map">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set mapping between DWI space and a template.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span>
+<span class="sd">            A mapping between DWI space and a template.</span>
+<span class="sd">            If None, mapping will be registered from data used in prepare_img.</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        reg_template : str or nib.Nifti1Image, optional.</span>
+<span class="sd">            Template to use for registration (defaults to the MNI T2)</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        reg_prealign : array, optional.</span>
+<span class="sd">            The linear transformation to be applied to align input images to</span>
+<span class="sd">            the reference space before warping under the deformation field.</span>
+<span class="sd">            Default: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reg_template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">reg_prealign</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+                    <span class="n">ut</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">,</span>
+                                    <span class="n">b0_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+                                            <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span></div>
+
+<div class="viewcode-block" id="Segmentation.cross_streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.cross_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">cross_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low_coord</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Classify the streamlines by whether they cross the midline.</span>
+
+<span class="sd">        Creates a crosses attribute which is an array of booleans. Each boolean</span>
+<span class="sd">        corresponds to a streamline, and is whether or not that streamline</span>
+<span class="sd">        crosses the midline.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tg : StatefulTractogram class instance.</span>
+
+<span class="sd">        template : nibabel.Nifti1Image class instance</span>
+<span class="sd">            An affine transformation into a template space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">template_affine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">template_affine</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">affine</span>
+
+        <span class="c1"># What is the x,y,z coordinate of 0,0,0 in the template space?</span>
+        <span class="n">zero_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">template_affine</span><span class="p">),</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="c1"># already_split = 0</span>
+        <span class="k">for</span> <span class="n">sl_idx</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Segmentation._get_bundle_info"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._get_bundle_info">[docs]</a>    <span class="k">def</span> <span class="nf">_get_bundle_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get fiber probabilites and ROIs for a given bundle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]</span>
+        <span class="n">include_rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">exclude_rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rule_idx</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="n">rule_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                <span class="n">roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">rule</span><span class="p">:</span>
+                <span class="c1"># include ROI:</span>
+                <span class="n">include_rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Exclude ROI:</span>
+                <span class="n">exclude_rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+        <span class="c1"># The probability map if doesn&#39;t exist is all ones with the same</span>
+        <span class="c1"># shape as the ROIs:</span>
+        <span class="n">prob_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;prob_map&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">prob_map</span> <span class="o">=</span> <span class="n">prob_map</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">warped_prob_map</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span>
+                                           <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">exclude_rois</span></div>
+
+<div class="viewcode-block" id="Segmentation._check_sl_with_inclusion"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._check_sl_with_inclusion">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sl_with_inclusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to check that a streamline is close to a list of</span>
+<span class="sd">        inclusion ROIS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">include_rois</span><span class="p">:</span>
+            <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
+            <span class="n">dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+                <span class="c1"># Too far from one of them:</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="c1"># Apparently you checked all the ROIs and it was close to all of them</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dist</span></div>
+
+<div class="viewcode-block" id="Segmentation._check_sl_with_exclusion"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._check_sl_with_exclusion">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sl_with_exclusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">exclude_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Helper function to check that a streamline is not too close to a</span>
+<span class="sd">        list of exclusion ROIs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">exclude_rois</span><span class="p">:</span>
+            <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># Either there are no exclusion ROIs, or you are not close to any:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Segmentation.segment_afq"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment_afq">[docs]</a>    <span class="k">def</span> <span class="nf">segment_afq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign streamlines to bundles using the waypoint ROI approach</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tg : StatefulTractogram class instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+        <span class="c1"># For expedience, we approximate each streamline as a 100 point curve:</span>
+        <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_resample_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+        <span class="n">n_streamlines</span> <span class="o">=</span> <span class="n">fgarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">streamlines_in_bundles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">n_streamlines</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">)))</span>
+        <span class="n">min_dist_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">n_streamlines</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
+            <span class="n">out_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_streamlines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span><span class="p">:</span>
+            <span class="n">aal_atlas</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
+            <span class="c1"># from mm to voxel units:</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">vox_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
+            <span class="n">dist_to_aal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_aal</span> <span class="o">/</span> <span class="n">vox_dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
+        <span class="c1"># Tolerance is set to the square of the distance to the corner</span>
+        <span class="c1"># because we are using the squared Euclidean distance in calls to</span>
+        <span class="c1"># `cdist` to make those calls faster.</span>
+        <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">for</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Finding Streamlines for </span><span class="si">{bundle}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span> <span class="n">exclude_roi</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_bundle_info</span><span class="p">(</span><span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">)</span>
+            <span class="n">fiber_probabilities</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span><span class="p">(</span>
+                <span class="n">warped_prob_map</span><span class="p">,</span>
+                <span class="n">fgarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+            <span class="n">fiber_probabilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">fiber_probabilities</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">idx_above_prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">fiber_probabilities</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="n">f</span><span class="s2">&quot;{len(idx_above_prob[0])} streamlines exceed&quot;</span>
+                              <span class="s2">&quot; the probability threshold.&quot;</span><span class="p">))</span>
+            <span class="n">crosses_midline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;cross_midline&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">sl_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">crosses_midline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]:</span>
+                            <span class="c1"># This means that the streamline does</span>
+                            <span class="c1"># cross the midline:</span>
+                            <span class="k">if</span> <span class="n">crosses_midline</span><span class="p">:</span>
+                                <span class="c1"># This is what we want, keep going</span>
+                                <span class="k">pass</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># This is not what we want,</span>
+                                <span class="c1"># skip to next streamline</span>
+                                <span class="k">continue</span>
+
+                    <span class="n">is_close</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_check_sl_with_inclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span>
+                                                      <span class="n">include_roi</span><span class="p">,</span>
+                                                      <span class="n">tol</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">is_close</span><span class="p">:</span>
+                        <span class="n">is_far</span> <span class="o">=</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_check_sl_with_exclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span>
+                                                          <span class="n">exclude_roi</span><span class="p">,</span>
+                                                          <span class="n">tol</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">is_far</span><span class="p">:</span>
+                            <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span>\
+                                <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span>\
+                                <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">streamlines_in_bundles</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">]</span> <span class="o">=</span>\
+                                <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">f</span><span class="s2">&quot;{np.sum(streamlines_in_bundles[:, bundle_idx] &gt; 0)} &quot;</span>
+                 <span class="s2">&quot;streamlines selected with waypoint ROIs&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Eliminate any fibers not selected using the plane ROIs:</span>
+        <span class="n">possible_fibers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">streamlines_in_bundles</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">tg</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">possible_fibers</span><span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                                <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
+            <span class="n">out_idx</span> <span class="o">=</span> <span class="n">out_idx</span><span class="p">[</span><span class="n">possible_fibers</span><span class="p">]</span>
+
+        <span class="n">streamlines_in_bundles</span> <span class="o">=</span> <span class="n">streamlines_in_bundles</span><span class="p">[</span><span class="n">possible_fibers</span><span class="p">]</span>
+        <span class="n">min_dist_coords</span> <span class="o">=</span> <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">possible_fibers</span><span class="p">]</span>
+        <span class="n">bundle_choice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">streamlines_in_bundles</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># We do another round through, so that we can orient all the</span>
+        <span class="c1"># streamlines within a bundle in the same orientation with respect to</span>
+        <span class="c1"># the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0</span>
+        <span class="c1"># to ROI1).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Re-orienting streamlines to consistent directions&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Processing </span><span class="si">{bundle}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">select_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bundle_choice</span> <span class="o">==</span> <span class="n">bundle_idx</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">select_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                        <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                        <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+                <span class="c1"># There&#39;s nothing here, move to the next bundle:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Use a list here, because ArraySequence doesn&#39;t support item</span>
+            <span class="c1"># assignment:</span>
+            <span class="n">select_sl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">select_idx</span><span class="p">])</span>
+            <span class="c1"># Sub-sample min_dist_coords:</span>
+            <span class="n">min_dist_coords_bundle</span> <span class="o">=</span> <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">select_idx</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">select_sl</span><span class="p">)):</span>
+                <span class="n">min0</span> <span class="o">=</span> <span class="n">min_dist_coords_bundle</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">min1</span> <span class="o">=</span> <span class="n">min_dist_coords_bundle</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">min0</span> <span class="o">&gt;</span> <span class="n">min1</span><span class="p">:</span>
+                    <span class="n">select_sl</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">select_sl</span><span class="p">[</span><span class="n">idx</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Set this to StatefulTractogram object for filtering/output:</span>
+            <span class="n">select_sl</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">select_sl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Filtering by endpoints&quot;</span><span class="p">)</span>
+                <span class="c1"># Create binary masks and warp these into subject&#39;s DWI space:</span>
+                <span class="n">aal_targets</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">bundles_to_aal</span><span class="p">([</span><span class="n">bundle</span><span class="p">],</span> <span class="n">atlas</span><span class="o">=</span><span class="n">aal_atlas</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">aal_idx</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">targ</span> <span class="ow">in</span> <span class="n">aal_targets</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">targ</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">aal_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">aal_atlas</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+                        <span class="n">aal_roi</span><span class="p">[</span><span class="n">targ</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">targ</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">targ</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">warped_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                            <span class="n">aal_roi</span><span class="p">,</span>
+                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+                        <span class="n">aal_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">aal_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Before filtering &quot;</span>
+                                 <span class="n">f</span><span class="s2">&quot;{len(select_sl)} streamlines&quot;</span><span class="p">)</span>
+
+                <span class="n">select_sl</span> <span class="o">=</span> <span class="n">clean_by_endpoints</span><span class="p">(</span><span class="n">select_sl</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                                               <span class="n">aal_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                               <span class="n">aal_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                               <span class="n">tol</span><span class="o">=</span><span class="n">dist_to_aal</span><span class="p">)</span>
+                <span class="c1"># Generate immediately:</span>
+                <span class="n">select_sl</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">select_sl</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                                               <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;After filtering &quot;</span>
+                                 <span class="n">f</span><span class="s2">&quot;{len(select_sl)} streamlines&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">select_sl</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_idx</span><span class="p">[</span><span class="n">select_idx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">select_sl</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span></div>
+
+<div class="viewcode-block" id="Segmentation.segment_reco"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment_reco">[docs]</a>    <span class="k">def</span> <span class="nf">segment_reco</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tg : StatefulTractogram class instance</span>
+<span class="sd">            A whole-brain tractogram to be segmented.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fiber_groups : dict</span>
+<span class="sd">            Keys are names of the bundles, values are Streamline objects.</span>
+<span class="sd">            The streamlines in each object have all been oriented to have the</span>
+<span class="sd">            same orientation (using `dts.orient_by_streamline`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
+
+        <span class="n">fiber_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering Whole-brain with SLR&quot;</span><span class="p">)</span>
+        <span class="c1"># We start with whole-brain SLR:</span>
+        <span class="n">atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span>
+        <span class="n">moved</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">qb_centroids1</span><span class="p">,</span> <span class="n">qb_centroids2</span> <span class="o">=</span> <span class="n">whole_brain_slr</span><span class="p">(</span>
+            <span class="n">atlas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">progressive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progressive</span><span class="p">,</span>
+            <span class="n">greater_than</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span><span class="p">,</span>
+            <span class="n">rm_small_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rm_small_clusters</span><span class="p">,</span>
+            <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+
+        <span class="c1"># We generate our instance of RB with the moved streamlines:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting Bundles&quot;</span><span class="p">)</span>
+        <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="n">moved</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+
+        <span class="c1"># Next we&#39;ll iterate over bundles, registering each one:</span>
+        <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
+            <span class="n">model_sl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">rec_labels</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">recognize</span><span class="p">(</span><span class="n">model_bundle</span><span class="o">=</span><span class="n">model_sl</span><span class="p">,</span>
+                                         <span class="n">model_clust_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span><span class="p">,</span>
+                                         <span class="n">reduction_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span><span class="p">,</span>
+                                         <span class="n">reduction_distance</span><span class="o">=</span><span class="s1">&#39;mdf&#39;</span><span class="p">,</span>
+                                         <span class="n">slr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                         <span class="n">slr_metric</span><span class="o">=</span><span class="s1">&#39;asymmetric&#39;</span><span class="p">,</span>
+                                         <span class="n">pruning_distance</span><span class="o">=</span><span class="s1">&#39;mdf&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Use the streamlines in the original space:</span>
+            <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">rec_labels</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">model_sl</span><span class="p">,</span> <span class="n">recognized_sl</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span><span class="p">,</span>
+                                          <span class="n">reduction_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span><span class="p">,</span>
+                                          <span class="n">pruning_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pruning_thr</span><span class="p">)</span>
+                <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
+
+            <span class="n">standard_sl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span>
+            <span class="n">oriented_sl</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">orient_by_streamline</span><span class="p">(</span><span class="n">recognized_sl</span><span class="p">,</span> <span class="n">standard_sl</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
+                <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_labels</span>
+                <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">oriented_sl</span><span class="p">,</span>
+                                                                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                                                                <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">oriented_sl</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                                                          <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">fiber_groups</span>
+        <span class="k">return</span> <span class="n">fiber_groups</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">clean_bundle</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">clean_rounds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                 <span class="n">length_threshold</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">min_sl</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                 <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean a segmented fiber group based on the Mahalnobis distance of</span>
+<span class="sd">    each streamline</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    streamlines : nibabel.Streamlines class instance.</span>
+<span class="sd">        The streamlines constituting a fiber group.</span>
+<span class="sd">        If streamlines is None, will use previously given streamlines.</span>
+<span class="sd">        Default: None.</span>
+
+<span class="sd">    clean_rounds : int, optional.</span>
+<span class="sd">        Number of rounds of cleaning based on the Mahalanobis distance from</span>
+<span class="sd">        the mean of extracted bundles. Default: 5</span>
+
+<span class="sd">    distance_threshold : float, optional.</span>
+<span class="sd">        Threshold of cleaning based on the Mahalanobis distance (the units are</span>
+<span class="sd">        standard deviations). Default: 5.</span>
+
+<span class="sd">    length_threshold: float, optional</span>
+<span class="sd">        Threshold for cleaning based on length (in standard deviations). Length</span>
+<span class="sd">        of any streamline should not be *more* than this number of stdevs from</span>
+<span class="sd">        the mean length.</span>
+
+<span class="sd">    min_sl : int, optional.</span>
+<span class="sd">        Number of streamlines in a bundle under which we will</span>
+<span class="sd">        not bother with cleaning outliers. Default: 20.</span>
+
+<span class="sd">    stat : callable or str, optional.</span>
+<span class="sd">        The statistic of each node relative to which the Mahalanobis is</span>
+<span class="sd">        calculated. Default: `np.mean` (but can also use median, etc.)</span>
+
+<span class="sd">    using_idx : bool</span>
+<span class="sd">        Whether &#39;streamlines&#39; contains indices in the original streamlines.</span>
+<span class="sd">        Default: False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A nibabel.Streamlines class instance containing only the streamlines</span>
+<span class="sd">    that have a Mahalanobis distance smaller than `clean_threshold` from</span>
+<span class="sd">    the mean of each one of the nodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert string to callable, if that&#39;s what you got.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">stat</span><span class="p">)</span>
+    <span class="c1"># We don&#39;t even bother if there aren&#39;t enough streamlines:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_sl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">return_idx</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tg</span>
+
+    <span class="c1"># Resample once up-front:</span>
+    <span class="n">fgarray</span> <span class="o">=</span> <span class="n">_resample_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+
+    <span class="c1"># Keep this around, so you can use it for indexing at the very end:</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fgarray</span><span class="p">))</span>
+    <span class="c1"># This calculates the Mahalanobis for each streamline/node:</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">return_mahalnobis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="n">stat</span><span class="p">)</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">])</span>
+    <span class="c1"># We&#39;ll only do this for clean_rounds</span>
+    <span class="n">rounds_elapsed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">w</span> <span class="o">&gt;</span> <span class="n">distance_threshold</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">zscore</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">length_threshold</span><span class="p">))</span>
+           <span class="ow">and</span> <span class="n">rounds_elapsed</span> <span class="o">&lt;</span> <span class="n">clean_rounds</span>
+           <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">min_sl</span><span class="p">):</span>
+        <span class="c1"># Select the fibers that have Mahalanobis smaller than the</span>
+        <span class="c1"># threshold for all their nodes:</span>
+        <span class="n">idx_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">w</span> <span class="o">&lt;</span> <span class="n">distance_threshold</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx_len</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">zscore</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length_threshold</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx_belong</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">idx_dist</span><span class="p">,</span> <span class="n">idx_len</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_belong</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_sl</span><span class="p">:</span>
+            <span class="c1"># need to sort and return exactly min_sl:</span>
+            <span class="n">idx_belong</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))[:</span><span class="n">min_sl</span><span class="p">]</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">idx_belong</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="c1"># Update by selection:</span>
+        <span class="n">fgarray</span> <span class="o">=</span> <span class="n">fgarray</span><span class="p">[</span><span class="n">idx_belong</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="n">idx_belong</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="c1"># Repeat:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">return_mahalnobis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rounds_elapsed</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Select based on the variable that was keeping track of things for us:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">tg</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_idx</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">idx</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">clean_by_endpoints</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">targets0</span><span class="p">,</span> <span class="n">targets1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean a collection of streamlines based on their two endpoints</span>
+
+<span class="sd">    Filters down to only include items that have their starting points close to</span>
+<span class="sd">    the targets0 and ending points close to targets1</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    streamlines : sequence of 3XN_i arrays The collection of streamlines to</span>
+<span class="sd">        filter down to.</span>
+
+<span class="sd">    targets0, target1: sequences or Nx3 arrays or None.</span>
+<span class="sd">        The targets. Numerical values in the atlas array for targets for the</span>
+<span class="sd">        first and last node in each streamline respectively, or NX3 arrays with</span>
+<span class="sd">        each row containing the indices for these locations in the atlas.</span>
+<span class="sd">        If provided a None, this means no restriction on that end.</span>
+
+<span class="sd">    tol : float, optional A distance tolerance (in units that the coordinates</span>
+<span class="sd">        of the streamlines are represented in). Default: 0, which means that</span>
+<span class="sd">        the endpoint is exactly in the coordinate of the target ROI.</span>
+
+<span class="sd">    atlas : 3D array or Nifti1Image class instance with a 3D array, optional.</span>
+<span class="sd">        Contains numerical values for ROIs. Default: if not provided, assume</span>
+<span class="sd">        that targets0 and targets1 are both arrays of indices, and this</span>
+<span class="sd">        information is not needed.</span>
+
+
+<span class="sd">    Yields</span>
+<span class="sd">    -------</span>
+<span class="sd">    Generator of the filtered collection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tol</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># We square the tolerance, because below we are using the squared Euclidean</span>
+    <span class="c1"># distance which is slightly faster:</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="c1"># Check whether it&#39;s already in the right format:</span>
+    <span class="n">sp_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets0</span> <span class="ow">is</span> <span class="kc">None</span>
+                 <span class="ow">or</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">targets0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="n">ep_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets1</span> <span class="ow">is</span> <span class="kc">None</span>
+                 <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+                     <span class="ow">and</span> <span class="n">targets1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ep_is_idx</span> <span class="ow">and</span> <span class="n">sp_is_idx</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">sp_is_idx</span><span class="p">:</span>
+        <span class="n">idxes0</span> <span class="o">=</span> <span class="n">targets0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Otherwise, we&#39;ll need to derive it:</span>
+        <span class="n">startpoint_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">atlas</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">targ</span> <span class="ow">in</span> <span class="n">targets0</span><span class="p">:</span>
+            <span class="n">startpoint_roi</span><span class="p">[</span><span class="n">atlas</span> <span class="o">==</span> <span class="n">targ</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">idxes0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">startpoint_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="n">ep_is_idx</span><span class="p">:</span>
+        <span class="n">idxes1</span> <span class="o">=</span> <span class="n">targets1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">endpoint_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">atlas</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">targ</span> <span class="ow">in</span> <span class="n">targets1</span><span class="p">:</span>
+            <span class="n">endpoint_roi</span><span class="p">[</span><span class="n">atlas</span> <span class="o">==</span> <span class="n">targ</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">idxes1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">endpoint_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">streamlines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">targets0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Nothing to check</span>
+            <span class="n">dist0ok</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dist0ok</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">dist0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]]),</span> <span class="n">idxes0</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">dist0</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">:</span>
+                <span class="n">dist0ok</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Only proceed if conditions for one side are fulfilled:</span>
+        <span class="k">if</span> <span class="n">dist0ok</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">targets1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Nothing to check on this end:</span>
+                <span class="k">yield</span> <span class="n">sl</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">idxes1</span><span class="p">,</span>
+                                     <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">dist2</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">sl</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../AFQ.html">AFQ</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,101 @@
+:mod:`AFQ.viz`
+==============
+
+.. py:module:: AFQ.viz
+
+
+Module Contents
+---------------
+
+.. function:: _inline_interact(ren, inline, interact)
+
+   Helper function to reuse across viz functions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None, color=None, inline=True, interact=False)
+
+   Visualize bundles in 3D using VTK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, ren=None, color=None, inline=True, interact=False)
+
+   Render a region of interest into a VTK viz as a volume
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True, interact=False)
+
+   Visualize a volume
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

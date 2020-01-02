@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.registration &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AFQ.segmentation" href="../segmentation/index.html" />
+    <link rel="prev" title="AFQ.dti" href="../dti/index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.registration">
+<span id="afq-registration"></span><h1><a class="reference internal" href="#module-AFQ.registration" title="AFQ.registration"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a><a class="headerlink" href="#module-AFQ.registration" title="Permalink to this headline">¶</a></h1>
+<p><p>Registration tools</p>
+</p>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AFQ.registration.syn_registration">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_registration</code><span class="sig-paren">(</span><em class="sig-param">moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric='CC', dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a source image (moving) to a target image (static).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>moving</strong><span class="classifier">ndarray</span></dt><dd><p>The source image data to be registered</p>
+</dd>
+<dt><strong>moving_affine</strong><span class="classifier">array, shape (4,4)</span></dt><dd><p>The affine matrix associated with the moving (source) data.</p>
+</dd>
+<dt><strong>static</strong><span class="classifier">ndarray</span></dt><dd><p>The target image data for registration</p>
+</dd>
+<dt><strong>static_affine</strong><span class="classifier">array, shape (4,4)</span></dt><dd><p>The affine matrix associated with the static (target) data</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier">string, optional</span></dt><dd><p>The metric to be optimized. One of <cite>CC</cite>, <cite>EM</cite>, <cite>SSD</cite>,
+Default: CCMetric.</p>
+</dd>
+<dt><strong>dim: int (either 2 or 3), optional</strong></dt><dd><p>The dimensions of the image domain. Default: 3</p>
+</dd>
+<dt><strong>level_iters</strong><span class="classifier">list of int, optional</span></dt><dd><p>the number of iterations at each level of the Gaussian Pyramid (the
+length of the list defines the number of pyramid levels to be
+used).</p>
+</dd>
+<dt><strong>sigma_diff, radius</strong><span class="classifier">float</span></dt><dd><p>Parameters for initialization of the metric.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>warped_moving</strong><span class="classifier">ndarray</span></dt><dd><p>The data in <cite>moving</cite>, warped towards the <cite>static</cite> data.</p>
+</dd>
+<dt><strong>forward</strong><span class="classifier">ndarray (…, 3)</span></dt><dd><p>The vector field describing the forward warping from the source to the
+target.</p>
+</dd>
+<dt><strong>backward</strong><span class="classifier">ndarray (…, 3)</span></dt><dd><p>The vector field describing the backward warping from the target to the
+source.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.syn_register_dwi">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_register_dwi</code><span class="sig-paren">(</span><em class="sig-param">dwi</em>, <em class="sig-param">gtab</em>, <em class="sig-param">template=None</em>, <em class="sig-param">**syn_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_register_dwi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register DWI data to a template.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dwi</strong><span class="classifier">nifti image or str</span></dt><dd><p>Image containing DWI data, or full path to a nifti file with DWI.</p>
+</dd>
+<dt><strong>gtab</strong><span class="classifier">GradientTable or list of strings</span></dt><dd><p>The gradients associated with the DWI data, or a string with [fbcal, ]</p>
+</dd>
+<dt><strong>template</strong><span class="classifier">nifti image or str, optional</span></dt><dd></dd>
+<dt><strong>syn_kwargs</strong><span class="classifier">key-word arguments for <a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></a></span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>DiffeomorphicMap object</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.write_mapping">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">write_mapping</code><span class="sig-paren">(</span><em class="sig-param">mapping</em>, <em class="sig-param">fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#write_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.write_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out a syn registration mapping to file</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mapping</strong><span class="classifier">a DiffeomorphicMap object derived from <a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></a></span></dt><dd></dd>
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Full path to the nifti file storing the mapping</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.read_mapping">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">read_mapping</code><span class="sig-paren">(</span><em class="sig-param">disp</em>, <em class="sig-param">domain_img</em>, <em class="sig-param">codomain_img</em>, <em class="sig-param">prealign=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#read_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.read_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a syn registration mapping from a nifti file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>disp</strong><span class="classifier">str or Nifti1Image</span></dt><dd><p>A file of image containing the mapping displacement field in each voxel
+Shape (x, y, z, 3, 2)</p>
+</dd>
+<dt><strong>domain_img</strong><span class="classifier">str or Nifti1Image</span></dt><dd></dd>
+<dt><strong>codomain_img</strong><span class="classifier">str or Nifti1Image</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>A <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffeomorphicMap</span></code> object</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.resample">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">static_affine</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resample an image from one space to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>moving</strong><span class="classifier">array</span></dt><dd><p>The image to be resampled</p>
+</dd>
+<dt><strong>static</strong><span class="classifier">array</span></dt><dd></dd>
+<dt><strong>moving_affine</strong></dt><dd></dd>
+<dt><strong>static_affine</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>resampled</strong><span class="classifier">the moving array resampled into the static array’s space.</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.c_of_mass">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">c_of_mass</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#c_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.c_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.translation">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">translation</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#translation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.translation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.rigid">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">rigid</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#rigid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.rigid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.affine">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.affine_registration">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine_registration</code><span class="sig-paren">(</span><em class="sig-param">moving, static, moving_affine=None, static_affine=None, nbins=32, sampling_prop=None, metric='MI', pipeline=[c_of_mass, translation, rigid, affine], level_iters=[10000, 1000, 100], sigmas=[5.0, 2.5, 0.0], factors=[4, 2, 1], params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the affine transformation between two 3D images.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.register_series">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_series</code><span class="sig-paren">(</span><em class="sig-param">series</em>, <em class="sig-param">ref</em>, <em class="sig-param">pipeline</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a series to a reference image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>series</strong><span class="classifier">Nifti1Image object</span></dt><dd><p>The data is 4D with the last dimension separating different 3D volumes</p>
+</dd>
+<dt><strong>ref</strong><span class="classifier">Nifti1Image or integer or iterable</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>transformed_list, affine_list</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.register_dwi">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_dwi</code><span class="sig-paren">(</span><em class="sig-param">data_files, bval_files, bvec_files, b0_ref=0, pipeline=[c_of_mass, translation, rigid, affine], out_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_dwi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a DWI data-set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_files</strong><span class="classifier">str or list</span></dt><dd><p>Files containing DWI data. If this is a str, that’s the full path to a
+single file. If it’s a list, each entry is a full path.</p>
+</dd>
+<dt><strong>bval_files</strong><span class="classifier">str or list</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>bvec_files</strong><span class="classifier">str or list</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.registration.streamline_registration">
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">streamline_registration</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">n_points=100</em>, <em class="sig-param">native_resampled=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#streamline_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.streamline_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register two collections of streamlines (‘bundles’) to each other</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>moving, static</strong><span class="classifier">lists of 3 by n, or str</span></dt><dd><p>The two bundles to be registered. Given either as lists of arrays with
+3D coordinates, or strings containing full paths to these files.</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>How many points to resample to. Default: 100.</p>
+</dd>
+<dt><strong>native_resampled</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to return the moving bundle in the original space, but
+resampled in the static space to n_points.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>aligned</strong><span class="classifier">list</span></dt><dd><p>Streamlines from the moving group, moved to be closely matched to
+the static group.</p>
+</dd>
+<dt><strong>matrix</strong><span class="classifier">array (4, 4)</span></dt><dd><p>The affine transformation that takes us from ‘moving’ to ‘static’</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+      <li>Previous: <a href="../dti/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.dti</span></code></a></li>
+      <li>Next: <a href="../segmentation/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../_sources/autoapi/AFQ/registration/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

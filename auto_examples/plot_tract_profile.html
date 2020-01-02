@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Plotting tract profiles &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plotting tract profiles using RecoBundles" href="plot_recobundles.html" />
+    <link rel="prev" title="AFQ API" href="plot_afq_api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-tract-profile-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="plotting-tract-profiles">
+<span id="sphx-glr-auto-examples-plot-tract-profile-py"></span><h1>Plotting tract profiles<a class="headerlink" href="#plotting-tract-profiles" title="Permalink to this headline">¶</a></h1>
+<p>An example of tracking and segmenting two tracts, and plotting their tract
+profiles for FA (calculated with DTI). This example uses the Yeatman et al.
+waypoint ROI approach, first described in <a class="reference internal" href="../index.html#yeatman2012" id="id1"><span>[Yeatman2012]</span></a> and further elaborated
+in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014]</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="k">import</span> <span class="n">fetcher</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="k">import</span> <span class="n">save_tractogram</span><span class="p">,</span> <span class="n">load_tractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="k">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="k">import</span> <span class="n">StatefulTractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="k">import</span> <span class="n">Space</span>
+
+<span class="kn">from</span> <span class="nn">AFQ</span> <span class="k">import</span> <span class="n">api</span>
+<span class="kn">import</span> <span class="nn">AFQ.utils.streamlines</span> <span class="k">as</span> <span class="nn">aus</span>
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">import</span> <span class="nn">AFQ.dti</span> <span class="k">as</span> <span class="nn">dti</span>
+<span class="kn">import</span> <span class="nn">AFQ.segmentation</span> <span class="k">as</span> <span class="nn">seg</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.volume</span> <span class="k">import</span> <span class="n">patch_up_roi</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/arokem/.virtualenvs/afq/lib/python3.7/site-packages/dipy/stats/__init__.py:7: UserWarning: The `dipy.stats` module is still under heavy development and functionality, as well as the API is likely to change in future versions of the software
+  warnings.warn(w_string)
+/Users/arokem/.virtualenvs/afq/lib/python3.7/site-packages/dask/config.py:168: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
+  data = yaml.load(f.read()) or {}
+</pre></div>
+</div>
+<div class="section" id="get-example-data">
+<h2>Get example data:<a class="headerlink" href="#get-example-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span><span class="p">()</span>
+<span class="n">hardi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
+<span class="n">hardi_fdata</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbval</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbvec</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/.dipy/stanford_hardi
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculate-dti">
+<h2>Calculate DTI:<a class="headerlink" href="#calculate-dti" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">):</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
+                             <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_params.nii.gz&#39;</span><span class="p">}</span>
+
+<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
+<span class="n">FA_data</span> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Calculating DTI...
+</pre></div>
+</div>
+</div>
+<div class="section" id="register-the-individual-data-to-a-template">
+<h2>Register the individual data to a template:<a class="headerlink" href="#register-the-individual-data-to-a-template" title="Permalink to this headline">¶</a></h2>
+<p>For the purpose of bundle segmentation, the individual brain is registered
+to the MNI T2 template. The waypoint ROIs used in segmentation are then each
+brought into each subject’s native space to test streamlines for whether they
+fulfill the segmentation criteria.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Here, we calculate just a non-linear transformation between the
+individual’s brain and the MNI T2 template. In practice, it’s a good idea
+to also perform a pre-alignment using an affine transformation. We don’t
+do that here, but this is part of the full pipeline implemented in the
+CLI.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
+<span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
+    <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
+
+    <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Registering to template...
+Data size is approximately 70MB
+Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/.dipy/mni_template
+</pre></div>
+</div>
+</div>
+<div class="section" id="read-in-bundle-specification">
+<h2>Read in bundle specification<a class="headerlink" href="#read-in-bundle-specification" title="Permalink to this headline">¶</a></h2>
+<p>The waypoint ROIs, in addition to bundle probability maps are stored in this
+data structure. The templates are first resampled into the MNI space, before
+they are brought into the subject’s individual native space.
+For speed, we only segment two bundles here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">],</span>
+                               <span class="n">resample_to</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/AFQ_data/templates
+Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/AFQ_data/callosum_templates
+</pre></div>
+</div>
+</div>
+<div class="section" id="tracking">
+<h2>Tracking<a class="headerlink" href="#tracking" title="Permalink to this headline">¶</a></h2>
+<p>Streamlines are generate using DTI and a deterministic tractography algorithm.
+For speed, we seed only within the waypoint ROIs for each bundle.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">):</span>
+    <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">patch_up_roi</span><span class="p">(</span>
+                    <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                        <span class="n">roi</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                        <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span>
+
+                <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                         <span class="n">f</span><span class="s2">&quot;</span><span class="si">{bundle}</span><span class="s2">_{idx+1}.nii.gz&quot;</span><span class="p">)</span>
+                <span class="c1"># Add voxels that aren&#39;t there yet:</span>
+                <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seed_roi</span><span class="p">,</span> <span class="n">warped_roi</span><span class="p">)</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">seed_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><span class="n">seed_roi</span><span class="p">,</span>
+                    <span class="n">stop_mask</span><span class="o">=</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;./dti_streamlines.trk&#39;</span><span class="p">,</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="s1">&#39;./dti_streamlines.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+
+<span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Tracking...
+</pre></div>
+</div>
+</div>
+<div class="section" id="segmentation">
+<h2>Segmentation<a class="headerlink" href="#segmentation" title="Permalink to this headline">¶</a></h2>
+<p>In this stage, streamlines are tested for several criteria: whether the
+probability that they belong to a bundle is larger than a threshold (set to 0,
+per default), whether they pass through inclusion ROIs and whether they do not
+pass through exclusion ROIs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segmenting fiber groups...&quot;</span><span class="p">)</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
+                     <span class="n">sft</span><span class="p">,</span>
+                     <span class="n">fdata</span><span class="o">=</span><span class="n">hardi_fdata</span><span class="p">,</span>
+                     <span class="n">fbval</span><span class="o">=</span><span class="n">hardi_fbval</span><span class="p">,</span>
+                     <span class="n">fbvec</span><span class="o">=</span><span class="n">hardi_fbvec</span><span class="p">,</span>
+                     <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+                     <span class="n">reg_template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+
+<span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
+Dataset is already in place. If you want to fetch it again please first remove the folder /Users/arokem/AFQ_data/aal_atlas
+
+  0%|          | 0/1893 [00:00&lt;?, ?it/s]
+ 37%|###6      | 698/1893 [00:00&lt;00:00, 6913.77it/s]
+ 61%|######    | 1151/1893 [00:00&lt;00:00, 5953.45it/s]
+ 76%|#######5  | 1432/1893 [00:00&lt;00:00, 3472.76it/s]
+100%|##########| 1893/1893 [00:00&lt;00:00, 4497.37it/s]
+
+  0%|          | 0/1532 [00:00&lt;?, ?it/s]
+ 17%|#6        | 259/1532 [00:00&lt;00:00, 2585.66it/s]
+ 25%|##4       | 379/1532 [00:00&lt;00:00, 1917.60it/s]
+ 34%|###3      | 518/1532 [00:00&lt;00:00, 1720.88it/s]
+100%|##########| 1532/1532 [00:00&lt;00:00, 3840.58it/s]
+
+  0%|          | 0/2008 [00:00&lt;?, ?it/s]
+ 13%|#3        | 269/2008 [00:00&lt;00:00, 2643.74it/s]
+ 23%|##3       | 469/2008 [00:00&lt;00:00, 2409.54it/s]
+ 29%|##9       | 585/2008 [00:00&lt;00:01, 1163.45it/s]
+ 34%|###3      | 682/2008 [00:00&lt;00:01, 818.48it/s]
+ 38%|###8      | 765/2008 [00:00&lt;00:02, 620.80it/s]
+ 42%|####1     | 835/2008 [00:00&lt;00:02, 573.61it/s]
+ 45%|####4     | 899/2008 [00:01&lt;00:02, 508.52it/s]
+ 48%|####7     | 956/2008 [00:01&lt;00:02, 509.44it/s]
+ 50%|#####     | 1011/2008 [00:01&lt;00:02, 418.59it/s]
+ 53%|#####2    | 1059/2008 [00:01&lt;00:02, 430.31it/s]
+ 55%|#####5    | 1106/2008 [00:01&lt;00:02, 435.05it/s]
+ 57%|#####7    | 1153/2008 [00:01&lt;00:01, 427.70it/s]
+ 61%|######1   | 1225/2008 [00:01&lt;00:01, 485.47it/s]
+ 64%|######4   | 1291/2008 [00:01&lt;00:01, 526.08it/s]
+ 68%|######8   | 1371/2008 [00:02&lt;00:01, 586.03it/s]
+ 73%|#######2  | 1457/2008 [00:02&lt;00:00, 647.51it/s]
+ 76%|#######6  | 1534/2008 [00:02&lt;00:00, 678.80it/s]
+ 80%|########  | 1615/2008 [00:02&lt;00:00, 711.48it/s]
+ 85%|########4 | 1701/2008 [00:02&lt;00:00, 749.64it/s]
+ 89%|########8 | 1779/2008 [00:02&lt;00:00, 756.40it/s]
+ 93%|#########2| 1867/2008 [00:02&lt;00:00, 789.59it/s]
+ 97%|#########7| 1954/2008 [00:02&lt;00:00, 810.44it/s]
+100%|##########| 2008/2008 [00:02&lt;00:00, 712.45it/s]
+
+  0%|          | 0/1698 [00:00&lt;?, ?it/s]
+  7%|6         | 113/1698 [00:00&lt;00:01, 1124.65it/s]
+ 13%|#2        | 215/1698 [00:00&lt;00:01, 1090.34it/s]
+ 19%|#9        | 324/1698 [00:00&lt;00:01, 1087.93it/s]
+ 25%|##4       | 421/1698 [00:00&lt;00:01, 1048.65it/s]
+ 30%|##9       | 501/1698 [00:00&lt;00:01, 940.06it/s]
+ 34%|###4      | 579/1698 [00:00&lt;00:01, 852.15it/s]
+ 39%|###8      | 655/1698 [00:00&lt;00:01, 797.43it/s]
+ 43%|####2     | 729/1698 [00:00&lt;00:01, 752.70it/s]
+ 47%|####7     | 801/1698 [00:00&lt;00:01, 719.60it/s]
+ 51%|#####1    | 871/1698 [00:01&lt;00:01, 621.85it/s]
+ 55%|#####5    | 934/1698 [00:01&lt;00:01, 529.97it/s]
+ 58%|#####8    | 990/1698 [00:01&lt;00:01, 523.72it/s]
+ 62%|######1   | 1052/1698 [00:01&lt;00:01, 547.46it/s]
+ 66%|######5   | 1114/1698 [00:01&lt;00:01, 565.41it/s]
+ 70%|######9   | 1187/1698 [00:01&lt;00:00, 606.26it/s]
+ 85%|########5 | 1446/1698 [00:01&lt;00:00, 787.10it/s]
+100%|##########| 1698/1698 [00:01&lt;00:00, 941.81it/s]
+</pre></div>
+</div>
+</div>
+<div class="section" id="cleaning">
+<h2>Cleaning<a class="headerlink" href="#cleaning" title="Permalink to this headline">¶</a></h2>
+<p>Each fiber group is cleaned to exclude streamlines that are outliers in terms
+of their trajector and/or length.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning fiber groups...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Cleaning </span><span class="si">{bundle}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Before cleaning: {len(fiber_groups[bundle][&#39;sl&#39;])} streamlines&quot;</span><span class="p">)</span>
+    <span class="n">new_fibers</span><span class="p">,</span> <span class="n">idx_in_bundle</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">clean_bundle</span><span class="p">(</span>
+        <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
+        <span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Afer cleaning: {len(new_fibers)} streamlines&quot;</span><span class="p">)</span>
+
+    <span class="n">idx_in_global</span> <span class="o">=</span> <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">][</span><span class="n">idx_in_bundle</span><span class="p">]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{bundle}</span><span class="s1">_idx.npy&#39;</span><span class="p">,</span> <span class="n">idx_in_global</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">new_fibers</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                             <span class="n">img</span><span class="p">,</span>
+                             <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;./</span><span class="si">{bundle}</span><span class="s1">_afq.trk&#39;</span><span class="p">,</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cleaning fiber groups...
+Cleaning CST_R
+Before cleaning: 37 streamlines
+Afer cleaning: 36 streamlines
+Cleaning CST_L
+Before cleaning: 53 streamlines
+Afer cleaning: 48 streamlines
+Cleaning ARC_R
+Before cleaning: 8 streamlines
+Afer cleaning: 8 streamlines
+Cleaning ARC_L
+Before cleaning: 25 streamlines
+Afer cleaning: 25 streamlines
+</pre></div>
+</div>
+</div>
+<div class="section" id="bundle-profiles">
+<h2>Bundle profiles<a class="headerlink" href="#bundle-profiles" title="Permalink to this headline">¶</a></h2>
+<p>Streamlines are represented in the original diffusion space (<cite>Space.VOX</cite>) and
+scalar properties along the length of each bundle are queried from this scalar
+data. Here, the contribution of each streamline is weighted according to how
+representative this streamline is of the bundle overall.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./</span><span class="si">{bundle}</span><span class="s1">_afq.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                          <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../_images/sphx_glr_plot_tract_profile_001.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_001.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_tract_profile_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_002.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_tract_profile_003.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_003.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_tract_profile_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_004.png" />
+</li>
+</ul>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Extracting tract profiles...
+/Users/arokem/source/pyAFQ/examples/plot_tract_profile.py:198: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
+</pre></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="citation">
+<dt class="label" id="yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
+<dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian
+A Wandell, Heidi M Feldman, “Tract profiles of white matter
+properties: automating fiber-tract quantification”, PloS One,
+7: e49790</p>
+</dd>
+<dt class="label" id="yeatman2014"><span class="brackets"><a class="fn-backref" href="#id2">Yeatman2014</a></span></dt>
+<dd><p>Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
+“Lifespan maturation and degeneration of human brain white
+matter”, Nature Communications 5: 4932</p>
+</dd>
+</dl>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  24.762 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/9c96ba129e99d6bf1eb1895a3814cd2c/plot_tract_profile.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_tract_profile.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_afq_api.html" title="previous chapter">AFQ API</a></li>
+      <li>Next: <a href="plot_recobundles.html" title="next chapter">Plotting tract profiles using RecoBundles</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/plot_tract_profile.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

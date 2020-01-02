@@ -1,0 +1,21 @@
+:mod:`AFQ.utils.bin`
+====================
+
+.. py:module:: AFQ.utils.bin
+
+
+Module Contents
+---------------
+
+.. function:: parse_string(option, opt, value, parser)
+
+
+.. function:: model_input_parser(usage)
+
+
+.. function:: model_predict_input_parser(usage)
+
+
+.. function:: get_default_args(func)
+
+

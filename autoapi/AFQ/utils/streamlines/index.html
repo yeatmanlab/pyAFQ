@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.utils.streamlines &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="AFQ.utils.volume" href="../volume/index.html" />
+    <link rel="prev" title="AFQ.utils.parallel" href="../parallel/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.utils.streamlines">
+<span id="afq-utils-streamlines"></span><h1><a class="reference internal" href="#module-AFQ.utils.streamlines" title="AFQ.utils.streamlines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a><a class="headerlink" href="#module-AFQ.utils.streamlines" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AFQ.utils.streamlines.add_bundles">
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">add_bundles</code><span class="sig-paren">(</span><em class="sig-param">t1</em>, <em class="sig-param">t2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#add_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.add_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine two bundles, using the second bundles’ affine and
+data_per_streamline keys.</p>
+<blockquote>
+<div><p>Parameters</p>
+</div></blockquote>
+<p>t1, t2 : nib.streamlines.Tractogram class instances</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.utils.streamlines.bundles_to_tgram">
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">bundles_to_tgram</code><span class="sig-paren">(</span><em class="sig-param">bundles</em>, <em class="sig-param">bundle_dict</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#bundles_to_tgram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.bundles_to_tgram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a StatefulTractogram object from bundles and their
+specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bundles: dict</strong></dt><dd><p>Each item in the dict is the streamlines of a particular bundle.</p>
+</dd>
+<dt><strong>bundle_dict: dict</strong></dt><dd><p>A bundle specification dictionary. Each item includes in particular a
+<cite>uid</cite> key that is a unique integer for that bundle.</p>
+</dd>
+<dt><strong>reference</strong><span class="classifier">Nifti</span></dt><dd><p>The affine_to_rasmm input to <cite>nib.streamlines.Tractogram</cite></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.utils.streamlines.tgram_to_bundles">
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">tgram_to_bundles</code><span class="sig-paren">(</span><em class="sig-param">tgram</em>, <em class="sig-param">bundle_dict</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#tgram_to_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.tgram_to_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a StatefulTractogram object to a dict with StatefulTractogram
+objects for each bundle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tgram</strong><span class="classifier">StatefulTractogram class instance.</span></dt><dd><p>Requires a data_per_streamline[‘bundle’][bundle_name][‘uid’] attribute.</p>
+</dd>
+<dt><strong>bundle_dict: dict</strong></dt><dd><p>A bundle specification dictionary. Each item includes in particular a
+<cite>uid</cite> key that is a unique integer for that bundle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.utils.streamlines.split_streamline">
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">split_streamline</code><span class="sig-paren">(</span><em class="sig-param">streamlines</em>, <em class="sig-param">sl_to_split</em>, <em class="sig-param">split_idx</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#split_streamline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.split_streamline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a Streamlines object, split one of the underlying streamlines</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>streamlines</strong><span class="classifier">a Streamlines class instance</span></dt><dd><p>The group of streamlines, one of which is being split.</p>
+</dd>
+<dt><strong>sl_to_split</strong><span class="classifier">int</span></dt><dd><p>The index of the streamline that is being split</p>
+</dd>
+<dt><strong>split_idx</strong><span class="classifier">int</span></dt><dd><p>Where is the streamline being split</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><ul>
+      <li>Previous: <a href="../parallel/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.parallel</span></code></a></li>
+      <li>Next: <a href="../volume/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/AFQ/utils/streamlines/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

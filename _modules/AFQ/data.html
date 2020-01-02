@@ -1,0 +1,963 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for AFQ.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">import</span> <span class="nn">s3fs</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="k">import</span> <span class="n">_make_fetcher</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="k">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.metric</span> <span class="k">import</span> <span class="p">(</span><span class="n">AveragePointwiseEuclideanMetric</span><span class="p">,</span>
+                                 <span class="n">ResampleFeature</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">dipy.segment.clustering</span> <span class="k">import</span> <span class="n">QuickBundles</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fetch_callosum_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_callosum_templates&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;fetch_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch_hcp&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;read_stanford_hardi_tractography&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;organize_stanford_data&quot;</span><span class="p">]</span>
+
+<span class="n">afq_home</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">)</span>
+
+<span class="n">baseurl</span> <span class="o">=</span> <span class="s2">&quot;https://ndownloader.figshare.com/files/&quot;</span>
+
+<span class="n">callosum_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Callosum_midsag.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_AntFrontal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_Motor.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_Occipital.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_Orbital.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_PostParietal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_SupFrontal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_SupParietal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;L_Temporal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_AntFrontal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_Motor.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_Occipital.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_Orbital.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_PostParietal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_SupFrontal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_SupParietal.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;R_Temporal.nii.gz&quot;</span><span class="p">]</span>
+
+<span class="n">callosum_remote_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;5273794&quot;</span><span class="p">,</span> <span class="s2">&quot;5273797&quot;</span><span class="p">,</span> <span class="s2">&quot;5273800&quot;</span><span class="p">,</span> <span class="s2">&quot;5273803&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273806&quot;</span><span class="p">,</span> <span class="s2">&quot;5273809&quot;</span><span class="p">,</span> <span class="s2">&quot;5273812&quot;</span><span class="p">,</span> <span class="s2">&quot;5273815&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273821&quot;</span><span class="p">,</span> <span class="s2">&quot;5273818&quot;</span><span class="p">,</span> <span class="s2">&quot;5273824&quot;</span><span class="p">,</span> <span class="s2">&quot;5273827&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273830&quot;</span><span class="p">,</span> <span class="s2">&quot;5273833&quot;</span><span class="p">,</span> <span class="s2">&quot;5273836&quot;</span><span class="p">,</span> <span class="s2">&quot;5273839&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273842&quot;</span><span class="p">]</span>
+
+<span class="n">callosum_md5_hashes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;709fa90baadeacd64f1d62b5049a4125&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;987c6169de807c4e93dc2cbd7a25d506&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;0da114123d0b0097b96fe450a459550b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;6d845bd10504f67f1dc17f9000076d7e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;e16c7873ef4b08d26b77ef746dab8237&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;47193fd4df1ea17367817466de798b90&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;7e78bf9671e6945f4b2f5e7c30595a3c&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;8adbb947377ff7b484c88d8c0ffc2125&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;0fd981a4d0847e0642ff96e84fe44e47&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;87c4855efa406d8fb004cffb8259180e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;c7969bcf5f2343fd9ce9c49b336cf14c&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;bb4372b88991932150205ffb22aa6cb7&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d198d4e7db18ddc7236cf143ecb8342e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d0f6edef64b0c710c92e634496085dda&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;85eaee44665f244db5adae2e259833f6&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;25f24eb22879a05d12bda007c81ea55a&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;2664e0b8c2d9c59f13649a89bfcce399&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="fetch_callosum_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_callosum_templates">[docs]</a><span class="n">fetch_callosum_templates</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span><span class="s2">&quot;fetch_callosum_templates&quot;</span><span class="p">,</span>
+                                         <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+                                                 <span class="s1">&#39;callosum_templates&#39;</span><span class="p">),</span>
+                                         <span class="n">baseurl</span><span class="p">,</span> <span class="n">callosum_remote_fnames</span><span class="p">,</span>
+                                         <span class="n">callosum_fnames</span><span class="p">,</span>
+                                         <span class="n">md5_list</span><span class="o">=</span><span class="n">callosum_md5_hashes</span><span class="p">,</span>
+                                         <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download AFQ callosum templates&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_callosum_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_callosum_templates">[docs]</a><span class="k">def</span> <span class="nf">read_callosum_templates</span><span class="p">(</span><span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load AFQ callosum templates from file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict with: keys: names of template ROIs and values: nibabel Nifti1Image</span>
+<span class="sd">    objects from each of the ROI nifti files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_callosum_templates</span><span class="p">()</span>
+    <span class="n">template_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">resample_to</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                                               <span class="n">resample_to</span><span class="p">,</span>
+                                               <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                               <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                                  <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+        <span class="n">template_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
+    <span class="k">return</span> <span class="n">template_dict</span></div>
+
+
+<span class="n">template_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ATR_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ATR_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ATR_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ATR_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ATR_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ATR_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CGC_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CST_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FA_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FA_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FA_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FP_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FP_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;FP_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;HCC_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;IFO_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ILF_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLFt_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLFt_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SLF_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_roi1_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_roi2_L.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;UNC_R_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ARC_L_prob_map.nii.gz&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;ARC_R_prob_map.nii.gz&quot;</span><span class="p">]</span>
+
+
+<span class="n">template_remote_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;5273680&quot;</span><span class="p">,</span> <span class="s2">&quot;5273683&quot;</span><span class="p">,</span> <span class="s2">&quot;5273686&quot;</span><span class="p">,</span> <span class="s2">&quot;5273689&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458274&quot;</span><span class="p">,</span> <span class="s2">&quot;11458277&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273695&quot;</span><span class="p">,</span> <span class="s2">&quot;5273692&quot;</span><span class="p">,</span> <span class="s2">&quot;5273698&quot;</span><span class="p">,</span> <span class="s2">&quot;5273701&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458268&quot;</span><span class="p">,</span> <span class="s2">&quot;11458271&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273704&quot;</span><span class="p">,</span> <span class="s2">&quot;5273707&quot;</span><span class="p">,</span> <span class="s2">&quot;5273710&quot;</span><span class="p">,</span> <span class="s2">&quot;5273713&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458262&quot;</span><span class="p">,</span> <span class="s2">&quot;11458265&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273716&quot;</span><span class="p">,</span> <span class="s2">&quot;5273719&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458220&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273722&quot;</span><span class="p">,</span> <span class="s2">&quot;5273725&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458226&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273728&quot;</span><span class="p">,</span> <span class="s2">&quot;5273731&quot;</span><span class="p">,</span> <span class="s2">&quot;5273734&quot;</span><span class="p">,</span> <span class="s2">&quot;5273746&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458259&quot;</span><span class="p">,</span> <span class="s2">&quot;11458256&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273737&quot;</span><span class="p">,</span> <span class="s2">&quot;5273740&quot;</span><span class="p">,</span> <span class="s2">&quot;5273743&quot;</span><span class="p">,</span> <span class="s2">&quot;5273749&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458250&quot;</span><span class="p">,</span> <span class="s2">&quot;11458253&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273752&quot;</span><span class="p">,</span> <span class="s2">&quot;5273755&quot;</span><span class="p">,</span> <span class="s2">&quot;5273758&quot;</span><span class="p">,</span> <span class="s2">&quot;5273761&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458244&quot;</span><span class="p">,</span> <span class="s2">&quot;11458247&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273764&quot;</span><span class="p">,</span> <span class="s2">&quot;5273767&quot;</span><span class="p">,</span> <span class="s2">&quot;5273770&quot;</span><span class="p">,</span> <span class="s2">&quot;5273773&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273776&quot;</span><span class="p">,</span> <span class="s2">&quot;5273791&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458238&quot;</span><span class="p">,</span> <span class="s2">&quot;11458241&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273779&quot;</span><span class="p">,</span> <span class="s2">&quot;5273782&quot;</span><span class="p">,</span> <span class="s2">&quot;5273785&quot;</span><span class="p">,</span> <span class="s2">&quot;5273788&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458223&quot;</span><span class="p">,</span> <span class="s2">&quot;11458229&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;11458232&quot;</span><span class="p">,</span> <span class="s2">&quot;11458235&quot;</span><span class="p">]</span>
+
+
+<span class="n">template_md5_hashes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;6b7aaed1a2982fd0ea436a223133908b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;fd60d46d4e3cbd906c86e4c9e4fd6e2a&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;3aba60b169a35c38640de4ec29d362c8&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;12716a5688a1809fbaed1d58d2e68b59&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;c5637f471df861d9bbb45604db34770b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;850cc4c04d7241747063fe3cd440b2ce&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;8e8973bc7838c8744914d402f52d91ca&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;c5fa4e6e685e695c006823b6784d2407&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;e1fab77f21d5303ed52285f015e24f0b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;5f89defec3753fd75cd688c7bfb20a36&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;a4f3cd65b06fb25f63d5dab7592f00f2&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;7e73ab02db30a3ad6bd9e82148c2486e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;f9db3154955a20b67c2dda758800d14c&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;73941510c798c1ed1b03e2bd481cd5c7&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;660cdc031ee0716d60159c7d933119ea&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;660cdc031ee0716d60159c7d933119ea&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;fd012bc89f6bed7bd54530195496bac4&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;3406906a86e633cc102127cf210a1063&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;9040a7953dcbbf131d135c866182d8ef&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;a72e17194824fcd838a594a2eb50c72e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;627d7bb2e6d55f8243da815a36d9ff1a&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;55adbe9b8279185eedbe342149e1ff90&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;5a7412a3cf0fb185eec53d1989df2f7c&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;1aa36e83ae7b5555bb19d776ede9c18d&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;ba453196ff179b0e31172806e313b52c&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d85c6574526b296935f34bf4f65cd493&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;9b81646317f59c7db087f27e2f85679e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;9806e82c250e4604534b96917f87b7e8&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;213d3fb1ccd756d878f9b50b765b1c8f&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;f1e7e6bc51aa0aa279c54fb3805fb5e3&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;0e68a9feaaddcc9b4d667c2f15903368&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d45020a87ee4bb496edd350631d91f6a&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;75c2c911826ec4b23159f9bd80e3c039&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;55d616ea9e0c646adc1aafa0f5fbe625&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;dee83fa6b03cfa5e0f5c965953aa6778&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;a13eef7059c98568adfefbab660e434e&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;045b7d5c6341997f3f0120c3a4212ad8&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d174b1359ba982b03840436c93b7bbb4&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;fff9753f394fc4c73fb2ae40b3b4dde0&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;cd278b4dd6ff77481ea9ac16485a5ae2&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;7bdf5111265107091c7a2fca9215de30&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;7d4a43714504e6e930f922c9bc2a13d5&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;af2bcedf47e193686af329b9a8e259da&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;9a1122943579d11ba169d3ad87a75625&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;627903f7a06627bfd4153dc9245fa390&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;1714cd7f989c3435bdd5a2076e6272a0&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;1fa2114049707a4e05b53f9d95730375&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;b6663067d5ea53c70cb8803948f8adf7&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d3e068997ebc60407bd6e9576e47dede&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;27ecfbd1d2f98213e52d73b7d70fe0e7&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;fa141bb2d951bec486916acda3652d95&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d391d073e86e28588be9a6d01b2e7a82&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;a3e085562e6b8111c7ebc358f9450c8b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;d65c67910807504735e034f7ea92d590&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;93cb24a9128db1a6c34a09eaf79fe7f0&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;71a7455cb4062dc39b1677c118c7b5a5&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;19590c712f1776da1fdba64d4eb7f1f6&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;04d5af0feb2c1b5b52a87ccbbf148e4b&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;53c277be990d00f7de04f2ea35e74d73&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="fetch_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_templates">[docs]</a><span class="n">fetch_templates</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span><span class="s2">&quot;fetch_templates&quot;</span><span class="p">,</span>
+                                <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">),</span>
+                                <span class="n">baseurl</span><span class="p">,</span> <span class="n">template_remote_fnames</span><span class="p">,</span>
+                                <span class="n">template_fnames</span><span class="p">,</span> <span class="n">md5_list</span><span class="o">=</span><span class="n">template_md5_hashes</span><span class="p">,</span>
+                                <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download AFQ templates&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_templates">[docs]</a><span class="k">def</span> <span class="nf">read_templates</span><span class="p">(</span><span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load AFQ templates from file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict with: keys: names of template ROIs and values: nibabel Nifti1Image</span>
+<span class="sd">    objects from each of the ROI nifti files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_templates</span><span class="p">()</span>
+    <span class="n">template_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">resample_to</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                                               <span class="n">resample_to</span><span class="p">,</span>
+                                               <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                               <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                                  <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+        <span class="n">template_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
+
+    <span class="k">return</span> <span class="n">template_dict</span></div>
+
+
+<div class="viewcode-block" id="fetch_hcp"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_hcp">[docs]</a><span class="k">def</span> <span class="nf">fetch_hcp</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span>
+              <span class="n">hcp_bucket</span><span class="o">=</span><span class="s1">&#39;hcp-openaccess&#39;</span><span class="p">,</span>
+              <span class="n">profile_name</span><span class="o">=</span><span class="s2">&quot;hcp&quot;</span><span class="p">,</span>
+              <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">aws_access_key_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetch HCP diffusion data and arrange it in a manner that resembles the</span>
+<span class="sd">    BIDS [1]_ specification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    subjects : list</span>
+<span class="sd">        Each item is an integer, identifying one of the HCP subjects</span>
+<span class="sd">    hcp_bucket : string, optional</span>
+<span class="sd">        The name of the HCP S3 bucket. Default: &quot;hcp-openaccess&quot;</span>
+<span class="sd">    profile_name : string, optional</span>
+<span class="sd">        The name of the AWS profile used for access. Default: &quot;hcp&quot;</span>
+<span class="sd">    path : string, optional</span>
+<span class="sd">        Path to save files into. Default: &#39;~/AFQ_data&#39;</span>
+<span class="sd">    aws_access_key_id : string, optional</span>
+<span class="sd">        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is</span>
+<span class="sd">        set to False.</span>
+<span class="sd">    aws_secret_access_key : string, optional</span>
+<span class="sd">        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is</span>
+<span class="sd">        set to False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict with remote and local names of these files.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    To use this function with its default setting, you need to have a</span>
+<span class="sd">    file &#39;~/.aws/credentials&#39;, that includes a section:</span>
+
+<span class="sd">    [hcp]</span>
+<span class="sd">    AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX</span>
+<span class="sd">    AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX</span>
+
+<span class="sd">    The keys are credentials that you can get from HCP</span>
+<span class="sd">    (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa</span>
+
+<span class="sd">    Local filenames are changed to match our expected conventions.</span>
+
+<span class="sd">    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,</span>
+<span class="sd">           a format for organizing and describing outputs of neuroimaging</span>
+<span class="sd">           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">profile_name</span><span class="p">:</span>
+        <span class="n">boto3</span><span class="o">.</span><span class="n">setup_default_session</span><span class="p">(</span><span class="n">profile_name</span><span class="o">=</span><span class="n">profile_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">aws_access_key_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">aws_secret_access_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">boto3</span><span class="o">.</span><span class="n">setup_default_session</span><span class="p">(</span>
+            <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key_id</span><span class="p">,</span>
+            <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">aws_secret_access_key</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must provide either a `profile_name` or &quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;both `aws_access_key_id` and &quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;`aws_secret_access_key` as input to &#39;fetch_hcp&#39;&quot;</span><span class="p">)</span>
+
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+    <span class="n">bucket</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">hcp_bucket</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">afq_home</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base_dir</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="n">base_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;HCP&#39;</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">base_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">data_files</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">subjects</span><span class="p">:</span>
+        <span class="c1"># We make a single session folder per subject for this case, because</span>
+        <span class="c1"># AFQ api expects session structure:</span>
+        <span class="n">sub_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)</span>
+        <span class="n">sess_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">,</span> <span class="s2">&quot;sess-01&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sub_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;anat&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data_files</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">_dwi.bval&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)]</span> <span class="o">=</span>\
+            <span class="s1">&#39;HCP_1200/</span><span class="si">%s</span><span class="s1">/T1w/Diffusion/bvals&#39;</span> <span class="o">%</span> <span class="n">subject</span>
+        <span class="n">data_files</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">_dwi.bvec&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)]</span> <span class="o">=</span>\
+            <span class="s1">&#39;HCP_1200/</span><span class="si">%s</span><span class="s1">/T1w/Diffusion/bvecs&#39;</span> <span class="o">%</span> <span class="n">subject</span>
+        <span class="n">data_files</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">_dwi.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)]</span> <span class="o">=</span>\
+            <span class="s1">&#39;HCP_1200/</span><span class="si">%s</span><span class="s1">/T1w/Diffusion/data.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span>
+        <span class="n">data_files</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;anat&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">_T1w.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)]</span> <span class="o">=</span>\
+            <span class="s1">&#39;HCP_1200/</span><span class="si">%s</span><span class="s1">/T1w/T1w_acpc_dc.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span>
+        <span class="n">data_files</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sess_dir</span><span class="p">,</span> <span class="s1">&#39;anat&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;sub-</span><span class="si">%s</span><span class="s1">_aparc+aseg.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span><span class="p">)]</span> <span class="o">=</span>\
+            <span class="s1">&#39;HCP_1200/</span><span class="si">%s</span><span class="s1">/T1w/aparc+aseg.nii.gz&#39;</span> <span class="o">%</span> <span class="n">subject</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data_files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">bucket</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">data_files</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">k</span><span class="p">)</span>
+    <span class="c1"># Create the BIDS dataset description file text</span>
+    <span class="n">dataset_description</span> <span class="o">=</span> <span class="p">{</span>
+         <span class="s2">&quot;BIDSVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;HCP&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;Acknowledgements&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.&quot;&quot;&quot;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+         <span class="s2">&quot;Subjects&quot;</span><span class="p">:</span> <span class="n">subjects</span><span class="p">}</span>
+
+    <span class="n">desc_file</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;HCP&#39;</span><span class="p">,</span> <span class="s1">&#39;dataset_description.json&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">desc_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dataset_description</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_files</span></div>
+
+
+<span class="n">stanford_hardi_tractography_remote_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;5325715&quot;</span><span class="p">,</span> <span class="s2">&quot;5325718&quot;</span><span class="p">]</span>
+<span class="n">stanford_hardi_tractography_hashes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;6f4bdae702031a48d1cd3811e7a42ef9&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;f20854b4f710577c58bd01072cfb4de6&#39;</span><span class="p">]</span>
+<span class="n">stanford_hardi_tractography_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="fetch_stanford_hardi_tractography"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_stanford_hardi_tractography">[docs]</a><span class="n">fetch_stanford_hardi_tractography</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
+    <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+            <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">),</span>
+    <span class="n">baseurl</span><span class="p">,</span>
+    <span class="n">stanford_hardi_tractography_remote_fnames</span><span class="p">,</span>
+    <span class="n">stanford_hardi_tractography_fnames</span><span class="p">,</span>
+    <span class="n">md5_list</span><span class="o">=</span><span class="n">stanford_hardi_tractography_hashes</span><span class="p">,</span>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Download Stanford HARDI tractography and mapping. For testing</span>
+<span class="s2">           purposes&quot;&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_stanford_hardi_tractography"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_stanford_hardi_tractography">[docs]</a><span class="k">def</span> <span class="nf">read_stanford_hardi_tractography</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a minimal tractography from the Stanford dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_stanford_hardi_tractography</span><span class="p">()</span>
+    <span class="n">files_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">files_dict</span><span class="p">[</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+                <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
+
+    <span class="n">files_dict</span><span class="p">[</span><span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_trk</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+                <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">),</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>
+        <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">trk_header_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">streamlines</span>
+
+    <span class="k">return</span> <span class="n">files_dict</span></div>
+
+
+<div class="viewcode-block" id="organize_stanford_data"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.organize_stanford_data">[docs]</a><span class="k">def</span> <span class="nf">organize_stanford_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the expected file-system structure for the Stanford HARDI data-set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">afq_home</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">afq_home</span><span class="p">)</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">afq_home</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="n">base_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">base_folder</span><span class="p">):</span>
+        <span class="n">anat_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;sess-01&#39;</span><span class="p">,</span> <span class="s1">&#39;anat&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dwi_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;sess-01&#39;</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">t1_img</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_stanford_t1</span><span class="p">()</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">t1_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_T1w.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">seg_img</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_stanford_labels</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">seg_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span>
+                                  <span class="s1">&#39;sub-01_sess-01_aparc+aseg.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">dwi_img</span><span class="p">,</span> <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_stanford_hardi</span><span class="p">()</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dwi_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.bvecs&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.bvals&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
+
+    <span class="n">dataset_description</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;BIDSVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Stanford HARDI&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Subjects&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sub-01&quot;</span><span class="p">]}</span>
+
+    <span class="n">desc_file</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">,</span> <span class="s1">&#39;dataset_description.json&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">desc_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dataset_description</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></div>
+
+
+<span class="n">fetch_hcp_atlas_16_bundles</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
+    <span class="s2">&quot;fetch_hcp_atlas_16_bundles&quot;</span><span class="p">,</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+            <span class="s1">&#39;hcp_atlas_16_bundles&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;https://ndownloader.figshare.com/files/&#39;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;11921522&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;atlas_16_bundles.zip&quot;</span><span class="p">],</span>
+    <span class="n">md5_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;b071f3e851f21ba1749c02fc6beb3118&quot;</span><span class="p">],</span>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download minimal Recobundles atlas&quot;</span><span class="p">,</span>
+    <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_hcp_atlas_16_bundles</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    XXX</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bundle_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_hcp_atlas_16_bundles</span><span class="p">()</span>
+    <span class="n">whole_brain</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span>
+                                          <span class="s1">&#39;Atlas_in_MNI_Space_16_bundles&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;whole_brain&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;whole_brain_MNI.trk&#39;</span><span class="p">),</span>
+                                  <span class="s1">&#39;same&#39;</span><span class="p">,</span> <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">streamlines</span>
+    <span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">whole_brain</span>
+    <span class="n">bundle_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;Atlas_in_MNI_Space_16_bundles&quot;</span><span class="p">,</span> <span class="s2">&quot;bundles&quot;</span><span class="p">,</span> <span class="s2">&quot;*.trk&quot;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">bundle_file</span> <span class="ow">in</span> <span class="n">bundle_files</span><span class="p">:</span>
+        <span class="n">bundle</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">bundle_file</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">bundle_file</span><span class="p">,</span>
+                                                    <span class="s1">&#39;same&#39;</span><span class="p">,</span>
+                                                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>\
+            <span class="o">.</span><span class="n">streamlines</span>
+
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">ResampleFeature</span><span class="p">(</span><span class="n">nb_points</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="n">AveragePointwiseEuclideanMetric</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="n">qb</span> <span class="o">=</span> <span class="n">QuickBundles</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+        <span class="n">cluster</span> <span class="o">=</span> <span class="n">qb</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">])</span>
+        <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># For some reason, this file-name has a 0 in it, instead of an O:</span>
+    <span class="n">bundle_dict</span><span class="p">[</span><span class="s2">&quot;IFOF_R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="s2">&quot;IF0F_R&quot;</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="s2">&quot;IF0F_R&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">bundle_dict</span>
+
+
+<span class="n">fetch_aal_atlas</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
+    <span class="s2">&quot;fetch_aal_atlas&quot;</span><span class="p">,</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+            <span class="s1">&#39;aal_atlas&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;https://digital.lib.washington.edu&#39;</span> <span class="o">+</span> <span class="s1">&#39;/researchworks&#39;</span> <span class="o">+</span> \
+    <span class="s1">&#39;/bitstream/handle/1773/44951/&#39;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;MNI_AAL.txt&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;MNI_AAL.txt&quot;</span><span class="p">],</span>
+    <span class="n">md5_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;69395b75a16f00294a80eb9428bf7855&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;59fd3284b17de2fbe411ca1c7afe8c65&quot;</span><span class="p">],</span>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download the AAL atlas&quot;</span><span class="p">,</span>
+    <span class="n">unzip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_aal_atlas</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads the AAL atlas [1]_.</span>
+
+<span class="sd">    .. [1] Tzourio-Mazoyer N, Landeau B, Papathanassiou D, Crivello F, Etard O,</span>
+<span class="sd">           Delcroix N, Mazoyer B, Joliot M. (2002). Automated anatomical</span>
+<span class="sd">           labeling of activations in SPM using a macroscopic anatomical</span>
+<span class="sd">           parcellation of the MNI MRI single-subject brain. Neuroimage. 2002;</span>
+<span class="sd">           15(1):273-89.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_dict</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_aal_atlas</span><span class="p">()</span>
+    <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">):</span>
+            <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out_dict</span>
+
+
+<span class="k">def</span> <span class="nf">aal_to_regions</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Queries for large regions containing multiple AAL ROIs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    regions : string or list of strings</span>
+<span class="sd">        The name of the requested region. This can either be an AAL-defined ROI</span>
+<span class="sd">        name (e.g, &#39;Occipital_Sup_L&#39;) or one of:</span>
+<span class="sd">        {&#39;leftfrontal&#39; | &#39;leftoccipital&#39; | &#39;lefttemporal&#39; | &#39;leftparietal&#39;</span>
+<span class="sd">        | &#39;leftanttemporal&#39; | &#39;leftparietal&#39; | &#39;leftanttemporal&#39;</span>
+<span class="sd">        | &#39;leftuncinatefront&#39; | &#39;leftifoffront&#39; | &#39;leftinfparietal&#39;</span>
+<span class="sd">        | &#39;cerebellum&#39; | &#39;leftarcfrontal&#39; | &#39;leftarctemp&#39; | &#39;leftcingpost&#39;}</span>
+<span class="sd">        each of which there is an equivalent &#39;right&#39; region for. In addition,</span>
+<span class="sd">        there are a few bilateral regions: {&#39;occipital&#39; | &#39;temporal&#39;}, which</span>
+<span class="sd">        encompass both the right and left region of this name, as well as:</span>
+<span class="sd">        {&#39;cstinferior&#39; | &#39;cstsuperior&#39;}</span>
+
+<span class="sd">    atlas : 4D array</span>
+<span class="sd">       Contains the AAL atlas in the correct coordinate frame with additional</span>
+<span class="sd">       volumes for CST and cingulate ROIs (&quot;AAL and more&quot;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    3D indices to the requested region in the atlas volume</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Several regions can be referred to by multiple names:</span>
+<span class="sd">           &#39;leftuncinatetemp&#39; = &#39;leftilftemp&#39;= &#39;leftanttemporal&#39;</span>
+<span class="sd">           &#39;rightuncinatetemp&#39; = &#39;rightilftemp&#39; = &#39;rightanttemporal&#39;</span>
+<span class="sd">           &#39;leftslfpar&#39;] = &#39;leftinfparietal&#39;</span>
+<span class="sd">           &#39;rightslfpar&#39; = &#39;rightinfparietal&#39;</span>
+<span class="sd">           &#39;leftslffrontal&#39; = &#39;leftarcfrontal&#39;</span>
+<span class="sd">           &#39;rightslffrontal&#39; = &#39;rightarcfrontal&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                  <span class="c1"># Occipital regions do not include fusiform:</span>
+                  <span class="s1">&#39;leftoccipital&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">43</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                  <span class="c1"># Temporal regions include fusiform:</span>
+                  <span class="s1">&#39;lefttemporal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                                                  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">55</span><span class="p">]),</span>
+                                                  <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">79</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]),</span>
+                  <span class="s1">&#39;leftparietal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">57</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+                  <span class="s1">&#39;leftanttemporal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">87</span><span class="p">]),</span>
+                  <span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">]),</span>
+                  <span class="s1">&#39;leftifoffront&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">]),</span>
+                  <span class="s1">&#39;leftinfparietal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">61</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">65</span><span class="p">]),</span>
+                  <span class="s1">&#39;cerebellum&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">91</span><span class="p">,</span> <span class="mi">117</span><span class="p">),</span>
+                  <span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">13</span><span class="p">]),</span>
+                  <span class="s1">&#39;leftarctemp&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">79</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">89</span><span class="p">]),</span>
+                  <span class="p">}</span>
+
+    <span class="c1"># Right symmetrical is off by one:</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;righttemporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;lefttemporal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightparietal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftparietal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightuncinatefront&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightifoffront&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftifoffront&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarcfrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarctemp&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Multiply named regions:</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftuncinatetemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftilftemp&#39;</span><span class="p">]</span> <span class="o">=</span>\
+        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightuncinatetemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightilftemp&#39;</span><span class="p">]</span> <span class="o">=</span>\
+        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftslfpar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightslfpar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftslffrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">]</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightslffrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarcfrontal&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Bilateral regions:</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;occipital&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">(</span><span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span>
+                                         <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">])</span>
+    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">(</span><span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;lefttemporal&#39;</span><span class="p">],</span>
+                                        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;righttemporal&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">regions</span><span class="p">]</span>
+
+    <span class="n">idxes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>  <span class="c1"># Just to be sure</span>
+        <span class="k">if</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">atlas_vals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;cstinferior&#39;</span><span class="p">:</span>
+            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;cstsuperior&#39;</span><span class="p">:</span>
+            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;leftcingpost&#39;</span><span class="p">:</span>
+            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;rightcingpost&#39;</span><span class="p">:</span>
+            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Broadcast vals, to test for equality over all three dimensions:</span>
+        <span class="n">is_in</span> <span class="o">=</span> <span class="n">atlas</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">vol_idx</span><span class="p">]</span> <span class="o">==</span> <span class="n">vals</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="c1"># Then collapse the 4th dimension (each val), to get the 3D array:</span>
+        <span class="n">is_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">is_in</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">idxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_in</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">idxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">bundles_to_aal</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a sequence of AFQ bundle names, give back a sequence of lists</span>
+<span class="sd">    with [target0, target1] being each NX3 arrays of the endpoint indices</span>
+<span class="sd">    for the first and last node of the streamlines in this bundle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
+
+    <span class="n">endpoint_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;cstinferior&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;cstsuperior&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;cstinferior&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;cstsuperior&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftcingpost&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightcingpost&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;HCC_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;HCC_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftifoffront&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightifoffront&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftilftemp&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightilftemp&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftslffrontal&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightslffrontal&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightuncinatefront&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftarctemp&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]]}</span>
+
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+        <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">endpoint_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aal_to_regions</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="n">atlas</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">targets</span>
+
+
+<span class="k">def</span> <span class="nf">s3fs_nifti_write</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write a nifti file straight to S3</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    img : nib.Nifti1Image class instance</span>
+<span class="sd">        The image containing data to be written into S3</span>
+<span class="sd">    fname : string</span>
+<span class="sd">        Full path (including bucket name and extension) to the S3 location</span>
+<span class="sd">        where the file is to be saved.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+
+    <span class="n">bio</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">file_map</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">make_file_map</span><span class="p">({</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">bio</span><span class="p">,</span> <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">bio</span><span class="p">})</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">to_file_map</span><span class="p">(</span><span class="n">file_map</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">s3fs_nifti_read</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lazily reads a nifti image from S3.</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    fname : string</span>
+<span class="sd">        Full path (including bucket name and extension) to the S3 location</span>
+<span class="sd">        of the file to be read.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nib.Nifti1Image class instance</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Because the image is lazily loaded, data stored in the file</span>
+<span class="sd">    is not transferred until `get_fdata` is called.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">zz</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+        <span class="n">rr</span> <span class="o">=</span> <span class="n">zz</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">FileHolder</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">bb</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="o">.</span><span class="n">from_file_map</span><span class="p">({</span><span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">fh</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">fh</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">img</span>
+
+
+<span class="k">def</span> <span class="nf">write_json</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write data to JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the file to write.</span>
+
+<span class="sd">    data : dict</span>
+<span class="sd">        A dict containing the data to write.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read data from a JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the data-containing file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">s3fs_json_read</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads json directly from S3</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path (including bucket name and extension) to the file on S3.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">s3fs_json_write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes json from a dict directly into S3</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : dict</span>
+<span class="sd">        The json to be written out</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path (including bucket name and extension) to the file to</span>
+<span class="sd">        be written out on S3</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../AFQ.html">AFQ</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

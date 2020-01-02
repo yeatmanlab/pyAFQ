@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.tractography &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AFQ.viz" href="../viz/index.html" />
+    <link rel="prev" title="AFQ.segmentation" href="../segmentation/index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.tractography">
+<span id="afq-tractography"></span><h1><a class="reference internal" href="#module-AFQ.tractography" title="AFQ.tractography"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><a class="headerlink" href="#module-AFQ.tractography" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AFQ.tractography.track">
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param">params_file</em>, <em class="sig-param">directions='det'</em>, <em class="sig-param">max_angle=30.0</em>, <em class="sig-param">sphere=None</em>, <em class="sig-param">seed_mask=None</em>, <em class="sig-param">n_seeds=1</em>, <em class="sig-param">random_seeds=False</em>, <em class="sig-param">stop_mask=None</em>, <em class="sig-param">stop_threshold=0</em>, <em class="sig-param">step_size=0.5</em>, <em class="sig-param">min_length=10</em>, <em class="sig-param">max_length=1000</em>, <em class="sig-param">odf_model='DTI'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tractography</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>params_file</strong><span class="classifier">str, nibabel img.</span></dt><dd><p>Full path to a nifti file containing CSD spherical harmonic
+coefficients, or nibabel img with model params.</p>
+</dd>
+<dt><strong>directions</strong><span class="classifier">str</span></dt><dd><p>How tracking directions are determined.
+One of: {“deterministic” | “probablistic”}</p>
+</dd>
+<dt><strong>max_angle</strong><span class="classifier">float, optional.</span></dt><dd><p>The maximum turning angle in each step. Default: 30</p>
+</dd>
+<dt><strong>sphere</strong><span class="classifier">Sphere object, optional.</span></dt><dd><p>The discretization of direction getting. default:
+dipy.data.default_sphere.</p>
+</dd>
+<dt><strong>seed_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>Binary mask describing the ROI within which we seed for tracking.
+Default to the entire volume.</p>
+</dd>
+<dt><strong>n_seeds</strong><span class="classifier">int or 2D array, optional.</span></dt><dd><p>The seeding density: if this is an int, it is is how many seeds in each
+voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D
+array, these are the coordinates of the seeds. Unless random_seeds is
+set to True, in which case this is the total number of random seeds
+to generate within the mask.</p>
+</dd>
+<dt><strong>random_seeds</strong><span class="classifier">bool</span></dt><dd><p>Whether to generate a total of n_seeds random seeds in the mask.
+Default: XXX.</p>
+</dd>
+<dt><strong>stop_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>A floating point value that determines a stopping criterion (e.g. FA).
+Default to no stopping (all ones).</p>
+</dd>
+<dt><strong>stop_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>A value of the stop_mask below which tracking is terminated. Default to
+0 (this means that if no stop_mask is passed, we will stop only at
+the edge of the image)</p>
+</dd>
+<dt><strong>step_size</strong><span class="classifier">float, optional.</span></dt><dd><p>The size (in mm) of a step of tractography. Default: 1.0</p>
+</dd>
+<dt><strong>min_length: int, optional</strong></dt><dd><p>The miminal length (mm) in a streamline. Default: 10</p>
+</dd>
+<dt><strong>max_length: int, optional</strong></dt><dd><p>The miminal length (mm) in a streamline. Default: 250</p>
+</dd>
+<dt><strong>odf_model</strong><span class="classifier">str, optional</span></dt><dd><p>One of {“DTI”, “CSD”}. Defaults to use “DTI”</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>list of streamlines ()</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AFQ.tractography._local_tracking">
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param">seeds</em>, <em class="sig-param">dg</em>, <em class="sig-param">threshold_classifier</em>, <em class="sig-param">params_img</em>, <em class="sig-param">step_size=0.5</em>, <em class="sig-param">min_length=10</em>, <em class="sig-param">max_length=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+      <li>Previous: <a href="../segmentation/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
+      <li>Next: <a href="../viz/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../_sources/autoapi/AFQ/tractography/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
