@@ -10,7 +10,7 @@ except ImportError:
 here = op.abspath(op.dirname(__file__))
 
 # Get metadata from the AFQ/version.py file:
-ver_file = op.join(here, 'AFQ', 'version.py')
+ver_file = op.join(here, 'AFQ', '_meta.py')
 with open(ver_file) as f:
     exec(f.read())
 
@@ -39,7 +39,6 @@ opts = dict(name=NAME,
             packages=find_packages(),
             install_requires=REQUIRES,
             scripts=SCRIPTS,
-            version=VERSION,
             python_requires=PYTHON_REQUIRES,
             use_scm_version=True,
             setup_requires=['setuptools_scm'])
