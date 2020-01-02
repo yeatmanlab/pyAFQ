@@ -1,5 +1,5 @@
-Help using pyAFQ
-~~~~~~~~~~~~~~~~
+Getting help using pyAFQ
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you run into any bugs or issues using pyAFQ, please contact us using
 one of the following communication channels:
