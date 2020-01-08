@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import warnings
-from pkg_resources import get_distribution
 from argparse import ArgumentParser
 import os
 import os.path as op
@@ -11,6 +10,8 @@ import platform
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
+
+    import AFQ
     from AFQ import api
     from AFQ.utils.bin import get_default_args
     import AFQ.segmentation as seg
@@ -107,7 +108,7 @@ if dmriprep_path is None:
 
 config['pyAFQ'] = {}
 config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
-config['pyAFQ']['version'] = get_distribution(__name__).version
+config['pyAFQ']['version'] = AFQ.__version__
 config['pyAFQ']['platform'] = platform.system()
 
 afq_path = op.join(op.split(dmriprep_path)[0], 'afq')
