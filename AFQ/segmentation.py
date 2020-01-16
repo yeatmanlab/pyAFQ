@@ -731,7 +731,8 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         return out
 
 
-def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None):
+def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
+                       return_idx=False):
     """
     Clean a collection of streamlines based on their two endpoints
 

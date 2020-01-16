@@ -181,6 +181,12 @@ def test_clean_by_endpoints():
     clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], atlas=atlas)
     npt.assert_equal(list(clean_sl), sl[:2])
 
+    clean_sl, clean_idx = seg.clean_by_endpoints(
+        sl, [1, 2], [3, 4], atlas=atlas, return_idx=True)
+    npt.assert_equal(list(clean_sl), sl[:2])
+    npt.assert_equal(clean_idx, np.array([0, 1]))
+
+
     # If tol=1, the third streamline also gets included
     clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], tol=1, atlas=atlas)
     npt.assert_equal(list(clean_sl), sl[:3])
