@@ -182,4 +182,9 @@ information, such as the country and city in which the computer using the CLI
 was located and the time that it was used. At this time, we do not record any
 additional information, although in the future we may want to record statistics
 on the computational environment in which the CLI was called, such as the
-operating system
+operating system.
+
+Opting out of this usage tracking can be done by calling the CLI with the
+`--notrack` flag::
+
+    pyAFQ /path/to/config.toml --notrack
