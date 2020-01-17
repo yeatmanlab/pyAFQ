@@ -19,7 +19,7 @@ with warnings.catch_warnings():
 
     import logging
     logging.basicConfig(level=logging.INFO)
-
+    logger = logging.getLogger('pyAFQ')
 
 def process_defaults(defaults_dict):
     defaults_list = []
@@ -84,7 +84,18 @@ parser = ArgumentParser(usage)
 parser.add_argument(dest='config', action="store", type=str,
                     help="Path to config file")
 
+parser.add_argument('--notrack', action="store_true", default=False)
+
 opts = parser.parse_args()
+
+if not opts.notrack:
+    logger.info(
+        "Your use of pyAFQ is being recorded using Google Analytics.",
+        "For more information, please refer to the pyAFQ documentation: ",
+        "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics"  #noqa
+        "to turn this off, use the `--notrack` flag when using the pyAFQ CLI")
+    import popylar
+    popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
 config = toml.load(opts.config)
 
