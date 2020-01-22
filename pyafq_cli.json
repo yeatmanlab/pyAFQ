@@ -6,7 +6,7 @@
     "schema-version": "0.5",
     "container-image": {
         "type": "docker",
-        "image": "boutiques/examples"
+        "image": "gkiar/fuzzy:ubuntu14.04-python-dipy-afq"
     },
     "groups":[
     {
