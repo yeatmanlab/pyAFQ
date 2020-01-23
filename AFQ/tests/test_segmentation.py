@@ -181,7 +181,9 @@ def test_clean_by_endpoints():
     clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], atlas=atlas)
     npt.assert_equal(list(clean_sl), sl[:2])
 
-    clean_results = list(seg.clean_by_endpoints(sl, [1, 2], [3, 4], atlas=atlas, return_idx=True))
+    clean_results = list(seg.clean_by_endpoints(sl, [1, 2], [3, 4],
+                                                atlas=atlas,
+                                                return_idx=True))
     clean_idx = []
     clean_sl = []
     for res in clean_results:
