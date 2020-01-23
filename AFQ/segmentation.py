@@ -800,7 +800,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
             endpoint_roi[atlas == targ] = 1
         idxes1 = np.array(np.where(endpoint_roi)).T
 
-    for sl in streamlines:
+    for ii, sl in enumerate(streamlines):
         if targets0 is None:
             # Nothing to check
             dist0ok = True
@@ -813,9 +813,15 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
         if dist0ok:
             if targets1 is None:
                 # Nothing to check on this end:
-                yield sl
+                if return_idx:
+                    yield sl, ii
+                else:
+                    yield sl
             else:
                 dist2 = np.min(cdist(np.array([sl[-1]]), idxes1,
                                      'sqeuclidean'))
                 if dist2 <= tol:
-                    yield sl
+                    if return_idx:
+                        yield sl, ii
+                    else:
+                        yield sl
