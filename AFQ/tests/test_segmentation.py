@@ -188,7 +188,6 @@ def test_clean_by_endpoints():
         clean_sl.append(res[0])
         clean_idx.append(res[1])
     npt.assert_equal(list(clean_sl), sl[:2])
-
     npt.assert_equal(clean_idx, np.array([0, 1]))
 
 

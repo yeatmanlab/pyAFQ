@@ -542,7 +542,16 @@ class Segmentation:
                 select_sl = clean_by_endpoints(select_sl.streamlines,
                                                aal_idx[0],
                                                aal_idx[1],
-                                               tol=dist_to_aal)
+                                               tol=dist_to_aal,
+                                               return_idx=self.return_idx)
+                if self.return_idx:
+                    temp_select_sl = []
+                    temp_select_idx = []
+                    for ss in select_sl:
+                        temp_select_sl.append(ss[0])
+                        temp_select_idx.append(ss[1])
+                    select_idx = select_idx[temp_select_idx]
+                    select_sl = temp_select_sl
                 # Generate immediately:
                 select_sl = StatefulTractogram(select_sl,
                                                self.img,
