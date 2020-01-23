@@ -40,7 +40,7 @@ opts = dict(name=NAME,
             install_requires=REQUIRES,
             scripts=SCRIPTS,
             python_requires=PYTHON_REQUIRES,
-            use_scm_version=True,
+            use_scm_version={"root": ".", "relative_to": __file__, "write_to": "AFQ/version.py"},
             setup_requires=['setuptools_scm'])
 
 
