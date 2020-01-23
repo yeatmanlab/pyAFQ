@@ -10,8 +10,8 @@ except ImportError:
 here = op.abspath(op.dirname(__file__))
 
 # Get metadata from the AFQ/version.py file:
-ver_file = op.join(here, 'AFQ', '_meta.py')
-with open(ver_file) as f:
+meta_file = op.join(here, 'AFQ', '_meta.py')
+with open(meta_file) as f:
     exec(f.read())
 
 REQUIRES = []
@@ -23,6 +23,13 @@ with open(op.join(here, 'requirements.txt')) as f:
 
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
+
+
+def local_version(version):
+    """
+    Patch in a version that can be uploaded to test PyPI
+    """
+    return ""
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
@@ -40,7 +47,9 @@ opts = dict(name=NAME,
             install_requires=REQUIRES,
             scripts=SCRIPTS,
             python_requires=PYTHON_REQUIRES,
-            use_scm_version={"root": ".", "relative_to": __file__, "write_to": "AFQ/version.py"},
+            use_scm_version={"root": ".", "relative_to": __file__,
+                             "write_to": "AFQ/version.py",
+                             "local_scheme": local_version},
             setup_requires=['setuptools_scm'])
 
 
