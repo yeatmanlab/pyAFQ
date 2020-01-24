@@ -822,6 +822,10 @@ class AFQ(object):
         tracking_params: dict, optional
             The parameters for tracking. Default: use the default behavior of
             the aft.track function.
+
+        cleaning_params: dict, optional
+            The parameters for cleaning. Default: use the default behavior of
+            the seg.clean_bundle function.
         """
 
         self.wm_labels = wm_labels
