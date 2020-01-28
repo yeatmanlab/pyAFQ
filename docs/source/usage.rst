@@ -72,6 +72,18 @@ the software.
     inputs, as well as outputs.
 
 
+Example data
+------------
+
+To get some example data formatted for input into `pyAFQ`, you can run::
+
+    import AFQ.data as afd
+    afd.organize_stanford_data()
+
+This should create a folder in your home directory with a properly-formatted
+data set in a directory called `stanford_hardi`.
+
+
 Running the pyAFQ pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
