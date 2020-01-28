@@ -383,6 +383,21 @@ class Segmentation:
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
 
+    def _return_empty(self, bundle):
+        """
+        Helper function for segment_afq, to return an empty dict under
+        some conditions.
+        """
+
+        if self.return_idx:
+            self.fiber_groups[bundle] = {}
+            self.fiber_groups[bundle]['sl'] = StatefulTractogram(
+                [], self.img, Space.VOX)
+            self.fiber_groups[bundle]['idx'] = np.array([])
+        else:
+            self.fiber_groups[bundle] = StatefulTractogram(
+                [], self.img, Space.VOX)
+
     def segment_afq(self, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
@@ -495,15 +510,8 @@ class Segmentation:
             select_idx = np.where(bundle_choice == bundle_idx)
 
             if len(select_idx[0]) == 0:
-                if self.return_idx:
-                    self.fiber_groups[bundle] = {}
-                    self.fiber_groups[bundle]['sl'] = StatefulTractogram(
-                        [], self.img, Space.VOX)
-                    self.fiber_groups[bundle]['idx'] = np.array([])
-                else:
-                    self.fiber_groups[bundle] = StatefulTractogram(
-                        [], self.img, Space.VOX)
-                # There's nothing here, move to the next bundle:
+                # There's nothing here, set and move to the next bundle:
+                self._return_empty(bundle)
                 continue
 
             # Use a list here, because ArraySequence doesn't support item
@@ -539,21 +547,30 @@ class Segmentation:
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
 
-                select_sl = clean_by_endpoints(select_sl.streamlines,
-                                               aal_idx[0],
-                                               aal_idx[1],
-                                               tol=dist_to_aal,
-                                               return_idx=self.return_idx)
+                new_select_sl = clean_by_endpoints(select_sl.streamlines,
+                                                   aal_idx[0],
+                                                   aal_idx[1],
+                                                   tol=dist_to_aal,
+                                                   return_idx=self.return_idx)
+                # Generate immediately:
+                new_select_sl = list(new_select_sl)
+
+                # We need to check this again:
+                if len(new_select_sl) == 0:
+                    # There's nothing here, set and move to the next bundle:
+                    self._return_empty(bundle)
+                    continue
+
                 if self.return_idx:
                     temp_select_sl = []
-                    temp_select_idx = []
-                    for ss in select_sl:
+                    temp_select_idx = np.empty(len(new_select_sl), int)
+                    for ii, ss in enumerate(new_select_sl):
                         temp_select_sl.append(ss[0])
-                        temp_select_idx.append(ss[1])
-                    select_idx = select_idx[temp_select_idx]
+                        temp_select_idx[ii] = ss[1]
+                    select_idx = select_idx[0][temp_select_idx]
                     select_sl = temp_select_sl
-                # Generate immediately:
-                select_sl = StatefulTractogram(select_sl,
+
+                select_sl = StatefulTractogram(new_select_sl,
                                                self.img,
                                                Space.RASMM)
 
