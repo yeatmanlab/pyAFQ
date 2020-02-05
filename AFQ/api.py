@@ -894,17 +894,14 @@ class AFQ(object):
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
 
-                dwi_file_list.append(glob.glob('%s/%s/%s.nii.gz' %
-                                               (sess, dwi_folder,
-                                                dwi_file))[0])
+                dwi_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
 
-                bvec_file_list.append(glob.glob('%s/%s/%s.bvec*' %
-                                                (sess, dwi_folder,
-                                                 dwi_file))[0])
+                bvec_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.bvec*")[0])
 
-                bval_file_list.append(glob.glob('%s/%s/%s.bval*' %
-                                                (sess, dwi_folder,
-                                                 dwi_file))[0])
+                bval_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.bval*")[0])
 
                 # The following two may or may not exist:
                 this_anat_file = glob.glob(op.join(sub_dir,
