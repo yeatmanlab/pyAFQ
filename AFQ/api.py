@@ -867,7 +867,7 @@ class AFQ(object):
             self.reg_template = reg_template
         # This is the place in which each subject's full data lives
         self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
-                                               '%s*' % sub_prefix))
+                                               f"{sub_prefix}*"))
 
         # This is where all the outputs will go:
         self.afq_dir = op.join(
@@ -904,19 +904,13 @@ class AFQ(object):
                     f"{sess}/{dwi_folder}/{dwi_file}.bval*")[0])
 
                 # The following two may or may not exist:
-                this_anat_file = glob.glob(op.join(sub_dir,
-                                           ('%s/%s/%s.nii.gz' %
-                                            (sess,
-                                             anat_folder,
-                                             anat_file))))
+                this_anat_file = glob.glob(op.join(
+                    sub_dir, (f"{sess}/{anat_folder}/{anat_file}.nii.gz")))
                 if len(this_anat_file):
                     anat_file_list.append(this_anat_file[0])
 
-                this_seg_file = glob.glob(op.join(sub_dir,
-                                                  ('%s/%s/%s.nii.gz' %
-                                                   (sess,
-                                                    anat_folder,
-                                                    seg_file))))
+                this_seg_file = glob.glob(op.join(
+                    sub_dir, (f"{sess}/{anat_folder}/{seg_file}.nii.gz")))
                 if len(this_seg_file):
                     seg_file_list.append(this_seg_file[0])
 
