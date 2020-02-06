@@ -568,7 +568,7 @@ class Segmentation:
                         temp_select_sl.append(ss[0])
                         temp_select_idx[ii] = ss[1]
                     select_idx = select_idx[0][temp_select_idx]
-                    select_sl = temp_select_sl
+                    new_select_sl = temp_select_sl
 
                 select_sl = StatefulTractogram(new_select_sl,
                                                self.img,
