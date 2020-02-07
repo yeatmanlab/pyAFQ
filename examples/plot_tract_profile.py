@@ -15,16 +15,12 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
-import dipy.tracking.utils as dtu
-import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 
 from AFQ import api
-import AFQ.utils.streamlines as aus
-import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
