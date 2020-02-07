@@ -224,8 +224,8 @@
         "min-list-entries": 1,
         "list-separator": ", ",
         "value-key": "[WM_LABELS]",
-        "value-choices": [250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
         "default-value": [250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+        "description": "The values specified correspond to all whitematter regions in the FreeSurfer aparc+aseg parcellation.",
         "optional": true
     },
     {
