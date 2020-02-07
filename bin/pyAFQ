@@ -113,7 +113,6 @@ for component in config.keys():
                          for k,v in config[component].items()
                          if v != eval(none_val)}
 
-
 files = config.get("files", {})
 
 dmriprep_path = files.get("dmriprep_path")
@@ -140,7 +139,6 @@ dwi_file = files.get("dwi_file", "*dwi")
 anat_folder = files.get("anat_folder", "anat")
 anat_file = files.get("anat_file", "*T1w*")
 seg_file = files.get("seg_file", "*aparc+aseg*")
-b0_threshold = files.get("b0_threshold", 0)
 reg_template = files.get("reg_template", None)
 
 tracking = config.get("tracking", {})
@@ -156,6 +154,7 @@ segmentation = config.get("segmentation", {})
 segmentation_params = {}
 for k, v in seg_defaults.items():
     segmentation_params[k] = segmentation.get(k, v)
+b0_threshold = segmentation_params.get("b0_threshold", 0)
 
 bundles = config.get("bundles", {})
 bundle_names = bundles.get("bundles", api.BUNDLES)
