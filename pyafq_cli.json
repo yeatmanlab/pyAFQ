@@ -8,6 +8,12 @@
         "type": "docker",
         "image": "gkiar/fuzzy:ubuntu14.04-python-dipy-afq"
     },
+    "environment-variables": [
+    {
+        "description": "The MCA backend and parameters to use when running commands within this container",
+        "name": "VFC_BACKENDS",
+        "value": "libinterflop_mca.so -m ieee"
+    }],
     "groups":[
     {
         "id": "bundles_group",
@@ -124,7 +130,7 @@
         "name": "sphere",
         "type": "String",
         "value-key": "[SPHERE]",
-        "default-value": "None",
+        "default-value": "",
         "optional": true
     },
     {
@@ -132,7 +138,7 @@
         "name": "seed mask",
         "type": "String",
         "value-key": "[SEED_MASK]",
-        "default-value": "None",
+        "default-value": "",
         "optional": true
     },
     {
@@ -159,7 +165,7 @@
         "name": "stop mask",
         "type": "String",
         "value-key": "[STOP_MASK]",
-        "default-value": "None",
+        "default-value": "",
         "optional": true
     },
     {
@@ -326,7 +332,7 @@
         "name": "rng",
         "type": "String",
         "value-key": "[RNG]",
-        "default-value": "None",
+        "default-value": "",
         "optional": true
     },
     {
@@ -454,11 +460,11 @@
             "[tracking]",
             "directions = '[DIRECTIONS]'",
             "max_angle = [MAX_ANGLE]",
-            "sphere = [SPHERE]",
-            "seed_mask = [SEED_MASK]",
+            "sphere = '[SPHERE]'",
+            "seed_mask = '[SEED_MASK]'",
             "n_seeds = [N_SEEDS]",
             "random_seeds = [RANDOM_SEEDS]",
-            "stop_mask = [STOP_MASK]",
+            "stop_mask = '[STOP_MASK]'",
             "stop_threshold = [STOP_THRESHOLD]",
             "step_size = [STEP_SIZE]",
             "min_length = [MIN_LENGTH]",
@@ -478,7 +484,7 @@
             "pruning_thr = [PRUNING_THR]",
             "b0_threshold = [B0_THRESHOLD]",
             "prob_threshold = [PROB_THRESHOLD]",
-            "rng = [RNG]",
+            "rng = '[RNG]'",
             "return_idx = [SEGMENTATION_RETURN_IDX]",
             "filter_by_endpoints = [FILTER_BY_ENDPOINTS]",
             "dist_to_aal = [DIST_TO_AAL]",
