@@ -81,7 +81,7 @@
         "name": "bubndles seg algo",
         "type": "String",
         "value-key": "[BUNDLES_SEG_ALGO]",
-        "value-choices": ["AFQ"],
+        "value-choices": ["AFQ", "Reco"],
         "default-value": "AFQ",
         "optional": true
     },
@@ -90,7 +90,7 @@
         "name": "scalars model",
         "type": "String",
         "value-key": "[SCALARS_MODEL]",
-        "value-choices": ["DTI"],
+        "value-choices": ["DTI", "DKI"],
         "default-value": "DTI",
         "optional": true
     },
