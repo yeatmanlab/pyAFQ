@@ -45,6 +45,14 @@ seg_defaults_list = process_defaults(seg_defaults)
 clean_defaults = get_default_args(seg.clean_bundle)
 clean_defaults_list = process_defaults(clean_defaults)
 
+# For all lists that contain a "None" default value, replace it with an
+# empty string to not break toml syntax. As of Feb-7-2020, that is only
+# track_defaults_list and seg_defaults_list
+none_val = "''"
+replace_none = lambda myl, rep=none_val: [v.replace('None', rep) for v in myl]
+track_defaults_list = replace_none(track_defaults_list)
+seg_defaults_list = replace_none(seg_defaults_list)
+
 usage = f"""pyAFQ /path/to/afq_config.toml
 
 Runs full AFQ processing as specified in the configuration file.
@@ -98,6 +106,13 @@ if not opts.notrack:
     popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
 config = toml.load(opts.config)
+# Delete empty values that are intended to be "None" so that the parser can
+# substitute default values in appropriately
+for component in config.keys():
+    config[component] = {k:v
+                         for k,v in config[component].items()
+                         if v != eval(none_val)}
+
 
 files = config.get("files", {})
 
