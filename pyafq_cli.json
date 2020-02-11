@@ -211,7 +211,7 @@
         "name": "odf model",
         "type": "String",
         "value-key": "[ODF_MODEL]",
-        "value-choices": ["DTI"],
+        "value-choices": ["DTI", "CSD"],
         "default-value": "DTI",
         "optional": true
     },
@@ -242,7 +242,7 @@
         "name": "segmentation seg algo",
         "type": "String",
         "value-key": "[SEGMENTATION_SEG_ALGO]",
-        "value-choices": ["AFQ"],
+        "value-choices": ["AFQ", "Reco"],
         "default-value": "AFQ",
         "optional": true
     },
