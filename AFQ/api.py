@@ -301,10 +301,7 @@ def _reg_prealign(row):
     return prealign_file
 
 
-def _export_registered_b0(row, reg_template, use_prealign=None):
-    if use_prealign is None:
-        use_prealign = self.use_prealign
-
+def _export_registered_b0(row, reg_template, use_prealign=True):
     if use_prealign:
         b0_warped_file = _get_fname(row, '_b0_in_MNI.nii.gz')
     else:
@@ -331,15 +328,23 @@ def _export_registered_b0(row, reg_template, use_prealign=None):
 
 
 def _mapping(row, reg_template, use_prealign=None):
+    mapping_file_no_prealign = _get_fname(row,
+                                          '_mapping_from-DWI_to_MNI_xfm'
+                                          + '_without_prealign.nii.gz')
+    mapping_file_prealign = _get_fname(row,
+                                       '_mapping_from-DWI_to_MNI_xfm.nii.gz')
     if use_prealign is None:
-        use_prealign = self.use_prealign
+        if (not op.exists(mapping_file_prealign))
+           and (op.exists(mapping_file_no_prealign)):
+           use_prealign = False
+        else:
+            use_prealign = True
 
     if use_prealign:
-        mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        mapping_file = mapping_file_prealign
     else:
-        mapping_file = _get_fname(row,
-                                  '_mapping_from-DWI_to_MNI_xfm'
-                                  + '_without_prealign.nii.gz')
+        mapping_file = mapping_file_no_prealign
+
     if not op.exists(mapping_file):
         gtab = row['gtab']
         if use_prealign:
@@ -823,7 +828,6 @@ class AFQ(object):
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
-                 use_prealign=True,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -856,10 +860,6 @@ class AFQ(object):
             provided with the HCP data, including labels for midbrain:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
 
-        use_prealign : bool, optional
-            Whether to perform pre-alignment before perforiming the
-            diffeomorphic mapping in registration. Default: True
-
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
             of the seg.Segmentation object
@@ -874,7 +874,6 @@ class AFQ(object):
         """
 
         self.wm_labels = wm_labels
-        self.use_prealign = use_prealign
 
         self.scalars = scalars
 
@@ -1110,15 +1109,16 @@ class AFQ(object):
 
     dti_md = property(get_dti_md, set_dti_md)
 
-    def set_mapping(self):
+    def set_mapping(self, use_prealign=True):
         if 'mapping' not in self.data_frame.columns:
             self.data_frame['mapping'] =\
                 self.data_frame.apply(_mapping,
-                                      args=[self.reg_template],
+                                      args=[self.reg_template,
+                                            use_prealign],
                                       axis=1)
 
-    def get_mapping(self):
-        self.set_mapping()
+    def get_mapping(self, use_prealign=True):
+        self.set_mapping(use_prealign=use_prealign)
         return self.data_frame['mapping']
 
     mapping = property(get_mapping, set_mapping)
