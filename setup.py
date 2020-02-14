@@ -1,5 +1,5 @@
 from setuptools import find_packages
-
+import string
 import os.path as op
 
 try:
@@ -29,7 +29,13 @@ def local_version(version):
     """
     Patch in a version that can be uploaded to test PyPI
     """
-    return "-sha-" + version.node
+    gh_in_int = []
+    for char in version.node:
+        if char.isdigit():
+            gh_in_int.append(str(char))
+        else:
+            gh_in_int.append(str(string.ascii_letters.find(char)))
+    return "".join(gh_in_int)
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
