@@ -27,6 +27,7 @@ from dipy.io.streamline import load_tractogram, load_trk
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
+import AFQ.data as afd
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,

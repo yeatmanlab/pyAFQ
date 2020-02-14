@@ -14,6 +14,8 @@ from AFQ.registration import (syn_registration, register_series, register_dwi,
                               streamline_registration, write_mapping,
                               read_mapping, syn_register_dwi, DiffeomorphicMap)
 
+import AFQ.data as afd
+
 from dipy.tracking.utils import transform_tracking_output
 from dipy.io.streamline import load_trk, save_trk
 from dipy.io.stateful_tractogram import StatefulTractogram, Space

@@ -21,6 +21,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 
 from AFQ import api
+import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
