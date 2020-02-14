@@ -328,7 +328,7 @@ def _export_registered_b0(row, reg_template, use_prealign=None):
         nib.save(nib.Nifti1Image(warped_b0, row['dwi_affine']), b0_warped_file)
 
     return b0_warped_file
-    
+
 
 def _mapping(row, reg_template, use_prealign=None):
     if use_prealign is None:
@@ -855,10 +855,10 @@ class AFQ(object):
             used. Default: the white matter values for the segmentation
             provided with the HCP data, including labels for midbrain:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
-        
+
         use_prealign : bool, optional
-            Whether to perform pre-alignment before perforiming the diffeomorphic
-            mapping in registration. Default: True
+            Whether to perform pre-alignment before perforiming the
+            diffeomorphic mapping in registration. Default: True
 
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
