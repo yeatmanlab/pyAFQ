@@ -259,7 +259,8 @@ class Segmentation:
 
         if mapping is None:
             gtab = dpg.gradient_table(self.fbval, self.fbvec)
-            self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
+            self.mapping = reg.syn_register_dwi(self.fdata, gtab,
+                                                template=reg_template)[1]
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)

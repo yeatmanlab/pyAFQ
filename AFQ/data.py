@@ -870,7 +870,7 @@ def s3fs_json_write(data, fname, fs=None):
         json.dump(data, ff)
 
 
-def read_mni_template(resolution=2, mask=True):
+def read_mni_template(resolution=1, mask=True):
     """
 
     Reads the MNI T2w template
@@ -878,7 +878,7 @@ def read_mni_template(resolution=2, mask=True):
     Parameters
     ----------
     resolution : int, optional.
-        Either 1 or 2, the resolution in mm of the voxels. Default: 2.
+        Either 1 or 2, the resolution in mm of the voxels. Default: 1.
 
     mask : bool, optional
         Whether to mask the data with a brain-mask before returning the image.
