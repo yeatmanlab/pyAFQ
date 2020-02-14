@@ -117,7 +117,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     DiffeomorphicMap object
     """
     if template is None:
-        template = dpd.read_mni_template()
+        template = afd.read_mni_template()
     if isinstance(template, str):
         template = nib.load(template)
 

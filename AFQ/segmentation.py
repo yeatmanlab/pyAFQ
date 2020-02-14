@@ -6,7 +6,10 @@ from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
 import nibabel as nib
+from templateflow import api as tflow
+
 from tqdm.auto import tqdm
+
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
@@ -250,7 +253,7 @@ class Segmentation:
             Default: None.
         """
         if reg_template is None:
-            reg_template = dpd.read_mni_template()
+            reg_template = afd.read_mni_template()
 
         self.reg_template = reg_template
 

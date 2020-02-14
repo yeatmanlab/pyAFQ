@@ -299,7 +299,7 @@ class AFQ(object):
         self.clean_params = default_clean_params
 
         if reg_template is None:
-            self.reg_template = dpd.read_mni_template()
+            self.reg_template = afd.read_mni_template()
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
@@ -531,7 +531,7 @@ class AFQ(object):
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
             moving = nib.load(self._b0(row))
-            static = dpd.read_mni_template()
+            static = afd.read_mni_template()
             moving_data = moving.get_fdata()
             moving_affine = moving.affine
             static_data = static.get_fdata()

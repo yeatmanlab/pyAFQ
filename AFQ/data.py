@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 import nibabel as nib
+from templateflow import api as tflow
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
@@ -867,3 +868,32 @@ def s3fs_json_write(data, fname, fs=None):
         fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
+
+
+def read_mni_template(res=resolution, mask=True):
+    """
+
+    Reads that MNI T2w template
+
+
+    """
+    template_img = nib.load(tflow.get('MNI152NLin2009cAsym',
+                                      desc=None,
+                                      resolution=resolution,
+                                      suffix='T2w',
+                                      extension='nii.gz')
+    if not mask:
+        return template
+    else:
+        mask_img = nib.load(tflow.get('MNI152NLin2009cAsym',
+                                     resolution=resolution,
+                                     desc='brain',
+                                     suffix='mask'))
+
+        template_data = template_img.get_fdata()
+        mask_data = mask_img.get_fdata()
+        out_data = template_data * mask_data
+        return nib.Nifti1Image(out_data, template_img.affine)
+
+
+

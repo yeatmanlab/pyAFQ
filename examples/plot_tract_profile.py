@@ -73,7 +73,7 @@ FA_data = FA_img.get_fdata()
 #     CLI.
 #
 print("Registering to template...")
-MNI_T2_img = dpd.read_mni_template()
+MNI_T2_img = afd.read_mni_template()
 if not op.exists('mapping.nii.gz'):
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
