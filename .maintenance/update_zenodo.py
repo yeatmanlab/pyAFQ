@@ -24,7 +24,8 @@ if __name__ == '__main__':
     contrib_file = Path('line-contributors.txt')
     lines = []
     if contrib_file.exists():
-        print('WARNING: Reusing existing line-contributors.txt file.', file=sys.stderr)
+        print('WARNING: Reusing existing line-contributors.txt file.',
+              file=sys.stderr)
         lines = contrib_file.read_text().splitlines()
 
     git_line_summary_path = shutil.which('git-summary')
@@ -34,11 +35,13 @@ if __name__ == '__main__':
         contrib_file.write_text('\n'.join(lines))
 
     if not lines:
-        raise RuntimeError("""\
-Could not find line-contributors from git repository.%s""" % """ \
-git-line-summary not found, please install git-extras. """ * (git_line_summary_path is None))
+        raise RuntimeError(
+            """Could not find line-contributors from git repository.%s"""
+            % """git-line-summary not found, please install git-extras. """
+            * (git_line_summary_path is None))
 
-    data = [' '.join(line.strip().split()[1:-1]) for line in lines if '%' in line]
+    data = [' '.join(line.strip().split()[1:-1]) for line in lines if '%'
+            in line]
 
     # load zenodo from master
     zenodo_file = Path('.zenodo.json')
@@ -52,7 +55,8 @@ git-line-summary not found, please install git-extras. """ * (git_line_summary_p
     for ele in data:
         matches = process.extract(ele, zen_names, scorer=fuzz.token_sort_ratio,
                                   limit=2)
-        # matches is a list [('First match', % Match), ('Second match', % Match)]
+        # matches is a list:
+        # [('First match', % Match), ('Second match', % Match)]
         if matches[0][1] > 80:
             val = zenodo['creators'][zen_names.index(matches[0][0])]
         else:
@@ -65,7 +69,8 @@ git-line-summary not found, please install git-extras. """ * (git_line_summary_p
                 val['position'] = position
                 position += 1
             else:
-                val['position'] = total_names + CREATORS_LAST.index(val['name'])
+                val['position'] = total_names + \
+                    CREATORS_LAST.index(val['name'])
             name_matches.append(val)
 
     for missing in MISSING_ENTRIES:
@@ -78,4 +83,5 @@ git-line-summary not found, please install git-extras. """ * (git_line_summary_p
     for creator in zenodo['creators']:
         del creator['position']
 
-    zenodo_file.write_text('%s\n' % json.dumps(zenodo, indent=2, sort_keys=True))
+    zenodo_file.write_text('%s\n' % json.dumps(zenodo, indent=2,
+                           sort_keys=True))
