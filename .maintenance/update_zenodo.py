@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Update and sort the creators list of the zenodo record."""
+"""Update and sort the creators list of the zenodo record.
+
+This script was originally developed by the nipreps developers.
+
+For the full LICENSE and terms of use, see
+https://github.com/nipreps/dmriprep/blob/master/LICENSE
+
+"""
 import sys
 import shutil
 from pathlib import Path

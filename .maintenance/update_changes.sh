@@ -7,6 +7,9 @@
 #
 # Usage /bin/bash update_changes.sh 1.0.1
 #
+# This script was originally developed by the nipreps developers.
+# For the full LICENSE and terms of use, see https://github.com/nipreps/dmriprep/blob/master/LICENSE
+#
 
 # Setting      # $ help set
 set -u         # Treat unset variables as an error when substituting.
