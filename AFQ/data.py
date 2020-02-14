@@ -529,7 +529,7 @@ fetch_aal_atlas = _make_fetcher(
     "fetch_aal_atlas",
     op.join(afq_home,
             'aal_atlas'),
-    'https://digital.lib.washington.edu' + '/researchworks' + \
+    'https://digital.lib.washington.edu' + '/researchworks' +
     '/bitstream/handle/1773/44951/',
     ["MNI_AAL_AndMore.nii.gz",
      "MNI_AAL.txt"],
@@ -870,30 +870,39 @@ def s3fs_json_write(data, fname, fs=None):
         json.dump(data, ff)
 
 
-def read_mni_template(res=resolution, mask=True):
+def read_mni_template(resolution=2, mask=True):
     """
 
-    Reads that MNI T2w template
+    Reads the MNI T2w template
 
+    Parameters
+    ----------
+    resolution : int, optional.
+        Either 1 or 2, the resolution in mm of the voxels. Default: 2.
+
+    mask : bool, optional
+        Whether to mask the data with a brain-mask before returning the image.
+        Default : True
+
+    Returns
+    -------
+    nib.Nifti1Image class instance containing masked or unmasked T2 template.
 
     """
     template_img = nib.load(tflow.get('MNI152NLin2009cAsym',
                                       desc=None,
                                       resolution=resolution,
                                       suffix='T2w',
-                                      extension='nii.gz')
+                                      extension='nii.gz'))
     if not mask:
         return template
     else:
         mask_img = nib.load(tflow.get('MNI152NLin2009cAsym',
-                                     resolution=resolution,
-                                     desc='brain',
-                                     suffix='mask'))
+                                      resolution=resolution,
+                                      desc='brain',
+                                      suffix='mask'))
 
         template_data = template_img.get_fdata()
         mask_data = mask_img.get_fdata()
         out_data = template_data * mask_data
         return nib.Nifti1Image(out_data, template_img.affine)
-
-
-
