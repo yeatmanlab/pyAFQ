@@ -334,7 +334,7 @@ def _mapping(row, reg_template, use_prealign=None):
     mapping_file_prealign = _get_fname(row,
                                        '_mapping_from-DWI_to_MNI_xfm.nii.gz')
     if use_prealign is None:
-        if (not op.exists(mapping_file_prealign))
+        if (not op.exists(mapping_file_prealign)) \
            and (op.exists(mapping_file_no_prealign)):
            use_prealign = False
         else:
