@@ -254,6 +254,31 @@ Module Contents
           !! processed by numpydoc !!
 
 
+   .. method:: _return_empty(self, bundle)
+
+
+      Helper function for segment_afq, to return an empty dict under
+      some conditions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. method:: segment_afq(self, tg=None)
 
 

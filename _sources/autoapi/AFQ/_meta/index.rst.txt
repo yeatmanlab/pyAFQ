@@ -1,0 +1,79 @@
+:mod:`AFQ._meta`
+================
+
+.. py:module:: AFQ._meta
+
+
+Module Contents
+---------------
+
+.. data:: CLASSIFIERS
+   :annotation: = ['Development Status :: 3 - Alpha', 'Environment :: Console', 'Intended Audience :: Science/Research', 'License :: OSI Approved :: MIT License', 'Operating System :: OS Independent', 'Programming Language :: Python', 'Topic :: Scientific/Engineering']
+
+   
+
+.. data:: description
+   :annotation: = pyAFQ: Automated Fiber Quantification ... in Python
+
+   
+
+.. data:: NAME
+   :annotation: = pyAFQ
+
+   
+
+.. data:: MAINTAINER
+   :annotation: = Ariel Rokem
+
+   
+
+.. data:: MAINTAINER_EMAIL
+   :annotation: = arokem@gmail.com
+
+   
+
+.. data:: DESCRIPTION
+   
+
+   
+
+.. data:: URL
+   :annotation: = http://github.com/yeatmanlab/pyAFQ
+
+   
+
+.. data:: DOWNLOAD_URL
+   :annotation: = 
+
+   
+
+.. data:: LICENSE
+   :annotation: = BSD
+
+   
+
+.. data:: AUTHOR
+   :annotation: = pyAFQ developers
+
+   
+
+.. data:: AUTHOR_EMAIL
+   :annotation: = arokem@gmail.com
+
+   
+
+.. data:: PLATFORMS
+   :annotation: = OS Independent
+
+   
+
+.. data:: SCRIPTS
+   
+
+   
+
+.. data:: PYTHON_REQUIRES
+   :annotation: = >=3.6
+
+   
+

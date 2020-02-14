@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.tractography" href="../tractography/index.html" />
@@ -169,6 +169,13 @@ list of exclusion ROIs.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AFQ.segmentation.Segmentation._return_empty">
+<code class="sig-name descname">_return_empty</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">bundle</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._return_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._return_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for segment_afq, to return an empty dict under
+some conditions.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="AFQ.segmentation.Segmentation.segment_afq">
 <code class="sig-name descname">segment_afq</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tg=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_afq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_afq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign streamlines to bundles using the waypoint ROI approach</p>
@@ -264,7 +271,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -277,11 +284,12 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
       </div>
       <div class="clearer"></div>
     </div>
+
     <div class="footer">
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
@@ -292,5 +300,15 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
     
 
     
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
   </body>
 </html>

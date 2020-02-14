@@ -19,6 +19,7 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   _meta/index.rst
    api/index.rst
    csd/index.rst
    data/index.rst
@@ -564,4 +565,9 @@ Package Contents
    ..
        !! processed by numpydoc !!
 
+
+.. data:: _ga_id
+   :annotation: = UA-156363454-3
+
+   
 

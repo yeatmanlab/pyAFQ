@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Examples" href="auto_examples/index.html" />
@@ -108,6 +108,16 @@ the software.</p>
 software to support a fully BIDS-compliant set of derivatives. Both as
 inputs, as well as outputs.</p>
 </div>
+<div class="section" id="example-data">
+<h3>Example data<a class="headerlink" href="#example-data" title="Permalink to this headline">¶</a></h3>
+<p>To get some example data formatted for input into <cite>pyAFQ</cite>, you can run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This should create a folder in your home directory with a properly-formatted
+data set in a directory called <cite>stanford_hardi</cite>.</p>
+</div>
 </div>
 <div class="section" id="running-the-pyafq-pipeline">
 <h2>Running the pyAFQ pipeline<a class="headerlink" href="#running-the-pyafq-pipeline" title="Permalink to this headline">¶</a></h2>
@@ -202,6 +212,23 @@ results. Note that the <cite>title</cite> variable and <cite>[metadata]</cite> s
 users to enter any title/metadata they would like and pyAFQ will generally
 ignore them.</p>
 </div>
+<div class="section" id="usage-tracking-with-google-analytics">
+<h3>Usage tracking with Google Analytics<a class="headerlink" href="#usage-tracking-with-google-analytics" title="Permalink to this headline">¶</a></h3>
+<p>To be able to assess usage of the software, we are recording each use of the
+CLI as an event in Google Analytics, using <a class="reference external" href="https://popylar.github.io">popylar</a></p>
+<p>The only information that we are recording is the fact that the CLI was called.
+In addition, through Google Analytics, we will have access to very general
+information, such as the country and city in which the computer using the CLI
+was located and the time that it was used. At this time, we do not record any
+additional information, although in the future we may want to record statistics
+on the computational environment in which the CLI was called, such as the
+operating system.</p>
+<p>Opting out of this usage tracking can be done by calling the CLI with the
+<cite>–notrack</cite> flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyAFQ</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">toml</span> <span class="o">--</span><span class="n">notrack</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -258,7 +285,7 @@ ignore them.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -271,11 +298,12 @@ ignore them.</p>
       </div>
       <div class="clearer"></div>
     </div>
+
     <div class="footer">
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
@@ -286,5 +314,15 @@ ignore them.</p>
     
 
     
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
   </body>
 </html>
