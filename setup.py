@@ -29,7 +29,7 @@ def local_version(version):
     """
     Patch in a version that can be uploaded to test PyPI
     """
-    return ""
+    return "-sha-" + version.node
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
