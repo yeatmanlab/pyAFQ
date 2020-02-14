@@ -301,7 +301,10 @@ def _reg_prealign(row):
     return prealign_file
 
 
-def _export_registered_b0(row, reg_template, use_prealign=True):
+def _export_registered_b0(row, reg_template, use_prealign=None):
+    if use_prealign is None:
+        use_prealign = self.use_prealign
+
     if use_prealign:
         b0_warped_file = _get_fname(row, '_b0_in_MNI.nii.gz')
     else:
@@ -317,7 +320,7 @@ def _export_registered_b0(row, reg_template, use_prealign=True):
             reg_prealign = None
 
         mapping_file = _mapping(row, reg_template, use_prealign=use_prealign)
-        mapping = reg.read_mapping(mapping_file, b0_file, reg_template, 
+        mapping = reg.read_mapping(mapping_file, b0_file, reg_template,
                                    prealign=reg_prealign)
 
         warped_b0 = mapping.transform(mean_b0)
@@ -327,7 +330,10 @@ def _export_registered_b0(row, reg_template, use_prealign=True):
     return b0_warped_file
     
 
-def _mapping(row, reg_template, use_prealign=True):
+def _mapping(row, reg_template, use_prealign=None):
+    if use_prealign is None:
+        use_prealign = self.use_prealign
+
     if use_prealign:
         mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
     else:
@@ -817,6 +823,7 @@ class AFQ(object):
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 use_prealign=True,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -848,6 +855,10 @@ class AFQ(object):
             used. Default: the white matter values for the segmentation
             provided with the HCP data, including labels for midbrain:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+        
+        use_prealign : bool, optional
+            Whether to perform pre-alignment before perforiming the diffeomorphic
+            mapping in registration. Default: True
 
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
@@ -863,6 +874,7 @@ class AFQ(object):
         """
 
         self.wm_labels = wm_labels
+        self.use_prealign = use_prealign
 
         self.scalars = scalars
 
