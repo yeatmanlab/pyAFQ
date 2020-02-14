@@ -889,18 +889,18 @@ def read_mni_template(resolution=2, mask=True):
     nib.Nifti1Image class instance containing masked or unmasked T2 template.
 
     """
-    template_img = nib.load(tflow.get('MNI152NLin2009cAsym',
-                                      desc=None,
-                                      resolution=resolution,
-                                      suffix='T2w',
-                                      extension='nii.gz'))
+    template_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                          desc=None,
+                                          resolution=resolution,
+                                          suffix='T2w',
+                                          extension='nii.gz')))
     if not mask:
         return template
     else:
-        mask_img = nib.load(tflow.get('MNI152NLin2009cAsym',
-                                      resolution=resolution,
-                                      desc='brain',
-                                      suffix='mask'))
+        mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                          resolution=resolution,
+                                          desc='brain',
+                                          suffix='mask')))
 
         template_data = template_img.get_fdata()
         mask_data = mask_img.get_fdata()
