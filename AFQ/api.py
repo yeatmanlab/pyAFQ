@@ -295,17 +295,51 @@ def _reg_prealign(row):
                                          moving_affine,
                                          static_affine)
         np.save(prealign_file, aff)
-        meta_fname = _get_fname(row, 'prealign_from-DWI_to-MNI_xfm.json')
+        meta_fname = _get_fname(row, '_prealign_from-DWI_to-MNI_xfm.json')
         meta = dict(type="rigid")
         afd.write_json(meta_fname, meta)
     return prealign_file
 
 
-def _mapping(row, reg_template):
-    mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+def _export_registered_b0(row, reg_template, use_prealign=True):
+    if use_prealign:
+        b0_warped_file = _get_fname(row, '_b0_in_MNI_without_prealign.nii.gz')
+    else:
+        b0_warped_file = _get_fname(row, '_b0_in_MNI.nii.gz')
+
+    if not op.exists(b0_warped_file):
+        b0_file = _b0(row)
+        mean_b0 = nib.load(b0_file).get_fdata()
+
+        if use_prealign:
+            reg_prealign = np.load(_reg_prealign(row))
+        else:
+            reg_prealign = None
+
+        mapping_file = _mapping(row, reg_template, use_prealign=use_prealign)
+        mapping = reg.read_mapping(mapping_file, b0_file, reg_template, 
+                                   prealign=reg_prealign)
+
+        warped_b0 = mapping.transform(mean_b0)
+
+        nib.save(nib.Nifti1Image(warped_b0, row['dwi_affine']), b0_warped_file)
+
+    return b0_warped_file
+    
+
+def _mapping(row, reg_template, use_prealign=True):
+    if use_prealign:
+        mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+    else:
+        mapping_file = _get_fname(row,
+                                  '_mapping_from-DWI_to_MNI_xfm'
+                                  + '_without_prealign.nii.gz')
     if not op.exists(mapping_file):
         gtab = row['gtab']
-        reg_prealign = np.load(_reg_prealign(row))
+        if use_prealign:
+            reg_prealign = np.load(_reg_prealign(row))
+        else:
+            reg_prealign = None
         warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
                                                   template=reg_template,
                                                   prealign=reg_prealign)
@@ -1176,6 +1210,12 @@ class AFQ(object):
                                     self.tracking_params,
                                     self.segmentation_params,
                                     self.clean_params],
+                              axis=1)
+
+    def export_registered_b0(self, use_prealign=True):
+        self.data_frame.apply(_export_registered_b0,
+                              args=[self.reg_template,
+                                    use_prealign]
                               axis=1)
 
     def combine_profiles(self):
