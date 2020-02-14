@@ -303,9 +303,9 @@ def _reg_prealign(row):
 
 def _export_registered_b0(row, reg_template, use_prealign=True):
     if use_prealign:
-        b0_warped_file = _get_fname(row, '_b0_in_MNI_without_prealign.nii.gz')
-    else:
         b0_warped_file = _get_fname(row, '_b0_in_MNI.nii.gz')
+    else:
+        b0_warped_file = _get_fname(row, '_b0_in_MNI_without_prealign.nii.gz')
 
     if not op.exists(b0_warped_file):
         b0_file = _b0(row)
@@ -1215,7 +1215,7 @@ class AFQ(object):
     def export_registered_b0(self, use_prealign=True):
         self.data_frame.apply(_export_registered_b0,
                               args=[self.reg_template,
-                                    use_prealign]
+                                    use_prealign],
                               axis=1)
 
     def combine_profiles(self):
