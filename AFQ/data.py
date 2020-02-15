@@ -895,7 +895,7 @@ def read_mni_template(resolution=1, mask=True):
                                           suffix='T2w',
                                           extension='nii.gz')))
     if not mask:
-        return template
+        return template_img
     else:
         mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
                                           resolution=resolution,
@@ -904,5 +904,5 @@ def read_mni_template(resolution=1, mask=True):
 
         template_data = template_img.get_fdata()
         mask_data = mask_img.get_fdata()
-        out_data = template_data * mask_data
+        # out_data = template_data * mask_data
         return nib.Nifti1Image(out_data, template_img.affine)
