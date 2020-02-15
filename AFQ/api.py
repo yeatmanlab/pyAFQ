@@ -657,8 +657,8 @@ class AFQ(object):
 
             meta = dict(
                 TractographyClass="local",
-                TractographyMethod=\
-                    meta_directions[self.tracking_params["directions"]],
+                TractographyMethod=meta_directions[
+                    self.tracking_params["directions"]],
                 Count=len(sft.streamlines),
                 Seeding=dict(
                     ROI=wm_mask_fname,
