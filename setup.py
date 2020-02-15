@@ -1,6 +1,7 @@
 from setuptools import find_packages
-
+import string
 import os.path as op
+from setuptools_scm import get_version
 
 try:
     from setuptools import setup
@@ -10,8 +11,8 @@ except ImportError:
 here = op.abspath(op.dirname(__file__))
 
 # Get metadata from the AFQ/version.py file:
-ver_file = op.join(here, 'AFQ', 'version.py')
-with open(ver_file) as f:
+meta_file = op.join(here, 'AFQ', '_meta.py')
+with open(meta_file) as f:
     exec(f.read())
 
 REQUIRES = []
@@ -23,6 +24,24 @@ with open(op.join(here, 'requirements.txt')) as f:
 
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
+
+
+def local_version(version):
+    """
+    Patch in a version that can be uploaded to test PyPI
+    """
+    scm_version = get_version()
+    if "dev" in scm_version:
+        gh_in_int = []
+        for char in version.node:
+            if char.isdigit():
+                gh_in_int.append(str(char))
+            else:
+                gh_in_int.append(str(string.ascii_letters.find(char)))
+        return "".join(gh_in_int)
+    else:
+        return ""
+
 
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
@@ -39,9 +58,10 @@ opts = dict(name=NAME,
             packages=find_packages(),
             install_requires=REQUIRES,
             scripts=SCRIPTS,
-            version=VERSION,
             python_requires=PYTHON_REQUIRES,
-            use_scm_version=True,
+            use_scm_version={"root": ".", "relative_to": __file__,
+                             "write_to": "AFQ/version.py",
+                             "local_scheme": local_version},
             setup_requires=['setuptools_scm'])
 
 
