@@ -561,12 +561,14 @@ class AFQ(object):
 
     def _mapping(self, row, reg_template):
         if self.use_prealign:
-            mapping_file = self._get_fname(row,
-                                      '_mapping_from-DWI_to_MNI_xfm'
-                                      + '_without_prealign.nii.gz')
+            mapping_file = self._get_fname(\
+                row,
+                '_mapping_from-DWI_to_MNI_xfm.nii.gz')
         else:
-            mapping_file = self._get_fname(row,
-                                      '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+            mapping_file = self._get_fname(\
+                row,
+                '_mapping_from-DWI_to_MNI_xfm'
+                + '_without_prealign.nii.gz')
 
         if not op.exists(mapping_file):
             gtab = row['gtab']
@@ -833,7 +835,7 @@ class AFQ(object):
 
             trk = nib.streamlines.load(bundles_file)
             for scalar in scalars:
-                scalar_file = _scalar_dict[scalar](row)
+                scalar_file = self._scalar_dict[scalar](self, row)
                 scalar_data = nib.load(scalar_file).get_fdata()
                 for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
                     idx = np.where(
