@@ -657,7 +657,8 @@ class AFQ(object):
 
             meta = dict(
                 TractographyClass="local",
-                TractographyMethod=meta_directions[self.tracking_params["directions"]],
+                TractographyMethod=\
+                    meta_directions[self.tracking_params["directions"]],
                 Count=len(sft.streamlines),
                 Seeding=dict(
                     ROI=wm_mask_fname,
@@ -769,7 +770,7 @@ class AFQ(object):
                             affine_to_rasmm=row['dwi_affine'])
                     tgram = aus.add_bundles(tgram, this_tgram)
             save_tractogram(
-                StatefulTractogram(\
+                StatefulTractogram(
                     tgram.streamlines,
                     sft,
                     Space.VOX,
