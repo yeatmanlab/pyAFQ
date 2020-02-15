@@ -245,8 +245,8 @@ class AFQ(object):
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
 
         use_prealign : bool, optional
-            Whether to perform pre-alignment before perforiming the diffeomorphic
-            mapping in registration. Default: True
+            Whether to perform pre-alignment before perforiming the
+            diffeomorphic mapping in registration. Default: True
 
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
@@ -603,8 +603,9 @@ class AFQ(object):
                 seg_data_orig = seg_img.get_fdata()
                 # For different sets of labels, extract all the voxels that
                 # have any of these values:
-                wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
-                                                 for l in self.wm_labels], -1), -1)
+                wm_mask = np.sum(np.concatenate(
+                    [(seg_data_orig == l)[..., None]
+                     for l in self.wm_labels], -1), -1)
 
                 # Resample to DWI data:
                 wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
@@ -637,7 +638,8 @@ class AFQ(object):
 
         streamlines_file = self._get_fname(
             row,
-            f'_space-RASMM_model-{odf_model}_desc-{directions}_tractography.trk')
+            f'_space-RASMM_model-{odf_model}_desc-{directions}'
+            + '_tractography.trk')
 
         if self.force_recompute or not op.exists(streamlines_file):
             if odf_model == "DTI":
@@ -662,11 +664,12 @@ class AFQ(object):
                     n_seeds=self.tracking_params["n_seeds"],
                     random_seeds=self.tracking_params["random_seeds"]),
                 Constraints=dict(AnatomicalImage=wm_mask_fname),
-                Parameters=dict(Units="mm",
-                                StepSize=self.tracking_params["step_size"],
-                                MinimumLength=self.tracking_params["min_length"],
-                                MaximumLength=self.tracking_params["max_length"],
-                                Unidirectional=False))
+                Parameters=dict(
+                    Units="mm",
+                    StepSize=self.tracking_params["step_size"],
+                    MinimumLength=self.tracking_params["min_length"],
+                    MaximumLength=self.tracking_params["max_length"],
+                    Unidirectional=False))
 
             meta_fname = self._get_fname(
                 row,
@@ -756,7 +759,8 @@ class AFQ(object):
                         idx_file = bundles_file.split('.')[0] + '_idx.json'
                         with open(idx_file) as ff:
                             bundle_idx = json.load(ff)[b]
-                        return_idx[b] = np.array(bundle_idx)[this_idx].tolist()
+                        return_idx[b] = \
+                            np.array(bundle_idx)[this_idx].tolist()
                     this_tgram = nib.streamlines.Tractogram(
                         this_tg.streamlines,
                         data_per_streamline={
@@ -765,10 +769,11 @@ class AFQ(object):
                             affine_to_rasmm=row['dwi_affine'])
                     tgram = aus.add_bundles(tgram, this_tgram)
             save_tractogram(
-                StatefulTractogram(tgram.streamlines,
-                                   sft,
-                                   Space.VOX,
-                                   data_per_streamline=tgram.data_per_streamline),
+                StatefulTractogram(\
+                    tgram.streamlines,
+                    sft,
+                    Space.VOX,
+                    data_per_streamline=tgram.data_per_streamline),
                 clean_bundles_file)
 
             seg_args = get_default_args(seg.clean_bundle)
@@ -808,7 +813,8 @@ class AFQ(object):
             for scalar in self.scalars:
                 scalar_file = self._scalar_dict[scalar](self, row)
                 scalar_data = nib.load(scalar_file).get_fdata()
-                for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
+                for b in np.unique(
+                        trk.tractogram.data_per_streamline['bundle']):
                     idx = np.where(
                         trk.tractogram.data_per_streamline['bundle'] == b)[0]
                     this_sl = trk.streamlines[idx]
@@ -919,8 +925,9 @@ class AFQ(object):
                     fname = op.split(
                         self._get_fname(
                             row,
-                            f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-                            f'{seg_algo}-{bundle}_tractography.trk'))
+                            f'_space-RASMM_model-{odf_model}_desc-'
+                            f'{directions}-{seg_algo}-{bundle}'
+                            f'_tractography.trk'))
                     fname = op.join(fname[0], bundles_dir, fname[1])
                     save_tractogram(this_tgm, fname, bbox_valid_check=False)
                     meta = dict(source=bundles_file)
