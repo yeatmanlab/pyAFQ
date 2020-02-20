@@ -1,3 +1,10 @@
+0.2 (February 20, 2020)
+=====================
+This release introduces some changes to the main API module, to incorporate all
+helper functions into the `API` class. This should not affect user API.
+  * RF: Api Usability (#207; JK)
+
+
 0.1.2 (February 14, 2020)
 =========================
 This release fixes a bug in the way that indices of streamlines are handled,
