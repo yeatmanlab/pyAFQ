@@ -14,8 +14,6 @@ AFQ API
 An example using the AFQ API
 
 
-
-
 .. code-block:: default
 
     import os.path as op
@@ -38,7 +36,7 @@ An example using the AFQ API
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.6.10/x64/lib/python3.6/site-packages/dipy/stats/__init__.py:7: UserWarning: The `dipy.stats` module is still under heavy development and functionality, as well as the API is likely to change in future versions of the software
+    /opt/hostedtoolcache/Python/3.7.6/x64/lib/python3.7/site-packages/dipy/stats/__init__.py:7: UserWarning: The `dipy.stats` module is still under heavy development and functionality, as well as the API is likely to change in future versions of the software
       warnings.warn(w_string)
 
 
@@ -286,7 +284,7 @@ few lines and go get a cup of coffee:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  49.877 seconds)
+   **Total running time of the script:** ( 5 minutes  10.794 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_afq_api.py:
