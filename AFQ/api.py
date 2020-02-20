@@ -130,585 +130,6 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     return afq_bundles
 
 
-def _b0(row):
-    b0_file = _get_fname(row, '_b0.nii.gz')
-    if not op.exists(b0_file):
-        img = nib.load(row['dwi_file'])
-        data = img.get_fdata()
-        gtab = row['gtab']
-        mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
-        mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
-        nib.save(mean_b0_img, b0_file)
-        meta = dict(b0_threshold=gtab.b0_threshold,
-                    source=row['dwi_file'])
-        meta_fname = _get_fname(row, '_b0.json')
-        afd.write_json(meta_fname, meta)
-    return b0_file
-
-
-def _brain_mask(row, median_radius=4, numpass=1, autocrop=False,
-                vol_idx=None, dilate=10):
-    brain_mask_file = _get_fname(row, '_brain_mask.nii.gz')
-    if not op.exists(brain_mask_file):
-        b0_file = _b0(row)
-        mean_b0_img = nib.load(b0_file)
-        mean_b0 = mean_b0_img.get_fdata()
-        _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                    autocrop, dilate=dilate)
-        be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                 mean_b0_img.affine)
-        nib.save(be_img, brain_mask_file)
-        meta = dict(source=b0_file,
-                    median_radius=median_radius,
-                    numpass=numpass,
-                    autocrop=autocrop,
-                    vol_idx=vol_idx)
-        meta_fname = _get_fname(row, '_brain_mask.json')
-        afd.write_json(meta_fname, meta)
-    return brain_mask_file
-
-
-def _dti_fit(row):
-    dti_params_file = _dti(row)
-    dti_params = nib.load(dti_params_file).get_fdata()
-    tm = dpy_dti.TensorModel(row['gtab'])
-    tf = dpy_dti.TensorFit(tm, dti_params)
-    return tf
-
-
-def _dti(row):
-    dti_params_file = _get_fname(row, '_model-DTI_diffmodel.nii.gz')
-    if not op.exists(dti_params_file):
-        img = nib.load(row['dwi_file'])
-        data = img.get_fdata()
-        gtab = row['gtab']
-        brain_mask_file = _brain_mask(row)
-        mask = nib.load(brain_mask_file).get_fdata()
-        dtf = dti_fit(gtab, data, mask=mask)
-        nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
-                 dti_params_file)
-        meta_fname = _get_fname(row, '_model-DTI_diffmodel.json')
-        meta = dict(
-            Parameters=dict(
-                FitMethod="WLS"),
-            OutlierRejection=False,
-            ModelURL=f"{DIPY_GH}reconst/dti.py")
-        afd.write_json(meta_fname, meta)
-    return dti_params_file
-
-
-def _csd(row, response=None, sh_order=8, lambda_=1, tau=0.1,):
-    csd_params_file = _get_fname(row, '_model-CSD_diffmodel.nii.gz')
-    if not op.exists(csd_params_file):
-        img = nib.load(row['dwi_file'])
-        data = img.get_fdata()
-        gtab = row['gtab']
-        brain_mask_file = _brain_mask(row)
-        mask = nib.load(brain_mask_file).get_fdata()
-        csdf = csd_fit(gtab, data, mask=mask,
-                       response=response, sh_order=sh_order,
-                       lambda_=lambda_, tau=tau)
-        nib.save(nib.Nifti1Image(csdf.shm_coeff, row['dwi_affine']),
-                 csd_params_file)
-        meta_fname = _get_fname(row, '_model-CSD_diffmodel.json')
-        meta = dict(SphericalHarmonicDegree=sh_order,
-                    ResponseFunctionTensor=response,
-                    SphericalHarmonicBasis="DESCOTEAUX",
-                    ModelURL=f"{DIPY_GH}reconst/csdeconv.py",
-                    lambda_=lambda_,
-                    tau=tau)
-        afd.write_json(meta_fname, meta)
-    return csd_params_file
-
-
-def _dti_fa(row):
-    dti_fa_file = _get_fname(row, '_model-DTI_FA.nii.gz')
-    if not op.exists(dti_fa_file):
-        tf = _dti_fit(row)
-        fa = tf.fa
-        nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
-                 dti_fa_file)
-        meta_fname = _get_fname(row, '_model-DTI_FA.json')
-        meta = dict()
-        afd.write_json(meta_fname, meta)
-    return dti_fa_file
-
-
-def _dti_cfa(row):
-    dti_cfa_file = _get_fname(row, '_model-DTI_desc-DEC_FA.nii.gz')
-    if not op.exists(dti_cfa_file):
-        tf = _dti_fit(row)
-        cfa = tf.color_fa
-        nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
-                 dti_cfa_file)
-        meta_fname = _get_fname(row, '_model-DTI_desc-DEC_FA.json')
-        meta = dict()
-        afd.write_json(meta_fname, meta)
-    return dti_cfa_file
-
-
-def _dti_pdd(row):
-    dti_pdd_file = _get_fname(row, '_model-DTI_PDD.nii.gz')
-    if not op.exists(dti_pdd_file):
-        tf = _dti_fit(row)
-        pdd = tf.directions.squeeze()
-        # Invert the x coordinates:
-        pdd[..., 0] = pdd[..., 0] * -1
-
-        nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
-                 dti_pdd_file)
-        meta_fname = _get_fname(row, '_model-DTI_PDD.json')
-        meta = dict()
-        afd.write_json(meta_fname, meta)
-    return dti_pdd_file
-
-
-def _dti_md(row):
-    dti_md_file = _get_fname(row, '_model-DTI_MD.nii.gz')
-    if not op.exists(dti_md_file):
-        tf = _dti_fit(row)
-        md = tf.md
-        nib.save(nib.Nifti1Image(md, row['dwi_affine']),
-                 dti_md_file)
-        meta_fname = _get_fname(row, '_model-DTI_MD.json')
-        meta = dict()
-        afd.write_json(meta_fname, meta)
-    return dti_md_file
-
-
-# Keep track of functions that compute scalars:
-_scalar_dict = {"dti_fa": _dti_fa,
-                "dti_md": _dti_md}
-
-
-def _reg_prealign(row):
-    prealign_file = _get_fname(row, '_prealign_from-DWI_to-MNI_xfm.npy')
-    if not op.exists(prealign_file):
-        moving = nib.load(_b0(row))
-        static = dpd.read_mni_template()
-        moving_data = moving.get_fdata()
-        moving_affine = moving.affine
-        static_data = static.get_fdata()
-        static_affine = static.affine
-        _, aff = reg.affine_registration(moving_data,
-                                         static_data,
-                                         moving_affine,
-                                         static_affine)
-        np.save(prealign_file, aff)
-        meta_fname = _get_fname(row, 'prealign_from-DWI_to-MNI_xfm.json')
-        meta = dict(type="rigid")
-        afd.write_json(meta_fname, meta)
-    return prealign_file
-
-
-def _mapping(row, reg_template):
-    mapping_file = _get_fname(row, '_mapping_from-DWI_to_MNI_xfm.nii.gz')
-    if not op.exists(mapping_file):
-        gtab = row['gtab']
-        reg_prealign = np.load(_reg_prealign(row))
-        warped_b0, mapping = reg.syn_register_dwi(row['dwi_file'], gtab,
-                                                  template=reg_template,
-                                                  prealign=reg_prealign)
-        mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
-        reg.write_mapping(mapping, mapping_file)
-        meta_fname = _get_fname(row, '_mapping_reg_prealign.json')
-        meta = dict(type="displacementfield")
-        afd.write_json(meta_fname, meta)
-
-    return mapping_file
-
-
-def _wm_mask(row, wm_labels, wm_fa_thresh=0.2):
-    wm_mask_file = _get_fname(row, '_wm_mask.nii.gz')
-    if not op.exists(wm_mask_file):
-        dwi_img = nib.load(row['dwi_file'])
-        dwi_data = dwi_img.get_fdata()
-
-        if 'seg_file' in row.index:
-            # If we found a white matter segmentation in the
-            # expected location:
-            seg_img = nib.load(row['seg_file'])
-            seg_data_orig = seg_img.get_fdata()
-            # For different sets of labels, extract all the voxels that
-            # have any of these values:
-            wm_mask = np.sum(np.concatenate([(seg_data_orig == l)[..., None]
-                                            for l in wm_labels], -1), -1)
-
-            # Resample to DWI data:
-            wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                                            seg_img.affine,
-                                            dwi_img.affine)).astype(int)
-            meta = dict(source=row['seg_file'],
-                        wm_labels=wm_labels)
-        else:
-            # Otherwise, we'll identify the white matter based on FA:
-            fa_fname = _dti_fa(row)
-            dti_fa = nib.load(fa_fname).get_fdata()
-            wm_mask = dti_fa > wm_fa_thresh
-            meta = dict(source=fa_fname,
-                        fa_threshold=wm_fa_thresh)
-
-        # Dilate to be sure to reach the gray matter:
-        wm_mask = binary_dilation(wm_mask) > 0
-
-        nib.save(nib.Nifti1Image(wm_mask.astype(int), row['dwi_affine']),
-                 wm_mask_file)
-
-        meta_fname = _get_fname(row, '_wm_mask.json')
-        afd.write_json(meta_fname, meta)
-
-    return wm_mask_file
-
-
-def _streamlines(row, wm_labels, tracking_params=None):
-    """
-    wm_labels : list
-        The values within the segmentation that are considered white matter. We
-        will use this part of the image both to seed tracking (seeding
-        throughout), and for stopping.
-    """
-    if tracking_params is None:
-        tracking_params = get_default_args(aft.track)
-
-    odf_model = tracking_params["odf_model"]
-    directions = tracking_params["directions"]
-
-    streamlines_file = _get_fname(
-        row,
-        f'_space-RASMM_model-{odf_model}_desc-{directions}_tractography.trk')
-
-    if not op.exists(streamlines_file):
-        if odf_model == "DTI":
-            params_file = _dti(row)
-        elif odf_model == "CSD":
-            params_file = _csd(row)
-        wm_mask_fname = _wm_mask(row, wm_labels)
-        wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
-        tracking_params['seed_mask'] = wm_mask
-        tracking_params['stop_mask'] = wm_mask
-        sft = aft.track(params_file, **tracking_params)
-        sft.to_vox()
-        meta_directions = {"det": "deterministic",
-                           "prob": "probabilistic"}
-
-        meta = dict(
-            TractographyClass="local",
-            TractographyMethod=meta_directions[tracking_params["directions"]],
-            Count=len(sft.streamlines),
-            Seeding=dict(
-                ROI=wm_mask_fname,
-                n_seeds=tracking_params["n_seeds"],
-                random_seeds=tracking_params["random_seeds"]),
-            Constraints=dict(AnatomicalImage=wm_mask_fname),
-            Parameters=dict(Units="mm",
-                            StepSize=tracking_params["step_size"],
-                            MinimumLength=tracking_params["min_length"],
-                            MaximumLength=tracking_params["max_length"],
-                            Unidirectional=False))
-
-        meta_fname = _get_fname(
-            row,
-            f'_space-RASMM_model-{odf_model}_desc-'
-            f'{directions}_tractography.json')
-        afd.write_json(meta_fname, meta)
-        save_tractogram(sft, streamlines_file, bbox_valid_check=False)
-
-    return streamlines_file
-
-
-def _segment(row, wm_labels, bundle_dict, reg_template,
-             tracking_params, segmentation_params, clean_params):
-    # We pass `clean_params` here, but do not use it, so we have the
-    # same signature as `_clean_bundles`.
-    odf_model = tracking_params["odf_model"]
-    directions = tracking_params["directions"]
-    seg_algo = segmentation_params["seg_algo"]
-    bundles_file = _get_fname(
-        row,
-        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-        f'{seg_algo}_tractography.trk')
-
-    if not op.exists(bundles_file):
-        streamlines_file = _streamlines(
-            row,
-            wm_labels,
-            tracking_params)
-
-        img = nib.load(row['dwi_file'])
-        tg = load_tractogram(streamlines_file, img, Space.VOX)
-        reg_prealign = np.load(_reg_prealign(row))
-
-        segmentation = seg.Segmentation(**segmentation_params)
-        bundles = segmentation.segment(bundle_dict,
-                                       tg,
-                                       row['dwi_file'],
-                                       row['bval_file'],
-                                       row['bvec_file'],
-                                       reg_template=reg_template,
-                                       mapping=_mapping(row, reg_template),
-                                       reg_prealign=reg_prealign)
-
-        if segmentation_params['return_idx']:
-            idx = {bundle: bundles[bundle]['idx'].tolist()
-                   for bundle in bundle_dict}
-            afd.write_json(bundles_file.split('.')[0] + '_idx.json',
-                           idx)
-            bundles = {bundle: bundles[bundle]['sl'] for bundle in bundle_dict}
-
-        tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
-        save_tractogram(tgram, bundles_file)
-        meta = dict(source=streamlines_file,
-                    Parameters=segmentation_params)
-        meta_fname = bundles_file.split('.')[0] + '.json'
-        afd.write_json(meta_fname, meta)
-
-    return bundles_file
-
-
-def _clean_bundles(row, wm_labels, bundle_dict, reg_template, tracking_params,
-                   segmentation_params, clean_params):
-    odf_model = tracking_params['odf_model']
-    directions = tracking_params['directions']
-    seg_algo = segmentation_params['seg_algo']
-    clean_bundles_file = _get_fname(
-        row,
-        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-        f'{seg_algo}-clean_tractography.trk')
-
-    if not op.exists(clean_bundles_file):
-        bundles_file = _segment(row,
-                                wm_labels,
-                                bundle_dict,
-                                reg_template,
-                                tracking_params,
-                                segmentation_params,
-                                clean_params)
-
-        sft = load_tractogram(bundles_file,
-                              row['dwi_img'],
-                              Space.VOX)
-
-        tgram = nib.streamlines.Tractogram([], {'bundle': []})
-        if clean_params['return_idx']:
-            return_idx = {}
-
-        for b in bundle_dict.keys():
-            if b != "whole_brain":
-                idx = np.where(sft.data_per_streamline['bundle']
-                               == bundle_dict[b]['uid'])[0]
-                this_tg = StatefulTractogram(
-                    sft.streamlines[idx],
-                    row['dwi_img'],
-                    Space.VOX)
-                this_tg = seg.clean_bundle(this_tg, **clean_params)
-                if clean_params['return_idx']:
-                    this_tg, this_idx = this_tg
-                    idx_file = bundles_file.split('.')[0] + '_idx.json'
-                    with open(idx_file) as ff:
-                        bundle_idx = json.load(ff)[b]
-                    return_idx[b] = np.array(bundle_idx)[this_idx].tolist()
-                this_tgram = nib.streamlines.Tractogram(
-                    this_tg.streamlines,
-                    data_per_streamline={
-                        'bundle': (len(this_tg)
-                                   * [bundle_dict[b]['uid']])},
-                        affine_to_rasmm=row['dwi_affine'])
-                tgram = aus.add_bundles(tgram, this_tgram)
-        save_tractogram(
-            StatefulTractogram(tgram.streamlines,
-                               sft,
-                               Space.VOX,
-                               data_per_streamline=tgram.data_per_streamline),
-            clean_bundles_file)
-
-        seg_args = get_default_args(seg.clean_bundle)
-        for k in seg_args:
-            if callable(seg_args[k]):
-                seg_args[k] = seg_args[k].__name__
-
-        meta = dict(source=bundles_file,
-                    Parameters=seg_args)
-        meta_fname = clean_bundles_file.split('.')[0] + '.json'
-        afd.write_json(meta_fname, meta)
-
-        if clean_params['return_idx']:
-            afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
-                           return_idx)
-
-    return clean_bundles_file
-
-
-def _tract_profiles(row, wm_labels, bundle_dict, reg_template,
-                    tracking_params, segmentation_params, clean_params,
-                    scalars, weighting=None):
-    profiles_file = _get_fname(row, '_profiles.csv')
-    if not op.exists(profiles_file):
-        bundles_file = _clean_bundles(row,
-                                      wm_labels,
-                                      bundle_dict,
-                                      reg_template,
-                                      tracking_params,
-                                      segmentation_params,
-                                      clean_params)
-        keys = []
-        vals = []
-        for k in bundle_dict.keys():
-            if k != "whole_brain":
-                keys.append(bundle_dict[k]['uid'])
-                vals.append(k)
-        reverse_dict = dict(zip(keys, vals))
-
-        bundle_names = []
-        profiles = []
-        node_numbers = []
-        scalar_names = []
-
-        trk = nib.streamlines.load(bundles_file)
-        for scalar in scalars:
-            scalar_file = _scalar_dict[scalar](row)
-            scalar_data = nib.load(scalar_file).get_fdata()
-            for b in np.unique(trk.tractogram.data_per_streamline['bundle']):
-                idx = np.where(
-                    trk.tractogram.data_per_streamline['bundle'] == b)[0]
-                this_sl = trk.streamlines[idx]
-                bundle_name = reverse_dict[b]
-                this_profile = afq_profile(
-                    scalar_data,
-                    this_sl,
-                    row["dwi_affine"])
-                nodes = list(np.arange(this_profile.shape[0]))
-                bundle_names.extend([bundle_name] * len(nodes))
-                node_numbers.extend(nodes)
-                scalar_names.extend([scalar] * len(nodes))
-                profiles.extend(list(this_profile))
-
-        profile_dframe = pd.DataFrame(dict(profiles=profiles,
-                                           bundle=bundle_names,
-                                           node=node_numbers,
-                                           scalar=scalar_names))
-        profile_dframe.to_csv(profiles_file)
-        meta = dict(source=bundles_file,
-                    parameters=get_default_args(afq_profile))
-        meta_fname = profiles_file.split('.')[0] + '.json'
-        afd.write_json(meta_fname, meta)
-
-    return profiles_file
-
-
-def _template_xform(row, reg_template):
-    template_xform_file = _get_fname(row, "_template_xform.nii.gz")
-    if not op.exists(template_xform_file):
-        reg_prealign = np.load(_reg_prealign(row))
-        mapping = reg.read_mapping(_mapping(row,
-                                            reg_template),
-                                   row['dwi_file'],
-                                   reg_template,
-                                   prealign=np.linalg.inv(reg_prealign))
-
-        template_xform = mapping.transform_inverse(reg_template.get_fdata())
-        nib.save(nib.Nifti1Image(template_xform,
-                                 row['dwi_affine']),
-                 template_xform_file)
-
-    return template_xform_file
-
-
-def _export_rois(row, bundle_dict, reg_template):
-    reg_prealign = np.load(_reg_prealign(row))
-
-    mapping = reg.read_mapping(_mapping(row, reg_template),
-                               row['dwi_file'],
-                               reg_template,
-                               prealign=np.linalg.inv(reg_prealign))
-
-    rois_dir = op.join(row['results_dir'], 'ROIs')
-    os.makedirs(rois_dir, exist_ok=True)
-
-    for bundle in bundle_dict:
-        for ii, roi in enumerate(bundle_dict[bundle]['ROIs']):
-
-            if bundle_dict[bundle]['rules'][ii]:
-                inclusion = 'include'
-            else:
-                inclusion = 'exclude'
-
-            warped_roi = auv.patch_up_roi(
-                (mapping.transform_inverse(
-                    roi.get_fdata(),
-                    interpolation='linear')) > 0).astype(int)
-
-            fname = op.split(
-                _get_fname(
-                    row,
-                    f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
-
-            fname = op.join(fname[0], rois_dir, fname[1])
-
-            # Cast to float32, so that it can be read in by MI-Brain:
-            nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
-                                     row['dwi_affine']),
-                     fname)
-            meta = dict()
-            meta_fname = fname.split('.')[0] + '.json'
-            afd.write_json(meta_fname, meta)
-
-
-def _export_bundles(row, wm_labels, bundle_dict, reg_template,
-                    tracking_params, segmentation_params, clean_params):
-
-    odf_model = tracking_params['odf_model']
-    directions = tracking_params['directions']
-    seg_algo = segmentation_params['seg_algo']
-
-    for func, folder in zip([_clean_bundles, _segment],
-                            ['clean_bundles', 'bundles']):
-        bundles_file = func(row,
-                            wm_labels,
-                            bundle_dict,
-                            reg_template,
-                            tracking_params,
-                            segmentation_params,
-                            clean_params)
-
-        bundles_dir = op.join(row['results_dir'], folder)
-        os.makedirs(bundles_dir, exist_ok=True)
-        trk = nib.streamlines.load(bundles_file)
-        tg = trk.tractogram
-        streamlines = tg.streamlines
-        for bundle in bundle_dict:
-            if bundle != "whole_brain":
-                uid = bundle_dict[bundle]['uid']
-                idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-                this_sl = dtu.transform_tracking_output(
-                    streamlines[idx],
-                    np.linalg.inv(row['dwi_affine']))
-
-                this_tgm = StatefulTractogram(this_sl, row['dwi_img'],
-                                              Space.VOX)
-
-                fname = op.split(
-                    _get_fname(
-                        row,
-                        f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-                        f'{seg_algo}-{bundle}_tractography.trk'))
-                fname = op.join(fname[0], bundles_dir, fname[1])
-                save_tractogram(this_tgm, fname, bbox_valid_check=False)
-                meta = dict(source=bundles_file)
-                meta_fname = fname.split('.')[0] + '.json'
-                afd.write_json(meta_fname, meta)
-
-
-def _get_affine(fname):
-    return nib.load(fname).affine
-
-
-def _get_fname(row, suffix):
-    split_fdwi = op.split(row['dwi_file'])
-    fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
-                    + suffix)
-    return fname
-
-
 class AFQ(object):
     """
 
@@ -769,6 +190,7 @@ class AFQ(object):
     .. [2] https://github.com/nipy/dmriprep
 
     """
+
     def __init__(self,
                  dmriprep_path,
                  sub_prefix="sub",
@@ -780,9 +202,11 @@ class AFQ(object):
                  b0_threshold=0,
                  bundle_names=BUNDLES,
                  dask_it=False,
+                 force_recompute=False,
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 use_prealign=True,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -809,11 +233,20 @@ class AFQ(object):
         dask_it : bool, optional
             Whether to use a dask DataFrame object
 
+        force_recompute : bool, optional
+            Whether to recompute or ignore existing derivatives.
+            This parameter can be turned on/off dynamically.
+            Default: False
+
         wm_labels : list, optional
             A list of the labels of the white matter in the segmentation file
             used. Default: the white matter values for the segmentation
             provided with the HCP data, including labels for midbrain:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+
+        use_prealign : bool, optional
+            Whether to perform pre-alignment before perforiming the
+            diffeomorphic mapping in registration. Default: True
 
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
@@ -822,9 +255,16 @@ class AFQ(object):
         tracking_params: dict, optional
             The parameters for tracking. Default: use the default behavior of
             the aft.track function.
+
+        clean_params: dict, optional
+            The parameters for cleaning. Default: use the default behavior of
+            the seg.clean_bundle function.
         """
 
+        self.force_recompute = force_recompute
+
         self.wm_labels = wm_labels
+        self.use_prealign = use_prealign
 
         self.scalars = scalars
 
@@ -863,7 +303,7 @@ class AFQ(object):
             self.reg_template = reg_template
         # This is the place in which each subject's full data lives
         self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
-                                               '%s*' % sub_prefix))
+                                               f"{sub_prefix}*"))
 
         # This is where all the outputs will go:
         self.afq_dir = op.join(
@@ -885,40 +325,28 @@ class AFQ(object):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
                 results_dir_list.append(op.join(self.afq_dir,
-                                        subject,
-                                        PurePath(sess).parts[-1]))
+                                                subject,
+                                                PurePath(sess).parts[-1]))
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
 
-                dwi_file_list.append(glob.glob(op.join(sub_dir,
-                                                       ('%s/%s/%s.nii.gz' %
-                                                        (sess, dwi_folder,
-                                                         dwi_file))))[0])
+                dwi_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
 
-                bvec_file_list.append(glob.glob(op.join(sub_dir,
-                                                        ('%s/%s/%s.bvec*' %
-                                                         (sess, dwi_folder,
-                                                          dwi_file))))[0])
+                bvec_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.bvec*")[0])
 
-                bval_file_list.append(glob.glob(op.join(sub_dir,
-                                                        ('%s/%s/%s.bval*' %
-                                                         (sess, dwi_folder,
-                                                          dwi_file))))[0])
+                bval_file_list.append(glob.glob(
+                    f"{sess}/{dwi_folder}/{dwi_file}.bval*")[0])
 
                 # The following two may or may not exist:
-                this_anat_file = glob.glob(op.join(sub_dir,
-                                           ('%s/%s/%s.nii.gz' %
-                                            (sess,
-                                             anat_folder,
-                                             anat_file))))
+                this_anat_file = glob.glob(op.join(
+                    sub_dir, (f"{sess}/{anat_folder}/{anat_file}.nii.gz")))
                 if len(this_anat_file):
                     anat_file_list.append(this_anat_file[0])
 
-                this_seg_file = glob.glob(op.join(sub_dir,
-                                                  ('%s/%s/%s.nii.gz' %
-                                                   (sess,
-                                                    anat_folder,
-                                                    seg_file))))
+                this_seg_file = glob.glob(op.join(
+                    sub_dir, (f"{sess}/{anat_folder}/{seg_file}.nii.gz")))
                 if len(this_seg_file):
                     seg_file_list.append(this_seg_file[0])
 
@@ -943,6 +371,579 @@ class AFQ(object):
         self.set_dwi_affine()
         self.set_dwi_img()
 
+    def _b0(self, row):
+        b0_file = self._get_fname(row, '_b0.nii.gz')
+        if self.force_recompute or not op.exists(b0_file):
+            img = nib.load(row['dwi_file'])
+            data = img.get_fdata()
+            gtab = row['gtab']
+            mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+            mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
+            nib.save(mean_b0_img, b0_file)
+            meta = dict(b0_threshold=gtab.b0_threshold,
+                        source=row['dwi_file'])
+            meta_fname = self._get_fname(row, '_b0.json')
+            afd.write_json(meta_fname, meta)
+        return b0_file
+
+    def _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False,
+                    vol_idx=None, dilate=10):
+        brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
+        if self.force_recompute or not op.exists(brain_mask_file):
+            b0_file = self._b0(row)
+            mean_b0_img = nib.load(b0_file)
+            mean_b0 = mean_b0_img.get_fdata()
+            _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
+                                        autocrop, dilate=dilate)
+            be_img = nib.Nifti1Image(brain_mask.astype(int),
+                                     mean_b0_img.affine)
+            nib.save(be_img, brain_mask_file)
+            meta = dict(source=b0_file,
+                        median_radius=median_radius,
+                        numpass=numpass,
+                        autocrop=autocrop,
+                        vol_idx=vol_idx)
+            meta_fname = self._get_fname(row, '_brain_mask.json')
+            afd.write_json(meta_fname, meta)
+        return brain_mask_file
+
+    def _dti_fit(self, row):
+        dti_params_file = self._dti(row)
+        dti_params = nib.load(dti_params_file).get_fdata()
+        tm = dpy_dti.TensorModel(row['gtab'])
+        tf = dpy_dti.TensorFit(tm, dti_params)
+        return tf
+
+    def _dti(self, row):
+        dti_params_file = self._get_fname(row, '_model-DTI_diffmodel.nii.gz')
+        if self.force_recompute or not op.exists(dti_params_file):
+            img = nib.load(row['dwi_file'])
+            data = img.get_fdata()
+            gtab = row['gtab']
+            brain_mask_file = self._brain_mask(row)
+            mask = nib.load(brain_mask_file).get_fdata()
+            dtf = dti_fit(gtab, data, mask=mask)
+            nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
+                     dti_params_file)
+            meta_fname = self._get_fname(row, '_model-DTI_diffmodel.json')
+            meta = dict(
+                Parameters=dict(
+                    FitMethod="WLS"),
+                OutlierRejection=False,
+                ModelURL=f"{DIPY_GH}reconst/dti.py")
+            afd.write_json(meta_fname, meta)
+        return dti_params_file
+
+    def _csd(self, row, response=None, sh_order=8, lambda_=1, tau=0.1,):
+        csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
+        if self.force_recompute or not op.exists(csd_params_file):
+            img = nib.load(row['dwi_file'])
+            data = img.get_fdata()
+            gtab = row['gtab']
+            brain_mask_file = self._brain_mask(row)
+            mask = nib.load(brain_mask_file).get_fdata()
+            csdf = csd_fit(gtab, data, mask=mask,
+                           response=response, sh_order=sh_order,
+                           lambda_=lambda_, tau=tau)
+            nib.save(nib.Nifti1Image(csdf.shm_coeff, row['dwi_affine']),
+                     csd_params_file)
+            meta_fname = self._get_fname(row, '_model-CSD_diffmodel.json')
+            meta = dict(SphericalHarmonicDegree=sh_order,
+                        ResponseFunctionTensor=response,
+                        SphericalHarmonicBasis="DESCOTEAUX",
+                        ModelURL=f"{DIPY_GH}reconst/csdeconv.py",
+                        lambda_=lambda_,
+                        tau=tau)
+            afd.write_json(meta_fname, meta)
+        return csd_params_file
+
+    def _dti_fa(self, row):
+        dti_fa_file = self._get_fname(row, '_model-DTI_FA.nii.gz')
+        if self.force_recompute or not op.exists(dti_fa_file):
+            tf = self._dti_fit(row)
+            fa = tf.fa
+            nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
+                     dti_fa_file)
+            meta_fname = self._get_fname(row, '_model-DTI_FA.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dti_fa_file
+
+    def _dti_cfa(self, row):
+        dti_cfa_file = self._get_fname(row, '_model-DTI_desc-DEC_FA.nii.gz')
+        if self.force_recompute or not op.exists(dti_cfa_file):
+            tf = self._dti_fit(row)
+            cfa = tf.color_fa
+            nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
+                     dti_cfa_file)
+            meta_fname = self._get_fname(row, '_model-DTI_desc-DEC_FA.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dti_cfa_file
+
+    def _dti_pdd(self, row):
+        dti_pdd_file = self._get_fname(row, '_model-DTI_PDD.nii.gz')
+        if self.force_recompute or not op.exists(dti_pdd_file):
+            tf = self._dti_fit(row)
+            pdd = tf.directions.squeeze()
+            # Invert the x coordinates:
+            pdd[..., 0] = pdd[..., 0] * -1
+
+            nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
+                     dti_pdd_file)
+            meta_fname = self._get_fname(row, '_model-DTI_PDD.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dti_pdd_file
+
+    def _dti_md(self, row):
+        dti_md_file = self._get_fname(row, '_model-DTI_MD.nii.gz')
+        if self.force_recompute or not op.exists(dti_md_file):
+            tf = self._dti_fit(row)
+            md = tf.md
+            nib.save(nib.Nifti1Image(md, row['dwi_affine']),
+                     dti_md_file)
+            meta_fname = self._get_fname(row, '_model-DTI_MD.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dti_md_file
+
+    # Keep track of functions that compute scalars:
+    _scalar_dict = {"dti_fa": _dti_fa,
+                    "dti_md": _dti_md}
+
+    def _reg_prealign(self, row):
+        prealign_file = self._get_fname(
+            row, '_prealign_from-DWI_to-MNI_xfm.npy')
+        if self.force_recompute or not op.exists(prealign_file):
+            moving = nib.load(self._b0(row))
+            static = dpd.read_mni_template()
+            moving_data = moving.get_fdata()
+            moving_affine = moving.affine
+            static_data = static.get_fdata()
+            static_affine = static.affine
+            _, aff = reg.affine_registration(moving_data,
+                                             static_data,
+                                             moving_affine,
+                                             static_affine)
+            np.save(prealign_file, aff)
+            meta_fname = self._get_fname(
+                row, '_prealign_from-DWI_to-MNI_xfm.json')
+            meta = dict(type="rigid")
+            afd.write_json(meta_fname, meta)
+        return prealign_file
+
+    def _export_registered_b0(self, row):
+        if self.use_prealign:
+            b0_warped_file = self._get_fname(row, '_b0_in_MNI.nii.gz')
+        else:
+            b0_warped_file = self._get_fname(
+                row, '_b0_in_MNI_without_prealign.nii.gz')
+
+        if self.force_recompute or not op.exists(b0_warped_file):
+            b0_file = self._b0(row)
+            mean_b0 = nib.load(b0_file).get_fdata()
+
+            if self.use_prealign:
+                reg_prealign = np.load(self._reg_prealign(row))
+            else:
+                reg_prealign = None
+
+            mapping_file = self._mapping(row)
+            mapping = reg.read_mapping(mapping_file, b0_file,
+                                       self.reg_template,
+                                       prealign=reg_prealign)
+
+            warped_b0 = mapping.transform(mean_b0)
+
+            nib.save(nib.Nifti1Image(
+                warped_b0, row['dwi_affine']), b0_warped_file)
+
+        return b0_warped_file
+
+    def _mapping(self, row):
+        if self.use_prealign:
+            mapping_file = self._get_fname(
+                row,
+                '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        else:
+            mapping_file = self._get_fname(
+                row,
+                '_mapping_from-DWI_to_MNI_xfm'
+                + '_without_prealign.nii.gz')
+
+        if self.force_recompute or not op.exists(mapping_file):
+            gtab = row['gtab']
+            if self.use_prealign:
+                reg_prealign = np.load(self._reg_prealign(row))
+            else:
+                reg_prealign = None
+            warped_b0, mapping = reg.syn_register_dwi(
+                row['dwi_file'], gtab,
+                template=self.reg_template,
+                prealign=reg_prealign)
+            mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+            reg.write_mapping(mapping, mapping_file)
+            meta_fname = self._get_fname(row, '_mapping_reg_prealign.json')
+            meta = dict(type="displacementfield")
+            afd.write_json(meta_fname, meta)
+
+        return mapping_file
+
+    def _wm_mask(self, row, wm_fa_thresh=0.2):
+        wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
+        if self.force_recompute or not op.exists(wm_mask_file):
+            dwi_img = nib.load(row['dwi_file'])
+            dwi_data = dwi_img.get_fdata()
+
+            if 'seg_file' in row.index:
+                # If we found a white matter segmentation in the
+                # expected location:
+                seg_img = nib.load(row['seg_file'])
+                seg_data_orig = seg_img.get_fdata()
+                # For different sets of labels, extract all the voxels that
+                # have any of these values:
+                wm_mask = np.sum(np.concatenate(
+                    [(seg_data_orig == l)[..., None]
+                     for l in self.wm_labels], -1), -1)
+
+                # Resample to DWI data:
+                wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                                                seg_img.affine,
+                                                dwi_img.affine)).astype(int)
+                meta = dict(source=row['seg_file'],
+                            wm_labels=self.wm_labels)
+            else:
+                # Otherwise, we'll identify the white matter based on FA:
+                fa_fname = self._dti_fa(row)
+                dti_fa = nib.load(fa_fname).get_fdata()
+                wm_mask = dti_fa > wm_fa_thresh
+                meta = dict(source=fa_fname,
+                            fa_threshold=wm_fa_thresh)
+
+            # Dilate to be sure to reach the gray matter:
+            wm_mask = binary_dilation(wm_mask) > 0
+
+            nib.save(nib.Nifti1Image(wm_mask.astype(int), row['dwi_affine']),
+                     wm_mask_file)
+
+            meta_fname = self._get_fname(row, '_wm_mask.json')
+            afd.write_json(meta_fname, meta)
+
+        return wm_mask_file
+
+    def _streamlines(self, row):
+        odf_model = self.tracking_params["odf_model"]
+        directions = self.tracking_params["directions"]
+
+        streamlines_file = self._get_fname(
+            row,
+            f'_space-RASMM_model-{odf_model}_desc-{directions}'
+            + '_tractography.trk')
+
+        if self.force_recompute or not op.exists(streamlines_file):
+            if odf_model == "DTI":
+                params_file = self._dti(row)
+            elif odf_model == "CSD":
+                params_file = self._csd(row)
+            wm_mask_fname = self._wm_mask(row)
+            wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
+            self.tracking_params['seed_mask'] = wm_mask
+            self.tracking_params['stop_mask'] = wm_mask
+            sft = aft.track(params_file, **self.tracking_params)
+            sft.to_vox()
+            meta_directions = {"det": "deterministic",
+                               "prob": "probabilistic"}
+
+            meta = dict(
+                TractographyClass="local",
+                TractographyMethod=meta_directions[
+                    self.tracking_params["directions"]],
+                Count=len(sft.streamlines),
+                Seeding=dict(
+                    ROI=wm_mask_fname,
+                    n_seeds=self.tracking_params["n_seeds"],
+                    random_seeds=self.tracking_params["random_seeds"]),
+                Constraints=dict(AnatomicalImage=wm_mask_fname),
+                Parameters=dict(
+                    Units="mm",
+                    StepSize=self.tracking_params["step_size"],
+                    MinimumLength=self.tracking_params["min_length"],
+                    MaximumLength=self.tracking_params["max_length"],
+                    Unidirectional=False))
+
+            meta_fname = self._get_fname(
+                row,
+                f'_space-RASMM_model-{odf_model}_desc-'
+                f'{directions}_tractography.json')
+            afd.write_json(meta_fname, meta)
+            save_tractogram(sft, streamlines_file, bbox_valid_check=False)
+
+        return streamlines_file
+
+    def _segment(self, row):
+        # We pass `clean_params` here, but do not use it, so we have the
+        # same signature as `_clean_bundles`.
+        odf_model = self.tracking_params["odf_model"]
+        directions = self.tracking_params["directions"]
+        seg_algo = self.segmentation_params["seg_algo"]
+        bundles_file = self._get_fname(
+            row,
+            f'_space-RASMM_model-{odf_model}_desc-{directions}-'
+            f'{seg_algo}_tractography.trk')
+
+        if self.force_recompute or not op.exists(bundles_file):
+            streamlines_file = self._streamlines(row)
+
+            img = nib.load(row['dwi_file'])
+            tg = load_tractogram(streamlines_file, img, Space.VOX)
+            reg_prealign = np.load(self._reg_prealign(row))
+
+            segmentation = seg.Segmentation(**self.segmentation_params)
+            bundles = segmentation.segment(self.bundle_dict,
+                                           tg,
+                                           row['dwi_file'],
+                                           row['bval_file'],
+                                           row['bvec_file'],
+                                           reg_template=self.reg_template,
+                                           mapping=self._mapping(row),
+                                           reg_prealign=reg_prealign)
+
+            if self.segmentation_params['return_idx']:
+                idx = {bundle: bundles[bundle]['idx'].tolist()
+                       for bundle in self.bundle_dict}
+                afd.write_json(bundles_file.split('.')[0] + '_idx.json',
+                               idx)
+                bundles = {bundle: bundles[bundle]['sl']
+                           for bundle in self.bundle_dict}
+
+            tgram = aus.bundles_to_tgram(bundles, self.bundle_dict, img)
+            save_tractogram(tgram, bundles_file)
+            meta = dict(source=streamlines_file,
+                        Parameters=self.segmentation_params)
+            meta_fname = bundles_file.split('.')[0] + '.json'
+            afd.write_json(meta_fname, meta)
+
+        return bundles_file
+
+    def _clean_bundles(self, row):
+        odf_model = self.tracking_params['odf_model']
+        directions = self.tracking_params['directions']
+        seg_algo = self.segmentation_params['seg_algo']
+        clean_bundles_file = self._get_fname(
+            row,
+            f'_space-RASMM_model-{odf_model}_desc-{directions}-'
+            f'{seg_algo}-clean_tractography.trk')
+
+        if self.force_recompute or not op.exists(clean_bundles_file):
+            bundles_file = self._segment(row)
+
+            sft = load_tractogram(bundles_file,
+                                  row['dwi_img'],
+                                  Space.VOX)
+
+            tgram = nib.streamlines.Tractogram([], {'bundle': []})
+            if self.clean_params['return_idx']:
+                return_idx = {}
+
+            for b in self.bundle_dict.keys():
+                if b != "whole_brain":
+                    idx = np.where(sft.data_per_streamline['bundle']
+                                   == self.bundle_dict[b]['uid'])[0]
+                    this_tg = StatefulTractogram(
+                        sft.streamlines[idx],
+                        row['dwi_img'],
+                        Space.VOX)
+                    this_tg = seg.clean_bundle(this_tg, **self.clean_params)
+                    if self.clean_params['return_idx']:
+                        this_tg, this_idx = this_tg
+                        idx_file = bundles_file.split('.')[0] + '_idx.json'
+                        with open(idx_file) as ff:
+                            bundle_idx = json.load(ff)[b]
+                        return_idx[b] = \
+                            np.array(bundle_idx)[this_idx].tolist()
+                    this_tgram = nib.streamlines.Tractogram(
+                        this_tg.streamlines,
+                        data_per_streamline={
+                            'bundle': (len(this_tg)
+                                       * [self.bundle_dict[b]['uid']])},
+                            affine_to_rasmm=row['dwi_affine'])
+                    tgram = aus.add_bundles(tgram, this_tgram)
+            save_tractogram(
+                StatefulTractogram(
+                    tgram.streamlines,
+                    sft,
+                    Space.VOX,
+                    data_per_streamline=tgram.data_per_streamline),
+                clean_bundles_file)
+
+            seg_args = get_default_args(seg.clean_bundle)
+            for k in seg_args:
+                if callable(seg_args[k]):
+                    seg_args[k] = seg_args[k].__name__
+
+            meta = dict(source=bundles_file,
+                        Parameters=seg_args)
+            meta_fname = clean_bundles_file.split('.')[0] + '.json'
+            afd.write_json(meta_fname, meta)
+
+            if self.clean_params['return_idx']:
+                afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
+                               return_idx)
+
+        return clean_bundles_file
+
+    def _tract_profiles(self, row, weighting=None):
+        profiles_file = self._get_fname(row, '_profiles.csv')
+        if self.force_recompute or not op.exists(profiles_file):
+            bundles_file = self._clean_bundles(row)
+            keys = []
+            vals = []
+            for k in self.bundle_dict.keys():
+                if k != "whole_brain":
+                    keys.append(self.bundle_dict[k]['uid'])
+                    vals.append(k)
+            reverse_dict = dict(zip(keys, vals))
+
+            bundle_names = []
+            profiles = []
+            node_numbers = []
+            scalar_names = []
+
+            trk = nib.streamlines.load(bundles_file)
+            for scalar in self.scalars:
+                scalar_file = self._scalar_dict[scalar](self, row)
+                scalar_data = nib.load(scalar_file).get_fdata()
+                for b in np.unique(
+                        trk.tractogram.data_per_streamline['bundle']):
+                    idx = np.where(
+                        trk.tractogram.data_per_streamline['bundle'] == b)[0]
+                    this_sl = trk.streamlines[idx]
+                    bundle_name = reverse_dict[b]
+                    this_profile = afq_profile(
+                        scalar_data,
+                        this_sl,
+                        row["dwi_affine"])
+                    nodes = list(np.arange(this_profile.shape[0]))
+                    bundle_names.extend([bundle_name] * len(nodes))
+                    node_numbers.extend(nodes)
+                    scalar_names.extend([scalar] * len(nodes))
+                    profiles.extend(list(this_profile))
+
+            profile_dframe = pd.DataFrame(dict(profiles=profiles,
+                                               bundle=bundle_names,
+                                               node=node_numbers,
+                                               scalar=scalar_names))
+            profile_dframe.to_csv(profiles_file)
+            meta = dict(source=bundles_file,
+                        parameters=get_default_args(afq_profile))
+            meta_fname = profiles_file.split('.')[0] + '.json'
+            afd.write_json(meta_fname, meta)
+
+        return profiles_file
+
+    def _template_xform(self, row):
+        template_xform_file = self._get_fname(row, "_template_xform.nii.gz")
+        if self.force_recompute or not op.exists(template_xform_file):
+            reg_prealign = np.load(self._reg_prealign(row))
+            mapping = reg.read_mapping(self._mapping(row),
+                                       row['dwi_file'],
+                                       self.reg_template,
+                                       prealign=np.linalg.inv(reg_prealign))
+
+            template_xform = mapping.transform_inverse(
+                self.reg_template.get_fdata())
+            nib.save(nib.Nifti1Image(template_xform,
+                                     row['dwi_affine']),
+                     template_xform_file)
+
+        return template_xform_file
+
+    def _export_rois(self, row):
+        reg_prealign = np.load(self._reg_prealign(row))
+
+        mapping = reg.read_mapping(self._mapping(row),
+                                   row['dwi_file'],
+                                   self.reg_template,
+                                   prealign=np.linalg.inv(reg_prealign))
+
+        rois_dir = op.join(row['results_dir'], 'ROIs')
+        os.makedirs(rois_dir, exist_ok=True)
+
+        for bundle in self.bundle_dict:
+            for ii, roi in enumerate(self.bundle_dict[bundle]['ROIs']):
+
+                if self.bundle_dict[bundle]['rules'][ii]:
+                    inclusion = 'include'
+                else:
+                    inclusion = 'exclude'
+
+                warped_roi = auv.patch_up_roi(
+                    (mapping.transform_inverse(
+                        roi.get_fdata(),
+                        interpolation='linear')) > 0).astype(int)
+
+                fname = op.split(
+                    self._get_fname(
+                        row,
+                        f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
+
+                fname = op.join(fname[0], rois_dir, fname[1])
+
+                # Cast to float32, so that it can be read in by MI-Brain:
+                nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
+                                         row['dwi_affine']),
+                         fname)
+                meta = dict()
+                meta_fname = fname.split('.')[0] + '.json'
+                afd.write_json(meta_fname, meta)
+
+    def _export_bundles(self, row):
+        odf_model = self.tracking_params['odf_model']
+        directions = self.tracking_params['directions']
+        seg_algo = self.segmentation_params['seg_algo']
+
+        for func, folder in zip([self._clean_bundles, self._segment],
+                                ['clean_bundles', 'bundles']):
+            bundles_file = func(row)
+
+            bundles_dir = op.join(row['results_dir'], folder)
+            os.makedirs(bundles_dir, exist_ok=True)
+            trk = nib.streamlines.load(bundles_file)
+            tg = trk.tractogram
+            streamlines = tg.streamlines
+            for bundle in self.bundle_dict:
+                if bundle != "whole_brain":
+                    uid = self.bundle_dict[bundle]['uid']
+                    idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+                    this_sl = dtu.transform_tracking_output(
+                        streamlines[idx],
+                        np.linalg.inv(row['dwi_affine']))
+
+                    this_tgm = StatefulTractogram(this_sl, row['dwi_img'],
+                                                  Space.VOX)
+
+                    fname = op.split(
+                        self._get_fname(
+                            row,
+                            f'_space-RASMM_model-{odf_model}_desc-'
+                            f'{directions}-{seg_algo}-{bundle}'
+                            f'_tractography.trk'))
+                    fname = op.join(fname[0], bundles_dir, fname[1])
+                    save_tractogram(this_tgm, fname, bbox_valid_check=False)
+                    meta = dict(source=bundles_file)
+                    meta_fname = fname.split('.')[0] + '.json'
+                    afd.write_json(meta_fname, meta)
+
+    def _get_affine(self, fname):
+        return nib.load(fname).affine
+
+    def _get_fname(self, row, suffix):
+        split_fdwi = op.split(row['dwi_file'])
+        fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
+                        + suffix)
+        return fname
+
     def set_gtab(self, b0_threshold):
         self.data_frame['gtab'] = self.data_frame.apply(
             lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file'],
@@ -956,7 +957,7 @@ class AFQ(object):
 
     def set_dwi_affine(self):
         self.data_frame['dwi_affine'] =\
-            self.data_frame['dwi_file'].apply(_get_affine)
+            self.data_frame['dwi_file'].apply(self._get_affine)
 
     def get_dwi_affine(self):
         return self.data_frame['dwi_affine']
@@ -978,7 +979,7 @@ class AFQ(object):
     def set_b0(self):
         if 'b0_file' not in self.data_frame.columns:
             self.data_frame['b0_file'] =\
-                self.data_frame.apply(_b0,
+                self.data_frame.apply(self._b0,
                                       axis=1)
 
     def get_b0(self):
@@ -990,7 +991,7 @@ class AFQ(object):
     def set_brain_mask(self):
         if 'brain_mask_file' not in self.data_frame.columns:
             self.data_frame['brain_mask_file'] =\
-                self.data_frame.apply(_brain_mask,
+                self.data_frame.apply(self._brain_mask,
                                       axis=1)
 
     def get_brain_mask(self):
@@ -1002,8 +1003,7 @@ class AFQ(object):
     def set_wm_mask(self):
         if 'wm_mask_file' not in self.data_frame.columns:
             self.data_frame['wm_mask_file'] =\
-                self.data_frame.apply(_wm_mask,
-                                      args=[self.wm_labels],
+                self.data_frame.apply(self._wm_mask,
                                       axis=1)
 
     def get_wm_mask(self):
@@ -1015,7 +1015,7 @@ class AFQ(object):
     def set_dti(self):
         if 'dti_params_file' not in self.data_frame.columns:
             self.data_frame['dti_params_file'] =\
-                self.data_frame.apply(_dti,
+                self.data_frame.apply(self._dti,
                                       axis=1)
 
     def get_dti(self):
@@ -1027,7 +1027,7 @@ class AFQ(object):
     def set_dti_fa(self):
         if 'dti_fa_file' not in self.data_frame.columns:
             self.data_frame['dti_fa_file'] =\
-                self.data_frame.apply(_dti_fa,
+                self.data_frame.apply(self._dti_fa,
                                       axis=1)
 
     def get_dti_fa(self):
@@ -1039,7 +1039,7 @@ class AFQ(object):
     def set_dti_cfa(self):
         if 'dti_cfa_file' not in self.data_frame.columns:
             self.data_frame['dti_cfa_file'] =\
-                self.data_frame.apply(_dti_cfa,
+                self.data_frame.apply(self._dti_cfa,
                                       axis=1)
 
     def get_dti_cfa(self):
@@ -1051,7 +1051,7 @@ class AFQ(object):
     def set_dti_pdd(self):
         if 'dti_pdd_file' not in self.data_frame.columns:
             self.data_frame['dti_pdd_file'] =\
-                self.data_frame.apply(_dti_pdd,
+                self.data_frame.apply(self._dti_pdd,
                                       axis=1)
 
     def get_dti_pdd(self):
@@ -1063,7 +1063,7 @@ class AFQ(object):
     def set_dti_md(self):
         if 'dti_md_file' not in self.data_frame.columns:
             self.data_frame['dti_md_file'] =\
-                self.data_frame.apply(_dti_md,
+                self.data_frame.apply(self._dti_md,
                                       axis=1)
 
     def get_dti_md(self):
@@ -1075,8 +1075,7 @@ class AFQ(object):
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
             self.data_frame['mapping'] =\
-                self.data_frame.apply(_mapping,
-                                      args=[self.reg_template],
+                self.data_frame.apply(self._mapping,
                                       axis=1)
 
     def get_mapping(self):
@@ -1088,9 +1087,7 @@ class AFQ(object):
     def set_streamlines(self):
         if 'streamlines_file' not in self.data_frame.columns:
             self.data_frame['streamlines_file'] =\
-                self.data_frame.apply(_streamlines, axis=1,
-                                      args=[self.wm_labels,
-                                            self.tracking_params])
+                self.data_frame.apply(self._streamlines, axis=1)
 
     def get_streamlines(self):
         self.set_streamlines()
@@ -1101,15 +1098,7 @@ class AFQ(object):
     def set_bundles(self):
         if 'bundles_file' not in self.data_frame.columns:
             self.data_frame['bundles_file'] =\
-                self.data_frame.apply(
-                    _segment,
-                    axis=1,
-                    args=[self.wm_labels,
-                          self.bundle_dict,
-                          self.reg_template,
-                          self.tracking_params,
-                          self.segmentation_params,
-                          self.clean_params])
+                self.data_frame.apply(self._segment, axis=1)
 
     def get_bundles(self):
         self.set_bundles()
@@ -1124,13 +1113,7 @@ class AFQ(object):
                     self.data_frame['bundles_file']
             else:
                 self.data_frame['clean_bundles_file'] =\
-                    self.data_frame.apply(_clean_bundles, axis=1,
-                                          args=[self.wm_labels,
-                                                self.bundle_dict,
-                                                self.reg_template,
-                                                self.tracking_params,
-                                                self.segmentation_params,
-                                                self.clean_params])
+                    self.data_frame.apply(self._clean_bundles, axis=1)
 
     def get_clean_bundles(self):
         self.set_clean_bundles()
@@ -1141,15 +1124,7 @@ class AFQ(object):
     def set_tract_profiles(self):
         if 'tract_profiles_file' not in self.data_frame.columns:
             self.data_frame['tract_profiles_file'] =\
-                self.data_frame.apply(_tract_profiles,
-                                      args=[self.wm_labels,
-                                            self.bundle_dict,
-                                            self.reg_template,
-                                            self.tracking_params,
-                                            self.segmentation_params,
-                                            self.clean_params,
-                                            self.scalars],
-                                      axis=1)
+                self.data_frame.apply(self._tract_profiles, axis=1)
 
     def get_tract_profiles(self):
         self.set_tract_profiles()
@@ -1160,8 +1135,7 @@ class AFQ(object):
     def set_template_xform(self):
         if 'template_xform_file' not in self.data_frame.columns:
             self.data_frame['template_xform_file'] = \
-                self.data_frame.apply(_template_xform,
-                                      args=[self.reg_template],
+                self.data_frame.apply(self._template_xform,
                                       axis=1)
 
     def get_template_xform(self):
@@ -1171,20 +1145,13 @@ class AFQ(object):
     template_xform = property(get_template_xform, set_template_xform)
 
     def export_rois(self):
-        self.data_frame.apply(_export_rois,
-                              args=[self.bundle_dict,
-                                    self.reg_template],
-                              axis=1)
+        self.data_frame.apply(self._export_rois, axis=1)
 
     def export_bundles(self):
-        self.data_frame.apply(_export_bundles,
-                              args=[self.wm_labels,
-                                    self.bundle_dict,
-                                    self.reg_template,
-                                    self.tracking_params,
-                                    self.segmentation_params,
-                                    self.clean_params],
-                              axis=1)
+        self.data_frame.apply(self._export_bundles, axis=1)
+
+    def export_registered_b0(self):
+        self.data_frame.apply(self._export_registered_b0, axis=1)
 
     def combine_profiles(self):
         dfs = []
