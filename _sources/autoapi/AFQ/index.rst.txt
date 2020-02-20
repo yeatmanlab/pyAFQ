@@ -34,7 +34,7 @@ Submodules
 Package Contents
 ----------------
 
-.. py:class:: AFQ(dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], tracking_params=None, segmentation_params=None, clean_params=None)
+.. py:class:: AFQ(dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, force_recompute=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], use_prealign=True, tracking_params=None, segmentation_params=None, clean_params=None)
 
    Bases: :class:`object`
 
@@ -109,6 +109,11 @@ Package Contents
 
    ..
        !! processed by numpydoc !!
+
+   .. attribute:: _scalar_dict
+      
+
+      
 
    .. attribute:: gtab
       
@@ -194,6 +199,94 @@ Package Contents
       
 
       
+
+   .. method:: _b0(self, row)
+
+
+
+   .. method:: _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False, vol_idx=None, dilate=10)
+
+
+
+   .. method:: _dti_fit(self, row)
+
+
+
+   .. method:: _dti(self, row)
+
+
+
+   .. method:: _csd(self, row, response=None, sh_order=8, lambda_=1, tau=0.1)
+
+
+
+   .. method:: _dti_fa(self, row)
+
+
+
+   .. method:: _dti_cfa(self, row)
+
+
+
+   .. method:: _dti_pdd(self, row)
+
+
+
+   .. method:: _dti_md(self, row)
+
+
+
+   .. method:: _reg_prealign(self, row)
+
+
+
+   .. method:: _export_registered_b0(self, row)
+
+
+
+   .. method:: _mapping(self, row)
+
+
+
+   .. method:: _wm_mask(self, row, wm_fa_thresh=0.2)
+
+
+
+   .. method:: _streamlines(self, row)
+
+
+
+   .. method:: _segment(self, row)
+
+
+
+   .. method:: _clean_bundles(self, row)
+
+
+
+   .. method:: _tract_profiles(self, row, weighting=None)
+
+
+
+   .. method:: _template_xform(self, row)
+
+
+
+   .. method:: _export_rois(self, row)
+
+
+
+   .. method:: _export_bundles(self, row)
+
+
+
+   .. method:: _get_affine(self, fname)
+
+
+
+   .. method:: _get_fname(self, row, suffix)
+
+
 
    .. method:: set_gtab(self, b0_threshold)
 
@@ -340,6 +433,10 @@ Package Contents
 
 
    .. method:: export_bundles(self)
+
+
+
+   .. method:: export_registered_b0(self)
 
 
 

@@ -56,7 +56,7 @@ image.</p>
 
 <dl class="class">
 <dt id="AFQ.api.AFQ">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.api.</code><code class="sig-name descname">AFQ</code><span class="sig-paren">(</span><em class="sig-param">dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], tracking_params=None, segmentation_params=None, clean_params=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.api.</code><code class="sig-name descname">AFQ</code><span class="sig-paren">(</span><em class="sig-param">dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, force_recompute=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], use_prealign=True, tracking_params=None, segmentation_params=None, clean_params=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <blockquote>
 <div><p>This is file folder structure that AFQ requires in your study folder:</p>
@@ -127,6 +127,11 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 <dd><p><a class="reference external" href="https://github.com/nipy/dmriprep">https://github.com/nipy/dmriprep</a></p>
 </dd>
 </dl>
+<dl class="attribute">
+<dt id="AFQ.api.AFQ._scalar_dict">
+<code class="sig-name descname">_scalar_dict</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._scalar_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._scalar_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="AFQ.api.AFQ.gtab">
 <code class="sig-name descname">gtab</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.gtab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.gtab" title="Permalink to this definition">¶</a></dt>
@@ -210,6 +215,116 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 <dl class="attribute">
 <dt id="AFQ.api.AFQ.template_xform">
 <code class="sig-name descname">template_xform</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.template_xform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._b0">
+<code class="sig-name descname">_b0</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._brain_mask">
+<code class="sig-name descname">_brain_mask</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em>, <em class="sig-param">median_radius=4</em>, <em class="sig-param">numpass=1</em>, <em class="sig-param">autocrop=False</em>, <em class="sig-param">vol_idx=None</em>, <em class="sig-param">dilate=10</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._brain_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._brain_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti_fit">
+<code class="sig-name descname">_dti_fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti">
+<code class="sig-name descname">_dti</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._csd">
+<code class="sig-name descname">_csd</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em>, <em class="sig-param">response=None</em>, <em class="sig-param">sh_order=8</em>, <em class="sig-param">lambda_=1</em>, <em class="sig-param">tau=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._csd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._csd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti_fa">
+<code class="sig-name descname">_dti_fa</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti_cfa">
+<code class="sig-name descname">_dti_cfa</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_cfa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_cfa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti_pdd">
+<code class="sig-name descname">_dti_pdd</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_pdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_pdd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._dti_md">
+<code class="sig-name descname">_dti_md</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_md" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._reg_prealign">
+<code class="sig-name descname">_reg_prealign</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._reg_prealign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._reg_prealign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._export_registered_b0">
+<code class="sig-name descname">_export_registered_b0</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_registered_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_registered_b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._mapping">
+<code class="sig-name descname">_mapping</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._wm_mask">
+<code class="sig-name descname">_wm_mask</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em>, <em class="sig-param">wm_fa_thresh=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._wm_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._wm_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._streamlines">
+<code class="sig-name descname">_streamlines</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._streamlines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._segment">
+<code class="sig-name descname">_segment</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._segment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._clean_bundles">
+<code class="sig-name descname">_clean_bundles</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._clean_bundles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._tract_profiles">
+<code class="sig-name descname">_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em>, <em class="sig-param">weighting=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._tract_profiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._template_xform">
+<code class="sig-name descname">_template_xform</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._template_xform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._export_rois">
+<code class="sig-name descname">_export_rois</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_rois"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_rois" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._export_bundles">
+<code class="sig-name descname">_export_bundles</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_bundles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._get_affine">
+<code class="sig-name descname">_get_affine</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_affine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AFQ.api.AFQ._get_fname">
+<code class="sig-name descname">_get_fname</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">row</em>, <em class="sig-param">suffix</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_fname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_fname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -398,6 +513,11 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="AFQ.api.AFQ.export_registered_b0">
+<code class="sig-name descname">export_registered_b0</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_registered_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_registered_b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="AFQ.api.AFQ.combine_profiles">
 <code class="sig-name descname">combine_profiles</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.combine_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.combine_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -481,7 +601,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
