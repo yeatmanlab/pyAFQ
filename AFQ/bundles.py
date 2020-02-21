@@ -10,12 +10,25 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 import AFQ.segmentation as seg
 
 class Bundles:
-    def __init__(self, bundles_dict=None, using_idx=False):
+    def __init__(self, reference, space=Space.RASMM, affine=np.eye(4),
+                 bundles_dict=None, using_idx=False):
         """
         Collection of bundles.
 
         Parameters
         ----------
+        reference : Nifti or Trk filename, Nifti1Image or TrkFile,
+            Nifti1Header, trk.header (dict) or another Stateful Tractogram
+            Reference that provides the spatial attribute.
+            Typically a nifti-related object from the native diffusion used for
+            streamlines generation
+
+        space : string, optional.
+            Current space in which the streamlines are (vox, voxmm or rasmm)
+            Typically after tracking the space is VOX, after nibabel loading
+            the space is RASMM
+            Default: Space.RASMM
+
         bundles : dict, optional.
             Keys are names of the bundles.
             If using_idx is true, values are Streamline objects.
@@ -29,23 +42,26 @@ class Bundles:
             Default: False.
         """
         self.bundles = {}
-        if bundles_dict is not None:
-            for fg_name in bundles_dict:
-                if using_idx:
-                    self.add_bundle(fg_name,
-                                        bundles_dict[fg_name]['sl'],
-                                        bundles_dict[fg_name]['idx'])
-                else:
-                    self.add_bundle(fg_name,
-                                        bundles_dict[fg_name])
+        self.reference = reference
+        self.space = space
 
-    def add_bundle(self, fg_name, streamlines, idx=None):
+        if bundles_dict is not None:
+            for bundle_name in bundles_dict:
+                if using_idx:
+                    self.add_bundle(bundle_name,
+                                    bundles_dict[bundle_name]['sl'],
+                                    bundles_dict[bundle_name]['idx'])
+                else:
+                    self.add_bundle(bundle_name,
+                                    bundles_dict[bundle_name])
+
+    def add_bundle(self, bundle_name, streamlines, idx=None):
         """
         Add a bundle to bundles.
 
         Parameters
         ----------
-        fg_name : string
+        bundle_name : string
             Name of bundle.
 
         streamlines : nibabel.Streamlines class instance.
@@ -55,15 +71,18 @@ class Bundles:
             Indices for streamlines in original tractography.
             Default: None.
         """
-        self.bundles[fg_name] = {}
-        self.bundles[fg_name]['sl'] = streamlines
+        self.bundles[bundle_name] = {}
+        self.bundles[bundle_name]['sl'] = StatefulTractogram(streamlines,
+                                                             self.reference,
+                                                             self.space)
 
         if idx is not None:
-            self.bundles[fg_name]['idx'] = idx
-            self.bundles[fg_name]['using_idx'] = True
+            self.bundles[bundle_name]['idx'] = idx
+            self.bundles[bundle_name]['using_idx'] = True
         else:
-            self.bundles[fg_name]['using_idx'] = False
+            self.bundles[bundle_name]['using_idx'] = False
 
+    # TODO: update to using sft
     def clean_bundles(self, **kwargs):
         """
         Clean each segmented bundle based on the Mahalnobis distance of
@@ -108,37 +127,19 @@ class Bundles:
         Parameters
         ----------
         affine : array (4, 4)
-            The mapping between voxel indices and the point space for seeds.
-            The voxel_to_rasmm matrix, typically from a NIFTI file.
+            Apply affine matrix to all streamlines
         """
         for _, bundle in self.bundles:
-            bundle['sl'] = dts.Streamlines(
-                dtu.transform_tracking_output(bundle['sl'],
-                                            affine))
+            bundle['sl'].apply_affine(affine)
 
-    def save_bundles(self, reference, affine=np.eye(4),
-                          space=Space.RASMM,
-                          file_path='./', file_suffix='.trk',
-                          bbox_valid_check=False):
+
+    def save_bundles(self, file_path='./', file_suffix='.trk',
+                     bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
         Parameters
         ----------
-        reference : Nifti or Trk filename, Nifti1Image or TrkFile,
-            Nifti1Header, trk.header (dict) or another Stateful Tractogram
-            Reference that provides the spatial attribute.
-            Typically a nifti-related object from the native diffusion used for
-            streamlines generation
-        affine : array (4, 4), optional.
-            The mapping between voxel indices and the point space for seeds.
-            The voxel_to_rasmm matrix, typically from a NIFTI file.
-            Default: np.eye(4)
-        space : string, optional.
-            Current space in which the streamlines are (vox, voxmm or rasmm)
-            Typically after tracking the space is VOX, after nibabel loading
-            the space is RASMM
-            Default: Space.RASMM
         file_path : string, optional.
             Path to save trk files to.
             Default: './'
@@ -149,41 +150,21 @@ class Bundles:
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
         """
-        for fg_name, bundle in self.bundles:
-            sft = StatefulTractogram(
-                dtu.transform_tracking_output(bundle['sl'], affine),
-                reference, space)
-
-            save_tractogram(sft, f'{file_path}{fg_name}{file_suffix}',
+        for bundle_name, bundle in self.bundles:
+            save_tractogram(bundle['sl'],
+                            f'{file_path}{bundle_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
 
-    # TODO: load_bundles
-    # TODO: tract_profiles
-    def load_bundles(self, fg_names, reference,
-                          space=Space.RASMM, affine=np.eye(4),
-                          file_path='./', file_suffix='.trk',
-                          bbox_valid_check=False):
+
+    def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
+                     bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
         Parameters
         ----------
-        fg_names : list of strings
+        bundle_names : list of strings
             Names of bundles to load.
-        reference : Nifti or Trk filename, Nifti1Image or TrkFile,
-            Nifti1Header, trk.header (dict) or another Stateful Tractogram
-            Reference that provides the spatial attribute.
-            Typically a nifti-related object from the native diffusion used for
-            streamlines generation
-        affine : array (4, 4), optional.
-            The mapping between voxel indices and the point space for seeds.
-            The voxel_to_rasmm matrix, typically from a NIFTI file.
-            Default: np.eye(4)
-        space : string, optional.
-            Current space in which the streamlines are (vox, voxmm or rasmm)
-            Typically after tracking the space is VOX, after nibabel loading
-            the space is RASMM
-            Default: Space.RASMM
         file_path : string, optional.
             Path to load trk files from.
             Default: './'
@@ -194,17 +175,14 @@ class Bundles:
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
         """
-        for fg_name in fg_names:
-            sft = load_tractogram(f'{file_path}{fg_name}{file_suffix}',
-                                  reference,
-                                  to_space=space,
+        for bundle_name in bundle_names:
+            sft = load_tractogram(f'{file_path}{bundle_name}{file_suffix}',
+                                  self.reference,
+                                  to_space=self.space,
                                   bbox_valid_check=bbox_valid_check)
+            self.add_sft(bundle_name, sft)
 
-            streamlines = dts.Streamlines(
-                dtu.transform_tracking_output(sft.streamlines,
-                                              affine))
-            self.add_bundle(fg_name, streamlines)
-
+    # TODO: update to using sft
     def tract_profiles(self, data, affine=np.eye(4)):
         """
         Calculate a summarized profile of data for each bundle along
@@ -226,3 +204,4 @@ class Bundles:
             weights = gaussian_weights(bundle['sl'])
             bundle['profile'] = afq_profile(data, bundle['sl'],
                                                  affine, weights=weights)
+    # TODO: add add_sft
