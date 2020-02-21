@@ -10,6 +10,9 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 import AFQ.segmentation as seg
 
 # TODO: suppress logs (show once for each call)
+# TODO: Use bundles to tgram to save and load as one tractogram file
+#       and a metadata file with bundle dict unique IDs.
+# TODO: make tests
 
 class Bundles:
     def __init__(self, reference, space=Space.RASMM,
