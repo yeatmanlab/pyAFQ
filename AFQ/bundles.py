@@ -9,8 +9,10 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 
 import AFQ.segmentation as seg
 
+# TODO: suppress logs (show once for each call)
+
 class Bundles:
-    def __init__(self, reference, space=Space.RASMM, affine=np.eye(4),
+    def __init__(self, reference, space=Space.RASMM,
                  bundles_dict=None, using_idx=False):
         """
         Collection of bundles.
@@ -64,7 +66,7 @@ class Bundles:
         bundle_name : string
             Name of bundle.
 
-        streamlines : nibabel.Streamlines class instance.
+        streamlines : nibabel.Streamlines or StatefulTractogram
             The streamlines constituting a bundle.
 
         idx : array of ints, optional
@@ -72,15 +74,28 @@ class Bundles:
             Default: None.
         """
         self.bundles[bundle_name] = {}
-        self.bundles[bundle_name]['sl'] = StatefulTractogram(streamlines,
-                                                             self.reference,
-                                                             self.space)
+
+        if isinstance(streamlines, StatefulTractogram):
+            if self.space == Space.VOX:
+                streamlines.to_vox()
+            elif self.space == Space.VOXMM:
+                streamlines.to_voxmm()
+            elif self.space == Space.RASMM:
+                streamlines.to_rasmm()
+
+            self.bundles[bundle_name]['sl'] = streamlines
+        else:
+            self.bundles[bundle_name]['sl'] = \
+                StatefulTractogram(streamlines,
+                                   self.reference,
+                                   self.space)
 
         if idx is not None:
             self.bundles[bundle_name]['idx'] = idx
             self.bundles[bundle_name]['using_idx'] = True
         else:
             self.bundles[bundle_name]['using_idx'] = False
+
 
     # TODO: update to using sft
     def clean_bundles(self, **kwargs):
@@ -119,7 +134,7 @@ class Bundles:
                                                      return_idx=False
                                                      **kwargs)
 
-    def transform_bundles(self, affine):
+    def apply_affine(self, affine):
         """
         Appliy a linear transformation, given by affine, to all
         streamlines.
@@ -132,9 +147,30 @@ class Bundles:
         for _, bundle in self.bundles:
             bundle['sl'].apply_affine(affine)
 
+    def to_space(self, space):
+        """
+        Transform streamlines to space.
+
+        Parameters
+        ----------
+        space : string
+            Space to transform the streamlines to.
+        """
+        space = space.lower()
+        for _, bundle in self.bundles:
+            if space == Space.VOX:
+                bundle['sl'].to_vox()
+                self.space = Space.VOX
+            elif space == Space.VOXMM:
+                bundle['sl'].to_voxmm()
+                self.space = Space.VOXMM
+            elif space == Space.RASMM:
+                bundle['sl'].to_rasmm()
+                self.space = Space.RASMM
+
 
     def save_bundles(self, file_path='./', file_suffix='.trk',
-                     bbox_valid_check=False):
+                     space=None, bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
@@ -146,18 +182,29 @@ class Bundles:
         file_suffix : string, optional.
             File name will be the bundle name + file_suffix.
             Default: '.trk'
+        space : string
+            Space to save the streamlines in. If not none, the streamlines
+            will be transformed to this space, saved, then transformed back.
+            Default: None.
         bbox_valid_check : boolean, optional.
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
         """
+        if space is not None:
+            space_temp = self.space
+            self.to_space(space)
+
         for bundle_name, bundle in self.bundles:
             save_tractogram(bundle['sl'],
                             f'{file_path}{bundle_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
+        
+        if space is not None:
+            self.to_space(space_temp)
 
 
     def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
-                     bbox_valid_check=False):
+                     space=None, bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
@@ -171,6 +218,9 @@ class Bundles:
         file_suffix : string, optional.
             File name will be the bundle name + file_suffix.
             Default: '.trk'
+        space : string
+            Space to transform the streamlines to.
+            Default: None.
         bbox_valid_check : boolean, optional.
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
@@ -180,7 +230,10 @@ class Bundles:
                                   self.reference,
                                   to_space=self.space,
                                   bbox_valid_check=bbox_valid_check)
-            self.add_sft(bundle_name, sft)
+            self.add_bundle(bundle_name, sft)
+
+        if space is not None:
+            self.to_space(space)
 
     # TODO: update to using sft
     def tract_profiles(self, data, affine=np.eye(4)):
@@ -200,8 +253,8 @@ class Bundles:
             The voxel_to_rasmm matrix, typically from a NIFTI file.
             Default: np.eye(4)
         """
+        # call to_vox from here
         for _, bundle in self.bundles:
             weights = gaussian_weights(bundle['sl'])
             bundle['profile'] = afq_profile(data, bundle['sl'],
                                                  affine, weights=weights)
-    # TODO: add add_sft
