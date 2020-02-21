@@ -205,7 +205,7 @@ class Bundles:
 
 
     def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
-                     space=None, bbox_valid_check=False):
+                     space=None, affine=np.eye(4), bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
@@ -222,15 +222,20 @@ class Bundles:
         space : string
             Space to transform the streamlines to.
             Default: None.
+        affine : array_like (4, 4), optional.
+            The mapping from the file's reference to this object's reference.
+            Default: np.eye(4)
         bbox_valid_check : boolean, optional.
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
         """
+
         for bundle_name in bundle_names:
             sft = load_tractogram(f'{file_path}{bundle_name}{file_suffix}',
                                   self.reference,
                                   to_space=self.space,
                                   bbox_valid_check=bbox_valid_check)
+            sft.apply_affine(affine)
             self.add_bundle(bundle_name, sft)
 
         if space is not None:
