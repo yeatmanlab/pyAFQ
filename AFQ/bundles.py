@@ -97,7 +97,6 @@ class Bundles:
             self.bundles[bundle_name]['using_idx'] = False
 
 
-    # TODO: update to using sft
     def clean_bundles(self, **kwargs):
         """
         Clean each segmented bundle based on the Mahalnobis distance of
@@ -125,14 +124,15 @@ class Bundles:
         for _, bundle in self.bundles:
             if bundle['using_idx']:
                 bundle['sl'], idx_in_bundle = seg.clean_bundle(
-                    bundle['sl'],
+                    bundle['sl'].streamlines,
                     return_idx=True
                     **kwargs)
                 bundle['idx'] = bundle['idx'][idx_in_bundle]
             else:
-                bundle['sl'] = seg.clean_bundle(bundle['sl'],
-                                                     return_idx=False
-                                                     **kwargs)
+                bundle['sl'] = seg.clean_bundle(bundle['sl'].streamlines,
+                                                return_idx=False
+                                                **kwargs)
+
 
     def apply_affine(self, affine):
         """
@@ -146,6 +146,7 @@ class Bundles:
         """
         for _, bundle in self.bundles:
             bundle['sl'].apply_affine(affine)
+
 
     def to_space(self, space):
         """
@@ -235,7 +236,7 @@ class Bundles:
         if space is not None:
             self.to_space(space)
 
-    # TODO: update to using sft
+
     def tract_profiles(self, data, affine=np.eye(4)):
         """
         Calculate a summarized profile of data for each bundle along
@@ -249,12 +250,11 @@ class Bundles:
             The statistic to sample with the streamlines.
 
         affine : array_like (4, 4), optional.
-            The mapping from voxel coordinates to streamline points.
-            The voxel_to_rasmm matrix, typically from a NIFTI file.
+            The mapping from voxel coordinates to 'data' coordinates.
             Default: np.eye(4)
         """
-        # call to_vox from here
+        self.to_space(Space.VOX)
         for _, bundle in self.bundles:
-            weights = gaussian_weights(bundle['sl'])
-            bundle['profile'] = afq_profile(data, bundle['sl'],
-                                                 affine, weights=weights)
+            weights = gaussian_weights(bundle['sl'].streamlines)
+            bundle['profile'] = afq_profile(data, bundle['sl'].streamlines,
+                                            affine, weights=weights)
