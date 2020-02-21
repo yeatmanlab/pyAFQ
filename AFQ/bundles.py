@@ -208,7 +208,7 @@ class Bundles:
 
 
     def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
-                     space=None, affine=np.eye(4), bbox_valid_check=False):
+                     affine=np.eye(4), bbox_valid_check=False):
         """
         Save tractograms in bundles.
 
@@ -222,9 +222,6 @@ class Bundles:
         file_suffix : string, optional.
             File name will be the bundle name + file_suffix.
             Default: '.trk'
-        space : string
-            Space to transform the streamlines to.
-            Default: None.
         affine : array_like (4, 4), optional.
             The mapping from the file's reference to this object's reference.
             Default: np.eye(4)
@@ -240,9 +237,6 @@ class Bundles:
                                   bbox_valid_check=bbox_valid_check)
             sft.apply_affine(affine)
             self.add_bundle(bundle_name, sft)
-
-        if space is not None:
-            self.to_space(space)
 
 
     def tract_profiles(self, data, affine=np.eye(4)):
