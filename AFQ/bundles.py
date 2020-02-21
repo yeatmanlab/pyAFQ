@@ -9,14 +9,14 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 
 import AFQ.segmentation as seg
 
-class FiberGroups:
-    def __init__(self, fiber_groups_dict=None, using_idx=False):
+class Bundles:
+    def __init__(self, bundles_dict=None, using_idx=False):
         """
-        Collection of fiber groups.
+        Collection of bundles.
 
         Parameters
         ----------
-        fiber_groups : dict, optional.
+        bundles : dict, optional.
             Keys are names of the bundles.
             If using_idx is true, values are Streamline objects.
             Else, values are dictionaries with Streamline objects and indices.
@@ -25,48 +25,48 @@ class FiberGroups:
             Default: None.
 
         using_idx : boolean
-            Whether or not fiber_groups_dict contains indices information.
+            Whether or not bundles_dict contains indices information.
             Default: False.
         """
-        self.fiber_groups = {}
-        if fiber_groups_dict is not None:
-            for fg_name in fiber_groups_dict:
+        self.bundles = {}
+        if bundles_dict is not None:
+            for fg_name in bundles_dict:
                 if using_idx:
-                    self.add_fiber_group(fg_name,
-                                        fiber_groups_dict[fg_name]['sl'],
-                                        fiber_groups_dict[fg_name]['idx'])
+                    self.add_bundle(fg_name,
+                                        bundles_dict[fg_name]['sl'],
+                                        bundles_dict[fg_name]['idx'])
                 else:
-                    self.add_fiber_group(fg_name,
-                                        fiber_groups_dict[fg_name])
+                    self.add_bundle(fg_name,
+                                        bundles_dict[fg_name])
 
-    def add_fiber_group(self, fg_name, streamlines, idx=None):
+    def add_bundle(self, fg_name, streamlines, idx=None):
         """
-        Add a fiber group to fiber_groups.
+        Add a bundle to bundles.
 
         Parameters
         ----------
         fg_name : string
-            Name of fiber group.
+            Name of bundle.
 
         streamlines : nibabel.Streamlines class instance.
-            The streamlines constituting a fiber group.
+            The streamlines constituting a bundle.
 
         idx : array of ints, optional
             Indices for streamlines in original tractography.
             Default: None.
         """
-        self.fiber_groups[fg_name] = {}
-        self.fiber_groups[fg_name]['sl'] = streamlines
+        self.bundles[fg_name] = {}
+        self.bundles[fg_name]['sl'] = streamlines
 
         if idx is not None:
-            self.fiber_groups[fg_name]['idx'] = idx
-            self.fiber_groups[fg_name]['using_idx'] = True
+            self.bundles[fg_name]['idx'] = idx
+            self.bundles[fg_name]['using_idx'] = True
         else:
-            self.fiber_groups[fg_name]['using_idx'] = False
+            self.bundles[fg_name]['using_idx'] = False
 
-    def clean_fiber_groups(self, **kwargs):
+    def clean_bundles(self, **kwargs):
         """
-        Clean each segmented fiber group based on the Mahalnobis distance of
+        Clean each segmented bundle based on the Mahalnobis distance of
         each streamline
 
         Parameters
@@ -88,19 +88,19 @@ class FiberGroups:
             calculated. Default: `np.mean` (but can also use median, etc.)
         """
 
-        for _, fiber_group in self.fiber_groups:
-            if fiber_group['using_idx']:
-                fiber_group['sl'], idx_in_bundle = seg.clean_bundle(
-                    fiber_group['sl'],
+        for _, bundle in self.bundles:
+            if bundle['using_idx']:
+                bundle['sl'], idx_in_bundle = seg.clean_bundle(
+                    bundle['sl'],
                     return_idx=True
                     **kwargs)
-                fiber_group['idx'] = fiber_group['idx'][idx_in_bundle]
+                bundle['idx'] = bundle['idx'][idx_in_bundle]
             else:
-                fiber_group['sl'] = seg.clean_bundle(fiber_group['sl'],
+                bundle['sl'] = seg.clean_bundle(bundle['sl'],
                                                      return_idx=False
                                                      **kwargs)
 
-    def transform_fiber_groups(self, affine):
+    def transform_bundles(self, affine):
         """
         Appliy a linear transformation, given by affine, to all
         streamlines.
@@ -111,17 +111,17 @@ class FiberGroups:
             The mapping between voxel indices and the point space for seeds.
             The voxel_to_rasmm matrix, typically from a NIFTI file.
         """
-        for _, fiber_group in self.fiber_groups:
-            fiber_group['sl'] = dts.Streamlines(
-                dtu.transform_tracking_output(fiber_group['sl'],
+        for _, bundle in self.bundles:
+            bundle['sl'] = dts.Streamlines(
+                dtu.transform_tracking_output(bundle['sl'],
                                             affine))
 
-    def save_fiber_groups(self, reference, affine=np.eye(4),
+    def save_bundles(self, reference, affine=np.eye(4),
                           space=Space.RASMM,
                           file_path='./', file_suffix='.trk',
                           bbox_valid_check=False):
         """
-        Save tractograms in fiber groups.
+        Save tractograms in bundles.
 
         Parameters
         ----------
@@ -143,33 +143,33 @@ class FiberGroups:
             Path to save trk files to.
             Default: './'
         file_suffix : string, optional.
-            File name will be the fiber group name + file_suffix.
+            File name will be the bundle name + file_suffix.
             Default: '.trk'
         bbox_valid_check : boolean, optional.
             Whether to verify that the bounding box is valid in voxel space.
             Default: False
         """
-        for fg_name, fiber_group in self.fiber_groups:
+        for fg_name, bundle in self.bundles:
             sft = StatefulTractogram(
-                dtu.transform_tracking_output(fiber_group['sl'], affine),
+                dtu.transform_tracking_output(bundle['sl'], affine),
                 reference, space)
 
             save_tractogram(sft, f'{file_path}{fg_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
 
-    # TODO: load_fiber_groups
+    # TODO: load_bundles
     # TODO: tract_profiles
-    def load_fiber_groups(self, fg_names, reference,
+    def load_bundles(self, fg_names, reference,
                           space=Space.RASMM, affine=np.eye(4),
                           file_path='./', file_suffix='.trk',
                           bbox_valid_check=False):
         """
-        Save tractograms in fiber groups.
+        Save tractograms in bundles.
 
         Parameters
         ----------
         fg_names : list of strings
-            Names of fiber groups to load.
+            Names of bundles to load.
         reference : Nifti or Trk filename, Nifti1Image or TrkFile,
             Nifti1Header, trk.header (dict) or another Stateful Tractogram
             Reference that provides the spatial attribute.
@@ -188,7 +188,7 @@ class FiberGroups:
             Path to load trk files from.
             Default: './'
         file_suffix : string, optional.
-            File name will be the fiber group name + file_suffix.
+            File name will be the bundle name + file_suffix.
             Default: '.trk'
         bbox_valid_check : boolean, optional.
             Whether to verify that the bounding box is valid in voxel space.
@@ -203,7 +203,7 @@ class FiberGroups:
             streamlines = dts.Streamlines(
                 dtu.transform_tracking_output(sft.streamlines,
                                               affine))
-            self.add_fiber_group(fg_name, streamlines)
+            self.add_bundle(fg_name, streamlines)
 
     def tract_profiles(self, data, affine=np.eye(4)):
         """
@@ -222,7 +222,7 @@ class FiberGroups:
             The voxel_to_rasmm matrix, typically from a NIFTI file.
             Default: np.eye(4)
         """
-        for _, fiber_group in self.fiber_groups:
-            weights = gaussian_weights(fiber_group['sl'])
-            fiber_group['profile'] = afq_profile(data, fiber_group['sl'],
+        for _, bundle in self.bundles:
+            weights = gaussian_weights(bundle['sl'])
+            bundle['profile'] = afq_profile(data, bundle['sl'],
                                                  affine, weights=weights)
