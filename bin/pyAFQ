@@ -168,6 +168,7 @@ for k, v in clean_defaults.items():
 
 compute = config.get("compute", {})
 dask_it = compute.get("dask_it", False)
+force_recompute = compute.get("force_recompute", False)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
@@ -179,6 +180,7 @@ myafq = api.AFQ(dmriprep_path,
                 b0_threshold=float(b0_threshold),
                 bundle_names=bundle_names,
                 dask_it=dask_it,
+                force_recompute=force_recompute,
                 reg_template=reg_template,
                 wm_labels=wm_labels,
                 segmentation_params=segmentation_params,
