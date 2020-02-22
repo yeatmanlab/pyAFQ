@@ -84,6 +84,7 @@ wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 
 [compute]
 dask_it = false
+force_recompute = false
 ```
 """
 
