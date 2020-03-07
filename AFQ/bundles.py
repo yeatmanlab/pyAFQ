@@ -167,15 +167,7 @@ class Bundles:
         """
         space = space.lower()
         for _, bundle in self.bundles:
-            if space == Space.VOX:
-                bundle['sl'].to_vox()
-                self.space = Space.VOX
-            elif space == Space.VOXMM:
-                bundle['sl'].to_voxmm()
-                self.space = Space.VOXMM
-            elif space == Space.RASMM:
-                bundle['sl'].to_rasmm()
-                self.space = Space.RASMM
+            bundle['sl'].to_space(space)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
