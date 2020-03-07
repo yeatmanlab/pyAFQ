@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 import dipy.tracking.streamline as dts
 import dipy.tracking.utils as dtu
@@ -9,9 +10,6 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 
 import AFQ.segmentation as seg
 
-# TODO: suppress logs (show once for each call)
-# TODO: Use bundles to tgram to save and load as one tractogram file
-#       and a metadata file with bundle dict unique IDs.
 # TODO: make tests
 
 class Bundles:
@@ -49,6 +47,7 @@ class Bundles:
         self.bundles = {}
         self.reference = reference
         self.space = space
+        self.logger = logging.getLogger('AFQ.Bundles')
 
         if bundles_dict is not None:
             for bundle_name in bundles_dict:
@@ -59,6 +58,8 @@ class Bundles:
                 else:
                     self.add_bundle(bundle_name,
                                     bundles_dict[bundle_name])
+                logging.disable(level=logging.WARNING)
+            logging.disable(logging.NOTSET)
 
     def add_bundle(self, bundle_name, streamlines, idx=None):
         """
@@ -135,6 +136,8 @@ class Bundles:
                 bundle['sl'] = seg.clean_bundle(bundle['sl'].streamlines,
                                                 return_idx=False
                                                 **kwargs)
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
 
 
     def apply_affine(self, affine):
@@ -149,6 +152,8 @@ class Bundles:
         """
         for _, bundle in self.bundles:
             bundle['sl'].apply_affine(affine)
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
 
 
     def to_space(self, space):
@@ -171,6 +176,8 @@ class Bundles:
             elif space == Space.RASMM:
                 bundle['sl'].to_rasmm()
                 self.space = Space.RASMM
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
 
 
     def save_bundles(self, file_path='./', file_suffix='.trk',
@@ -202,6 +209,8 @@ class Bundles:
             save_tractogram(bundle['sl'],
                             f'{file_path}{bundle_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
         
         if space is not None:
             self.to_space(space_temp)
@@ -237,6 +246,8 @@ class Bundles:
                                   bbox_valid_check=bbox_valid_check)
             sft.apply_affine(affine)
             self.add_bundle(bundle_name, sft)
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
 
 
     def tract_profiles(self, data, affine=np.eye(4)):
@@ -260,3 +271,5 @@ class Bundles:
             weights = gaussian_weights(bundle['sl'].streamlines)
             bundle['profile'] = afq_profile(data, bundle['sl'].streamlines,
                                             affine, weights=weights)
+            logging.disable(level=logging.WARNING)
+        logging.disable(logging.NOTSET)
