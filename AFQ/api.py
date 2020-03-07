@@ -578,11 +578,15 @@ class AFQ(object):
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
                 reg_prealign = None
+
             warped_b0, mapping = reg.syn_register_dwi(
                 row['dwi_file'], gtab,
                 template=self.reg_template,
                 prealign=reg_prealign)
-            mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+
+            if self.use_prealign:
+                mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+
             reg.write_mapping(mapping, mapping_file)
             meta_fname = self._get_fname(row, '_mapping_reg_prealign.json')
             meta = dict(type="displacementfield")
