@@ -4,7 +4,7 @@ import numpy as np
 import IPython.display as display
 
 import nibabel as nib
-from dipy.viz.colormap import line_colors
+from dipy.viz.app import distinguishable_colormap
 from dipy.viz import window, actor, ui
 
 from palettable.tableau import Tableau_20
@@ -52,7 +52,7 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
     # There are no bundles in here:
     if list(tg.data_per_streamline.keys()) == []:
         streamlines = list(streamlines)
-        sl_actor = actor.line(streamlines, line_colors(streamlines))
+        sl_actor = actor.line(streamlines, [c for i, c in zip(range(len(streamlines)), distinguishable_colormap())])
         ren.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)
