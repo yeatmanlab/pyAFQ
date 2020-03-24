@@ -324,12 +324,9 @@ class AFQ(object):
         for subject, sub_dir in zip(self.subjects, self.dmriprep_dirs):
             sessions = glob.glob(op.join(sub_dir, '*'))
             for sess in sessions:
-                try:
-                    print(glob.glob(f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
-                try:
-                    print(glob.glob(f"{sess}/{anat_folder}/{anat_file}.nii.gz")[0])
-                try:
-                    print(glob.glob(f"{sess}/{anat_folder}/{seg_file}.nii.gz")[0])
+                print(glob.glob(f"{sess}/{dwi_folder}/{dwi_file}.nii.gz"))
+                print(glob.glob(f"{sess}/{anat_folder}/{anat_file}.nii.gz"))
+                print(glob.glob(f"{sess}/{anat_folder}/{seg_file}.nii.gz"))
                 results_dir_list.append(op.join(self.afq_dir,
                                                 subject,
                                                 PurePath(sess).parts[-1]))
