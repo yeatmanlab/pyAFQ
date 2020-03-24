@@ -1,7 +1,9 @@
 import tempfile
+import os
 import os.path as op
 import numpy as np
 import IPython.display as display
+import imageio as io
 import itertools
 
 import nibabel as nib
@@ -23,14 +25,14 @@ def _inline_interact(ren, inline, interact):
     if inline:
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
-        window.record(ren, out_path=fname, size=(1200, 1200))
+        window.snapshot(ren, fname=fname, size=(1200, 1200))
         display.display_png(display.Image(fname))
 
     return ren
 
 
 def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
-                      color=None, inline=True, interact=False):
+                      color=None, inline=False, interact=False):
     """
     Visualize bundles in 3D using VTK
     """
@@ -89,27 +91,19 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
 
     return _inline_interact(scene, inline, interact)
 
-def create_gif(scene):
-    showm = window.ShowManager(scene, size=(1200, 1200), reset_camera=False)
-    showm.initialize()
-
-    counter = itertools.count()
+def create_gif(scene, file_name):
     tdir = tempfile.gettempdir()
-    step = 360.0/100
-    def timer_callback(_obj, _event):
-        cnt = next(counter)
-        if cnt <= 100: 
-            showm.scene.azimuth(step)
-        showm.render()
+    window.record(scene, az_ang=3.6, n_frames=100, path_numbering=True, out_path=tdir + '/tgif', size=(1200, 1200))
 
-        fname = op.join(tdir, f"cnt-{cnt}.png")
-        window.record(scene, out_path=fname, size=(1200, 1200))
-
-        if cnt == 100:
-            showm.exit()
-
-    showm.add_timer_callback(True, 100, timer_callback)
-    showm.start()
+    angles = []
+    for i in range(100):
+        if i < 10:
+            angle_fname = f"tgif00000{i}.png"
+        else:
+            angle_fname = f"tgif0000{i}.png"
+        angles.append(io.imread(os.path.join(tdir, angle_fname)))
+            
+    io.mimsave(file_name, angles)
 
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
@@ -160,7 +154,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     if inline:
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
-        window.record(ren, out_path=fname)
+        window.snapshot(ren, fname=fname)
         display.display_png(display.Image(fname))
 
     return _inline_interact(ren, inline, interact)
