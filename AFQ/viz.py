@@ -4,7 +4,7 @@ import numpy as np
 import IPython.display as display
 
 import nibabel as nib
-from dipy.viz.app import distinguishable_colormap
+from dipy.viz.regtools import distinguishable_colormap
 from dipy.viz import window, actor, ui
 
 from palettable.tableau import Tableau_20
