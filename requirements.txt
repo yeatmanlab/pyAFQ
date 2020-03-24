@@ -18,3 +18,4 @@ toml==0.10.0
 setuptools_scm[toml]==3.4.3
 popylar==0.2
 fury==0.3.0
+imageio==2.8.0

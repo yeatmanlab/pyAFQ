@@ -2,6 +2,7 @@ import tempfile
 import os.path as op
 import numpy as np
 import IPython.display as display
+import itertools
 
 import nibabel as nib
 from dipy.viz import window, actor, ui, regtools
@@ -28,7 +29,7 @@ def _inline_interact(ren, inline, interact):
     return ren
 
 
-def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
+def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
                       color=None, inline=True, interact=False):
     """
     Visualize bundles in 3D using VTK
@@ -45,14 +46,14 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
 
     streamlines = tg.streamlines
 
-    if ren is None:
-        ren = window.Renderer()
+    if scene is None:
+        scene = window.Scene()
 
     # There are no bundles in here:
     if list(tg.data_per_streamline.keys()) == []:
         streamlines = list(streamlines)
         sl_actor = actor.line(streamlines, [c for i, c in zip(range(len(streamlines)), regtools.distinguishable_colormap())])
-        ren.add(sl_actor)
+        scene.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)
     if bundle is None:
@@ -69,7 +70,7 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
                 sl_actor.GetProperty().SetRenderLinesAsTubes(1)
                 sl_actor.GetProperty().SetLineWidth(6)
 
-            ren.add(sl_actor)
+            scene.add(sl_actor)
     else:
         idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
         this_sl = list(streamlines[idx])
@@ -84,9 +85,31 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, ren=None,
                 Tableau_20.colors[np.mod(20, int(bundle))])
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
-        ren.add(sl_actor)
+        scene.add(sl_actor)
 
-    return _inline_interact(ren, inline, interact)
+    return _inline_interact(scene, inline, interact)
+
+def create_gif(scene):
+    showm = window.ShowManager(scene, size=(1200, 1200), reset_camera=False)
+    showm.initialize()
+
+    counter = itertools.count()
+    tdir = tempfile.gettempdir()
+    step = 360.0/100
+    def timer_callback(_obj, _event):
+        cnt = next(counter)
+        if cnt <= 100: 
+            showm.scene.azimuth(step)
+        showm.render()
+
+        fname = op.join(tdir, f"cnt-{cnt}.png")
+        window.record(scene, out_path=fname, size=(1200, 1200))
+
+        if cnt == 100:
+            showm.exit()
+
+    showm.add_timer_callback(True, 100, timer_callback)
+    showm.start()
 
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
