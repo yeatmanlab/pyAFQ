@@ -93,6 +93,7 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
     if face_forward:
         scene.elevation(90)
         scene.set_camera(view_up=(0.0, 0.0, 1.0))
+        scene.reset_camera()
 
     return _inline_interact(scene, inline, interact)
 
