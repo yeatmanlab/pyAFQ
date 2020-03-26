@@ -941,8 +941,18 @@ class AFQ(object):
     
     def _export_bundle_gif(self, row):
         bundles_file = self.get_clean_bundles()[0]
-        scene = viz.visualize_bundles(bundles_file, inline=False,
-                                      interact=False, face_forward=True)
+        fa_file = self.get_dti_fa()[0]
+        fa_img = nib.load(fa_file).get_fdata()
+
+        scene = viz.visualize_volume(fa_img,
+                                     inline=False,
+                                     interact=False)
+        scene = viz.visualize_bundles(bundles_file,
+                                      affine_or_mapping=row['dwi_affine'],
+                                      inline=False,
+                                      interact=False,
+                                      scene=scene,
+                                      face_forward=True)
 
         odf_model = self.tracking_params['odf_model']
         directions = self.tracking_params['directions']
