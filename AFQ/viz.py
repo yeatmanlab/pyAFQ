@@ -15,20 +15,20 @@ import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
 
-def _inline_interact(ren, inline, interact):
+def _inline_interact(scene, inline, interact):
     """
     Helper function to reuse across viz functions
     """
     if interact:
-        window.show(ren)
+        window.show(scene)
 
     if inline:
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
-        window.snapshot(ren, fname=fname, size=(1200, 1200))
+        window.snapshot(scene, fname=fname, size=(1200, 1200))
         display.display_png(display.Image(fname))
 
-    return ren
+    return scene
 
 
 def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
@@ -115,7 +115,7 @@ def create_gif(scene, file_name):
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  ren=None, color=None, inline=True, interact=False):
+                  scene=None, color=None, inline=True, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
     """
@@ -152,28 +152,28 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                                    roi,
                                    interpolation='nearest')).astype(bool)
 
-    if ren is None:
-        ren = window.Renderer()
+    if scene is None:
+        scene = window.Scene()
 
     roi_actor = actor.contour_from_roi(roi, color=color)
-    ren.add(roi_actor)
+    scene.add(roi_actor)
 
     if inline:
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
-        window.snapshot(ren, fname=fname)
+        window.snapshot(scene, fname=fname)
         display.display_png(display.Image(fname))
 
-    return _inline_interact(ren, inline, interact)
+    return _inline_interact(scene, inline, interact)
 
 
-def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
+def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
                      interact=False):
     """
     Visualize a volume
     """
-    if ren is None:
-        ren = window.Renderer()
+    if scene is None:
+        scene = window.Scene()
 
     shape = volume.shape
     image_actor_z = actor.slicer(volume)
@@ -197,11 +197,11 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
                                  0,
                                  shape[2] - 1)
 
-    ren.add(image_actor_z)
-    ren.add(image_actor_x)
-    ren.add(image_actor_y)
+    scene.add(image_actor_z)
+    scene.add(image_actor_x)
+    scene.add(image_actor_y)
 
-    show_m = window.ShowManager(ren, size=(1200, 900))
+    show_m = window.ShowManager(scene, size=(1200, 900))
     show_m.initialize()
 
     line_slider_z = ui.LineSlider2D(min_value=0,
@@ -284,10 +284,10 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
     panel.add_element(opacity_slider_label, (0.1, 0.15))
     panel.add_element(opacity_slider, (0.38, 0.15))
 
-    show_m.ren.add(panel)
+    show_m.scene.add(panel)
 
     global size
-    size = ren.GetSize()
+    size = scene.GetSize()
 
     def win_callback(obj, event):
         global size
@@ -299,12 +299,12 @@ def visualize_volume(volume, x=None, y=None, z=None, ren=None, inline=True,
 
     show_m.initialize()
 
-    ren.zoom(1.5)
-    ren.reset_clipping_range()
+    scene.zoom(1.5)
+    scene.reset_clipping_range()
 
     if interact:
         show_m.add_window_callback(win_callback)
         show_m.render()
         show_m.start()
 
-    return _inline_interact(ren, inline, interact)
+    return _inline_interact(scene, inline, interact)
