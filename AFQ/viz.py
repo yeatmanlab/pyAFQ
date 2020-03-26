@@ -100,7 +100,7 @@ def create_gif(scene, file_name):
     tdir = tempfile.gettempdir()
     window.record(scene, az_ang=3.6, n_frames=100,
                   path_numbering=True, out_path=tdir + '/tgif',
-                  size=(1200, 1200), reset_camera=False)
+                  size=(1200, 1200))
 
     angles = []
     for i in range(100):
