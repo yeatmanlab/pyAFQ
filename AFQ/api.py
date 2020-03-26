@@ -29,6 +29,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+import AFQ.viz as viz
 from AFQ.utils.bin import get_default_args
 
 
@@ -937,6 +938,24 @@ class AFQ(object):
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
+    
+    def _export_bundle_gif(self, row):
+        bundles_file = self.get_clean_bundles()[0]
+        scene = viz.visualize_bundles(bundles_file, inline=False,
+                                      interact=False, face_forward=True)
+
+        odf_model = self.tracking_params['odf_model']
+        directions = self.tracking_params['directions']
+        seg_algo = self.segmentation_params['seg_algo']
+        fname = op.split(
+            self._get_fname(
+                row,
+                f'_space-RASMM_model-{odf_model}_desc-'
+                f'{directions}-{seg_algo}'
+                f'_viz.gif'))
+        fname = op.join(fname[0], row['results_dir'], fname[1])
+
+        viz.create_gif(scene, fname)
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
@@ -1152,6 +1171,9 @@ class AFQ(object):
 
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
+
+    def export_bundle_gif(self):
+        self.data_frame.apply(self._export_bundle_gif, axis=1)
 
     def export_registered_b0(self):
         self.data_frame.apply(self._export_registered_b0, axis=1)
