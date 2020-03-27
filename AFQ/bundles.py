@@ -13,7 +13,7 @@ import AFQ.segmentation as seg
 # TODO: make tests
 
 class Bundles:
-    def __init__(self, reference, space=Space.RASMM,
+    def __init__(self, reference='same', space=Space.RASMM,
                  bundles_dict=None, using_idx=False):
         """
         Collection of bundles.
@@ -23,8 +23,9 @@ class Bundles:
         reference : Nifti or Trk filename, Nifti1Image or TrkFile,
             Nifti1Header, trk.header (dict) or another Stateful Tractogram
             Reference that provides the spatial attribute.
-            Typically a nifti-related object from the native diffusion used for
-            streamlines generation
+            Typically a nifti-related object from the native diffusion used
+            for streamlines generation. Use 'same' if tractograms will be
+            loaded from a file first.
 
         space : string, optional.
             Current space in which the streamlines are (vox, voxmm or rasmm)
@@ -34,10 +35,8 @@ class Bundles:
 
         bundles : dict, optional.
             Keys are names of the bundles.
-            If using_idx is true, values are Streamline objects.
+            If using_idx is False, values are Streamline objects.
             Else, values are dictionaries with Streamline objects and indices.
-            The streamlines in each object have all been oriented to have the
-            same orientation (using `dts.orient_by_streamline`).
             Default: None.
 
         using_idx : boolean
@@ -216,7 +215,7 @@ class Bundles:
     def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
                      affine=np.eye(4), bbox_valid_check=False):
         """
-        Save tractograms in bundles.
+        load tractograms from file.
 
         Parameters
         ----------
@@ -237,10 +236,19 @@ class Bundles:
         """
 
         for bundle_name in bundle_names:
-            sft = load_tractogram(f'{file_path}{bundle_name}{file_suffix}',
-                                  self.reference,
-                                  to_space=self.space,
-                                  bbox_valid_check=bbox_valid_check)
+            if self.reference == 'same':
+                sft = load_tractogram(
+                    f'{file_path}{bundle_name}{file_suffix}',
+                    self.reference,
+                    bbox_valid_check=bbox_valid_check)
+                self.reference = sft
+                self.space = sft.space
+            else:
+                sft = load_tractogram(
+                    f'{file_path}{bundle_name}{file_suffix}',
+                    self.reference,
+                    to_space=self.space,
+                    bbox_valid_check=bbox_valid_check)
             sft = self._apply_affine_sft(sft, affine)
             self.add_bundle(bundle_name, sft)
             logging.disable(level=logging.WARNING)
