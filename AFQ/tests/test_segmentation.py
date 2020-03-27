@@ -4,9 +4,9 @@ import pytest
 
 import numpy as np
 import numpy.testing as npt
+import tempfile
 
 import nibabel as nib
-import nibabel.tmpdirs as nbtmp
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
 import dipy.tracking.streamline as dts
@@ -35,6 +35,7 @@ streamlines = file_dict['tractography_subsampled.trk']
 tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
 streamlines = tg.streamlines
+tmpdir = tempfile.mkdtemp()
 
 # streamlines = dts.Streamlines(
 #     dtu.transform_tracking_output(
@@ -161,13 +162,11 @@ def test_segment():
     bundles = bdl.Bundles(reference=segmentation.img,
                           bundles_dict=fiber_groups,
                           using_idx=True)
-    tmpdir = nbtmp.InTemporaryDirectory()
     bundles.save_bundles(file_path=tmpdir)
 
 
 def test_bundles_class():
     bundles = bdl.Bundles()
-    tmpdir = nbtmp.InTemporaryDirectory()
     bundle_names = ['CST_L', 'CST_R']
     bundles.load_bundles(bundle_names, file_path=tmpdir)
 
@@ -175,7 +174,6 @@ def test_bundles_class():
     len_bundles = len(bundles.bundles)
     npt.assert_equal(len_bundles, 2)
     npt.assert_(len(bundles.bundles['CST_R']['sl']) > 0)
-    npt.assert_(len(bundles.bundles['CST_R']['idx']) > 0)
 
     # test tract profiles
     profiles = bundles.tract_profiles(

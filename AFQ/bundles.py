@@ -12,6 +12,7 @@ import AFQ.segmentation as seg
 
 # TODO: make tests
 
+
 class Bundles:
     def __init__(self, reference='same', space=Space.RASMM,
                  bundles_dict=None, using_idx=False):
@@ -99,7 +100,6 @@ class Bundles:
         else:
             self.bundles[bundle_name]['using_idx'] = False
 
-
     def clean_bundles(self, **kwargs):
         """
         Clean each segmented bundle based on the Mahalnobis distance of
@@ -124,23 +124,23 @@ class Bundles:
             calculated. Default: `np.mean` (but can also use median, etc.)
         """
 
-        for _, bundle in self.bundles:
+        for _, bundle in self.bundles.items():
             if bundle['using_idx']:
                 bundle['sl'], idx_in_bundle = seg.clean_bundle(
                     bundle['sl'].streamlines,
                     return_idx=True
-                    **kwargs)
+                    ** kwargs)
                 bundle['idx'] = bundle['idx'][idx_in_bundle]
             else:
                 bundle['sl'] = seg.clean_bundle(bundle['sl'].streamlines,
                                                 return_idx=False
-                                                **kwargs)
+                                                ** kwargs)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
     def _apply_affine_sft(self, sft, affine):
         sls = dtu.transform_tracking_output(sft.streamlines, affine)
-        return StatefulTractogram(streamlines,
+        return StatefulTractogram(sls,
                                   self.reference,
                                   self.space)
 
@@ -154,11 +154,10 @@ class Bundles:
         affine : array (4, 4)
             Apply affine matrix to all streamlines
         """
-        for _, bundle in self.bundles:
+        for _, bundle in self.bundles.items():
             bundle['sl'] = self._apply_affine_sft(bundle['sl'], affine)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
-
 
     def to_space(self, space):
         """
@@ -170,11 +169,10 @@ class Bundles:
             Space to transform the streamlines to.
         """
         space = space.lower()
-        for _, bundle in self.bundles:
+        for _, bundle in self.bundles.items():
             bundle['sl'].to_space(space)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
-
 
     def save_bundles(self, file_path='./', file_suffix='.trk',
                      space=None, bbox_valid_check=False):
@@ -201,16 +199,15 @@ class Bundles:
             space_temp = self.space
             self.to_space(space)
 
-        for bundle_name, bundle in self.bundles:
+        for bundle_name, bundle in self.bundles.items():
             save_tractogram(bundle['sl'],
                             f'{file_path}{bundle_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
-        
+
         if space is not None:
             self.to_space(space_temp)
-
 
     def load_bundles(self, bundle_names, file_path='./', file_suffix='.trk',
                      affine=np.eye(4), bbox_valid_check=False):
@@ -254,7 +251,6 @@ class Bundles:
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
-
     def tract_profiles(self, data, affine=np.eye(4)):
         """
         Calculate a summarized profile of data for each bundle along
@@ -272,7 +268,7 @@ class Bundles:
             Default: np.eye(4)
         """
         self.to_space(Space.VOX)
-        for _, bundle in self.bundles:
+        for _, bundle in self.bundles.items():
             weights = gaussian_weights(bundle['sl'].streamlines)
             bundle['profile'] = afq_profile(data, bundle['sl'].streamlines,
                                             affine, weights=weights)
