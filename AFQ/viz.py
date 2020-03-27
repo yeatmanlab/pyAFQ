@@ -97,18 +97,20 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
 
     return _inline_interact(scene, inline, interact)
 
-def create_gif(scene, file_name):
+def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
     tdir = tempfile.gettempdir()
-    window.record(scene, az_ang=3.6, n_frames=100,
+    window.record(scene, az_ang=360.0/n_frames, n_frames=n_frames,
                   path_numbering=True, out_path=tdir + '/tgif',
-                  size=(1200, 1200))
+                  size=size)
 
     angles = []
-    for i in range(100):
+    for i in range(n_frames):
         if i < 10:
             angle_fname = f"tgif00000{i}.png"
-        else:
+        elif i < 100:
             angle_fname = f"tgif0000{i}.png"
+        else:
+            angle_fname = f"tgif000{i}.png"
         angles.append(io.imread(os.path.join(tdir, angle_fname)))
             
     io.mimsave(file_name, angles)
@@ -205,98 +207,99 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
     show_m = window.ShowManager(scene, size=(1200, 900))
     show_m.initialize()
 
-    line_slider_z = ui.LineSlider2D(min_value=0,
-                                    max_value=shape[2] - 1,
-                                    initial_value=shape[2] / 2,
-                                    text_template="{value:.0f}",
-                                    length=140)
+    if interact:
+        line_slider_z = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[2] - 1,
+                                        initial_value=shape[2] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
 
-    line_slider_x = ui.LineSlider2D(min_value=0,
-                                    max_value=shape[0] - 1,
-                                    initial_value=shape[0] / 2,
-                                    text_template="{value:.0f}",
-                                    length=140)
+        line_slider_x = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[0] - 1,
+                                        initial_value=shape[0] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
 
-    line_slider_y = ui.LineSlider2D(min_value=0,
-                                    max_value=shape[1] - 1,
-                                    initial_value=shape[1] / 2,
-                                    text_template="{value:.0f}",
-                                    length=140)
+        line_slider_y = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[1] - 1,
+                                        initial_value=shape[1] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
 
-    opacity_slider = ui.LineSlider2D(min_value=0.0,
-                                     max_value=1.0,
-                                     initial_value=slicer_opacity,
-                                     length=140)
+        opacity_slider = ui.LineSlider2D(min_value=0.0,
+                                        max_value=1.0,
+                                        initial_value=slicer_opacity,
+                                        length=140)
 
-    def change_slice_z(slider):
-        z = int(np.round(slider.value))
-        image_actor_z.display_extent(0, shape[0] - 1, 0, shape[1] - 1, z, z)
+        def change_slice_z(slider):
+            z = int(np.round(slider.value))
+            image_actor_z.display_extent(0, shape[0] - 1, 0, shape[1] - 1, z, z)
 
-    def change_slice_x(slider):
-        x = int(np.round(slider.value))
-        image_actor_x.display_extent(x, x, 0, shape[1] - 1, 0, shape[2] - 1)
+        def change_slice_x(slider):
+            x = int(np.round(slider.value))
+            image_actor_x.display_extent(x, x, 0, shape[1] - 1, 0, shape[2] - 1)
 
-    def change_slice_y(slider):
-        y = int(np.round(slider.value))
-        image_actor_y.display_extent(0, shape[0] - 1, y, y, 0, shape[2] - 1)
+        def change_slice_y(slider):
+            y = int(np.round(slider.value))
+            image_actor_y.display_extent(0, shape[0] - 1, y, y, 0, shape[2] - 1)
 
-    def change_opacity(slider):
-        slicer_opacity = slider.value
-        image_actor_z.opacity(slicer_opacity)
-        image_actor_x.opacity(slicer_opacity)
-        image_actor_y.opacity(slicer_opacity)
+        def change_opacity(slider):
+            slicer_opacity = slider.value
+            image_actor_z.opacity(slicer_opacity)
+            image_actor_x.opacity(slicer_opacity)
+            image_actor_y.opacity(slicer_opacity)
 
-    line_slider_z.on_change = change_slice_z
-    line_slider_x.on_change = change_slice_x
-    line_slider_y.on_change = change_slice_y
-    opacity_slider.on_change = change_opacity
+        line_slider_z.on_change = change_slice_z
+        line_slider_x.on_change = change_slice_x
+        line_slider_y.on_change = change_slice_y
+        opacity_slider.on_change = change_opacity
 
-    def build_label(text):
-        label = ui.TextBlock2D()
-        label.message = text
-        label.font_size = 18
-        label.font_family = 'Arial'
-        label.justification = 'left'
-        label.bold = False
-        label.italic = False
-        label.shadow = False
-        label.background = (0, 0, 0)
-        label.color = (1, 1, 1)
+        def build_label(text):
+            label = ui.TextBlock2D()
+            label.message = text
+            label.font_size = 18
+            label.font_family = 'Arial'
+            label.justification = 'left'
+            label.bold = False
+            label.italic = False
+            label.shadow = False
+            label.background = (0, 0, 0)
+            label.color = (1, 1, 1)
 
-        return label
+            return label
 
-    line_slider_label_z = build_label(text="Z Slice")
-    line_slider_label_x = build_label(text="X Slice")
-    line_slider_label_y = build_label(text="Y Slice")
-    opacity_slider_label = build_label(text="Opacity")
+        line_slider_label_z = build_label(text="Z Slice")
+        line_slider_label_x = build_label(text="X Slice")
+        line_slider_label_y = build_label(text="Y Slice")
+        opacity_slider_label = build_label(text="Opacity")
 
-    panel = ui.Panel2D(size=(300, 200),
-                       color=(1, 1, 1),
-                       opacity=0.1,
-                       align="right")
-    panel.center = (1030, 120)
+        panel = ui.Panel2D(size=(300, 200),
+                        color=(1, 1, 1),
+                        opacity=0.1,
+                        align="right")
+        panel.center = (1030, 120)
 
-    panel.add_element(line_slider_label_x, (0.1, 0.75))
-    panel.add_element(line_slider_x, (0.38, 0.75))
-    panel.add_element(line_slider_label_y, (0.1, 0.55))
-    panel.add_element(line_slider_y, (0.38, 0.55))
-    panel.add_element(line_slider_label_z, (0.1, 0.35))
-    panel.add_element(line_slider_z, (0.38, 0.35))
-    panel.add_element(opacity_slider_label, (0.1, 0.15))
-    panel.add_element(opacity_slider, (0.38, 0.15))
+        panel.add_element(line_slider_label_x, (0.1, 0.75))
+        panel.add_element(line_slider_x, (0.38, 0.75))
+        panel.add_element(line_slider_label_y, (0.1, 0.55))
+        panel.add_element(line_slider_y, (0.38, 0.55))
+        panel.add_element(line_slider_label_z, (0.1, 0.35))
+        panel.add_element(line_slider_z, (0.38, 0.35))
+        panel.add_element(opacity_slider_label, (0.1, 0.15))
+        panel.add_element(opacity_slider, (0.38, 0.15))
 
-    show_m.scene.add(panel)
+        show_m.scene.add(panel)
 
-    global size
-    size = scene.GetSize()
-
-    def win_callback(obj, event):
         global size
-        if size != obj.GetSize():
-            size_old = size
-            size = obj.GetSize()
-            size_change = [size[0] - size_old[0], 0]
-            panel.re_align(size_change)
+        size = scene.GetSize()
+
+        def win_callback(obj, event):
+            global size
+            if size != obj.GetSize():
+                size_old = size
+                size = obj.GetSize()
+                size_change = [size[0] - size_old[0], 0]
+                panel.re_align(size_change)
 
     show_m.initialize()
 
