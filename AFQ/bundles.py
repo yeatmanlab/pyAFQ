@@ -139,6 +139,11 @@ class Bundles:
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
+    def _apply_affine_sft(self, sft, affine):
+        sls = dtu.transform_tracking_output(sft.streamlines, affine)
+        return StatefulTractogram(streamlines,
+                                  self.reference,
+                                  self.space)
 
     def apply_affine(self, affine):
         """
@@ -151,7 +156,7 @@ class Bundles:
             Apply affine matrix to all streamlines
         """
         for _, bundle in self.bundles:
-            bundle['sl'].apply_affine(affine)
+            bundle['sl'] = self._apply_affine_sft(bundle['sl'], affine)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -236,7 +241,7 @@ class Bundles:
                                   self.reference,
                                   to_space=self.space,
                                   bbox_valid_check=bbox_valid_check)
-            sft.apply_affine(affine)
+            sft = self._apply_affine_sft(sft, affine)
             self.add_bundle(bundle_name, sft)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
