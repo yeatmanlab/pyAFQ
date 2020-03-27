@@ -165,9 +165,11 @@ class Bundles:
 
         Parameters
         ----------
-        space : string
+        space : string or Space
             Space to transform the streamlines to.
         """
+        if isinstance(space, Space):
+            space = space.name
         space = space.lower()
         for _, bundle in self.bundles.items():
             bundle['sl'].to_space(space)
