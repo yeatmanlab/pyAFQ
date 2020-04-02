@@ -10,8 +10,6 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 
 import AFQ.segmentation as seg
 
-# TODO: make tests
-
 
 class Bundles:
     def __init__(self, reference='same', space=Space.RASMM,
@@ -76,8 +74,6 @@ class Bundles:
             Indices for streamlines in original tractography.
             Default: None.
         """
-        self.bundles[bundle_name] = {}
-
         if isinstance(streamlines, StatefulTractogram):
             if self.space == Space.VOX:
                 streamlines.to_vox()
@@ -85,19 +81,21 @@ class Bundles:
                 streamlines.to_voxmm()
             elif self.space == Space.RASMM:
                 streamlines.to_rasmm()
-
-            self.bundles[bundle_name]['sl'] = streamlines
+            
+            if idx is None:
+                self.bundles[bundle_name] = streamlines
+            else:
+                self.bundles[bundle_name] = \
+                    StatefulTractogram(streamlines.streamlines,
+                                        self.reference,
+                                        self.space,
+                                        data_per_streamline=idx)
         else:
-            self.bundles[bundle_name]['sl'] = \
+            self.bundles[bundle_name] = \
                 StatefulTractogram(streamlines,
-                                   self.reference,
-                                   self.space)
-
-        if idx is not None:
-            self.bundles[bundle_name]['idx'] = idx
-            self.bundles[bundle_name]['using_idx'] = True
-        else:
-            self.bundles[bundle_name]['using_idx'] = False
+                                    self.reference,
+                                    self.space,
+                                    data_per_streamline=idx)
 
     def clean_bundles(self, **kwargs):
         """
@@ -123,17 +121,23 @@ class Bundles:
             calculated. Default: `np.mean` (but can also use median, etc.)
         """
 
-        for _, bundle in self.bundles.items():
-            if bundle['using_idx']:
-                bundle['sl'], idx_in_bundle = seg.clean_bundle(
+        for bundle_name, bundle in self.bundles.items():
+            if bundle.data_per_streamline is not None:
+                new_sls, idx_in_bundle = seg.clean_bundle(
                     bundle['sl'].streamlines,
                     return_idx=True
                     ** kwargs)
-                bundle['idx'] = bundle['idx'][idx_in_bundle]
+                new_idx = bundle.data_per_streamline[idx_in_bundle]
             else:
-                bundle['sl'] = seg.clean_bundle(bundle['sl'].streamlines,
+                new_sls = seg.clean_bundle(bundle['sl'].streamlines,
                                                 return_idx=False
                                                 ** kwargs)
+                new_idx = None
+            self.bundles[bundle_name] = \
+                StatefulTractogram(new_sls,
+                                    self.reference,
+                                    self.space,
+                                    data_per_streamline=new_idx)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -141,7 +145,8 @@ class Bundles:
         sls = dtu.transform_tracking_output(sft.streamlines, affine)
         return StatefulTractogram(sls,
                                   reference,
-                                  self.space)
+                                  self.space,
+                                  data_per_streamline=sft.data_per_streamline)
 
     def apply_affine(self, affine, reference):
         """
@@ -158,10 +163,10 @@ class Bundles:
             Reference that provides the spatial attribute.
             New reference for bundles.
         """
-        for _, bundle in self.bundles.items():
-            bundle['sl'] = self._apply_affine_sft(bundle['sl'],
-                                                  affine,
-                                                  reference)
+        for bundle_idx, bundle in self.bundles.items():
+            self.bundles[bundle_idx] = self._apply_affine_sft(bundle,
+                                                              affine,
+                                                              reference)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -177,8 +182,8 @@ class Bundles:
         if isinstance(space, Space):
             space = space.name
         space = space.lower()
-        for _, bundle in self.bundles.items():
-            bundle['sl'].to_space(space)
+        for bundle_idx, bundle in self.bundles.items():
+            self.bundles[bundle_idx].to_space(space)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -208,7 +213,7 @@ class Bundles:
             self.to_space(space)
 
         for bundle_name, bundle in self.bundles.items():
-            save_tractogram(bundle['sl'],
+            save_tractogram(bundle,
                             f'{file_path}{bundle_name}{file_suffix}',
                             bbox_valid_check=bbox_valid_check)
             logging.disable(level=logging.WARNING)
@@ -246,7 +251,7 @@ class Bundles:
                     f'{file_path}{bundle_name}{file_suffix}',
                     self.reference,
                     bbox_valid_check=bbox_valid_check)
-                self.reference = sft
+                self.reference = sft.reference
                 self.space = sft.space
             else:
                 sft = load_tractogram(
@@ -277,8 +282,9 @@ class Bundles:
         """
         self.to_space(Space.VOX)
         for _, bundle in self.bundles.items():
-            weights = gaussian_weights(bundle['sl'].streamlines)
-            bundle['profile'] = afq_profile(data, bundle['sl'].streamlines,
-                                            affine, weights=weights)
+            weights = gaussian_weights(bundle.streamlines)
+            # TODO: return somehow
+            profile = afq_profile(data, bundle.streamlines,
+                                  affine, weights=weights)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
