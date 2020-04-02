@@ -47,7 +47,6 @@ class Bundles:
         self.bundles = {}
         self.reference = reference
         self.space = space
-        self.logger = logging.getLogger('AFQ.Bundles')
 
         if bundles_dict is not None:
             for bundle_name in bundles_dict:
@@ -138,13 +137,13 @@ class Bundles:
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
-    def _apply_affine_sft(self, sft, affine):
+    def _apply_affine_sft(self, sft, affine, reference):
         sls = dtu.transform_tracking_output(sft.streamlines, affine)
         return StatefulTractogram(sls,
-                                  self.reference,
+                                  reference,
                                   self.space)
 
-    def apply_affine(self, affine):
+    def apply_affine(self, affine, reference):
         """
         Appliy a linear transformation, given by affine, to all
         streamlines.
@@ -153,9 +152,16 @@ class Bundles:
         ----------
         affine : array (4, 4)
             Apply affine matrix to all streamlines
+
+        reference : Nifti or Trk filename, Nifti1Image or TrkFile,
+            Nifti1Header, trk.header (dict) or another Stateful Tractogram
+            Reference that provides the spatial attribute.
+            New reference for bundles.
         """
         for _, bundle in self.bundles.items():
-            bundle['sl'] = self._apply_affine_sft(bundle['sl'], affine)
+            bundle['sl'] = self._apply_affine_sft(bundle['sl'],
+                                                  affine,
+                                                  reference)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -248,7 +254,7 @@ class Bundles:
                     self.reference,
                     to_space=self.space,
                     bbox_valid_check=bbox_valid_check)
-            sft = self._apply_affine_sft(sft, affine)
+            sft = self._apply_affine_sft(sft, affine, self.reference)
             self.add_bundle(bundle_name, sft)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
