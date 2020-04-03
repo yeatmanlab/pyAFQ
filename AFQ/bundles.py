@@ -226,7 +226,7 @@ class Bundles:
 
         for bundle_name, bundle in self.bundles.items():
             save_tractogram(bundle,
-                            os.path.join(file_path, bundle_name, file_suffix),
+                            os.path.join(file_path, f"{bundle_name}{file_suffix}"),
                             bbox_valid_check=bbox_valid_check)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
@@ -257,8 +257,8 @@ class Bundles:
             Default: False
         """
 
-        full_path = os.path.join(file_path, bundle_name, file_suffix)
         for bundle_name in bundle_names:
+            full_path = os.path.join(file_path, f"{bundle_name}{file_suffix}")
             if self.reference == 'same':
                 sft = load_tractogram(
                     full_path,
