@@ -11,6 +11,7 @@ import AFQ.bundles as bdl
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
 hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
 
+
 def test_bundles_class():
     # Example Segmentation results
     img = nib.Nifti1Image(np.zeros((2, 2, 2)), np.eye(4))
