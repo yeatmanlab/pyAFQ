@@ -77,6 +77,19 @@ def test_AFQ_init():
     npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
 
 
+def test_AFQ_no_prealign():
+    """
+    Test if API can run without prealign
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub',
+                    use_prealign=False)
+    myafq.export_rois()
+
+
 def test_AFQ_data():
     """
     Test with some actual data
@@ -103,7 +116,7 @@ def test_AFQ_data_waypoint():
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI")
     segmentation_params = dict(filter_by_endpoints=False,
-                               seg_algo = "AFQ",
+                               seg_algo="AFQ",
                                return_idx=True)
 
     clean_params = dict(return_idx=True)

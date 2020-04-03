@@ -578,11 +578,15 @@ class AFQ(object):
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
                 reg_prealign = None
+
             warped_b0, mapping = reg.syn_register_dwi(
                 row['dwi_file'], gtab,
                 template=self.reg_template,
                 prealign=reg_prealign)
-            mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+
+            if self.use_prealign:
+                mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+
             reg.write_mapping(mapping, mapping_file)
             meta_fname = self._get_fname(row, '_mapping_reg_prealign.json')
             meta = dict(type="displacementfield")
@@ -697,7 +701,10 @@ class AFQ(object):
 
             img = nib.load(row['dwi_file'])
             tg = load_tractogram(streamlines_file, img, Space.VOX)
-            reg_prealign = np.load(self._reg_prealign(row))
+            if self.use_prealign:
+                reg_prealign = np.load(self._reg_prealign(row))
+            else:
+                reg_prealign = None
 
             segmentation = seg.Segmentation(**self.segmentation_params)
             bundles = segmentation.segment(self.bundle_dict,
@@ -860,12 +867,16 @@ class AFQ(object):
         return template_xform_file
 
     def _export_rois(self, row):
-        reg_prealign = np.load(self._reg_prealign(row))
+        if self.use_prealign:
+            reg_prealign = np.load(self._reg_prealign(row))
+            reg_prealign_inv = np.linalg.inv(reg_prealign)
+        else:
+            reg_prealign_inv = None
 
         mapping = reg.read_mapping(self._mapping(row),
                                    row['dwi_file'],
                                    self.reg_template,
-                                   prealign=np.linalg.inv(reg_prealign))
+                                   prealign=reg_prealign_inv)
 
         rois_dir = op.join(row['results_dir'], 'ROIs')
         os.makedirs(rois_dir, exist_ok=True)
