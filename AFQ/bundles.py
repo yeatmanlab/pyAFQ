@@ -23,21 +23,15 @@ class Bundles:
         reference : Nifti or Trk filename, Nifti1Image or TrkFile,
             Nifti1Header, trk.header (dict) or another Stateful Tractogram,
             optional.
-            Reference that provides the spatial attribute.
-            Typically a nifti-related object from the native diffusion used
-            for streamlines generation. Use 'same' if tractograms will be
-            loaded from a file first.
+            see DIPY.
             Default: 'same'
 
         origin : Enum (dipy.io.stateful_tractogram.Origin), optional
-            Current origin in which the streamlines are (center or corner)
-            After loading with nibabel the origin is CENTER
+            see DIPY.
             Default: Origin.NIFTI
 
         space : string, optional.
-            Current space in which the streamlines are (vox, voxmm or rasmm)
-            Typically after tracking the space is VOX, after nibabel loading
-            the space is RASMM
+            see DIPY.
             Default: Space.RASMM
 
         bundles : dict, optional.
@@ -173,12 +167,10 @@ class Bundles:
 
         reference : Nifti or Trk filename, Nifti1Image or TrkFile,
             Nifti1Header, trk.header (dict) or another Stateful Tractogram
-            Reference that provides the spatial attribute.
-            New reference for bundles.
+            Reference that provides the new spatial attribute.
 
         origin : Enum (dipy.io.stateful_tractogram.Origin), optional
-            Current origin in which the streamlines are (center or corner)
-            After loading with nibabel the origin is CENTER
+            New origin of streamlines.
             Default: Origin.NIFTI
         """
         for bundle_idx, bundle in self.bundles.items():
