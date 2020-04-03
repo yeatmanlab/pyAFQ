@@ -7,7 +7,7 @@ import imageio as io
 import itertools
 
 import nibabel as nib
-from dipy.viz import window, actor, ui, regtools
+from dipy.viz import window, actor, ui, app
 
 from palettable.tableau import Tableau_20
 
@@ -96,7 +96,7 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
     if list(tg.data_per_streamline.keys()) == []:
         streamlines = list(streamlines)
         sl_actor = actor.line(streamlines, [c for i, c in zip(
-            range(len(streamlines)), regtools.distinguishable_colormap())])
+            range(len(streamlines)), app.distinguishable_colormap())])
         scene.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)
