@@ -319,7 +319,11 @@ class Bundles:
         self.to_space(Space.VOX)
         profiles = []
         for bundle_name, bundle in self.bundles.items():
-            weights = gaussian_weights(bundle.streamlines, n_points=n_points)
+            if weight:
+                weights = gaussian_weights(bundle.streamlines,
+                                           n_points=n_points)
+            else:
+                weights = None
             profile = afq_profile(data, bundle.streamlines,
                                   affine, weights=weights, n_points=n_points)
             for ii in range(len(profile)):
