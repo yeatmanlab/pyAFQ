@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.testing as npt
-import tempfile
 import os.path as op
 
 import nibabel as nib
+import nibabel.tmpdirs as nbtmp
 import dipy.data.fetcher as fetcher
 
 import AFQ.bundles as bdl
@@ -30,17 +30,17 @@ def test_bundles_class():
                                  [-78.5, -68.7, -12.6]]],
                          'idx': [0, 1]}}
 
-    tmpdir = tempfile.mkdtemp()
-    # save in bundles class for bundles class tests
-    bundles_og = bdl.Bundles(reference=img,
-                             bundles_dict=bundles,
-                             using_idx=True)
-    bundles_og.save_bundles(file_path=tmpdir)
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        # save in bundles class for bundles class tests
+        bundles_og = bdl.Bundles(reference=img,
+                                bundles_dict=bundles,
+                                using_idx=True)
+        bundles_og.save_bundles(file_path=tmpdir)
 
-    # load bundles again
-    bundles = bdl.Bundles()
-    bundle_names = ['CST_L', 'CST_R']
-    bundles.load_bundles(bundle_names, file_path=tmpdir)
+        # load bundles again
+        bundles = bdl.Bundles()
+        bundle_names = ['CST_L', 'CST_R']
+        bundles.load_bundles(bundle_names, file_path=tmpdir)
 
     # check loaded bundles are same
     npt.assert_equal(len(bundles.bundles), len(bundles_og.bundles))
