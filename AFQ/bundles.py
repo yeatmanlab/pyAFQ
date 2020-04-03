@@ -251,7 +251,7 @@ class Bundles:
                     f'{file_path}{bundle_name}{file_suffix}',
                     self.reference,
                     bbox_valid_check=bbox_valid_check)
-                self.reference = sft.reference
+                self.reference = sft
                 self.space = sft.space
             else:
                 sft = load_tractogram(
@@ -281,10 +281,10 @@ class Bundles:
             Default: np.eye(4)
         """
         self.to_space(Space.VOX)
+        profiles = []
         for _, bundle in self.bundles.items():
             weights = gaussian_weights(bundle.streamlines)
-            # TODO: return somehow
-            profile = afq_profile(data, bundle.streamlines,
-                                  affine, weights=weights)
+            profiles.append(afq_profile(data, bundle.streamlines,
+                            affine, weights=weights))
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
