@@ -33,8 +33,8 @@ def test_bundles_class():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         # save in bundles class for bundles class tests
         bundles_og = bdl.Bundles(reference=img,
-                                bundles_dict=bundles,
-                                using_idx=True)
+                                 bundles_dict=bundles,
+                                 using_idx=True)
         bundles_og.save_bundles(file_path=tmpdir)
 
         # load bundles again
