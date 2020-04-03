@@ -65,4 +65,3 @@ def test_bundles_class():
     # test clean bundles
     bundles.clean_bundles()
     npt.assert_equal(len(bundles.bundles), len(bundles_og.bundles))
-test_bundles_class()
