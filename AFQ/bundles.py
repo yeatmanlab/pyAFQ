@@ -90,23 +90,23 @@ class Bundles:
                 streamlines.to_voxmm()
             elif self.space == Space.RASMM:
                 streamlines.to_rasmm()
-            
+
             if idx is None:
                 self.bundles[bundle_name] = streamlines
             else:
                 self.bundles[bundle_name] = \
                     StatefulTractogram(streamlines.streamlines,
-                                        self.reference,
-                                        self.space,
-                                        origin=self.origin,
-                                        data_per_streamline={'idx': idx})
+                                       self.reference,
+                                       self.space,
+                                       origin=self.origin,
+                                       data_per_streamline={'idx': idx})
         else:
             self.bundles[bundle_name] = \
                 StatefulTractogram(streamlines,
-                                    self.reference,
-                                    self.space,
-                                    origin=self.origin,
-                                    data_per_streamline={'idx': idx})
+                                   self.reference,
+                                   self.space,
+                                   origin=self.origin,
+                                   data_per_streamline={'idx': idx})
 
     def clean_bundles(self, **kwargs):
         """
@@ -146,10 +146,10 @@ class Bundles:
                 new_idx = None
             self.bundles[bundle_name] = \
                 StatefulTractogram(new_sls.streamlines,
-                                    self.reference,
-                                    self.space,
-                                    origin=self.origin,
-                                    data_per_streamline={'idx': new_idx})
+                                   self.reference,
+                                   self.space,
+                                   origin=self.origin,
+                                   data_per_streamline={'idx': new_idx})
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
@@ -175,7 +175,7 @@ class Bundles:
             Nifti1Header, trk.header (dict) or another Stateful Tractogram
             Reference that provides the spatial attribute.
             New reference for bundles.
-        
+
         origin : Enum (dipy.io.stateful_tractogram.Origin), optional
             Current origin in which the streamlines are (center or corner)
             After loading with nibabel the origin is CENTER
@@ -276,7 +276,8 @@ class Bundles:
                     self.reference,
                     to_space=self.space,
                     bbox_valid_check=bbox_valid_check)
-            sft = self._apply_affine_sft(sft, affine, self.reference, self.origin)
+            sft = self._apply_affine_sft(
+                sft, affine, self.reference, self.origin)
             self.add_bundle(bundle_name, sft)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
@@ -302,7 +303,7 @@ class Bundles:
         for _, bundle in self.bundles.items():
             weights = gaussian_weights(bundle.streamlines)
             profiles.append(afq_profile(data, bundle.streamlines,
-                            affine, weights=weights))
+                                        affine, weights=weights))
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
         return profiles
