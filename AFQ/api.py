@@ -935,7 +935,7 @@ class AFQ(object):
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
-    
+
     def _export_bundle_gif(self, row):
         bundles_file = self.get_clean_bundles()[0]
         fa_file = self.get_dti_fa()[0]
@@ -976,7 +976,7 @@ class AFQ(object):
         directions = self.tracking_params['directions']
         seg_algo = self.segmentation_params['seg_algo']
 
-        for bundle_name in self.bundle_dict.keys(): 
+        for bundle_name in self.bundle_dict.keys():
             uid = self.bundle_dict[bundle_name]['uid']
             scene = viz.visualize_volume(fa_img,
                                          inline=False,
@@ -1015,7 +1015,7 @@ class AFQ(object):
 
             scene = viz.scene_rotate_forward(scene)
             viz.create_gif(scene, fname)
-            
+
     def _get_affine(self, fname):
         return nib.load(fname).affine
 

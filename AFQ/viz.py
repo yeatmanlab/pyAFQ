@@ -19,41 +19,42 @@ tbl_interleavecs = [(31, 119, 180),
                     (174, 199, 232),
                     (215, 228, 244),
                     (255, 127, 14),
-                    (255, 154, 66), 
-                    (255, 187, 120), 
-                    (255, 214, 173), 
-                    (44, 160, 44), 
-                    (55, 200, 55), 
-                    (152, 223, 138), 
-                    (188, 234, 179), 
-                    (214, 39, 40), 
-                    (223, 83, 83), 
-                    (255, 152, 150), 
-                    (255, 200, 199), 
-                    (148, 103, 189), 
-                    (172, 138, 204), 
-                    (197, 176, 213), 
-                    (221, 208, 230), 
-                    (140, 86, 75), 
-                    (169, 108, 96), 
-                    (196, 156, 148), 
-                    (213, 185, 179), 
-                    (227, 119, 194), 
-                    (236, 162, 214), 
-                    (247, 182, 210), 
-                    (252, 227, 238), 
-                    (127, 127, 127), 
-                    (153, 153, 153), 
-                    (199, 199, 199), 
-                    (224, 224, 224), 
-                    (188, 189, 34), 
-                    (220, 220, 56), 
-                    (219, 219, 141), 
-                    (232, 232, 181), 
-                    (23, 190, 207), 
-                    (48, 214, 232), 
-                    (158, 218, 229), 
+                    (255, 154, 66),
+                    (255, 187, 120),
+                    (255, 214, 173),
+                    (44, 160, 44),
+                    (55, 200, 55),
+                    (152, 223, 138),
+                    (188, 234, 179),
+                    (214, 39, 40),
+                    (223, 83, 83),
+                    (255, 152, 150),
+                    (255, 200, 199),
+                    (148, 103, 189),
+                    (172, 138, 204),
+                    (197, 176, 213),
+                    (221, 208, 230),
+                    (140, 86, 75),
+                    (169, 108, 96),
+                    (196, 156, 148),
+                    (213, 185, 179),
+                    (227, 119, 194),
+                    (236, 162, 214),
+                    (247, 182, 210),
+                    (252, 227, 238),
+                    (127, 127, 127),
+                    (153, 153, 153),
+                    (199, 199, 199),
+                    (224, 224, 224),
+                    (188, 189, 34),
+                    (220, 220, 56),
+                    (219, 219, 141),
+                    (232, 232, 181),
+                    (23, 190, 207),
+                    (48, 214, 232),
+                    (158, 218, 229),
                     (199, 234, 240)]
+
 
 def _inline_interact(scene, inline, interact):
     """
@@ -94,7 +95,8 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
     # There are no bundles in here:
     if list(tg.data_per_streamline.keys()) == []:
         streamlines = list(streamlines)
-        sl_actor = actor.line(streamlines, [c for i, c in zip(range(len(streamlines)), regtools.distinguishable_colormap())])
+        sl_actor = actor.line(streamlines, [c for i, c in zip(
+            range(len(streamlines)), regtools.distinguishable_colormap())])
         scene.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)
@@ -103,7 +105,8 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
             idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
             this_sl = list(streamlines[idx])
             if colors is not None:
-                sl_actor = actor.line(this_sl, colors[np.mod(len(colors), int(b))])
+                sl_actor = actor.line(
+                    this_sl, colors[np.mod(len(colors), int(b))])
                 sl_actor.GetProperty().SetRenderLinesAsTubes(1)
                 sl_actor.GetProperty().SetLineWidth(6)
             else:
@@ -117,7 +120,8 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
         idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
         this_sl = list(streamlines[idx])
         if colors is not None:
-            sl_actor = actor.line(this_sl, colors[np.mod(len(colors), int(bundle))])
+            sl_actor = actor.line(
+                this_sl, colors[np.mod(len(colors), int(bundle))])
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
 
@@ -131,15 +135,17 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
 
     return _inline_interact(scene, inline, interact)
 
+
 def scene_rotate_forward(scene):
     scene.elevation(90)
     scene.set_camera(view_up=(0.0, 0.0, 1.0))
     scene.reset_camera()
     return scene
 
+
 def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
     tdir = tempfile.gettempdir()
-    window.record(scene, az_ang=360.0/n_frames, n_frames=n_frames,
+    window.record(scene, az_ang=360.0 / n_frames, n_frames=n_frames,
                   path_numbering=True, out_path=tdir + '/tgif',
                   size=size)
 
@@ -152,7 +158,7 @@ def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
         else:
             angle_fname = f"tgif000{i}.png"
         angles.append(io.imread(os.path.join(tdir, angle_fname)))
-            
+
     io.mimsave(file_name, angles)
 
 
@@ -268,21 +274,24 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
                                         length=140)
 
         opacity_slider = ui.LineSlider2D(min_value=0.0,
-                                        max_value=1.0,
-                                        initial_value=slicer_opacity,
-                                        length=140)
+                                         max_value=1.0,
+                                         initial_value=slicer_opacity,
+                                         length=140)
 
         def change_slice_z(slider):
             z = int(np.round(slider.value))
-            image_actor_z.display_extent(0, shape[0] - 1, 0, shape[1] - 1, z, z)
+            image_actor_z.display_extent(
+                0, shape[0] - 1, 0, shape[1] - 1, z, z)
 
         def change_slice_x(slider):
             x = int(np.round(slider.value))
-            image_actor_x.display_extent(x, x, 0, shape[1] - 1, 0, shape[2] - 1)
+            image_actor_x.display_extent(
+                x, x, 0, shape[1] - 1, 0, shape[2] - 1)
 
         def change_slice_y(slider):
             y = int(np.round(slider.value))
-            image_actor_y.display_extent(0, shape[0] - 1, y, y, 0, shape[2] - 1)
+            image_actor_y.display_extent(
+                0, shape[0] - 1, y, y, 0, shape[2] - 1)
 
         def change_opacity(slider):
             slicer_opacity = slider.value
@@ -315,9 +324,9 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
         opacity_slider_label = build_label(text="Opacity")
 
         panel = ui.Panel2D(size=(300, 200),
-                        color=(1, 1, 1),
-                        opacity=0.1,
-                        align="right")
+                           color=(1, 1, 1),
+                           opacity=0.1,
+                           align="right")
         panel.center = (1030, 120)
 
         panel.add_element(line_slider_label_x, (0.1, 0.75))
