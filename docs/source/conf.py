@@ -198,7 +198,10 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/', None),
+                       'numpy': ('http://http://docs.scipy.org/doc/numpy/', None),
+                       'dipy': ('http://docs.dipy.org', None)
+                        }
 
 image_scrapers = ('matplotlib', plotly_sg_scraper,)
 
