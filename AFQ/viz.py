@@ -14,6 +14,46 @@ from palettable.tableau import Tableau_20
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
+tbl_interleavecs = [(31, 119, 180),
+                    (41, 145, 219),
+                    (174, 199, 232),
+                    (215, 228, 244),
+                    (255, 127, 14),
+                    (255, 154, 66), 
+                    (255, 187, 120), 
+                    (255, 214, 173), 
+                    (44, 160, 44), 
+                    (55, 200, 55), 
+                    (152, 223, 138), 
+                    (188, 234, 179), 
+                    (214, 39, 40), 
+                    (223, 83, 83), 
+                    (255, 152, 150), 
+                    (255, 200, 199), 
+                    (148, 103, 189), 
+                    (172, 138, 204), 
+                    (197, 176, 213), 
+                    (221, 208, 230), 
+                    (140, 86, 75), 
+                    (169, 108, 96), 
+                    (196, 156, 148), 
+                    (213, 185, 179), 
+                    (227, 119, 194), 
+                    (236, 162, 214), 
+                    (247, 182, 210), 
+                    (252, 227, 238), 
+                    (127, 127, 127), 
+                    (153, 153, 153), 
+                    (199, 199, 199), 
+                    (224, 224, 224), 
+                    (188, 189, 34), 
+                    (220, 220, 56), 
+                    (219, 219, 141), 
+                    (232, 232, 181), 
+                    (23, 190, 207), 
+                    (48, 214, 232), 
+                    (158, 218, 229), 
+                    (199, 234, 240)]
 
 def _inline_interact(scene, inline, interact):
     """
@@ -32,7 +72,7 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
-                      color=None, inline=False, interact=False,
+                      colors=tbl_interleavecs, inline=False, interact=False,
                       face_forward=False):
     """
     Visualize bundles in 3D using VTK
@@ -63,8 +103,8 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
         for b in np.unique(tg.data_per_streamline['bundle']):
             idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
             this_sl = list(streamlines[idx])
-            if color is not None:
-                sl_actor = actor.line(this_sl, color)
+            if colors is not None:
+                sl_actor = actor.line(this_sl, colors[np.mod(len(colors), int(b))])
                 sl_actor.GetProperty().SetRenderLinesAsTubes(1)
                 sl_actor.GetProperty().SetLineWidth(6)
             else:
@@ -77,8 +117,8 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
     else:
         idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
         this_sl = list(streamlines[idx])
-        if color is not None:
-            sl_actor = actor.line(this_sl, color)
+        if colors is not None:
+            sl_actor = actor.line(this_sl, colors[np.mod(len(colors), int(bundle))])
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
 
