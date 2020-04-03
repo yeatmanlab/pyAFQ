@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import logging
 
 import dipy.tracking.streamline as dts
@@ -274,7 +275,8 @@ class Bundles:
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
 
-    def tract_profiles(self, data, affine=np.eye(4)):
+    def tract_profiles(self, data, subject_label, affine=np.eye(4),
+                       method='afq', metric='FA', n_points=100):
         """
         Calculate a summarized profile of data for each bundle along
         its length.
@@ -286,16 +288,38 @@ class Bundles:
         data : 3D volume
             The statistic to sample with the streamlines.
 
+        subject_label : string
+            String which identifies these bundles in the pandas dataframe.
+
         affine : array_like (4, 4), optional.
             The mapping from voxel coordinates to 'data' coordinates.
             Default: np.eye(4)
+
+        method : string
+            Method used to segment streamlines.
+            Default: 'afq'
+
+        metric : string
+            Metric of statistic in data.
+            Default: 'FA'
+
+        n_points : int
+            Number of points to resample to.
+            Default: 100
         """
         self.to_space(Space.VOX)
         profiles = []
-        for _, bundle in self.bundles.items():
-            weights = gaussian_weights(bundle.streamlines)
-            profiles.append(afq_profile(data, bundle.streamlines,
-                                        affine, weights=weights))
+        for bundle_name, bundle in self.bundles.items():
+            weights = gaussian_weights(bundle.streamlines, n_points=n_points)
+            profile = afq_profile(data, bundle.streamlines,
+                                  affine, weights=weights, n_points=n_points)
+            for ii in range(len(profile)):
+                # Subject, Bundle, node, method, metric (FA, MD), value
+                profiles.append([subject_label, bundle_name, ii, method,
+                                 metric, profile[ii]])
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
+        profiles = pd.DataFrame(data=profiles,
+                                columns=["Subject", "Bundle", "Node",
+                                         "Method", "Metric", "Value"])
         return profiles

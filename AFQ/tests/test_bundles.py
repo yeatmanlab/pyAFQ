@@ -18,15 +18,16 @@ def test_bundles_class():
     bundles = {'CST_L': {'sl': [[[-80.5, -120.5, -60.5],
                                  [-80.5, -94.5, -36.5],
                                  [-78.5, -68.7, -12.6]],
-                                [[-80.5, 9.5, 59.5],
-                                 [-80.5, 35.5, 83.5],
-                                 [-80.5, 63.5, -44.5]]],
+                                [[-80.5, -120.5, -60.5],
+                                 [-80.5, -94.5, -36.5],
+                                 [-78.5, -68.7, -12.6]]],
                          'idx': [0, 1]},
                'CST_R': {'sl': [[[-80.5, -120.5, -60.5],
                                  [-80.5, -94.5, -36.5],
                                  [-78.5, -68.7, -12.6]],
-                                [[-78.5, 61.5, -4.5],
-                                 [-78.5, 87.5, 19.5]]],
+                                [[-80.5, -120.5, -60.5],
+                                 [-80.5, -94.5, -36.5],
+                                 [-78.5, -68.7, -12.6]]],
                          'idx': [0, 1]}}
 
     tmpdir = tempfile.mkdtemp()
@@ -56,10 +57,12 @@ def test_bundles_class():
         bundles_og.bundles['CST_L'].data_per_streamline['idx'])
 
     # test tract profiles
-    # profiles = bundles.tract_profiles(
-    #     np.ones(nib.load(hardi_fdata).shape[:3]))
-    # npt.assert_almost_equal(profiles[0], np.ones(100))
+    profiles = bundles.tract_profiles(
+        np.ones(nib.load(hardi_fdata).shape[:3]),
+        'test_subject', n_points=1)
+    npt.assert_almost_equal(profiles.Value, np.zeros(2))
 
     # test clean bundles
     bundles.clean_bundles()
     npt.assert_equal(len(bundles.bundles), len(bundles_og.bundles))
+test_bundles_class()
