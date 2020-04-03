@@ -311,7 +311,7 @@ class Bundles:
         n_points : int
             Number of points to resample to.
             Default: 100
-        
+
         weight : boolean
             Whether to calculate gaussian weights before profiling.
             Default: True
