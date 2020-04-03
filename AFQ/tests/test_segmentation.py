@@ -4,7 +4,6 @@ import pytest
 
 import numpy as np
 import numpy.testing as npt
-import tempfile
 
 import nibabel as nib
 import dipy.data as dpd
@@ -20,7 +19,6 @@ import AFQ.registration as reg
 import AFQ.segmentation as seg
 import AFQ.dti as dti
 from AFQ.utils.volume import patch_up_roi
-import AFQ.bundles as bdl
 
 
 dpd.fetch_stanford_hardi()
@@ -35,7 +33,6 @@ streamlines = file_dict['tractography_subsampled.trk']
 tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
 streamlines = tg.streamlines
-tmpdir = tempfile.mkdtemp()
 
 # streamlines = dts.Streamlines(
 #     dtu.transform_tracking_output(
@@ -157,32 +154,6 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
-
-    # save in bundles class for bundles class tests
-    bundles = bdl.Bundles(reference=segmentation.img,
-                          bundles_dict=fiber_groups,
-                          using_idx=True)
-    bundles.save_bundles(file_path=tmpdir)
-
-
-def test_bundles_class():
-    bundles = bdl.Bundles()
-    bundle_names = ['CST_L', 'CST_R']
-    bundles.load_bundles(bundle_names, file_path=tmpdir)
-
-    # check loaded bundles have same size
-    len_bundles = len(bundles.bundles)
-    npt.assert_equal(len_bundles, 2)
-    npt.assert_(len(bundles.bundles['CST_R']['sl']) > 0)
-
-    # test tract profiles
-    profiles = bundles.tract_profiles(
-        np.ones(nib.load(hardi_fdata).shape[:3]))
-    npt.assert_almost_equal(tract_profile, np.ones(100))
-
-    # test clean bundles
-    bundles.clean_bundles()
-    npt.assert_equal(len(bundles.bundles), len_bundles)
 
 
 def test_clean_by_endpoints():
