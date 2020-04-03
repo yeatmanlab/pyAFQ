@@ -72,8 +72,7 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
-                      colors=tbl_interleavecs, inline=False, interact=False,
-                      face_forward=False):
+                      colors=tbl_interleavecs, inline=False, interact=False):
     """
     Visualize bundles in 3D using VTK
     """
@@ -129,13 +128,14 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
         scene.add(sl_actor)
-    
-    if face_forward:
-        scene.elevation(90)
-        scene.set_camera(view_up=(0.0, 0.0, 1.0))
-        scene.reset_camera()
 
     return _inline_interact(scene, inline, interact)
+
+def scene_rotate_forward(scene):
+    scene.elevation(90)
+    scene.set_camera(view_up=(0.0, 0.0, 1.0))
+    scene.reset_camera()
+    return scene
 
 def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
     tdir = tempfile.gettempdir()
@@ -158,7 +158,8 @@ def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  scene=None, color=None, inline=True, interact=False):
+                  scene=None, color=np.array([1, 0, 0]), opacity=1.0,
+                  inline=False, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
     """
@@ -198,7 +199,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     if scene is None:
         scene = window.Scene()
 
-    roi_actor = actor.contour_from_roi(roi, color=color)
+    roi_actor = actor.contour_from_roi(roi, color=color, opacity=opacity)
     scene.add(roi_actor)
 
     if inline:
