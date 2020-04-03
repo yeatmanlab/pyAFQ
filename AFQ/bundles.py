@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import logging
+import os
 
 import dipy.tracking.streamline as dts
 import dipy.tracking.utils as dtu
@@ -37,8 +38,10 @@ class Bundles:
 
         bundles : dict, optional.
             Keys are names of the bundles.
-            If using_idx is False, values are Streamline objects.
-            Else, values are dictionaries with Streamline objects and indices.
+            If using_idx is False, values are StatefulTractograms
+            or Streamline Objects.
+            Else, values are dictionaries with StatefulTractograms
+            or Streamline objects and indices.
             Default: None.
 
         using_idx : boolean
@@ -158,7 +161,7 @@ class Bundles:
 
     def apply_affine(self, affine, reference, origin=Origin.NIFTI):
         """
-        Appliy a linear transformation, given by affine, to all
+        Apply a linear transformation, given by affine, to all
         streamlines.
 
         Parameters
@@ -223,7 +226,7 @@ class Bundles:
 
         for bundle_name, bundle in self.bundles.items():
             save_tractogram(bundle,
-                            f'{file_path}{bundle_name}{file_suffix}',
+                            os.path.join(file_path, bundle_name, file_suffix),
                             bbox_valid_check=bbox_valid_check)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
@@ -254,10 +257,11 @@ class Bundles:
             Default: False
         """
 
+        full_path = os.path.join(file_path, bundle_name, file_suffix)
         for bundle_name in bundle_names:
             if self.reference == 'same':
                 sft = load_tractogram(
-                    f'{file_path}{bundle_name}{file_suffix}',
+                    full_path,
                     self.reference,
                     bbox_valid_check=bbox_valid_check)
                 self.reference = sft
@@ -265,7 +269,7 @@ class Bundles:
                 self.space = sft.space
             else:
                 sft = load_tractogram(
-                    f'{file_path}{bundle_name}{file_suffix}',
+                    full_path,
                     self.reference,
                     to_space=self.space,
                     bbox_valid_check=bbox_valid_check)
@@ -276,7 +280,8 @@ class Bundles:
         logging.disable(logging.NOTSET)
 
     def tract_profiles(self, data, subject_label, affine=np.eye(4),
-                       method='afq', metric='FA', n_points=100):
+                       method='afq', metric='FA', n_points=100,
+                       weight=True):
         """
         Calculate a summarized profile of data for each bundle along
         its length.
@@ -306,6 +311,10 @@ class Bundles:
         n_points : int
             Number of points to resample to.
             Default: 100
+        
+        weight : boolean
+            Whether to calculate gaussian weights before profiling.
+            Default: True
         """
         self.to_space(Space.VOX)
         profiles = []
