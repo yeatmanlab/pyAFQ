@@ -15,6 +15,7 @@ from palettable.tableau import Tableau_20
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
+
 tbl_interleavecs = [(31, 119, 180),
                     (41, 145, 219),
                     (174, 199, 232),
@@ -57,6 +58,28 @@ tbl_interleavecs = [(31, 119, 180),
                     (199, 234, 240)]
 
 
+color_dict = {'ATR_R': tbl_interleavecs[0],
+              'ATR_L': tbl_interleavecs[1],
+              'CGC_R': tbl_interleavecs[2],
+              'CGC_L': tbl_interleavecs[3],
+              'CST_R': tbl_interleavecs[4],
+              'CST_L': tbl_interleavecs[5],
+              'HCC_R': tbl_interleavecs[6],
+              'HCC_L': tbl_interleavecs[7],
+              'IFO_R': tbl_interleavecs[8],
+              'IFO_L': tbl_interleavecs[9],
+              'ILF_R': tbl_interleavecs[10],
+              'ILF_L': tbl_interleavecs[11],
+              'SLF_R': tbl_interleavecs[12],
+              'SLF_L': tbl_interleavecs[13],
+              'ARC_R': tbl_interleavecs[14],
+              'ARC_L': tbl_interleavecs[15],
+              'UNC_R': tbl_interleavecs[16],
+              'UNC_L': tbl_interleavecs[17],
+              'FA': tbl_interleavecs[18],
+              'FP': tbl_interleavecs[19]}
+
+
 def _inline_interact(scene, inline, interact):
     """
     Helper function to reuse across viz functions
@@ -74,7 +97,8 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
-                      colors=tbl_interleavecs, inline=False, interact=False):
+                      colors=tbl_interleavecs, bundle_names=None,
+                      inline=False, interact=False):
     """
     Visualize bundles in 3D using VTK
     """
@@ -105,8 +129,15 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
             idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
             this_sl = list(streamlines[idx])
             if colors is not None:
-                sl_actor = actor.line(
-                    this_sl, colors[np.mod(len(colors), int(b))])
+                if bundle_names is not None:
+                    for b_name_iter, b_iter in bundle_names.items():
+                        if b_iter['uid'] == b:
+                            b_name = b_name_iter
+                            pass
+                    color = color_dict[b_name]
+                else:
+                    color = colors[np.mod(len(colors), int(b))]
+                sl_actor = actor.line(this_sl, color)
                 sl_actor.GetProperty().SetRenderLinesAsTubes(1)
                 sl_actor.GetProperty().SetLineWidth(6)
             else:
@@ -120,8 +151,15 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
         idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
         this_sl = list(streamlines[idx])
         if colors is not None:
-            sl_actor = actor.line(
-                this_sl, colors[np.mod(len(colors), int(bundle))])
+            if bundle_names is not None:
+                for b_name_iter, b_iter in bundle_names.items():
+                    if b_iter['uid'] == bundle:
+                        b_name = b_name_iter
+                        pass
+                color = color_dict[b_name]
+            else:
+                color = colors[np.mod(len(colors), int(bundle))]
+            sl_actor = actor.line(this_sl, color)
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
 

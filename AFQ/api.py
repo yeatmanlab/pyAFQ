@@ -946,6 +946,7 @@ class AFQ(object):
                                      interact=False)
         scene = viz.visualize_bundles(bundles_file,
                                       affine_or_mapping=row['dwi_affine'],
+                                      bundle_names=self.bundle_dict,
                                       inline=False,
                                       interact=False,
                                       scene=scene)
@@ -985,6 +986,7 @@ class AFQ(object):
                 scene = viz.visualize_bundles(
                     bundles_file,
                     affine_or_mapping=row['dwi_affine'],
+                    bundle_names=self.bundle_dict,
                     bundle=uid,
                     inline=False,
                     interact=False,
