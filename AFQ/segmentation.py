@@ -832,7 +832,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
             dist0ok = True
         else:
             dist0ok = False
-            dist0 = np.min(cdist(np.array([sl[0]]), idxes0, 'sqeuclidean'))
+            dist0 = np.min(cdist(np.array([sl[-1]]), idxes0, 'sqeuclidean'))
             if dist0 <= tol:
                 dist0ok = True
         # Only proceed if conditions for one side are fulfilled:
@@ -844,7 +844,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                 else:
                     yield sl
             else:
-                dist2 = np.min(cdist(np.array([sl[-1]]), idxes1,
+                dist2 = np.min(cdist(np.array([sl[0]]), idxes1,
                                      'sqeuclidean'))
                 if dist2 <= tol:
                     if return_idx:
