@@ -54,13 +54,11 @@ class Segmentation:
                  dist_to_aal=4):
         """
         Segment streamlines into bundles.
-
         Parameters
         ----------
         nb_points : int, boolean
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
-
         seg_algo : string
             Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
@@ -68,55 +66,45 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
                 during whole brain SLR.
             Default: 50
-
         progressive : boolean, optional
             Using RecoBundles Algorithm.
             Whether or not to use progressive technique
                 during whole brain SLR.
             Default: True.
-
         greater_than : int, optional
             Using RecoBundles Algorithm.
             Keep streamlines that have length greater than this value
                 during whole brain SLR.
             Default: 50.
-
         b0_theshold : float.
             Using AFQ Algorithm.
             All b-values with values less than or equal to `bo_threshold` are
             considered as b0s i.e. without diffusion weighting.
             Default: 0.
-
         prob_threshold : float.
             Using AFQ Algorithm.
             Initial cleaning of fiber groups is done using probability maps
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
-
         rng : RandomState
             If None, creates RandomState. Used in RecoBundles Algorithm.
             Default: None.
-
         return_idx : bool
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
-
         filter_by_endpoints: bool
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
-
         dist_to_aal : float
             If filter_by_endpoints is True, this is the distance from the
             endpoints to the AAL atlas ROIs that is required.
-
         References
         ----------
         .. [Hua2008] Hua K, Zhang J, Wakana S, Jiang H, Li X, et al. (2008)
@@ -153,46 +141,36 @@ class Segmentation:
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
-
         Parameters
         ----------
         bundle_dict: dict
             Meta-data for the segmentation. The format is something like::
-
                 {'name': {'ROIs':[img1, img2],
                 'rules':[True, True]},
                 'prob_map': img3,
                 'cross_midline': False}
-
         tg : StatefulTractogram
             Bundles to segment
-
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
-
         mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
             A mapping between DWI space and a template. If None, mapping will
             be registered from data used in prepare_img. Default: None.
-
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
             Default: None.
-
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration. Default: MNI T2.
-
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
-
         References
         ----------
         .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
         Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of
         White Matter Properties: Automating Fiber-Tract Quantification"
         PloS One 7 (11): e49790.
-
         .. [Garyfallidis17] Garyfallidis et al. Recognition of white matter
         bundles using local and global streamline-based registration and
         clustering, Neuroimage, 2017.
@@ -233,7 +211,6 @@ class Segmentation:
     def prepare_img(self, fdata, fbval, fbvec):
         """
         Prepare image data from DWI data.
-
         Parameters
         ----------
         fdata, fbval, fbvec : str
@@ -252,18 +229,15 @@ class Segmentation:
     def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None):
         """
         Set mapping between DWI space and a template.
-
         Parameters
         ----------
         mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
             A mapping between DWI space and a template.
             If None, mapping will be registered from data used in prepare_img.
             Default: None.
-
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration (defaults to the MNI T2)
             Default: None.
-
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
@@ -285,22 +259,21 @@ class Segmentation:
                                     self.fbvec,
                                     b0_threshold=self.b0_threshold)
             self.mapping = reg.read_mapping(mapping, self.img, reg_template,
-                                            prealign=reg_prealign)
+                                            prealign=np.linalg.inv(reg_prealign))
+            # replaced the pre_align with its inverse _aNNe
+            # that fixed the warped rois and the warped prob maps which were wrong otherwise
         else:
             self.mapping = mapping
 
     def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """
         Classify the streamlines by whether they cross the midline.
-
         Creates a crosses attribute which is an array of booleans. Each boolean
         corresponds to a streamline, and is whether or not that streamline
         crosses the midline.
-
         Parameters
         ----------
         tg : StatefulTractogram class instance.
-
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
         """
@@ -344,6 +317,12 @@ class Segmentation:
             else:
                 # Exclude ROI:
                 exclude_rois.append(np.array(np.where(warped_roi)).T)
+########for debugging: save the warped ROI that is actually used in segment_afq() ##########
+#       path_for_debugging = '/debugpath/'
+#            nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
+#                                     self.img_affine),
+#                     debugpath+'warpedROI_'+bundle+'as_used.nii.gz')
+############################################################################################
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
@@ -401,7 +380,6 @@ class Segmentation:
     def segment_afq(self, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
-
         Parameters
         ----------
         tg : StatefulTractogram class instance
@@ -414,6 +392,16 @@ class Segmentation:
         self.tg.to_vox()
         # For expedience, we approximate each streamline as a 100 point curve:
         fgarray = np.array(_resample_tg(tg, 100))
+        
+        # comment _aNNe
+        # in general, this might cause errors: 
+        # if rois were traversed by streamlines in just a few voxels
+        # and if streamlines were so long or resolution so high 
+        # that one hundredth of a streamline length was more than a voxel,
+        # then the contact check below (closest distance streamline to ROI < voxel width) can fail when resampling to 100 points
+        # To be cartain that the resampling does not cause problems, 
+        # the number of resamplign points has to be larger than the length of the streamline in voxels in native space! 
+        # end comment
 
         n_streamlines = fgarray.shape[0]
 
@@ -443,6 +431,12 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
+########for debugging: save the warped probability map that is actually used in segment_afq() ##########
+#            path_for_debugging = '/debugpath/'
+#            nib.save(nib.Nifti1Image(warped_prob_map.astype(np.float32),
+#                                     self.img_affine),
+#                      debugpath+'warpedprobmap_'+bundle+'as_used.nii.gz')
+############################################################################################
             fiber_probabilities = dts.values_from_volume(
                 warped_prob_map,
                 fgarray, np.eye(4))
@@ -588,12 +582,10 @@ class Segmentation:
     def segment_reco(self, tg=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
-
         Parameters
         ----------
         tg : StatefulTractogram class instance
             A whole-brain tractogram to be segmented.
-
         Returns
         -------
         fiber_groups : dict
@@ -667,40 +659,31 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
-
     Parameters
     ----------
-
     streamlines : nibabel.Streamlines class instance.
         The streamlines constituting a fiber group.
         If streamlines is None, will use previously given streamlines.
         Default: None.
-
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
-
     distance_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
         standard deviations). Default: 5.
-
     length_threshold: float, optional
         Threshold for cleaning based on length (in standard deviations). Length
         of any streamline should not be *more* than this number of stdevs from
         the mean length.
-
     min_sl : int, optional.
         Number of streamlines in a bundle under which we will
         not bother with cleaning outliers. Default: 20.
-
     stat : callable or str, optional.
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
-
     using_idx : bool
         Whether 'streamlines' contains indices in the original streamlines.
         Default: False.
-
     Returns
     -------
     A nibabel.Streamlines class instance containing only the streamlines
@@ -761,31 +744,24 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                        return_idx=False):
     """
     Clean a collection of streamlines based on their two endpoints
-
     Filters down to only include items that have their starting points close to
     the targets0 and ending points close to targets1
-
     Parameters
     ----------
     streamlines : sequence of 3XN_i arrays The collection of streamlines to
         filter down to.
-
     targets0, target1: sequences or Nx3 arrays or None.
         The targets. Numerical values in the atlas array for targets for the
         first and last node in each streamline respectively, or NX3 arrays with
         each row containing the indices for these locations in the atlas.
         If provided a None, this means no restriction on that end.
-
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
-
     atlas : 3D array or Nifti1Image class instance with a 3D array, optional.
         Contains numerical values for ROIs. Default: if not provided, assume
         that targets0 and targets1 are both arrays of indices, and this
         information is not needed.
-
-
     Yields
     -------
     Generator of the filtered collection
