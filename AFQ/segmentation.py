@@ -428,6 +428,31 @@ class Segmentation:
 
         if self.filter_by_endpoints:
             aal_atlas = afd.read_aal_atlas()['atlas'].get_fdata()
+            # This atlas is not yet aligned to template space
+            resample_to = self.reg_template
+            if isinstance(resample_to, str):
+                resample_to = nib.load(resample_to)
+            allVolumes = []
+            # aal atlas and more has mutiple volumes to represent overlapping areas separately
+            # move through all volumes, register them to the template 
+            # put them together 
+            # safe with affine of the template
+            # this puts aal atlas in the sam espace as template before it is warped to native space _aNNe
+            for ii in range(aal_atlas.get_fdata().shape[-1]):
+                vol = aal_atlas.get_fdata()
+                vol = vol[...,ii]
+                trafo = reg.resample(vol,# moving (according to reg.resample)
+                                               resample_to,# static
+                                               aal_atlas.affine,# moving affine
+                                               resample_to.affine)# static affine
+                allVolumes.append(np.asarray(trafo))
+            aal_atlas = np.stack(allVolumes, axis = 3)
+            aal_atlas = nib.Nifti1Image(aal_atlas,resample_to.affine)
+################for debugging: save AAL Atlas after registering to template ############
+#            path_for_debugging = '/debugpath/'
+#            nib.save(atlas_inFSL_space,debugpath+'AAL_registered_to_template.nii.gz')
+#########################################################################################
+
             # We need to calculate the size of a voxel, so we can transform
             # from mm to voxel units:
             R = self.img_affine[0:3, 0:3]
