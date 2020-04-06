@@ -310,7 +310,7 @@ class Segmentation:
                 roi = roi.get_fdata()
             warped_roi = auv.patch_up_roi(self.mapping.transform_inverse(
                 roi.astype(np.float32), interpolation='linear'))
-
+ 
             if rule:
                 # include ROI:
                 include_rois.append(np.array(np.where(warped_roi)).T)
