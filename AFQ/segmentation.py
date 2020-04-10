@@ -490,7 +490,7 @@ class Segmentation:
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
 
-        # Eliminate any fibers not selected using the plane ROIs:
+        # Eliminate any fibers not selected using the waypoint ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         tg = StatefulTractogram(tg.streamlines[possible_fibers],
                                 self.img,
