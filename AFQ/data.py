@@ -565,12 +565,15 @@ def read_aal_atlas(resample_to=None):
         else:
             out_dict['atlas'] = nib.load(op.join(folder, f))
     if resample_to is not None:
-        out_dict['atlas'] = nib.Nifti1Image(
-                                reg.resample(out_dict['atlas'].get_fdata(),
-                                             resample_to,
-                                             out_dict['atlas'].affine,
-                                             resample_to.affine),
-                                resample_to.affine)
+        data = out_dict['atlas'].get_fdata()
+        oo = []
+        for ii in range(data.shape[-1]):
+            oo.append(reg.resample(data[..., ii],
+                                   resample_to,
+                                   out_dict['atlas'].affine,
+                                   resample_to.affine))
+        out_dict['atlas'] = nib.Nifti1Image(np.stack(oo, -1),
+                                            resample_to.affine)
     return out_dict
 
 

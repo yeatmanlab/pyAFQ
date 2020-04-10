@@ -54,7 +54,7 @@ class Segmentation:
                  return_idx=False,
                  filter_by_endpoints=True,
                  dist_to_aal=4,
-                 save_intermediates=False):
+                 save_intermediates=None):
         """
         Segment streamlines into bundles.
         Parameters
@@ -205,8 +205,6 @@ class Segmentation:
                 dps.set_number_of_points(self.tg.streamlines, self.nb_points),
                 self.tg, self.tg.space)
 
-            self.resample_streamlines(self.nb_points)
-
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
         self.cross_streamlines()
@@ -253,6 +251,8 @@ class Segmentation:
         """
         if reg_template is None:
             reg_template = dpd.read_mni_template()
+
+        self.reg_template = reg_template
 
         if mapping is None:
             gtab = dpg.gradient_table(self.fbval, self.fbvec)
