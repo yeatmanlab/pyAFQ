@@ -2,7 +2,7 @@ scikit_image==0.14.0
 nibabel==2.5.1
 dipy==1.0.0
 numpy==1.15.4
-scipy==1.1.0
+scipy==1.2.0
 pandas==0.23.4
 joblib==0.12.4
 dask==1.1.0
@@ -20,3 +20,4 @@ popylar==0.2
 fury==0.4.0
 imageio==2.8.0
 ipython==7.13.0
+
