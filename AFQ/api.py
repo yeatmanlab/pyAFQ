@@ -379,6 +379,10 @@ class AFQ(object):
         self.logger.info(f"Saving {fname}")
         nib.save(img, fname)
 
+    def log_and_save_trk(self, sft, fname):
+        self.logger.info(f"Saving {fname}")
+        save_tractogram(sft, fname, bbox_valid_check=False)
+
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
         if self.force_recompute or not op.exists(b0_file):
@@ -641,7 +645,7 @@ class AFQ(object):
 
             self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(int),
                                                   row['dwi_affine']),
-                     wm_mask_file)
+                                  wm_mask_file)
 
             meta_fname = self._get_fname(row, '_wm_mask.json')
             afd.write_json(meta_fname, meta)
@@ -693,7 +697,7 @@ class AFQ(object):
                 f'_space-RASMM_model-{odf_model}_desc-'
                 f'{directions}_tractography.json')
             afd.write_json(meta_fname, meta)
-            save_tractogram(sft, streamlines_file, bbox_valid_check=False)
+            self.log_and_save_trk(sft, streamlines_file)
 
         return streamlines_file
 
@@ -737,7 +741,7 @@ class AFQ(object):
                            for bundle in self.bundle_dict}
 
             tgram = aus.bundles_to_tgram(bundles, self.bundle_dict, img)
-            save_tractogram(tgram, bundles_file)
+            self.log_and_save_trk(tgram, bundles_file)
             meta = dict(source=streamlines_file,
                         Parameters=self.segmentation_params)
             meta_fname = bundles_file.split('.')[0] + '.json'
@@ -788,7 +792,7 @@ class AFQ(object):
                                        * [self.bundle_dict[b]['uid']])},
                             affine_to_rasmm=row['dwi_affine'])
                     tgram = aus.add_bundles(tgram, this_tgram)
-            save_tractogram(
+            self.log_and_save_trk(
                 StatefulTractogram(
                     tgram.streamlines,
                     sft,
@@ -954,7 +958,7 @@ class AFQ(object):
                             f'{directions}-{seg_algo}-{bundle}'
                             f'_tractography.trk'))
                     fname = op.join(fname[0], bundles_dir, fname[1])
-                    save_tractogram(this_tgm, fname, bbox_valid_check=False)
+                    self.log_and_save_trk(this_tgm, fname)
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
