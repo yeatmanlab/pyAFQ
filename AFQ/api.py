@@ -20,9 +20,11 @@ from dipy.stats.analysis import afq_profile
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
+from AFQ.dki import _fit as dki_fit
 from AFQ.csd import _fit as csd_fit
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
+import dipy.reconst.dki as dpy_dki
 import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
@@ -446,6 +448,33 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dti_params_file
 
+    def _dki_fit(self, row):
+        dki_params_file = self._dki(row)
+        dki_params = nib.load(dki_params_file).get_fdata()
+        tm = dpy_dki.TensorModel(row['gtab'])
+        tf = dpy_dki.TensorFit(tm, dki_params)
+        return tf
+
+    def _dki(self, row):
+        dki_params_file = self._get_fname(row, '_model-DKI_diffmodel.nii.gz')
+        if self.force_recompute or not op.exists(dki_params_file):
+            img = nib.load(row['dwi_file'])
+            data = img.get_fdata()
+            gtab = row['gtab']
+            brain_mask_file = self._brain_mask(row)
+            mask = nib.load(brain_mask_file).get_fdata()
+            dkf = dki_fit(gtab, data, mask=mask)
+            nib.save(nib.Nifti1Image(dkf.model_params, row['dwi_affine']),
+                     dki_params_file)
+            meta_fname = self._get_fname(row, '_model-DKI_diffmodel.json')
+            meta = dict(
+                Parameters=dict(
+                    FitMethod="WLS"),
+                OutlierRejection=False,
+                ModelURL=f"{DIPY_GH}reconst/dki.py")
+            afd.write_json(meta_fname, meta)
+        return dki_params_file
+
     def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,):
         csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(csd_params_file):
@@ -521,9 +550,35 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dti_md_file
 
+    def _dki_fa(self, row):
+        dki_fa_file = self._get_fname(row, '_model-DKI_FA.nii.gz')
+        if self.force_recompute or not op.exists(dki_fa_file):
+            tf = self._dki_fit(row)
+            fa = tf.fa
+            nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
+                     dki_fa_file)
+            meta_fname = self._get_fname(row, '_model-DKI_FA.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_fa_file
+
+    def _dki_md(self, row):
+        dki_md_file = self._get_fname(row, '_model-DKI_MD.nii.gz')
+        if self.force_recompute or not op.exists(dki_md_file):
+            tf = self._dki_fit(row)
+            md = tf.md
+            nib.save(nib.Nifti1Image(md, row['dwi_affine']),
+                     dki_md_file)
+            meta_fname = self._get_fname(row, '_model-DTI_MD.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_md_file
+
     # Keep track of functions that compute scalars:
     _scalar_dict = {"dti_fa": _dti_fa,
-                    "dti_md": _dti_md}
+                    "dti_md": _dti_md,
+                    "dki_fa": _dki_fa,
+                    "dki_md": _dki_md}
 
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
@@ -664,6 +719,8 @@ class AFQ(object):
                 params_file = self._dti(row)
             elif odf_model == "CSD":
                 params_file = self._csd(row)
+            elif odf_model == "DKI":
+                params_file = self._dki(row)
             wm_mask_fname = self._wm_mask(row)
             wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
             self.tracking_params['seed_mask'] = wm_mask
@@ -1181,6 +1238,42 @@ class AFQ(object):
         return self.data_frame['dti_md_file']
 
     dti_md = property(get_dti_md, set_dti_md)
+
+    def set_dki(self):
+        if 'dki_params_file' not in self.data_frame.columns:
+            self.data_frame['dki_params_file'] =\
+                self.data_frame.apply(self._dki,
+                                      axis=1)
+
+    def get_dki(self):
+        self.set_dki()
+        return self.data_frame['dki_params_file']
+
+    dki = property(get_dki, set_dki)
+
+    def set_dki_fa(self):
+        if 'dki_fa_file' not in self.data_frame.columns:
+            self.data_frame['dki_fa_file'] =\
+                self.data_frame.apply(self._dki_fa,
+                                      axis=1)
+
+    def get_dki_fa(self):
+        self.set_dki_fa()
+        return self.data_frame['dki_fa_file']
+
+    dki_fa = property(get_dki_fa, set_dki_fa)
+
+    def set_dki_md(self):
+        if 'dki_md_file' not in self.data_frame.columns:
+            self.data_frame['dki_md_file'] =\
+                self.data_frame.apply(self._dki_md,
+                                      axis=1)
+
+    def get_dki_md(self):
+        self.set_dki_md()
+        return self.data_frame['dki_md_file']
+
+    dki_md = property(get_dki_md, set_dki_md)
 
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
