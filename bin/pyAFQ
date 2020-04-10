@@ -110,8 +110,8 @@ config = toml.load(opts.config)
 # Delete empty values that are intended to be "None" so that the parser can
 # substitute default values in appropriately
 for component in config.keys():
-    config[component] = {k:v
-                         for k,v in config[component].items()
+    config[component] = {k: v
+                         for k, v in config[component].items()
                          if v != eval(none_val)}
 
 files = config.get("files", {})
