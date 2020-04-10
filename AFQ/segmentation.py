@@ -420,7 +420,8 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            aal_atlas = afd.read_aal_atlas()['atlas'].get_fdata()
+            aal_atlas = afd.read_aal_atlas(self.reg_template)
+            aal_atlas = aal_atlas['atlas'].get_fdata()
             # We need to calculate the size of a voxel, so we can transform
             # from mm to voxel units:
             R = self.img_affine[0:3, 0:3]

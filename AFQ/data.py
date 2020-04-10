@@ -540,9 +540,16 @@ fetch_aal_atlas = _make_fetcher(
     unzip=False)
 
 
-def read_aal_atlas():
+def read_aal_atlas(resample_to=None):
     """
     Reads the AAL atlas [1]_.
+
+    Parameters
+    ----------
+    template : nib.Nifti1Image class instance, optional
+        If provided, this is the template used and AAL atlas should be
+        registered and aligned to this template
+
 
     .. [1] Tzourio-Mazoyer N, Landeau B, Papathanassiou D, Crivello F, Etard O,
            Delcroix N, Mazoyer B, Joliot M. (2002). Automated anatomical
@@ -557,6 +564,13 @@ def read_aal_atlas():
             out_dict['labels'] = pd.read_csv(op.join(folder, f))
         else:
             out_dict['atlas'] = nib.load(op.join(folder, f))
+    if resample_to is not None:
+        out_dict['atlas'] = nib.Nifti1Image(
+                                reg.resample(out_dict['atlas'].get_fdata(),
+                                             resample_to,
+                                             out_dict['atlas'].affine,
+                                             resample_to.affine),
+                                resample_to.affine)
     return out_dict
 
 
