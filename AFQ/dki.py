@@ -13,6 +13,9 @@ import AFQ.utils.models as ut
 
 __all__ = ["fit_dki", "predict"]
 
+def _fit(gtab, data, mask=None):
+    dkimodel = dki.TensorModel(gtab)
+    return dkimodel.fit(data, mask=mask)
 
 def fit_dki(data_files, bval_files, bvec_files, mask=None,
             min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0):
