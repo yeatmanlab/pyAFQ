@@ -31,6 +31,8 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 import AFQ.viz as viz
 from AFQ.utils.bin import get_default_args
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 __all__ = ["AFQ", "make_bundle_dict"]
@@ -261,6 +263,7 @@ class AFQ(object):
             The parameters for cleaning. Default: use the default behavior of
             the seg.clean_bundle function.
         """
+        self.logger = logging.getLogger('AFQ.api')
 
         self.force_recompute = force_recompute
 
@@ -372,6 +375,10 @@ class AFQ(object):
         self.set_dwi_affine()
         self.set_dwi_img()
 
+    def log_and_save_nii(self, img, fname):
+        self.logger(f"Saving {fname}")
+        nib.save(img, fname)
+
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
         if self.force_recompute or not op.exists(b0_file):
@@ -380,7 +387,8 @@ class AFQ(object):
             gtab = row['gtab']
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
-            nib.save(mean_b0_img, b0_file)
+            self.log_and_save_nii(mean_b0_img, b0_file)
+
             meta = dict(b0_threshold=gtab.b0_threshold,
                         source=row['dwi_file'])
             meta_fname = self._get_fname(row, '_b0.json')
@@ -398,7 +406,7 @@ class AFQ(object):
                                         autocrop, dilate=dilate)
             be_img = nib.Nifti1Image(brain_mask.astype(int),
                                      mean_b0_img.affine)
-            nib.save(be_img, brain_mask_file)
+            self.log_and_save_nii(be_img, brain_mask_file)
             meta = dict(source=b0_file,
                         median_radius=median_radius,
                         numpass=numpass,
@@ -424,7 +432,8 @@ class AFQ(object):
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             dtf = dti_fit(gtab, data, mask=mask)
-            nib.save(nib.Nifti1Image(dtf.model_params, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(dtf.model_params,
+                                                  row['dwi_affine']),
                      dti_params_file)
             meta_fname = self._get_fname(row, '_model-DTI_diffmodel.json')
             meta = dict(
@@ -446,7 +455,8 @@ class AFQ(object):
             csdf = csd_fit(gtab, data, mask=mask,
                            response=response, sh_order=sh_order,
                            lambda_=lambda_, tau=tau)
-            nib.save(nib.Nifti1Image(csdf.shm_coeff, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(csdf.shm_coeff,
+                                                  row['dwi_affine']),
                      csd_params_file)
             meta_fname = self._get_fname(row, '_model-CSD_diffmodel.json')
             meta = dict(SphericalHarmonicDegree=sh_order,
@@ -463,7 +473,7 @@ class AFQ(object):
         if self.force_recompute or not op.exists(dti_fa_file):
             tf = self._dti_fit(row)
             fa = tf.fa
-            nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(fa, row['dwi_affine']),
                      dti_fa_file)
             meta_fname = self._get_fname(row, '_model-DTI_FA.json')
             meta = dict()
@@ -475,7 +485,7 @@ class AFQ(object):
         if self.force_recompute or not op.exists(dti_cfa_file):
             tf = self._dti_fit(row)
             cfa = tf.color_fa
-            nib.save(nib.Nifti1Image(cfa, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(cfa, row['dwi_affine']),
                      dti_cfa_file)
             meta_fname = self._get_fname(row, '_model-DTI_desc-DEC_FA.json')
             meta = dict()
@@ -490,7 +500,7 @@ class AFQ(object):
             # Invert the x coordinates:
             pdd[..., 0] = pdd[..., 0] * -1
 
-            nib.save(nib.Nifti1Image(pdd, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(pdd, row['dwi_affine']),
                      dti_pdd_file)
             meta_fname = self._get_fname(row, '_model-DTI_PDD.json')
             meta = dict()
@@ -502,7 +512,7 @@ class AFQ(object):
         if self.force_recompute or not op.exists(dti_md_file):
             tf = self._dti_fit(row)
             md = tf.md
-            nib.save(nib.Nifti1Image(md, row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(md, row['dwi_affine']),
                      dti_md_file)
             meta_fname = self._get_fname(row, '_model-DTI_MD.json')
             meta = dict()
@@ -557,7 +567,7 @@ class AFQ(object):
 
             warped_b0 = mapping.transform(mean_b0)
 
-            nib.save(nib.Nifti1Image(
+            self.log_and_save_nii(nib.Nifti1Image(
                 warped_b0, row['dwi_affine']), b0_warped_file)
 
         return b0_warped_file
@@ -629,7 +639,8 @@ class AFQ(object):
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
 
-            nib.save(nib.Nifti1Image(wm_mask.astype(int), row['dwi_affine']),
+            self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(int),
+                                                  row['dwi_affine']),
                      wm_mask_file)
 
             meta_fname = self._get_fname(row, '_wm_mask.json')
@@ -861,7 +872,7 @@ class AFQ(object):
 
             template_xform = mapping.transform_inverse(
                 self.reg_template.get_fdata())
-            nib.save(nib.Nifti1Image(template_xform,
+            self.log_and_save_nii(nib.Nifti1Image(template_xform,
                                      row['dwi_affine']),
                      template_xform_file)
 
@@ -903,9 +914,10 @@ class AFQ(object):
                 fname = op.join(fname[0], rois_dir, fname[1])
 
                 # Cast to float32, so that it can be read in by MI-Brain:
-                nib.save(nib.Nifti1Image(warped_roi.astype(np.float32),
-                                         row['dwi_affine']),
-                         fname)
+                self.log_and_save_nii(
+                    nib.Nifti1Image(warped_roi.astype(np.float32),
+                                    row['dwi_affine']),
+                    fname)
                 meta = dict()
                 meta_fname = fname.split('.')[0] + '.json'
                 afd.write_json(meta_fname, meta)
