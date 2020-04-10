@@ -376,7 +376,7 @@ class AFQ(object):
         self.set_dwi_img()
 
     def log_and_save_nii(self, img, fname):
-        self.logger(f"Saving {fname}")
+        self.logger.info(f"Saving {fname}")
         nib.save(img, fname)
 
     def _b0(self, row):
