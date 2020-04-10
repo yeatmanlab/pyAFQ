@@ -64,7 +64,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     -------
     list of streamlines ()
     """
-    logger = logging.getLogger('AFQ.Tractography')
+    logger = logging.getLogger('AFQ.tractography')
 
     logger.info("Loading Image...")
     if isinstance(params_file, str):
