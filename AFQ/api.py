@@ -29,6 +29,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+import AFQ.viz as viz
 from AFQ.utils.bin import get_default_args
 
 
@@ -946,6 +947,88 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
+    def _export_bundle_gif(self, row):
+        bundles_file = self.get_clean_bundles()[0]
+        fa_file = self.get_dti_fa()[0]
+        fa_img = nib.load(fa_file).get_fdata()
+
+        scene = viz.visualize_volume(fa_img,
+                                     inline=False,
+                                     interact=False)
+        scene = viz.visualize_bundles(bundles_file,
+                                      affine_or_mapping=row['dwi_affine'],
+                                      bundle_names=self.bundle_dict,
+                                      inline=False,
+                                      interact=False,
+                                      scene=scene)
+
+        odf_model = self.tracking_params['odf_model']
+        directions = self.tracking_params['directions']
+        seg_algo = self.segmentation_params['seg_algo']
+        fname = op.split(
+            self._get_fname(
+                row,
+                f'_space-RASMM_model-{odf_model}_desc-'
+                f'{directions}-{seg_algo}'
+                f'_viz.gif'))
+        fname = op.join(fname[0], row['results_dir'], fname[1])
+
+        scene = viz.scene_rotate_forward(scene)
+        viz.create_gif(scene, fname)
+
+    def _export_ROI_gifs(self, row):
+        bundles_file = self.get_clean_bundles()[0]
+        fa_file = self.get_dti_fa()[0]
+        fa_img = nib.load(fa_file).get_fdata()
+        seg_img = nib.load(row['seg_file'])
+        dwi_img = nib.load(row['dwi_file'])
+        dwi_data = dwi_img.get_fdata()
+
+        odf_model = self.tracking_params['odf_model']
+        directions = self.tracking_params['directions']
+        seg_algo = self.segmentation_params['seg_algo']
+
+        for bundle_name in self.bundle_dict.keys():
+            uid = self.bundle_dict[bundle_name]['uid']
+            scene = viz.visualize_volume(fa_img,
+                                         inline=False,
+                                         interact=False)
+            try:
+                scene = viz.visualize_bundles(
+                    bundles_file,
+                    affine_or_mapping=row['dwi_affine'],
+                    bundle_names=self.bundle_dict,
+                    bundle=uid,
+                    inline=False,
+                    interact=False,
+                    scene=scene)
+            except ValueError:
+                print("No streamlines found for " + bundle_name)
+
+            for roi in self.bundle_dict[bundle_name]['ROIs']:
+                scene = viz.visualize_roi(
+                    roi,
+                    affine_or_mapping=row['dwi_affine'],
+                    static_img=dwi_data[..., 0],
+                    roi_affine=seg_img.affine,
+                    static_affine=dwi_img.affine,
+                    opacity=0.75,
+                    inline=False,
+                    interact=False,
+                    scene=scene)
+            fname = op.split(
+                self._get_fname(
+                    row,
+                    f'_space-RASMM_model-{odf_model}_desc-'
+                    f'{directions}-{seg_algo}_{bundle_name}'
+                    f'_viz.gif'))
+            roi_dir = op.join(row['results_dir'], 'viz_bundles')
+            os.makedirs(roi_dir, exist_ok=True)
+            fname = op.join(fname[0], roi_dir, fname[1])
+
+            scene = viz.scene_rotate_forward(scene)
+            viz.create_gif(scene, fname)
+
     def _get_affine(self, fname):
         return nib.load(fname).affine
 
@@ -1160,6 +1243,12 @@ class AFQ(object):
 
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
+
+    def export_bundle_gif(self):
+        self.data_frame.apply(self._export_bundle_gif, axis=1)
+
+    def export_ROI_gifs(self):
+        self.data_frame.apply(self._export_ROI_gifs, axis=1)
 
     def export_registered_b0(self):
         self.data_frame.apply(self._export_registered_b0, axis=1)
