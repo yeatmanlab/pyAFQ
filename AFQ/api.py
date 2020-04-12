@@ -11,7 +11,6 @@ import numpy as np
 import nibabel as nib
 from scipy.ndimage.morphology import binary_dilation
 
-
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.data as dpd
@@ -435,7 +434,7 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dti_params_file
 
-    def _csd(self, row, response=None, sh_order=8, lambda_=1, tau=0.1,):
+    def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,):
         csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(csd_params_file):
             img = nib.load(row['dwi_file'])
