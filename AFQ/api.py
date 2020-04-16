@@ -13,7 +13,6 @@ from scipy.ndimage.morphology import binary_dilation
 
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
-import dipy.data as dpd
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
