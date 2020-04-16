@@ -1,6 +1,7 @@
 import os
 import os.path as op
 
+import numpy as np
 import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
@@ -14,11 +15,21 @@ shm.spherical_harmonics = spherical_harmonics
 __all__ = ["fit_csd"]
 
 
-def _fit(gtab, data, mask, response=None, sh_order=8,
+def _fit(gtab, data, mask, response=None, sh_order=None,
          lambda_=1, tau=0.1):
     """
     Helper function that does the core of fitting a model to data.
     """
+    if sh_order is None:
+        ndata = np.sum(~gtab.b0s_mask)
+        # See dipy.reconst.shm.calculate_max_order
+        L1 = (-3 + np.sqrt(1 + 8 * ndata)) / 2.0
+        sh_order = int(L1)
+        if np.mod(sh_order, 2) != 0:
+            sh_order = sh_order - 1
+        if sh_order > 8:
+            sh_order = 8
+
     if response is None:
         response, ratio = csd.auto_response(gtab, data, roi_radius=10,
                                             fa_thr=0.7)
@@ -31,7 +42,7 @@ def _fit(gtab, data, mask, response=None, sh_order=8,
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
-            b0_threshold=0, sh_order=8, lambda_=1, tau=0.1, out_dir=None):
+            b0_threshold=0, sh_order=None, lambda_=1, tau=0.1, out_dir=None):
     """
     Fit the CSD model and save file with SH coefficients.
 
@@ -57,7 +68,8 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
       The value of diffusion-weighting under which we consider it to be
       equivalent to 0. Default:0
     sh_order : int, optional.
-        default: 8,
+        default: infer the number of parameters from the number of data
+        volumes, but no larger than 8.
     lambda_ : float, optional.
         weight given to the constrained-positivity regularization part of
         the deconvolution equation. Default: 1
@@ -78,6 +90,7 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files,
                                             b0_threshold=b0_threshold)
+
 
     csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
                   lambda_=lambda_, tau=tau)
