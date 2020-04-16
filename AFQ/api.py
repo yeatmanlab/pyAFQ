@@ -18,7 +18,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.stats.analysis import afq_profile
 
-import AFQ.data as afd
+from AFQ.data import read_mni_template
 from AFQ.dti import _fit as dti_fit
 from AFQ.csd import _fit as csd_fit
 import AFQ.tractography as aft
@@ -298,7 +298,7 @@ class AFQ(object):
         self.clean_params = default_clean_params
 
         if reg_template is None:
-            self.reg_template = afd.read_mni_template()
+            self.reg_template = read_mni_template()
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
@@ -530,7 +530,7 @@ class AFQ(object):
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
             moving = nib.load(self._b0(row))
-            static = afd.read_mni_template()
+            static = read_mni_template()
             moving_data = moving.get_fdata()
             moving_affine = moving.affine
             static_data = static.get_fdata()
