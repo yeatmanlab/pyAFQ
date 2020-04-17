@@ -8,3 +8,4 @@ numpydoc
 sphinx-autoapi
 six==1.12.0
 fuzzywuzzy
+xvfbwrapper

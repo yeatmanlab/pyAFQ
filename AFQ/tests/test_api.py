@@ -20,6 +20,7 @@ import dipy.data as dpd
 from dipy.data import fetcher
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.testing import xvfb_it
 
 from AFQ import api
 import AFQ.data as afd
@@ -105,6 +106,7 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
+@xvfb_it
 def test_AFQ_data_waypoint():
     """
     Test with some actual data again, this time for track segmentation

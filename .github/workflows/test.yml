@@ -29,4 +29,5 @@ jobs:
         pip install .
     - name: Test
       run: |
+        export TEST_WITH_XVFB=true
         make all
