@@ -99,10 +99,10 @@ opts = parser.parse_args()
 
 if not opts.notrack:
     logger.info(
-        "Your use of pyAFQ is being recorded using Google Analytics."
+        "Your use of pyAFQ is being recorded using Google Analytics. "
         "For more information, please refer to the pyAFQ documentation: "
-        "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics"  #noqa
-        "to turn this off, use the `--notrack` flag when using the pyAFQ CLI")
+        "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  #noqa
+        "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
     import popylar
     popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
@@ -110,8 +110,8 @@ config = toml.load(opts.config)
 # Delete empty values that are intended to be "None" so that the parser can
 # substitute default values in appropriately
 for component in config.keys():
-    config[component] = {k:v
-                         for k,v in config[component].items()
+    config[component] = {k: v
+                         for k, v in config[component].items()
                          if v != eval(none_val)}
 
 files = config.get("files", {})
