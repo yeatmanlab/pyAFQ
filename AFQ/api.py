@@ -962,8 +962,8 @@ class AFQ(object):
                     afd.write_json(meta_fname, meta)
 
     def _export_bundle_gif(self, row):
-        bundles_file = self.get_clean_bundles()[0]
-        fa_file = self.get_dti_fa()[0]
+        bundles_file = self._clean_bundles(row)
+        fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
 
         scene = viz.visualize_volume(fa_img,
@@ -991,10 +991,10 @@ class AFQ(object):
         viz.create_gif(scene, fname)
 
     def _export_ROI_gifs(self, row):
-        bundles_file = self.get_clean_bundles()[0]
-        fa_file = self.get_dti_fa()[0]
+        bundles_file = self._clean_bundles(row)
+        fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
-        seg_img = nib.load(row['seg_file'])
+        seg_img = nib.load(self._wm_mask(row))
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_fdata()
 
@@ -1017,7 +1017,8 @@ class AFQ(object):
                     interact=False,
                     scene=scene)
             except ValueError:
-                print("No streamlines found for " + bundle_name)
+                self.logger.info("No streamlines found to visualize for "
+                                 + bundle_name)
 
             for roi in self.bundle_dict[bundle_name]['ROIs']:
                 scene = viz.visualize_roi(
