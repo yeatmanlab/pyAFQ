@@ -20,7 +20,7 @@ import dipy.data as dpd
 from dipy.data import fetcher
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.testing import xvfb_it
+from dipy.testing.decorators import xvfb_it
 
 from AFQ import api
 import AFQ.data as afd
