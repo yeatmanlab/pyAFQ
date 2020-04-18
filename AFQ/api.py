@@ -894,8 +894,9 @@ class AFQ(object):
 
         rois_dir = op.join(row['results_dir'], 'ROIs')
         os.makedirs(rois_dir, exist_ok=True)
-
+        roi_files = {}
         for bundle in self.bundle_dict:
+            roi_files[bundle] = []
             for ii, roi in enumerate(self.bundle_dict[bundle]['ROIs']):
 
                 if self.bundle_dict[bundle]['rules'][ii]:
@@ -903,26 +904,29 @@ class AFQ(object):
                 else:
                     inclusion = 'exclude'
 
-                warped_roi = auv.patch_up_roi(
-                    (mapping.transform_inverse(
-                        roi.get_fdata(),
-                        interpolation='linear')) > 0).astype(int)
-
                 fname = op.split(
                     self._get_fname(
                         row,
                         f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
 
                 fname = op.join(fname[0], rois_dir, fname[1])
+                if not op.exists(fname):
 
-                # Cast to float32, so that it can be read in by MI-Brain:
-                self.log_and_save_nii(
-                    nib.Nifti1Image(warped_roi.astype(np.float32),
-                                    row['dwi_affine']),
-                    fname)
-                meta = dict()
-                meta_fname = fname.split('.')[0] + '.json'
-                afd.write_json(meta_fname, meta)
+                    warped_roi = auv.patch_up_roi(
+                        (mapping.transform_inverse(
+                            roi.get_fdata(),
+                            interpolation='linear')) > 0).astype(int)
+
+                    # Cast to float32, so that it can be read in by MI-Brain:
+                    self.log_and_save_nii(
+                        nib.Nifti1Image(warped_roi.astype(np.float32),
+                                        row['dwi_affine']),
+                        fname)
+                    meta = dict()
+                    meta_fname = fname.split('.')[0] + '.json'
+                    afd.write_json(meta_fname, meta)
+                roi_files[bundle].append(fname)
+        return roi_files
 
     def _export_bundles(self, row):
         odf_model = self.tracking_params['odf_model']
@@ -1020,17 +1024,14 @@ class AFQ(object):
                 self.logger.info("No streamlines found to visualize for "
                                  + bundle_name)
 
-            for roi in self.bundle_dict[bundle_name]['ROIs']:
+            roi_files = self._export_rois(row)
+            for roi in roi_files[bundle_name]:
                 scene = viz.visualize_roi(
                     roi,
-                    affine_or_mapping=row['dwi_affine'],
-                    static_img=dwi_data[..., 0],
-                    roi_affine=seg_img.affine,
-                    static_affine=dwi_img.affine,
-                    opacity=0.75,
                     inline=False,
                     interact=False,
                     scene=scene)
+
             fname = op.split(
                 self._get_fname(
                     row,
