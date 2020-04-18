@@ -13,7 +13,6 @@ from scipy.ndimage.morphology import binary_dilation
 
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
-import dipy.data as dpd
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -299,7 +298,7 @@ class AFQ(object):
         self.clean_params = default_clean_params
 
         if reg_template is None:
-            self.reg_template = dpd.read_mni_template()
+            self.reg_template = afd.read_mni_template()
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
@@ -531,7 +530,7 @@ class AFQ(object):
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
             moving = nib.load(self._b0(row))
-            static = dpd.read_mni_template()
+            static = afd.read_mni_template()
             moving_data = moving.get_fdata()
             moving_affine = moving.affine
             static_data = static.get_fdata()
@@ -895,8 +894,9 @@ class AFQ(object):
 
         rois_dir = op.join(row['results_dir'], 'ROIs')
         os.makedirs(rois_dir, exist_ok=True)
-
+        roi_files = {}
         for bundle in self.bundle_dict:
+            roi_files[bundle] = []
             for ii, roi in enumerate(self.bundle_dict[bundle]['ROIs']):
 
                 if self.bundle_dict[bundle]['rules'][ii]:
@@ -904,26 +904,29 @@ class AFQ(object):
                 else:
                     inclusion = 'exclude'
 
-                warped_roi = auv.patch_up_roi(
-                    (mapping.transform_inverse(
-                        roi.get_fdata(),
-                        interpolation='linear')) > 0).astype(int)
-
                 fname = op.split(
                     self._get_fname(
                         row,
                         f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
 
                 fname = op.join(fname[0], rois_dir, fname[1])
+                if not op.exists(fname):
 
-                # Cast to float32, so that it can be read in by MI-Brain:
-                self.log_and_save_nii(
-                    nib.Nifti1Image(warped_roi.astype(np.float32),
-                                    row['dwi_affine']),
-                    fname)
-                meta = dict()
-                meta_fname = fname.split('.')[0] + '.json'
-                afd.write_json(meta_fname, meta)
+                    warped_roi = auv.patch_up_roi(
+                        (mapping.transform_inverse(
+                            roi.get_fdata(),
+                            interpolation='linear')) > 0).astype(int)
+
+                    # Cast to float32, so that it can be read in by MI-Brain:
+                    self.log_and_save_nii(
+                        nib.Nifti1Image(warped_roi.astype(np.float32),
+                                        row['dwi_affine']),
+                        fname)
+                    meta = dict()
+                    meta_fname = fname.split('.')[0] + '.json'
+                    afd.write_json(meta_fname, meta)
+                roi_files[bundle].append(fname)
+        return roi_files
 
     def _export_bundles(self, row):
         odf_model = self.tracking_params['odf_model']
@@ -963,8 +966,8 @@ class AFQ(object):
                     afd.write_json(meta_fname, meta)
 
     def _export_bundle_gif(self, row):
-        bundles_file = self.get_clean_bundles()[0]
-        fa_file = self.get_dti_fa()[0]
+        bundles_file = self._clean_bundles(row)
+        fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
 
         scene = viz.visualize_volume(fa_img,
@@ -992,10 +995,10 @@ class AFQ(object):
         viz.create_gif(scene, fname)
 
     def _export_ROI_gifs(self, row):
-        bundles_file = self.get_clean_bundles()[0]
-        fa_file = self.get_dti_fa()[0]
+        bundles_file = self._clean_bundles(row)
+        fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
-        seg_img = nib.load(row['seg_file'])
+        seg_img = nib.load(self._wm_mask(row))
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_fdata()
 
@@ -1018,19 +1021,17 @@ class AFQ(object):
                     interact=False,
                     scene=scene)
             except ValueError:
-                print("No streamlines found for " + bundle_name)
+                self.logger.info("No streamlines found to visualize for "
+                                 + bundle_name)
 
-            for roi in self.bundle_dict[bundle_name]['ROIs']:
+            roi_files = self._export_rois(row)
+            for roi in roi_files[bundle_name]:
                 scene = viz.visualize_roi(
                     roi,
-                    affine_or_mapping=row['dwi_affine'],
-                    static_img=dwi_data[..., 0],
-                    roi_affine=seg_img.affine,
-                    static_affine=dwi_img.affine,
-                    opacity=0.75,
                     inline=False,
                     interact=False,
                     scene=scene)
+
             fname = op.split(
                 self._get_fname(
                     row,

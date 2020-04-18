@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 import nibabel as nib
+from templateflow import api as tflow
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
@@ -528,8 +529,8 @@ fetch_aal_atlas = _make_fetcher(
     "fetch_aal_atlas",
     op.join(afq_home,
             'aal_atlas'),
-    'https://digital.lib.washington.edu' + '/researchworks' + \
-    '/bitstream/handle/1773/44951/',
+    'https://digital.lib.washington.edu' + '/researchworks'
+    + '/bitstream/handle/1773/44951/',
     ["MNI_AAL_AndMore.nii.gz",
      "MNI_AAL.txt"],
     ["MNI_AAL_AndMore.nii.gz",
@@ -867,3 +868,41 @@ def s3fs_json_write(data, fname, fs=None):
         fs = s3fs.S3FileSystem()
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
+
+
+def read_mni_template(resolution=1, mask=True):
+    """
+
+    Reads the MNI T2w template
+
+    Parameters
+    ----------
+    resolution : int, optional.
+        Either 1 or 2, the resolution in mm of the voxels. Default: 1.
+
+    mask : bool, optional
+        Whether to mask the data with a brain-mask before returning the image.
+        Default : True
+
+    Returns
+    -------
+    nib.Nifti1Image class instance containing masked or unmasked T2 template.
+
+    """
+    template_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                          desc=None,
+                                          resolution=resolution,
+                                          suffix='T2w',
+                                          extension='nii.gz')))
+    if not mask:
+        return template_img
+    else:
+        mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                          resolution=resolution,
+                                          desc='brain',
+                                          suffix='mask')))
+
+        template_data = template_img.get_fdata()
+        mask_data = mask_img.get_fdata()
+        out_data = template_data * mask_data
+        return nib.Nifti1Image(out_data, template_img.affine)

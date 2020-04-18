@@ -6,7 +6,10 @@ from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
 import nibabel as nib
+from templateflow import api as tflow
+
 from tqdm.auto import tqdm
+
 
 import dipy.data as dpd
 import dipy.tracking.streamline as dts
@@ -250,13 +253,14 @@ class Segmentation:
             Default: None.
         """
         if reg_template is None:
-            reg_template = dpd.read_mni_template()
+            reg_template = afd.read_mni_template()
 
         self.reg_template = reg_template
 
         if mapping is None:
             gtab = dpg.gradient_table(self.fbval, self.fbvec)
-            self.mapping = reg.syn_register_dwi(self.fdata, gtab)[1]
+            self.mapping = reg.syn_register_dwi(self.fdata, gtab,
+                                                template=reg_template)[1]
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
