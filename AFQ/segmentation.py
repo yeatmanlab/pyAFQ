@@ -676,9 +676,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     each streamline
     Parameters
     ----------
-    streamlines : nibabel.Streamlines class instance.
-        The streamlines constituting a fiber group.
-        Default: None.
+    tg : StatefulTractogram class instance
+        A whole-brain tractogram to be segmented.
+
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
@@ -695,8 +695,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     stat : callable or str, optional.
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
-    using_idx : bool
-        Whether 'streamlines' contains indices in the original streamlines.
+
+    return_idx : bool
+        Whether to return indices in the original streamlines.
         Default: False.
     Returns
     -------
