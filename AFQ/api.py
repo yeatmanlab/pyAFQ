@@ -451,7 +451,7 @@ class AFQ(object):
     def _dki_fit(self, row):
         dki_params_file = self._dki(row)
         dki_params = nib.load(dki_params_file).get_fdata()
-        tm = dpy_dki.TensorModel(row['gtab'])
+        tm = dpy_dki.DiffusionKurtosisModel(row['gtab'])
         tf = dpy_dki.TensorFit(tm, dki_params)
         return tf
 
