@@ -106,6 +106,17 @@ def test_AFQ_data():
                      nib.load(myafq.dti[0]).shape[:3])
 
 
+def test_DKI_profile():
+    """
+    Test using API to profile dki
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_cfin_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'cfin_multib',
+                                          'derivatives', 'dmriprep'))
+    myafq.get_dki_fa()
+    myafq.get_dki_md()
+
 @xvfb_it
 def test_AFQ_data_waypoint():
     """
@@ -126,7 +137,7 @@ def test_AFQ_data_waypoint():
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
                     bundle_names=bundle_names,
-                    scalars=["dti_fa", "dti_md", "dki_fa", "dki_md"],
+                    scalars=["dti_fa", "dti_md"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
