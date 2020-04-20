@@ -226,7 +226,8 @@ class Bundles:
 
         for bundle_name, bundle in self.bundles.items():
             save_tractogram(bundle,
-                            os.path.join(file_path, f"{bundle_name}{file_suffix}"),
+                            os.path.join(file_path,
+                                         f"{bundle_name}{file_suffix}"),
                             bbox_valid_check=bbox_valid_check)
             logging.disable(level=logging.WARNING)
         logging.disable(logging.NOTSET)
