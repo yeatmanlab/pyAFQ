@@ -126,6 +126,7 @@ def test_AFQ_data_waypoint():
     myafq = api.AFQ(dmriprep_path=dmriprep_path,
                     sub_prefix='sub',
                     bundle_names=bundle_names,
+                    scalars=["dti_fa", "dti_md", "dki_fa", "dki_md"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
