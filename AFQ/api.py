@@ -452,7 +452,7 @@ class AFQ(object):
         dki_params_file = self._dki(row)
         dki_params = nib.load(dki_params_file).get_fdata()
         tm = dpy_dki.DiffusionKurtosisModel(row['gtab'])
-        tf = dpy_dki.TensorFit(tm, dki_params)
+        tf = dpy_dki.DiffusionKurtosisFit(tm, dki_params)
         return tf
 
     def _dki(self, row):
@@ -569,7 +569,7 @@ class AFQ(object):
             md = tf.md
             nib.save(nib.Nifti1Image(md, row['dwi_affine']),
                      dki_md_file)
-            meta_fname = self._get_fname(row, '_model-DTI_MD.json')
+            meta_fname = self._get_fname(row, '_model-DKI_MD.json')
             meta = dict()
             afd.write_json(meta_fname, meta)
         return dki_md_file
