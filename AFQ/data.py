@@ -437,6 +437,46 @@ def read_stanford_hardi_tractography():
     return files_dict
 
 
+def organize_cfin_data(path=None):
+    """
+    Create the expected file-system structure for the
+    CFIN multi b-value diffusion data-set.
+    """
+    dpd.fetch_cfin_multib()
+
+    if path is None:
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        my_path = afq_home
+    else:
+        my_path = path
+
+    base_folder = op.join(my_path, 'cfin_multib',
+                          'derivatives', 'dmriprep')
+
+    if not op.exists(base_folder):
+        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+        os.makedirs(anat_folder, exist_ok=True)
+        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
+        os.makedirs(dwi_folder, exist_ok=True)
+        t1_img = dpd.read_cfin_t1()
+        nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        dwi_img, gtab = dpd.read_cfin_dwi()
+        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+
+    dataset_description = {
+        "BIDSVersion": "1.0.0",
+        "Name": "CFIN",
+        "Subjects": ["sub-01"]}
+
+    desc_file = op.join(my_path, 'cfin_multib', 'dataset_description.json')
+
+    with open(desc_file, 'w') as outfile:
+        json.dump(dataset_description, outfile)
+
+
 def organize_stanford_data(path=None):
     """
     Create the expected file-system structure for the Stanford HARDI data-set.
