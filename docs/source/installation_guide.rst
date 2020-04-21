@@ -15,7 +15,7 @@ probably where you should get started
 
 To install it, in a shell or command line, issue the following::
 
-  pip install AFQ
+  pip install pyAFQ
 
 
 Installing the development version
