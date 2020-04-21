@@ -7,6 +7,7 @@
 Module Contents
 ---------------
 
+
 .. function:: make_bundle_dict(bundle_names=BUNDLES, seg_algo='afq', resample_to=False)
 
    Create a bundle dictionary, needed for the segmentation
@@ -174,6 +175,21 @@ Module Contents
 
       
 
+   .. attribute:: dki
+      
+
+      
+
+   .. attribute:: dki_fa
+      
+
+      
+
+   .. attribute:: dki_md
+      
+
+      
+
    .. attribute:: mapping
       
 
@@ -204,6 +220,14 @@ Module Contents
 
       
 
+   .. method:: log_and_save_nii(self, img, fname)
+
+
+
+   .. method:: log_and_save_trk(self, sft, fname)
+
+
+
    .. method:: _b0(self, row)
 
 
@@ -220,7 +244,15 @@ Module Contents
 
 
 
-   .. method:: _csd(self, row, response=None, sh_order=8, lambda_=1, tau=0.1)
+   .. method:: _dki_fit(self, row)
+
+
+
+   .. method:: _dki(self, row)
+
+
+
+   .. method:: _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1)
 
 
 
@@ -237,6 +269,14 @@ Module Contents
 
 
    .. method:: _dti_md(self, row)
+
+
+
+   .. method:: _dki_fa(self, row)
+
+
+
+   .. method:: _dki_md(self, row)
 
 
 
@@ -281,6 +321,14 @@ Module Contents
 
 
    .. method:: _export_bundles(self, row)
+
+
+
+   .. method:: _export_bundle_gif(self, row)
+
+
+
+   .. method:: _export_ROI_gifs(self, row)
 
 
 
@@ -384,6 +432,30 @@ Module Contents
 
 
 
+   .. method:: set_dki(self)
+
+
+
+   .. method:: get_dki(self)
+
+
+
+   .. method:: set_dki_fa(self)
+
+
+
+   .. method:: get_dki_fa(self)
+
+
+
+   .. method:: set_dki_md(self)
+
+
+
+   .. method:: get_dki_md(self)
+
+
+
    .. method:: set_mapping(self)
 
 
@@ -437,6 +509,14 @@ Module Contents
 
 
    .. method:: export_bundles(self)
+
+
+
+   .. method:: export_bundle_gif(self)
+
+
+
+   .. method:: export_ROI_gifs(self)
 
 
 

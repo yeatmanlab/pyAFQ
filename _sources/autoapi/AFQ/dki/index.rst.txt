@@ -7,6 +7,7 @@
 Module Contents
 ---------------
 
+
 .. function:: fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0)
 
    Fit the DKI model, save files with derived maps

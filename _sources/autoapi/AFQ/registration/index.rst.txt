@@ -15,6 +15,7 @@
 Module Contents
 ---------------
 
+
 .. function:: syn_registration(moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric='CC', dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None)
 
    Register a source image (moving) to a target image (static).

@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.dki &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -47,6 +50,10 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit_dki&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">]</span>
 
+
+<span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">dkimodel</span> <span class="o">=</span> <span class="n">dki</span><span class="o">.</span><span class="n">DiffusionKurtosisModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dkimodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
 <div class="viewcode-block" id="fit_dki"><a class="viewcode-back" href="../../autoapi/AFQ/dki/index.html#AFQ.dki.fit_dki">[docs]</a><span class="k">def</span> <span class="nf">fit_dki</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">min_kurtosis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_kurtosis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -453,7 +460,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

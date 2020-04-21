@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.csd &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -16,7 +19,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.data" href="../data/index.html" />
-    <link rel="prev" title="AFQ.api" href="../api/index.html" />
+    <link rel="prev" title="AFQ.bundles" href="../bundles/index.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
@@ -37,9 +40,9 @@
 <span id="afq-csd"></span><h1><a class="reference internal" href="#module-AFQ.csd" title="AFQ.csd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.csd</span></code></a><a class="headerlink" href="#module-AFQ.csd" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.csd.fit_csd">
-<code class="sig-prename descclassname">AFQ.csd.</code><code class="sig-name descname">fit_csd</code><span class="sig-paren">(</span><em class="sig-param">data_files</em>, <em class="sig-param">bval_files</em>, <em class="sig-param">bvec_files</em>, <em class="sig-param">mask=None</em>, <em class="sig-param">response=None</em>, <em class="sig-param">b0_threshold=0</em>, <em class="sig-param">sh_order=8</em>, <em class="sig-param">lambda_=1</em>, <em class="sig-param">tau=0.1</em>, <em class="sig-param">out_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/csd.html#fit_csd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.csd.fit_csd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.csd.</code><code class="sig-name descname">fit_csd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">response</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">sh_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lambda_</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/csd.html#fit_csd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.csd.fit_csd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit the CSD model and save file with SH coefficients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -63,7 +66,8 @@ these values.</p>
 <dt><strong>b0_threshold</strong><span class="classifier">float,optional.</span></dt><dd><p>The value of diffusion-weighting under which we consider it to be
 equivalent to 0. Default:0</p>
 </dd>
-<dt><strong>sh_order</strong><span class="classifier">int, optional.</span></dt><dd><p>default: 8,</p>
+<dt><strong>sh_order</strong><span class="classifier">int, optional.</span></dt><dd><p>default: infer the number of parameters from the number of data
+volumes, but no larger than 8.</p>
 </dd>
 <dt><strong>lambda_</strong><span class="classifier">float, optional.</span></dt><dd><p>weight given to the constrained-positivity regularization part of
 the deconvolution equation. Default: 1</p>
@@ -131,7 +135,7 @@ the first DWI file in <cite>data_files</cite>.</p>
   <li><a href="../../../index.html">Documentation overview</a><ul>
   <li><a href="../../index.html">API Reference</a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../api/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a></li>
+      <li>Previous: <a href="../bundles/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a></li>
       <li>Next: <a href="../data/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a></li>
   </ul></li>
   </ul></li>
@@ -165,7 +169,7 @@ the first DWI file in <cite>data_files</cite>.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

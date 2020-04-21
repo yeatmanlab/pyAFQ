@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -46,6 +49,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">from</span> <span class="nn">templateflow</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">tflow</span>
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="kn">import</span> <span class="n">_make_fetcher</span>
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
@@ -470,6 +474,46 @@
     <span class="k">return</span> <span class="n">files_dict</span></div>
 
 
+<span class="k">def</span> <span class="nf">organize_cfin_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the expected file-system structure for the</span>
+<span class="sd">    CFIN multi b-value diffusion data-set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dpd</span><span class="o">.</span><span class="n">fetch_cfin_multib</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">afq_home</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">afq_home</span><span class="p">)</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">afq_home</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="n">base_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;cfin_multib&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">base_folder</span><span class="p">):</span>
+        <span class="n">anat_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;sess-01&#39;</span><span class="p">,</span> <span class="s1">&#39;anat&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dwi_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;sess-01&#39;</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">t1_img</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_cfin_t1</span><span class="p">()</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">t1_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_T1w.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">dwi_img</span><span class="p">,</span> <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_cfin_dwi</span><span class="p">()</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dwi_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.bvecs&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_sess-01_dwi.bvals&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
+
+    <span class="n">dataset_description</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;BIDSVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;CFIN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Subjects&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sub-01&quot;</span><span class="p">]}</span>
+
+    <span class="n">desc_file</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s1">&#39;cfin_multib&#39;</span><span class="p">,</span> <span class="s1">&#39;dataset_description.json&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">desc_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dataset_description</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="organize_stanford_data"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.organize_stanford_data">[docs]</a><span class="k">def</span> <span class="nf">organize_stanford_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create the expected file-system structure for the Stanford HARDI data-set.</span>
@@ -562,8 +606,8 @@
     <span class="s2">&quot;fetch_aal_atlas&quot;</span><span class="p">,</span>
     <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
             <span class="s1">&#39;aal_atlas&#39;</span><span class="p">),</span>
-    <span class="s1">&#39;https://digital.lib.washington.edu&#39;</span> <span class="o">+</span> <span class="s1">&#39;/researchworks&#39;</span> <span class="o">+</span> \
-    <span class="s1">&#39;/bitstream/handle/1773/44951/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://digital.lib.washington.edu&#39;</span> <span class="o">+</span> <span class="s1">&#39;/researchworks&#39;</span>
+    <span class="o">+</span> <span class="s1">&#39;/bitstream/handle/1773/44951/&#39;</span><span class="p">,</span>
     <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
      <span class="s2">&quot;MNI_AAL.txt&quot;</span><span class="p">],</span>
     <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
@@ -574,9 +618,16 @@
     <span class="n">unzip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">read_aal_atlas</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">read_aal_atlas</span><span class="p">(</span><span class="n">resample_to</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads the AAL atlas [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    template : nib.Nifti1Image class instance, optional</span>
+<span class="sd">        If provided, this is the template used and AAL atlas should be</span>
+<span class="sd">        registered and aligned to this template</span>
+
 
 <span class="sd">    .. [1] Tzourio-Mazoyer N, Landeau B, Papathanassiou D, Crivello F, Etard O,</span>
 <span class="sd">           Delcroix N, Mazoyer B, Joliot M. (2002). Automated anatomical</span>
@@ -591,6 +642,16 @@
             <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">resample_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">oo</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">oo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">],</span>
+                                   <span class="n">resample_to</span><span class="p">,</span>
+                                   <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                   <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">))</span>
+        <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">oo</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                                            <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out_dict</span>
 
 
@@ -884,6 +945,44 @@
         <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_mni_template</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Reads the MNI T2w template</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    resolution : int, optional.</span>
+<span class="sd">        Either 1 or 2, the resolution in mm of the voxels. Default: 1.</span>
+
+<span class="sd">    mask : bool, optional</span>
+<span class="sd">        Whether to mask the data with a brain-mask before returning the image.</span>
+<span class="sd">        Default : True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nib.Nifti1Image class instance containing masked or unmasked T2 template.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tflow</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MNI152NLin2009cAsym&#39;</span><span class="p">,</span>
+                                          <span class="n">desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+                                          <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;T2w&#39;</span><span class="p">,</span>
+                                          <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;nii.gz&#39;</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">template_img</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mask_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tflow</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MNI152NLin2009cAsym&#39;</span><span class="p">,</span>
+                                          <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+                                          <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;brain&#39;</span><span class="p">,</span>
+                                          <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">)))</span>
+
+        <span class="n">template_data</span> <span class="o">=</span> <span class="n">template_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">mask_data</span> <span class="o">=</span> <span class="n">mask_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">out_data</span> <span class="o">=</span> <span class="n">template_data</span> <span class="o">*</span> <span class="n">mask_data</span>
+        <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">out_data</span><span class="p">,</span> <span class="n">template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -954,7 +1053,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

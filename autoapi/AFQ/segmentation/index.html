@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -37,45 +40,44 @@
 <span id="afq-segmentation"></span><h1><a class="reference internal" href="#module-AFQ.segmentation" title="AFQ.segmentation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a><a class="headerlink" href="#module-AFQ.segmentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="AFQ.segmentation.Segmentation">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param">nb_points=False</em>, <em class="sig-param">seg_algo='AFQ'</em>, <em class="sig-param">progressive=True</em>, <em class="sig-param">greater_than=50</em>, <em class="sig-param">rm_small_clusters=50</em>, <em class="sig-param">model_clust_thr=40</em>, <em class="sig-param">reduction_thr=40</em>, <em class="sig-param">refine=False</em>, <em class="sig-param">pruning_thr=6</em>, <em class="sig-param">b0_threshold=0</em>, <em class="sig-param">prob_threshold=0</em>, <em class="sig-param">rng=None</em>, <em class="sig-param">return_idx=False</em>, <em class="sig-param">filter_by_endpoints=True</em>, <em class="sig-param">dist_to_aal=4</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_points</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'AFQ'</span></em>, <em class="sig-param"><span class="n">progressive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">greater_than</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">rm_small_clusters</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">model_clust_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">reduction_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">refine</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pruning_thr</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">prob_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_idx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">filter_by_endpoints</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dist_to_aal</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">save_intermediates</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.segment">
-<code class="sig-name descname">segment</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">bundle_dict</em>, <em class="sig-param">tg</em>, <em class="sig-param">fdata=None</em>, <em class="sig-param">fbval=None</em>, <em class="sig-param">fbvec=None</em>, <em class="sig-param">mapping=None</em>, <em class="sig-param">reg_prealign=None</em>, <em class="sig-param">reg_template=None</em>, <em class="sig-param">b0_threshold=0</em>, <em class="sig-param">img_affine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">tg</span></em>, <em class="sig-param"><span class="n">fdata</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbvec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_prealign</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">img_affine</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Segment streamlines into bundles based on either waypoint ROIs
-<a class="reference internal" href="#r03e71c6d7dc6-yeatman2012" id="id1">[Yeatman2012]</a> or RecoBundles <a class="reference internal" href="../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>bundle_dict: dict</strong></dt><dd><p>Meta-data for the segmentation. The format is something like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ROIs&#39;</span><span class="p">:[</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">],</span>
-<span class="s1">&#39;rules&#39;</span><span class="p">:[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]},</span>
-<span class="s1">&#39;prob_map&#39;</span><span class="p">:</span> <span class="n">img3</span><span class="p">,</span>
-<span class="s1">&#39;cross_midline&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-</pre></div>
-</div>
+<a class="reference internal" href="#r03e71c6d7dc6-yeatman2012" id="id1">[Yeatman2012]</a> or RecoBundles <a class="reference internal" href="../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>.
+Parameters
+———-
+bundle_dict: dict</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Meta-data for the segmentation. The format is something like::</dt><dd><p>{‘name’: {‘ROIs’:[img1, img2],
+‘rules’:[True, True]},
+‘prob_map’: img3,
+‘cross_midline’: False}</p>
 </dd>
-<dt><strong>tg</strong><span class="classifier">StatefulTractogram</span></dt><dd><p>Bundles to segment</p>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>tg<span class="classifier">StatefulTractogram</span></dt><dd><p>Bundles to segment</p>
 </dd>
-<dt><strong>fdata, fbval, fbvec</strong><span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
+<dt>fdata, fbval, fbvec<span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
 </dd>
-<dt><strong>mapping</strong><span class="classifier">DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span></dt><dd><p>A mapping between DWI space and a template. If None, mapping will
+<dt>mapping<span class="classifier">DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span></dt><dd><p>A mapping between DWI space and a template. If None, mapping will
 be registered from data used in prepare_img. Default: None.</p>
 </dd>
-<dt><strong>reg_prealign</strong><span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
+<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
 the reference space before warping under the deformation field.
 Default: None.</p>
 </dd>
-<dt><strong>reg_template</strong><span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration. Default: MNI T2.</p>
+<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration. Default: MNI T2.</p>
 </dd>
-<dt><strong>img_affine</strong><span class="classifier">array, optional.</span></dt><dd><p>The spatial transformation from the measurement to the scanner
+<dt>img_affine<span class="classifier">array, optional.</span></dt><dd><p>The spatial transformation from the measurement to the scanner
 space.</p>
 </dd>
 </dl>
-</dd>
-</dl>
-<p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r03e71c6d7dc6-yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
 <dd><p>Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.</p>
@@ -83,129 +85,113 @@ space.</p>
 </dl>
 <p>Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. “Tract Profiles of
 White Matter Properties: Automating Fiber-Tract Quantification”
-PloS One 7 (11): e49790.</p>
-<dl class="citation">
-<dt class="label" id="r03e71c6d7dc6-garyfallidis17"><span class="brackets">Garyfallidis17</span></dt>
-<dd><p>Garyfallidis et al. Recognition of white matter</p>
-</dd>
-</dl>
-<p>bundles using local and global streamline-based registration and
+PloS One 7 (11): e49790.
+.. [R03e71c6d7dc6-Garyfallidis17] Garyfallidis et al. Recognition of white matter
+bundles using local and global streamline-based registration and
 clustering, Neuroimage, 2017.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.prepare_img">
-<code class="sig-name descname">prepare_img</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fdata</em>, <em class="sig-param">fbval</em>, <em class="sig-param">fbvec</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_img" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare image data from DWI data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fdata, fbval, fbvec</strong><span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<code class="sig-name descname">prepare_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">fdata</span></em>, <em class="sig-param"><span class="n">fbval</span></em>, <em class="sig-param"><span class="n">fbvec</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare image data from DWI data.
+Parameters
+———-
+fdata, fbval, fbvec : str</p>
+<blockquote>
+<div><p>Full path to data, bvals, bvecs</p>
+</div></blockquote>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.prepare_map">
-<code class="sig-name descname">prepare_map</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">mapping=None</em>, <em class="sig-param">reg_prealign=None</em>, <em class="sig-param">reg_template=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set mapping between DWI space and a template.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>mapping</strong><span class="classifier">DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span></dt><dd><p>A mapping between DWI space and a template.
+<code class="sig-name descname">prepare_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_prealign</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set mapping between DWI space and a template.
+Parameters
+———-
+mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.</p>
+<blockquote>
+<div><p>A mapping between DWI space and a template.
 If None, mapping will be registered from data used in prepare_img.
 Default: None.</p>
-</dd>
-<dt><strong>reg_template</strong><span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration (defaults to the MNI T2)
+</div></blockquote>
+<dl class="simple">
+<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration (defaults to the MNI T2)
 Default: None.</p>
 </dd>
-<dt><strong>reg_prealign</strong><span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
+<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
 the reference space before warping under the deformation field.
 Default: None.</p>
 </dd>
 </dl>
-</dd>
-</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.cross_streamlines">
-<code class="sig-name descname">cross_streamlines</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tg=None</em>, <em class="sig-param">template=None</em>, <em class="sig-param">low_coord=10</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.cross_streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.cross_streamlines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Classify the streamlines by whether they cross the midline.</p>
-<p>Creates a crosses attribute which is an array of booleans. Each boolean
+<code class="sig-name descname">cross_streamlines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">tg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">low_coord</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.cross_streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.cross_streamlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Classify the streamlines by whether they cross the midline.
+Creates a crosses attribute which is an array of booleans. Each boolean
 corresponds to a streamline, and is whether or not that streamline
-crosses the midline.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tg</strong><span class="classifier">StatefulTractogram class instance.</span></dt><dd></dd>
-<dt><strong>template</strong><span class="classifier">nibabel.Nifti1Image class instance</span></dt><dd><p>An affine transformation into a template space.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+crosses the midline.
+Parameters
+———-
+tg : StatefulTractogram class instance.
+template : nibabel.Nifti1Image class instance</p>
+<blockquote>
+<div><p>An affine transformation into a template space.</p>
+</div></blockquote>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation._get_bundle_info">
-<code class="sig-name descname">_get_bundle_info</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">bundle_idx</em>, <em class="sig-param">bundle</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._get_bundle_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._get_bundle_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_get_bundle_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_idx</span></em>, <em class="sig-param"><span class="n">bundle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._get_bundle_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._get_bundle_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get fiber probabilites and ROIs for a given bundle.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation._check_sl_with_inclusion">
-<code class="sig-name descname">_check_sl_with_inclusion</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">sl</em>, <em class="sig-param">include_rois</em>, <em class="sig-param">tol</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._check_sl_with_inclusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._check_sl_with_inclusion" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_check_sl_with_inclusion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">sl</span></em>, <em class="sig-param"><span class="n">include_rois</span></em>, <em class="sig-param"><span class="n">tol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._check_sl_with_inclusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._check_sl_with_inclusion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to check that a streamline is close to a list of
 inclusion ROIS.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation._check_sl_with_exclusion">
-<code class="sig-name descname">_check_sl_with_exclusion</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">sl</em>, <em class="sig-param">exclude_rois</em>, <em class="sig-param">tol</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._check_sl_with_exclusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._check_sl_with_exclusion" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_check_sl_with_exclusion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">sl</span></em>, <em class="sig-param"><span class="n">exclude_rois</span></em>, <em class="sig-param"><span class="n">tol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._check_sl_with_exclusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._check_sl_with_exclusion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to check that a streamline is not too close to a
 list of exclusion ROIs.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation._return_empty">
-<code class="sig-name descname">_return_empty</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">bundle</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._return_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._return_empty" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_return_empty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._return_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._return_empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for segment_afq, to return an empty dict under
 some conditions.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.segment_afq">
-<code class="sig-name descname">segment_afq</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tg=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_afq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_afq" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign streamlines to bundles using the waypoint ROI approach</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tg</strong><span class="classifier">StatefulTractogram class instance</span></dt><dd></dd>
-</dl>
-</dd>
-</dl>
+<code class="sig-name descname">segment_afq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">tg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_afq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_afq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign streamlines to bundles using the waypoint ROI approach
+Parameters
+———-
+tg : StatefulTractogram class instance</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.segment_reco">
-<code class="sig-name descname">segment_reco</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tg=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_reco"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_reco" title="Permalink to this definition">¶</a></dt>
-<dd><p>Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tg</strong><span class="classifier">StatefulTractogram class instance</span></dt><dd><p>A whole-brain tractogram to be segmented.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>fiber_groups</strong><span class="classifier">dict</span></dt><dd><p>Keys are names of the bundles, values are Streamline objects.
+<code class="sig-name descname">segment_reco</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">tg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_reco"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_reco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+Parameters
+———-
+tg : StatefulTractogram class instance</p>
+<blockquote>
+<div><p>A whole-brain tractogram to be segmented.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>fiber_groups<span class="classifier">dict</span></dt><dd><p>Keys are names of the bundles, values are Streamline objects.
 The streamlines in each object have all been oriented to have the
 same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
-</dd>
-</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -289,7 +275,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

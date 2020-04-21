@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.viz &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -36,27 +39,47 @@
 <span id="afq-viz"></span><h1><a class="reference internal" href="#module-AFQ.viz" title="AFQ.viz"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><a class="headerlink" href="#module-AFQ.viz" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py data">
+<dt id="AFQ.viz.tbl_interleavecs">
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">tbl_interleavecs</code><em class="property"> = [[31, 119, 180], [41, 145, 219], [174, 199, 232], [215, 228, 244], [255, 127, 14], [255, 154, 66], [255, 187, 120], [255, 214, 173], [44, 160, 44], [55, 200, 55], [152, 223, 138], [188, 234, 179], [214, 39, 40], [223, 83, 83], [255, 152, 150], [255, 200, 199], [148, 103, 189], [172, 138, 204], [197, 176, 213], [221, 208, 230], [140, 86, 75], [169, 108, 96], [196, 156, 148], [213, 185, 179], [227, 119, 194], [236, 162, 214], [247, 182, 210], [252, 227, 238], [127, 127, 127], [153, 153, 153], [199, 199, 199], [224, 224, 224], [188, 189, 34], [220, 220, 56], [219, 219, 141], [232, 232, 181], [23, 190, 207], [48, 214, 232], [158, 218, 229], [199, 234, 240]]</em><a class="reference internal" href="../../../_modules/AFQ/viz.html#tbl_interleavecs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.tbl_interleavecs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="AFQ.viz.color_dict">
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">color_dict</code><a class="reference internal" href="../../../_modules/AFQ/viz.html#color_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.color_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="AFQ.viz._inline_interact">
-<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">_inline_interact</code><span class="sig-paren">(</span><em class="sig-param">ren</em>, <em class="sig-param">inline</em>, <em class="sig-param">interact</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#_inline_interact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz._inline_interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">_inline_interact</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scene</span></em>, <em class="sig-param"><span class="n">inline</span></em>, <em class="sig-param"><span class="n">interact</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#_inline_interact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz._inline_interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to reuse across viz functions</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.viz.visualize_bundles">
-<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_bundles</code><span class="sig-paren">(</span><em class="sig-param">trk</em>, <em class="sig-param">affine_or_mapping=None</em>, <em class="sig-param">bundle=None</em>, <em class="sig-param">ren=None</em>, <em class="sig-param">color=None</em>, <em class="sig-param">inline=True</em>, <em class="sig-param">interact=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trk</span></em>, <em class="sig-param"><span class="n">affine_or_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scene</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">tbl_interleavecs</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_bundles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize bundles in 3D using VTK</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
+<dt id="AFQ.viz.scene_rotate_forward">
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">scene_rotate_forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scene</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#scene_rotate_forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.scene_rotate_forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.viz.create_gif">
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">create_gif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scene</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">n_frames</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">600, 600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#create_gif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.create_gif" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="AFQ.viz.visualize_roi">
-<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_roi</code><span class="sig-paren">(</span><em class="sig-param">roi</em>, <em class="sig-param">affine_or_mapping=None</em>, <em class="sig-param">static_img=None</em>, <em class="sig-param">roi_affine=None</em>, <em class="sig-param">static_affine=None</em>, <em class="sig-param">reg_template=None</em>, <em class="sig-param">ren=None</em>, <em class="sig-param">color=None</em>, <em class="sig-param">inline=True</em>, <em class="sig-param">interact=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_roi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_roi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">roi</span></em>, <em class="sig-param"><span class="n">affine_or_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_img</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roi_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scene</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">np.array([1, 0, 0])</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_roi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a region of interest into a VTK viz as a volume</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.viz.visualize_volume">
-<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_volume</code><span class="sig-paren">(</span><em class="sig-param">volume</em>, <em class="sig-param">x=None</em>, <em class="sig-param">y=None</em>, <em class="sig-param">z=None</em>, <em class="sig-param">ren=None</em>, <em class="sig-param">inline=True</em>, <em class="sig-param">interact=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_volume" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.</code><code class="sig-name descname">visualize_volume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">volume</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scene</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/viz.html#visualize_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.visualize_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize a volume</p>
 </dd></dl>
 
@@ -136,7 +159,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

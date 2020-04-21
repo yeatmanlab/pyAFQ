@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.tractography &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -37,9 +40,9 @@
 <span id="afq-tractography"></span><h1><a class="reference internal" href="#module-AFQ.tractography" title="AFQ.tractography"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><a class="headerlink" href="#module-AFQ.tractography" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.tractography.track">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param">params_file</em>, <em class="sig-param">directions='det'</em>, <em class="sig-param">max_angle=30.0</em>, <em class="sig-param">sphere=None</em>, <em class="sig-param">seed_mask=None</em>, <em class="sig-param">n_seeds=1</em>, <em class="sig-param">random_seeds=False</em>, <em class="sig-param">stop_mask=None</em>, <em class="sig-param">stop_threshold=0</em>, <em class="sig-param">step_size=0.5</em>, <em class="sig-param">min_length=10</em>, <em class="sig-param">max_length=1000</em>, <em class="sig-param">odf_model='DTI'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">directions</span><span class="o">=</span><span class="default_value">'det'</span></em>, <em class="sig-param"><span class="n">max_angle</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_seeds</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">random_seeds</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stop_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">odf_model</span><span class="o">=</span><span class="default_value">'DTI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tractography</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -90,9 +93,9 @@ the edge of the image)</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.tractography._local_tracking">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param">seeds</em>, <em class="sig-param">dg</em>, <em class="sig-param">threshold_classifier</em>, <em class="sig-param">params_img</em>, <em class="sig-param">step_size=0.5</em>, <em class="sig-param">min_length=10</em>, <em class="sig-param">max_length=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seeds</span></em>, <em class="sig-param"><span class="n">dg</span></em>, <em class="sig-param"><span class="n">threshold_classifier</span></em>, <em class="sig-param"><span class="n">params_img</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function</p>
 </dd></dl>
 
@@ -173,7 +176,7 @@ the edge of the image)</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.registration &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -39,9 +42,9 @@
 </p>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.syn_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_registration</code><span class="sig-paren">(</span><em class="sig-param">moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric='CC', dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_registration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step_length</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'CC'</span></em>, <em class="sig-param"><span class="n">dim</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">level_iters</span><span class="o">=</span><span class="default_value">[10, 10, 5]</span></em>, <em class="sig-param"><span class="n">sigma_diff</span><span class="o">=</span><span class="default_value">2.0</span></em>, <em class="sig-param"><span class="n">radius</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">prealign</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_registration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a source image (moving) to a target image (static).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -82,9 +85,9 @@ source.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.syn_register_dwi">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_register_dwi</code><span class="sig-paren">(</span><em class="sig-param">dwi</em>, <em class="sig-param">gtab</em>, <em class="sig-param">template=None</em>, <em class="sig-param">**syn_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_register_dwi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_register_dwi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dwi</span></em>, <em class="sig-param"><span class="n">gtab</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">syn_kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_register_dwi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register DWI data to a template.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -105,9 +108,9 @@ source.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.write_mapping">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">write_mapping</code><span class="sig-paren">(</span><em class="sig-param">mapping</em>, <em class="sig-param">fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#write_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.write_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">write_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapping</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#write_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.write_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write out a syn registration mapping to file</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -120,9 +123,9 @@ source.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.read_mapping">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">read_mapping</code><span class="sig-paren">(</span><em class="sig-param">disp</em>, <em class="sig-param">domain_img</em>, <em class="sig-param">codomain_img</em>, <em class="sig-param">prealign=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#read_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.read_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">read_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">disp</span></em>, <em class="sig-param"><span class="n">domain_img</span></em>, <em class="sig-param"><span class="n">codomain_img</span></em>, <em class="sig-param"><span class="n">prealign</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#read_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.read_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a syn registration mapping from a nifti file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -142,9 +145,9 @@ Shape (x, y, z, 3, 2)</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.resample">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">static_affine</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.resample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">static_affine</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.resample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resample an image from one space to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -164,35 +167,35 @@ Shape (x, y, z, 3, 2)</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.c_of_mass">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">c_of_mass</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#c_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.c_of_mass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">c_of_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#c_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.c_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.translation">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">translation</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#translation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.translation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">translation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#translation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.translation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.rigid">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">rigid</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#rigid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.rigid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">rigid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#rigid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.rigid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.affine">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">static_affine</em>, <em class="sig-param">moving_affine</em>, <em class="sig-param">reg</em>, <em class="sig-param">starting_affine</em>, <em class="sig-param">params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.affine_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine_registration</code><span class="sig-paren">(</span><em class="sig-param">moving, static, moving_affine=None, static_affine=None, nbins=32, sampling_prop=None, metric='MI', pipeline=[c_of_mass, translation, rigid, affine], level_iters=[10000, 1000, 100], sigmas=[5.0, 2.5, 0.0], factors=[4, 2, 1], params0=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine_registration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbins</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">sampling_prop</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'MI'</span></em>, <em class="sig-param"><span class="n">pipeline</span><span class="o">=</span><span class="default_value">[c_of_mass, translation, rigid, affine]</span></em>, <em class="sig-param"><span class="n">level_iters</span><span class="o">=</span><span class="default_value">[10000, 1000, 100]</span></em>, <em class="sig-param"><span class="n">sigmas</span><span class="o">=</span><span class="default_value">[5.0, 2.5, 0.0]</span></em>, <em class="sig-param"><span class="n">factors</span><span class="o">=</span><span class="default_value">[4, 2, 1]</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine_registration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the affine transformation between two 3D images.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.register_series">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_series</code><span class="sig-paren">(</span><em class="sig-param">series</em>, <em class="sig-param">ref</em>, <em class="sig-param">pipeline</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_series" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_series</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series</span></em>, <em class="sig-param"><span class="n">ref</span></em>, <em class="sig-param"><span class="n">pipeline</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_series" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a series to a reference image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -210,9 +213,9 @@ Shape (x, y, z, 3, 2)</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.register_dwi">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_dwi</code><span class="sig-paren">(</span><em class="sig-param">data_files, bval_files, bvec_files, b0_ref=0, pipeline=[c_of_mass, translation, rigid, affine], out_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_dwi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_dwi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">b0_ref</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pipeline</span><span class="o">=</span><span class="default_value">[c_of_mass, translation, rigid, affine]</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_dwi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a DWI data-set</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -229,9 +232,9 @@ single file. If it’s a list, each entry is a full path.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.registration.streamline_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">streamline_registration</code><span class="sig-paren">(</span><em class="sig-param">moving</em>, <em class="sig-param">static</em>, <em class="sig-param">n_points=100</em>, <em class="sig-param">native_resampled=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#streamline_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.streamline_registration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">streamline_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">native_resampled</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#streamline_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.streamline_registration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register two collections of streamlines (‘bundles’) to each other</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -335,7 +338,7 @@ the static group.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

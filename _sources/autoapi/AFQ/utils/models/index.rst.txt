@@ -7,6 +7,7 @@
 Module Contents
 ---------------
 
+
 .. function:: prepare_data(data_files, bval_files, bvec_files, mask=None, b0_threshold=0)
 
    :Parameters:

@@ -7,6 +7,7 @@
 Module Contents
 ---------------
 
+
 .. function:: parfor(func, in_list, out_shape=None, n_jobs=-1, engine='joblib', backend='threading', func_args=[], func_kwargs={})
 
    Parallel for loop for numpy arrays

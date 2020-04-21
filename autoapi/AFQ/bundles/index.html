@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AFQ.bundles &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AFQ.csd" href="../csd/index.html" />
+    <link rel="prev" title="AFQ.api" href="../api/index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.bundles">
+<span id="afq-bundles"></span><h1><a class="reference internal" href="#module-AFQ.bundles" title="AFQ.bundles"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a><a class="headerlink" href="#module-AFQ.bundles" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="AFQ.bundles.Bundles">
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.bundles.</code><code class="sig-name descname">Bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'same'</span></em>, <em class="sig-param"><span class="n">space</span><span class="o">=</span><span class="default_value">Space.RASMM</span></em>, <em class="sig-param"><span class="n">origin</span><span class="o">=</span><span class="default_value">Origin.NIFTI</span></em>, <em class="sig-param"><span class="n">bundles_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">using_idx</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="AFQ.bundles.Bundles.add_bundle">
+<code class="sig-name descname">add_bundle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_name</span></em>, <em class="sig-param"><span class="n">streamlines</span></em>, <em class="sig-param"><span class="n">idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.add_bundle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.add_bundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a bundle to bundles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bundle_name</strong><span class="classifier">string</span></dt><dd><p>Name of bundle.</p>
+</dd>
+<dt><strong>streamlines</strong><span class="classifier">nibabel.Streamlines or StatefulTractogram</span></dt><dd><p>The streamlines constituting a bundle.</p>
+</dd>
+<dt><strong>idx</strong><span class="classifier">array of ints, optional</span></dt><dd><p>Indices for streamlines in original tractography.
+Default: None.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.clean_bundles">
+<code class="sig-name descname">clean_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.clean_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean each segmented bundle based on the Mahalnobis distance of
+each streamline</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>clean_rounds</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of rounds of cleaning based on the Mahalanobis distance
+from the mean of extracted bundles. Default: 5</p>
+</dd>
+<dt><strong>clean_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>Threshold of cleaning based on the Mahalanobis distance (the units
+are standard deviations). Default: 3.</p>
+</dd>
+<dt><strong>min_sl</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of streamlines in a bundle under which we will
+not bother with cleaning outliers. Default: 20.</p>
+</dd>
+<dt><strong>stat</strong><span class="classifier">callable, optional.</span></dt><dd><p>The statistic of each node relative to which the Mahalanobis is
+calculated. Default: <cite>np.mean</cite> (but can also use median, etc.)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles._apply_affine_sft">
+<code class="sig-name descname">_apply_affine_sft</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">sft</span></em>, <em class="sig-param"><span class="n">affine</span></em>, <em class="sig-param"><span class="n">reference</span></em>, <em class="sig-param"><span class="n">origin</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles._apply_affine_sft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles._apply_affine_sft" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.apply_affine">
+<code class="sig-name descname">apply_affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">affine</span></em>, <em class="sig-param"><span class="n">reference</span></em>, <em class="sig-param"><span class="n">origin</span><span class="o">=</span><span class="default_value">Origin.NIFTI</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.apply_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.apply_affine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a linear transformation, given by affine, to all
+streamlines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>affine</strong><span class="classifier">array (4, 4)</span></dt><dd><p>Apply affine matrix to all streamlines</p>
+</dd>
+<dt><strong>reference</strong><span class="classifier">Nifti or Trk filename, Nifti1Image or TrkFile,</span></dt><dd><p>Nifti1Header, trk.header (dict) or another Stateful Tractogram
+Reference that provides the new spatial attribute.</p>
+</dd>
+<dt><strong>origin</strong><span class="classifier">Enum (dipy.io.stateful_tractogram.Origin), optional</span></dt><dd><p>New origin of streamlines.
+Default: Origin.NIFTI</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.to_space">
+<code class="sig-name descname">to_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">space</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.to_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.to_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform streamlines to space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>space</strong><span class="classifier">Space</span></dt><dd><p>Space to transform the streamlines to.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.save_bundles">
+<code class="sig-name descname">save_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="o">=</span><span class="default_value">'./'</span></em>, <em class="sig-param"><span class="n">file_suffix</span><span class="o">=</span><span class="default_value">'.trk'</span></em>, <em class="sig-param"><span class="n">space</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bbox_valid_check</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.save_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.save_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save tractograms in bundles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_path</strong><span class="classifier">string, optional.</span></dt><dd><p>Path to save trk files to.
+Default: ‘./’</p>
+</dd>
+<dt><strong>file_suffix</strong><span class="classifier">string, optional.</span></dt><dd><p>File name will be the bundle name + file_suffix.
+Default: ‘.trk’</p>
+</dd>
+<dt><strong>space</strong><span class="classifier">string</span></dt><dd><p>Space to save the streamlines in. If not none, the streamlines
+will be transformed to this space, saved, then transformed back.
+Default: None.</p>
+</dd>
+<dt><strong>bbox_valid_check</strong><span class="classifier">boolean, optional.</span></dt><dd><p>Whether to verify that the bounding box is valid in voxel space.
+Default: False</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.load_bundles">
+<code class="sig-name descname">load_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_names</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="o">=</span><span class="default_value">'./'</span></em>, <em class="sig-param"><span class="n">file_suffix</span><span class="o">=</span><span class="default_value">'.trk'</span></em>, <em class="sig-param"><span class="n">affine</span><span class="o">=</span><span class="default_value">np.eye(4)</span></em>, <em class="sig-param"><span class="n">bbox_valid_check</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.load_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.load_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>load tractograms from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bundle_names</strong><span class="classifier">list of strings</span></dt><dd><p>Names of bundles to load.</p>
+</dd>
+<dt><strong>file_path</strong><span class="classifier">string, optional.</span></dt><dd><p>Path to load trk files from.
+Default: ‘./’</p>
+</dd>
+<dt><strong>file_suffix</strong><span class="classifier">string, optional.</span></dt><dd><p>File name will be the bundle name + file_suffix.
+Default: ‘.trk’</p>
+</dd>
+<dt><strong>affine</strong><span class="classifier">array_like (4, 4), optional.</span></dt><dd><p>The mapping from the file’s reference to this object’s reference.
+Default: np.eye(4)</p>
+</dd>
+<dt><strong>bbox_valid_check</strong><span class="classifier">boolean, optional.</span></dt><dd><p>Whether to verify that the bounding box is valid in voxel space.
+Default: False</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.bundles.Bundles.tract_profiles">
+<code class="sig-name descname">tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">subject_label</span></em>, <em class="sig-param"><span class="n">affine</span><span class="o">=</span><span class="default_value">np.eye(4)</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'afq'</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'FA'</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/bundles.html#Bundles.tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.bundles.Bundles.tract_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a summarized profile of data for each bundle along
+its length.</p>
+<p>Follows the approach outlined in <a class="reference internal" href="../../../index.html#yeatman2012" id="id1"><span>[Yeatman2012]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">3D volume</span></dt><dd><p>The statistic to sample with the streamlines.</p>
+</dd>
+<dt><strong>subject_label</strong><span class="classifier">string</span></dt><dd><p>String which identifies these bundles in the pandas dataframe.</p>
+</dd>
+<dt><strong>affine</strong><span class="classifier">array_like (4, 4), optional.</span></dt><dd><p>The mapping from voxel coordinates to ‘data’ coordinates.
+Default: np.eye(4)</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">string</span></dt><dd><p>Method used to segment streamlines.
+Default: ‘afq’</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier">string</span></dt><dd><p>Metric of statistic in data.
+Default: ‘FA’</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int</span></dt><dd><p>Number of points to resample to.
+Default: 100</p>
+</dd>
+<dt><strong>weight</strong><span class="classifier">boolean</span></dt><dd><p>Whether to calculate gaussian weights before profiling.
+Default: True</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+      <li>Previous: <a href="../api/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a></li>
+      <li>Next: <a href="../csd/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.csd</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../_sources/autoapi/AFQ/bundles/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

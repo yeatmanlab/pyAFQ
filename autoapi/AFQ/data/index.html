@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -37,14 +40,14 @@
 <span id="afq-data"></span><h1><a class="reference internal" href="#module-AFQ.data" title="AFQ.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><a class="headerlink" href="#module-AFQ.data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
+<dl class="py data">
 <dt id="AFQ.data.fetch_callosum_templates">
 <code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_callosum_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_callosum_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.data.read_callosum_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_callosum_templates</code><span class="sig-paren">(</span><em class="sig-param">resample_to=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_callosum_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_callosum_templates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resample_to</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_callosum_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load AFQ callosum templates from file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -56,14 +59,14 @@
 </dl>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="AFQ.data.fetch_templates">
 <code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.data.read_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_templates</code><span class="sig-paren">(</span><em class="sig-param">resample_to=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_templates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resample_to</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load AFQ templates from file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -75,9 +78,9 @@
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.data.fetch_hcp">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param">subjects</em>, <em class="sig-param">hcp_bucket='hcp-openaccess'</em>, <em class="sig-param">profile_name='hcp'</em>, <em class="sig-param">path=None</em>, <em class="sig-param">aws_access_key_id=None</em>, <em class="sig-param">aws_secret_access_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subjects</span></em>, <em class="sig-param"><span class="n">hcp_bucket</span><span class="o">=</span><span class="default_value">'hcp-openaccess'</span></em>, <em class="sig-param"><span class="n">profile_name</span><span class="o">=</span><span class="default_value">'hcp'</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_access_key_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_secret_access_key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch HCP diffusion data and arrange it in a manner that resembles the
 BIDS <a class="reference internal" href="../index.html#r8494a6c36190-1" id="id1">[1]</a> specification.</p>
 <dl class="field-list simple">
@@ -123,20 +126,20 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 </dl>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="AFQ.data.fetch_stanford_hardi_tractography">
 <code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_stanford_hardi_tractography</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.data.read_stanford_hardi_tractography">
 <code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_stanford_hardi_tractography</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a minimal tractography from the Stanford dataset.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.data.organize_stanford_data">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the expected file-system structure for the Stanford HARDI data-set.</p>
 </dd></dl>
 
@@ -217,7 +220,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

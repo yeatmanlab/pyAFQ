@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>AFQ.utils.streamlines &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
@@ -37,9 +40,9 @@
 <span id="afq-utils-streamlines"></span><h1><a class="reference internal" href="#module-AFQ.utils.streamlines" title="AFQ.utils.streamlines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a><a class="headerlink" href="#module-AFQ.utils.streamlines" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.utils.streamlines.add_bundles">
-<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">add_bundles</code><span class="sig-paren">(</span><em class="sig-param">t1</em>, <em class="sig-param">t2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#add_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.add_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">add_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t1</span></em>, <em class="sig-param"><span class="n">t2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#add_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.add_bundles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine two bundles, using the second bundles’ affine and
 data_per_streamline keys.</p>
 <blockquote>
@@ -48,9 +51,9 @@ data_per_streamline keys.</p>
 <p>t1, t2 : nib.streamlines.Tractogram class instances</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.utils.streamlines.bundles_to_tgram">
-<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">bundles_to_tgram</code><span class="sig-paren">(</span><em class="sig-param">bundles</em>, <em class="sig-param">bundle_dict</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#bundles_to_tgram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.bundles_to_tgram" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">bundles_to_tgram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bundles</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">reference</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#bundles_to_tgram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.bundles_to_tgram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a StatefulTractogram object from bundles and their
 specification.</p>
 <dl class="field-list simple">
@@ -68,9 +71,9 @@ specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.utils.streamlines.tgram_to_bundles">
-<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">tgram_to_bundles</code><span class="sig-paren">(</span><em class="sig-param">tgram</em>, <em class="sig-param">bundle_dict</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#tgram_to_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.tgram_to_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">tgram_to_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tgram</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">reference</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#tgram_to_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.tgram_to_bundles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a StatefulTractogram object to a dict with StatefulTractogram
 objects for each bundle.</p>
 <dl class="field-list simple">
@@ -86,9 +89,9 @@ objects for each bundle.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AFQ.utils.streamlines.split_streamline">
-<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">split_streamline</code><span class="sig-paren">(</span><em class="sig-param">streamlines</em>, <em class="sig-param">sl_to_split</em>, <em class="sig-param">split_idx</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#split_streamline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.split_streamline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">split_streamline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">streamlines</span></em>, <em class="sig-param"><span class="n">sl_to_split</span></em>, <em class="sig-param"><span class="n">split_idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#split_streamline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.split_streamline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a Streamlines object, split one of the underlying streamlines</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -183,7 +186,7 @@ objects for each bundle.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

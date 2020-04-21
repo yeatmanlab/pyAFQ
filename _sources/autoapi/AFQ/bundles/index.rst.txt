@@ -1,0 +1,298 @@
+:mod:`AFQ.bundles`
+==================
+
+.. py:module:: AFQ.bundles
+
+
+Module Contents
+---------------
+
+
+.. py:class:: Bundles(reference='same', space=Space.RASMM, origin=Origin.NIFTI, bundles_dict=None, using_idx=False)
+
+   .. method:: add_bundle(self, bundle_name, streamlines, idx=None)
+
+
+      Add a bundle to bundles.
+
+
+      :Parameters:
+
+          **bundle_name** : string
+              Name of bundle.
+
+          **streamlines** : nibabel.Streamlines or StatefulTractogram
+              The streamlines constituting a bundle.
+
+          **idx** : array of ints, optional
+              Indices for streamlines in original tractography.
+              Default: None.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: clean_bundles(self, **kwargs)
+
+
+      Clean each segmented bundle based on the Mahalnobis distance of
+      each streamline
+
+
+      :Parameters:
+
+          **clean_rounds** : int, optional.
+              Number of rounds of cleaning based on the Mahalanobis distance
+              from the mean of extracted bundles. Default: 5
+
+          **clean_threshold** : float, optional.
+              Threshold of cleaning based on the Mahalanobis distance (the units
+              are standard deviations). Default: 3.
+
+          **min_sl** : int, optional.
+              Number of streamlines in a bundle under which we will
+              not bother with cleaning outliers. Default: 20.
+
+          **stat** : callable, optional.
+              The statistic of each node relative to which the Mahalanobis is
+              calculated. Default: `np.mean` (but can also use median, etc.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _apply_affine_sft(self, sft, affine, reference, origin)
+
+
+
+   .. method:: apply_affine(self, affine, reference, origin=Origin.NIFTI)
+
+
+      Apply a linear transformation, given by affine, to all
+      streamlines.
+
+
+      :Parameters:
+
+          **affine** : array (4, 4)
+              Apply affine matrix to all streamlines
+
+          **reference** : Nifti or Trk filename, Nifti1Image or TrkFile,
+              Nifti1Header, trk.header (dict) or another Stateful Tractogram
+              Reference that provides the new spatial attribute.
+
+          **origin** : Enum (dipy.io.stateful_tractogram.Origin), optional
+              New origin of streamlines.
+              Default: Origin.NIFTI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: to_space(self, space)
+
+
+      Transform streamlines to space.
+
+
+      :Parameters:
+
+          **space** : Space
+              Space to transform the streamlines to.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: save_bundles(self, file_path='./', file_suffix='.trk', space=None, bbox_valid_check=False)
+
+
+      Save tractograms in bundles.
+
+
+      :Parameters:
+
+          **file_path** : string, optional.
+              Path to save trk files to.
+              Default: './'
+
+          **file_suffix** : string, optional.
+              File name will be the bundle name + file_suffix.
+              Default: '.trk'
+
+          **space** : string
+              Space to save the streamlines in. If not none, the streamlines
+              will be transformed to this space, saved, then transformed back.
+              Default: None.
+
+          **bbox_valid_check** : boolean, optional.
+              Whether to verify that the bounding box is valid in voxel space.
+              Default: False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: load_bundles(self, bundle_names, file_path='./', file_suffix='.trk', affine=np.eye(4), bbox_valid_check=False)
+
+
+      load tractograms from file.
+
+
+      :Parameters:
+
+          **bundle_names** : list of strings
+              Names of bundles to load.
+
+          **file_path** : string, optional.
+              Path to load trk files from.
+              Default: './'
+
+          **file_suffix** : string, optional.
+              File name will be the bundle name + file_suffix.
+              Default: '.trk'
+
+          **affine** : array_like (4, 4), optional.
+              The mapping from the file's reference to this object's reference.
+              Default: np.eye(4)
+
+          **bbox_valid_check** : boolean, optional.
+              Whether to verify that the bounding box is valid in voxel space.
+              Default: False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: tract_profiles(self, data, subject_label, affine=np.eye(4), method='afq', metric='FA', n_points=100, weight=True)
+
+
+      Calculate a summarized profile of data for each bundle along
+      its length.
+
+      Follows the approach outlined in [Yeatman2012]_.
+
+      :Parameters:
+
+          **data** : 3D volume
+              The statistic to sample with the streamlines.
+
+          **subject_label** : string
+              String which identifies these bundles in the pandas dataframe.
+
+          **affine** : array_like (4, 4), optional.
+              The mapping from voxel coordinates to 'data' coordinates.
+              Default: np.eye(4)
+
+          **method** : string
+              Method used to segment streamlines.
+              Default: 'afq'
+
+          **metric** : string
+              Metric of statistic in data.
+              Default: 'FA'
+
+          **n_points** : int
+              Number of points to resample to.
+              Default: 100
+
+          **weight** : boolean
+              Whether to calculate gaussian weights before profiling.
+              Default: True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+

@@ -7,70 +7,59 @@
 Module Contents
 ---------------
 
-.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=0, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4)
+
+.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=0, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
 
    .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=0, img_affine=None)
 
 
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
-
-
-      :Parameters:
-
-          **bundle_dict: dict**
-              Meta-data for the segmentation. The format is something like::
-              
-                  {'name': {'ROIs':[img1, img2],
-                  'rules':[True, True]},
-                  'prob_map': img3,
-                  'cross_midline': False}
-
-          **tg** : StatefulTractogram
-              Bundles to segment
-
-          **fdata, fbval, fbvec** : str
-              Full path to data, bvals, bvecs
-
-          **mapping** : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-              A mapping between DWI space and a template. If None, mapping will
-              be registered from data used in prepare_img. Default: None.
-
-          **reg_prealign** : array, optional.
-              The linear transformation to be applied to align input images to
-              the reference space before warping under the deformation field.
-              Default: None.
-
-          **reg_template** : str or nib.Nifti1Image, optional.
-              Template to use for registration. Default: MNI T2.
-
-          **img_affine** : array, optional.
-              The spatial transformation from the measurement to the scanner
-              space.
-
-
-
-
-
-
-
-
-
-
-      .. rubric:: References
-
+      Parameters
+      ----------
+      bundle_dict: dict
+          Meta-data for the segmentation. The format is something like::
+              {'name': {'ROIs':[img1, img2],
+              'rules':[True, True]},
+              'prob_map': img3,
+              'cross_midline': False}
+      tg : StatefulTractogram
+          Bundles to segment
+      fdata, fbval, fbvec : str
+          Full path to data, bvals, bvecs
+      mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+          A mapping between DWI space and a template. If None, mapping will
+          be registered from data used in prepare_img. Default: None.
+      reg_prealign : array, optional.
+          The linear transformation to be applied to align input images to
+          the reference space before warping under the deformation field.
+          Default: None.
+      reg_template : str or nib.Nifti1Image, optional.
+          Template to use for registration. Default: MNI T2.
+      img_affine : array, optional.
+          The spatial transformation from the measurement to the scanner
+          space.
+      References
+      ----------
       .. [R03e71c6d7dc6-Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
       Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of
       White Matter Properties: Automating Fiber-Tract Quantification"
       PloS One 7 (11): e49790.
-
       .. [R03e71c6d7dc6-Garyfallidis17] Garyfallidis et al. Recognition of white matter
       bundles using local and global streamline-based registration and
       clustering, Neuroimage, 2017.
 
-      .. only:: latex
 
-         [R03e71c6d7dc6-Yeatman2012]_, [R03e71c6d7dc6-Garyfallidis17]_
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -83,12 +72,12 @@ Module Contents
 
 
       Prepare image data from DWI data.
+      Parameters
+      ----------
+      fdata, fbval, fbvec : str
+          Full path to data, bvals, bvecs
 
 
-      :Parameters:
-
-          **fdata, fbval, fbvec** : str
-              Full path to data, bvals, bvecs
 
 
 
@@ -111,23 +100,21 @@ Module Contents
 
 
       Set mapping between DWI space and a template.
+      Parameters
+      ----------
+      mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
+          A mapping between DWI space and a template.
+          If None, mapping will be registered from data used in prepare_img.
+          Default: None.
+      reg_template : str or nib.Nifti1Image, optional.
+          Template to use for registration (defaults to the MNI T2)
+          Default: None.
+      reg_prealign : array, optional.
+          The linear transformation to be applied to align input images to
+          the reference space before warping under the deformation field.
+          Default: None.
 
 
-      :Parameters:
-
-          **mapping** : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-              A mapping between DWI space and a template.
-              If None, mapping will be registered from data used in prepare_img.
-              Default: None.
-
-          **reg_template** : str or nib.Nifti1Image, optional.
-              Template to use for registration (defaults to the MNI T2)
-              Default: None.
-
-          **reg_prealign** : array, optional.
-              The linear transformation to be applied to align input images to
-              the reference space before warping under the deformation field.
-              Default: None.
 
 
 
@@ -150,18 +137,16 @@ Module Contents
 
 
       Classify the streamlines by whether they cross the midline.
-
       Creates a crosses attribute which is an array of booleans. Each boolean
       corresponds to a streamline, and is whether or not that streamline
       crosses the midline.
+      Parameters
+      ----------
+      tg : StatefulTractogram class instance.
+      template : nibabel.Nifti1Image class instance
+          An affine transformation into a template space.
 
-      :Parameters:
 
-          **tg** : StatefulTractogram class instance.
-              ..
-
-          **template** : nibabel.Nifti1Image class instance
-              An affine transformation into a template space.
 
 
 
@@ -283,12 +268,11 @@ Module Contents
 
 
       Assign streamlines to bundles using the waypoint ROI approach
+      Parameters
+      ----------
+      tg : StatefulTractogram class instance
 
 
-      :Parameters:
-
-          **tg** : StatefulTractogram class instance
-              ..
 
 
 
@@ -311,19 +295,19 @@ Module Contents
 
 
       Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+      Parameters
+      ----------
+      tg : StatefulTractogram class instance
+          A whole-brain tractogram to be segmented.
+      Returns
+      -------
+      fiber_groups : dict
+          Keys are names of the bundles, values are Streamline objects.
+          The streamlines in each object have all been oriented to have the
+          same orientation (using `dts.orient_by_streamline`).
 
 
-      :Parameters:
 
-          **tg** : StatefulTractogram class instance
-              A whole-brain tractogram to be segmented.
-
-      :Returns:
-
-          **fiber_groups** : dict
-              Keys are names of the bundles, values are Streamline objects.
-              The streamlines in each object have all been oriented to have the
-              same orientation (using `dts.orient_by_streamline`).
 
 
 
