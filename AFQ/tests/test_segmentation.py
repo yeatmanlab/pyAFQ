@@ -155,6 +155,7 @@ def test_segment():
     npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
 
+
 def test_clean_by_endpoints():
     sl = [np.array([[1, 1, 1],
                     [2, 1, 1],
