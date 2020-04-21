@@ -36,6 +36,10 @@
     {
       "name": "Cipollini, Ben",
       "type": "Researcher"
+    },
+    {
+        "name": "Neef, Andreas",
+        "type": "Researcher"
     }
   ],
   "creators": [
@@ -50,11 +54,11 @@
       "orcid": "0000-0003-0679-1985"
     }
   ],
-  "description": "<p>pyAFQ</p>",
+  "description": "<p>pyAFQ is a program and software library for analysis of white matter connections in the human brain measured with diffusion MRI</p>",
   "keywords": [
     "neuroimaging",
     "dMRI",
-    "tracotgraphy"
+    "tractography"
   ],
   "license": "BSD",
   "related_identifiers": [
@@ -62,13 +66,8 @@
       "identifier": "http://yeatmanlab.github.io/pyAFQ",
       "relation": "isPartOf",
       "scheme": "url"
-    },
-    {
-      "identifier": "10.1038/s41592-018-0235-4",
-      "relation": "isPartOf",
-      "scheme": "doi"
     }
   ],
-  "title": "pyAFQ",
+  "title": "pyAFQ: Automated Fiber Quantification in Python",
   "upload_type": "software"
 }
