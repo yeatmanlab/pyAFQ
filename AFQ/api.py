@@ -11,12 +11,19 @@ import numpy as np
 import nibabel as nib
 from scipy.ndimage.morphology import binary_dilation
 
+use_xvfb = True
+if use_xvfb:
+    from xvfbwrapper import Xvfb
+    display = Xvfb(width=1920, height=1080)
+    display.start()
+
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.stats.analysis import afq_profile
+from dipy.testing.decorators import xvfb_it
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
@@ -1373,3 +1380,7 @@ class AFQ(object):
         df = pd.concat(dfs)
         df.to_csv(op.join(self.afq_dir, 'tract_profiles.csv'), index=False)
         return df
+
+
+if use_xvfb:
+    display.stop()
