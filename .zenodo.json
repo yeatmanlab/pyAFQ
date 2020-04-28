@@ -60,7 +60,7 @@
     "dMRI",
     "tractography"
   ],
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "related_identifiers": [
     {
       "identifier": "http://yeatmanlab.github.io/pyAFQ",
