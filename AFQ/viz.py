@@ -57,7 +57,8 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
-                      colors=None, scene=None, interact=False, inline=False):
+                      colors=None, scene=None, background=(1, 1, 1),
+                      interact=False, inline=False):
     """
     Visualize bundles in 3D using VTK
 
@@ -83,7 +84,11 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
         If this is a list, each item is an RGB tuple. Defaults to a list
-        with Tableua 20 RGB values
+        with Tableau 20 RGB values
+
+    background : tuple, optional
+        RGB values for the background. Default: (1, 1, 1), which is white
+        background.
 
     scene : fury Scene object, optional
         If provided, the visualization will be added to this Scene. Default:
@@ -115,6 +120,8 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     if scene is None:
         scene = window.Scene()
+
+    scene.SetBackground(background[0], background[1], background[2])
 
     if colors is None:
         # Use the color dict provided
