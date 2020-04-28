@@ -1,83 +1,43 @@
 import tempfile
 import os
 import os.path as op
+from collections import OrderedDict
+
 import numpy as np
 import IPython.display as display
 import imageio as io
-import itertools
+from palettable.tableau import Tableau_20
 
 import nibabel as nib
 from dipy.viz import window, actor, ui
 from fury.colormap import line_colors
 
-from palettable.tableau import Tableau_20
-
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
 
-tbl_interleavecs = [(31, 119, 180),
-                    (41, 145, 219),
-                    (174, 199, 232),
-                    (215, 228, 244),
-                    (255, 127, 14),
-                    (255, 154, 66),
-                    (255, 187, 120),
-                    (255, 214, 173),
-                    (44, 160, 44),
-                    (55, 200, 55),
-                    (152, 223, 138),
-                    (188, 234, 179),
-                    (214, 39, 40),
-                    (223, 83, 83),
-                    (255, 152, 150),
-                    (255, 200, 199),
-                    (148, 103, 189),
-                    (172, 138, 204),
-                    (197, 176, 213),
-                    (221, 208, 230),
-                    (140, 86, 75),
-                    (169, 108, 96),
-                    (196, 156, 148),
-                    (213, 185, 179),
-                    (227, 119, 194),
-                    (236, 162, 214),
-                    (247, 182, 210),
-                    (252, 227, 238),
-                    (127, 127, 127),
-                    (153, 153, 153),
-                    (199, 199, 199),
-                    (224, 224, 224),
-                    (188, 189, 34),
-                    (220, 220, 56),
-                    (219, 219, 141),
-                    (232, 232, 181),
-                    (23, 190, 207),
-                    (48, 214, 232),
-                    (158, 218, 229),
-                    (199, 234, 240)]
+tableau_20_rgb = np.array(Tableau_20.colors) / 255
 
-
-color_dict = {'ATR_R': tbl_interleavecs[0],
-              'ATR_L': tbl_interleavecs[1],
-              'CGC_R': tbl_interleavecs[2],
-              'CGC_L': tbl_interleavecs[3],
-              'CST_R': tbl_interleavecs[4],
-              'CST_L': tbl_interleavecs[5],
-              'HCC_R': tbl_interleavecs[6],
-              'HCC_L': tbl_interleavecs[7],
-              'IFO_R': tbl_interleavecs[8],
-              'IFO_L': tbl_interleavecs[9],
-              'ILF_R': tbl_interleavecs[10],
-              'ILF_L': tbl_interleavecs[11],
-              'SLF_R': tbl_interleavecs[12],
-              'SLF_L': tbl_interleavecs[13],
-              'ARC_R': tbl_interleavecs[14],
-              'ARC_L': tbl_interleavecs[15],
-              'UNC_R': tbl_interleavecs[16],
-              'UNC_L': tbl_interleavecs[17],
-              'FA': tbl_interleavecs[18],
-              'FP': tbl_interleavecs[19]}
+color_dict = OrderedDict({"ATR_L": tableau_20_rgb[0],
+                          "ATR_R": tableau_20_rgb[1],
+                          "CST_L": tableau_20_rgb[2],
+                          "CST_R": tableau_20_rgb[3],
+                          "CGC_L": tableau_20_rgb[4],
+                          "CGC_R": tableau_20_rgb[5],
+                          "HCC_L": tableau_20_rgb[6],
+                          "HCC_R": tableau_20_rgb[7],
+                          "FP": tableau_20_rgb[8],
+                          "FA": tableau_20_rgb[9],
+                          "IFO_L": tableau_20_rgb[10],
+                          "IFO_R": tableau_20_rgb[11],
+                          "ILF_L": tableau_20_rgb[12],
+                          "ILF_R": tableau_20_rgb[13],
+                          "SLF_L": tableau_20_rgb[14],
+                          "SLF_R": tableau_20_rgb[15],
+                          "UNC_L": tableau_20_rgb[16],
+                          "UNC_R": tableau_20_rgb[17],
+                          "ARC_L": tableau_20_rgb[18],
+                          "ARC_R": tableau_20_rgb[19]})
 
 
 def _inline_interact(scene, inline, interact):
@@ -96,11 +56,50 @@ def _inline_interact(scene, inline, interact):
     return scene
 
 
-def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
-                      colors=tbl_interleavecs, bundle_names=None,
-                      inline=False, interact=False):
+def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
+                      colors=None, scene=None, interact=False, inline=False):
     """
     Visualize bundles in 3D using VTK
+
+    Parameters
+    ----------
+    trk : str, list, or Streamlines
+        The streamline information
+
+    affine : ndarray, optional
+       An affine transformation to apply to the streamlines before
+       visualization. Default: no transform.
+
+    bundle_dict : dict, optional
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the trk
+        metadata. Default: bundles are either not identified, or identified
+        only as unique integers in the metadata.
+
+    bundle : str or int, optional
+        The name of a bundle to select from among the keys in `bundle_dict`
+        or an integer for selection from the trk metadata.
+
+    colors : dict or list
+        If this is a dict, keys are bundle names and values are RGB tuples.
+        If this is a list, each item is an RGB tuple. Defaults to a list
+        with Tableua 20 RGB values
+
+    scene : fury Scene object, optional
+        If provided, the visualization will be added to this Scene. Default:
+        Initialize a new Scene.
+
+    interact : bool
+        Whether to provide an interactive VTK window for interaction.
+        Default: False
+
+    inline : bool
+        Whether to embed the visualization inline in a notebook. Only works
+        in the notebook context. Default: False.
+
+    Returns
+    -------
+    Fury Scene object
     """
     if isinstance(trk, str):
         trk = nib.streamlines.load(trk)
@@ -109,67 +108,74 @@ def visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None,
         # Assume these are streamlines (as list or Streamlines object):
         tg = nib.streamlines.Tractogram(trk)
 
-    if affine_or_mapping is not None:
-        tg = tg.apply_affine(np.linalg.inv(affine_or_mapping))
+    if affine is not None:
+        tg = tg.apply_affine(np.linalg.inv(affine))
 
     streamlines = tg.streamlines
 
     if scene is None:
         scene = window.Scene()
 
-    # There are no bundles in here:
+    if colors is None:
+        # Use the color dict provided
+        colors = color_dict
+
+    def _color_selector(bundle_dict, colors, b):
+        """Helper function """
+        if bundle_dict is None:
+            # We'll choose a color from a rotating list:
+            if isinstance(colors, list):
+                color = colors[np.mod(len(colors), int(b))]
+            else:
+                color_list = colors.values()
+                color = color_list[np.mod(len(colors), int(b))]
+        else:
+            # We have a mapping from UIDs to bundle names:
+            for b_name_iter, b_iter in bundle_dict.items():
+                if b_iter['uid'] == b:
+                    b_name = b_name_iter
+                    break
+            color = colors[b_name]
+        return color
+
     if list(tg.data_per_streamline.keys()) == []:
+        # There are no bundles in here:
         streamlines = list(streamlines)
+        # Visualize all the streamlines with directionally assigned RGB:
         sl_actor = actor.line(streamlines, line_colors(streamlines))
         scene.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)
-    if bundle is None:
-        for b in np.unique(tg.data_per_streamline['bundle']):
-            idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
-            this_sl = list(streamlines[idx])
-            if colors is not None:
-                if bundle_names is not None:
-                    for b_name_iter, b_iter in bundle_names.items():
-                        if b_iter['uid'] == b:
-                            b_name = b_name_iter
-                            pass
-                    color = color_dict[b_name]
-                else:
-                    color = colors[np.mod(len(colors), int(b))]
+
+    else:
+        # There are bundles:
+        if bundle is None:
+            # No selection: visualize all of them:
+            for b in np.unique(tg.data_per_streamline['bundle']):
+                idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
+                this_sl = list(streamlines[idx])
+                color = _color_selector(bundle_dict, colors, b)
                 sl_actor = actor.line(this_sl, color)
                 sl_actor.GetProperty().SetRenderLinesAsTubes(1)
                 sl_actor.GetProperty().SetLineWidth(6)
-            else:
-                sl_actor = actor.line(this_sl,
-                                      Tableau_20.colors[np.mod(20, int(b))])
-                sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-                sl_actor.GetProperty().SetLineWidth(6)
+                scene.add(sl_actor)
 
-            scene.add(sl_actor)
-    else:
-        idx = np.where(tg.data_per_streamline['bundle'] == bundle)[0]
-        this_sl = list(streamlines[idx])
-        if colors is not None:
-            if bundle_names is not None:
-                for b_name_iter, b_iter in bundle_names.items():
-                    if b_iter['uid'] == bundle:
-                        b_name = b_name_iter
-                        pass
-                color = color_dict[b_name]
+        else:
+            # Select just one to visualize:
+            if isinstance(bundle, str):
+                # We need to find the UID:
+                uid = bundle_dict[bundle]['uid']
             else:
-                color = colors[np.mod(len(colors), int(bundle))]
+                # It's already a UID:
+                uid = bundle
+
+            idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+            this_sl = list(streamlines[idx])
+            color = _color_selector(bundle_dict, colors, uid)
             sl_actor = actor.line(this_sl, color)
             sl_actor.GetProperty().SetRenderLinesAsTubes(1)
             sl_actor.GetProperty().SetLineWidth(6)
-
-        else:
-            sl_actor = actor.line(
-                this_sl,
-                Tableau_20.colors[np.mod(20, int(bundle))])
-            sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-            sl_actor.GetProperty().SetLineWidth(6)
-        scene.add(sl_actor)
+            scene.add(sl_actor)
 
     return _inline_interact(scene, inline, interact)
 
