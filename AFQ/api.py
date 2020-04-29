@@ -336,7 +336,6 @@ class AFQ(object):
 
                 dwi_file_list.append(glob.glob(
                     f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
-                print(f"{sess}/{dwi_folder}/{dwi_file}")
 
                 bvec_file_list.append(glob.glob(
                     f"{sess}/{dwi_folder}/{dwi_file}.bvec*")[0])
