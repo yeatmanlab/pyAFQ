@@ -1373,4 +1373,3 @@ class AFQ(object):
         df = pd.concat(dfs)
         df.to_csv(op.join(self.afq_dir, 'tract_profiles.csv'), index=False)
         return df
-
