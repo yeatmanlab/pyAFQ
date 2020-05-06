@@ -6,6 +6,7 @@ import os
 import os.path as op
 from pathlib import PurePath
 import json
+from xvfbwrapper import Xvfb
 
 import numpy as np
 import nibabel as nib
@@ -210,6 +211,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
+                 use_xvfbwrapper=False,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -271,6 +273,9 @@ class AFQ(object):
         self.use_prealign = use_prealign
 
         self.scalars = scalars
+
+        self.vdisplay = Xvfb(width=1280, height=1280)
+        self.vdisplay.start()
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
