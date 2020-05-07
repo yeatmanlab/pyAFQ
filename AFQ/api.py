@@ -6,7 +6,6 @@ import os
 import os.path as op
 from pathlib import PurePath
 import json
-from xvfbwrapper import Xvfb
 
 import numpy as np
 import nibabel as nib
@@ -274,8 +273,10 @@ class AFQ(object):
 
         self.scalars = scalars
 
-        self.vdisplay = Xvfb(width=1280, height=1280)
-        self.vdisplay.start()
+        if use_xvfbwrapper:
+            from xvfbwrapper import Xvfb    
+            self.vdisplay = Xvfb(width=1280, height=1280)
+            self.vdisplay.start()
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
