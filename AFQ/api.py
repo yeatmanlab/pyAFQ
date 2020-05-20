@@ -252,6 +252,10 @@ class AFQ(object):
             Whether to perform pre-alignment before perforiming the
             diffeomorphic mapping in registration. Default: True
 
+        virtual_frame_buffer : bool, optional
+            Whether to use a virtual fram buffer. This is neccessary if generating
+            GIFs in a headless environment. Default: False
+
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
             of the seg.Segmentation object
