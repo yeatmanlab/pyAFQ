@@ -75,15 +75,6 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-<<<<<<< HEAD
-=======
-
-        clip_edges : bool
-            When using the 'AFQ' segmentation algorithm, whether to clip
-            parts of the streamlines that are beyond the inclusion waypoint
-            ROIs.
-
->>>>>>> Clips streamlines by the inclusion ROI.
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
@@ -158,17 +149,7 @@ class Segmentation:
         else:
             self.rng = rng
 
-<<<<<<< HEAD
         self.seg_algo = seg_algo.lower()
-=======
-        algo = algo.lower()
-        if algo == 'reco':
-            self.segment = self._seg_reco
-        else:
-            self.segment = self._seg_afq
-
-        self.clip_edges = clip_edges
->>>>>>> Clips streamlines by the inclusion ROI.
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -351,14 +332,7 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-<<<<<<< HEAD
     def _get_bundle_info(self, bundle_idx, bundle):
-=======
-        # Move back to the original space:
-        self.streamlines = streamlines
-
-    def _get_bundle_info(self, bundle):
->>>>>>> Clips streamlines by the inclusion ROI.
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
@@ -494,7 +468,6 @@ class Segmentation:
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
-<<<<<<< HEAD
                 self._get_bundle_info(bundle_idx, bundle)
             if self.save_intermediates is not None:
                 nib.save(
@@ -505,9 +478,6 @@ class Segmentation:
                             bundle,
                             'as_used.nii.gz'))
 
-=======
-                self._get_bundle_info(bundle)
->>>>>>> Clips streamlines by the inclusion ROI.
             fiber_probabilities = dts.values_from_volume(
                 warped_prob_map,
                 fgarray, np.eye(4))
@@ -589,7 +559,8 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
-<<<<<<< HEAD
+                if self.clip_edges:
+                    select_sl[idx] = select_sl[idx][min0:min1]
 
             # Set this to StatefulTractogram object for filtering/output:
             select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
@@ -643,12 +614,8 @@ class Segmentation:
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
-=======
-                if self.clip_edges:
-                    select_sl[idx] = select_sl[idx][min0:min1]
             # Set this to nibabel.Streamlines object for output:
             select_sl = dts.Streamlines(select_sl)
->>>>>>> Clips streamlines by the inclusion ROI.
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
