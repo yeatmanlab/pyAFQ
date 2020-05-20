@@ -210,7 +210,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
-                 use_xvfbwrapper=False,
+                 virtual_frame_buffer=False,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -273,8 +273,8 @@ class AFQ(object):
 
         self.scalars = scalars
 
-        if use_xvfbwrapper:
-            from xvfbwrapper import Xvfb    
+        if virtual_frame_buffer:
+            from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
 
