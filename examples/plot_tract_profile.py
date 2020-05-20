@@ -32,14 +32,9 @@ import AFQ.utils.volume as auv
 import logging
 logging.basicConfig(level=logging.INFO)
 
-<<<<<<< HEAD
-
 ##########################################################################
 # Get example data:
 # -------------------------
-=======
-dpd.fetch_stanford_hardi()
->>>>>>> Don't need this if we're using API bundle names.
 
 dpd.fetch_stanford_hardi()
 hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
@@ -143,7 +138,9 @@ sft.to_vox()
 # not pass through exclusion ROIs.
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(return_idx=True)
+segmentation = seg.Segmentation(
+    clip_edges=True,
+    return_idx=True)
 segmentation.segment(bundles,
                      sft,
                      fdata=hardi_fdata,
