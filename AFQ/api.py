@@ -696,7 +696,7 @@ class AFQ(object):
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
 
-            self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(int),
+            self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(np.float32),
                                                   row['dwi_affine']),
                                   wm_mask_file)
 
