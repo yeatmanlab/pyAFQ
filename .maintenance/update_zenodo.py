@@ -53,8 +53,9 @@ if __name__ == '__main__':
     name_matches = []
     position = 1
     for ele in data:
-        match = process.extractOne(ele, zen_names, scorer=fuzz.token_sort_ratio,
-                                  score_cutoff=80)
+        match = process.extractOne(ele, zen_names,
+                                   scorer=fuzz.token_sort_ratio,
+                                   score_cutoff=80)
 
         if match:
             val = zenodo['creators'][zen_names.index(match[0])]
