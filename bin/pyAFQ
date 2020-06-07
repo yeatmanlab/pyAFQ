@@ -85,6 +85,7 @@ wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 [compute]
 dask_it = false
 force_recompute = false
+virtual_frame_buffer = false
 ```
 """
 
@@ -170,6 +171,7 @@ for k, v in clean_defaults.items():
 compute = config.get("compute", {})
 dask_it = compute.get("dask_it", False)
 force_recompute = compute.get("force_recompute", False)
+virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 
 myafq = api.AFQ(dmriprep_path,
                 sub_prefix=sub_prefix,
@@ -184,6 +186,7 @@ myafq = api.AFQ(dmriprep_path,
                 force_recompute=force_recompute,
                 reg_template=reg_template,
                 wm_labels=wm_labels,
+                virtual_frame_buffer=virtual_frame_buffer,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params,
                 clean_params=clean_params)

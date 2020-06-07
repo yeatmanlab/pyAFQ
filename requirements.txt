@@ -21,3 +21,4 @@ fury==0.4.0
 imageio==2.8.0
 ipython==7.13.0
 templateflow==0.4.2
+xvfbwrapper==0.2.9

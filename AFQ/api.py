@@ -210,6 +210,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
+                 virtual_frame_buffer=False,
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -251,6 +252,10 @@ class AFQ(object):
             Whether to perform pre-alignment before perforiming the
             diffeomorphic mapping in registration. Default: True
 
+        virtual_frame_buffer : bool, optional
+            Whether to use a virtual fram buffer. This is neccessary if
+            generating GIFs in a headless environment. Default: False
+
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
             of the seg.Segmentation object
@@ -271,6 +276,11 @@ class AFQ(object):
         self.use_prealign = use_prealign
 
         self.scalars = scalars
+
+        if virtual_frame_buffer:
+            from xvfbwrapper import Xvfb
+            self.vdisplay = Xvfb(width=1280, height=1280)
+            self.vdisplay.start()
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
