@@ -4,6 +4,7 @@ import os.path as op
 from collections import OrderedDict
 
 import numpy as np
+import matplotlib.pyplot as plt
 import IPython.display as display
 import imageio as io
 from palettable.tableau import Tableau_20
@@ -413,3 +414,67 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
         show_m.start()
 
     return _inline_interact(scene, inline, interact)
+
+
+def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0, max_fa=0.9, 
+                             file_name=None):
+    """
+    Visualize all tract profiles for a scalar in one plot
+
+    Parameters
+    ----------
+    tract_profiles : pandas dataframe
+        Pandas dataframe of tract_profiles. For example,
+        tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])
+
+    scalar : string, optional
+       Scalar to use in plots. Default: "dti_fa".
+
+    min_fa : float, optional
+        Minimum FA used for y-axis bounds. Default: 0.0
+
+    max_fa : float, optional
+        Maximum FA used for y-axis bounds. Default: 0.9
+
+    file_name : string, option
+        File name to save figure to if not None. Default: None
+
+    Returns
+    -------
+        Matplotlib figure and axes.
+    """
+    positions = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
+                             "CST_L": (1, 1), "CST_R": (1, 3),
+                             "CGC_L": (3, 1), "CGC_R": (3, 3),
+                             "HCC_L": (4, 1), "HCC_R": (4, 3),
+                             "FP": (4, 2), "FA": (0, 2),
+                             "IFO_L": (4, 0), "IFO_R": (4, 4),
+                             "ILF_L": (3, 0), "ILF_R": (3, 4),
+                             "SLF_L": (2, 1), "SLF_R": (2, 3),
+                             "ARC_L": (2, 0), "ARC_R": (2, 4),
+                             "UNC_L": (0, 1), "UNC_R": (0, 3)})
+
+    fig, axes = plt.subplots(5, 5)
+    afqb_colors = color_dict.values()
+
+    for ii, bundle in enumerate(positions.keys()):
+        ax = axes[positions[bundle][0], positions[bundle][1]]
+        fa = tract_profiles[
+            (tract_profiles["bundle"] == bundle) &
+            (tract_profiles["scalar"] == scalar)
+        ]['profiles'].values
+        ax.plot(fa, 'o-', color=afqb_colors[ii])
+        ax.set_ylim([min_fa, max_fa])
+        ax.set_yticks([0.2, 0.4, 0.6])
+        ax.set_yticklabels([0.2, 0.4, 0.6])
+        ax.set_xticklabels([])
+
+    fig.set_size_inches((12, 12))
+
+    axes[0, 0].axis("off")
+    axes[0, -1].axis("off")
+    axes[1, 2].axis("off")
+    axes[2, 2].axis("off")
+    axes[3, 2].axis("off")
+
+    return fig, axes
