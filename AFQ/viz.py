@@ -454,16 +454,18 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
                              "ARC_L": (2, 0), "ARC_R": (2, 4),
                              "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
-    fig, axes = plt.subplots(5, 5)
-    afqb_colors = color_dict.values()
+    if (file_name != None):
+        plt.ioff()
 
-    for ii, bundle in enumerate(positions.keys()):
+    fig, axes = plt.subplots(5, 5)
+
+    for bundle in positions.keys():
         ax = axes[positions[bundle][0], positions[bundle][1]]
         fa = tract_profiles[
             (tract_profiles["bundle"] == bundle) &
             (tract_profiles["scalar"] == scalar)
         ]['profiles'].values
-        ax.plot(fa, 'o-', color=afqb_colors[ii])
+        ax.plot(fa, 'o-', color=color_dict[bundle])
         ax.set_ylim([min_fa, max_fa])
         ax.set_yticks([0.2, 0.4, 0.6])
         ax.set_yticklabels([0.2, 0.4, 0.6])
@@ -476,5 +478,9 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     axes[1, 2].axis("off")
     axes[2, 2].axis("off")
     axes[3, 2].axis("off")
+
+    if (file_name != None):
+        fig.savefig(file_name)
+        plt.ion()
 
     return fig, axes
