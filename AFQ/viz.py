@@ -454,7 +454,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
                              "ARC_L": (2, 0), "ARC_R": (2, 4),
                              "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
-    if (file_name != None):
+    if (file_name is not None):
         plt.ioff()
 
     fig, axes = plt.subplots(5, 5)
@@ -479,7 +479,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     axes[2, 2].axis("off")
     axes[3, 2].axis("off")
 
-    if (file_name != None):
+    if (file_name is not None):
         fig.savefig(file_name)
         plt.ion()
 
