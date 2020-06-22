@@ -5,6 +5,7 @@ import nibabel.tmpdirs as nbtmp
 import AFQ.data as afd
 from AFQ import api
 
+
 def test_plot_tract_profiles():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)

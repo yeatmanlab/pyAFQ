@@ -1112,7 +1112,9 @@ class AFQ(object):
                     f'_{scalar}_profile_plots.png'))
             fname = op.join(fname[0], row['results_dir'], fname[1])
 
-            viz.visualize_tract_profiles(tract_profiles, scalar=scalar, file_name=fname)
+            viz.visualize_tract_profiles(tract_profiles,
+                                         scalar=scalar,
+                                         file_name=fname)
 
     def _get_affine(self, fname):
         return nib.load(fname).affine

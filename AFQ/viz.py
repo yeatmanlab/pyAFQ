@@ -416,8 +416,8 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
     return _inline_interact(scene, inline, interact)
 
 
-def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0, max_fa=0.9, 
-                             file_name=None):
+def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
+                             max_fa=0.9, file_name=None):
     """
     Visualize all tract profiles for a scalar in one plot
 
