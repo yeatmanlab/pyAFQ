@@ -1104,12 +1104,11 @@ class AFQ(object):
         directions = self.tracking_params['directions']
         seg_algo = self.segmentation_params['seg_algo']
         for scalar in self.scalars:
-            fname = op.split(
-                self._get_fname(
+            fname = self._get_fname(
                     row,
                     f'_space-RASMM_model-{odf_model}_desc-'
                     f'{directions}-{seg_algo}'
-                    f'_{scalar}_profile_plots.png'))
+                    f'_{scalar}_profile_plots.png')
 
             viz.visualize_tract_profiles(tract_profiles,
                                          scalar=scalar,
