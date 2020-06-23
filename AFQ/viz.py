@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use("Agg")
+
 import tempfile
 import os
 import os.path as op
