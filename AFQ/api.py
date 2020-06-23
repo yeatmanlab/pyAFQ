@@ -1040,12 +1040,11 @@ class AFQ(object):
                                       interact=False,
                                       scene=scene)
 
-        fname = op.split(
-            self._get_fname(
+        fname = self._get_fname(
                 row,
                 f'_viz.gif',
                 include_track=True,
-                include_seg=True))
+                include_seg=True)
 
         scene = viz.scene_rotate_forward(scene)
         viz.create_gif(scene, fname)
