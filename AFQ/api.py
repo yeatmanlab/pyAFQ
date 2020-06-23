@@ -1046,7 +1046,6 @@ class AFQ(object):
                 f'_viz.gif',
                 include_track=True,
                 include_seg=True))
-        fname = op.join(fname[0], row['results_dir'], fname[1])
 
         scene = viz.scene_rotate_forward(scene)
         viz.create_gif(scene, fname)
