@@ -1110,7 +1110,6 @@ class AFQ(object):
                     f'_space-RASMM_model-{odf_model}_desc-'
                     f'{directions}-{seg_algo}'
                     f'_{scalar}_profile_plots.png'))
-            fname = op.join(fname[0], row['results_dir'], fname[1])
 
             viz.visualize_tract_profiles(tract_profiles,
                                          scalar=scalar,
