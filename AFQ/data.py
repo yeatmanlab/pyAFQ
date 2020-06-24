@@ -350,9 +350,13 @@ def fetch_hcp(subjects,
     bucket = s3.Bucket(hcp_bucket)
 
     if path is None:
-        path = afq_home
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        my_path = afq_home
+    else:
+        my_path = path
 
-    base_dir = op.join(path, 'HCP', 'derivatives', 'dmriprep')
+    base_dir = op.join(my_path, 'HCP', 'derivatives', 'dmriprep')
 
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
