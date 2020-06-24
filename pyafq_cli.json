@@ -27,7 +27,7 @@
         "name": "Tracking Group",
         "description": "Parameters related to streamline tracking.",
         "members": ["directions", "max_angle", "sphere", "seed_mask", "n_seeds",
-                    "random_seeds", "random_seed", "stop_mask", "stop_threshold", "step_size",
+                    "random_seeds", "rng_seed", "stop_mask", "stop_threshold", "step_size",
                     "min_length", "max_length", "odf_model", "wm_labels"]
     },
     {
@@ -166,10 +166,10 @@
         "optional": true
     },
     {
-        "id": "random_seed",
+        "id": "rng_seed",
         "name": "random seed",
         "type": "Number",
-        "value-key": "[RANDOM_SEED]",
+        "value-key": "[RNG_SEED]",
         "default-value": "None",
         "optional": true
     },
@@ -477,7 +477,7 @@
             "seed_mask = [SEED_MASK]",
             "n_seeds = [N_SEEDS]",
             "random_seeds = [RANDOM_SEEDS]",
-            "random_seed = [RANDOM_SEED]",
+            "rng_seed = [RNG_SEED]",
             "stop_mask = [STOP_MASK]",
             "stop_threshold = [STOP_THRESHOLD]",
             "step_size = [STEP_SIZE]",
