@@ -1,6 +1,3 @@
-import matplotlib
-matplotlib.use("Agg")
-
 import tempfile
 import os
 import os.path as op
@@ -19,6 +16,8 @@ from fury.colormap import line_colors
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
+import matplotlib
+matplotlib.use("Agg")
 
 tableau_20_rgb = np.array(Tableau_20.colors) / 255
 
