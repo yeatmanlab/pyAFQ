@@ -1102,8 +1102,7 @@ class AFQ(object):
 
     def _get_fname(self, row, suffix, include_track=False, include_seg=False):
         split_fdwi = op.split(row['dwi_file'])
-        fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
-                        + suffix)
+        fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0])
 
         if include_track:
             odf_model = self.tracking_params['odf_model']
@@ -1115,7 +1114,8 @@ class AFQ(object):
         if include_seg:
             seg_algo = self.segmentation_params['seg_algo']
             fname = fname + f'-{seg_algo}'
-        return fname
+
+        return fname + suffix
 
     def set_gtab(self, b0_threshold):
         self.data_frame['gtab'] = self.data_frame.apply(
