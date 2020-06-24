@@ -120,11 +120,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     return _local_tracking(seeds, dg, threshold_classifier, params_img,
                            step_size=step_size, min_length=min_length,
-                           max_length=max_length)
+                           max_length=max_length, random_seed=random_seed)
 
 
 def _local_tracking(seeds, dg, threshold_classifier, params_img,
-                    step_size=0.5, min_length=10, max_length=1000):
+                    step_size=0.5, min_length=10, max_length=1000,
+                    random_seed=None):
     """
     Helper function
     """
@@ -136,6 +137,7 @@ def _local_tracking(seeds, dg, threshold_classifier, params_img,
                                    params_img.affine,
                                    step_size=step_size,
                                    min_length=min_length,
-                                   max_length=max_length)
+                                   max_length=max_length,
+                                   random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)
