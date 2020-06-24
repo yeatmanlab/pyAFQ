@@ -1041,10 +1041,10 @@ class AFQ(object):
                                       scene=scene)
 
         fname = self._get_fname(
-                row,
-                f'_viz.gif',
-                include_track=True,
-                include_seg=True)
+            row,
+            f'_viz.gif',
+            include_track=True,
+            include_seg=True)
 
         scene = viz.scene_rotate_forward(scene)
         viz.create_gif(scene, fname)
@@ -1105,9 +1105,6 @@ class AFQ(object):
         fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
                         + suffix)
 
-        subject = row['subject']
-        sess = row['sess']
-        fname = fname + f'_sub-{subject}_sess-{sess}'
         if include_track:
             odf_model = self.tracking_params['odf_model']
             directions = self.tracking_params['directions']
