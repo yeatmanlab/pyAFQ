@@ -1100,15 +1100,12 @@ class AFQ(object):
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
 
-        odf_model = self.tracking_params['odf_model']
-        directions = self.tracking_params['directions']
-        seg_algo = self.segmentation_params['seg_algo']
         for scalar in self.scalars:
             fname = self._get_fname(
                     row,
-                    f'_space-RASMM_model-{odf_model}_desc-'
-                    f'{directions}-{seg_algo}'
-                    f'_{scalar}_profile_plots.png')
+                    f'_{scalar}_profile_plots.png',
+                    include_track=True,
+                    include_seg=True)
 
             viz.visualize_tract_profiles(tract_profiles,
                                          scalar=scalar,
