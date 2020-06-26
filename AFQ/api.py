@@ -889,34 +889,36 @@ class AFQ(object):
             reverse_dict = dict(zip(keys, vals))
 
             bundle_names = []
-            profiles = []
             node_numbers = []
-            scalar_names = []
+            profiles = np.empty((len(self.scalars), 0)).tolist()
+            this_profile = np.zeros((len(self.scalars), 100))
 
             trk = nib.streamlines.load(bundles_file)
-            for scalar in self.scalars:
-                scalar_file = self._scalar_dict[scalar](self, row)
-                scalar_data = nib.load(scalar_file).get_fdata()
-                for b in np.unique(
-                        trk.tractogram.data_per_streamline['bundle']):
-                    idx = np.where(
-                        trk.tractogram.data_per_streamline['bundle'] == b)[0]
-                    this_sl = trk.streamlines[idx]
-                    bundle_name = reverse_dict[b]
-                    this_profile = afq_profile(
+            for b in np.unique(
+                    trk.tractogram.data_per_streamline['bundle']):
+                idx = np.where(
+                    trk.tractogram.data_per_streamline['bundle'] == b)[0]
+                this_sl = trk.streamlines[idx]
+                bundle_name = reverse_dict[b]
+                for ii, scalar in enumerate(self.scalars):
+                    scalar_file = self._scalar_dict[scalar](self, row)
+                    scalar_data = nib.load(scalar_file).get_fdata()
+                    this_profile[ii] = afq_profile(
                         scalar_data,
                         this_sl,
                         row["dwi_affine"])
-                    nodes = list(np.arange(this_profile.shape[0]))
-                    bundle_names.extend([bundle_name] * len(nodes))
-                    node_numbers.extend(nodes)
-                    scalar_names.extend([scalar] * len(nodes))
-                    profiles.extend(list(this_profile))
+                    profiles[ii].extend(list(this_profile[ii]))
+                nodes = list(np.arange(this_profile[0].shape[0]))
+                bundle_names.extend([bundle_name] * len(nodes))
+                node_numbers.extend(nodes)
 
-            profile_dframe = pd.DataFrame(dict(profiles=profiles,
-                                               bundle=bundle_names,
-                                               node=node_numbers,
-                                               scalar=scalar_names))
+            profile_dict = dict()
+            profile_dict['bundle'] = bundle_names
+            profile_dict['node'] = node_numbers
+            for ii, scalar in enumerate(self.scalars):
+                profile_dict[scalar] = profiles[ii]
+
+            profile_dframe = pd.DataFrame(profile_dict)
             profile_dframe.to_csv(profiles_file)
             meta = dict(source=bundles_file,
                         parameters=get_default_args(afq_profile))
