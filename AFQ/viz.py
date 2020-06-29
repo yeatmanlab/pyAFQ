@@ -416,7 +416,7 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
-                             max_fa=0.9, file_name=None):
+                             max_fa=1.0, file_name=None):
     """
     Visualize all tract profiles for a scalar in one plot
 
@@ -433,7 +433,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
         Minimum FA used for y-axis bounds. Default: 0.0
 
     max_fa : float, optional
-        Maximum FA used for y-axis bounds. Default: 0.9
+        Maximum FA used for y-axis bounds. Default: 1.0
 
     file_name : string, option
         File name to save figure to if not None. Default: None
