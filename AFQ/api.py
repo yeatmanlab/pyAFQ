@@ -1099,6 +1099,20 @@ class AFQ(object):
             scene = viz.scene_rotate_forward(scene)
             viz.create_gif(scene, fname)
 
+    def _plot_tract_profiles(self, row):
+        tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
+
+        for scalar in self.scalars:
+            fname = self._get_fname(
+                    row,
+                    f'_{scalar}_profile_plots.png',
+                    include_track=True,
+                    include_seg=True)
+
+            viz.visualize_tract_profiles(tract_profiles,
+                                         scalar=scalar,
+                                         file_name=fname)
+
     def _get_affine(self, fname):
         return nib.load(fname).affine
 
@@ -1366,6 +1380,9 @@ class AFQ(object):
 
     def export_ROI_gifs(self):
         self.data_frame.apply(self._export_ROI_gifs, axis=1)
+
+    def plot_tract_profiles(self):
+        self.data_frame.apply(self._plot_tract_profiles, axis=1)
 
     def export_registered_b0(self):
         self.data_frame.apply(self._export_registered_b0, axis=1)
