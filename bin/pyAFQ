@@ -200,6 +200,7 @@ if segmentation_params["seg_algo"].lower() == "afq":
     myafq.export_rois()
     myafq.export_ROI_gifs()
     myafq.export_bundle_gif()
+    myafq.plot_tract_profiles()
 myafq.export_bundles()
 myafq.combine_profiles()
 
