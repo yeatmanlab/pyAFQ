@@ -18,7 +18,7 @@ import AFQ.registration as reg
 
 tableau_20_rgb = np.array(Tableau_20.colors) / 255
 
-color_dict = OrderedDict({"ATR_L": tableau_20_rgb[0],
+COLOR_DICT = OrderedDict({"ATR_L": tableau_20_rgb[0],
                           "ATR_R": tableau_20_rgb[1],
                           "CST_L": tableau_20_rgb[2],
                           "CST_R": tableau_20_rgb[3],
@@ -38,6 +38,17 @@ color_dict = OrderedDict({"ATR_L": tableau_20_rgb[0],
                           "UNC_R": tableau_20_rgb[17],
                           "ARC_L": tableau_20_rgb[18],
                           "ARC_R": tableau_20_rgb[19]})
+
+POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
+                         "CST_L": (1, 1), "CST_R": (1, 3),
+                         "CGC_L": (3, 1), "CGC_R": (3, 3),
+                         "HCC_L": (4, 1), "HCC_R": (4, 3),
+                         "FP": (4, 2), "FA": (0, 2),
+                         "IFO_L": (4, 0), "IFO_R": (4, 4),
+                         "ILF_L": (3, 0), "ILF_R": (3, 4),
+                         "SLF_L": (2, 1), "SLF_R": (2, 3),
+                         "ARC_L": (2, 0), "ARC_R": (2, 4),
+                         "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
 
 def _inline_interact(scene, inline, interact):
@@ -125,7 +136,7 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     if colors is None:
         # Use the color dict provided
-        colors = color_dict
+        colors = COLOR_DICT
 
     def _color_selector(bundle_dict, colors, b):
         """Helper function """
@@ -416,7 +427,7 @@ def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
-                             max_fa=1.0, file_name=None):
+                             max_fa=1.0, file_name=None, positions=POSITIONS):
     """
     Visualize all tract profiles for a scalar in one plot
 
@@ -435,23 +446,17 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     max_fa : float, optional
         Maximum FA used for y-axis bounds. Default: 1.0
 
-    file_name : string, option
+    file_name : string, optional
         File name to save figure to if not None. Default: None
+
+    positions : dictionary, optional
+        Dictionary that maps bundle names to position in plot.
+        Default: POSITIONS
 
     Returns
     -------
         Matplotlib figure and axes.
     """
-    positions = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
-                             "CST_L": (1, 1), "CST_R": (1, 3),
-                             "CGC_L": (3, 1), "CGC_R": (3, 3),
-                             "HCC_L": (4, 1), "HCC_R": (4, 3),
-                             "FP": (4, 2), "FA": (0, 2),
-                             "IFO_L": (4, 0), "IFO_R": (4, 4),
-                             "ILF_L": (3, 0), "ILF_R": (3, 4),
-                             "SLF_L": (2, 1), "SLF_R": (2, 3),
-                             "ARC_L": (2, 0), "ARC_R": (2, 4),
-                             "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
     if (file_name is not None):
         plt.ioff()
@@ -464,7 +469,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
             (tract_profiles["bundle"] == bundle)
             & (tract_profiles["scalar"] == scalar)
         ]['profiles'].values
-        ax.plot(fa, 'o-', color=color_dict[bundle])
+        ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
         ax.set_ylim([min_fa, max_fa])
         ax.set_yticks([0.2, 0.4, 0.6])
         ax.set_yticklabels([0.2, 0.4, 0.6])
