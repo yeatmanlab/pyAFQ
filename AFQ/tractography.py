@@ -14,9 +14,9 @@ from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, n_seeds=1, random_seeds=False, stop_mask=None,
-          stop_threshold=0, step_size=0.5, min_length=10, max_length=1000,
-          odf_model="DTI"):
+          seed_mask=None, n_seeds=1, random_seeds=False, rng_seed=None,
+          stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10,
+          max_length=1000, odf_model="DTI"):
     """
     Tractography
 
@@ -45,6 +45,9 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     random_seeds : bool
         Whether to generate a total of n_seeds random seeds in the mask.
         Default: XXX.
+    rng_seed : int
+        random seed used to generate random seeds if random_seeds is
+        set to True. Default: None
     stop_mask : array, optional.
         A floating point value that determines a stopping criterion (e.g. FA).
         Default to no stopping (all ones).
@@ -82,7 +85,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
                                                seed_count_per_voxel=False,
-                                               affine=affine)
+                                               affine=affine,
+                                               random_seed=rng_seed)
         else:
             seeds = dtu.seeds_from_mask(seed_mask,
                                         density=n_seeds,
@@ -116,11 +120,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     return _local_tracking(seeds, dg, threshold_classifier, params_img,
                            step_size=step_size, min_length=min_length,
-                           max_length=max_length)
+                           max_length=max_length, random_seed=rng_seed)
 
 
 def _local_tracking(seeds, dg, threshold_classifier, params_img,
-                    step_size=0.5, min_length=10, max_length=1000):
+                    step_size=0.5, min_length=10, max_length=1000,
+                    random_seed=None):
     """
     Helper function
     """
@@ -132,6 +137,7 @@ def _local_tracking(seeds, dg, threshold_classifier, params_img,
                                    params_img.affine,
                                    step_size=step_size,
                                    min_length=min_length,
-                                   max_length=max_length)
+                                   max_length=max_length,
+                                   random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)

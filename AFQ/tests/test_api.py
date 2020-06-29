@@ -192,7 +192,7 @@ def test_AFQ_data_waypoint():
         'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (800, 5)
+    assert tract_profiles.shape == (400, 5)
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -219,7 +219,7 @@ def test_AFQ_data_waypoint():
     from_file = pd.read_csv(op.join(myafq.afq_dir, 'tract_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (800, 7)
+    assert combined_profiles.shape == (400, 7)
     assert_frame_equal(combined_profiles, from_file)
 
     # Make sure the CLI did indeed generate these:

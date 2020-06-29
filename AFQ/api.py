@@ -448,7 +448,7 @@ class AFQ(object):
             dtf = dti_fit(gtab, data, mask=mask)
             self.log_and_save_nii(nib.Nifti1Image(dtf.model_params,
                                                   row['dwi_affine']),
-                     dti_params_file)
+                                  dti_params_file)
             meta_fname = self._get_fname(row, '_model-DTI_diffmodel.json')
             meta = dict(
                 Parameters=dict(
@@ -498,7 +498,7 @@ class AFQ(object):
                            lambda_=lambda_, tau=tau)
             self.log_and_save_nii(nib.Nifti1Image(csdf.shm_coeff,
                                                   row['dwi_affine']),
-                     csd_params_file)
+                                  csd_params_file)
             meta_fname = self._get_fname(row, '_model-CSD_diffmodel.json')
             meta = dict(SphericalHarmonicDegree=sh_order,
                         ResponseFunctionTensor=response,
@@ -515,7 +515,7 @@ class AFQ(object):
             tf = self._dti_fit(row)
             fa = tf.fa
             self.log_and_save_nii(nib.Nifti1Image(fa, row['dwi_affine']),
-                     dti_fa_file)
+                                  dti_fa_file)
             meta_fname = self._get_fname(row, '_model-DTI_FA.json')
             meta = dict()
             afd.write_json(meta_fname, meta)
@@ -527,7 +527,7 @@ class AFQ(object):
             tf = self._dti_fit(row)
             cfa = tf.color_fa
             self.log_and_save_nii(nib.Nifti1Image(cfa, row['dwi_affine']),
-                     dti_cfa_file)
+                                  dti_cfa_file)
             meta_fname = self._get_fname(row, '_model-DTI_desc-DEC_FA.json')
             meta = dict()
             afd.write_json(meta_fname, meta)
@@ -542,7 +542,7 @@ class AFQ(object):
             pdd[..., 0] = pdd[..., 0] * -1
 
             self.log_and_save_nii(nib.Nifti1Image(pdd, row['dwi_affine']),
-                     dti_pdd_file)
+                                  dti_pdd_file)
             meta_fname = self._get_fname(row, '_model-DTI_PDD.json')
             meta = dict()
             afd.write_json(meta_fname, meta)
@@ -554,7 +554,7 @@ class AFQ(object):
             tf = self._dti_fit(row)
             md = tf.md
             self.log_and_save_nii(nib.Nifti1Image(md, row['dwi_affine']),
-                     dti_md_file)
+                                  dti_md_file)
             meta_fname = self._get_fname(row, '_model-DTI_MD.json')
             meta = dict()
             afd.write_json(meta_fname, meta)
@@ -717,12 +717,11 @@ class AFQ(object):
 
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
-        directions = self.tracking_params["directions"]
 
         streamlines_file = self._get_fname(
             row,
-            f'_space-RASMM_model-{odf_model}_desc-{directions}'
-            + '_tractography.trk')
+            '_tractography.trk',
+            include_track=True)
 
         if self.force_recompute or not op.exists(streamlines_file):
             if odf_model == "DTI":
@@ -759,8 +758,8 @@ class AFQ(object):
 
             meta_fname = self._get_fname(
                 row,
-                f'_space-RASMM_model-{odf_model}_desc-'
-                f'{directions}_tractography.json')
+                '_tractography.json',
+                include_track=True)
             afd.write_json(meta_fname, meta)
             self.log_and_save_trk(sft, streamlines_file)
 
@@ -769,13 +768,11 @@ class AFQ(object):
     def _segment(self, row):
         # We pass `clean_params` here, but do not use it, so we have the
         # same signature as `_clean_bundles`.
-        odf_model = self.tracking_params["odf_model"]
-        directions = self.tracking_params["directions"]
-        seg_algo = self.segmentation_params["seg_algo"]
         bundles_file = self._get_fname(
             row,
-            f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-            f'{seg_algo}_tractography.trk')
+            '_tractography.trk',
+            include_track=True,
+            include_seg=True)
 
         if self.force_recompute or not op.exists(bundles_file):
             streamlines_file = self._streamlines(row)
@@ -815,13 +812,11 @@ class AFQ(object):
         return bundles_file
 
     def _clean_bundles(self, row):
-        odf_model = self.tracking_params['odf_model']
-        directions = self.tracking_params['directions']
-        seg_algo = self.segmentation_params['seg_algo']
         clean_bundles_file = self._get_fname(
             row,
-            f'_space-RASMM_model-{odf_model}_desc-{directions}-'
-            f'{seg_algo}-clean_tractography.trk')
+            '-clean_tractography.trk',
+            include_track=True,
+            include_seg=True)
 
         if self.force_recompute or not op.exists(clean_bundles_file):
             bundles_file = self._segment(row)
@@ -894,34 +889,36 @@ class AFQ(object):
             reverse_dict = dict(zip(keys, vals))
 
             bundle_names = []
-            profiles = []
             node_numbers = []
-            scalar_names = []
+            profiles = np.empty((len(self.scalars), 0)).tolist()
+            this_profile = np.zeros((len(self.scalars), 100))
 
             trk = nib.streamlines.load(bundles_file)
-            for scalar in self.scalars:
-                scalar_file = self._scalar_dict[scalar](self, row)
-                scalar_data = nib.load(scalar_file).get_fdata()
-                for b in np.unique(
-                        trk.tractogram.data_per_streamline['bundle']):
-                    idx = np.where(
-                        trk.tractogram.data_per_streamline['bundle'] == b)[0]
-                    this_sl = trk.streamlines[idx]
-                    bundle_name = reverse_dict[b]
-                    this_profile = afq_profile(
+            for b in np.unique(
+                    trk.tractogram.data_per_streamline['bundle']):
+                idx = np.where(
+                    trk.tractogram.data_per_streamline['bundle'] == b)[0]
+                this_sl = trk.streamlines[idx]
+                bundle_name = reverse_dict[b]
+                for ii, scalar in enumerate(self.scalars):
+                    scalar_file = self._scalar_dict[scalar](self, row)
+                    scalar_data = nib.load(scalar_file).get_fdata()
+                    this_profile[ii] = afq_profile(
                         scalar_data,
                         this_sl,
                         row["dwi_affine"])
-                    nodes = list(np.arange(this_profile.shape[0]))
-                    bundle_names.extend([bundle_name] * len(nodes))
-                    node_numbers.extend(nodes)
-                    scalar_names.extend([scalar] * len(nodes))
-                    profiles.extend(list(this_profile))
+                    profiles[ii].extend(list(this_profile[ii]))
+                nodes = list(np.arange(this_profile[0].shape[0]))
+                bundle_names.extend([bundle_name] * len(nodes))
+                node_numbers.extend(nodes)
 
-            profile_dframe = pd.DataFrame(dict(profiles=profiles,
-                                               bundle=bundle_names,
-                                               node=node_numbers,
-                                               scalar=scalar_names))
+            profile_dict = dict()
+            profile_dict['bundle'] = bundle_names
+            profile_dict['node'] = node_numbers
+            for ii, scalar in enumerate(self.scalars):
+                profile_dict[scalar] = profiles[ii]
+
+            profile_dframe = pd.DataFrame(profile_dict)
             profile_dframe.to_csv(profiles_file)
             meta = dict(source=bundles_file,
                         parameters=get_default_args(afq_profile))
@@ -942,8 +939,8 @@ class AFQ(object):
             template_xform = mapping.transform_inverse(
                 self.reg_template.get_fdata())
             self.log_and_save_nii(nib.Nifti1Image(template_xform,
-                                     row['dwi_affine']),
-                     template_xform_file)
+                                                  row['dwi_affine']),
+                                  template_xform_file)
 
         return template_xform_file
 
@@ -996,10 +993,6 @@ class AFQ(object):
         return roi_files
 
     def _export_bundles(self, row):
-        odf_model = self.tracking_params['odf_model']
-        directions = self.tracking_params['directions']
-        seg_algo = self.segmentation_params['seg_algo']
-
         for func, folder in zip([self._clean_bundles, self._segment],
                                 ['clean_bundles', 'bundles']):
             bundles_file = func(row)
@@ -1023,9 +1016,10 @@ class AFQ(object):
                     fname = op.split(
                         self._get_fname(
                             row,
-                            f'_space-RASMM_model-{odf_model}_desc-'
-                            f'{directions}-{seg_algo}-{bundle}'
-                            f'_tractography.trk'))
+                            f'-{bundle}'
+                            f'_tractography.trk',
+                            include_track=True,
+                            include_seg=True))
                     fname = op.join(fname[0], bundles_dir, fname[1])
                     self.log_and_save_trk(this_tgm, fname)
                     meta = dict(source=bundles_file)
@@ -1048,16 +1042,11 @@ class AFQ(object):
                                       interact=False,
                                       scene=scene)
 
-        odf_model = self.tracking_params['odf_model']
-        directions = self.tracking_params['directions']
-        seg_algo = self.segmentation_params['seg_algo']
-        fname = op.split(
-            self._get_fname(
-                row,
-                f'_space-RASMM_model-{odf_model}_desc-'
-                f'{directions}-{seg_algo}'
-                f'_viz.gif'))
-        fname = op.join(fname[0], row['results_dir'], fname[1])
+        fname = self._get_fname(
+            row,
+            f'_viz.gif',
+            include_track=True,
+            include_seg=True)
 
         scene = viz.scene_rotate_forward(scene)
         viz.create_gif(scene, fname)
@@ -1069,10 +1058,6 @@ class AFQ(object):
         seg_img = nib.load(self._wm_mask(row))
         dwi_img = nib.load(row['dwi_file'])
         dwi_data = dwi_img.get_fdata()
-
-        odf_model = self.tracking_params['odf_model']
-        directions = self.tracking_params['directions']
-        seg_algo = self.segmentation_params['seg_algo']
 
         for bundle_name in self.bundle_dict.keys():
             uid = self.bundle_dict[bundle_name]['uid']
@@ -1103,9 +1088,10 @@ class AFQ(object):
             fname = op.split(
                 self._get_fname(
                     row,
-                    f'_space-RASMM_model-{odf_model}_desc-'
-                    f'{directions}-{seg_algo}_{bundle_name}'
-                    f'_viz.gif'))
+                    f'_{bundle_name}'
+                    f'_viz.gif',
+                    include_track=True,
+                    include_seg=True))
             roi_dir = op.join(row['results_dir'], 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.join(fname[0], roi_dir, fname[1])
@@ -1113,14 +1099,39 @@ class AFQ(object):
             scene = viz.scene_rotate_forward(scene)
             viz.create_gif(scene, fname)
 
+    def _plot_tract_profiles(self, row):
+        tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
+
+        for scalar in self.scalars:
+            fname = self._get_fname(
+                    row,
+                    f'_{scalar}_profile_plots.png',
+                    include_track=True,
+                    include_seg=True)
+
+            viz.visualize_tract_profiles(tract_profiles,
+                                         scalar=scalar,
+                                         file_name=fname)
+
     def _get_affine(self, fname):
         return nib.load(fname).affine
 
-    def _get_fname(self, row, suffix):
+    def _get_fname(self, row, suffix, include_track=False, include_seg=False):
         split_fdwi = op.split(row['dwi_file'])
-        fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0]
-                        + suffix)
-        return fname
+        fname = op.join(row['results_dir'], split_fdwi[1].split('.')[0])
+
+        if include_track:
+            odf_model = self.tracking_params['odf_model']
+            directions = self.tracking_params['directions']
+            fname = fname + (
+                f'_space-RASMM_model-{odf_model}'
+                f'_desc-{directions}'
+            )
+        if include_seg:
+            seg_algo = self.segmentation_params['seg_algo']
+            fname = fname + f'-{seg_algo}'
+
+        return fname + suffix
 
     def set_gtab(self, b0_threshold):
         self.data_frame['gtab'] = self.data_frame.apply(
@@ -1369,6 +1380,9 @@ class AFQ(object):
 
     def export_ROI_gifs(self):
         self.data_frame.apply(self._export_ROI_gifs, axis=1)
+
+    def plot_tract_profiles(self):
+        self.data_frame.apply(self._plot_tract_profiles, axis=1)
 
     def export_registered_b0(self):
         self.data_frame.apply(self._export_registered_b0, axis=1)
