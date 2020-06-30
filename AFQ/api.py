@@ -145,6 +145,8 @@ class AFQ(object):
                  segmentation='dmriprep',
                  seg_suffix='seg',
                  b0_threshold=0,
+                 moving="b0",
+                 static="mni",
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
@@ -190,6 +192,12 @@ class AFQ(object):
             How to select directions for tracking (deterministic or
             probablistic) {"det", "prob"}. Default: "det".
 
+        moving : str or Nifti1Image, optional
+
+        static : str or Nifti1Image, optional
+
+        static_affine : array, shape (4,4)
+
         dask_it : bool, optional
             Whether to use a dask DataFrame object
 
@@ -234,6 +242,8 @@ class AFQ(object):
         self.force_recompute = force_recompute
 
         self.wm_criterion = wm_criterion
+        self.moving = moving
+        self.static = static
         self.use_prealign = use_prealign
 
         self.scalars = scalars
@@ -589,16 +599,28 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
+    def _reg_img(self, row, img):
+        if isinstance(img, str):
+            img_l = img.lower()
+            if img_l == "mni":
+                img = afd.read_mni_template()
+            elif img_l == "b0":
+                img = nib.load(self._b0(row))
+            elif img_l == "dti_fa_subject":
+                img = nib.load(self._dti_fa(row))
+            elif img_l == "dti_fa_template":
+                img = afd.read_fa_template()
+            else:
+                img = nib.load(img)
+
+        return img.get_fdata(), img.affine
+
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            moving = nib.load(self._b0(row))
-            static = afd.read_mni_template()
-            moving_data = moving.get_fdata()
-            moving_affine = moving.affine
-            static_data = static.get_fdata()
-            static_affine = static.affine
+            moving_data, moving_affine = self._reg_img(row, self.moving)
+            static_data, static_affine = self._reg_img(row, self.static)
             _, aff = reg.affine_registration(moving_data,
                                              static_data,
                                              moving_affine,
