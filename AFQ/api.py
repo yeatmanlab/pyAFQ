@@ -193,10 +193,16 @@ class AFQ(object):
             probablistic) {"det", "prob"}. Default: "det".
 
         moving : str or Nifti1Image, optional
+            The source image data to be registered. 
+            Can either be a Nifti1Image, a path to a Nifti1Image, or
+            If "mni", "b0", "dti_fa_subject", or "dti_fa_template",
+            image data will be loaded automatically.
 
         static : str or Nifti1Image, optional
-
-        static_affine : array, shape (4,4)
+            The target image data for registration.
+            Can either be a Nifti1Image, a path to a Nifti1Image, or
+            If "mni", "b0", "dti_fa_subject", or "dti_fa_template",
+            image data will be loaded automatically.
 
         dask_it : bool, optional
             Whether to use a dask DataFrame object
@@ -678,9 +684,13 @@ class AFQ(object):
             else:
                 reg_prealign = None
 
-            warped_b0, mapping = reg.syn_register_dwi(
-                row['dwi_file'], gtab,
-                template=self.reg_template,
+            static_data, static_affine = self._reg_img(row, self.static)
+            moving_data, moving_affine = self._reg_img(row, self.moving)
+
+            warped_b0, mapping = reg.syn_registration(
+                moving_data, static_data,
+                moving_affine=moving_affine,
+                static_affine=static_affine,
                 prealign=reg_prealign)
 
             if self.use_prealign:
