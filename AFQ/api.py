@@ -298,9 +298,6 @@ class AFQ(object):
 
         self.segmentation_params = default_seg_params
         self.seg_algo = self.segmentation_params["seg_algo"].lower()
-        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
-                                            seg_algo=self.seg_algo,
-                                            resample_to=reg_template)
 
         default_clean_params = get_default_args(seg.clean_bundle)
         if clean_params is not None:
@@ -315,6 +312,11 @@ class AFQ(object):
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
             self.reg_template = reg_template
+
+        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
+                                            seg_algo=self.seg_algo,
+                                            resample_to=reg_template)
+
         # This is the place in which each subject's full data lives
         self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
                                                f"{sub_prefix}*"))
