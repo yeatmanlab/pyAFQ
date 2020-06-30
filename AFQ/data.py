@@ -520,6 +520,17 @@ def organize_stanford_data(path=None):
     with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
 
+    pipeline_description = {
+        "Name": "Example dataset",
+        "BIDSVersion": "1.0.2",
+        "PipelineDescription": {"Name": "Example pipeline"}}
+
+    desc_file = op.join(my_path, 'stanford_hardi', 'derivatives', 'dmriprep',
+                        'pipeline_description.json')
+
+    with open(desc_file, 'w') as outfile:
+        json.dump(pipeline_description, outfile)
+
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(
     "fetch_hcp_atlas_16_bundles",
