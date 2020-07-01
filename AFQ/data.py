@@ -963,6 +963,7 @@ def read_mni_template(resolution=1, mask=True):
         out_data = template_data * mask_data
         return nib.Nifti1Image(out_data, template_img.affine)
 
+
 def read_fa_template():
     """
 
