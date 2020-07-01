@@ -467,8 +467,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
         ax = axes[positions[bundle][0], positions[bundle][1]]
         fa = tract_profiles[
             (tract_profiles["bundle"] == bundle)
-            & (tract_profiles["scalar"] == scalar)
-        ]['profiles'].values
+        ][scalar].values
         ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
         ax.set_ylim([min_fa, max_fa])
         ax.set_yticks([0.2, 0.4, 0.6])
