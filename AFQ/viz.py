@@ -1,22 +1,24 @@
 import tempfile
 import os
 import os.path as op
+import enum
 from collections import OrderedDict
 
 import numpy as np
 import matplotlib.pyplot as plt
 import IPython.display as display
+import plotly
+import plotly.graph_objs as go
 import imageio as io
 from palettable.tableau import Tableau_20
 
 import nibabel as nib
-from dipy.viz import window, actor, ui
-from fury.colormap import line_colors
+import dipy.tracking.streamlinespeed as dps
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
-tableau_20_rgb = np.array(Tableau_20.colors) / 255
+tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
 
 COLOR_DICT = OrderedDict({"ATR_L": tableau_20_rgb[0],
                           "ATR_R": tableau_20_rgb[1],
@@ -51,25 +53,56 @@ POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
                          "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
 
-def _inline_interact(scene, inline, interact):
+def _inline_interact(figure, show, show_inline):
     """
     Helper function to reuse across viz functions
     """
-    if interact:
-        window.show(scene)
+    if show:
+        plotly.offline.plot(figure)
 
-    if inline:
-        tdir = tempfile.gettempdir()
-        fname = op.join(tdir, "fig.png")
-        window.snapshot(scene, fname=fname, size=(1200, 1200))
-        display.display_png(display.Image(fname))
+    if show_inline:
+        plotly.offline.iplot(figure)
 
-    return scene
+    return figure
 
+def _color_arr2str(color_arr, opacity=1.0):
+    return f"rgba({color_arr[0]}, {color_arr[1]}, {color_arr[2]}, {opacity})"
+
+def _draw_streamlines(figure, sls, color, name, n_points=100):
+    x_pts = []
+    y_pts = []
+    z_pts = []
+    
+    for sl in sls:
+        # resample streamline to n_points
+        if sl.shape[0] > n_points:
+            sl = dps.set_number_of_points(sl, n_points)
+
+        # add sl to lines
+        x_pts.extend(sl[:, 0])
+        x_pts.append(None) # don't draw between streamlines
+        y_pts.extend(sl[:, 1])
+        y_pts.append(None)
+        z_pts.extend(sl[:, 2])
+        z_pts.append(None)
+
+    figure.add_trace(
+        go.Scatter3d(
+            x=x_pts,
+            y=y_pts,
+            z=z_pts,
+            mode='lines',
+            name=name,
+            line=dict(
+                width=1,
+                color=_color_arr2str(color),
+            )
+        )
+    )
 
 def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
-                      colors=None, scene=None, background=(1, 1, 1),
-                      interact=False, inline=False):
+                      colors=None, figure=None, background=(1, 1, 1),
+                      resample=100, show=False, show_inline=False):
     """
     Visualize bundles in 3D using VTK
 
@@ -105,11 +138,11 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
         If provided, the visualization will be added to this Scene. Default:
         Initialize a new Scene.
 
-    interact : bool
-        Whether to provide an interactive VTK window for interaction.
+    show : bool
+        Whether to provide an interactive html file.
         Default: False
 
-    inline : bool
+    show_inline : bool
         Whether to embed the visualization inline in a notebook. Only works
         in the notebook context. Default: False.
 
@@ -129,17 +162,18 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     streamlines = tg.streamlines
 
-    if scene is None:
-        scene = window.Scene()
+    if figure is None:
+        figure = go.Figure()
 
-    scene.SetBackground(background[0], background[1], background[2])
-
+    figure.update_layout(plot_bgcolor=_color_arr2str(background))
+        
     if colors is None:
         # Use the color dict provided
         colors = COLOR_DICT
 
-    def _color_selector(bundle_dict, colors, b):
+    def _bundle_selector(bundle_dict, colors, b):
         """Helper function """
+        b_name = str(b)
         if bundle_dict is None:
             # We'll choose a color from a rotating list:
             if isinstance(colors, list):
@@ -154,29 +188,25 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
                     b_name = b_name_iter
                     break
             color = colors[b_name]
-        return color
+        return color, b_name
 
     if list(tg.data_per_streamline.keys()) == []:
         # There are no bundles in here:
         streamlines = list(streamlines)
         # Visualize all the streamlines with directionally assigned RGB:
-        sl_actor = actor.line(streamlines, line_colors(streamlines))
-        scene.add(sl_actor)
-        sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-        sl_actor.GetProperty().SetLineWidth(6)
+        _draw_streamlines(figure, streamlines, [0.5, 0.5, 0.5], "all_bundles", n_points=resample)
+        
 
     else:
         # There are bundles:
         if bundle is None:
             # No selection: visualize all of them:
+            
             for b in np.unique(tg.data_per_streamline['bundle']):
                 idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
-                this_sl = list(streamlines[idx])
-                color = _color_selector(bundle_dict, colors, b)
-                sl_actor = actor.line(this_sl, color)
-                sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-                sl_actor.GetProperty().SetLineWidth(6)
-                scene.add(sl_actor)
+                these_sls = list(streamlines[idx])
+                color, b_name = _bundle_selector(bundle_dict, colors, b)
+                _draw_streamlines(figure, these_sls, color, b_name, n_points=resample)
 
         else:
             # Select just one to visualize:
@@ -188,46 +218,69 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
                 uid = bundle
 
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            this_sl = list(streamlines[idx])
-            color = _color_selector(bundle_dict, colors, uid)
-            sl_actor = actor.line(this_sl, color)
-            sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-            sl_actor.GetProperty().SetLineWidth(6)
-            scene.add(sl_actor)
+            these_sls = list(streamlines[idx])
+            color, b_name = _bundle_selector(bundle_dict, colors, uid)
+            _draw_streamlines(figure, these_sls, color, b_name, n_points=resample)
 
-    return _inline_interact(scene, inline, interact)
+    return _inline_interact(figure, show, show_inline)
 
 
-def scene_rotate_forward(scene):
-    scene.elevation(90)
-    scene.set_camera(view_up=(0.0, 0.0, 1.0))
-    scene.reset_camera()
-    return scene
+def stop_orca():
+    plotly.io.orca.shutdown_server()
 
-
-def create_gif(scene, file_name, n_frames=60, size=(600, 600)):
+def create_gif(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, auto_stop_orca=True):
     tdir = tempfile.gettempdir()
-    window.record(scene, az_ang=360.0 / n_frames, n_frames=n_frames,
-                  path_numbering=True, out_path=tdir + '/tgif',
-                  size=size)
+    
+    for i in range(n_frames):
+        theta = (i*6.28)/n_frames
+        camera = dict(
+            eye=dict(x = np.cos(theta)*zoom, y = np.sin(theta)*zoom, z = z_offset)
+        )
+        figure.update_layout(scene_camera=camera)
+        figure.write_image(tdir + f"/tgif{i}.png")
 
+    if auto_stop_orca:
+        stop_orca()
+    
     angles = []
     for i in range(n_frames):
         if i < 10:
-            angle_fname = f"tgif00000{i}.png"
+            angle_fname = f"tgif{i}.png"
         elif i < 100:
-            angle_fname = f"tgif0000{i}.png"
+            angle_fname = f"tgif{i}.png"
         else:
-            angle_fname = f"tgif000{i}.png"
+            angle_fname = f"tgif{i}.png"
         angles.append(io.imread(os.path.join(tdir, angle_fname)))
 
     io.mimsave(file_name, angles)
 
+def visualize_gif_inline(fname, use_s3fs=False):
+    if use_s3fs:
+        import s3fs
+        fs = s3fs.S3FileSystem()
+        tdir = tempfile.gettempdir()
+        fname_remote = fname
+        fname = op.join(tdir, "fig.gif")
+        fs.get(fname_remote, fname)
+    
+    display.display(display.Image(fname))
+
+def _draw_roi(figure, roi, color, opacity):
+    roi = np.where(roi==1)
+    figure.add_trace(
+        go.Scatter3d(
+            x=roi[0],
+            y=roi[1],
+            z=roi[2],
+            marker=dict(color=_color_arr2str(color, opacity=opacity)),
+            line=dict(color=f"rgba(0,0,0,0)")
+        )
+    )
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  scene=None, color=np.array([1, 0, 0]), opacity=1.0,
-                  inline=False, interact=False):
+                  figure=None, color=np.array([0.9999, 0, 0]), opacity=1.0,
+                  show=False, show_inline=False):
     """
     Render a region of interest into a VTK viz as a volume
     """
@@ -264,166 +317,115 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                                    roi,
                                    interpolation='nearest')).astype(bool)
 
-    if scene is None:
-        scene = window.Scene()
+    if figure is None:
+        figure = go.Figure()
 
-    roi_actor = actor.contour_from_roi(roi, color=color, opacity=opacity)
-    scene.add(roi_actor)
+    figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
 
-    if inline:
-        tdir = tempfile.gettempdir()
-        fname = op.join(tdir, "fig.png")
-        window.snapshot(scene, fname=fname)
-        display.display_png(display.Image(fname))
+    _draw_roi(figure, roi, color, opacity)
+    
+    return _inline_interact(figure, show, show_inline)
 
-    return _inline_interact(scene, inline, interact)
+class Axes(enum.IntEnum):
+    X = 0
+    Y = 1
+    Z = 2
 
+def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
+    if step is None:
+        height = volume.shape[axis]//2
+        visible = True
+    else:
+        height = (volume.shape[axis]*step)//n_steps
+        visible = False
 
-def visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True,
-                     interact=False):
+    if axis == Axes.X:
+        X, Y, Z = np.mgrid[height:height+1, :volume.shape[1], :volume.shape[2]]
+        values = 1-volume[height, :, :].flatten()
+    elif axis == Axes.Y:
+        X, Y, Z = np.mgrid[:volume.shape[0], height:height+1, :volume.shape[2]]
+        values = 1-volume[:, height, :].flatten()
+    elif axis == Axes.Z:
+        X, Y, Z = np.mgrid[:volume.shape[0], :volume.shape[1], height:height+1]
+        values = 1-volume[:, :, height].flatten()
+
+    figure.add_trace(
+        go.Isosurface(
+            x=X.flatten(),
+            y=Y.flatten(),
+            z=Z.flatten(),
+            value=values,
+            colorscale='greys',
+            surface_count=1,
+            showscale=False,
+            opacity=opacity,
+            visible=visible
+        )
+    )
+    
+def _name_from_enum(axis):
+    if axis == Axes.X:
+        return "Coronal"
+    elif axis == Axes.Y:
+        return "Sagittal"
+    elif axis == Axes.Z:
+        return "Axial"
+
+def _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0):
+    if n_steps == 0:
+        _draw_slice(figure, axis, volume, opacity=opacity)
+    else:
+        active = n_steps//2
+        name = _name_from_enum(axis) + " Plane"
+        steps = []
+        for step in range(n_steps):
+            _draw_slice(figure, axis, volume, opacity=opacity, step=step, n_steps=n_steps)
+            
+            step_dict = dict(
+                method="update",
+                args=[{"visible": [False] * n_steps}],
+                label=""
+            )
+
+            step_dict["args"][0]["visible"][step] = True
+            steps.append(step_dict)
+
+        figure.data[-active].visible = True
+        sliders.append(dict(
+            active=active,
+            currentvalue=dict(visible=True, prefix=name, xanchor='center'),
+            pad=dict(t=50),
+            steps=steps,
+            y=y_loc,
+            x=0.2,
+            lenmode='fraction',
+            len=0.6
+        )) # TODO: these sliders won't become independent!
+
+def visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True,
+                     show=False, opacity=0.3, show_inline=False, slider_definition=0):
     """
     Visualize a volume
     """
-    if scene is None:
-        scene = window.Scene()
+    if isinstance(volume, str):
+        volume = nib.load(volume).get_fdata()
+    
+    if figure is None:
+        figure = go.Figure()
 
-    shape = volume.shape
-    image_actor_z = actor.slicer(volume)
-    slicer_opacity = 0.6
-    image_actor_z.opacity(slicer_opacity)
+    figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
+    sliders = []
 
-    image_actor_x = image_actor_z.copy()
-    x_midpoint = int(np.round(shape[0] / 2))
-    image_actor_x.display_extent(x_midpoint,
-                                 x_midpoint, 0,
-                                 shape[1] - 1,
-                                 0,
-                                 shape[2] - 1)
+    if show_x:
+        _draw_slices(figure, Axes.X, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=0)
+    if show_y:
+        _draw_slices(figure, Axes.Y, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=-0.3)
+    if show_z:
+        _draw_slices(figure, Axes.Z, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=-0.6)
 
-    image_actor_y = image_actor_z.copy()
-    y_midpoint = int(np.round(shape[1] / 2))
-    image_actor_y.display_extent(0,
-                                 shape[0] - 1,
-                                 y_midpoint,
-                                 y_midpoint,
-                                 0,
-                                 shape[2] - 1)
-
-    scene.add(image_actor_z)
-    scene.add(image_actor_x)
-    scene.add(image_actor_y)
-
-    show_m = window.ShowManager(scene, size=(1200, 900))
-    show_m.initialize()
-
-    if interact:
-        line_slider_z = ui.LineSlider2D(min_value=0,
-                                        max_value=shape[2] - 1,
-                                        initial_value=shape[2] / 2,
-                                        text_template="{value:.0f}",
-                                        length=140)
-
-        line_slider_x = ui.LineSlider2D(min_value=0,
-                                        max_value=shape[0] - 1,
-                                        initial_value=shape[0] / 2,
-                                        text_template="{value:.0f}",
-                                        length=140)
-
-        line_slider_y = ui.LineSlider2D(min_value=0,
-                                        max_value=shape[1] - 1,
-                                        initial_value=shape[1] / 2,
-                                        text_template="{value:.0f}",
-                                        length=140)
-
-        opacity_slider = ui.LineSlider2D(min_value=0.0,
-                                         max_value=1.0,
-                                         initial_value=slicer_opacity,
-                                         length=140)
-
-        def change_slice_z(slider):
-            z = int(np.round(slider.value))
-            image_actor_z.display_extent(
-                0, shape[0] - 1, 0, shape[1] - 1, z, z)
-
-        def change_slice_x(slider):
-            x = int(np.round(slider.value))
-            image_actor_x.display_extent(
-                x, x, 0, shape[1] - 1, 0, shape[2] - 1)
-
-        def change_slice_y(slider):
-            y = int(np.round(slider.value))
-            image_actor_y.display_extent(
-                0, shape[0] - 1, y, y, 0, shape[2] - 1)
-
-        def change_opacity(slider):
-            slicer_opacity = slider.value
-            image_actor_z.opacity(slicer_opacity)
-            image_actor_x.opacity(slicer_opacity)
-            image_actor_y.opacity(slicer_opacity)
-
-        line_slider_z.on_change = change_slice_z
-        line_slider_x.on_change = change_slice_x
-        line_slider_y.on_change = change_slice_y
-        opacity_slider.on_change = change_opacity
-
-        def build_label(text):
-            label = ui.TextBlock2D()
-            label.message = text
-            label.font_size = 18
-            label.font_family = 'Arial'
-            label.justification = 'left'
-            label.bold = False
-            label.italic = False
-            label.shadow = False
-            label.background = (0, 0, 0)
-            label.color = (1, 1, 1)
-
-            return label
-
-        line_slider_label_z = build_label(text="Z Slice")
-        line_slider_label_x = build_label(text="X Slice")
-        line_slider_label_y = build_label(text="Y Slice")
-        opacity_slider_label = build_label(text="Opacity")
-
-        panel = ui.Panel2D(size=(300, 200),
-                           color=(1, 1, 1),
-                           opacity=0.1,
-                           align="right")
-        panel.center = (1030, 120)
-
-        panel.add_element(line_slider_label_x, (0.1, 0.75))
-        panel.add_element(line_slider_x, (0.38, 0.75))
-        panel.add_element(line_slider_label_y, (0.1, 0.55))
-        panel.add_element(line_slider_y, (0.38, 0.55))
-        panel.add_element(line_slider_label_z, (0.1, 0.35))
-        panel.add_element(line_slider_z, (0.38, 0.35))
-        panel.add_element(opacity_slider_label, (0.1, 0.15))
-        panel.add_element(opacity_slider, (0.38, 0.15))
-
-        show_m.scene.add(panel)
-
-        global size
-        size = scene.GetSize()
-
-        def win_callback(obj, event):
-            global size
-            if size != obj.GetSize():
-                size_old = size
-                size = obj.GetSize()
-                size_change = [size[0] - size_old[0], 0]
-                panel.re_align(size_change)
-
-    show_m.initialize()
-
-    scene.zoom(1.5)
-    scene.reset_clipping_range()
-
-    if interact:
-        show_m.add_window_callback(win_callback)
-        show_m.render()
-        show_m.start()
-
-    return _inline_interact(scene, inline, interact)
+    figure.update_layout(sliders=tuple(sliders))
+    
+    return _inline_interact(figure, show, show_inline)
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,

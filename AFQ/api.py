@@ -1025,14 +1025,14 @@ class AFQ(object):
         fa_img = nib.load(fa_file).get_fdata()
 
         scene = viz.visualize_volume(fa_img,
-                                     inline=False,
-                                     interact=False)
+                                     show=False,
+                                     show_inline=False)
 
         scene = viz.visualize_bundles(bundles_file,
                                       affine=row['dwi_affine'],
                                       bundle_dict=self.bundle_dict,
-                                      inline=False,
-                                      interact=False,
+                                      show=False,
+                                      show_inline=False,
                                       scene=scene)
 
         fname = self._get_fname(
@@ -1055,16 +1055,16 @@ class AFQ(object):
         for bundle_name in self.bundle_dict.keys():
             uid = self.bundle_dict[bundle_name]['uid']
             scene = viz.visualize_volume(fa_img,
-                                         inline=False,
-                                         interact=False)
+                                         show=False,
+                                         show_inline=False)
             try:
                 scene = viz.visualize_bundles(
                     bundles_file,
                     affine=row['dwi_affine'],
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
-                    inline=False,
-                    interact=False,
+                    show=False,
+                    show_inline=False,
                     scene=scene)
             except ValueError:
                 self.logger.info("No streamlines found to visualize for "
@@ -1074,8 +1074,8 @@ class AFQ(object):
             for roi in roi_files[bundle_name]:
                 scene = viz.visualize_roi(
                     roi,
-                    inline=False,
-                    interact=False,
+                    show=False,
+                    show_inline=False,
                     scene=scene)
 
             fname = op.split(
