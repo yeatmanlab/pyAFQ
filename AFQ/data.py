@@ -493,18 +493,20 @@ def organize_stanford_data(path=None):
         my_path = path
 
     base_folder = op.join(my_path, 'stanford_hardi',
-                          'derivatives', 'dmriprep')
+                          'derivatives')
+    dmriprep_folder = op.join(base_folder, 'dmriprep')
+    freesurfer_folder = op.join(base_folder, 'freesurfer')
 
     if not op.exists(base_folder):
-        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+        anat_folder = op.join(freesurfer_folder, 'sub-01', 'sess-01', 'anat')
         os.makedirs(anat_folder, exist_ok=True)
-        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
-        os.makedirs(dwi_folder, exist_ok=True)
         t1_img = dpd.read_stanford_t1()
         nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
         seg_img = dpd.read_stanford_labels()[-1]
         nib.save(seg_img, op.join(anat_folder,
                                   'sub-01_sess-01_aparc+aseg.nii.gz'))
+        dwi_folder = op.join(dmriprep_folder, 'sub-01', 'sess-01', 'dwi')
+        os.makedirs(dwi_folder, exist_ok=True)
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
@@ -521,12 +523,24 @@ def organize_stanford_data(path=None):
         json.dump(dataset_description, outfile)
 
     pipeline_description = {
-        "Name": "Example dataset",
-        "BIDSVersion": "1.0.2",
-        "PipelineDescription": {"Name": "Example pipeline"}}
+        "Name": "Stanford HARDI",
+        "BIDSVersion": "1.0.0",
+        "PipelineDescription": {"Name": "vistasoft"}}
 
     pl_desc_file = op.join(my_path, 'stanford_hardi', 'derivatives',
                            'dmriprep', 'dataset_description.json')
+
+    with open(pl_desc_file, 'w') as outfile:
+        json.dump(pipeline_description, outfile)
+
+
+    pipeline_description = {
+        "Name": "Stanford HARDI",
+        "BIDSVersion": "1.0.0",
+        "PipelineDescription": {"Name": "freesurfer"}}
+
+    pl_desc_file = op.join(my_path, 'stanford_hardi', 'derivatives',
+                           'freesurfer', 'dataset_description.json')
 
     with open(pl_desc_file, 'w') as outfile:
         json.dump(pipeline_description, outfile)
