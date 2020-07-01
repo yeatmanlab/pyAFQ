@@ -288,6 +288,697 @@ def read_templates(resample_to=False):
     return template_dict
 
 
+def get_s3_client(anon=True):
+    """Return a boto3 s3 client
+    
+    Parameters
+    ----------
+    anon : bool, default=True
+        Whether to use anonymous connection (public buckets only).
+        If False, uses the key/secret given, or boto’s credential
+        resolver (client_kwargs, environment, variables, config files,
+        EC2 IAM server, in that order)
+
+    Returns
+    -------
+    s3_client : boto3.client('s3')
+    """
+    if anon:
+        # Global s3 client to preserve anonymous config
+        s3_client = boto3.client(
+            's3',
+            config=Config(signature_version=UNSIGNED)
+        )
+    else:
+        s3_client = boto3.client('s3')
+
+    return s3_client
+
+
+def _ls_s3fs(s3_prefix, anon=True):
+    """Returns a dict of list of files using s3fs
+
+    The files are divided between subject directories/files and
+    non-subject directories/files.
+
+    Parameters
+    ----------
+    s3_prefix : str
+        AWS S3 key for the study or site "directory" that contains all
+        of the subjects
+
+    anon : bool, default=True
+        Whether to use anonymous connection (public buckets only).
+        If False, uses the key/secret given, or boto’s credential
+        resolver (client_kwargs, environment, variables, config files,
+        EC2 IAM server, in that order)
+
+    Returns
+    -------
+    subjects : dict
+    """
+    fs = s3fs.S3FileSystem(anon=anon)
+    site_files = fs.ls(s3_prefix, detail=False)
+
+    # Just need BIDSLayout for the `parse_file_entities` method
+    # so we can pass dev/null as the argument
+    layout = BIDSLayout(os.devnull, validate=False)
+
+    entities = [
+        layout.parse_file_entities(f) for f in site_files
+    ]
+
+    files = {
+        "subjects": [
+            f for f, e in zip(site_files, entities)
+            if e.get("subject") is not None
+        ],
+        "other": [
+            f for f, e in zip(site_files, entities)
+            if e.get("subject") is None
+        ]
+    }
+
+    return files
+
+
+def _get_matching_s3_keys(bucket, prefix='', suffix=''):
+    """Generate all the matching keys in an S3 bucket.
+
+    Parameters
+    ----------
+    bucket : str
+        Name of the S3 bucket
+
+    prefix : str, optional
+        Only fetch keys that start with this prefix
+
+    suffix : str, optional
+        Only fetch keys that end with this suffix
+
+    Yields
+    ------
+    key : list
+        S3 keys that match the prefix and suffix
+    """
+    s3 = get_s3_client()
+    kwargs = {'Bucket': bucket, "MaxKeys": 1000}
+
+    # If the prefix is a single string (not a tuple of strings), we can
+    # do the filtering directly in the S3 API.
+    if isinstance(prefix, str):
+        kwargs['Prefix'] = prefix
+
+    while True:
+        # The S3 API response is a large blob of metadata.
+        # 'Contents' contains information about the listed objects.
+        resp = s3.list_objects_v2(**kwargs)
+
+        try:
+            contents = resp['Contents']
+        except KeyError:
+            return
+
+        for obj in contents:
+            key = obj['Key']
+            if key.startswith(prefix) and key.endswith(suffix):
+                yield key
+
+        # The S3 API is paginated, returning up to 1000 keys at a time.
+        # Pass the continuation token into the next response, until we
+        # reach the final page (when this field is missing).
+        try:
+            kwargs['ContinuationToken'] = resp['NextContinuationToken']
+        except KeyError:
+            break
+
+
+def _download_from_s3(fname, bucket, key, overwrite=False):
+    """Download object from S3 to local file
+
+    Parameters
+    ----------
+    fname : str
+        File path to which to download the object
+
+    bucket : str
+        S3 bucket name
+
+    key : str
+        S3 key for the object to download
+
+    overwrite : bool, default=False
+        If True, overwrite file if it already exists.
+        If False, skip download and return
+    """
+    # Create the directory and file if necessary
+    s3 = get_s3_client()
+    Path(op.dirname(fname)).mkdir(parents=True, exist_ok=True)
+    try:
+        Path(fname).touch(exist_ok=overwrite)
+
+        # Download the file
+        s3.download_file(Bucket=bucket, Key=key, Filename=fname)
+    except FileExistsError:
+        mod_logger.info(f'File {fname} already exists. Continuing...')
+        pass
+
+
+class S3BIDSStudy:
+    """A BIDS-compliant study hosted on AWS S3"""
+    def __init__(self, study_id, bucket, s3_prefix, multisite=False,
+                 subjects=None, use_participants_tsv=False,
+                 random_seed=None):
+        """Initialize an S3BIDSStudy instance
+
+        Parameters
+        ----------
+        study_id : str
+            An identifier string for the study
+
+        bucket : str
+            The S3 bucket that contains the study data
+
+        s3_prefix : str
+            The S3 prefix common to all of the study objects on S3
+
+        multisite : bool, default=False
+            Is this a multisite study. If yes, it assumes that the
+            various sites are represented as root-level directories and
+            that each of those directories can be treated as its own
+            BIDS-compliant study
+
+        subjects : str, sequence(str), int, or None, default=None
+            If int, retrieve S3 keys for the first `subjects` subjects.
+            If "all", retrieve all subjects. If str or sequence of
+            strings, retrieve S3 keys for the specified subjects. If
+            None, retrieve S3 keys for the first subject.
+
+        use_participants_tsv : bool, default=False
+            If True, use the particpants tsv files to retrieve subject
+            identifiers. This is faster but may not catch all subjects.
+            Sometimes the tsv files are outdated.
+
+        random_seed : int or None, default=None
+            Random seed for selection of subjects if `subjects` is an
+            integer. Use the same random seed for reproducibility
+        """
+        if not isinstance(study_id, str):
+            raise TypeError("study_id must be a string.")
+
+        if not isinstance(bucket, str):
+            raise TypeError("bucket must be a string.")
+
+        if not isinstance(s3_prefix, str):
+            raise TypeError("s3_prefix must be a string.")
+
+        if not isinstance(multisite, bool):
+            raise TypeError("multisite must be `True` or `False`.")
+
+        if not (subjects is None or
+                isinstance(subjects, int) or
+                isinstance(subjects, str) or
+                all(isinstance(s, str) for s in subjects)):
+            raise TypeError("subjects must be an int, string or a "
+                            "sequence of strings.")
+
+        if isinstance(subjects, int) and subjects < 1:
+            raise ValueError("If subjects is an int, it must be "
+                             "greater than 0.")
+
+        if not isinstance(use_participants_tsv, bool):
+            raise TypeError("`use_participants_tsv` must be boolean.")
+
+        if not isinstance(random_seed, int):
+            raise TypeError("`random_seed` must be an integer.")
+
+        self._study_id = study_id
+        self._bucket = bucket
+        self._s3_prefix = s3_prefix
+        self._multisite = multisite
+        self._use_participants_tsv = use_participants_tsv
+        self._random_seed = random_seed
+
+        # Get a list of all subjects in the study
+        self._all_subjects = self.list_all_subjects()
+
+        # Convert `subjects` into a sequence of subjectID strings
+        if subjects is None or isinstance(subjects, int):
+            # if subjects is an int, get that many random subjects
+            n_subs = subjects if subjects is not None else 1
+            prng = np.random.RandomState(random_seed)
+            subjects = prng.choice(sorted(self._all_subjects.keys()),
+                                   size=subjects,
+                                   replace=False)
+        elif subjects == "all":
+            # if "all," retrieve all subjects
+            subjects = sorted(self._all_subjects.keys())
+        elif isinstance(subjects, str):
+            # if a string, just get that one subject
+            subjects = [subjects]
+        # The last case for subjects is what we want. No transformation
+        # needed.
+
+        if not set(subjects) <= set(self._all_subjects.keys()):
+            raise ValueError(
+                f"The following subjects could not be found in the study: "
+                f"{set(subjects) - set(self._all_subjects.keys())}"
+            )
+
+        subs = [
+            delayed(self._get_subject)(s) for s in set(subjects)
+        ]
+
+        print("Retrieving subject S3 keys")
+        with ProgressBar():
+            subjects = list(compute(*subs, scheduler="threads"))
+
+        self._subjects = subjects
+
+    @property
+    def study_id(self):
+        """An identifier string for the study"""
+        return self._study_id
+
+    @property
+    def bucket(self):
+        """The S3 bucket that contains the study data"""
+        return self._bucket
+
+    @property
+    def s3_prefix(self):
+        """The S3 prefix common to all of the study objects on S3"""
+        return self._s3_prefix
+
+    @property
+    def subjects(self):
+        """A list of Subject instances for each requested subject"""
+        return self._subjects
+
+    @property
+    def multisite(self):
+        """Is this a multisite study"""
+        return self._multisite
+
+    @property
+    def use_participants_tsv(self):
+        """Did we use a participants.tsv file to populate the list of
+        study subjects."""
+        return self._use_participants_tsv
+
+    @property
+    def random_seed(self):
+        """The random seed used to retrieve study subjects"""
+        return self._random_seed
+
+    def __repr__(self):
+        return (f"{type(self).__name__}(study_id={self.study_id}, "
+                f"bucket={self.bucket}, s3_prefix={self.s3_prefix}, "
+                f"multisite={self.multisite})")
+
+    def _get_subject(self, subject_id):
+        """Return a Subject instance from a subject-ID"""
+        return S3BIDSSubject(subject_id=subject_id,
+                         site=self._all_subjects[subject_id],
+                         study=self)
+
+    def list_all_subjects(self):
+        """Return dict of subjects
+
+        Returns
+        -------
+        dict
+            dict with participant_id as keys and site_id as values
+            an empty string site_id is used for single site studies
+        """
+        if self.multisite:
+            sites = _ls_s3fs(
+                op.join(self.bucket, self.s3_prefix)
+            )["other"]
+        else:
+            # Setting the single "site" to an empty string works by
+            # using the behavior of os.path.join with intermediate empty
+            # string arguments, taking advantage of the fact that it
+            # will drop the intermediate slashes
+            sites = [""]
+
+        subjects = {}
+
+        if self._use_participants_tsv:
+            def get_tsv_keys(site_id):
+                # raw tsv file, as opposed to derivatives
+                return op.join(
+                    self.s3_prefix,
+                    site_id,
+                    'participants.tsv'
+                )
+
+            tsv_keys = {site: get_site_tsv_keys(site) for site in sites}
+
+            s3 = get_s3_client()
+
+            def get_subs_from_tsv_key(s3_key):
+                response = s3.get_object(
+                    Bucket=self.bucket,
+                    Key=s3_key
+                )
+
+                return set(pd.read_csv(
+                    response.get('Body')
+                ).participant_id.values)
+
+            for site, s3_key in tsv_keys.items():
+                subject_set = get_subs_from_tsv_key(s3_key)
+                for sub in subject_set:
+                    subjects[sub] = site
+        else:
+            for site in sites:
+                s3_prefix = op.join(self.bucket,
+                                    self.s3_prefix,
+                                    site)
+                # Unfortunately, we cannot use the empty string trick
+                # here because os.path.join will preserve the trailing
+                # slash, so we have to remove it manually
+                s3_prefix = s3_prefix.rstrip('/')
+                site_sub_keys = _ls_s3fs(s3_prefix=s3_prefix,
+                                         anon=True)["subjects"]
+
+                # Just need BIDSLayout for the `parse_file_entities`
+                # method so we can pass dev/null as the argument
+                layout = BIDSLayout(os.devnull, validate=False)
+                for key in site_sub_keys:
+                    entities = layout.parse_file_entitites(key)
+                    subjects["sub-" + entities.get("subject")] = site
+
+        return subjects
+
+    def download(self, directory, include_site=False,
+                 include_derivs=False, overwrite=False, pbar=True):
+        """Download files for each subject in the study
+
+        Parameters
+        ----------
+        directory : str
+            Directory to which to download subject files
+
+        include_site : bool, default=False
+            If True, include the site-ID in the download path
+
+        include_derivs : bool or str, default=False
+            If True, download all derivatives files. If False, do not.
+            If a string or sequence of strings is passed, this will
+            only download derivatives that match the string(s) (e.g.
+            ["dmriprep", "afq"]).
+
+        overwrite : bool, default=False
+            If True, overwrite files for each subject
+
+        pbar : bool, default=True
+            If True, include progress bar
+
+        See Also
+        --------
+        AFQ.data.S3BIDSSubject.download()
+        """
+        results = [delayed(sub.download)(
+            directory=directory,
+            include_site=include_site,
+            include_derivs=include_derivs,
+            overwrite=overwrite,
+            pbar=pbar,
+            pbar_idx=idx,
+        ) for idx, sub in enumerate(self.subjects)]
+
+        compute(*results, scheduler="threads")
+
+
+class HBN(S3BIDSStudy):
+    """The HBN study
+
+    See Also
+    --------
+    AFQ.data.S3BIDSStudy
+    """
+    def __init__(self, study_id="HBN", bucket="fcp-indi",
+                 s3_prefix="data/Projects/HBN/MRI", multisite=True,
+                 subjects=None, use_participants_tsv=False,
+                 random_seed=None):
+        """Initialize the HBN instance
+
+        Parameters
+        ----------
+        study_id : str
+            An identifier string for the study
+
+        bucket : str
+            The S3 bucket that contains the study data
+
+        s3_prefix : str
+            The S3 prefix common to all of the study objects on S3
+
+        multisite : bool, default=False
+            Is this a multisite study. If yes, it assumes that the
+            various sites are represented as root-level directories and
+            that each of those directories can be treated as its own
+            BIDS-compliant study
+
+        subjects : str, sequence(str), int, or None, default=None
+            If int, retrieve S3 keys for the first `subjects` subjects.
+            If "all", retrieve all subjects. If str or sequence of
+            strings, retrieve S3 keys for the specified subjects. If
+            None, retrieve S3 keys for the first subject.
+
+        use_participants_tsv : bool, default=False
+            If True, use the particpants tsv files to retrieve subject
+            identifiers. This is faster but may not catch all subjects.
+            Sometimes the tsv files are outdated.
+
+        random_seed : int or None, default=None
+            Random seed for selection of subjects if `subjects` is an
+            integer. Use the same random seed for reproducibility
+        """
+        super().__init__(
+            study_id=study_id,
+            bucket=bucket,
+            s3_prefix=s3_prefix,
+            multisite=True,
+            subjects=subjects,
+            use_participants_tsv=use_participants_tsv,
+            random_seed=random_seed
+        )
+
+
+class S3BIDSSubject:
+    """A single study subject hosted on AWS S3"""
+    def __init__(self, subject_id, study, site=None):
+        """Initialize a Subject instance
+
+        Parameters
+        ----------
+        subject_id : str
+            Subject-ID for this subject
+
+        study : AFQ.data.S3BIDSStudy
+            The S3BIDSStudy for which this subject was a participant
+
+        site : str, optional
+            Site-ID for the site from which this subject's data was collected
+        """
+        if not isinstance(subject_id, str):
+            raise TypeError("subject_id must be a string.")
+
+        if not isinstance(study, S3BIDSStudy):
+            raise TypeError("study must be an instance of S3BIDSStudy.")
+
+        if not (site is None or isinstance(site, str)):
+            raise TypeError("site must be a string or None.")
+
+        self._subject_id = subject_id
+        self._study = study
+        self._site = site
+        self._get_s3_keys()
+        self._files = {"raw": {}, "deriv": {}}
+
+    @property
+    def subject_id(self):
+        """An identifier string for the subject"""
+        return self._subject_id
+
+    @property
+    def study(self):
+        """The study in which this subject participated"""
+        return self._study
+
+    @property
+    def site(self):
+        """The site at which this subject was a participant"""
+        return self._site
+
+    @property
+    def s3_keys(self):
+        """A dict of S3 keys for this subject's data
+
+        The S3 keys are divided between "raw" data and derivatives
+        """
+        return self._s3_keys
+
+    @property
+    def files(self):
+        """Local files for this subject's dMRI data
+
+        Before the call to subject.download(), this is None.
+        Afterward, the files are stored in a dict with keys
+        for each Amazon S3 key and values corresponding to
+        the local file.
+        """
+        return self._files
+
+    def __repr__(self):
+        return (f"{type(self).__name__}(subject_id={self.subject_id}, "
+                f"study_id={self.study.study_id}, site={self.site}")
+
+    def _get_s3_keys(self):
+        """Get all required S3 keys for this subject
+
+        Returns
+        -------
+        s3_keys : dict
+            S3 keys organized into "raw" and "deriv" lists
+        """
+        if self.study.multisite:
+            prefixes = {
+                'raw': '/'.join([self.study.s3_prefix,
+                                 self.site,
+                                 self.subject_id]),
+                'deriv': '/'.join([self.study.s3_prefix,
+                                   self.site,
+                                   'derivatives',
+                                   self.subject_id]),
+            }
+        else:
+            prefixes = {
+                'raw': '/'.join([self.study.s3_prefix,
+                                 self.subject_id]),
+                'deriv': '/'.join([self.study.s3_prefix,
+                                   'derivatives',
+                                   self.subject_id]),
+            }
+
+        s3_keys = {
+            rd: list(_get_matching_s3_keys(
+                bucket=self.study.bucket,
+                prefix=prefix,
+            )) for rd, prefix in prefixes.items()
+        }
+
+        self._s3_keys = s3_keys
+
+    def download(self, directory, include_site=False,
+                 include_derivs=False, overwrite=False, pbar=True,
+                 pbar_idx=0):
+        """Download files from S3
+
+        Parameters
+        ----------
+        directory : str
+            Directory to which to download subject files
+
+        include_site : bool, default=False
+            If True, include the site-ID in the download path
+
+        include_derivs : bool or str, default=False
+            If True, download all derivatives files. If False, do not.
+            If a string or sequence of strings is passed, this will
+            only download derivatives that match the string(s) (e.g.
+            ["dmriprep", "afq"]).
+
+        overwrite : bool, default=False
+            If True, overwrite files for each subject
+
+        pbar : bool, default=True
+            If True, include download progress bar
+
+        pbar_idx : int, default=0
+            Progress bar index for multithreaded progress bars
+        """
+        if not isinstance(directory, str):
+            raise TypeError("directory must be a string.")
+
+        if not isinstance(include_site, bool):
+            raise TypeError("include_site must be a boolean.")
+
+        if not (isinstance(include_derivs, bool)
+                or isinstance(include_derivs, str)
+                or all(isinstance(s, str) for s in include_derivs)):
+            raise TypeError("include_site must be a boolean.")
+
+        if not isinstance(overwrite, bool):
+            raise TypeError("overwrite must be a boolean.")
+
+        if not isinstance(pbar, bool):
+            raise TypeError("pbar must be a boolean.")
+
+        if not isinstance(pbar_idx, int):
+            raise TypeError("pbar_idx must be an integer.")
+
+        if include_site and self.study.multisite:
+            directory = op.join(directory, self.site)
+
+        files = {
+            k: [op.abspath(op.join(
+                directory, p.split('/' + self.site + '/')[-1]
+            )) for p in v] for k, v in self.s3_keys.items()
+        }
+
+        raw_zip = zip(self.s3_keys["raw"], files["raw"])
+
+        # Populate files parameter
+        self._files["raw"].update({k: f for k, f in raw_zip})
+
+        # Generate list of (key, file) tuples
+        download_pairs = [(k, f) for k, f in raw_zip]
+
+        deriv_zip = zip(self.s3_keys["deriv"], files["deriv"])
+        if include_derivs == True:
+            # In this case, include all derivatives files
+            deriv_pairs = [(k, f) for k, f in deriv_zip]
+        elif isinstance(include_derivs, str):
+            # In this case, filter only derivatives S3 keys that include
+            # the `include_derivs` string as a substring
+            deriv_pairs = [(k, f) for k, f in deriv_zip
+                           if include_derivs in k]
+        elif all(isinstance(s, str) for s in include_derivs):
+            # In this case, filter only derivatives S3 keys that include
+            # any of the `include_derivs` strings as a substring
+            deriv_pairs = [(k, f) for k, f in deriv_zip
+                           if any([s in k for s in include_derivs])]
+
+        if include_derivs != False:
+            download_pairs += deriv_pairs
+            self._files["deriv"].update({
+                k: f for (k, f) in deriv_pairs
+            })
+
+        # Now iterate through the list and download each item
+        if pbar:
+            progress = tqdm(desc=f"Download {self.subject_id}",
+                            position=pbar_idx,
+                            total=len(download_pairs) + 1)
+
+        for (key, fname) in download_pairs:
+            _download_from_s3(fname=fname,
+                              bucket=self.study.bucket,
+                              key=key,
+                              overwrite=overwrite)
+
+            if pbar:
+                progress.update()
+
+        if pbar:
+            progress.update()
+            progress.close()
+
+
 def fetch_hcp(subjects,
               hcp_bucket='hcp-openaccess',
               profile_name="hcp",
