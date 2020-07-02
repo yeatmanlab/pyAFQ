@@ -153,6 +153,7 @@ class AFQ(object):
                  wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
                  virtual_frame_buffer=False,
+                 viz_library="fury",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -212,6 +213,10 @@ class AFQ(object):
             Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
 
+        viz_library : str, optional
+            Should be either "fury" or "plotly".
+            Default: "fury"
+
         segmentation_params : dict, optional
             The parameters for segmentation. Default: use the default behavior
             of the seg.Segmentation object
@@ -237,6 +242,7 @@ class AFQ(object):
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
+        self.viz = viz.Viz(viz_library=viz_library)
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
@@ -1024,16 +1030,16 @@ class AFQ(object):
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
 
-        figure = viz.visualize_volume(fa_img,
-                                      show=False,
-                                      show_inline=False)
+        figure = self.viz.visualize_volume(fa_img,
+                                           interact=False,
+                                           inline=False)
 
-        figure = viz.visualize_bundles(bundles_file,
-                                       affine=row['dwi_affine'],
-                                       bundle_dict=self.bundle_dict,
-                                       show=False,
-                                       show_inline=False,
-                                       figure=figure)
+        figure = self.viz.visualize_bundles(bundles_file,
+                                            affine=row['dwi_affine'],
+                                            bundle_dict=self.bundle_dict,
+                                            interact=False,
+                                            inline=False,
+                                            figure=figure)
 
         fname = self._get_fname(
             row,
@@ -1041,29 +1047,26 @@ class AFQ(object):
             include_track=True,
             include_seg=True)
 
-        viz.create_gif(figure, fname)
+        self.viz.create_gif(figure, fname)
 
     def _export_ROI_gifs(self, row):
         bundles_file = self._clean_bundles(row)
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
-        seg_img = nib.load(self._wm_mask(row))
-        dwi_img = nib.load(row['dwi_file'])
-        dwi_data = dwi_img.get_fdata()
 
         for bundle_name in self.bundle_dict.keys():
             uid = self.bundle_dict[bundle_name]['uid']
-            figure = viz.visualize_volume(fa_img,
-                                          show=False,
-                                          show_inline=False)
+            figure = self.viz.visualize_volume(fa_img,
+                                               interact=False,
+                                               inline=False)
             try:
-                figure = viz.visualize_bundles(
+                figure = self.viz.visualize_bundles(
                     bundles_file,
                     affine=row['dwi_affine'],
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
-                    show=False,
-                    show_inline=False,
+                    interact=False,
+                    inline=False,
                     figure=figure)
             except ValueError:
                 self.logger.info("No streamlines found to visualize for "
@@ -1071,10 +1074,10 @@ class AFQ(object):
 
             roi_files = self._export_rois(row)
             for roi in roi_files[bundle_name]:
-                figure = viz.visualize_roi(
+                figure = self.viz.visualize_roi(
                     roi,
-                    show=False,
-                    show_inline=False,
+                    inline=False,
+                    interact=False,
                     figure=figure)
 
             fname = op.split(
@@ -1088,8 +1091,8 @@ class AFQ(object):
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.join(fname[0], roi_dir, fname[1])
 
-            viz.create_gif(figure, fname, auto_stop_orca=False)
-        viz.stop_orca()
+            self.viz.create_gif(figure, fname, creating_many=True)
+        self.viz.stop_creating_gifs()
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])

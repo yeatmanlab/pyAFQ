@@ -1,0 +1,292 @@
+import tempfile
+import os
+import os.path as op
+
+import numpy as np
+import IPython.display as display
+
+from dipy.viz import window, actor, ui
+from fury.colormap import line_colors
+
+import AFQ.viz_libs.utils as vut
+
+
+def _inline_interact(scene, inline, interact):
+    """
+    Helper function to reuse across viz functions
+    """
+    if interact:
+        window.show(scene)
+
+    if inline:
+        tdir = tempfile.gettempdir()
+        fname = op.join(tdir, "fig.png")
+        window.snapshot(scene, fname=fname, size=(1200, 1200))
+        display.display_png(display.Image(fname))
+
+    return scene
+
+
+def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
+                      colors=None, figure=None, background=(1, 1, 1),
+                      interact=False, inline=False):
+    """
+    Visualize bundles in 3D using VTK
+
+    Parameters
+    ----------
+    trk : str, list, or Streamlines
+        The streamline information
+
+    affine : ndarray, optional
+       An affine transformation to apply to the streamlines before
+       visualization. Default: no transform.
+
+    bundle_dict : dict, optional
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the trk
+        metadata. Default: bundles are either not identified, or identified
+        only as unique integers in the metadata.
+
+    bundle : str or int, optional
+        The name of a bundle to select from among the keys in `bundle_dict`
+        or an integer for selection from the trk metadata.
+
+    colors : dict or list
+        If this is a dict, keys are bundle names and values are RGB tuples.
+        If this is a list, each item is an RGB tuple. Defaults to a list
+        with Tableau 20 RGB values
+
+    background : tuple, optional
+        RGB values for the background. Default: (1, 1, 1), which is white
+        background.
+
+    figure : fury Scene object, optional
+        If provided, the visualization will be added to this Scene. Default:
+        Initialize a new Scene.
+
+    interact : bool
+        Whether to provide an interactive VTK window for interaction.
+        Default: False
+
+    inline : bool
+        Whether to embed the visualization inline in a notebook. Only works
+        in the notebook context. Default: False.
+
+    Returns
+    -------
+    Fury Scene object
+    """
+    tg, streamlines = vut.tract_loader(trk, affine)
+
+    if figure is None:
+        figure = window.Scene()
+
+    figure.SetBackground(background[0], background[1], background[2])
+
+    for (sls, color, name) in \
+            vut.tract_generator(tg, streamlines, bundle, bundle_dict, colors):
+        if name == "all_bundles":
+            color = line_colors(sls)
+
+        sl_actor = actor.line(sls, color)
+        figure.add(sl_actor)
+        sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+        sl_actor.GetProperty().SetLineWidth(6)
+
+    return _inline_interact(figure, inline, interact)
+
+
+def scene_rotate_forward(scene):
+    scene.elevation(90)
+    scene.set_camera(view_up=(0.0, 0.0, 1.0))
+    scene.reset_camera()
+    return scene
+
+
+def stop_creating_gifs():
+    pass
+
+
+def create_gif(figure,
+               file_name,
+               n_frames=60,
+               zoom=2.5,
+               z_offset=0.5,
+               creating_many=False,
+               size=(600, 600)):
+    tdir = tempfile.gettempdir()
+    window.record(figure, az_ang=360.0 / n_frames, n_frames=n_frames,
+                  path_numbering=True, out_path=tdir + '/tgif',
+                  size=size)
+
+    vut.gif_from_pngs(tdir, file_name, n_frames,
+                      png_fname="tgif", add_zeros=True)
+
+
+def visualize_roi(roi, affine_or_mapping=None, static_img=None,
+                  roi_affine=None, static_affine=None, reg_template=None,
+                  figure=None, color=np.array([1, 0, 0]), opacity=1.0,
+                  inline=False, interact=False):
+    """
+    Render a region of interest into a VTK viz as a volume
+    """
+    roi = vut.prepare_roi(roi, affine_or_mapping, static_img,
+                          roi_affine, static_affine, reg_template)
+
+    if figure is None:
+        figure = window.Scene()
+
+    roi_actor = actor.contour_from_roi(roi, color=color, opacity=opacity)
+    figure.add(roi_actor)
+
+    return _inline_interact(figure, inline, interact)
+
+
+def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
+                     interact=False):
+    """
+    Visualize a volume
+    """
+    volume = vut.load_volume(volume)
+
+    if figure is None:
+        figure = window.Scene()
+
+    shape = volume.shape
+    image_actor_z = actor.slicer(volume)
+    slicer_opacity = 0.6
+    image_actor_z.opacity(slicer_opacity)
+
+    image_actor_x = image_actor_z.copy()
+    x_midpoint = int(np.round(shape[0] / 2))
+    image_actor_x.display_extent(x_midpoint,
+                                 x_midpoint, 0,
+                                 shape[1] - 1,
+                                 0,
+                                 shape[2] - 1)
+
+    image_actor_y = image_actor_z.copy()
+    y_midpoint = int(np.round(shape[1] / 2))
+    image_actor_y.display_extent(0,
+                                 shape[0] - 1,
+                                 y_midpoint,
+                                 y_midpoint,
+                                 0,
+                                 shape[2] - 1)
+
+    figure.add(image_actor_z)
+    figure.add(image_actor_x)
+    figure.add(image_actor_y)
+
+    show_m = window.ShowManager(figure, size=(1200, 900))
+    show_m.initialize()
+
+    if interact:
+        line_slider_z = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[2] - 1,
+                                        initial_value=shape[2] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
+
+        line_slider_x = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[0] - 1,
+                                        initial_value=shape[0] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
+
+        line_slider_y = ui.LineSlider2D(min_value=0,
+                                        max_value=shape[1] - 1,
+                                        initial_value=shape[1] / 2,
+                                        text_template="{value:.0f}",
+                                        length=140)
+
+        opacity_slider = ui.LineSlider2D(min_value=0.0,
+                                         max_value=1.0,
+                                         initial_value=slicer_opacity,
+                                         length=140)
+
+        def change_slice_z(slider):
+            z = int(np.round(slider.value))
+            image_actor_z.display_extent(
+                0, shape[0] - 1, 0, shape[1] - 1, z, z)
+
+        def change_slice_x(slider):
+            x = int(np.round(slider.value))
+            image_actor_x.display_extent(
+                x, x, 0, shape[1] - 1, 0, shape[2] - 1)
+
+        def change_slice_y(slider):
+            y = int(np.round(slider.value))
+            image_actor_y.display_extent(
+                0, shape[0] - 1, y, y, 0, shape[2] - 1)
+
+        def change_opacity(slider):
+            slicer_opacity = slider.value
+            image_actor_z.opacity(slicer_opacity)
+            image_actor_x.opacity(slicer_opacity)
+            image_actor_y.opacity(slicer_opacity)
+
+        line_slider_z.on_change = change_slice_z
+        line_slider_x.on_change = change_slice_x
+        line_slider_y.on_change = change_slice_y
+        opacity_slider.on_change = change_opacity
+
+        def build_label(text):
+            label = ui.TextBlock2D()
+            label.message = text
+            label.font_size = 18
+            label.font_family = 'Arial'
+            label.justification = 'left'
+            label.bold = False
+            label.italic = False
+            label.shadow = False
+            label.background = (0, 0, 0)
+            label.color = (1, 1, 1)
+
+            return label
+
+        line_slider_label_z = build_label(text="Z Slice")
+        line_slider_label_x = build_label(text="X Slice")
+        line_slider_label_y = build_label(text="Y Slice")
+        opacity_slider_label = build_label(text="Opacity")
+
+        panel = ui.Panel2D(size=(300, 200),
+                           color=(1, 1, 1),
+                           opacity=0.1,
+                           align="right")
+        panel.center = (1030, 120)
+
+        panel.add_element(line_slider_label_x, (0.1, 0.75))
+        panel.add_element(line_slider_x, (0.38, 0.75))
+        panel.add_element(line_slider_label_y, (0.1, 0.55))
+        panel.add_element(line_slider_y, (0.38, 0.55))
+        panel.add_element(line_slider_label_z, (0.1, 0.35))
+        panel.add_element(line_slider_z, (0.38, 0.35))
+        panel.add_element(opacity_slider_label, (0.1, 0.15))
+        panel.add_element(opacity_slider, (0.38, 0.15))
+
+        show_m.scene.add(panel)
+
+        global size
+        size = figure.GetSize()
+
+        def win_callback(obj, event):
+            global size
+            if size != obj.GetSize():
+                size_old = size
+                size = obj.GetSize()
+                size_change = [size[0] - size_old[0], 0]
+                panel.re_align(size_change)
+
+    show_m.initialize()
+
+    figure.zoom(1.5)
+    figure.reset_clipping_range()
+
+    if interact:
+        show_m.add_window_callback(win_callback)
+        show_m.render()
+        show_m.start()
+
+    return _inline_interact(figure, inline, interact)
