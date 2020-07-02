@@ -32,7 +32,8 @@ class Viz:
             self.visualize_roi = AFQ.viz_libs.afq_plotly.visualize_roi
             self.visualize_volume = AFQ.viz_libs.afq_plotly.visualize_volume
             self.create_gif = AFQ.viz_libs.afq_plotly.create_gif
-            self.stop_creating_gifs = AFQ.viz_libs.afq_plotly.stop_creating_gifs
+            self.stop_creating_gifs = \
+                AFQ.viz_libs.afq_plotly.stop_creating_gifs
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,

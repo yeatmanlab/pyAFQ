@@ -114,7 +114,11 @@ def create_gif(figure,
                zoom=2.5,
                z_offset=0.5,
                creating_many=False,
-               size=(600, 600)):
+               size=(600, 600),
+               rotate_forward=True):
+    if rotate_forward:
+        figure = scene_rotate_forward(figure)
+
     tdir = tempfile.gettempdir()
     window.record(figure, az_ang=360.0 / n_frames, n_frames=n_frames,
                   path_numbering=True, out_path=tdir + '/tgif',

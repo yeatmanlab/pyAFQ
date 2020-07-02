@@ -116,7 +116,8 @@ def tract_generator(tg, streamlines, bundle, bundle_dict, colors):
             yield these_sls, color, b_name
 
 
-def gif_from_pngs(tdir, gif_fname, n_frames, png_fname="tgif", add_zeros=False):
+def gif_from_pngs(tdir, gif_fname, n_frames,
+                  png_fname="tgif", add_zeros=False):
     """Helper function """
     if add_zeros:
         fname_suffix10 = "00000"

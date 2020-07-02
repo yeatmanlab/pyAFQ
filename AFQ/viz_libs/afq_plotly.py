@@ -137,7 +137,8 @@ def create_gif(figure,
                zoom=2.5,
                z_offset=0.5,
                creating_many=False,
-               size=(600, 600)):
+               size=(600, 600),
+               rotate_forward=True):
     tdir = tempfile.gettempdir()
 
     for i in range(n_frames):
