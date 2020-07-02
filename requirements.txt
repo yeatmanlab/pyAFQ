@@ -21,5 +21,5 @@ fury==0.4.0
 imageio==2.8.0
 ipython==7.13.0
 templateflow==0.6.2
-pybids==0.10.2
+pybids==0.11.1
 xvfbwrapper==0.2.9
