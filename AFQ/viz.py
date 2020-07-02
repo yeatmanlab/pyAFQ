@@ -65,14 +65,16 @@ def _inline_interact(figure, show, show_inline):
 
     return figure
 
+
 def _color_arr2str(color_arr, opacity=1.0):
     return f"rgba({color_arr[0]}, {color_arr[1]}, {color_arr[2]}, {opacity})"
+
 
 def _draw_streamlines(figure, sls, color, name, n_points=100):
     x_pts = []
     y_pts = []
     z_pts = []
-    
+
     for sl in sls:
         # resample streamline to n_points
         if sl.shape[0] > n_points:
@@ -80,7 +82,7 @@ def _draw_streamlines(figure, sls, color, name, n_points=100):
 
         # add sl to lines
         x_pts.extend(sl[:, 0])
-        x_pts.append(None) # don't draw between streamlines
+        x_pts.append(None)  # don't draw between streamlines
         y_pts.extend(sl[:, 1])
         y_pts.append(None)
         z_pts.extend(sl[:, 2])
@@ -99,6 +101,7 @@ def _draw_streamlines(figure, sls, color, name, n_points=100):
             )
         )
     )
+
 
 def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
                       colors=None, figure=None, background=(1, 1, 1),
@@ -166,7 +169,7 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
         figure = go.Figure()
 
     figure.update_layout(plot_bgcolor=_color_arr2str(background))
-        
+
     if colors is None:
         # Use the color dict provided
         colors = COLOR_DICT
@@ -194,19 +197,20 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
         # There are no bundles in here:
         streamlines = list(streamlines)
         # Visualize all the streamlines with directionally assigned RGB:
-        _draw_streamlines(figure, streamlines, [0.5, 0.5, 0.5], "all_bundles", n_points=resample)
-        
+        _draw_streamlines(figure, streamlines, [
+                          0.5, 0.5, 0.5], "all_bundles", n_points=resample)
 
     else:
         # There are bundles:
         if bundle is None:
             # No selection: visualize all of them:
-            
+
             for b in np.unique(tg.data_per_streamline['bundle']):
                 idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
                 these_sls = list(streamlines[idx])
                 color, b_name = _bundle_selector(bundle_dict, colors, b)
-                _draw_streamlines(figure, these_sls, color, b_name, n_points=resample)
+                _draw_streamlines(figure, these_sls, color,
+                                  b_name, n_points=resample)
 
         else:
             # Select just one to visualize:
@@ -220,7 +224,8 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
             idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
             these_sls = list(streamlines[idx])
             color, b_name = _bundle_selector(bundle_dict, colors, uid)
-            _draw_streamlines(figure, these_sls, color, b_name, n_points=resample)
+            _draw_streamlines(figure, these_sls, color,
+                              b_name, n_points=resample)
 
     return _inline_interact(figure, show, show_inline)
 
@@ -228,20 +233,22 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 def stop_orca():
     plotly.io.orca.shutdown_server()
 
+
 def create_gif(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, auto_stop_orca=True):
     tdir = tempfile.gettempdir()
-    
+
     for i in range(n_frames):
-        theta = (i*6.28)/n_frames
+        theta = (i * 6.28) / n_frames
         camera = dict(
-            eye=dict(x = np.cos(theta)*zoom, y = np.sin(theta)*zoom, z = z_offset)
+            eye=dict(x=np.cos(theta) * zoom,
+                     y=np.sin(theta) * zoom, z=z_offset)
         )
         figure.update_layout(scene_camera=camera)
         figure.write_image(tdir + f"/tgif{i}.png")
 
     if auto_stop_orca:
         stop_orca()
-    
+
     angles = []
     for i in range(n_frames):
         if i < 10:
@@ -254,6 +261,7 @@ def create_gif(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, auto_stop
 
     io.mimsave(file_name, angles)
 
+
 def visualize_gif_inline(fname, use_s3fs=False):
     if use_s3fs:
         import s3fs
@@ -262,11 +270,12 @@ def visualize_gif_inline(fname, use_s3fs=False):
         fname_remote = fname
         fname = op.join(tdir, "fig.gif")
         fs.get(fname_remote, fname)
-    
+
     display.display(display.Image(fname))
 
+
 def _draw_roi(figure, roi, color, opacity):
-    roi = np.where(roi==1)
+    roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
             x=roi[0],
@@ -276,6 +285,7 @@ def _draw_roi(figure, roi, color, opacity):
             line=dict(color=f"rgba(0,0,0,0)")
         )
     )
+
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
@@ -323,31 +333,36 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
 
     _draw_roi(figure, roi, color, opacity)
-    
+
     return _inline_interact(figure, show, show_inline)
+
 
 class Axes(enum.IntEnum):
     X = 0
     Y = 1
     Z = 2
 
+
 def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
     if step is None:
-        height = volume.shape[axis]//2
+        height = volume.shape[axis] // 2
         visible = True
     else:
-        height = (volume.shape[axis]*step)//n_steps
+        height = (volume.shape[axis] * step) // n_steps
         visible = False
 
     if axis == Axes.X:
-        X, Y, Z = np.mgrid[height:height+1, :volume.shape[1], :volume.shape[2]]
-        values = 1-volume[height, :, :].flatten()
+        X, Y, Z = np.mgrid[height:height + 1,
+                           :volume.shape[1], :volume.shape[2]]
+        values = 1 - volume[height, :, :].flatten()
     elif axis == Axes.Y:
-        X, Y, Z = np.mgrid[:volume.shape[0], height:height+1, :volume.shape[2]]
-        values = 1-volume[:, height, :].flatten()
+        X, Y, Z = np.mgrid[:volume.shape[0],
+                           height:height + 1, :volume.shape[2]]
+        values = 1 - volume[:, height, :].flatten()
     elif axis == Axes.Z:
-        X, Y, Z = np.mgrid[:volume.shape[0], :volume.shape[1], height:height+1]
-        values = 1-volume[:, :, height].flatten()
+        X, Y, Z = np.mgrid[:volume.shape[0],
+                           :volume.shape[1], height:height + 1]
+        values = 1 - volume[:, :, height].flatten()
 
     figure.add_trace(
         go.Isosurface(
@@ -362,7 +377,8 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             visible=visible
         )
     )
-    
+
+
 def _name_from_enum(axis):
     if axis == Axes.X:
         return "Coronal"
@@ -371,16 +387,18 @@ def _name_from_enum(axis):
     elif axis == Axes.Z:
         return "Axial"
 
+
 def _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0):
     if n_steps == 0:
         _draw_slice(figure, axis, volume, opacity=opacity)
     else:
-        active = n_steps//2
+        active = n_steps // 2
         name = _name_from_enum(axis) + " Plane"
         steps = []
         for step in range(n_steps):
-            _draw_slice(figure, axis, volume, opacity=opacity, step=step, n_steps=n_steps)
-            
+            _draw_slice(figure, axis, volume, opacity=opacity,
+                        step=step, n_steps=n_steps)
+
             step_dict = dict(
                 method="update",
                 args=[{"visible": [False] * n_steps}],
@@ -400,7 +418,8 @@ def _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc
             x=0.2,
             lenmode='fraction',
             len=0.6
-        )) # TODO: these sliders won't become independent!
+        ))  # TODO: these sliders won't become independent!
+
 
 def visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True,
                      show=False, opacity=0.3, show_inline=False, slider_definition=0):
@@ -409,7 +428,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True,
     """
     if isinstance(volume, str):
         volume = nib.load(volume).get_fdata()
-    
+
     if figure is None:
         figure = go.Figure()
 
@@ -417,14 +436,17 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True,
     sliders = []
 
     if show_x:
-        _draw_slices(figure, Axes.X, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=0)
+        _draw_slices(figure, Axes.X, volume, sliders=sliders,
+                     opacity=opacity, n_steps=slider_definition, y_loc=0)
     if show_y:
-        _draw_slices(figure, Axes.Y, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=-0.3)
+        _draw_slices(figure, Axes.Y, volume, sliders=sliders,
+                     opacity=opacity, n_steps=slider_definition, y_loc=-0.3)
     if show_z:
-        _draw_slices(figure, Axes.Z, volume, sliders=sliders, opacity=opacity, n_steps=slider_definition, y_loc=-0.6)
+        _draw_slices(figure, Axes.Z, volume, sliders=sliders,
+                     opacity=opacity, n_steps=slider_definition, y_loc=-0.6)
 
     figure.update_layout(sliders=tuple(sliders))
-    
+
     return _inline_interact(figure, show, show_inline)
 
 
