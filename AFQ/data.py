@@ -13,6 +13,13 @@ import numpy as np
 import pandas as pd
 import logging
 
+from bids import BIDSLayout
+from botocore import UNSIGNED
+from botocore.client import Config
+from dask import compute, delayed
+from dask.diagnostics import ProgressBar
+from pathlib import Path
+from tqdm.auto import tqdm
 import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
@@ -440,7 +447,6 @@ def _download_from_s3(fname, bucket, key, overwrite=False):
         # Download the file
         s3.download_file(Bucket=bucket, Key=key, Filename=fname)
     except FileExistsError:
-        mod_logger.info(f'File {fname} already exists. Continuing...')
         pass
 
 
@@ -509,7 +515,7 @@ class S3BIDSStudy:
         if not isinstance(use_participants_tsv, bool):
             raise TypeError("`use_participants_tsv` must be boolean.")
 
-        if not isinstance(random_seed, int):
+        if not (random_seed is None or isinstance(random_seed, int)):
             raise TypeError("`random_seed` must be an integer.")
 
         self._study_id = study_id
@@ -615,6 +621,8 @@ class S3BIDSStudy:
             sites = _ls_s3fs(
                 op.join(self.bucket, self.s3_prefix)
             )["other"]
+
+            sites = [s.split('/')[-1] for s in sites]
         else:
             # Setting the single "site" to an empty string works by
             # using the behavior of os.path.join with intermediate empty
@@ -667,7 +675,7 @@ class S3BIDSStudy:
                 # method so we can pass dev/null as the argument
                 layout = BIDSLayout(os.devnull, validate=False)
                 for key in site_sub_keys:
-                    entities = layout.parse_file_entitites(key)
+                    entities = layout.parse_file_entities(key)
                     subjects["sub-" + entities.get("subject")] = site
 
         return subjects
@@ -873,7 +881,7 @@ class S3BIDSSubject:
 
         self._s3_keys = s3_keys
 
-    def download(self, directory, include_site=False,
+    def download(self, directory, include_site=True,
                  include_derivs=False, overwrite=False, pbar=True,
                  pbar_idx=0):
         """Download files from S3
@@ -930,7 +938,7 @@ class S3BIDSSubject:
             )) for p in v] for k, v in self.s3_keys.items()
         }
 
-        raw_zip = zip(self.s3_keys["raw"], files["raw"])
+        raw_zip = list(zip(self.s3_keys["raw"], files["raw"]))
 
         # Populate files parameter
         self._files["raw"].update({k: f for k, f in raw_zip})
@@ -938,10 +946,12 @@ class S3BIDSSubject:
         # Generate list of (key, file) tuples
         download_pairs = [(k, f) for k, f in raw_zip]
 
-        deriv_zip = zip(self.s3_keys["deriv"], files["deriv"])
+        deriv_zip = list(zip(self.s3_keys["deriv"], files["deriv"]))
         if include_derivs == True:
             # In this case, include all derivatives files
             deriv_pairs = [(k, f) for k, f in deriv_zip]
+        elif include_derivs == False:
+            pass
         elif isinstance(include_derivs, str):
             # In this case, filter only derivatives S3 keys that include
             # the `include_derivs` string as a substring
