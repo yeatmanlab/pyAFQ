@@ -300,7 +300,7 @@ def read_templates(resample_to=False):
 # +----------------------------------------------------+
 def get_s3_client(anon=True):
     """Return a boto3 s3 client
-    
+
     Parameters
     ----------
     anon : bool, default=True
@@ -620,8 +620,8 @@ class S3BIDSStudy:
     def _get_subject(self, subject_id):
         """Return a Subject instance from a subject-ID"""
         return S3BIDSSubject(subject_id=subject_id,
-                         site=self._all_subjects[subject_id],
-                         study=self)
+                             site=self._all_subjects[subject_id],
+                             study=self)
 
     def _get_sites(self):
         """Return a list of sites
@@ -1019,10 +1019,10 @@ class S3BIDSSubject:
         download_pairs = [(k, f) for k, f in raw_zip]
 
         deriv_zip = list(zip(self.s3_keys["deriv"], files["deriv"]))
-        if include_derivs == True:
+        if include_derivs is True:
             # In this case, include all derivatives files
             deriv_pairs = [(k, f) for k, f in deriv_zip]
-        elif include_derivs == False:
+        elif include_derivs is False:
             pass
         elif isinstance(include_derivs, str):
             # In this case, filter only derivatives S3 keys that include
@@ -1035,7 +1035,7 @@ class S3BIDSSubject:
             deriv_pairs = [(k, f) for k, f in deriv_zip
                            if any([s in k for s in include_derivs])]
 
-        if include_derivs != False:
+        if include_derivs is not False:
             download_pairs += deriv_pairs
             self._files["deriv"].update({
                 k: f for (k, f) in deriv_pairs
