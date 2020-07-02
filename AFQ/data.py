@@ -295,6 +295,9 @@ def read_templates(resample_to=False):
     return template_dict
 
 
+# +----------------------------------------------------+
+# | Begin S3BIDSStudy classes and supporting functions |
+# +----------------------------------------------------+
 def get_s3_client(anon=True):
     """Return a boto3 s3 client
     
@@ -526,7 +529,9 @@ class S3BIDSStudy:
         self._random_seed = random_seed
 
         # Get a list of all subjects in the study
+        self._get_sites()
         self._all_subjects = self.list_all_subjects()
+        self._non_subject_s3_keys = self._get_non_subject_s3_keys()
 
         # Convert `subjects` into a sequence of subjectID strings
         if subjects is None or isinstance(subjects, int):
@@ -577,9 +582,19 @@ class S3BIDSStudy:
         return self._s3_prefix
 
     @property
+    def sites(self):
+        """A list of Site IDs"""
+        return self._sites
+
+    @property
     def subjects(self):
         """A list of Subject instances for each requested subject"""
         return self._subjects
+
+    @property
+    def non_sub_s3_keys(self):
+        """A dict of S3 keys that are not in subject directories"""
+        return self._non_subject_s3_keys
 
     @property
     def multisite(self):
@@ -608,6 +623,75 @@ class S3BIDSStudy:
                          site=self._all_subjects[subject_id],
                          study=self)
 
+    def _get_sites(self):
+        """Return a list of sites
+
+        Returns
+        -------
+        list
+            a list of site IDs. If not a multisite study, this
+            returns a list with a single empty string
+        """
+        if self.multisite:
+            sites = _ls_s3fs(
+                op.join(self.bucket, self.s3_prefix)
+            )["other"]
+
+            self._sites = [s.split('/')[-1] for s in sites]
+        else:
+            # Setting the single "site" to an empty string works by
+            # using the behavior of os.path.join with intermediate empty
+            # string arguments, taking advantage of the fact that it
+            # will drop the intermediate slashes
+            self._sites = [""]
+
+    def _get_non_subject_s3_keys(self):
+        """Return a list of "non-subject" files
+
+        In this context, a "non-subject" file is any file
+        or directory that is not a subject ID folder
+
+        Returns
+        -------
+        dict
+            dict with keys "raw" and "deriv" and whose values
+            are lists of S3 keys for non-subject files
+        """
+        non_sub_s3_keys = {}
+
+        for site in self.sites:
+            s3_prefix = op.join(self.bucket,
+                                self.s3_prefix,
+                                site)
+            # Drop trailing slash in the case of single site study
+            s3_prefix = s3_prefix.rstrip('/')
+
+            nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
+                                   anon=True)["other"]
+            nonsub_keys = [k for k in nonsub_keys
+                           if not k.endswith("derivatives")]
+
+            s3_prefix = op.join(self.bucket,
+                                self.s3_prefix,
+                                site,
+                                "derivatives")
+
+            nonsub_deriv_keys = _ls_s3fs(s3_prefix=s3_prefix,
+                                         anon=True)["other"]
+
+            if self.multisite:
+                non_sub_s3_keys[site] = {
+                    "raw": nonsub_keys,
+                    "deriv": nonsub_deriv_keys,
+                }
+            else:
+                non_sub_s3_keys = {
+                    "raw": nonsub_keys,
+                    "deriv": nonsub_deriv_keys,
+                }
+
+        return non_sub_s3_keys
+
     def list_all_subjects(self):
         """Return dict of subjects
 
@@ -617,19 +701,6 @@ class S3BIDSStudy:
             dict with participant_id as keys and site_id as values
             an empty string site_id is used for single site studies
         """
-        if self.multisite:
-            sites = _ls_s3fs(
-                op.join(self.bucket, self.s3_prefix)
-            )["other"]
-
-            sites = [s.split('/')[-1] for s in sites]
-        else:
-            # Setting the single "site" to an empty string works by
-            # using the behavior of os.path.join with intermediate empty
-            # string arguments, taking advantage of the fact that it
-            # will drop the intermediate slashes
-            sites = [""]
-
         subjects = {}
 
         if self._use_participants_tsv:
@@ -641,7 +712,8 @@ class S3BIDSStudy:
                     'participants.tsv'
                 )
 
-            tsv_keys = {site: get_site_tsv_keys(site) for site in sites}
+            tsv_keys = {site: get_site_tsv_keys(site)
+                        for site in self.sites}
 
             s3 = get_s3_client()
 
@@ -660,7 +732,7 @@ class S3BIDSStudy:
                 for sub in subject_set:
                     subjects[sub] = site
         else:
-            for site in sites:
+            for site in self.sites:
                 s3_prefix = op.join(self.bucket,
                                     self.s3_prefix,
                                     site)
@@ -987,6 +1059,9 @@ class S3BIDSSubject:
         if pbar:
             progress.update()
             progress.close()
+# +--------------------------------------------------+
+# | End S3BIDSStudy classes and supporting functions |
+# +--------------------------------------------------+
 
 
 def fetch_hcp(subjects,
