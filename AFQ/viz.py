@@ -234,7 +234,12 @@ def stop_orca():
     plotly.io.orca.shutdown_server()
 
 
-def create_gif(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, auto_stop_orca=True):
+def create_gif(figure,
+               file_name,
+               n_frames=60,
+               zoom=2.5,
+               z_offset=0.5,
+               auto_stop_orca=True):
     tdir = tempfile.gettempdir()
 
     for i in range(n_frames):
@@ -388,7 +393,8 @@ def _name_from_enum(axis):
         return "Axial"
 
 
-def _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0):
+def _draw_slices(figure, axis, volume,
+                 opacity=0.3, sliders=[], n_steps=0, y_loc=0):
     if n_steps == 0:
         _draw_slice(figure, axis, volume, opacity=opacity)
     else:
@@ -421,8 +427,9 @@ def _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc
         ))  # TODO: these sliders won't become independent!
 
 
-def visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True,
-                     show=False, opacity=0.3, show_inline=False, slider_definition=0):
+def visualize_volume(volume, figure=None, show_x=True, show_y=True,
+                     show_z=True, show=False, opacity=0.3, show_inline=False,
+                     slider_definition=0):
     """
     Visualize a volume
     """
