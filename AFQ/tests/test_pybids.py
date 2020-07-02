@@ -9,8 +9,8 @@ bids_dir = '/Users/arokem/AFQ_data/stanford_hardi'
 
 lay = BIDSLayout(bids_dir, derivatives=True)
 
-dwi_sub_01 = lay.get(subject='01', extension='nii.gz', suffix='dwi', return_type='filename')
-bvals_sub_01 = lay.get(subject='01', extension='bvals', suffix='dwi', return_type='filename')
-bvecs_sub_01 = lay.get(subject='01', extension='bvecs', suffix='dwi', return_type='filename')
+dwi_sub_01 = lay.get(subject='01', extension='nii.gz', suffix='dwi', return_type='filename', scope='vistasoft')
+bvals_sub_01 = lay.get(subject='01', extension='bvals', suffix='dwi', return_type='filename', scope='vistasoft')
+bvecs_sub_01 = lay.get(subject='01', extension='bvecs', suffix='dwi', return_type='filename', scope='vistasoft')
 t1w_sub_01 = lay.get(subject='01', extension='.nii.gz', suffix='T1w', return_type='filename')
-seg_sub_01 = lay.get(subject='01', extension='.nii.gz', suffix='_seg', return_type='filename')
+seg_sub_01 = lay.get(subject='01', extension='.nii.gz', suffix='seg', return_type='filename')

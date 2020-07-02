@@ -18,6 +18,9 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.stats.analysis import afq_profile
 
+from bids.layout import BIDSLayout
+
+from .version import version as pyafq_version
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
 from AFQ.dki import _fit as dki_fit
@@ -135,73 +138,12 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
 
 class AFQ(object):
     """
-
-    This is file folder structure that AFQ requires in your study folder::
-
-|    study
-|      ├-derivatives
-|            ├-dmriprep
-|                ├── sub01
-|                │   ├── sess01
-|                │   │   ├── anat
-|                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-|                │   │   │   └── sub-01_sess-01_T1.nii.gz
-|                │   │   └── dwi
-|                │   │       ├── sub-01_sess-01_dwi.bvals
-|                │   │       ├── sub-01_sess-01_dwi.bvecs
-|                │   │       └── sub-01_sess-01_dwi.nii.gz
-|                │   └── sess02
-|                │       ├── anat
-|                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-|                │       │   └── sub-01_sess-02_T1w.nii.gz
-|                │       └── dwi
-|                │           ├── sub-01_sess-02_dwi.bvals
-|                │           ├── sub-01_sess-02_dwi.bvecs
-|                │           └── sub-01_sess-02_dwi.nii.gz
-|                └── sub02
-|                   ├── sess01
-|                   │   ├── anat
-|                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-|                   │   │   └── sub-02_sess-01_T1w.nii.gz
-|                   │   └── dwi
-|                   │       ├── sub-02_sess-01_dwi.bvals
-|                   │       ├── sub-02_sess-01_dwi.bvecs
-|                   │       └── sub-02_sess-01_dwi.nii.gz
-|                   └── sess02
-|                       ├── anat
-|                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-|                       │   └── sub-02_sess-02_T1w.nii.gz
-|                       └── dwi
-|                           ├── sub-02_sess-02_dwi.bvals
-|                           ├── sub-02_sess-02_dwi.bvecs
-|                           └── sub-02_sess-02_dwi.nii.gz
-
-    This structure can be automatically generated from BIDS-compliant
-    data [1]_, using the dmriprep software [2]_ and BIDS app.
-
-    Notes
-    -----
-    The structure of the file-system required here resembles that specified
-    by BIDS [1]_. In the future, this will be organized according to the
-    BIDS derivatives specification, as we require preprocessed, rather than
-    raw data.
-
-    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
-           a format for organizing and describing outputs of neuroimaging
-           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
-
-    .. [2] https://github.com/nipy/dmriprep
-
     """
-
     def __init__(self,
-                 dmriprep_path,
-                 sub_prefix="sub",
-                 dwi_folder="dwi",
-                 dwi_file="*dwi",
-                 anat_folder="anat",
-                 anat_file="*T1w*",
-                 seg_file='*aparc+aseg*',
+                 bids_path,
+                 dmriprep='dmriprep',
+                 segmentation='dmriprep',
+                 seg_suffix='seg',
                  b0_threshold=0,
                  bundle_names=BUNDLES,
                  dask_it=False,
@@ -216,8 +158,19 @@ class AFQ(object):
                  clean_params=None):
         """
 
-        dmriprep_path: str
-            The path to the preprocessed diffusion data.
+        bids_path : str
+            The path to preprocessed diffusion data organized in a BIDS
+            dataset. This should contain a BIDS derivative dataset with
+            preprocessed dwi/bvals/bvecs.
+
+        dmriprep : str
+            The name of the pipeline used to preprocess the DWI data.
+
+        freesurfer : str
+            The name of the pipeline used to generate a segmentation image.
+
+        suffix : str
+            Identifies the
 
         seg_algo : str
             Which algorithm to use for segmentation.
@@ -317,17 +270,29 @@ class AFQ(object):
                                             seg_algo=self.seg_algo,
                                             resample_to=reg_template)
 
-        # This is the place in which each subject's full data lives
-        self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
-                                               f"{sub_prefix}*"))
-
         # This is where all the outputs will go:
-        self.afq_dir = op.join(
-            op.join(*PurePath(dmriprep_path).parts[:-1]), 'afq')
+        afq_path = op.join(bids_path, 'afq')
 
-        os.makedirs(self.afq_dir, exist_ok=True)
+        # Create it as needed:
+        os.makedirs(afq_path, exist_ok=True)
 
-        self.subjects = [op.split(p)[-1] for p in self.dmriprep_dirs]
+        bids_layout = BIDSLayout(bids_path, derivatives=True)
+        bids_description = bids_layout.description
+
+        # Add required metadata file at top level (inheriting as needed):
+        pipeline_description = {
+            "Name": bids_description["Name"],
+            "BIDSVersion": bids_description["BIDSVersion"],
+            "PipelineDescription": {"Name": "pyAFQ",
+                                    "Version": pyafq_version}}
+
+        pl_desc_file = op.join(afq_path, 'dataset_description.json')
+
+        with open(pl_desc_file, 'w') as outfile:
+            json.dump(pipeline_description, outfile)
+
+        self.subjects = bids_layout.get(return_type='id', target='subject')
+        self.sessions = bids_layout.get(return_type='id', target='session')
 
         sub_list = []
         sess_list = []
@@ -337,37 +302,45 @@ class AFQ(object):
         anat_file_list = []
         seg_file_list = []
         results_dir_list = []
-        for subject, sub_dir in zip(self.subjects, self.dmriprep_dirs):
-            sessions = glob.glob(op.join(sub_dir, '*'))
-            for sess in sessions:
-                results_dir_list.append(op.join(self.afq_dir,
+        for subject in self.subjects:
+            for session in self.sessions:
+                results_dir_list.append(op.join(afq_path,
                                                 subject,
-                                                PurePath(sess).parts[-1]))
+                                                PurePath(session).parts[-1]))
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
+                dwi_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension='nii.gz', suffix='dwi',
+                                    return_type='filename'))
+                bvec_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension=['bvec', 'bvecs'],
+                                    suffix='dwi',
+                                    return_type='filename'))
+                bval_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension=['bval', 'bvals'],
+                                    suffix='dwi',
+                                    return_type='filename'))
+                this_t1w = bids_layout.get(
+                    subject=subject, session=session,
+                    extension='.nii.gz',
+                    suffix='T1w', return_type='filename')
 
-                dwi_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
+                this_seg = bids_layout.get(
+                    subject=subject, session=session,
+                    extension='.nii.gz',
+                    suffix='seg', return_type='filename')
 
-                bvec_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.bvec*")[0])
+                if len(this_t1w):
+                    anat_file_list.append(this_t1w)
 
-                bval_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.bval*")[0])
-
-                # The following two may or may not exist:
-                this_anat_file = glob.glob(op.join(
-                    sub_dir, (f"{sess}/{anat_folder}/{anat_file}.nii.gz")))
-                if len(this_anat_file):
-                    anat_file_list.append(this_anat_file[0])
-
-                this_seg_file = glob.glob(op.join(
-                    sub_dir, (f"{sess}/{anat_folder}/{seg_file}.nii.gz")))
-                if len(this_seg_file):
-                    seg_file_list.append(this_seg_file[0])
+                if len(this_seg):
+                    seg_file_list.append(this_seg)
 
                 sub_list.append(subject)
-                sess_list.append(sess)
+                sess_list.append(session)
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
