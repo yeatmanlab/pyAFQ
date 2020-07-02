@@ -11,6 +11,7 @@ import plotly
 import plotly.graph_objs as go
 import imageio as io
 from palettable.tableau import Tableau_20
+import logging
 
 import nibabel as nib
 import dipy.tracking.streamlinespeed as dps
@@ -241,6 +242,7 @@ def create_gif(figure,
                z_offset=0.5,
                auto_stop_orca=True):
     tdir = tempfile.gettempdir()
+    logger = logging.getLogger('AFQ.viz')
 
     for i in range(n_frames):
         theta = (i * 6.28) / n_frames
@@ -249,7 +251,13 @@ def create_gif(figure,
                      y=np.sin(theta) * zoom, z=z_offset)
         )
         figure.update_layout(scene_camera=camera)
-        figure.write_image(tdir + f"/tgif{i}.png")
+        try:
+            figure.write_image(tdir + f"/tgif{i}.png")
+        except ValueError:
+            logger.error("Unable to create gif, orca executable not found. " +
+                         "See https://github.com/plotly/orca " +
+                         "for more information")
+            return
 
     if auto_stop_orca:
         stop_orca()
