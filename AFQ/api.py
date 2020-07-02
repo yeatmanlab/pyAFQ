@@ -1024,16 +1024,16 @@ class AFQ(object):
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
 
-        scene = viz.visualize_volume(fa_img,
-                                     show=False,
-                                     show_inline=False)
-
-        scene = viz.visualize_bundles(bundles_file,
-                                      affine=row['dwi_affine'],
-                                      bundle_dict=self.bundle_dict,
+        figure = viz.visualize_volume(fa_img,
                                       show=False,
-                                      show_inline=False,
-                                      scene=scene)
+                                      show_inline=False)
+
+        figure = viz.visualize_bundles(bundles_file,
+                                       affine=row['dwi_affine'],
+                                       bundle_dict=self.bundle_dict,
+                                       show=False,
+                                       show_inline=False,
+                                       figure=figure)
 
         fname = self._get_fname(
             row,
@@ -1041,8 +1041,7 @@ class AFQ(object):
             include_track=True,
             include_seg=True)
 
-        scene = viz.scene_rotate_forward(scene)
-        viz.create_gif(scene, fname)
+        viz.create_gif(figure, fname)
 
     def _export_ROI_gifs(self, row):
         bundles_file = self._clean_bundles(row)
@@ -1054,29 +1053,29 @@ class AFQ(object):
 
         for bundle_name in self.bundle_dict.keys():
             uid = self.bundle_dict[bundle_name]['uid']
-            scene = viz.visualize_volume(fa_img,
-                                         show=False,
-                                         show_inline=False)
+            figure = viz.visualize_volume(fa_img,
+                                          show=False,
+                                          show_inline=False)
             try:
-                scene = viz.visualize_bundles(
+                figure = viz.visualize_bundles(
                     bundles_file,
                     affine=row['dwi_affine'],
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
                     show=False,
                     show_inline=False,
-                    scene=scene)
+                    figure=figure)
             except ValueError:
                 self.logger.info("No streamlines found to visualize for "
                                  + bundle_name)
 
             roi_files = self._export_rois(row)
             for roi in roi_files[bundle_name]:
-                scene = viz.visualize_roi(
+                figure = viz.visualize_roi(
                     roi,
                     show=False,
                     show_inline=False,
-                    scene=scene)
+                    figure=figure)
 
             fname = op.split(
                 self._get_fname(
@@ -1089,18 +1088,18 @@ class AFQ(object):
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.join(fname[0], roi_dir, fname[1])
 
-            scene = viz.scene_rotate_forward(scene)
-            viz.create_gif(scene, fname)
+            viz.create_gif(figure, fname, auto_stop_orca=False)
+        viz.stop_orca()
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
 
         for scalar in self.scalars:
             fname = self._get_fname(
-                    row,
-                    f'_{scalar}_profile_plots.png',
-                    include_track=True,
-                    include_seg=True)
+                row,
+                f'_{scalar}_profile_plots.png',
+                include_track=True,
+                include_seg=True)
 
             viz.visualize_tract_profiles(tract_profiles,
                                          scalar=scalar,
