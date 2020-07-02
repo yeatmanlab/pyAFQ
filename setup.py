@@ -25,10 +25,7 @@ with open(op.join(here, 'requirements.txt')) as f:
 
 EXTRAS_REQUIRE = {}
 for extra_req_file in glob.glob(op.join(here, 'requirements-*.txt')):
-    extra_name = extra_req_file[
-        extra_req_file.rfind('requirements-')+13:
-        extra_req_file.rfind('.txt')
-    ]
+    extra_name = extra_req_file.split('-')[1].split('.')[0]
     extra_reqs = []
     with open(extra_req_file) as f:
         ll = f.readline()[:-1]
