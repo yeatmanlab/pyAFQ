@@ -312,26 +312,31 @@ class AFQ(object):
                 dwi_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension='nii.gz', suffix='dwi',
-                                    return_type='filename'))
+                                    return_type='filename',
+                                    scope=dmriprep))
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
                                     suffix='dwi',
-                                    return_type='filename'))
+                                    return_type='filename',
+                                    scope=dmriprep))
                 bval_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bval', 'bvals'],
                                     suffix='dwi',
-                                    return_type='filename'))
+                                    return_type='filename',
+                                    scope=dmriprep))
                 this_t1w = bids_layout.get(
                     subject=subject, session=session,
                     extension='.nii.gz',
-                    suffix='T1w', return_type='filename')
+                    suffix='T1w', return_type='filename',
+                    scope=segmentation)
 
                 this_seg = bids_layout.get(
                     subject=subject, session=session,
                     extension='.nii.gz',
-                    suffix='seg', return_type='filename')
+                    suffix='seg', return_type='filename',
+                    scope=segmentation)
 
                 if len(this_t1w):
                     anat_file_list.append(this_t1w)
