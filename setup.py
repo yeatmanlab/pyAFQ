@@ -2,6 +2,7 @@ from setuptools import find_packages
 import string
 import os.path as op
 from setuptools_scm import get_version
+import glob
 
 try:
     from setuptools import setup
@@ -21,6 +22,20 @@ with open(op.join(here, 'requirements.txt')) as f:
     while ll:
         REQUIRES.append(ll)
         ll = f.readline()[:-1]
+
+EXTRAS_REQUIRE = {}
+for extra_req_file in glob.glob(op.join(here, 'requirements-*.txt')):
+    extra_name = extra_req_file[
+        extra_req_file.rfind('requirements-')+13 : 
+        extra_req_file.rfind('.txt')
+    ]
+    extra_reqs = []
+    with open(extra_req_file) as f:
+        ll = f.readline()[:-1]
+        while ll:
+            extra_reqs.append(ll)
+            ll = f.readline()[:-1]
+    EXTRAS_REQUIRE[extra_name] = extra_reqs
 
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
@@ -57,6 +72,7 @@ opts = dict(name=NAME,
             platforms=PLATFORMS,
             packages=find_packages(),
             install_requires=REQUIRES,
+            extras_require=EXTRAS_REQUIRE,
             scripts=SCRIPTS,
             python_requires=PYTHON_REQUIRES,
             use_scm_version={"root": ".", "relative_to": __file__,
