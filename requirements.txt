@@ -16,9 +16,7 @@ python-dateutil==2.8.1
 toml==0.10.0
 setuptools_scm[toml]==3.4.3
 popylar==0.2
-fury==0.4.0
 imageio==2.8.0
 ipython==7.13.0
 templateflow==0.6.2
 pybids==0.11.1
-xvfbwrapper==0.2.9
