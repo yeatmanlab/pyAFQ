@@ -295,7 +295,7 @@ class AFQ(object):
         self.sessions = bids_layout.get(return_type='id', target='session')
 
         sub_list = []
-        sess_list = []
+        ses_list = []
         dwi_file_list = []
         bvec_file_list = []
         bval_file_list = []
@@ -345,12 +345,12 @@ class AFQ(object):
                     seg_file_list.append(this_seg[0])
 
                 sub_list.append(subject)
-                sess_list.append(session)
+                ses_list.append(session)
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            ses=sess_list,
+                                            ses=ses_list,
                                             results_dir=results_dir_list))
         # Add these if they exist:
         if len(seg_file_list):
