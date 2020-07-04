@@ -73,7 +73,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
                              'T1w.nii.gz'))
             nib.save(nib.Nifti1Image(data, aff),
                      op.join(dmriprep_dir, subject, session, 'anat',
-                             'aparc+aseg.nii.gz'))
+                             'seg.nii.gz'))
 
     return bids_dir
 
@@ -85,7 +85,9 @@ def test_AFQ_init():
     n_subjects = 3
     n_sessions = 2
     bids_path = create_dummy_bids_path(n_subjects, n_sessions)
-    my_afq = api.AFQ(bids_path, dmriprep="synthetic")
+    my_afq = api.AFQ(bids_path,
+                     dmriprep="synthetic",
+                     segmentation="synthetic")
     npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
 
 
