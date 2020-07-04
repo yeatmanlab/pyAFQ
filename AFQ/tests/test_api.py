@@ -35,23 +35,65 @@ def touch(fname, times=None):
 
 def create_dummy_bids_path(n_subjects, n_sessions):
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
-    sessions = ['ses-0%s' % (d + 1) for d in range(n_sessions)]
 
-    bids_dir = tempfile.mkdtemp()
+    # Case where there are individual session folders within each subject's
+    # folder:
+    if n_sessions > 1:
+        sessions = ['ses-0%s' % (d + 1) for d in range(n_sessions)]
 
-    afd.to_bids_description(bids_dir,
-        **{"Name": "Dummy", "Subjects": subjects, "Sessions": sessions})
+        bids_dir = tempfile.mkdtemp()
 
-    dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
-    os.makedirs(dmriprep_dir)
-    afd.to_bids_description(dmriprep_dir,
-        **{"Name": "Dummy",
-           "PipelineDescription": {"Name": "synthetic"}})
+        afd.to_bids_description(bids_dir,
+            **{"Name": "Dummy", "Subjects": subjects, "Sessions": sessions})
 
-    for subject in subjects:
-        for session in sessions:
+        dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
+        os.makedirs(dmriprep_dir)
+        afd.to_bids_description(dmriprep_dir,
+            **{"Name": "Dummy",
+            "PipelineDescription": {"Name": "synthetic"}})
+
+        for subject in subjects:
+            for session in sessions:
+                for modality in ['anat', 'dwi']:
+                    os.makedirs(op.join(dmriprep_dir, subject, session, modality))
+                # Make some dummy data:
+                aff = np.eye(4)
+                data = np.ones((10, 10, 10, 6))
+                bvecs = np.vstack([np.eye(3), np.eye(3)])
+                bvecs[0] = 0
+                bvals = np.ones(6) * 1000.
+                bvals[0] = 0
+                np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
+                                'dwi.bvals'),
+                        bvals)
+                np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
+                                'dwi.bvecs'),
+                        bvecs)
+                nib.save(nib.Nifti1Image(data, aff),
+                        op.join(dmriprep_dir, subject, session, 'dwi',
+                                'dwi.nii.gz'))
+                nib.save(nib.Nifti1Image(data, aff),
+                        op.join(dmriprep_dir, subject, session, 'anat',
+                                'T1w.nii.gz'))
+                nib.save(nib.Nifti1Image(data, aff),
+                        op.join(dmriprep_dir, subject, session, 'anat',
+                                'seg.nii.gz'))
+    else:
+        # Don't create session folders at all:
+        bids_dir = tempfile.mkdtemp()
+
+        afd.to_bids_description(bids_dir,
+            **{"Name": "Dummy", "Subjects": subjects})
+
+        dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
+        os.makedirs(dmriprep_dir)
+        afd.to_bids_description(dmriprep_dir,
+            **{"Name": "Dummy",
+            "PipelineDescription": {"Name": "synthetic"}})
+
+        for subject in subjects:
             for modality in ['anat', 'dwi']:
-                os.makedirs(op.join(dmriprep_dir, subject, session, modality))
+                os.makedirs(op.join(dmriprep_dir, subject, modality))
             # Make some dummy data:
             aff = np.eye(4)
             data = np.ones((10, 10, 10, 6))
@@ -59,21 +101,22 @@ def create_dummy_bids_path(n_subjects, n_sessions):
             bvecs[0] = 0
             bvals = np.ones(6) * 1000.
             bvals[0] = 0
-            np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
-                               'dwi.bvals'),
-                       bvals)
-            np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
-                               'dwi.bvecs'),
-                       bvecs)
+            np.savetxt(op.join(dmriprep_dir, subject, 'dwi',
+                            'dwi.bvals'),
+                    bvals)
+            np.savetxt(op.join(dmriprep_dir, subject, 'dwi',
+                            'dwi.bvecs'),
+                    bvecs)
             nib.save(nib.Nifti1Image(data, aff),
-                     op.join(dmriprep_dir, subject, session, 'dwi',
-                             'dwi.nii.gz'))
+                    op.join(dmriprep_dir, subject, 'dwi',
+                            'dwi.nii.gz'))
             nib.save(nib.Nifti1Image(data, aff),
-                     op.join(dmriprep_dir, subject, session, 'anat',
-                             'T1w.nii.gz'))
+                    op.join(dmriprep_dir, subject, 'anat',
+                            'T1w.nii.gz'))
             nib.save(nib.Nifti1Image(data, aff),
-                     op.join(dmriprep_dir, subject, session, 'anat',
-                             'seg.nii.gz'))
+                    op.join(dmriprep_dir, subject, 'anat',
+                            'seg.nii.gz'))
+
 
     return bids_dir
 
@@ -82,13 +125,13 @@ def test_AFQ_init():
     """
     Test the initialization of the AFQ object
     """
-    n_subjects = 3
-    n_sessions = 2
-    bids_path = create_dummy_bids_path(n_subjects, n_sessions)
-    my_afq = api.AFQ(bids_path,
-                     dmriprep="synthetic",
-                     segmentation="synthetic")
-    npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
+    for n_sessions in [1, 2]:
+        n_subjects = 3
+        bids_path = create_dummy_bids_path(n_subjects, n_sessions)
+        my_afq = api.AFQ(bids_path,
+                        dmriprep="synthetic",
+                        segmentation="synthetic")
+        npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
 
 
 def test_AFQ_no_prealign():

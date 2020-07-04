@@ -292,7 +292,12 @@ class AFQ(object):
             json.dump(pipeline_description, outfile)
 
         self.subjects = bids_layout.get(return_type='id', target='subject')
-        self.sessions = bids_layout.get(return_type='id', target='session')
+        sessions = bids_layout.get(return_type='id', target='session')
+        if len(sessions):
+            self.sessions = sessions
+        else:
+            self.sessions = [None]
+
 
         sub_list = []
         ses_list = []
@@ -304,9 +309,13 @@ class AFQ(object):
         results_dir_list = []
         for subject in self.subjects:
             for session in self.sessions:
-                results_dir_list.append(op.join(afq_path,
-                                                subject,
-                                                PurePath(session).parts[-1]))
+                if session is not None:
+                    results_dir_list.append(op.join(afq_path,
+                                                    subject,
+                                                    session))
+                else:
+                    results_dir_list.append(op.join(afq_path,
+                                                    subject))
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
                 dwi_file_list.append(
