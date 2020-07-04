@@ -43,19 +43,24 @@ def create_dummy_bids_path(n_subjects, n_sessions):
 
         bids_dir = tempfile.mkdtemp()
 
-        afd.to_bids_description(bids_dir,
-            **{"Name": "Dummy", "Subjects": subjects, "Sessions": sessions})
+        afd.to_bids_description(
+            bids_dir,
+            **{"Name": "Dummy",
+               "Subjects": subjects,
+               "Sessions": sessions})
 
         dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
         os.makedirs(dmriprep_dir)
-        afd.to_bids_description(dmriprep_dir,
+        afd.to_bids_description(
+            dmriprep_dir,
             **{"Name": "Dummy",
-            "PipelineDescription": {"Name": "synthetic"}})
+               "PipelineDescription": {"Name": "synthetic"}})
 
         for subject in subjects:
             for session in sessions:
                 for modality in ['anat', 'dwi']:
-                    os.makedirs(op.join(dmriprep_dir, subject, session, modality))
+                    os.makedirs(
+                        op.join(dmriprep_dir, subject, session, modality))
                 # Make some dummy data:
                 aff = np.eye(4)
                 data = np.ones((10, 10, 10, 6))
@@ -63,33 +68,40 @@ def create_dummy_bids_path(n_subjects, n_sessions):
                 bvecs[0] = 0
                 bvals = np.ones(6) * 1000.
                 bvals[0] = 0
-                np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
-                                'dwi.bvals'),
-                        bvals)
-                np.savetxt(op.join(dmriprep_dir, subject, session, 'dwi',
-                                'dwi.bvecs'),
-                        bvecs)
-                nib.save(nib.Nifti1Image(data, aff),
-                        op.join(dmriprep_dir, subject, session, 'dwi',
-                                'dwi.nii.gz'))
-                nib.save(nib.Nifti1Image(data, aff),
-                        op.join(dmriprep_dir, subject, session, 'anat',
-                                'T1w.nii.gz'))
-                nib.save(nib.Nifti1Image(data, aff),
-                        op.join(dmriprep_dir, subject, session, 'anat',
-                                'seg.nii.gz'))
+                np.savetxt(
+                    op.join(
+                        dmriprep_dir, subject, session, 'dwi', 'dwi.bvals'),
+                    bvals)
+                np.savetxt(
+                    op.join(
+                        dmriprep_dir, subject, session, 'dwi', 'dwi.bvecs'),
+                    bvecs)
+                nib.save(
+                    nib.Nifti1Image(data, aff),
+                    op.join(
+                        dmriprep_dir, subject, session, 'dwi', 'dwi.nii.gz'))
+                nib.save(
+                    nib.Nifti1Image(data, aff),
+                    op.join(
+                        dmriprep_dir, subject, session, 'anat', 'T1w.nii.gz'))
+                nib.save(
+                    nib.Nifti1Image(data, aff),
+                    op.join(
+                        dmriprep_dir, subject, session, 'anat', 'seg.nii.gz'))
     else:
         # Don't create session folders at all:
         bids_dir = tempfile.mkdtemp()
 
-        afd.to_bids_description(bids_dir,
+        afd.to_bids_description(
+            bids_dir,
             **{"Name": "Dummy", "Subjects": subjects})
 
         dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
         os.makedirs(dmriprep_dir)
-        afd.to_bids_description(dmriprep_dir,
+        afd.to_bids_description(
+            dmriprep_dir,
             **{"Name": "Dummy",
-            "PipelineDescription": {"Name": "synthetic"}})
+               "PipelineDescription": {"Name": "synthetic"}})
 
         for subject in subjects:
             for modality in ['anat', 'dwi']:
@@ -101,22 +113,21 @@ def create_dummy_bids_path(n_subjects, n_sessions):
             bvecs[0] = 0
             bvals = np.ones(6) * 1000.
             bvals[0] = 0
-            np.savetxt(op.join(dmriprep_dir, subject, 'dwi',
-                            'dwi.bvals'),
-                    bvals)
-            np.savetxt(op.join(dmriprep_dir, subject, 'dwi',
-                            'dwi.bvecs'),
-                    bvecs)
-            nib.save(nib.Nifti1Image(data, aff),
-                    op.join(dmriprep_dir, subject, 'dwi',
-                            'dwi.nii.gz'))
-            nib.save(nib.Nifti1Image(data, aff),
-                    op.join(dmriprep_dir, subject, 'anat',
-                            'T1w.nii.gz'))
-            nib.save(nib.Nifti1Image(data, aff),
-                    op.join(dmriprep_dir, subject, 'anat',
-                            'seg.nii.gz'))
-
+            np.savetxt(
+                op.join(dmriprep_dir, subject, 'dwi', 'dwi.bvals'),
+                bvals)
+            np.savetxt(
+                op.join(dmriprep_dir, subject, 'dwi', 'dwi.bvecs'),
+                bvecs)
+            nib.save(
+                nib.Nifti1Image(data, aff),
+                op.join(dmriprep_dir, subject, 'dwi', 'dwi.nii.gz'))
+            nib.save(
+                nib.Nifti1Image(data, aff),
+                op.join(dmriprep_dir, subject, 'anat', 'T1w.nii.gz'))
+            nib.save(
+                nib.Nifti1Image(data, aff),
+                op.join(dmriprep_dir, subject, 'anat', 'seg.nii.gz'))
 
     return bids_dir
 
@@ -129,9 +140,10 @@ def test_AFQ_init():
         n_subjects = 3
         bids_path = create_dummy_bids_path(n_subjects, n_sessions)
         my_afq = api.AFQ(bids_path,
-                        dmriprep="synthetic",
-                        segmentation="synthetic")
-        npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
+                         dmriprep="synthetic",
+                         segmentation="synthetic")
+        npt.assert_equal(my_afq.data_frame.shape,
+                         (n_subjects * n_sessions, 11))
 
 
 def test_AFQ_no_prealign():
@@ -172,6 +184,7 @@ def test_DKI_profile():
                                           'derivatives', 'dmriprep'))
     myafq.get_dki_fa()
     myafq.get_dki_md()
+
 
 @xvfb_it
 def test_AFQ_data_waypoint():
@@ -290,30 +303,3 @@ def test_AFQ_data_waypoint():
         myafq.data_frame['results_dir'][0],
         'bundles',
         'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
-
-
-# def test_AFQ_data_recobundles():
-#     tmpdir = nbtmp.InTemporaryDirectory()
-#     afd.fetch_hcp(["100206"], hcp_bucket='hcp-openaccess', profile_name="hcp",
-#                   path=tmpdir.name)
-#     dmriprep_path = op.join(tmpdir.name, 'HCP', 'derivatives', 'dmriprep')
-#     seg_algo = "reco"
-#     bundle_names = ["F", "CST", "AF", "CC_ForcepsMajor"]
-#     myafq = api.AFQ(dmriprep_path=dmriprep_path,
-#                     sub_prefix='sub',
-#                     seg_algo=seg_algo,
-#                     bundle_names=bundle_names,
-#                     odf_model="DTI",
-#                     b0_threshold=15)
-
-#     # Replace the streamlines with precomputed:
-#     path_to_trk = dpd.fetcher.fetch_target_tractogram_hcp()
-#     path_to_trk = dpd.fetcher.get_target_tractogram_hcp()
-#     sl_file = op.join(myafq.data_frame.results_dir[0], 'sub-100206_sess-01_dwiDTI_det_streamlines.trk')
-#     shutil.copy(path_to_trk, sl_file)
-#     myafq.data_frame["streamlines_file"] = sl_file
-#     print("here")
-#     tgram = nib.streamlines.load(myafq.bundles[0]).tractogram
-#     print("here")
-#     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict)
-#     npt.assert_(len(bundles['CST_L']) > 0)
