@@ -35,7 +35,7 @@ def touch(fname, times=None):
 
 def create_dummy_bids_path(n_subjects, n_sessions):
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
-    sessions = ['sess-0%s' % (d + 1) for d in range(n_sessions)]
+    sessions = ['ses-0%s' % (d + 1) for d in range(n_sessions)]
 
     bids_dir = tempfile.mkdtemp()
 
@@ -46,7 +46,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     os.makedirs(dmriprep_dir)
     afd.to_bids_description(dmriprep_dir,
         **{"Name": "Dummy",
-           "PipelineDescription": {"Name": "Synthetic"}})
+           "PipelineDescription": {"Name": "synthetic"}})
 
     for subject in subjects:
         for session in sessions:
@@ -85,7 +85,7 @@ def test_AFQ_init():
     n_subjects = 3
     n_sessions = 2
     bids_path = create_dummy_bids_path(n_subjects, n_sessions)
-    my_afq = api.AFQ(bids_path)
+    my_afq = api.AFQ(bids_path, dmriprep="synthetic")
     npt.assert_equal(my_afq.data_frame.shape, (n_subjects * n_sessions, 11))
 
 

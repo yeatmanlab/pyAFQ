@@ -313,19 +313,19 @@ class AFQ(object):
                     bids_layout.get(subject=subject, session=session,
                                     extension='nii.gz', suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep))
+                                    scope=dmriprep)[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
                                     suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep))
+                                    scope=dmriprep)[0])
                 bval_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bval', 'bvals'],
                                     suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep))
+                                    scope=dmriprep)[0])
                 this_t1w = bids_layout.get(
                     subject=subject, session=session,
                     extension='.nii.gz',
@@ -339,10 +339,10 @@ class AFQ(object):
                     scope=segmentation)
 
                 if len(this_t1w):
-                    anat_file_list.append(this_t1w)
+                    anat_file_list.append(this_t1w[0])
 
                 if len(this_seg):
-                    seg_file_list.append(this_seg)
+                    seg_file_list.append(this_seg[0])
 
                 sub_list.append(subject)
                 sess_list.append(session)
@@ -350,7 +350,7 @@ class AFQ(object):
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            sess=sess_list,
+                                            ses=sess_list,
                                             results_dir=results_dir_list))
         # Add these if they exist:
         if len(seg_file_list):
