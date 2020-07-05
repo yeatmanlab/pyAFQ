@@ -146,32 +146,25 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 11))
 
 
-def test_AFQ_no_prealign():
+def test_AFQ_data():
     """
     Test if API can run without prealign
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                          'derivatives', 'dmriprep'),
-                    sub_prefix='sub',
-                    use_prealign=False)
-    myafq.export_rois()
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    for use_prealign in [True, False]:
 
-
-def test_AFQ_data():
-    """
-    Test with some actual data
-    """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                          'derivatives', 'dmriprep'),
-                    sub_prefix='sub')
-    npt.assert_equal(nib.load(myafq.b0[0]).shape,
-                     nib.load(myafq['dwi_file'][0]).shape[:3])
-    npt.assert_equal(nib.load(myafq.b0[0]).shape,
-                     nib.load(myafq.dti[0]).shape[:3])
+        myafq = api.AFQ(
+            bids_path=bids_path,
+            dmriprep='vistasoft',
+            segmentation='freesurfer',
+            use_prealign=use_prealign)
+        npt.assert_equal(nib.load(myafq.b0[0]).shape,
+                        nib.load(myafq['dwi_file'][0]).shape[:3])
+        npt.assert_equal(nib.load(myafq.b0[0]).shape,
+                        nib.load(myafq.dti[0]).shape[:3])
+        myafq.export_rois()
 
 
 def test_DKI_profile():
