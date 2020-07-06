@@ -11,7 +11,7 @@ import sys
 import shutil
 from pathlib import Path
 import json
-from fuzzywuzzy import fuzz, process
+from rapidfuzz import fuzz, process
 import subprocess as sp
 
 # These ORCIDs should go last
@@ -53,12 +53,12 @@ if __name__ == '__main__':
     name_matches = []
     position = 1
     for ele in data:
-        matches = process.extract(ele, zen_names, scorer=fuzz.token_sort_ratio,
-                                  limit=2)
-        # matches is a list:
-        # [('First match', % Match), ('Second match', % Match)]
-        if matches[0][1] > 80:
-            val = zenodo['creators'][zen_names.index(matches[0][0])]
+        match = process.extractOne(ele, zen_names,
+                                   scorer=fuzz.token_sort_ratio,
+                                   score_cutoff=80)
+
+        if match:
+            val = zenodo['creators'][zen_names.index(match[0])]
         else:
             # skip unmatched names
             print("No entry to sort:", ele)
