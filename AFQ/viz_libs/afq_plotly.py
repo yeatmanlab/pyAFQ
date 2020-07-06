@@ -135,10 +135,10 @@ def stop_creating_gifs():
 
 
 def _orca_err():
-    print("pyAFQ is trying to generate gifs using plotly. " +
-          "This requires orca, which cannot be installed via pip. " +
-          "See: https://github.com/plotly/orca \n" +
-          "Or consider using fury to visualize with pyAFQ instead")
+    print("pyAFQ is trying to generate gifs using plotly. "
+          + "This requires orca, which cannot be installed via pip. "
+          + "See: https://github.com/plotly/orca \n"
+          + "Or consider using fury to visualize with pyAFQ instead")
 
 
 def create_gif(figure,
