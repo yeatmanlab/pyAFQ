@@ -616,6 +616,25 @@ class AFQ(object):
                 img = nib.load(self._dti_fa(row))
             elif img_l == "dti_fa_template":
                 img = afd.read_fa_template()
+            elif img_l == "subject_sls": 
+                tg = load_tractogram(self._streamlines(row),
+                                     nib.load(row['dwi_file']),
+                                     Space.VOX)
+                return tg.streamlines, tg.affine
+            elif img_l == "hcp_atlas": #TODO: add use_slr flag; make sure not to prealign if its set
+                atlas_fname = op.join(
+                    afd.afq_home,
+                    'hcp_atlas_16_bundles',
+                    'Atlas_in_MNI_Space_16_bundles',
+                    'whole_brain',
+                    'whole_brain_MNI.trk')
+                if not op.exists(atlas_fname):
+                    afd.fetch_hcp_atlas_16_bundles()
+                hcp_atlas = load_tractogram(
+                    atlas_fname,
+                    'same', bbox_valid_check=False)
+
+                return hcp_atlas.streamlines, hcp_atlas.affine
             else:
                 img = nib.load(img)
 
@@ -687,11 +706,17 @@ class AFQ(object):
             static_data, static_affine = self._reg_img(row, self.static)
             moving_data, moving_affine = self._reg_img(row, self.moving)
 
-            warped_b0, mapping = reg.syn_registration(
-                moving_data, static_data,
-                moving_affine=moving_affine,
-                static_affine=static_affine,
-                prealign=reg_prealign)
+            if self.reg_algo == "slr":
+                mapping = reg.slr_registration(
+                    moving_data, static_data,
+                    moving_affine=moving_affine,
+                    static_affine=static_affine)
+            else:
+                _, mapping = reg.syn_registration(
+                    moving_data, static_data,
+                    moving_affine=moving_affine,
+                    static_affine=static_affine,
+                    prealign=reg_prealign)
 
             if self.use_prealign:
                 mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
