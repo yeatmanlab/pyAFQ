@@ -128,7 +128,17 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
 
 def stop_creating_gifs():
-    plotly.io.orca.shutdown_server()
+    try:
+        plotly.io.orca.shutdown_server()
+    except ValueError:
+        _orca_err()
+
+
+def _orca_err():
+    print("pyAFQ is trying to generate gifs using plotly. " +
+          "This requires orca, which cannot be installed via pip. " +
+          "See: https://github.com/plotly/orca \n" +
+          "Or consider using fury to visualize with pyAFQ instead")
 
 
 def create_gif(figure,
@@ -148,7 +158,11 @@ def create_gif(figure,
                      y=np.sin(theta) * zoom, z=z_offset)
         )
         figure.update_layout(scene_camera=camera)
-        figure.write_image(tdir + f"/tgif{i}.png")
+        try:
+            figure.write_image(tdir + f"/tgif{i}.png")
+        except ValueError:
+            _orca_err()
+            return
 
     if not creating_many:
         stop_creating_gifs()
