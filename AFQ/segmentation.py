@@ -145,7 +145,7 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
 
-        if not op.exists(save_intermediates):
+        if (save_intermediates is not None) and (not op.exists(save_intermediates)):
             os.makedirs(save_intermediates, exist_ok=True)
         self.save_intermediates = save_intermediates
 
