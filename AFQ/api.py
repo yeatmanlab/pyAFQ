@@ -344,7 +344,8 @@ class AFQ(object):
                 this_seg = bids_layout.get(
                     subject=subject, session=session,
                     extension='.nii.gz',
-                    suffix='seg', return_type='filename',
+                    suffix=seg_suffix,
+                    return_type='filename',
                     scope=segmentation)
 
                 if len(this_t1w):

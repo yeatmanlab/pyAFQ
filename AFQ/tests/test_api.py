@@ -173,8 +173,8 @@ def test_DKI_profile():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'cfin_multib',
-                                          'derivatives', 'dmriprep'))
+    myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
+                    dmriprep='dipy')
     myafq.get_dki_fa()
     myafq.get_dki_md()
 
@@ -186,8 +186,7 @@ def test_AFQ_data_waypoint():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    dmriprep_path = op.join(tmpdir.name, 'stanford_hardi',
-                            'derivatives', 'dmriprep')
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI")
     segmentation_params = dict(filter_by_endpoints=False,
@@ -196,8 +195,9 @@ def test_AFQ_data_waypoint():
 
     clean_params = dict(return_idx=True)
 
-    myafq = api.AFQ(dmriprep_path=dmriprep_path,
-                    sub_prefix='sub',
+    myafq = api.AFQ(bids_path=bids_path,
+                    dmriprep='vistasoft',
+                    segmentation='freesurfer',
                     bundle_names=bundle_names,
                     scalars=["dti_fa", "dti_md"],
                     tracking_params=tracking_params,
@@ -267,8 +267,10 @@ def test_AFQ_data_waypoint():
     # Test the CLI:
     print("Running the CLI:")
 
-    # Bare bones config only points to the files
-    config = dict(files=dict(dmriprep_path=dmriprep_path))
+    # Bare bones config only points to the files:
+    config = dict(files=dict(bids_path=bids_path,
+                             dmriprep='vistasoft',
+                             segmentation='freesurfer'))
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:

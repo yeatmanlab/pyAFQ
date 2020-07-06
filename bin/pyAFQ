@@ -64,7 +64,7 @@ The default values of the configuration are:
 
 ```
 [files]
-dmriprep_path = '/path/to/dmriprep/folder'
+bids_path = '/path/to/bids/dataset/'
 
 [bundles]
 bundles = {api.BUNDLES}
@@ -117,17 +117,17 @@ for component in config.keys():
 
 files = config.get("files", {})
 
-dmriprep_path = files.get("dmriprep_path")
+dmriprep_path = files.get("bids_path")
 
 if dmriprep_path is None:
-    raise RuntimeError("Config file must provide dmriprep_path")
+    raise RuntimeError("Config file must provide bids_path")
 
 config['pyAFQ'] = {}
 config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
 config['pyAFQ']['version'] = AFQ.__version__
 config['pyAFQ']['platform'] = platform.system()
 
-afq_path = op.join(op.split(dmriprep_path)[0], 'afq')
+afq_path = op.join(bids_path, 'derivatives', 'afq')
 os.makedirs(afq_path, exist_ok=True)
 
 afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
@@ -135,12 +135,7 @@ afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
 with open(afq_metadata_file, 'w') as ff:
     toml.dump(config, ff)
 
-sub_prefix = files.get("sub_prefix", "sub")
-dwi_folder = files.get("dwi_folder", "dwi")
-dwi_file = files.get("dwi_file", "*dwi")
-anat_folder = files.get("anat_folder", "anat")
-anat_file = files.get("anat_file", "*T1w*")
-seg_file = files.get("seg_file", "*aparc+aseg*")
+seg_suffix = files.get("seg_suffix", "seg")
 reg_template = files.get("reg_template", None)
 
 tracking = config.get("tracking", {})
@@ -173,13 +168,10 @@ dask_it = compute.get("dask_it", False)
 force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 
-myafq = api.AFQ(dmriprep_path,
-                sub_prefix=sub_prefix,
-                dwi_folder=dwi_folder,
-                dwi_file=dwi_file,
-                anat_folder=anat_folder,
-                anat_file=anat_file,
-                seg_file=seg_file,
+myafq = api.AFQ(bids_path,
+                dmriprep=dmriprep,
+                segmentation=segmentation,
+                seg_suffix=seg_suffix,
                 b0_threshold=float(b0_threshold),
                 bundle_names=bundle_names,
                 dask_it=dask_it,
