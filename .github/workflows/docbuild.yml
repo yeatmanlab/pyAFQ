@@ -24,10 +24,9 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install -r requirements-fury.txt
-        pip install .
     - name: Install software
       run: |
-        pip install .
+        pip install -e .
     - name: Build docs
       run: |
         cd docs
