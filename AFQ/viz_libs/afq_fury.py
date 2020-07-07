@@ -5,14 +5,13 @@ import os.path as op
 import numpy as np
 import IPython.display as display
 
+import AFQ.viz_libs.utils as vut
+
 try:
     from dipy.viz import window, actor, ui
     from fury.colormap import line_colors
 except ImportError:
-    raise ImportError(viz_import_msg_error("fury"))
-
-import AFQ.viz_libs.utils as vut
-
+    raise ImportError(vut.viz_import_msg_error("fury"))
 
 def _inline_interact(scene, inline, interact):
     """

@@ -5,15 +5,15 @@ import enum
 
 import numpy as np
 
+import dipy.tracking.streamlinespeed as dps
+
+import AFQ.viz_libs.utils as vut
+
 try:
     import plotly
     import plotly.graph_objs as go
 except ImportError:
-    raise ImportError(viz_import_msg_error("plotly"))
-
-import dipy.tracking.streamlinespeed as dps
-
-import AFQ.viz_libs.utils as vut
+    raise ImportError(vut.viz_import_msg_error("plotly"))
 
 
 def _inline_interact(figure, show, show_inline):
