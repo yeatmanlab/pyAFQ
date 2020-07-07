@@ -4,12 +4,14 @@ import os
 import os.path as op
 import json
 from glob import glob
+import shutil
 
 import boto3
 import s3fs
 
 import numpy as np
 import pandas as pd
+import logging
 
 import nibabel as nib
 from templateflow import api as tflow
@@ -925,6 +927,16 @@ def s3fs_json_write(data, fname, fs=None):
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
 
+def _apply_mask(template_img, resolution=1):
+    mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                        resolution=resolution,
+                                        desc='brain',
+                                        suffix='mask')))
+
+    template_data = template_img.get_fdata()
+    mask_data = mask_img.get_fdata()
+    out_data = template_data * mask_data
+    return nib.Nifti1Image(out_data, template_img.affine)
 
 def read_mni_template(resolution=1, mask=True):
     """
@@ -953,25 +965,71 @@ def read_mni_template(resolution=1, mask=True):
     if not mask:
         return template_img
     else:
-        mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
-                                          resolution=resolution,
-                                          desc='brain',
-                                          suffix='mask')))
-
-        template_data = template_img.get_fdata()
-        mask_data = mask_img.get_fdata()
-        out_data = template_data * mask_data
-        return nib.Nifti1Image(out_data, template_img.affine)
+        return _apply_mask(template_img, resolution)
 
 
-def read_fa_template():
+fetch_biobank_templates = \
+    _make_fetcher(
+        "fetch_biobank_templates",
+        op.join(afq_home,
+                'biobank_templates'),
+        "http://biobank.ctsu.ox.ac.uk/showcase/showcase/docs/",
+        ["bmri_group_means.zip"],
+        ["bmri_group_means.zip"],
+        data_size="1.1 GB",
+        doc="Download UK Biobank templates",
+        unzip=True)
+
+def read_fa_template(mask=True):
     """
-
     Reads the FA template
+
+    Parameters
+    ----------
+    mask : bool, optional
+        Whether to mask the data with a brain-mask before returning the image.
+        Default : True
 
     Returns
     -------
     nib.Nifti1Image class instance containing the FA template.
 
     """
-    raise NotImplementedError
+    fa_folder = op.join(
+        afq_home,
+        'biobank_templates',
+        'UKBiobank_BrainImaging_GroupMeanTemplates'
+    )
+    fa_path = op.join(
+        fa_folder,
+        'dti_FA.nii.gz'
+    )
+
+    if not op.exists(fa_path):
+        logger = logging.getLogger('AFQ.data')
+        logger.warning(
+            "Downloading brain MRI group mean statistics from UK Biobank. "
+            + "This download is approximately 1.1 GB. "
+            + "It is currently necessary to access the FA template.")
+
+        files, folder = fetch_biobank_templates()
+
+        # remove zip
+        for filename in files:
+            os.remove(op.join(folder, filename))
+
+        # remove non-FA related directories
+        for filename in os.listdir(fa_folder):
+            full_path = op.join(fa_folder, filename)
+            if full_path != fa_path: 
+                if os.path.isfile(full_path):
+                    os.remove(full_path)
+                else:
+                    shutil.rmtree(full_path)
+
+    template_img = nib.load(fa_path)
+
+    if not mask:
+        return template_img
+    else:
+        return _apply_mask(template_img, 1)
