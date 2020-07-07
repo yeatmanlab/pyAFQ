@@ -936,10 +936,17 @@ def _apply_mask(template_img, resolution=1):
 
     template_data = template_img.get_fdata()
     mask_data = mask_img.get_fdata()
-    out_data = template_data * (
-        mask_data[:template_data.shape[0],
-                  :template_data.shape[1],
-                  :template_data.shape[2]])
+
+    if mask_data.shape != template_data.shape:
+        mask_img = nib.Nifti1Image(
+            reg.resample(mask_data,
+                         template_data,
+                         mask_img.affine,
+                         template_img.affine),
+            template_img.affine)
+        mask_data = mask_img.get_fdata()
+
+    out_data = template_data * mask_data
     return nib.Nifti1Image(out_data, template_img.affine)
 
 
