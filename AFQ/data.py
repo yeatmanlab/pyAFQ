@@ -301,6 +301,9 @@ def read_templates(resample_to=False):
 def get_s3_client(anon=True):
     """Return a boto3 s3 client
 
+    Global boto clients are not thread safe so we use this function
+    to return independent session clients for different threads.
+
     Parameters
     ----------
     anon : bool, default=True
@@ -313,14 +316,14 @@ def get_s3_client(anon=True):
     -------
     s3_client : boto3.client('s3')
     """
+    session = boto3.session.Session()
     if anon:
-        # Global s3 client to preserve anonymous config
-        s3_client = boto3.client(
+        s3_client = session.client(
             's3',
             config=Config(signature_version=UNSIGNED)
         )
     else:
-        s3_client = boto3.client('s3')
+        s3_client = session.client('s3')
 
     return s3_client
 
