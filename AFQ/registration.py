@@ -20,7 +20,8 @@ from dipy.align.transforms import (TranslationTransform3D,
 
 import dipy.core.gradients as dpg
 import dipy.data as dpd
-from dipy.align.streamlinear import StreamlineLinearRegistration, whole_brain_slr
+from dipy.align.streamlinear import \
+    StreamlineLinearRegistration, whole_brain_slr
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import transform_tracking_output
 from dipy.io.streamline import load_tractogram, load_trk
@@ -276,7 +277,6 @@ def affine_registration(moving, static,
                         sigmas=[5.0, 2.5, 0.0],
                         factors=[4, 2, 1],
                         params0=None):
-
     """
     Find the affine transformation between two 3D images.
 
@@ -450,6 +450,9 @@ def slr_registration(moving_data, static_data,
 
     _, transform, _, _ = whole_brain_slr(
         moving_data, static_data, x0='affine', verbose=False)
-    
-    return AffineMap(transform, domain_grid_shape=static_affine.shape, domain_grid2world=static_affine,
-                 codomain_grid_shape=static_affine.shape, codomain_grid2world=static_affine)
+
+    return AffineMap(transform,
+                     domain_grid_shape=static_affine.shape,
+                     domain_grid2world=static_affine,
+                     codomain_grid_shape=static_affine.shape,
+                     codomain_grid2world=static_affine)
