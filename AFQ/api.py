@@ -147,6 +147,8 @@ class AFQ(object):
                  b0_threshold=0,
                  moving="b0",
                  static="mni",
+                 mask_templ=True,
+                 reg_algo="syn",
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
@@ -193,7 +195,7 @@ class AFQ(object):
             probablistic) {"det", "prob"}. Default: "det".
 
         moving : str or Nifti1Image, optional
-            The source image data to be registered. 
+            The source image data to be registered.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni", "b0", "dti_fa_subject", or "dti_fa_template",
             image data will be loaded automatically.
@@ -203,6 +205,14 @@ class AFQ(object):
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni", "b0", "dti_fa_subject", or "dti_fa_template",
             image data will be loaded automatically.
+
+        mask_templ : bool, optional
+            Whether to mask the chosen template(s) with a brain-mask
+            Default: True
+
+        reg_algo : string, optional
+            Algorithm to use for registration. Can be either 'syn' or 'slr'.
+            Default: 'syn'
 
         dask_it : bool, optional
             Whether to use a dask DataFrame object
@@ -250,7 +260,10 @@ class AFQ(object):
         self.wm_criterion = wm_criterion
         self.moving = moving
         self.static = static
-        self.use_prealign = use_prealign
+        self.mask_templ = mask_templ
+        self.wm_labels = wm_labels
+        self.reg_algo = reg_algo.lower()
+        self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
 
         self.scalars = scalars
 
@@ -285,7 +298,7 @@ class AFQ(object):
         self.clean_params = default_clean_params
 
         if reg_template is None:
-            self.reg_template = afd.read_mni_template()
+            self.reg_template = afd.read_mni_template(mask=self.mask_templ)
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
@@ -609,19 +622,19 @@ class AFQ(object):
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni":
-                img = afd.read_mni_template()
+                img = afd.read_mni_template(mask=self.mask_templ)
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
             elif img_l == "dti_fa_subject":
                 img = nib.load(self._dti_fa(row))
             elif img_l == "dti_fa_template":
-                img = afd.read_fa_template()
-            elif img_l == "subject_sls": 
+                img = afd.read_fa_template(mask=self.mask_templ)
+            elif img_l == "subject_sls":
                 tg = load_tractogram(self._streamlines(row),
                                      nib.load(row['dwi_file']),
                                      Space.VOX)
                 return tg.streamlines, tg.affine
-            elif img_l == "hcp_atlas": #TODO: add use_slr flag; make sure not to prealign if its set
+            elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
                     afd.afq_home,
                     'hcp_atlas_16_bundles',
@@ -697,7 +710,6 @@ class AFQ(object):
                 + '_without_prealign.nii.gz')
 
         if self.force_recompute or not op.exists(mapping_file):
-            gtab = row['gtab']
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
