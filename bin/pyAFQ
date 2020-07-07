@@ -74,6 +74,12 @@ seg_algo = 'AFQ'
 scalars_model = 'DTI'
 scalars = ['dti_fa', 'dti_md']
 
+[template]
+moving="b0"
+static="mni"
+mask_templ=True
+reg_algo="syn"
+
 [tracking]
 {chr(10).join(track_defaults_list)}
 wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
@@ -175,6 +181,11 @@ force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 viz_backend = compute.get("viz_backend", 'fury')
 
+moving = compute.get("moving", "b0")
+static = compute.get("static", "mni")
+mask_templ = compute.get("mask_templ", True)
+reg_algo = compute.get("reg_algo", "syn")
+
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,
                 segmentation=segmentation_path,
@@ -185,6 +196,10 @@ myafq = api.AFQ(bids_path,
                 force_recompute=force_recompute,
                 reg_template=reg_template,
                 wm_criterion=wm_criterion,
+                moving=moving,
+                static=static,
+                mask_templ=mask_templ,
+                reg_algo=reg_algo,
                 virtual_frame_buffer=virtual_frame_buffer,
                 viz_backend=viz_backend,
                 segmentation_params=segmentation_params,

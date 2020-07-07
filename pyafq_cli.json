@@ -46,6 +46,12 @@
         "description": "Parameters related to cleaning.",
         "members": ["n_points", "clean_rounds", "distance_threshold",
                     "length_threshold", "min_sl", "stat", "cleaning_return_idx"]
+    },
+    {
+        "id": "template_group",
+        "name": "Template Group",
+        "description": "Parameters related to registering to a template.",
+        "members": ["moving", "static", "mask_templ", "reg_algo"]
     }
     ],
     "inputs": [
@@ -443,6 +449,39 @@
         "optional": true
     },
     {
+        "id": "moving",
+        "name": "moving",
+        "type": "String",
+        "value-key": "[MOVING]",
+        "default-value": "b0",
+        "optional": true
+    },
+    {
+        "id": "static",
+        "name": "static",
+        "type": "String",
+        "value-key": "[STATIC]",
+        "default-value": "mni",
+        "optional": true
+    },
+    {
+        "id": "mask_templ",
+        "name": "mask_templ",
+        "type": "String",
+        "value-key": "[MASK_TEMPL]",
+        "value-choices": ["false", "true"],
+        "default-value": "true",
+        "optional": true
+    },
+    {
+        "id": "reg_algo",
+        "name": "reg_algo",
+        "type": "String",
+        "value-key": "[REG_ALGO]",
+        "default-value": "syn",
+        "optional": true
+    },
+    {
         "id": "dask_it",
         "name": "dask it",
         "type": "String",
@@ -511,6 +550,12 @@
             "min_sl = [MIN_SL]",
             "stat = '[STAT]'",
             "return_idx = [CLEANING_RETURN_IDX]",
+            "",
+            "[template]",
+            "moving=[MOVING]",
+            "static=[STATIC]",
+            "mask_templ=[MASK_TEMPL]",
+            "reg_algo=[REG_ALGO]",
             "",
             "[compute]",
             "dask_it = [DASK_IT]",
