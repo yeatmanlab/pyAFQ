@@ -45,6 +45,16 @@ POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
                          "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
 
+def viz_import_msg_error(module):
+    msg = f"To use {module.upper()} visualizations in pyAFQ, you will need "
+    msg += f"to have {module.upper()} installed. "
+    msg += f"You can do that by installing pyAFQ with "
+    msg += f"`pip install AFQ[{module.lower()}]`, or by "
+    msg += f"separately installing {module.upper()}: "
+    msg += f"`pip install {module.lower()}`."
+    return msg
+
+
 def tract_loader(trk, affine):
     """Helper function """
     if isinstance(trk, str):

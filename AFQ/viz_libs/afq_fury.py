@@ -5,8 +5,11 @@ import os.path as op
 import numpy as np
 import IPython.display as display
 
-from dipy.viz import window, actor, ui
-from fury.colormap import line_colors
+try:
+    from dipy.viz import window, actor, ui
+    from fury.colormap import line_colors
+except ImportError:
+    raise ImportError(viz_import_msg_error("fury"))
 
 import AFQ.viz_libs.utils as vut
 

@@ -4,7 +4,7 @@ import os.path as op
 import IPython.display as display
 import matplotlib.pyplot as plt
 
-from AFQ.viz_libs.utils import POSITIONS, COLOR_DICT
+from AFQ.viz_libs.utils import POSITIONS, COLOR_DICT, viz_import_msg_error
 
 
 class Viz:
@@ -20,14 +20,20 @@ class Viz:
                 Default: "fury"
         """
         if viz_library == "fury":
-            import AFQ.viz_libs.afq_fury
+            try:
+                import AFQ.viz_libs.afq_fury
+            except ImportError:
+                raise ImportError(viz_import_msg_error("fury"))
             self.visualize_bundles = AFQ.viz_libs.afq_fury.visualize_bundles
             self.visualize_roi = AFQ.viz_libs.afq_fury.visualize_roi
             self.visualize_volume = AFQ.viz_libs.afq_fury.visualize_volume
             self.create_gif = AFQ.viz_libs.afq_fury.create_gif
             self.stop_creating_gifs = AFQ.viz_libs.afq_fury.stop_creating_gifs
         elif viz_library == "plotly":
-            import AFQ.viz_libs.afq_plotly
+            try:
+                import AFQ.viz_libs.afq_plotly
+            except ImportError:
+                raise ImportError(viz_import_msg_error("plotly"))
             self.visualize_bundles = AFQ.viz_libs.afq_plotly.visualize_bundles
             self.visualize_roi = AFQ.viz_libs.afq_plotly.visualize_roi
             self.visualize_volume = AFQ.viz_libs.afq_plotly.visualize_volume

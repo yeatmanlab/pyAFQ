@@ -4,8 +4,12 @@ import os.path as op
 import enum
 
 import numpy as np
-import plotly
-import plotly.graph_objs as go
+
+try:
+    import plotly
+    import plotly.graph_objs as go
+except ImportError:
+    raise ImportError(viz_import_msg_error("plotly"))
 
 import dipy.tracking.streamlinespeed as dps
 
@@ -131,11 +135,11 @@ def stop_creating_gifs():
     try:
         plotly.io.orca.shutdown_server()
     except ValueError:
-        _orca_err()
+        ValueError(_orca_err())
 
 
 def _orca_err():
-    print("pyAFQ is trying to generate gifs using plotly. "
+    return ("pyAFQ is trying to generate gifs using plotly. "
           + "This requires orca, which cannot be installed via pip. "
           + "See: https://github.com/plotly/orca \n"
           + "Or consider using fury to visualize with pyAFQ instead")
@@ -161,8 +165,7 @@ def create_gif(figure,
         try:
             figure.write_image(tdir + f"/tgif{i}.png")
         except ValueError:
-            _orca_err()
-            return
+            ValueError(_orca_err())
 
     if not creating_many:
         stop_creating_gifs()
