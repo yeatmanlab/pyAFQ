@@ -927,16 +927,21 @@ def s3fs_json_write(data, fname, fs=None):
     with fs.open(fname, 'w') as ff:
         json.dump(data, ff)
 
+
 def _apply_mask(template_img, resolution=1):
     mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
-                                        resolution=resolution,
-                                        desc='brain',
-                                        suffix='mask')))
+                                      resolution=resolution,
+                                      desc='brain',
+                                      suffix='mask')))
 
     template_data = template_img.get_fdata()
     mask_data = mask_img.get_fdata()
-    out_data = template_data * mask_data
+    out_data = template_data * (
+        mask_data[:template_data.shape[0],
+                  :template_data.shape[1],
+                  :template_data.shape[2]])
     return nib.Nifti1Image(out_data, template_img.affine)
+
 
 def read_mni_template(resolution=1, mask=True):
     """
@@ -980,6 +985,7 @@ fetch_biobank_templates = \
         doc="Download UK Biobank templates",
         unzip=True)
 
+
 def read_fa_template(mask=True):
     """
     Reads the FA template
@@ -1021,7 +1027,7 @@ def read_fa_template(mask=True):
         # remove non-FA related directories
         for filename in os.listdir(fa_folder):
             full_path = op.join(fa_folder, filename)
-            if full_path != fa_path: 
+            if full_path != fa_path:
                 if os.path.isfile(full_path):
                     os.remove(full_path)
                 else:
