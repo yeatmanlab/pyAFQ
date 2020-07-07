@@ -1,4 +1,5 @@
 import os.path as op
+import os
 import logging
 
 import numpy as np
@@ -143,12 +144,15 @@ class Segmentation:
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
+
+        if (save_intermediates is not None) and \
+                (not op.exists(save_intermediates)):
+            os.makedirs(save_intermediates, exist_ok=True)
         self.save_intermediates = save_intermediates
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=0, img_affine=None):
-
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
