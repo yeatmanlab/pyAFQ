@@ -134,20 +134,20 @@ def create_gif(figure,
         Number of frames in gif.
         Will be evenly distributed throughout the rotation. 
         Default: 60
-    
+
     zoom: float, optional
         How much to magnify the figure in the fig. 
         Default: 1.0
-    
+
     creating_many: bool, optional
         Whether or not you intend to repeatedly call this function.
         Can speed up performance when using plotly.
         Default: False
-    
+
     size: tuple, optional
         Size of the gif.
         Default: (600, 600)
-    
+
     rotate_forward: bool, optional
         Whether to rotate the figure forward before converting to a gif.
         Generally necessary for fury scenes.

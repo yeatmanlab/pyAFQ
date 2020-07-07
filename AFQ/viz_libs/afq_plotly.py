@@ -140,9 +140,9 @@ def stop_creating_gifs():
 
 def _orca_err():
     return ("pyAFQ is trying to generate gifs using plotly. "
-          + "This requires orca, which cannot be installed via pip. "
-          + "See: https://github.com/plotly/orca \n"
-          + "Or consider using fury to visualize with pyAFQ instead")
+            + "This requires orca, which cannot be installed via pip. "
+            + "See: https://github.com/plotly/orca \n"
+            + "Or consider using fury to visualize with pyAFQ instead")
 
 
 def create_gif(figure,
@@ -167,16 +167,16 @@ def create_gif(figure,
         Number of frames in gif.
         Will be evenly distributed throughout the rotation. 
         Default: 60
-    
+
     zoom: float, optional
         How much to magnify the figure in the fig. 
         Default: 2.5
-    
+
     creating_many: bool, optional
         Whether or not you intend to repeatedly call this function.
         Can speed up performance when using plotly.
         Default: False
-    
+
     size: tuple, optional
         Size of the gif.
         Default: (600, 600)
@@ -381,7 +381,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
     figure : Plotly Figure object, optional
         If provided, the visualization will be added to this Figure. Default:
         Initialize a new Figure.
-    
+
     show_x : bool, optional
         Whether to show Coronal Slice.
         Default: True

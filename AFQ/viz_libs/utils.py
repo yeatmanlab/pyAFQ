@@ -68,7 +68,7 @@ def tract_loader(trk, affine):
 
     affine : ndarray
        An affine transformation to apply to the streamlines.
-    
+
     Returns
     -------
     Tractogram
@@ -91,7 +91,7 @@ def bundle_selector(bundle_dict, colors, b):
     Selects bundle and color
     from the given bundle dictionary and color informaiton
     Helper function
-    
+
     Parameters
     ----------
     bundle_dict : dict, optional
@@ -108,7 +108,7 @@ def bundle_selector(bundle_dict, colors, b):
         If this is a dict, keys are bundle names and values are RGB tuples.
         If this is a list, each item is an RGB tuple. Defaults to a list
         with Tableau 20 RGB values
-    
+
     Returns
     -------
     RGB tuple and str
@@ -227,7 +227,7 @@ def prepare_roi(roi, affine_or_mapping, static_img,
     Load the ROI
     Possibly perform a transformation on an ROI
     Helper function
-    
+
     Parameters
     ----------
     roi : str or Nifti1Image
@@ -247,7 +247,7 @@ def prepare_roi(roi, affine_or_mapping, static_img,
 
     reg_template: str or Nifti1Image
         Template to use for registration.
-    
+
     Returns
     -------
     ndarray
@@ -298,7 +298,7 @@ def load_volume(volume):
         3d volume to load.
         If string, it is used as a file path.
         If it is an ndarray, it is simply returned.
-        
+
     Returns
     -------
     ndarray
