@@ -165,11 +165,11 @@ def create_gif(figure,
 
     n_frames: int, optional
         Number of frames in gif.
-        Will be evenly distributed throughout the rotation. 
+        Will be evenly distributed throughout the rotation.
         Default: 60
 
     zoom: float, optional
-        How much to magnify the figure in the fig. 
+        How much to magnify the figure in the fig.
         Default: 2.5
 
     creating_many: bool, optional

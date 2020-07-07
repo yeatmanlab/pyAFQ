@@ -13,6 +13,7 @@ try:
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("fury"))
 
+
 def _inline_interact(scene, inline, interact):
     """
     Helper function to reuse across viz functions
@@ -131,11 +132,11 @@ def create_gif(figure,
 
     n_frames: int, optional
         Number of frames in gif.
-        Will be evenly distributed throughout the rotation. 
+        Will be evenly distributed throughout the rotation.
         Default: 60
 
     zoom: float, optional
-        How much to magnify the figure in the fig. 
+        How much to magnify the figure in the fig.
         Default: 1.0
 
     creating_many: bool, optional

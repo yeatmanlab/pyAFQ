@@ -59,12 +59,12 @@ def viz_import_msg_error(module):
 def tract_loader(trk, affine):
     """
     Loads tracts
-    Helper function 
+    Helper function
 
     Parameters
     ----------
     trk : str, list, or Streamlines
-        The streamline information. 
+        The streamline information.
 
     affine : ndarray
        An affine transformation to apply to the streamlines.
@@ -197,7 +197,7 @@ def tract_generator(tg, bundle, bundle_dict, colors):
 def gif_from_pngs(tdir, gif_fname, n_frames,
                   png_fname="tgif", add_zeros=False):
     """
-        Helper function 
+        Helper function
         Stitches together gif from screenshots
     """
     if add_zeros:
