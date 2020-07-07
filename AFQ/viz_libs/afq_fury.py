@@ -80,7 +80,7 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     -------
     Fury Scene object
     """
-    tg, streamlines = vut.tract_loader(trk, affine)
+    tg = vut.tract_loader(trk, affine)
 
     if figure is None:
         figure = window.Scene()
@@ -88,7 +88,7 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     figure.SetBackground(background[0], background[1], background[2])
 
     for (sls, color, name) in \
-            vut.tract_generator(tg, streamlines, bundle, bundle_dict, colors):
+            vut.tract_generator(tg, bundle, bundle_dict, colors):
         if name == "all_bundles":
             color = line_colors(sls)
 
@@ -175,11 +175,11 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
     Parameters
     ----------
-    roi : str, list, or Streamlines
-        The streamline information
+    roi : str or Nifti1Image
+        The ROI information
 
     affine_or_mapping : ndarray, Nifti1Image, or str, optional
-       An affine transformation or mapping to apply to the streamlines before
+       An affine transformation or mapping to apply to the ROIs before
        visualization. Default: no transform.
 
     static_img: str or Nifti1Image, optional

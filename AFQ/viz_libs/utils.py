@@ -46,6 +46,7 @@ POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
 
 
 def viz_import_msg_error(module):
+    """Alerts user to install the appropriate viz module """
     msg = f"To use {module.upper()} visualizations in pyAFQ, you will need "
     msg += f"to have {module.upper()} installed. "
     msg += f"You can do that by installing pyAFQ with "
@@ -56,7 +57,22 @@ def viz_import_msg_error(module):
 
 
 def tract_loader(trk, affine):
-    """Helper function """
+    """
+    Loads tracts
+    Helper function 
+
+    Parameters
+    ----------
+    trk : str, list, or Streamlines
+        The streamline information. 
+
+    affine : ndarray
+       An affine transformation to apply to the streamlines.
+    
+    Returns
+    -------
+    Tractogram
+    """
     if isinstance(trk, str):
         trk = nib.streamlines.load(trk)
         tg = trk.tractogram
@@ -67,11 +83,36 @@ def tract_loader(trk, affine):
     if affine is not None:
         tg = tg.apply_affine(np.linalg.inv(affine))
 
-    return tg, tg.streamlines
+    return tg
 
 
 def bundle_selector(bundle_dict, colors, b):
-    """Helper function """
+    """
+    Selects bundle and color
+    from the given bundle dictionary and color informaiton
+    Helper function
+    
+    Parameters
+    ----------
+    bundle_dict : dict, optional
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the trk
+        metadata. Default: bundles are either not identified, or identified
+        only as unique integers in the metadata.
+
+    bundle : str or int, optional
+        The name of a bundle to select from among the keys in `bundle_dict`
+        or an integer for selection from the trk metadata.
+
+    colors : dict or list
+        If this is a dict, keys are bundle names and values are RGB tuples.
+        If this is a list, each item is an RGB tuple. Defaults to a list
+        with Tableau 20 RGB values
+    
+    Returns
+    -------
+    RGB tuple and str
+    """
     b_name = str(b)
     if bundle_dict is None:
         # We'll choose a color from a rotating list:
@@ -90,8 +131,35 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(tg, streamlines, bundle, bundle_dict, colors):
-    """Helper function """
+def tract_generator(tg, bundle, bundle_dict, colors):
+    """
+    Generates bundles of streamlines from the tractogram.
+    Only generates from relevant bundle if bundle is set.
+    Uses bundle_dict and colors to assign colors if set.
+    Otherwise, returns all streamlines.
+
+    Helper function
+
+    Parameters
+    ----------
+    trk : Tractogram
+        Tractogram to pull streamlines from.
+
+    bundle : str or int
+        The name of a bundle to select from among the keys in `bundle_dict`
+        or an integer for selection from the trk metadata.
+
+    colors : dict or list
+        If this is a dict, keys are bundle names and values are RGB tuples.
+        If this is a list, each item is an RGB tuple. Defaults to a list
+        with Tableau 20 RGB values
+
+    Returns
+    -------
+    list, RGB tuple, str
+    """
+    streamlines = tg.streamlines
+
     if colors is None:
         # Use the color dict provided
         colors = COLOR_DICT
@@ -128,7 +196,10 @@ def tract_generator(tg, streamlines, bundle, bundle_dict, colors):
 
 def gif_from_pngs(tdir, gif_fname, n_frames,
                   png_fname="tgif", add_zeros=False):
-    """Helper function """
+    """
+        Helper function 
+        Stitches together gif from screenshots
+    """
     if add_zeros:
         fname_suffix10 = "00000"
         fname_suffix100 = "0000"
@@ -152,7 +223,35 @@ def gif_from_pngs(tdir, gif_fname, n_frames,
 
 def prepare_roi(roi, affine_or_mapping, static_img,
                 roi_affine, static_affine, reg_template):
-    """Helper function """
+    """
+    Load the ROI
+    Possibly perform a transformation on an ROI
+    Helper function
+    
+    Parameters
+    ----------
+    roi : str or Nifti1Image
+        The ROI information.
+        If str, ROI will be loaded using the str as a path.
+
+    affine_or_mapping : ndarray, Nifti1Image, or str
+       An affine transformation or mapping to apply to the ROI before
+       visualization. Default: no transform.
+
+    static_img: str or Nifti1Image
+        Template to resample roi to.
+
+    roi_affine: ndarray
+
+    static_affine: ndarray
+
+    reg_template: str or Nifti1Image
+        Template to use for registration.
+    
+    Returns
+    -------
+    ndarray
+    """
     if not isinstance(roi, np.ndarray):
         if isinstance(roi, str):
             roi = nib.load(roi).get_fdata()
@@ -189,7 +288,21 @@ def prepare_roi(roi, affine_or_mapping, static_img,
 
 
 def load_volume(volume):
-    """Helper function """
+    """
+    Load a volume
+    Helper function
+
+    Parameters
+    ----------
+    volume : ndarray or str
+        3d volume to load.
+        If string, it is used as a file path.
+        If it is an ndarray, it is simply returned.
+        
+    Returns
+    -------
+    ndarray
+    """
     if isinstance(volume, str):
         return nib.load(volume).get_fdata()
     else:
