@@ -114,17 +114,52 @@ def stop_creating_gifs():
 def create_gif(figure,
                file_name,
                n_frames=60,
-               zoom=2.5,
+               zoom=1.0,
                z_offset=0.5,
                creating_many=False,
                size=(600, 600),
                rotate_forward=True):
+    """
+    Convert a Fury Scene object into a gif
+
+    Parameters
+    ----------
+    figure: Fury Scene object
+        Scene to be converted to a gif
+
+    file_name: str
+        File to save gif to.
+
+    n_frames: int, optional
+        Number of frames in gif.
+        Will be evenly distributed throughout the rotation. 
+        Default: 60
+    
+    zoom: float, optional
+        How much to magnify the figure in the fig. 
+        Default: 1.0
+    
+    creating_many: bool, optional
+        Whether or not you intend to repeatedly call this function.
+        Can speed up performance when using plotly.
+        Default: False
+    
+    size: tuple, optional
+        Size of the gif.
+        Default: (600, 600)
+    
+    rotate_forward: bool, optional
+        Whether to rotate the figure forward before converting to a gif.
+        Generally necessary for fury scenes.
+        Default: True
+    """
     if rotate_forward:
         figure = scene_rotate_forward(figure)
 
     tdir = tempfile.gettempdir()
     window.record(figure, az_ang=360.0 / n_frames, n_frames=n_frames,
                   path_numbering=True, out_path=tdir + '/tgif',
+                  magnification=zoom,
                   size=size)
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
@@ -137,6 +172,53 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   inline=False, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
+
+    Parameters
+    ----------
+    roi : str, list, or Streamlines
+        The streamline information
+
+    affine_or_mapping : ndarray, Nifti1Image, or str, optional
+       An affine transformation or mapping to apply to the streamlines before
+       visualization. Default: no transform.
+
+    static_img: str or Nifti1Image, optional
+        Template to resample roi to.
+        Default: None
+
+    roi_affine: ndarray, optional
+        Default: None
+
+    static_affine: ndarray, optional
+        Default: None
+
+    reg_template: str or Nifti1Image, optional
+        Template to use for registration.
+        Default: None
+
+    color : ndarray, optional
+        RGB color for ROI.
+        Default: np.array([1, 0, 0])
+
+    opacity : float, optional
+        Opacity of ROI.
+        Default: 1.0
+
+    figure : fury Scene object, optional
+        If provided, the visualization will be added to this Scene. Default:
+        Initialize a new Scene.
+
+    interact : bool
+        Whether to provide an interactive VTK window for interaction.
+        Default: False
+
+    inline : bool
+        Whether to embed the visualization inline in a notebook. Only works
+        in the notebook context. Default: False.
+
+    Returns
+    -------
+    Fury Scene object
     """
     roi = vut.prepare_roi(roi, affine_or_mapping, static_img,
                           roi_affine, static_affine, reg_template)
@@ -154,6 +236,27 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
                      interact=False):
     """
     Visualize a volume
+
+    Parameters
+    ----------
+    volume : ndarray or str
+        3d volume to visualize.
+
+    figure : fury Scene object, optional
+        If provided, the visualization will be added to this Scene. Default:
+        Initialize a new Scene.
+
+    interact : bool
+        Whether to provide an interactive VTK window for interaction.
+        Default: False
+
+    inline : bool
+        Whether to embed the visualization inline in a notebook. Only works
+        in the notebook context. Default: False.
+
+    Returns
+    -------
+    Fury Scene object
     """
     volume = vut.load_volume(volume)
 
