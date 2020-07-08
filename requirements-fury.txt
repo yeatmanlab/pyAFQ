@@ -1,2 +1,2 @@
-fury==0.4.0
+fury==0.5.1
 xvfbwrapper==0.2.9
