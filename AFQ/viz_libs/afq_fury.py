@@ -114,7 +114,7 @@ def stop_creating_gifs():
 def create_gif(figure,
                file_name,
                n_frames=60,
-               zoom=1.0,
+               zoom=1,
                z_offset=0.5,
                creating_many=False,
                size=(600, 600),
@@ -135,9 +135,9 @@ def create_gif(figure,
         Will be evenly distributed throughout the rotation.
         Default: 60
 
-    zoom: float, optional
+    zoom: int, optional
         How much to magnify the figure in the fig.
-        Default: 1.0
+        Default: 1
 
     creating_many: bool, optional
         Whether or not you intend to repeatedly call this function.
