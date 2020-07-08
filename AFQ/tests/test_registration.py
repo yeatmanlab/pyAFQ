@@ -12,7 +12,8 @@ import dipy.core.gradients as dpg
 from AFQ.registration import (syn_registration, register_series, register_dwi,
                               c_of_mass, translation, rigid, affine,
                               streamline_registration, write_mapping,
-                              read_mapping, syn_register_dwi, DiffeomorphicMap)
+                              read_mapping, syn_register_dwi, DiffeomorphicMap,
+                              slr_registration)
 
 import AFQ.data as afd
 
@@ -52,6 +53,34 @@ def test_syn_registration():
                                                   radius=1,
                                                   prealign=None)
 
+        npt.assert_equal(warped_moving.shape, subset_t2.shape)
+        mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
+        write_mapping(mapping, mapping_fname)
+        file_mapping = read_mapping(mapping_fname,
+                                    subset_b0_img,
+                                    subset_t2_img)
+
+        # Test that it has the same effect on the data:
+        warped_from_file = file_mapping.transform(subset_b0)
+        npt.assert_equal(warped_from_file, warped_moving)
+
+        # Test that it is, attribute by attribute, identical:
+        for k in mapping.__dict__:
+            assert (np.all(mapping.__getattribute__(k) ==
+                           file_mapping.__getattribute__(k)))
+
+def test_slr_registration():
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        mapping = slr_registration(subset_b0,
+                                   subset_t2,
+                                   moving_affine=hardi_affine,
+                                   static_affine=MNI_T2_affine)
+        warped_moving = mapping.transform
+        # TODO:
+        # check to see if this is right, finish test
+        # add test for dti registration
+        # double check documentation
+        # standardize API to be able to use affine mapping
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
         mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
         write_mapping(mapping, mapping_fname)
