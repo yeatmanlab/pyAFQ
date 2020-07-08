@@ -447,7 +447,23 @@ def streamline_registration(moving, static, n_points=100,
 
 def slr_registration(moving_data, static_data,
                      moving_affine=None, static_affine=None):
+    """Register a source image (moving) to a target image (static).
 
+    Parameters
+    ----------
+    moving : ndarray
+        The source image data to be registered
+    moving_affine : array, shape (4,4)
+        The affine matrix associated with the moving (source) data.
+    static : ndarray
+        The target image data for registration
+    static_affine : array, shape (4,4)
+        The affine matrix associated with the static (target) data
+
+    Returns
+    -------
+    AffineMap
+    """
     _, transform, _, _ = whole_brain_slr(
         moving_data, static_data, x0='affine', verbose=False)
 
