@@ -203,7 +203,7 @@ def test_AFQ_data_waypoint():
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params,
-                    wm_labels=0.2)
+                    wm_criterion=0.2)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()

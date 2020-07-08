@@ -5,61 +5,16 @@ Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
 The pyAFQ software assumes that your data is organized according to a format
-that emulates the `BIDS <http://bids.neuroimaging.io/>`_ format.
-
-Preprocessed diffusion MRI data, as well as anatomical and segmentation data
-should be organized as follows:
-
-|    study
-|      ├-derivatives
-|            ├-dmriprep
-|                ├── sub01
-|                │   ├── sess01
-|                │   │   ├── anat
-|                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-|                │   │   │   └── sub-01_sess-01_T1.nii.gz
-|                │   │   └── dwi
-|                │   │       ├── sub-01_sess-01_dwi.bvals
-|                │   │       ├── sub-01_sess-01_dwi.bvecs
-|                │   │       └── sub-01_sess-01_dwi.nii.gz
-|                │   └── sess02
-|                │       ├── anat
-|                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-|                │       │   └── sub-01_sess-02_T1w.nii.gz
-|                │       └── dwi
-|                │           ├── sub-01_sess-02_dwi.bvals
-|                │           ├── sub-01_sess-02_dwi.bvecs
-|                │           └── sub-01_sess-02_dwi.nii.gz
-|                └── sub02
-|                   ├── sess01
-|                   │   ├── anat
-|                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-|                   │   │   └── sub-02_sess-01_T1w.nii.gz
-|                   │   └── dwi
-|                   │       ├── sub-02_sess-01_dwi.bvals
-|                   │       ├── sub-02_sess-01_dwi.bvecs
-|                   │       └── sub-02_sess-01_dwi.nii.gz
-|                   └── sess02
-|                       ├── anat
-|                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-|                       │   └── sub-02_sess-02_T1w.nii.gz
-|                       └── dwi
-|                           ├── sub-02_sess-02_dwi.bvals
-|                           ├── sub-02_sess-02_dwi.bvecs
-|                           └── sub-02_sess-02_dwi.nii.gz
-
-
-Where the `raw` directory contains your raw data, and the `dmriprep` directory
-contains data that has been processed to be motion-corrected, eddy-current
-corrected and so on. Anatomical data is optional. If a T1-weighted anatomical
-image and its segmentation are not provided (i.e., there is no `anat` folder),
-the software will use the diffusion data to estimate the parts of the image that
-comprise the white matter.
+that emulates the `BIDS <http://bids.neuroimaging.io/>`_ format. Anatomical data
+and segmentation are optional. If a T1-weighted anatomical image and its
+segmentation are not provided, the software will use the diffusion data to
+estimate the parts of the image that comprise the white matter.
 
 .. note::
 
-    The structure within the `raw` directory doesn't matter much to the `pyAFQ`
-    software, as the software will not touch this data at all.
+    The structure within the `raw` part of the BIDS directory doesn't matter
+    much to the `pyAFQ` software, as the software will not touch this data at
+    all.
 
 As part of its operation, the software will create another directory, under
 `study/derivatives/afq`, which will contain all of the derivatives created by
@@ -141,7 +96,7 @@ But additional configuration options can be provided for the following values::
     min_length = 10
     max_length = 1000
     odf_model = 'DTI'
-    wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+    wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 
     [segmentation]
     nb_points = false

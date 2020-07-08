@@ -150,7 +150,7 @@ class AFQ(object):
                  force_recompute=False,
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
-                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  tracking_params=None,
@@ -195,7 +195,7 @@ class AFQ(object):
             This parameter can be turned on/off dynamically.
             Default: False
 
-        wm_labels : list or float, optional
+        wm_criterion : list or float, optional
             This is either a list of the labels of the white matter in the
             segmentation file or (if a float is provided) the threshold FA to
             use for creating the white-matter mask. Default: the white matter
@@ -226,7 +226,7 @@ class AFQ(object):
 
         self.force_recompute = force_recompute
 
-        self.wm_labels = wm_labels
+        self.wm_criterion = wm_criterion
         self.use_prealign = use_prealign
 
         self.scalars = scalars
@@ -669,7 +669,7 @@ class AFQ(object):
             dwi_img = nib.load(row['dwi_file'])
             dwi_data = dwi_img.get_fdata()
 
-            if 'seg_file' in row.index and isinstance(row['wm_labels'], list):
+            if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
                 # If we found a white matter segmentation in the
                 # expected location:
                 seg_img = nib.load(row['seg_file'])
@@ -678,21 +678,21 @@ class AFQ(object):
                 # have any of these values:
                 wm_mask = np.sum(np.concatenate(
                     [(seg_data_orig == l)[..., None]
-                     for l in self.wm_labels], -1), -1)
+                     for l in self.wm_criterion], -1), -1)
 
                 # Resample to DWI data:
                 wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
                                                 seg_img.affine,
                                                 dwi_img.affine)).astype(int)
                 meta = dict(source=row['seg_file'],
-                            wm_labels=self.wm_labels)
+                            wm_criterion=self.wm_criterion)
             else:
                 # Otherwise, we'll identify the white matter based on FA:
                 fa_fname = self._dti_fa(row)
                 dti_fa = nib.load(fa_fname).get_fdata()
-                wm_mask = dti_fa > row['wm_labels']
+                wm_mask = dti_fa > self.wm_criterion
                 meta = dict(source=fa_fname,
-                            fa_threshold=row['wm_labels'])
+                            fa_threshold=self.wm_criterion)
 
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0

@@ -28,7 +28,7 @@
         "description": "Parameters related to streamline tracking.",
         "members": ["directions", "max_angle", "sphere", "seed_mask", "n_seeds",
                     "random_seeds", "rng_seed", "stop_mask", "stop_threshold", "step_size",
-                    "min_length", "max_length", "odf_model", "wm_labels"]
+                    "min_length", "max_length", "odf_model", "wm_criterion"]
     },
     {
         "id": "segmentation_group",
@@ -229,16 +229,16 @@
         "optional": true
     },
     {
-        "id": "wm_labels",
+        "id": "wm_criterion",
         "name": "wm labels",
         "type": "Number",
         "integer": true,
         "list": true,
         "min-list-entries": 1,
         "list-separator": ", ",
-        "value-key": "[WM_LABELS]",
+        "value-key": "[WM_CRITERION]",
         "default-value": [250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
-        "description": "The values specified correspond to all whitematter regions in the FreeSurfer aparc+aseg parcellation.",
+        "description": "The values specified correspond to all whitematter regions in the FreeSurfer aparc+aseg parcellation or an FA threshold to use.",
         "optional": true
     },
     {

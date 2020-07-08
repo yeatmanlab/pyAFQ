@@ -74,7 +74,7 @@ scalars = ['dti_fa', 'dti_md']
 
 [tracking]
 {chr(10).join(track_defaults_list)}
-wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 
 [segmentation]
 {chr(10).join(seg_defaults_list)}
@@ -143,8 +143,8 @@ tracking_params = {}
 for k, v in track_defaults.items():
     tracking_params[k] = tracking.get(k, v)
 
-wm_labels = tracking.get(
-    "wm_labels",
+wm_criterion = tracking.get(
+    "wm_criterion",
     [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
 segmentation = config.get("segmentation", {})
@@ -177,7 +177,7 @@ myafq = api.AFQ(bids_path,
                 dask_it=dask_it,
                 force_recompute=force_recompute,
                 reg_template=reg_template,
-                wm_labels=wm_labels,
+                wm_criterion=wm_criterion,
                 virtual_frame_buffer=virtual_frame_buffer,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params,
