@@ -266,6 +266,7 @@ class AFQ(object):
                 reg_template = nib.load(reg_template)
             self.reg_template = reg_template
 
+        # Create the bundle dict after reg_template has been resolved:
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=reg_template)
@@ -298,7 +299,6 @@ class AFQ(object):
         else:
             self.sessions = [None]
 
-
         sub_list = []
         ses_list = []
         dwi_file_list = []
@@ -309,13 +309,12 @@ class AFQ(object):
         results_dir_list = []
         for subject in self.subjects:
             for session in self.sessions:
+                results_dir = op.join(afq_path, 'sub-' + subject)
+
                 if session is not None:
-                    results_dir_list.append(op.join(afq_path,
-                                                    subject,
-                                                    session))
-                else:
-                    results_dir_list.append(op.join(afq_path,
-                                                    subject))
+                    results_dir = op.join(results_dir, 'ses-' + session)
+
+                results_dir_list.append(results_dir)
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
                 dwi_file_list.append(
@@ -356,6 +355,7 @@ class AFQ(object):
 
                 sub_list.append(subject)
                 ses_list.append(session)
+
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
