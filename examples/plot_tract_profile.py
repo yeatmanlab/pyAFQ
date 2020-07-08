@@ -93,15 +93,15 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = api.make_bundle_dict(bundle_names= ["CST", "ARC"],
+bundles = api.make_bundle_dict(bundle_names=["CST", "ARC"],
                                resample_to=MNI_T2_img)
 
 
 ##########################################################################
 # Tracking
 # --------
-# Streamlines are generate using DTI and a deterministic tractography algorithm.
-# For speed, we seed only within the waypoint ROIs for each bundle.
+# Streamlines are generate using DTI and a deterministic tractography
+# algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 print("Tracking...")
 if not op.exists('dti_streamlines.trk'):
@@ -118,7 +118,8 @@ if not op.exists('dti_streamlines.trk'):
                          f"{bundle}_{idx+1}.nii.gz")
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
-    nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine), 'seed_roi.nii.gz')
+    nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
+                             'seed_roi.nii.gz')
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     stop_mask=FA_data, stop_threshold=0.1)
     save_tractogram(sft, './dti_streamlines.trk',
@@ -132,9 +133,9 @@ sft.to_vox()
 # Segmentation
 # --------
 # In this stage, streamlines are tested for several criteria: whether the
-# probability that they belong to a bundle is larger than a threshold (set to 0,
-# per default), whether they pass through inclusion ROIs and whether they do not
-# pass through exclusion ROIs.
+# probability that they belong to a bundle is larger than a threshold (set to
+# 0,per default), whether they pass through inclusion ROIs and whether they do
+# not pass through exclusion ROIs.
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True)
@@ -178,9 +179,9 @@ for bundle in bundles:
 # Bundle profiles
 # ---------------
 # Streamlines are represented in the original diffusion space (`Space.VOX`) and
-# scalar properties along the length of each bundle are queried from this scalar
-# data. Here, the contribution of each streamline is weighted according to how
-# representative this streamline is of the bundle overall.
+# scalar properties along the length of each bundle are queried from this
+# scalar data. Here, the contribution of each streamline is weighted according
+# to how representative this streamline is of the bundle overall.
 
 print("Extracting tract profiles...")
 for bundle in bundles:
@@ -197,10 +198,10 @@ plt.show()
 ##########################################################################
 # References:
 # -------------------------
-# .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian
-#                  A Wandell, Heidi M Feldman, "Tract profiles of white matter
-#                  properties: automating fiber-tract quantification", PloS One,
-#                  7: e49790
+# .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
+#                  Brian A Wandell, Heidi M Feldman, "Tract profiles of
+#                  white matter properties: automating fiber-tract
+#                  quantification", PloS One, 7: e49790
 #
 # .. [Yeatman2014] Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
 #                  "Lifespan maturation and degeneration of human brain white

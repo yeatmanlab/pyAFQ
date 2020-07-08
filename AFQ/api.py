@@ -195,11 +195,12 @@ class AFQ(object):
             This parameter can be turned on/off dynamically.
             Default: False
 
-        wm_labels : list, optional
-            A list of the labels of the white matter in the segmentation file
-            used. Default: the white matter values for the segmentation
-            provided with the HCP data, including labels for midbrain:
-            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+        wm_labels : list or float, optional
+            This is either a list of the labels of the white matter in the
+            segmentation file or (if a float is provided) the threshold FA to
+            use for creating the white-matter mask. Default: the white matter
+            values for the segmentation provided with the HCP data, including
+            labels for midbrain: [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the
@@ -662,13 +663,13 @@ class AFQ(object):
 
         return mapping_file
 
-    def _wm_mask(self, row, wm_fa_thresh=0.2):
+    def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
             dwi_img = nib.load(row['dwi_file'])
             dwi_data = dwi_img.get_fdata()
 
-            if 'seg_file' in row.index:
+            if 'seg_file' in row.index and isinstance(row['wm_labels'], list):
                 # If we found a white matter segmentation in the
                 # expected location:
                 seg_img = nib.load(row['seg_file'])
@@ -689,9 +690,9 @@ class AFQ(object):
                 # Otherwise, we'll identify the white matter based on FA:
                 fa_fname = self._dti_fa(row)
                 dti_fa = nib.load(fa_fname).get_fdata()
-                wm_mask = dti_fa > wm_fa_thresh
+                wm_mask = dti_fa > row['wm_labels']
                 meta = dict(source=fa_fname,
-                            fa_threshold=wm_fa_thresh)
+                            fa_threshold=row['wm_labels'])
 
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
