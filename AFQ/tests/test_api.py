@@ -216,18 +216,18 @@ def test_AFQ_data_waypoint():
 
     sl_file = op.join(
         myafq.data_frame.results_dir[0],
-        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
     sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
                              Space.VOX)
     save_tractogram(sft, sl_file, bbox_valid_check=False)
 
     mapping_file = op.join(
         myafq.data_frame.results_dir[0],
-        'sub-01_sess-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
         myafq.data_frame.results_dir[0],
-        'sub-01_sess-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
+        'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
@@ -240,19 +240,19 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'ROIs',
-        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
+        'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
     myafq.export_bundles()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
     # Test creation of file with bundle indices:
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (400, 5)
@@ -292,10 +292,10 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'ROIs',
-        'sub-01_sess-01_dwi_desc-ROI-CST_R-1-include.json'))
+        'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     myafq.export_bundles()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_sess-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
