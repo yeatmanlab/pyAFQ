@@ -69,6 +69,7 @@ def test_syn_registration():
             assert (np.all(mapping.__getattribute__(k) ==
                            file_mapping.__getattribute__(k)))
 
+
 def test_slr_registration():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         mapping = slr_registration(subset_b0,
