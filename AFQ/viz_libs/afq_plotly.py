@@ -24,6 +24,7 @@ def _inline_interact(figure, show, show_inline):
         plotly.offline.plot(figure)
 
     if show_inline:
+        plotly.offline.init_notebook_mode()
         plotly.offline.iplot(figure)
 
     return figure
