@@ -1409,8 +1409,8 @@ class AFQ(object):
     def show_inline_bundles(self):
         self.data_frame.apply(self._show_inline_bundles, axis=1)
 
-    def show_inline_ROIs(self):
-        self.data_frame.apply(self._show_inline_ROIs, axis=1)
+    # def show_inline_ROIs(self):
+    #     self.data_frame.apply(self._show_inline_ROIs, axis=1)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)
