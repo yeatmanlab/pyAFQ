@@ -1066,12 +1066,19 @@ class AFQ(object):
                                  + bundle_name)
 
             roi_files = self._export_rois(row)
-            for roi in roi_files[bundle_name]:
-                figure = self.viz.visualize_roi(
-                    roi,
-                    inline=inline,
-                    interact=interactive,
-                    figure=figure)
+            for i, roi in enumerate(roi_files[bundle_name]):
+                if i == len(roi_files[bundle_name]) - 1: # show on last ROI
+                    figure = self.viz.visualize_roi(
+                        roi,
+                        inline=inline,
+                        interact=interactive,
+                        figure=figure)
+                else:
+                    figure = self.viz.visualize_roi(
+                        roi,
+                        inline=False,
+                        interact=False,
+                        figure=figure)
 
             yield figure, bundle_name
 
