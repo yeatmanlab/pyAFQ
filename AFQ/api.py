@@ -1025,7 +1025,7 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
-    def _export_bundle_gif(self, row):
+    def _create_bundles_fig(self, row, interact=False):
         bundles_file = self._clean_bundles(row)
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
@@ -1037,19 +1037,12 @@ class AFQ(object):
         figure = self.viz.visualize_bundles(bundles_file,
                                             affine=row['dwi_affine'],
                                             bundle_dict=self.bundle_dict,
-                                            interact=False,
+                                            interact=interact,
                                             inline=False,
                                             figure=figure)
+        return figure
 
-        fname = self._get_fname(
-            row,
-            f'_viz.gif',
-            include_track=True,
-            include_seg=True)
-
-        self.viz.create_gif(figure, fname)
-
-    def _export_ROI_gifs(self, row):
+    def _create_ROI_figs(self, row, interact=False):
         bundles_file = self._clean_bundles(row)
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
@@ -1077,9 +1070,24 @@ class AFQ(object):
                 figure = self.viz.visualize_roi(
                     roi,
                     inline=False,
-                    interact=False,
+                    interact=interact,
                     figure=figure)
 
+            yield figure, bundle_name
+
+    def _export_bundle_gif(self, row):
+        figure = self._create_bundles_fig(row)
+
+        fname = self._get_fname(
+            row,
+            f'_viz.gif',
+            include_track=True,
+            include_seg=True)
+
+        self.viz.create_gif(figure, fname)
+
+    def _export_ROI_gifs(self, row):
+        for figure, bundle_name in self._create_ROI_figs(row):
             fname = op.split(
                 self._get_fname(
                     row,
@@ -1093,6 +1101,14 @@ class AFQ(object):
 
             self.viz.create_gif(figure, fname, creating_many=True)
         self.viz.stop_creating_gifs()
+
+    def _show_interactive_bundles(self, row):
+        self._create_bundles_fig(row, interact=True)
+        print(f"Subject: {row['subject']}")
+
+    def _show_interactive_ROIs(self, row):
+        for _, bundle_name in self._create_ROI_figs(row, interact=True):
+            print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1375,6 +1391,12 @@ class AFQ(object):
 
     def export_ROI_gifs(self):
         self.data_frame.apply(self._export_ROI_gifs, axis=1)
+
+    def show_interactive_bundles(self):
+        self.data_frame.apply(self._show_interactive_bundles, axis=1)
+
+    def show_interactive_ROIs(self):
+        self.data_frame.apply(self._show_interactive_ROIs, axis=1)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)
