@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import os.path as op
+import logging
 
 import numpy as np
 from palettable.tableau import Tableau_20
@@ -10,6 +11,7 @@ import nibabel as nib
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 
+viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
 
 COLOR_DICT = OrderedDict({"ATR_L": tableau_20_rgb[0],
@@ -73,6 +75,7 @@ def tract_loader(trk, affine):
     -------
     Tractogram
     """
+    viz_logger.info("Loading tractography...")
     if isinstance(trk, str):
         trk = nib.streamlines.load(trk)
         tg = trk.tractogram
@@ -159,6 +162,7 @@ def tract_generator(tg, bundle, bundle_dict, colors):
     list, RGB tuple, str
     """
     streamlines = tg.streamlines
+    viz_logger.info("Generating lines from tractography...")
 
     if colors is None:
         # Use the color dict provided
@@ -252,6 +256,7 @@ def prepare_roi(roi, affine_or_mapping, static_img,
     -------
     ndarray
     """
+    viz_logger.info("Preparing ROI...")
     if not isinstance(roi, np.ndarray):
         if isinstance(roi, str):
             roi = nib.load(roi).get_fdata()
@@ -303,6 +308,7 @@ def load_volume(volume):
     -------
     ndarray
     """
+    viz_logger.info("Loading Volume...")
     if isinstance(volume, str):
         return nib.load(volume).get_fdata()
     else:

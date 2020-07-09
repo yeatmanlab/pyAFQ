@@ -1,6 +1,7 @@
 import tempfile
 import os
 import os.path as op
+import logging
 
 import numpy as np
 import IPython.display as display
@@ -13,15 +14,18 @@ try:
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("fury"))
 
+viz_logger = logging.getLogger("AFQ.viz")
 
 def _inline_interact(scene, inline, interact):
     """
     Helper function to reuse across viz functions
     """
     if interact:
+        viz_logger.info("Showing interactive scene...")
         window.show(scene)
 
     if inline:
+        viz_logger.info("Showing inline scene...")
         tdir = tempfile.gettempdir()
         fname = op.join(tdir, "fig.png")
         window.snapshot(scene, fname=fname, size=(1200, 1200))

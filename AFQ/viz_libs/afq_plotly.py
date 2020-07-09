@@ -2,6 +2,7 @@ import tempfile
 import os
 import os.path as op
 import enum
+import logging
 
 import numpy as np
 
@@ -15,15 +16,18 @@ try:
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
+viz_logger = logging.getLogger("AFQ.viz")
 
 def _inline_interact(figure, show, show_inline):
     """
     Helper function to reuse across viz functions
     """
     if show:
+        viz_logger.info("Creating interactive figure in HTML file...")
         plotly.offline.plot(figure)
 
     if show_inline:
+        viz_logger.info("Creating interactive figure inline...")
         plotly.offline.init_notebook_mode()
         plotly.offline.iplot(figure)
 
