@@ -170,7 +170,7 @@ def test_AFQ_data():
 
 def test_AFQ_slr():
     """
-    Test if API can run without prealign
+    Test if API can run using slr map
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
@@ -178,6 +178,20 @@ def test_AFQ_slr():
                                           'derivatives', 'dmriprep'),
                     sub_prefix='sub',
                     reg_algo='slr')
+    myafq.export_rois()
+
+
+def test_AFQ_FA():
+    """
+    Test if API can run registeration with FA
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub',
+                    moving='dti_fa_template',
+                    static='dti_fa_subject')
     myafq.export_rois()
 
 

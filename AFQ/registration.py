@@ -481,7 +481,7 @@ def slr_registration(moving_data, static_data,
     AffineMap
     """
     _, transform, _, _ = whole_brain_slr(
-        moving_data, static_data, x0='affine', verbose=False)
+        static_data, moving_data, x0='affine', verbose=False)
 
     return AffineMap(transform,
                      domain_grid_shape=static_affine.shape,
