@@ -208,9 +208,10 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
         mapping.is_inverse = True
     else:
         mapping = ConformedAffineMap(disp,
-                                     domain_grid_shape=domain_img.shape,
+                                     domain_grid_shape=domain_img.shape[:3],
                                      domain_grid2world=domain_img.affine,
-                                     codomain_grid_shape=codomain_img.shape,
+                                     codomain_grid_shape=\
+                                         codomain_img.shape[:3],
                                      codomain_grid2world=codomain_img.affine)
 
     return mapping
@@ -486,7 +487,7 @@ def slr_registration(moving_data, static_data,
         static_data, moving_data, x0='affine', verbose=False, **kwargs)
 
     return ConformedAffineMap(transform,
-                              domain_grid_shape=static_affine.shape,
+                              domain_grid_shape=static_affine.shape[:3],
                               domain_grid2world=static_affine,
-                              codomain_grid_shape=static_affine.shape,
+                              codomain_grid_shape=static_affine.shape[:3],
                               codomain_grid2world=static_affine)
