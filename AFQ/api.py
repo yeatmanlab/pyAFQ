@@ -1383,7 +1383,7 @@ class AFQ(object):
         for ii, fname in enumerate(self.tract_profiles):
             profiles = pd.read_csv(fname)
             profiles['sub'] = self.data_frame['subject'].iloc[ii]
-            profiles['sess'] = op.split(self.data_frame['sess'].iloc[ii])[-1]
+            profiles['ses'] = op.split(self.data_frame['ses'].iloc[ii])[-1]
             dfs.append(profiles)
 
         df = pd.concat(dfs)
