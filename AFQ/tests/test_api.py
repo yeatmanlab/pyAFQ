@@ -155,6 +155,7 @@ def test_AFQ_data():
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     for use_prealign in [True, False]:
 
+<<<<<<< HEAD
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
@@ -165,6 +166,35 @@ def test_AFQ_data():
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                         nib.load(myafq.dti[0]).shape[:3])
         myafq.export_rois()
+=======
+
+def test_AFQ_slr():
+    """
+    Test if API can run without prealign
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub',
+                    reg_algo='slr')
+    myafq.export_rois()
+
+
+def test_AFQ_data():
+    """
+    Test with some actual data
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub')
+    npt.assert_equal(nib.load(myafq.b0[0]).shape,
+                     nib.load(myafq['dwi_file'][0]).shape[:3])
+    npt.assert_equal(nib.load(myafq.b0[0]).shape,
+                     nib.load(myafq.dti[0]).shape[:3])
+>>>>>>> added slr test
 
 
 def test_DKI_profile():
