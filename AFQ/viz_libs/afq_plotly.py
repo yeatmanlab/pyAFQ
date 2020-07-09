@@ -211,9 +211,9 @@ def _draw_roi(figure, roi, name, color, opacity):
     roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
-            x=roi[0],
-            y=roi[1],
-            z=roi[2],
+            x=roi[0]+1,
+            y=roi[1]+1,
+            z=roi[2]+1,
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
             line=dict(color=f"rgba(0,0,0,0)")
