@@ -96,7 +96,7 @@ def test_slr_registration():
                                    greater_than=10,
                                    rm_small_clusters=1,
                                    rng=np.random.RandomState(seed=8))
-        warped_moving = mapping.transform(subset_b0)
+        warped_moving = mapping.transform(subset_b0[0])
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
         mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
