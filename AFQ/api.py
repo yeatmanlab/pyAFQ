@@ -699,15 +699,18 @@ class AFQ(object):
         return b0_warped_file
 
     def _mapping(self, row):
-        if self.use_prealign:
-            mapping_file = self._get_fname(
-                row,
-                '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        mapping_file = self._get_fname(
+            row,
+            '_mapping_from-DWI_to_MNI_xfm')
+        meta_fname = self._get_fname(row, '_mapping_reg')
+        if not self.use_prealign:
+            mapping_file = mapping_file + '_without_prealign'
+            meta_fname = meta_fname + '_without_prealign'
+        if self.reg_algo == "slr":
+            mapping_file = mapping_file + '.npy'
         else:
-            mapping_file = self._get_fname(
-                row,
-                '_mapping_from-DWI_to_MNI_xfm'
-                + '_without_prealign.nii.gz')
+            mapping_file = mapping_file + '.nii.gz'
+        meta_fname = meta_fname + '.json'
 
         if self.force_recompute or not op.exists(mapping_file):
             if self.use_prealign:
@@ -734,7 +737,6 @@ class AFQ(object):
                 mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
 
             reg.write_mapping(mapping, mapping_file)
-            meta_fname = self._get_fname(row, '_mapping_reg_prealign.json')
             meta = dict(type="displacementfield")
             afd.write_json(meta_fname, meta)
 
