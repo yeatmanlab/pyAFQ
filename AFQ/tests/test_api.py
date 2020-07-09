@@ -9,7 +9,7 @@ import numpy as np
 import numpy.testing as npt
 
 import pandas as pd
-from pandas.testing import assert_frame_equal
+from pandas.testing import assert_series_equal
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
@@ -285,7 +285,7 @@ def test_AFQ_data_waypoint():
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
     assert combined_profiles.shape == (400, 7)
-    assert_frame_equal(combined_profiles, from_file)
+    assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     myafq.export_rois()
