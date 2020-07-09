@@ -462,7 +462,7 @@ def streamline_registration(moving, static, n_points=100,
 
 
 def slr_registration(moving_data, static_data,
-                     moving_affine=None, static_affine=None):
+                     moving_affine=None, static_affine=None, **kwargs):
     """Register a source image (moving) to a target image (static).
 
     Parameters
@@ -474,14 +474,16 @@ def slr_registration(moving_data, static_data,
     static : ndarray
         The target tractography data for registration
     static_affine : array, shape (4,4)
-        The affine matrix associated with the static (target) data
+        The affine matrix associated with the static (target) data.
+    **kwargs:
+        kwargs are passed into whole_brain_slr
 
     Returns
     -------
     AffineMap
     """
     _, transform, _, _ = whole_brain_slr(
-        static_data, moving_data, x0='affine', verbose=False)
+        static_data, moving_data, x0='affine', verbose=False, **kwargs)
 
     return ConformedAffineMap(transform,
                               domain_grid_shape=static_affine.shape,

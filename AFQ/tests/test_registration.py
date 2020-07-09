@@ -91,7 +91,11 @@ def test_slr_registration():
         mapping = slr_registration(streamlines,
                                    hcp_atlas.streamlines,
                                    moving_affine=hardi_affine,
-                                   static_affine=hcp_atlas.affine)
+                                   static_affine=hcp_atlas.affine,
+                                   progressive=False,
+                                   greater_than=10,
+                                   rm_small_clusters=1,
+                                   rng=np.random.RandomState(seed=8))
         warped_moving = mapping.transform(subset_b0)
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
