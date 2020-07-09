@@ -75,12 +75,8 @@ def test_slr_registration():
                                    subset_t2,
                                    moving_affine=hardi_affine,
                                    static_affine=MNI_T2_affine)
-        warped_moving = mapping.transform
-        # TODO:
-        # check to see if this is right, finish test
-        # add test for dti registration
-        # double check documentation
-        # standardize API to be able to use affine mapping
+        warped_moving = mapping.transform(subset_b0)
+
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
         mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
         write_mapping(mapping, mapping_fname)

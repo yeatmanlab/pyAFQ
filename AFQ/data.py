@@ -929,6 +929,20 @@ def s3fs_json_write(data, fname, fs=None):
 
 
 def _apply_mask(template_img, resolution=1):
+    """
+    Helper function, gets MNI brain mask and applies it to template_img.
+
+    Parameters
+    ----------
+    template_img : nib.Nifti1Image
+        Unmasked template
+    resolution : int, optional
+        Resolution of mask. Default: 1
+    
+    Returns
+    -------
+    Masked template as nib.Nifti1Image
+    """
     mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
                                       resolution=resolution,
                                       desc='brain',
