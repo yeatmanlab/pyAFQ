@@ -172,8 +172,8 @@ def create_gif(figure,
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  figure=None, color=np.array([1, 0, 0]), opacity=1.0,
-                  inline=False, interact=False):
+                  name='ROI', figure=None, color=np.array([1, 0, 0]),
+                  opacity=1.0, inline=False, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
 
@@ -199,6 +199,10 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     reg_template: str or Nifti1Image, optional
         Template to use for registration.
         Default: None
+
+    name: str, optional
+        Name of ROI for the legend.
+        Default: 'ROI'
 
     color : ndarray, optional
         RGB color for ROI.

@@ -207,13 +207,14 @@ def create_gif(figure,
                       png_fname="tgif", add_zeros=False)
 
 
-def _draw_roi(figure, roi, color, opacity):
+def _draw_roi(figure, roi, name, color, opacity):
     roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
             x=roi[0],
             y=roi[1],
             z=roi[2],
+            name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
             line=dict(color=f"rgba(0,0,0,0)")
         )
@@ -222,8 +223,8 @@ def _draw_roi(figure, roi, color, opacity):
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  figure=None, color=np.array([0.9999, 0, 0]), opacity=1.0,
-                  interact=False, inline=False):
+                  name='ROI', figure=None, color=np.array([0.9999, 0, 0]),
+                  opacity=1.0, interact=False, inline=False):
     """
     Render a region of interest into a volume
 
@@ -249,6 +250,10 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     reg_template: str or Nifti1Image, optional
         Template to use for registration.
         Default: None
+
+    name: str, optional
+        Name of ROI for the legend.
+        Default: 'ROI'
 
     color : ndarray, optional
         RGB color for ROI.
@@ -282,7 +287,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
     figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
 
-    _draw_roi(figure, roi, color, opacity)
+    _draw_roi(figure, roi, name, color, opacity)
 
     return _inline_interact(figure, interact, inline)
 

@@ -1070,12 +1070,14 @@ class AFQ(object):
                 if i == len(roi_files[bundle_name]) - 1: # show on last ROI
                     figure = self.viz.visualize_roi(
                         roi,
+                        name=f"{bundle_name} ROI {i}",
                         inline=inline,
                         interact=interactive,
                         figure=figure)
                 else:
                     figure = self.viz.visualize_roi(
                         roi,
+                        name=f"{bundle_name} ROI {i}",
                         inline=False,
                         interact=False,
                         figure=figure)
