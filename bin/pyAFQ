@@ -65,6 +65,8 @@ The default values of the configuration are:
 ```
 [files]
 bids_path = '/path/to/bids/dataset/'
+dmriprep = 'dmriprep'
+segmentation = 'freesurfer'
 
 [bundles]
 bundles = {api.BUNDLES}
@@ -117,10 +119,13 @@ for component in config.keys():
 
 files = config.get("files", {})
 
-dmriprep_path = files.get("bids_path")
+bids_path = files.get("bids_path")
 
-if dmriprep_path is None:
+if bids_path is None:
     raise RuntimeError("Config file must provide bids_path")
+
+dmriprep = files.get("dmriprep", "dmriprep")
+segmentation_path = files.get("segmentation", "freesurfer")
 
 config['pyAFQ'] = {}
 config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
@@ -170,7 +175,7 @@ virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,
-                segmentation=segmentation,
+                segmentation=segmentation_path,
                 seg_suffix=seg_suffix,
                 b0_threshold=float(b0_threshold),
                 bundle_names=bundle_names,
