@@ -183,18 +183,19 @@ def test_AFQ_slr():
     myafq.export_rois()
 
 
-def test_AFQ_FA():
-    """
-    Test if API can run registeration with FA
-    """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                          'derivatives', 'dmriprep'),
-                    sub_prefix='sub',
-                    moving='dti_fa_template',
-                    static='dti_fa_subject')
-    myafq.export_rois()
+# Requires large download
+# def test_AFQ_FA():
+#     """
+#     Test if API can run registeration with FA
+#     """
+#     tmpdir = nbtmp.InTemporaryDirectory()
+#     afd.organize_stanford_data(path=tmpdir.name)
+#     myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+#                                           'derivatives', 'dmriprep'),
+#                     sub_prefix='sub',
+#                     moving='dti_fa_template',
+#                     static='dti_fa_subject')
+#     myafq.export_rois()
 
 
 def test_AFQ_data():
