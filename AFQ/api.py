@@ -273,10 +273,10 @@ class AFQ(object):
                                             resample_to=reg_template)
 
         # This is where all the outputs will go:
-        afq_path = op.join(bids_path, 'afq')
+        self.afq_path = op.join(bids_path, 'afq')
 
         # Create it as needed:
-        os.makedirs(afq_path, exist_ok=True)
+        os.makedirs(self.afq_path, exist_ok=True)
 
         bids_layout = BIDSLayout(bids_path, derivatives=True)
         bids_description = bids_layout.description
@@ -288,7 +288,7 @@ class AFQ(object):
             "PipelineDescription": {"Name": "pyAFQ",
                                     "Version": pyafq_version}}
 
-        pl_desc_file = op.join(afq_path, 'dataset_description.json')
+        pl_desc_file = op.join(self.afq_path, 'dataset_description.json')
 
         with open(pl_desc_file, 'w') as outfile:
             json.dump(pipeline_description, outfile)
@@ -310,7 +310,7 @@ class AFQ(object):
         results_dir_list = []
         for subject in self.subjects:
             for session in self.sessions:
-                results_dir = op.join(afq_path, 'sub-' + subject)
+                results_dir = op.join(self.afq_path, 'sub-' + subject)
 
                 if session is not None:
                     results_dir = op.join(results_dir, 'ses-' + session)
@@ -1387,5 +1387,5 @@ class AFQ(object):
             dfs.append(profiles)
 
         df = pd.concat(dfs)
-        df.to_csv(op.join(self.afq_dir, 'tract_profiles.csv'), index=False)
+        df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
         return df
