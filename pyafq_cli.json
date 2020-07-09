@@ -484,7 +484,7 @@
             "min_length = [MIN_LENGTH]",
             "max_length = [MAX_LENGTH]",
             "odf_model = '[ODF_MODEL]'",
-            "wm_labels = [[WM_LABELS]]",
+            "wm_criterion = [[WM_CRITERION]]",
             "",
             "[segmentation]",
             "nb_points = [NB_POINTS]",
