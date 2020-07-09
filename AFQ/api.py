@@ -1396,7 +1396,7 @@ class AFQ(object):
     template_xform = property(get_template_xform, set_template_xform)
 
     def export_rois(self):
-        self.data_frame.apply(self._export_rois, axis=1)
+        return self.data_frame.apply(self._export_rois, axis=1)
 
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
