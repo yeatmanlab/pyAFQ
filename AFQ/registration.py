@@ -153,8 +153,12 @@ def write_mapping(mapping, fname):
         Full path to the nifti file storing the mapping
 
     """
-    mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
-    nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
+    if isinstance(mapping, DiffeomorphicMap):
+        mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
+        nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid),
+                 fname)
+    else:
+        np.save(fname, mapping.affine)
 
 
 def read_mapping(disp, domain_img, codomain_img, prealign=None):
@@ -163,9 +167,11 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
 
     Parameters
     ----------
-    disp : str or Nifti1Image
-        A file of image containing the mapping displacement field in each voxel
+    disp : str, Nifti1Image, or ndarray
+        If string, file must of an image or ndarray.
+        If image, contains the mapping displacement field in each voxel
         Shape (x, y, z, 3, 2)
+        If ndarray, contains affine transformation used for mapping
 
     domain_img : str or Nifti1Image
 
@@ -176,7 +182,10 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
     A :class:`DiffeomorphicMap` object
     """
     if isinstance(disp, str):
-        disp = nib.load(disp)
+        if "nii.gz" in disp:
+            disp = nib.load(disp)
+        else:
+            disp = np.load(disp)
 
     if isinstance(domain_img, str):
         domain_img = nib.load(domain_img)
@@ -184,18 +193,25 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
     if isinstance(codomain_img, str):
         codomain_img = nib.load(codomain_img)
 
-    mapping = DiffeomorphicMap(3, disp.shape[:3],
-                               disp_grid2world=np.linalg.inv(disp.affine),
-                               domain_shape=domain_img.shape[:3],
-                               domain_grid2world=domain_img.affine,
-                               codomain_shape=codomain_img.shape,
-                               codomain_grid2world=codomain_img.affine,
-                               prealign=prealign)
+    if isinstance(disp, nib.Nifti1Image):
+        mapping = DiffeomorphicMap(3, disp.shape[:3],
+                                   disp_grid2world=np.linalg.inv(disp.affine),
+                                   domain_shape=domain_img.shape[:3],
+                                   domain_grid2world=domain_img.affine,
+                                   codomain_shape=codomain_img.shape,
+                                   codomain_grid2world=codomain_img.affine,
+                                   prealign=prealign)
 
-    disp_data = disp.get_fdata().astype(np.float32)
-    mapping.forward = disp_data[..., 0]
-    mapping.backward = disp_data[..., 1]
-    mapping.is_inverse = True
+        disp_data = disp.get_fdata().astype(np.float32)
+        mapping.forward = disp_data[..., 0]
+        mapping.backward = disp_data[..., 1]
+        mapping.is_inverse = True
+    else:
+        mapping = AffineMap(disp,
+                            domain_grid_shape=domain_img.shape,
+                            domain_grid2world=domain_img.affine,
+                            codomain_grid_shape=codomain_img.shape,
+                            codomain_grid2world=codomain_img.affine)
 
     return mapping
 
@@ -452,11 +468,11 @@ def slr_registration(moving_data, static_data,
     Parameters
     ----------
     moving : ndarray
-        The source image data to be registered
+        The source tractography data to be registered
     moving_affine : array, shape (4,4)
         The affine matrix associated with the moving (source) data.
     static : ndarray
-        The target image data for registration
+        The target tractography data for registration
     static_affine : array, shape (4,4)
         The affine matrix associated with the static (target) data
 
