@@ -177,7 +177,9 @@ def test_AFQ_slr():
     myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
                                           'derivatives', 'dmriprep'),
                     sub_prefix='sub',
-                    reg_algo='slr')
+                    reg_algo='slr',
+                    moving='subject_sls',
+                    static='hcp_atlas')
     myafq.export_rois()
 
 
