@@ -10,7 +10,6 @@ from dipy.align.imwarp import (SymmetricDiffeomorphicRegistration,
                                DiffeomorphicMap)
 
 from dipy.align.imaffine import (transform_centers_of_mass,
-                                 AffineMap,
                                  MutualInformationMetric,
                                  AffineRegistration)
 
@@ -28,6 +27,7 @@ from dipy.io.streamline import load_tractogram, load_trk
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
+from AFQ._fixes import ConformedAffineMap
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
@@ -207,11 +207,11 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
         mapping.backward = disp_data[..., 1]
         mapping.is_inverse = True
     else:
-        mapping = AffineMap(disp,
-                            domain_grid_shape=domain_img.shape,
-                            domain_grid2world=domain_img.affine,
-                            codomain_grid_shape=codomain_img.shape,
-                            codomain_grid2world=codomain_img.affine)
+        mapping = ConformedAffineMap(disp,
+                                     domain_grid_shape=domain_img.shape,
+                                     domain_grid2world=domain_img.affine,
+                                     codomain_grid_shape=codomain_img.shape,
+                                     codomain_grid2world=codomain_img.affine)
 
     return mapping
 
@@ -234,9 +234,9 @@ def resample(moving, static, moving_affine, static_affine):
     resampled : the moving array resampled into the static array's space.
     """
     identity = np.eye(4)
-    affine_map = AffineMap(identity,
-                           static.shape, static_affine,
-                           moving.shape, moving_affine)
+    affine_map = ConformedAffineMap(identity,
+                                    static.shape, static_affine,
+                                    moving.shape, moving_affine)
     resampled = affine_map.transform(moving)
     return resampled
 
@@ -483,8 +483,8 @@ def slr_registration(moving_data, static_data,
     _, transform, _, _ = whole_brain_slr(
         static_data, moving_data, x0='affine', verbose=False)
 
-    return AffineMap(transform,
-                     domain_grid_shape=static_affine.shape,
-                     domain_grid2world=static_affine,
-                     codomain_grid_shape=static_affine.shape,
-                     codomain_grid2world=static_affine)
+    return ConformedAffineMap(transform,
+                              domain_grid_shape=static_affine.shape,
+                              domain_grid2world=static_affine,
+                              codomain_grid_shape=static_affine.shape,
+                              codomain_grid2world=static_affine)
