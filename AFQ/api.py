@@ -163,14 +163,16 @@ class AFQ(object):
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
 
-        dmriprep : str
+        dmriprep : str, optional.
             The name of the pipeline used to preprocess the DWI data.
+            Default: "dmriprep".
 
         freesurfer : str
             The name of the pipeline used to generate a segmentation image.
+            Default: "dmriprep"
 
-        suffix : str
-            Identifies the
+        seg_suffix : str, optional.
+            The suffix that identifies the segmentation image. Default: "seg".
 
         seg_algo : str
             Which algorithm to use for segmentation.
