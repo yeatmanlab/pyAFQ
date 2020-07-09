@@ -1025,7 +1025,7 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
-    def _create_bundles_fig(self, row, interact=False):
+    def _create_bundles_fig(self, row, inline=False, interactive=False):
         bundles_file = self._clean_bundles(row)
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
@@ -1037,12 +1037,12 @@ class AFQ(object):
         figure = self.viz.visualize_bundles(bundles_file,
                                             affine=row['dwi_affine'],
                                             bundle_dict=self.bundle_dict,
-                                            interact=interact,
-                                            inline=False,
+                                            interact=interactive,
+                                            inline=inline,
                                             figure=figure)
         return figure
 
-    def _create_ROI_figs(self, row, interact=False):
+    def _create_ROI_figs(self, row, inline=False, interactive=False):
         bundles_file = self._clean_bundles(row)
         fa_file = self._dti_fa(row)
         fa_img = nib.load(fa_file).get_fdata()
@@ -1069,8 +1069,8 @@ class AFQ(object):
             for roi in roi_files[bundle_name]:
                 figure = self.viz.visualize_roi(
                     roi,
-                    inline=False,
-                    interact=interact,
+                    inline=inline,
+                    interact=interactive,
                     figure=figure)
 
             yield figure, bundle_name
@@ -1102,12 +1102,20 @@ class AFQ(object):
             self.viz.create_gif(figure, fname, creating_many=True)
         self.viz.stop_creating_gifs()
 
+    def _show_inline_bundles(self, row):
+        self._create_bundles_fig(row, inline=True)
+        print(f"Subject: {row['subject']}")
+
+    def _show_inline_ROIs(self, row):
+        for _, bundle_name in self._create_ROI_figs(row, interactive=True):
+            print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
+
     def _show_interactive_bundles(self, row):
-        self._create_bundles_fig(row, interact=True)
+        self._create_bundles_fig(row, inline=True)
         print(f"Subject: {row['subject']}")
 
     def _show_interactive_ROIs(self, row):
-        for _, bundle_name in self._create_ROI_figs(row, interact=True):
+        for _, bundle_name in self._create_ROI_figs(row, interactive=True):
             print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
 
     def _plot_tract_profiles(self, row):
@@ -1397,6 +1405,12 @@ class AFQ(object):
 
     def show_interactive_ROIs(self):
         self.data_frame.apply(self._show_interactive_ROIs, axis=1)
+
+    def show_inline_bundles(self):
+        self.data_frame.apply(self._show_inline_bundles, axis=1)
+
+    def show_inline_ROIs(self):
+        self.data_frame.apply(self._show_inline_ROIs, axis=1)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)
