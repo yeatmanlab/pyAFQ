@@ -18,6 +18,7 @@ except ImportError:
 
 viz_logger = logging.getLogger("AFQ.viz")
 
+
 def _inline_interact(figure, show, show_inline):
     """
     Helper function to reuse across viz functions
@@ -211,9 +212,9 @@ def _draw_roi(figure, roi, name, color, opacity):
     roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
-            x=roi[0]+1,
-            y=roi[1]+1,
-            z=roi[2]+1,
+            x=roi[0] + 1,
+            y=roi[1] + 1,
+            z=roi[2] + 1,
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
             line=dict(color=f"rgba(0,0,0,0)")
@@ -336,9 +337,9 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
 
 def _name_from_enum(axis):
     if axis == Axes.X:
-        return "Coronal"
-    elif axis == Axes.Y:
         return "Sagittal"
+    elif axis == Axes.Y:
+        return "Coronal"
     elif axis == Axes.Z:
         return "Axial"
 
@@ -355,12 +356,14 @@ def _draw_slices(figure, axis, volume,
             _draw_slice(figure, axis, volume, opacity=opacity,
                         step=step, n_steps=n_steps)
 
+        for step in range(n_steps):
             step_dict = dict(
                 method="update",
-                args=[{"visible": [False] * n_steps}],
+                args=[{"visible": [True] * len(figure.data)}],
                 label=""
             )
 
+            step_dict["args"][0]["visible"][-n_steps:] = [False] * n_steps
             step_dict["args"][0]["visible"][step] = True
             steps.append(step_dict)
 
@@ -374,12 +377,12 @@ def _draw_slices(figure, axis, volume,
             x=0.2,
             lenmode='fraction',
             len=0.6
-        ))  # TODO: these sliders won't become independent!
+        ))
 
 
 def visualize_volume(volume, figure=None, show_x=True, show_y=True,
                      show_z=True, interact=False, inline=False, opacity=0.3,
-                     slider_definition=0):
+                     slider_definition=20, which_plane=None):
     """
     Visualize a volume
 
@@ -411,7 +414,15 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
     slider_definition : int, optional
         How many discrete positions the slices can take.
         If 0, slices are stationary.
-        Default: 0
+        Default: 50
+
+    which_plane : str, optional
+        Should be 'Coronal', 'Axial', 'Sagittal', or None.
+        Determines which slice gets a slider.
+        If None, slices are stationary.
+        Note: If slices are not stationary,
+        do not add any more traces to the figure.
+        Default: 'Coronal'
 
     interact : bool
         Whether to open the visualization in an interactive window.
@@ -433,15 +444,33 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
     figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
     sliders = []
 
+    # draw stationary slices first
     if show_x:
-        _draw_slices(figure, Axes.X, volume, sliders=sliders,
-                     opacity=opacity, n_steps=slider_definition, y_loc=0)
+        if (which_plane is None) or which_plane.lower() != 'sagittal':
+            _draw_slices(figure, Axes.X, volume, opacity=opacity, y_loc=0)
     if show_y:
-        _draw_slices(figure, Axes.Y, volume, sliders=sliders,
-                     opacity=opacity, n_steps=slider_definition, y_loc=-0.3)
+        if (which_plane is None) or which_plane.lower() != 'coronal':
+            _draw_slices(figure, Axes.Y, volume, opacity=opacity, y_loc=0)
     if show_z:
-        _draw_slices(figure, Axes.Z, volume, sliders=sliders,
-                     opacity=opacity, n_steps=slider_definition, y_loc=-0.6)
+        if (which_plane is None) or which_plane.lower() != 'axial':
+            _draw_slices(figure, Axes.Z, volume, opacity=opacity, y_loc=0)
+
+    # Then draw interactive slices
+    if show_x:
+        if (which_plane is not None) and which_plane.lower() == 'sagittal':
+            _draw_slices(figure, Axes.X, volume, sliders=sliders,
+                         opacity=opacity, n_steps=slider_definition,
+                         y_loc=0)
+    if show_y:
+        if (which_plane is not None) and which_plane.lower() == 'coronal':
+            _draw_slices(figure, Axes.Y, volume, sliders=sliders,
+                         opacity=opacity, n_steps=slider_definition,
+                         y_loc=0)
+    if show_z:
+        if (which_plane is not None) and which_plane.lower() == 'axial':
+            _draw_slices(figure, Axes.Z, volume, sliders=sliders,
+                         opacity=opacity, n_steps=slider_definition,
+                         y_loc=0)
 
     figure.update_layout(sliders=tuple(sliders))
 
