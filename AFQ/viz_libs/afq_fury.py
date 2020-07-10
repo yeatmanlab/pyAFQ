@@ -16,6 +16,7 @@ except ImportError:
 
 viz_logger = logging.getLogger("AFQ.viz")
 
+
 def _inline_interact(scene, inline, interact):
     """
     Helper function to reuse across viz functions

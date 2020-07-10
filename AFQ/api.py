@@ -1067,7 +1067,7 @@ class AFQ(object):
 
             roi_files = self._export_rois(row)
             for i, roi in enumerate(roi_files[bundle_name]):
-                if i == len(roi_files[bundle_name]) - 1: # show on last ROI
+                if i == len(roi_files[bundle_name]) - 1:  # show on last ROI
                     figure = self.viz.visualize_roi(
                         roi,
                         name=f"{bundle_name} ROI {i}",
