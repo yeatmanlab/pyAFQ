@@ -11,7 +11,7 @@ from dipy.align.imwarp import (SymmetricDiffeomorphicRegistration,
 
 from dipy.align.imaffine import (transform_centers_of_mass,
                                  MutualInformationMetric,
-                                 AffineRegistration)
+                                 AffineRegistration, AffineMap)
 
 from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
@@ -236,9 +236,9 @@ def resample(moving, static, moving_affine, static_affine):
     resampled : the moving array resampled into the static array's space.
     """
     identity = np.eye(4)
-    affine_map = ConformedAffineMap(identity,
-                                    static.shape, static_affine,
-                                    moving.shape, moving_affine)
+    affine_map = AffineMap(identity,
+                           static.shape, static_affine,
+                           moving.shape, moving_affine)
     resampled = affine_map.transform(moving)
     return resampled
 
