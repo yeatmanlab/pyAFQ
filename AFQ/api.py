@@ -649,8 +649,9 @@ class AFQ(object):
                 hcp_atlas = load_tractogram(
                     atlas_fname,
                     'same', bbox_valid_check=False)
-                shape = nib.streamlines.load(atlas_fname,
-                                             lazy_load=True).header['dimensions']
+                shape = nib.streamlines.load(
+                    atlas_fname,
+                    lazy_load=True).header['dimensions']
 
                 return hcp_atlas.streamlines, hcp_atlas.affine, shape
             else:
