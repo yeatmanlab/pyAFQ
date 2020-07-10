@@ -662,8 +662,8 @@ class AFQ(object):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            moving_data, moving_affine = self._reg_img(row, self.moving)
-            static_data, static_affine = self._reg_img(row, self.static)
+            moving_data, moving_affine, _ = self._reg_img(row, self.moving)
+            static_data, static_affine, _ = self._reg_img(row, self.static)
             _, aff = reg.affine_registration(moving_data,
                                              static_data,
                                              moving_affine,
