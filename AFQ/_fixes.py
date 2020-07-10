@@ -13,6 +13,11 @@ import math
 
 
 class ConformedAffineMap(AffineMap):
+    """
+    Modifies AffineMap API to match functionality of DiffeomorphicMap.
+    Important for SLR maps to be indistinguishable from SYN maps
+    in terms of API.
+    """
     def transform(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
         return super().transform_inverse(*args, **kwargs)
