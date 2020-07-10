@@ -469,7 +469,7 @@ def reduce_shape(shape):
     """
     try:
         return shape[:3]
-    except:
+    except TypeError:
         return shape
 
 
