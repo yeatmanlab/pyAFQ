@@ -78,11 +78,11 @@ def test_slr_registration():
     # have to import sls atlas
     afd.fetch_hcp_atlas_16_bundles()
     atlas_fname = op.join(
-                    afd.afq_home,
-                    'hcp_atlas_16_bundles',
-                    'Atlas_in_MNI_Space_16_bundles',
-                    'whole_brain',
-                    'whole_brain_MNI.trk')
+        afd.afq_home,
+        'hcp_atlas_16_bundles',
+        'Atlas_in_MNI_Space_16_bundles',
+        'whole_brain',
+        'whole_brain_MNI.trk')
     hcp_atlas = load_tractogram(
         atlas_fname,
         'same', bbox_valid_check=False)
@@ -90,16 +90,18 @@ def test_slr_registration():
     with nbtmp.InTemporaryDirectory() as tmpdir:
         mapping = slr_registration(streamlines,
                                    hcp_atlas.streamlines,
-                                   moving_affine=hardi_affine,
-                                   static_affine=hcp_atlas.affine,
+                                   moving_affine=subset_b0_img.affine,
+                                   static_affine=subset_t2_img.affine,
+                                   moving_shape=subset_b0_img.shape,
+                                   static_shape=subset_t2_img.shape,
                                    progressive=False,
                                    greater_than=10,
                                    rm_small_clusters=1,
                                    rng=np.random.RandomState(seed=8))
-        warped_moving = mapping.transform(subset_b0[0])
+        warped_moving = mapping.transform(subset_b0)
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
-        mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
+        mapping_fname = op.join(tmpdir, 'mapping.npy')
         write_mapping(mapping, mapping_fname)
         file_mapping = read_mapping(mapping_fname,
                                     subset_b0_img,

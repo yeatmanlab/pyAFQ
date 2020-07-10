@@ -208,10 +208,11 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
         mapping.is_inverse = True
     else:
         mapping = ConformedAffineMap(disp,
-                                     domain_grid_shape=domain_img.shape[:3],
+                                     domain_grid_shape=reduce_shape(
+                                         domain_img.shape),
                                      domain_grid2world=domain_img.affine,
-                                     codomain_grid_shape=\
-                                         codomain_img.shape[:3],
+                                     codomain_grid_shape=reduce_shape(
+                                         codomain_img.shape),
                                      codomain_grid2world=codomain_img.affine)
 
     return mapping
@@ -462,20 +463,36 @@ def streamline_registration(moving, static, n_points=100,
     return aligned, srm.matrix
 
 
+def reduce_shape(shape):
+    """
+    Reduce dimension in shape to 3 if possible
+    """
+    try:
+        return shape[:3]
+    except:
+        return shape
+
+
 def slr_registration(moving_data, static_data,
-                     moving_affine=None, static_affine=None, **kwargs):
+                     moving_affine=None, static_affine=None,
+                     moving_shape=None, static_shape=None, **kwargs):
     """Register a source image (moving) to a target image (static).
 
     Parameters
     ----------
     moving : ndarray
         The source tractography data to be registered
-    moving_affine : array, shape (4,4)
-        The affine matrix associated with the moving (source) data.
+    moving_affine : ndarray
+        The affine associated with the moving (source) data.
+    moving_shape : ndarray
+        The shape of the space associated with the static (target) data.
     static : ndarray
         The target tractography data for registration
-    static_affine : array, shape (4,4)
-        The affine matrix associated with the static (target) data.
+    static_affine : ndarray
+        The affine associated with the static (target) data.
+    static_shape : ndarray
+        The shape of the space associated with the static (target) data.
+
     **kwargs:
         kwargs are passed into whole_brain_slr
 
@@ -487,7 +504,7 @@ def slr_registration(moving_data, static_data,
         static_data, moving_data, x0='affine', verbose=False, **kwargs)
 
     return ConformedAffineMap(transform,
-                              domain_grid_shape=static_affine.shape[:3],
-                              domain_grid2world=static_affine,
-                              codomain_grid_shape=static_affine.shape[:3],
-                              codomain_grid2world=static_affine)
+                              codomain_grid_shape=reduce_shape(static_shape),
+                              codomain_grid2world=static_affine,
+                              domain_grid_shape=reduce_shape(moving_shape),
+                              domain_grid2world=moving_affine)

@@ -630,10 +630,11 @@ class AFQ(object):
             elif img_l == "dti_fa_template":
                 img = afd.read_fa_template(mask=self.mask_templ)
             elif img_l == "subject_sls":
+                img = nib.load(row['dwi_file'])
                 tg = load_tractogram(self._streamlines(row),
-                                     nib.load(row['dwi_file']),
+                                     img,
                                      Space.VOX)
-                return tg.streamlines, tg.affine
+                return tg.streamlines, img.affine, img.shape
             elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
                     afd.afq_home,
@@ -646,12 +647,14 @@ class AFQ(object):
                 hcp_atlas = load_tractogram(
                     atlas_fname,
                     'same', bbox_valid_check=False)
+                shape = nib.streamlines.load(atlas_fname,
+                                             lazy_load=True).header['dimensions']
 
-                return hcp_atlas.streamlines, hcp_atlas.affine
+                return hcp_atlas.streamlines, hcp_atlas.affine, shape
             else:
                 img = nib.load(img)
 
-        return img.get_fdata(), img.affine
+        return img.get_fdata(), img.affine, img.shape
 
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
@@ -718,14 +721,18 @@ class AFQ(object):
             else:
                 reg_prealign = None
 
-            static_data, static_affine = self._reg_img(row, self.static)
-            moving_data, moving_affine = self._reg_img(row, self.moving)
+            static_data, static_affine, static_shape = \
+                self._reg_img(row, self.static)
+            moving_data, moving_affine, moving_shape = \
+                self._reg_img(row, self.moving)
 
             if self.reg_algo == "slr":
                 mapping = reg.slr_registration(
                     moving_data, static_data,
                     moving_affine=moving_affine,
-                    static_affine=static_affine)
+                    moving_shape=moving_shape,
+                    static_affine=static_affine,
+                    static_shape=static_shape)
             else:
                 _, mapping = reg.syn_registration(
                     moving_data, static_data,

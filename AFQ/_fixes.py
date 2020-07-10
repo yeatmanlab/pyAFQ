@@ -11,10 +11,11 @@ import random
 import sys
 import math
 
+
 class ConformedAffineMap(AffineMap):
     def transform(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)
+        return super().transform_inverse(*args, **kwargs)
 
     def transform_inverse(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
