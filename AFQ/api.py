@@ -1010,11 +1010,17 @@ class AFQ(object):
     def _template_xform(self, row):
         template_xform_file = self._get_fname(row, "_template_xform.nii.gz")
         if self.force_recompute or not op.exists(template_xform_file):
-            reg_prealign = np.load(self._reg_prealign(row))
+            if self.use_prealign:
+                reg_prealign_inv = np.linalg.inv(
+                    np.load(self._reg_prealign(row))
+                )
+            else:
+                reg_prealign_inv = None
+
             mapping = reg.read_mapping(self._mapping(row),
                                        row['dwi_file'],
                                        self.reg_template,
-                                       prealign=np.linalg.inv(reg_prealign))
+                                       prealign=reg_prealign_inv)
 
             template_xform = mapping.transform_inverse(
                 self.reg_template.get_fdata())
