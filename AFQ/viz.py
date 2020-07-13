@@ -19,6 +19,7 @@ class Viz:
                 Should be either "fury" or "plotly".
                 Default: "fury"
         """
+        self.viz_library = viz_library
         if viz_library == "fury":
             try:
                 import AFQ.viz_libs.afq_fury

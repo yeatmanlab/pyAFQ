@@ -1108,6 +1108,7 @@ class AFQ(object):
                         name=f"{bundle_name} ROI {i}",
                         inline=inline,
                         interact=interactive,
+                        opacity=0.75,
                         figure=figure)
                 else:
                     figure = self.viz.visualize_roi(
@@ -1119,32 +1120,77 @@ class AFQ(object):
 
             yield figure, bundle_name
 
-    def _export_bundle_gif(self, row):
+    def _export_bundle_viz(self, row, as_gif=False, as_html=False):
         figure = self._create_bundles_fig(row)
 
-        fname = self._get_fname(
-            row,
-            f'_viz.gif',
-            include_track=True,
-            include_seg=True)
+        if not as_gif and not as_html:
+            if self.viz.viz_library == 'plotly':
+                as_html = True
+            else:
+                as_gif = True
 
-        self.viz.create_gif(figure, fname)
+        if as_gif:
+            fname = self._get_fname(
+                row,
+                f'_viz.gif',
+                include_track=True,
+                include_seg=True)
 
-    def _export_ROI_gifs(self, row):
+            self.viz.create_gif(figure, fname)
+
+        if as_html:
+            if self.viz.viz_library != 'plotly':
+                raise TypeError(
+                    "Viz library must be set to plotly to export html files"
+                )
+            fname = self._get_fname(
+                row,
+                f'_viz.html',
+                include_track=True,
+                include_seg=True)
+
+            figure.write_html(fname)
+
+    def _export_ROI_viz(self, row, as_gif=False, as_html=False):
+        if not as_gif and not as_html:
+            if self.viz.viz_library == 'plotly':
+                as_html = True
+            else:
+                as_gif = True
         for figure, bundle_name in self._create_ROI_figs(row):
-            fname = op.split(
-                self._get_fname(
-                    row,
-                    f'_{bundle_name}'
-                    f'_viz.gif',
-                    include_track=True,
-                    include_seg=True))
+            self.logger.info(f"Generating {bundle_name} visualization...")
             roi_dir = op.join(row['results_dir'], 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
-            fname = op.join(fname[0], roi_dir, fname[1])
+            if as_gif:
+                fname = op.split(
+                    self._get_fname(
+                        row,
+                        f'_{bundle_name}'
+                        f'_viz.gif',
+                        include_track=True,
+                        include_seg=True))
 
-            self.viz.create_gif(figure, fname, creating_many=True)
-        self.viz.stop_creating_gifs()
+                fname = op.join(fname[0], roi_dir, fname[1])
+                self.viz.create_gif(figure, fname, creating_many=True)
+            if as_html:
+                if self.viz.viz_library != 'plotly':
+                    raise TypeError(
+                        "Viz library must be set to plotly"
+                        + " to export html files"
+                    )
+                fname = op.split(
+                    self._get_fname(
+                        row,
+                        f'_{bundle_name}'
+                        f'_viz.html',
+                        include_track=True,
+                        include_seg=True))
+
+                fname = op.join(fname[0], roi_dir, fname[1])
+                figure.write_html(fname)
+
+        if as_gif:
+            self.viz.stop_creating_gifs()
 
     def _viz_ROIs(self, row):
         for _, bundle_name in self._create_ROI_figs(row, inline=True):
@@ -1444,11 +1490,17 @@ class AFQ(object):
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
 
-    def export_bundle_gif(self):
-        self.data_frame.apply(self._export_bundle_gif, axis=1)
+    def export_bundle_viz(self, as_gif=False, as_html=False):
+        self.data_frame.apply(self._export_bundle_viz,
+                              axis=1,
+                              as_gif=as_gif,
+                              as_html=as_html)
 
-    def export_ROI_gifs(self):
-        self.data_frame.apply(self._export_ROI_gifs, axis=1)
+    def export_ROI_viz(self, as_gif=False, as_html=False):
+        self.data_frame.apply(self._export_ROI_viz,
+                              axis=1,
+                              as_gif=as_gif,
+                              as_html=as_html)
 
     def viz_bundles(self,
                     volume=None,
