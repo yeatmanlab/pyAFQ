@@ -456,7 +456,7 @@ def organize_cfin_data(path=None):
 
     dpd.fetch_cfin_multib()
     if path is None:
-        os.makedirs(afq_home)
+        os.makedirs(afq_home, exist_ok=True)
         path = afq_home
 
     bids_path = op.join(path, 'cfin_multib',)
@@ -493,7 +493,7 @@ def organize_stanford_data(path=None):
     """
     dpd.fetch_stanford_hardi()
     if path is None:
-        os.makedirs(afq_home)
+        os.makedirs(afq_home, exist_ok=True)
         path = afq_home
 
     bids_path = op.join(path, 'stanford_hardi',)
