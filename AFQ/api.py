@@ -1025,15 +1025,11 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
-    def _create_bundles_fig(self, row,
-                            inline=False,
-                            interactive=False,
-                            volume=None,
-                            xform_volume=False,
-                            color_by_volume=None,
-                            xform_color_by_volume=False):
-        bundles_file = self._clean_bundles(row)
-
+    def _viz_prepare_vols(self, row,
+                          volume=None,
+                          xform_volume=False,
+                          color_by_volume=None,
+                          xform_color_by_volume=False):
         if volume is None or color_by_volume == 'dti_fa':
             fa_file = self._dti_fa(row)
             fa_img = nib.load(fa_file).get_fdata()
@@ -1049,7 +1045,6 @@ class AFQ(object):
                                        row['dwi_file'],
                                        self.reg_template,
                                        prealign=reg_prealign_inv)
-
         if volume is None:
             volume = fa_img
         if color_by_volume == 'dti_fa':
@@ -1063,6 +1058,25 @@ class AFQ(object):
             if isinstance(color_by_volume, str):
                 color_by_volume = nib.load(color_by_volume).get_fdata()
             color_by_volume = mapping.transform_inverse(color_by_volume)
+        return volume, color_by_volume
+
+    def _viz_bundles(self, row,
+                     export_as_gif=False,
+                     export_as_html=False,
+                     inline=False,
+                     interactive=False,
+                     volume=None,
+                     xform_volume=False,
+                     color_by_volume=None,
+                     xform_color_by_volume=False):
+        bundles_file = self._clean_bundles(row)
+        volume, color_by_volume = self._viz_prepare_vols(
+            row,
+            volume=volume,
+            xform_volume=xform_volume,
+            color_by_volume=color_by_volume,
+            xform_color_by_volume=xform_color_by_volume
+        )
 
         figure = self.viz.visualize_volume(volume,
                                            interact=False,
@@ -1075,22 +1089,60 @@ class AFQ(object):
                                             interact=interactive,
                                             inline=inline,
                                             figure=figure)
+
+        if export_as_gif:
+            fname = self._get_fname(
+                row,
+                f'_viz.gif',
+                include_track=True,
+                include_seg=True)
+
+            self.viz.create_gif(figure, fname)
+
+        if export_as_html:
+            if self.viz.viz_library != 'plotly':
+                raise TypeError(
+                    "Viz library must be set to plotly to export html files"
+                )
+            fname = self._get_fname(
+                row,
+                f'_viz.html',
+                include_track=True,
+                include_seg=True)
+
+            figure.write_html(fname)
         return figure
 
-    def _create_ROI_figs(self, row, inline=False, interactive=False):
+    def _viz_ROIs(self, row,
+                  export_as_gif=False,
+                  export_as_html=False,
+                  inline=False,
+                  interactive=False,
+                  volume=None,
+                  xform_volume=False,
+                  color_by_volume=None,
+                  xform_color_by_volume=False):
         bundles_file = self._clean_bundles(row)
-        fa_file = self._dti_fa(row)
-        fa_img = nib.load(fa_file).get_fdata()
+
+        volume, color_by_volume = self._viz_prepare_vols(
+            row,
+            volume=volume,
+            xform_volume=xform_volume,
+            color_by_volume=color_by_volume,
+            xform_color_by_volume=xform_color_by_volume
+        )
 
         for bundle_name in self.bundle_dict.keys():
+            self.logger.info(f"Generating {bundle_name} visualization...")
             uid = self.bundle_dict[bundle_name]['uid']
-            figure = self.viz.visualize_volume(fa_img,
+            figure = self.viz.visualize_volume(volume,
                                                interact=False,
                                                inline=False)
             try:
                 figure = self.viz.visualize_bundles(
                     bundles_file,
                     affine=row['dwi_affine'],
+                    color_by_volume=color_by_volume,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
                     interact=False,
@@ -1118,50 +1170,9 @@ class AFQ(object):
                         interact=False,
                         figure=figure)
 
-            yield figure, bundle_name
-
-    def _export_bundle_viz(self, row, as_gif=False, as_html=False):
-        figure = self._create_bundles_fig(row)
-
-        if not as_gif and not as_html:
-            if self.viz.viz_library == 'plotly':
-                as_html = True
-            else:
-                as_gif = True
-
-        if as_gif:
-            fname = self._get_fname(
-                row,
-                f'_viz.gif',
-                include_track=True,
-                include_seg=True)
-
-            self.viz.create_gif(figure, fname)
-
-        if as_html:
-            if self.viz.viz_library != 'plotly':
-                raise TypeError(
-                    "Viz library must be set to plotly to export html files"
-                )
-            fname = self._get_fname(
-                row,
-                f'_viz.html',
-                include_track=True,
-                include_seg=True)
-
-            figure.write_html(fname)
-
-    def _export_ROI_viz(self, row, as_gif=False, as_html=False):
-        if not as_gif and not as_html:
-            if self.viz.viz_library == 'plotly':
-                as_html = True
-            else:
-                as_gif = True
-        for figure, bundle_name in self._create_ROI_figs(row):
-            self.logger.info(f"Generating {bundle_name} visualization...")
-            roi_dir = op.join(row['results_dir'], 'viz_bundles')
-            os.makedirs(roi_dir, exist_ok=True)
-            if as_gif:
+            if export_as_gif:
+                roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                os.makedirs(roi_dir, exist_ok=True)
                 fname = op.split(
                     self._get_fname(
                         row,
@@ -1172,7 +1183,9 @@ class AFQ(object):
 
                 fname = op.join(fname[0], roi_dir, fname[1])
                 self.viz.create_gif(figure, fname, creating_many=True)
-            if as_html:
+            if export_as_html:
+                roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                os.makedirs(roi_dir, exist_ok=True)
                 if self.viz.viz_library != 'plotly':
                     raise TypeError(
                         "Viz library must be set to plotly"
@@ -1189,30 +1202,8 @@ class AFQ(object):
                 fname = op.join(fname[0], roi_dir, fname[1])
                 figure.write_html(fname)
 
-        if as_gif:
+        if export_as_gif:
             self.viz.stop_creating_gifs()
-
-    def _viz_ROIs(self, row):
-        for _, bundle_name in self._create_ROI_figs(row, inline=True):
-            print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
-
-    def _viz_bundles(self,
-                     row,
-                     volume=None,
-                     xform_volume=False,
-                     color_by_volume=None,
-                     xform_color_by_volume=False,
-                     interactive=False,
-                     inline=False):
-        self._create_bundles_fig(
-            row,
-            interactive=interactive,
-            inline=inline,
-            volume=volume,
-            xform_volume=xform_volume,
-            color_by_volume=color_by_volume,
-            xform_color_by_volume=xform_color_by_volume)
-        print(f"Subject: {row['subject']}")
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1490,19 +1481,9 @@ class AFQ(object):
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
 
-    def export_bundle_viz(self, as_gif=False, as_html=False):
-        self.data_frame.apply(self._export_bundle_viz,
-                              axis=1,
-                              as_gif=as_gif,
-                              as_html=as_html)
-
-    def export_ROI_viz(self, as_gif=False, as_html=False):
-        self.data_frame.apply(self._export_ROI_viz,
-                              axis=1,
-                              as_gif=as_gif,
-                              as_html=as_html)
-
     def viz_bundles(self,
+                    export_as_gif=False,
+                    export_as_html=False,
                     volume=None,
                     xform_volume=False,
                     color_by_volume=None,
@@ -1510,6 +1491,8 @@ class AFQ(object):
                     inline=False,
                     interactive=False):
         self.data_frame.apply(self._viz_bundles, axis=1,
+                              export_as_gif=export_as_gif,
+                              export_as_html=export_as_html,
                               volume=volume,
                               xform_volume=xform_volume,
                               color_by_volume=color_by_volume,
@@ -1517,12 +1500,26 @@ class AFQ(object):
                               inline=inline,
                               interactive=interactive)
 
-    def viz_ROIs(self, inline=False, interactive=False):
+    def viz_ROIs(self,
+                 export_as_gif=False,
+                 export_as_html=False,
+                 volume=None,
+                 xform_volume=False,
+                 color_by_volume=None,
+                 xform_color_by_volume=False,
+                 inline=False,
+                 interactive=False):
         self.data_frame.apply(
             self._viz_ROIs,
             axis=1,
-            inline=False,
-            interactive=False)
+            export_as_gif=export_as_gif,
+            export_as_html=export_as_html,
+            inline=inline,
+            interactive=interactive,
+            volume=volume,
+            xform_volume=xform_volume,
+            color_by_volume=color_by_volume,
+            xform_color_by_volume=xform_color_by_volume)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)
