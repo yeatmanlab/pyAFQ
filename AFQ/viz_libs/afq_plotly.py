@@ -59,6 +59,7 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
 
     if cbv is not None:
         line_color = []
+        cbv_max = cbv.max()
         color_max = color.max()
     else:
         line_color = _color_arr2str(color)
@@ -83,8 +84,10 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
                 sl[:, 2].astype(int)
             ]:
                 line_color.append(
-                    _color_arr2str(  # slight saturation, brighter looks better
-                        np.round(brightness * color / color_max * 1.2, 3)))
+                    _color_arr2str(  # slight saturation, brighter is better
+                        np.round(
+                            brightness / cbv_max * color / color_max * 1.4,
+                            3)))
 
             line_color.append(f"rgba(0, 0, 0, 0)")
 
