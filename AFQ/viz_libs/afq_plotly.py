@@ -58,10 +58,13 @@ def set_layout(figure, color=None):
 
     figure.update_layout(
         plot_bgcolor=color,
-        scene = dict(
-            xaxis = dict(showbackground=False, showticklabels=False, title=''),
-            yaxis = dict(showbackground=False, showticklabels=False, title=''),
-            zaxis = dict(showbackground=False, showticklabels=False, title='')
+        scene=dict(
+            xaxis=dict(
+                showbackground=False, showticklabels=False, title=''),
+            yaxis=dict(
+                showbackground=False, showticklabels=False, title=''),
+            zaxis=dict(
+                showbackground=False, showticklabels=False, title='')
         )
     )
 
@@ -366,7 +369,7 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
         visible = False
 
     v_min = volume.min()
-    sf = volume.max()-v_min
+    sf = volume.max() - v_min
 
     if axis == Axes.X:
         X, Y, Z = np.mgrid[height:height + 1,
@@ -381,7 +384,7 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
                            :volume.shape[1], height:height + 1]
         values = volume[:, :, height].flatten()
 
-    values = 1 - (values-v_min)/sf
+    values = 1 - (values - v_min) / sf
 
     figure.add_trace(
         go.Volume(
@@ -536,7 +539,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
                          opacity=opacity, n_steps=slider_definition,
                          y_loc=0)
 
-    if slider_definition >0 and which_plane is not None:
+    if slider_definition > 0 and which_plane is not None:
         figure.update_layout(sliders=tuple(sliders))
 
     return _inline_interact(figure, interact, inline)
