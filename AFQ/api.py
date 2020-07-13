@@ -1150,7 +1150,7 @@ class AFQ(object):
         for _, bundle_name in self._create_ROI_figs(row, inline=True):
             print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
 
-    def _viz_bundles(self, #TODO: delete this intermediary and re organize
+    def _viz_bundles(self,
                      row,
                      volume=None,
                      xform_volume=False,

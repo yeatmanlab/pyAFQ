@@ -365,21 +365,26 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
         height = (volume.shape[axis] * step) // n_steps
         visible = False
 
+    v_min = volume.min()
+    sf = volume.max()-v_min
+
     if axis == Axes.X:
         X, Y, Z = np.mgrid[height:height + 1,
                            :volume.shape[1], :volume.shape[2]]
-        values = 1 - volume[height, :, :].flatten()
+        values = volume[height, :, :].flatten()
     elif axis == Axes.Y:
         X, Y, Z = np.mgrid[:volume.shape[0],
                            height:height + 1, :volume.shape[2]]
-        values = 1 - volume[:, height, :].flatten()
+        values = volume[:, height, :].flatten()
     elif axis == Axes.Z:
         X, Y, Z = np.mgrid[:volume.shape[0],
                            :volume.shape[1], height:height + 1]
-        values = 1 - volume[:, :, height].flatten()
+        values = volume[:, :, height].flatten()
+
+    values = 1 - (values-v_min)/sf
 
     figure.add_trace(
-        go.Isosurface(
+        go.Volume(
             x=X.flatten(),
             y=Y.flatten(),
             z=Z.flatten(),
