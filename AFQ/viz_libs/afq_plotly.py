@@ -75,10 +75,12 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
     z_pts = []
 
     if cbv is not None:
+        customdata = []
         line_color = []
         cbv_max = cbv.max()
         color_max = color.max()
     else:
+        customdata = None
         line_color = _color_arr2str(color)
 
     for sl in sls:
@@ -105,8 +107,10 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
                         np.round(
                             brightness / cbv_max * color / color_max * 1.4,
                             3)))
+                customdata.append(str(brightness))
 
             line_color.append(f"rgba(0, 0, 0, 0)")
+            customdata.append("")
 
     figure.add_trace(
         go.Scatter3d(
@@ -118,7 +122,9 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
             line=dict(
                 width=8,
                 color=line_color,
-            )
+            ),
+            hovertext=customdata,
+            hoverinfo='all'
         )
     )
 
@@ -397,7 +403,8 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             showscale=False,
             opacity=opacity,
             visible=visible,
-            name=_name_from_enum(axis)
+            name=_name_from_enum(axis),
+            hoverinfo='skip'
         )
     )
 

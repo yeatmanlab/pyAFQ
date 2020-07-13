@@ -36,8 +36,8 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
-                      colors=None, figure=None, background=(1, 1, 1),
-                      interact=False, inline=False):
+                      colors=None, color_by_volume=None, figure=None,
+                      background=(1, 1, 1), interact=False, inline=False):
     """
     Visualize bundles in 3D using VTK
 
