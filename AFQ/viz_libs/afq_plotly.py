@@ -35,14 +35,33 @@ def _inline_interact(figure, show, show_inline):
     return figure
 
 
+def _to_color_range(num):
+    if num < 0:
+        num = 0
+    if num >= 0.999:
+        num = 0.999
+    return num
+
+
 def _color_arr2str(color_arr, opacity=1.0):
-    return f"rgba({color_arr[0]}, {color_arr[1]}, {color_arr[2]}, {opacity})"
+    return (
+        f"rgba({_to_color_range(color_arr[0])}, "
+        f"{_to_color_range(color_arr[1])}, "
+        f"{_to_color_range(color_arr[2])}, "
+        f"{_to_color_range(opacity)})"
+    )
 
 
-def _draw_streamlines(figure, sls, color, name, n_points=100):
+def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
     x_pts = []
     y_pts = []
     z_pts = []
+
+    if cbv is not None:
+        line_color = []
+        color_max = color.max()
+    else:
+        line_color = _color_arr2str(color)
 
     for sl in sls:
         # resample streamline to n_points
@@ -57,6 +76,18 @@ def _draw_streamlines(figure, sls, color, name, n_points=100):
         z_pts.extend(sl[:, 2])
         z_pts.append(None)
 
+        if cbv is not None:
+            for brightness in cbv[
+                sl[:, 0].astype(int),
+                sl[:, 1].astype(int),
+                sl[:, 2].astype(int)
+            ]:
+                line_color.append(
+                    _color_arr2str(  # slight saturation, brighter looks better
+                        np.round(brightness * color / color_max * 1.2, 3)))
+
+            line_color.append(f"rgba(0, 0, 0, 0)")
+
     figure.add_trace(
         go.Scatter3d(
             x=x_pts,
@@ -65,16 +96,17 @@ def _draw_streamlines(figure, sls, color, name, n_points=100):
             mode='lines',
             name=name,
             line=dict(
-                width=1,
-                color=_color_arr2str(color),
+                width=8,
+                color=line_color,
             )
         )
     )
 
 
 def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
-                      colors=None, figure=None, background=(1, 1, 1),
-                      resample=100, interact=False, inline=False):
+                      colors=None, color_by_volume=None, figure=None,
+                      background=(1, 1, 1), resample=100, interact=False,
+                      inline=False):
     """
     Visualize bundles in 3D
 
@@ -125,6 +157,9 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     tg = vut.tract_loader(trk, affine)
 
+    if color_by_volume is not None:
+        color_by_volume = vut.load_volume(color_by_volume)
+
     if figure is None:
         figure = go.Figure()
 
@@ -132,7 +167,13 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     for (sls, color, name) in \
             vut.tract_generator(tg, bundle, bundle_dict, colors):
-        _draw_streamlines(figure, sls, color, name, n_points=resample)
+        _draw_streamlines(
+            figure,
+            sls,
+            color,
+            name,
+            n_points=resample,
+            cbv=color_by_volume)
 
     return _inline_interact(figure, interact, inline)
 
