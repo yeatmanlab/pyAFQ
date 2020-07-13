@@ -52,6 +52,20 @@ def _color_arr2str(color_arr, opacity=1.0):
     )
 
 
+def set_layout(figure, color=None):
+    if color is None:
+        color = f"rgba(0,0,0,0)"
+
+    figure.update_layout(
+        plot_bgcolor=color,
+        scene = dict(
+            xaxis = dict(showbackground=False, showticklabels=False, title=''),
+            yaxis = dict(showbackground=False, showticklabels=False, title=''),
+            zaxis = dict(showbackground=False, showticklabels=False, title='')
+        )
+    )
+
+
 def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
     x_pts = []
     y_pts = []
@@ -166,7 +180,7 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     if figure is None:
         figure = go.Figure()
 
-    figure.update_layout(plot_bgcolor=_color_arr2str(background))
+    set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name) in \
             vut.tract_generator(tg, bundle, bundle_dict, colors):
@@ -330,7 +344,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     if figure is None:
         figure = go.Figure()
 
-    figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
+    set_layout(figure)
 
     _draw_roi(figure, roi, name, color, opacity)
 
@@ -374,7 +388,8 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             surface_count=1,
             showscale=False,
             opacity=opacity,
-            visible=visible
+            visible=visible,
+            name=_name_from_enum(axis)
         )
     )
 
@@ -485,7 +500,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
     if figure is None:
         figure = go.Figure()
 
-    figure.update_layout(plot_bgcolor=f"rgba(0,0,0,0)")
+    set_layout(figure)
     sliders = []
 
     # draw stationary slices first
@@ -516,6 +531,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
                          opacity=opacity, n_steps=slider_definition,
                          y_loc=0)
 
-    figure.update_layout(sliders=tuple(sliders))
+    if slider_definition >0 and which_plane is not None:
+        figure.update_layout(sliders=tuple(sliders))
 
     return _inline_interact(figure, interact, inline)
