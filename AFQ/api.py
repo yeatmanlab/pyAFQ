@@ -1025,16 +1025,51 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
-    def _create_bundles_fig(self, row, inline=False, interactive=False):
+    def _create_bundles_fig(self, row,
+                            inline=False,
+                            interactive=False,
+                            volume=None,
+                            xform_volume=False,
+                            color_by_volume=None,
+                            xform_color_by_volume=False):
         bundles_file = self._clean_bundles(row)
-        fa_file = self._dti_fa(row)
-        fa_img = nib.load(fa_file).get_fdata()
 
-        figure = self.viz.visualize_volume(fa_img,
+        if volume is None or color_by_volume == 'dti_fa':
+            fa_file = self._dti_fa(row)
+            fa_img = nib.load(fa_file).get_fdata()
+
+        if xform_volume or xform_color_by_volume:
+            if self.use_prealign:
+                reg_prealign = np.load(self._reg_prealign(row))
+                reg_prealign_inv = np.linalg.inv(reg_prealign)
+            else:
+                reg_prealign_inv = None
+
+            mapping = reg.read_mapping(self._mapping(row),
+                                       row['dwi_file'],
+                                       self.reg_template,
+                                       prealign=reg_prealign_inv)
+
+        if volume is None:
+            volume = fa_img
+        if color_by_volume == 'dti_fa':
+            color_by_volume = fa_img
+
+        if xform_volume:
+            if isinstance(volume, str):
+                volume = nib.load(volume).get_fdata()
+            volume = mapping.transform_inverse(volume)
+        if xform_color_by_volume:
+            if isinstance(color_by_volume, str):
+                color_by_volume = nib.load(color_by_volume).get_fdata()
+            color_by_volume = mapping.transform_inverse(color_by_volume)
+
+        figure = self.viz.visualize_volume(volume,
                                            interact=False,
                                            inline=False)
 
         figure = self.viz.visualize_bundles(bundles_file,
+                                            color_by_volume=color_by_volume,
                                             affine=row['dwi_affine'],
                                             bundle_dict=self.bundle_dict,
                                             interact=interactive,
@@ -1111,21 +1146,27 @@ class AFQ(object):
             self.viz.create_gif(figure, fname, creating_many=True)
         self.viz.stop_creating_gifs()
 
-    def _show_inline_bundles(self, row):
-        self._create_bundles_fig(row, inline=True)
-        print(f"Subject: {row['subject']}")
-
-    def _show_inline_ROIs(self, row):
-        for _, bundle_name in self._create_ROI_figs(row, interactive=True):
+    def _viz_ROIs(self, row):
+        for _, bundle_name in self._create_ROI_figs(row, inline=True):
             print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
 
-    def _show_interactive_bundles(self, row):
-        self._create_bundles_fig(row, inline=True)
+    def _viz_bundles(self, #TODO: delete this intermediary and re organize
+                     row,
+                     volume=None,
+                     xform_volume=False,
+                     color_by_volume=None,
+                     xform_color_by_volume=False,
+                     interactive=False,
+                     inline=False):
+        self._create_bundles_fig(
+            row,
+            interactive=interactive,
+            inline=inline,
+            volume=volume,
+            xform_volume=xform_volume,
+            color_by_volume=color_by_volume,
+            xform_color_by_volume=xform_color_by_volume)
         print(f"Subject: {row['subject']}")
-
-    def _show_interactive_ROIs(self, row):
-        for _, bundle_name in self._create_ROI_figs(row, interactive=True):
-            print(f"Subject: {row['subject']}, Bundle: {bundle_name}")
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1409,17 +1450,27 @@ class AFQ(object):
     def export_ROI_gifs(self):
         self.data_frame.apply(self._export_ROI_gifs, axis=1)
 
-    def show_interactive_bundles(self):
-        self.data_frame.apply(self._show_interactive_bundles, axis=1)
+    def viz_bundles(self,
+                    volume=None,
+                    xform_volume=False,
+                    color_by_volume=None,
+                    xform_color_by_volume=False,
+                    inline=False,
+                    interactive=False):
+        self.data_frame.apply(self._viz_bundles, axis=1,
+                              volume=volume,
+                              xform_volume=xform_volume,
+                              color_by_volume=color_by_volume,
+                              xform_color_by_volume=xform_color_by_volume,
+                              inline=inline,
+                              interactive=interactive)
 
-    def show_interactive_ROIs(self):
-        self.data_frame.apply(self._show_interactive_ROIs, axis=1)
-
-    def show_inline_bundles(self):
-        self.data_frame.apply(self._show_inline_bundles, axis=1)
-
-    # def show_inline_ROIs(self):
-    #     self.data_frame.apply(self._show_inline_ROIs, axis=1)
+    def viz_ROIs(self, inline=False, interactive=False):
+        self.data_frame.apply(
+            self._viz_ROIs,
+            axis=1,
+            inline=False,
+            interactive=False)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)
