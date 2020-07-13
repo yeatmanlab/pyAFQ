@@ -1114,6 +1114,7 @@ class AFQ(object):
         return figure
 
     def _viz_ROIs(self, row,
+                  bundle_names=None,
                   export_as_gif=False,
                   export_as_html=False,
                   inline=False,
@@ -1132,7 +1133,10 @@ class AFQ(object):
             xform_color_by_volume=xform_color_by_volume
         )
 
-        for bundle_name in self.bundle_dict.keys():
+        if bundle_names is None:
+            bundle_names = self.bundle_dict.keys()
+
+        for bundle_name in bundle_names:
             self.logger.info(f"Generating {bundle_name} visualization...")
             uid = self.bundle_dict[bundle_name]['uid']
             figure = self.viz.visualize_volume(volume,
@@ -1501,6 +1505,7 @@ class AFQ(object):
                               interactive=interactive)
 
     def viz_ROIs(self,
+                 bundle_names=None,
                  export_as_gif=False,
                  export_as_html=False,
                  volume=None,
@@ -1512,6 +1517,7 @@ class AFQ(object):
         self.data_frame.apply(
             self._viz_ROIs,
             axis=1,
+            bundle_names=bundle_names,
             export_as_gif=export_as_gif,
             export_as_html=export_as_html,
             inline=inline,
