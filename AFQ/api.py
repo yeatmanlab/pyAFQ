@@ -153,7 +153,7 @@ class AFQ(object):
                  wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
                  virtual_frame_buffer=False,
-                 viz_library="fury",
+                 viz_backend="fury",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -213,8 +213,8 @@ class AFQ(object):
             Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
 
-        viz_library : str, optional
-            Should be either "fury" or "plotly".
+        viz_backend : str, optional
+            Which visualization backend to us. One of {"fury", "plotly"}.
             Default: "fury"
 
         segmentation_params : dict, optional
@@ -242,7 +242,7 @@ class AFQ(object):
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
-        self.viz = Viz(viz_library=viz_library)
+        self.viz = Viz(backend=viz_backend)
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was
@@ -1100,7 +1100,7 @@ class AFQ(object):
             self.viz.create_gif(figure, fname)
 
         if export_as_html:
-            if self.viz.viz_library != 'plotly':
+            if self.viz.backend != 'plotly':
                 raise TypeError(
                     "Viz library must be set to plotly to export html files"
                 )
@@ -1190,7 +1190,7 @@ class AFQ(object):
             if export_as_html:
                 roi_dir = op.join(row['results_dir'], 'viz_bundles')
                 os.makedirs(roi_dir, exist_ok=True)
-                if self.viz.viz_library != 'plotly':
+                if self.viz.backend != 'plotly':
                     raise TypeError(
                         "Viz library must be set to plotly"
                         + " to export html files"

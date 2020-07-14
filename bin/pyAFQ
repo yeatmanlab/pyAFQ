@@ -88,7 +88,7 @@ wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 dask_it = false
 force_recompute = false
 virtual_frame_buffer = false
-viz_library = 'fury'
+viz_backend = 'fury'
 ```
 """
 
@@ -173,7 +173,7 @@ compute = config.get("compute", {})
 dask_it = compute.get("dask_it", False)
 force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
-viz_library = compute.get("viz_library", 'fury')
+viz_backend = compute.get("viz_backend", 'fury')
 
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,
@@ -186,7 +186,7 @@ myafq = api.AFQ(bids_path,
                 reg_template=reg_template,
                 wm_criterion=wm_criterion,
                 virtual_frame_buffer=virtual_frame_buffer,
-                viz_library=viz_library,
+                viz_backend=viz_backend,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params,
                 clean_params=clean_params)

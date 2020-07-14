@@ -322,18 +322,18 @@ def load_volume(volume):
 
 class Viz:
     def __init__(self,
-                 viz_library="fury"):
+                 backend="fury"):
         """
         Set up visualization preferences.
 
         Parameters
         ----------
-            viz_library : str, optional
+            backend : str, optional
                 Should be either "fury" or "plotly".
                 Default: "fury"
         """
-        self.viz_library = viz_library
-        if viz_library == "fury":
+        self.backend = backend
+        if backend == "fury":
             try:
                 import AFQ.viz.afq_fury
             except ImportError:
@@ -343,7 +343,7 @@ class Viz:
             self.visualize_volume = AFQ.viz.afq_fury.visualize_volume
             self.create_gif = AFQ.viz.afq_fury.create_gif
             self.stop_creating_gifs = AFQ.viz.afq_fury.stop_creating_gifs
-        elif viz_library == "plotly":
+        elif backend == "plotly":
             try:
                 import AFQ.viz.afq_plotly
             except ImportError:
