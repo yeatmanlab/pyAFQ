@@ -359,7 +359,7 @@ def fetch_hcp(subjects,
     else:
         my_path = path
 
-    base_dir = op.join(my_path, 'HCP', 'derivatives', 'dmriprep')
+    base_dir = op.join(my_path, study, 'derivatives', 'dmriprep')
 
     if not os.path.exists(base_dir):
         os.makedirs(base_dir, exist_ok=True)
