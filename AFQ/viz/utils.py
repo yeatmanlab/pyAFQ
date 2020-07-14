@@ -164,7 +164,7 @@ def tract_generator(tg, bundle, bundle_dict, colors):
 
     Returns
     -------
-    list, RGB tuple, str
+    list of streamlines, RGB numpy array, str
     """
     streamlines = tg.streamlines
     viz_logger.info("Generating lines from tractography...")
