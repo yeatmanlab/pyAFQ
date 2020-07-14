@@ -319,7 +319,7 @@ def fetch_hcp(subjects,
     Returns
     -------
     dict with remote and local names of these files,
-    path to derivatives folder
+    path to dmri_prep folder
 
     Notes
     -----
