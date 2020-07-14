@@ -491,8 +491,8 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         Default: 50
 
     which_plane : str, optional
+        Which plane can be moved with a slider.
         Should be 'Coronal', 'Axial', 'Sagittal', or None.
-        Determines which slice gets a slider.
         If None, slices are stationary.
         Note: If slices are not stationary,
         do not add any more traces to the figure.
