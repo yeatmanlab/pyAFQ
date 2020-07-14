@@ -405,7 +405,7 @@ def fetch_hcp(subjects,
          "BIDSVersion": "1.0.0",
          "Name": "HCP",
          "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
-         "PipelineDescription": {'Name': 'HCP Pipeline'}}
+         "PipelineDescription": {'Name': 'dmriprep'}}
     desc_file = op.join(base_dir, 'dataset_description.json')
     with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
