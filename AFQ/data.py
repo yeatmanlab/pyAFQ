@@ -399,7 +399,7 @@ def fetch_hcp(subjects,
     with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
 
-    return data_files
+    return data_files, base_dir
 
 
 stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]
