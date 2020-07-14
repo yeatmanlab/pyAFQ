@@ -32,7 +32,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
-from AFQ.viz.utils import Viz
+from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -1219,7 +1219,7 @@ class AFQ(object):
                 include_track=True,
                 include_seg=True)
 
-            viz.visualize_tract_profiles(tract_profiles,
+            visualize_tract_profiles(tract_profiles,
                                          scalar=scalar,
                                          file_name=fname)
 
