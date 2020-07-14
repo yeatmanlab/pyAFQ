@@ -318,7 +318,8 @@ def fetch_hcp(subjects,
 
     Returns
     -------
-    dict with remote and local names of these files.
+    dict with remote and local names of these files,
+    path to derivatives folder
 
     Notes
     -----
