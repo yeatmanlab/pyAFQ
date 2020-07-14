@@ -290,6 +290,7 @@ def fetch_hcp(subjects,
               hcp_bucket='hcp-openaccess',
               profile_name="hcp",
               path=None,
+              study='HCP_1200',
               aws_access_key_id=None,
               aws_secret_access_key=None):
     """
@@ -306,6 +307,8 @@ def fetch_hcp(subjects,
         The name of the AWS profile used for access. Default: "hcp"
     path : string, optional
         Path to save files into. Default: '~/AFQ_data'
+    study : string, optional
+        Which HCP study to grab. Default: 'HCP_1200'
     aws_access_key_id : string, optional
         AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
         set to False.
@@ -365,22 +368,22 @@ def fetch_hcp(subjects,
     for subject in subjects:
         # We make a single session folder per subject for this case, because
         # AFQ api expects session structure:
-        sub_dir = op.join(base_dir, 'sub-%s' % subject)
+        sub_dir = op.join(base_dir, f'sub-{subject}')
         sess_dir = op.join(sub_dir, "ses-01")
         if not os.path.exists(sub_dir):
             os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
             os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
-        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bval' % subject)] =\
-            'HCP_1200/%s/T1w/Diffusion/bvals' % subject
-        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.bvec' % subject)] =\
-            'HCP_1200/%s/T1w/Diffusion/bvecs' % subject
-        data_files[op.join(sess_dir, 'dwi', 'sub-%s_dwi.nii.gz' % subject)] =\
-            'HCP_1200/%s/T1w/Diffusion/data.nii.gz' % subject
-        data_files[op.join(sess_dir, 'anat', 'sub-%s_T1w.nii.gz' % subject)] =\
-            'HCP_1200/%s/T1w/T1w_acpc_dc.nii.gz' % subject
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.bval')] =\
+            f'{study}/{subject}/T1w/Diffusion/bvals'
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.bvec')] =\
+            f'{study}/{subject}/T1w/Diffusion/bvecs'
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.nii.gz')] =\
+            f'{study}/{subject}/T1w/Diffusion/data.nii.gz'
+        data_files[op.join(sess_dir, 'anat', f'sub-{subject}_T1w.nii.gz')] =\
+            f'{study}/{subject}/T1w/T1w_acpc_dc.nii.gz'
         data_files[op.join(sess_dir, 'anat',
-                           'sub-%s_aparc+aseg.nii.gz' % subject)] =\
-            'HCP_1200/%s/T1w/aparc+aseg.nii.gz' % subject
+                           f'sub-{subject}_aparc+aseg.nii.gz')] =\
+            f'{study}/{subject}/T1w/aparc+aseg.nii.gz'
 
     for k in data_files.keys():
         if not op.exists(k):
