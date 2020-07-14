@@ -28,11 +28,10 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 # Initialize an AFQ object:
 # ------------------------
 
-myafq = api.AFQ(op.join(afd.afq_home,
-                        'stanford_hardi',
-                        'derivatives',
-                        'dmriprep'),
-                sub_prefix='sub')
+myafq = api.AFQ(bids_path=op.join(afd.afq_home,
+                                  'stanford_hardi'),
+                dmriprep='vistasoft',
+                segmentation='freesurfer')
 
 ##########################################################################
 # Reading in DTI FA

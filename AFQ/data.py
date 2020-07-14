@@ -366,7 +366,7 @@ def fetch_hcp(subjects,
         # We make a single session folder per subject for this case, because
         # AFQ api expects session structure:
         sub_dir = op.join(base_dir, 'sub-%s' % subject)
-        sess_dir = op.join(sub_dir, "sess-01")
+        sess_dir = op.join(sub_dir, "ses-01")
         if not os.path.exists(sub_dir):
             os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
             os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
@@ -439,44 +439,52 @@ def read_stanford_hardi_tractography():
     return files_dict
 
 
+def to_bids_description(path, fname='dataset_description.json',
+                        BIDSVersion="1.4.0", **kwargs):
+    """Dumps a dict into a bids description at the given location"""
+    kwargs.update({"BIDSVersion": BIDSVersion})
+    desc_file = op.join(path, fname)
+    with open(desc_file, 'w') as outfile:
+        json.dump(kwargs, outfile)
+
+
 def organize_cfin_data(path=None):
     """
     Create the expected file-system structure for the
     CFIN multi b-value diffusion data-set.
     """
+
     dpd.fetch_cfin_multib()
-
     if path is None:
-        if not op.exists(afq_home):
-            os.mkdir(afq_home)
-        my_path = afq_home
-    else:
-        my_path = path
+        os.makedirs(afq_home, exist_ok=True)
+        path = afq_home
 
-    base_folder = op.join(my_path, 'cfin_multib',
-                          'derivatives', 'dmriprep')
+    bids_path = op.join(path, 'cfin_multib',)
+    derivatives_path = op.join(bids_path, 'derivatives')
+    dmriprep_folder = op.join(derivatives_path, 'dmriprep')
 
-    if not op.exists(base_folder):
-        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+    if not op.exists(derivatives_path):
+        anat_folder = op.join(dmriprep_folder, 'sub-01', 'ses-01', 'anat')
         os.makedirs(anat_folder, exist_ok=True)
-        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
+        dwi_folder = op.join(dmriprep_folder, 'sub-01', 'ses-01', 'dwi')
         os.makedirs(dwi_folder, exist_ok=True)
         t1_img = dpd.read_cfin_t1()
-        nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        nib.save(t1_img, op.join(anat_folder, 'sub-01_ses-01_T1w.nii.gz'))
         dwi_img, gtab = dpd.read_cfin_dwi()
-        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
 
-    dataset_description = {
-        "BIDSVersion": "1.0.0",
-        "Name": "CFIN",
-        "Subjects": ["sub-01"]}
+    to_bids_description(
+        bids_path,
+        **{"BIDSVersion": "1.0.0",
+           "Name": "CFIN",
+           "Subjects": ["sub-01"]})
 
-    desc_file = op.join(my_path, 'cfin_multib', 'dataset_description.json')
-
-    with open(desc_file, 'w') as outfile:
-        json.dump(dataset_description, outfile)
+    to_bids_description(
+        dmriprep_folder,
+        **{"Name": "CFIN",
+           "PipelineDescription": {"Name": "dipy"}})
 
 
 def organize_stanford_data(path=None):
@@ -484,41 +492,41 @@ def organize_stanford_data(path=None):
     Create the expected file-system structure for the Stanford HARDI data-set.
     """
     dpd.fetch_stanford_hardi()
-
     if path is None:
-        if not op.exists(afq_home):
-            os.mkdir(afq_home)
-        my_path = afq_home
-    else:
-        my_path = path
+        os.makedirs(afq_home, exist_ok=True)
+        path = afq_home
 
-    base_folder = op.join(my_path, 'stanford_hardi',
-                          'derivatives', 'dmriprep')
+    bids_path = op.join(path, 'stanford_hardi',)
+    derivatives_path = op.join(bids_path, 'derivatives')
+    dmriprep_folder = op.join(derivatives_path, 'vistasoft')
+    freesurfer_folder = op.join(derivatives_path, 'freesurfer')
 
-    if not op.exists(base_folder):
-        anat_folder = op.join(base_folder, 'sub-01', 'sess-01', 'anat')
+    if not op.exists(derivatives_path):
+        anat_folder = op.join(freesurfer_folder, 'sub-01', 'ses-01', 'anat')
         os.makedirs(anat_folder, exist_ok=True)
-        dwi_folder = op.join(base_folder, 'sub-01', 'sess-01', 'dwi')
-        os.makedirs(dwi_folder, exist_ok=True)
         t1_img = dpd.read_stanford_t1()
-        nib.save(t1_img, op.join(anat_folder, 'sub-01_sess-01_T1w.nii.gz'))
+        nib.save(t1_img, op.join(anat_folder, 'sub-01_ses-01_T1w.nii.gz'))
         seg_img = dpd.read_stanford_labels()[-1]
         nib.save(seg_img, op.join(anat_folder,
-                                  'sub-01_sess-01_aparc+aseg.nii.gz'))
+                                  'sub-01_ses-01_seg.nii.gz'))
+        dwi_folder = op.join(dmriprep_folder, 'sub-01', 'ses-01', 'dwi')
+        os.makedirs(dwi_folder, exist_ok=True)
         dwi_img, gtab = dpd.read_stanford_hardi()
-        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_sess-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_sess-01_dwi.bvals'), gtab.bvals)
+        nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
 
-    dataset_description = {
-        "BIDSVersion": "1.0.0",
-        "Name": "Stanford HARDI",
-        "Subjects": ["sub-01"]}
+    # Dump out the description of the dataset
+    to_bids_description(bids_path,
+                        **{"Name": "Stanford HARDI", "Subjects": ["sub-01"]})
 
-    desc_file = op.join(my_path, 'stanford_hardi', 'dataset_description.json')
-
-    with open(desc_file, 'w') as outfile:
-        json.dump(dataset_description, outfile)
+    # And descriptions of the pipelines in the derivatives:
+    to_bids_description(dmriprep_folder,
+                        **{"Name": "Stanford HARDI",
+                           "PipelineDescription": {"Name": "vistasoft"}})
+    to_bids_description(freesurfer_folder,
+                        **{"Name": "Stanford HARDI",
+                           "PipelineDescription": {"Name": "freesurfer"}})
 
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(

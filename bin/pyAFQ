@@ -64,7 +64,9 @@ The default values of the configuration are:
 
 ```
 [files]
-dmriprep_path = '/path/to/dmriprep/folder'
+bids_path = '/path/to/bids/dataset/'
+dmriprep = 'dmriprep'
+segmentation = 'freesurfer'
 
 [bundles]
 bundles = {api.BUNDLES}
@@ -74,7 +76,7 @@ scalars = ['dti_fa', 'dti_md']
 
 [tracking]
 {chr(10).join(track_defaults_list)}
-wm_labels = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
 
 [segmentation]
 {chr(10).join(seg_defaults_list)}
@@ -117,17 +119,20 @@ for component in config.keys():
 
 files = config.get("files", {})
 
-dmriprep_path = files.get("dmriprep_path")
+bids_path = files.get("bids_path")
 
-if dmriprep_path is None:
-    raise RuntimeError("Config file must provide dmriprep_path")
+if bids_path is None:
+    raise RuntimeError("Config file must provide bids_path")
+
+dmriprep = files.get("dmriprep", "dmriprep")
+segmentation_path = files.get("segmentation", "freesurfer")
 
 config['pyAFQ'] = {}
 config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
 config['pyAFQ']['version'] = AFQ.__version__
 config['pyAFQ']['platform'] = platform.system()
 
-afq_path = op.join(op.split(dmriprep_path)[0], 'afq')
+afq_path = op.join(bids_path, 'derivatives', 'afq')
 os.makedirs(afq_path, exist_ok=True)
 
 afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
@@ -135,12 +140,7 @@ afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
 with open(afq_metadata_file, 'w') as ff:
     toml.dump(config, ff)
 
-sub_prefix = files.get("sub_prefix", "sub")
-dwi_folder = files.get("dwi_folder", "dwi")
-dwi_file = files.get("dwi_file", "*dwi")
-anat_folder = files.get("anat_folder", "anat")
-anat_file = files.get("anat_file", "*T1w*")
-seg_file = files.get("seg_file", "*aparc+aseg*")
+seg_suffix = files.get("seg_suffix", "seg")
 reg_template = files.get("reg_template", None)
 
 tracking = config.get("tracking", {})
@@ -148,8 +148,8 @@ tracking_params = {}
 for k, v in track_defaults.items():
     tracking_params[k] = tracking.get(k, v)
 
-wm_labels = tracking.get(
-    "wm_labels",
+wm_criterion = tracking.get(
+    "wm_criterion",
     [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
 
 segmentation = config.get("segmentation", {})
@@ -173,19 +173,16 @@ dask_it = compute.get("dask_it", False)
 force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 
-myafq = api.AFQ(dmriprep_path,
-                sub_prefix=sub_prefix,
-                dwi_folder=dwi_folder,
-                dwi_file=dwi_file,
-                anat_folder=anat_folder,
-                anat_file=anat_file,
-                seg_file=seg_file,
+myafq = api.AFQ(bids_path,
+                dmriprep=dmriprep,
+                segmentation=segmentation_path,
+                seg_suffix=seg_suffix,
                 b0_threshold=float(b0_threshold),
                 bundle_names=bundle_names,
                 dask_it=dask_it,
                 force_recompute=force_recompute,
                 reg_template=reg_template,
-                wm_labels=wm_labels,
+                wm_criterion=wm_criterion,
                 virtual_frame_buffer=virtual_frame_buffer,
                 segmentation_params=segmentation_params,
                 tracking_params=tracking_params,

@@ -75,10 +75,10 @@ if not op.exists('dti_streamlines_reco.trk'):
         if bundle != 'whole_brain':
             sl_xform = dts.Streamlines(
                 dtu.transform_tracking_output(bundles[bundle]['sl'],
-                                            MNI_T2_img.affine))
+                                              MNI_T2_img.affine))
 
             delta = dts.values_from_volume(mapping.backward,
-                                            sl_xform, np.eye(4))
+                                           sl_xform, np.eye(4))
             sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
 
             sl_xform = dts.Streamlines(

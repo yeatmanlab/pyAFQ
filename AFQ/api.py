@@ -18,6 +18,9 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.stats.analysis import afq_profile
 
+from bids.layout import BIDSLayout
+
+from .version import version as pyafq_version
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
 from AFQ.dki import _fit as dki_fit
@@ -135,80 +138,19 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
 
 class AFQ(object):
     """
-
-    This is file folder structure that AFQ requires in your study folder::
-
-|    study
-|      ├-derivatives
-|            ├-dmriprep
-|                ├── sub01
-|                │   ├── sess01
-|                │   │   ├── anat
-|                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-|                │   │   │   └── sub-01_sess-01_T1.nii.gz
-|                │   │   └── dwi
-|                │   │       ├── sub-01_sess-01_dwi.bvals
-|                │   │       ├── sub-01_sess-01_dwi.bvecs
-|                │   │       └── sub-01_sess-01_dwi.nii.gz
-|                │   └── sess02
-|                │       ├── anat
-|                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-|                │       │   └── sub-01_sess-02_T1w.nii.gz
-|                │       └── dwi
-|                │           ├── sub-01_sess-02_dwi.bvals
-|                │           ├── sub-01_sess-02_dwi.bvecs
-|                │           └── sub-01_sess-02_dwi.nii.gz
-|                └── sub02
-|                   ├── sess01
-|                   │   ├── anat
-|                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-|                   │   │   └── sub-02_sess-01_T1w.nii.gz
-|                   │   └── dwi
-|                   │       ├── sub-02_sess-01_dwi.bvals
-|                   │       ├── sub-02_sess-01_dwi.bvecs
-|                   │       └── sub-02_sess-01_dwi.nii.gz
-|                   └── sess02
-|                       ├── anat
-|                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-|                       │   └── sub-02_sess-02_T1w.nii.gz
-|                       └── dwi
-|                           ├── sub-02_sess-02_dwi.bvals
-|                           ├── sub-02_sess-02_dwi.bvecs
-|                           └── sub-02_sess-02_dwi.nii.gz
-
-    This structure can be automatically generated from BIDS-compliant
-    data [1]_, using the dmriprep software [2]_ and BIDS app.
-
-    Notes
-    -----
-    The structure of the file-system required here resembles that specified
-    by BIDS [1]_. In the future, this will be organized according to the
-    BIDS derivatives specification, as we require preprocessed, rather than
-    raw data.
-
-    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
-           a format for organizing and describing outputs of neuroimaging
-           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
-
-    .. [2] https://github.com/nipy/dmriprep
-
     """
-
     def __init__(self,
-                 dmriprep_path,
-                 sub_prefix="sub",
-                 dwi_folder="dwi",
-                 dwi_file="*dwi",
-                 anat_folder="anat",
-                 anat_file="*T1w*",
-                 seg_file='*aparc+aseg*',
+                 bids_path,
+                 dmriprep='dmriprep',
+                 segmentation='dmriprep',
+                 seg_suffix='seg',
                  b0_threshold=0,
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
                  reg_template=None,
                  scalars=["dti_fa", "dti_md"],
-                 wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  tracking_params=None,
@@ -216,8 +158,21 @@ class AFQ(object):
                  clean_params=None):
         """
 
-        dmriprep_path: str
-            The path to the preprocessed diffusion data.
+        bids_path : str
+            The path to preprocessed diffusion data organized in a BIDS
+            dataset. This should contain a BIDS derivative dataset with
+            preprocessed dwi/bvals/bvecs.
+
+        dmriprep : str, optional.
+            The name of the pipeline used to preprocess the DWI data.
+            Default: "dmriprep".
+
+        freesurfer : str
+            The name of the pipeline used to generate a segmentation image.
+            Default: "dmriprep"
+
+        seg_suffix : str, optional.
+            The suffix that identifies the segmentation image. Default: "seg".
 
         seg_algo : str
             Which algorithm to use for segmentation.
@@ -242,11 +197,12 @@ class AFQ(object):
             This parameter can be turned on/off dynamically.
             Default: False
 
-        wm_labels : list, optional
-            A list of the labels of the white matter in the segmentation file
-            used. Default: the white matter values for the segmentation
-            provided with the HCP data, including labels for midbrain:
-            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+        wm_criterion : list or float, optional
+            This is either a list of the labels of the white matter in the
+            segmentation file or (if a float is provided) the threshold FA to
+            use for creating the white-matter mask. Default: the white matter
+            values for the segmentation provided with the HCP data, including
+            labels for midbrain: [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the
@@ -272,7 +228,7 @@ class AFQ(object):
 
         self.force_recompute = force_recompute
 
-        self.wm_labels = wm_labels
+        self.wm_criterion = wm_criterion
         self.use_prealign = use_prealign
 
         self.scalars = scalars
@@ -313,66 +269,101 @@ class AFQ(object):
                 reg_template = nib.load(reg_template)
             self.reg_template = reg_template
 
+        # Create the bundle dict after reg_template has been resolved:
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=reg_template)
 
-        # This is the place in which each subject's full data lives
-        self.dmriprep_dirs = glob.glob(op.join(dmriprep_path,
-                                               f"{sub_prefix}*"))
-
         # This is where all the outputs will go:
-        self.afq_dir = op.join(
-            op.join(*PurePath(dmriprep_path).parts[:-1]), 'afq')
+        self.afq_path = op.join(bids_path, 'afq')
 
-        os.makedirs(self.afq_dir, exist_ok=True)
+        # Create it as needed:
+        os.makedirs(self.afq_path, exist_ok=True)
 
-        self.subjects = [op.split(p)[-1] for p in self.dmriprep_dirs]
+        bids_layout = BIDSLayout(bids_path, derivatives=True)
+        bids_description = bids_layout.description
+
+        # Add required metadata file at top level (inheriting as needed):
+        pipeline_description = {
+            "Name": bids_description["Name"],
+            "BIDSVersion": bids_description["BIDSVersion"],
+            "PipelineDescription": {"Name": "pyAFQ",
+                                    "Version": pyafq_version}}
+
+        pl_desc_file = op.join(self.afq_path, 'dataset_description.json')
+
+        with open(pl_desc_file, 'w') as outfile:
+            json.dump(pipeline_description, outfile)
+
+        self.subjects = bids_layout.get(return_type='id', target='subject')
+        sessions = bids_layout.get(return_type='id', target='session')
+        if len(sessions):
+            self.sessions = sessions
+        else:
+            self.sessions = [None]
 
         sub_list = []
-        sess_list = []
+        ses_list = []
         dwi_file_list = []
         bvec_file_list = []
         bval_file_list = []
         anat_file_list = []
         seg_file_list = []
         results_dir_list = []
-        for subject, sub_dir in zip(self.subjects, self.dmriprep_dirs):
-            sessions = glob.glob(op.join(sub_dir, '*'))
-            for sess in sessions:
-                results_dir_list.append(op.join(self.afq_dir,
-                                                subject,
-                                                PurePath(sess).parts[-1]))
+        for subject in self.subjects:
+            for session in self.sessions:
+                results_dir = op.join(self.afq_path, 'sub-' + subject)
+
+                if session is not None:
+                    results_dir = op.join(results_dir, 'ses-' + session)
+
+                results_dir_list.append(results_dir)
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
+                dwi_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension='nii.gz', suffix='dwi',
+                                    return_type='filename',
+                                    scope=dmriprep)[0])
+                bvec_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension=['bvec', 'bvecs'],
+                                    suffix='dwi',
+                                    return_type='filename',
+                                    scope=dmriprep)[0])
+                bval_file_list.append(
+                    bids_layout.get(subject=subject, session=session,
+                                    extension=['bval', 'bvals'],
+                                    suffix='dwi',
+                                    return_type='filename',
+                                    scope=dmriprep)[0])
+                this_t1w = bids_layout.get(
+                    subject=subject, session=session,
+                    extension='.nii.gz',
+                    suffix='T1w', return_type='filename',
+                    scope=segmentation)
 
-                dwi_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.nii.gz")[0])
+                this_seg = bids_layout.get(
+                    subject=subject, session=session,
+                    extension='.nii.gz',
+                    suffix=seg_suffix,
+                    return_type='filename',
+                    scope=segmentation)
 
-                bvec_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.bvec*")[0])
+                if len(this_t1w):
+                    anat_file_list.append(this_t1w[0])
 
-                bval_file_list.append(glob.glob(
-                    f"{sess}/{dwi_folder}/{dwi_file}.bval*")[0])
-
-                # The following two may or may not exist:
-                this_anat_file = glob.glob(op.join(
-                    sub_dir, (f"{sess}/{anat_folder}/{anat_file}.nii.gz")))
-                if len(this_anat_file):
-                    anat_file_list.append(this_anat_file[0])
-
-                this_seg_file = glob.glob(op.join(
-                    sub_dir, (f"{sess}/{anat_folder}/{seg_file}.nii.gz")))
-                if len(this_seg_file):
-                    seg_file_list.append(this_seg_file[0])
+                if len(this_seg):
+                    seg_file_list.append(this_seg[0])
 
                 sub_list.append(subject)
-                sess_list.append(sess)
+                ses_list.append(session)
+
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
-                                            sess=sess_list,
+                                            ses=ses_list,
                                             results_dir=results_dir_list))
         # Add these if they exist:
         if len(seg_file_list):
@@ -674,13 +665,13 @@ class AFQ(object):
 
         return mapping_file
 
-    def _wm_mask(self, row, wm_fa_thresh=0.2):
+    def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
             dwi_img = nib.load(row['dwi_file'])
             dwi_data = dwi_img.get_fdata()
 
-            if 'seg_file' in row.index:
+            if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
                 # If we found a white matter segmentation in the
                 # expected location:
                 seg_img = nib.load(row['seg_file'])
@@ -689,21 +680,21 @@ class AFQ(object):
                 # have any of these values:
                 wm_mask = np.sum(np.concatenate(
                     [(seg_data_orig == l)[..., None]
-                     for l in self.wm_labels], -1), -1)
+                     for l in self.wm_criterion], -1), -1)
 
                 # Resample to DWI data:
                 wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
                                                 seg_img.affine,
                                                 dwi_img.affine)).astype(int)
                 meta = dict(source=row['seg_file'],
-                            wm_labels=self.wm_labels)
+                            wm_criterion=self.wm_criterion)
             else:
                 # Otherwise, we'll identify the white matter based on FA:
                 fa_fname = self._dti_fa(row)
                 dti_fa = nib.load(fa_fname).get_fdata()
-                wm_mask = dti_fa > wm_fa_thresh
+                wm_mask = dti_fa > self.wm_criterion
                 meta = dict(source=fa_fname,
-                            fa_threshold=wm_fa_thresh)
+                            fa_threshold=self.wm_criterion)
 
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
@@ -1394,9 +1385,9 @@ class AFQ(object):
         for ii, fname in enumerate(self.tract_profiles):
             profiles = pd.read_csv(fname)
             profiles['sub'] = self.data_frame['subject'].iloc[ii]
-            profiles['sess'] = op.split(self.data_frame['sess'].iloc[ii])[-1]
+            profiles['ses'] = op.split(self.data_frame['ses'].iloc[ii])[-1]
             dfs.append(profiles)
 
         df = pd.concat(dfs)
-        df.to_csv(op.join(self.afq_dir, 'tract_profiles.csv'), index=False)
+        df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
         return df
