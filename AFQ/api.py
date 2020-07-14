@@ -32,7 +32,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
-import AFQ.viz as viz
+from AFQ.viz.utils import Viz
 from AFQ.utils.bin import get_default_args
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -242,7 +242,7 @@ class AFQ(object):
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
-        self.viz = viz.Viz(viz_library=viz_library)
+        self.viz = Viz(viz_library=viz_library)
 
         default_tracking_params = get_default_args(aft.track)
         # Replace the defaults only for kwargs for which a non-default value was

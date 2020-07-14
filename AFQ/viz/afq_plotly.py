@@ -8,7 +8,7 @@ import numpy as np
 
 import dipy.tracking.streamlinespeed as dps
 
-import AFQ.viz_libs.utils as vut
+import AFQ.viz.utils as vut
 
 try:
     import plotly

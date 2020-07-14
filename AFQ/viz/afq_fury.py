@@ -6,7 +6,7 @@ import logging
 import numpy as np
 import IPython.display as display
 
-import AFQ.viz_libs.utils as vut
+import AFQ.viz.utils as vut
 
 try:
     from dipy.viz import window, actor, ui
