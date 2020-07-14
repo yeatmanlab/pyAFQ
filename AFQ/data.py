@@ -319,7 +319,7 @@ def fetch_hcp(subjects,
     Returns
     -------
     dict with remote and local names of these files,
-    path to dmri_prep folder
+    path to BIDS derivative dataset
 
     Notes
     -----
@@ -400,7 +400,7 @@ def fetch_hcp(subjects,
     with open(desc_file, 'w') as outfile:
         json.dump(dataset_description, outfile)
 
-    return data_files, base_dir
+    return data_files, op.join(my_path, study)
 
 
 stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]
