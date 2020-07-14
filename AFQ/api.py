@@ -216,6 +216,11 @@ class AFQ(object):
             Algorithm to use for registration. Can be either 'syn' or 'slr'.
             Default: 'syn'
 
+        reg_template : str or nib.Nifti1Image, optional.
+            Template which defines static image space  (defaults to the MNI T2)
+            If set to 'static', will use static template.
+            Default: None.
+
         dask_it : bool, optional
             Whether to use a dask DataFrame object
 
@@ -301,6 +306,8 @@ class AFQ(object):
 
         if reg_template is None:
             self.reg_template = afd.read_mni_template(mask=self.mask_templ)
+        elif reg_template == 'static':
+            self.reg_template = self._reg_img(img=self.static)
         else:
             if not isinstance(reg_template, nib.Nifti1Image):
                 reg_template = nib.load(reg_template)
@@ -620,7 +627,7 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
-    def _reg_img(self, row, img):
+    def _reg_img(self, row=None, img="mni"):
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni":
