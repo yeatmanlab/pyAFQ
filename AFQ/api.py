@@ -268,7 +268,6 @@ class AFQ(object):
         self.moving = moving
         self.static = static
         self.mask_templ = mask_templ
-        self.wm_labels = wm_labels
         self.reg_algo = reg_algo.lower()
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
 
