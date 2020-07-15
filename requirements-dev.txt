@@ -1,5 +1,7 @@
+botocore==1.17.19
+docutils==0.15.2
 sphinx
-pytest==5.2.2
+pytest==5.4.3
 pytest-cov==2.8.1
 flake8
 sphinx_gallery
