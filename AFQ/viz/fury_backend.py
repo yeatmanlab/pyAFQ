@@ -35,7 +35,7 @@ def _inline_interact(scene, inline, interact):
     return scene
 
 
-def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
+def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
                       colors=None, color_by_volume=None, figure=None,
                       background=(1, 1, 1), interact=False, inline=False):
     """
@@ -43,8 +43,9 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     Parameters
     ----------
-    trk : str, list, or Streamlines
-        The streamline information
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information
+        or a path to a trk file
 
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
@@ -52,13 +53,13 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     bundle_dict : dict, optional
         Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the trk
+        a key `'uid'` with values as integers for selection from the sft
         metadata. Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
     bundle : str or int, optional
         The name of a bundle to select from among the keys in `bundle_dict`
-        or an integer for selection from the trk metadata.
+        or an integer for selection from the sft metadata.
 
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
@@ -85,7 +86,6 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     -------
     Fury Scene object
     """
-    tg = vut.tract_loader(trk, affine)
 
     if figure is None:
         figure = window.Scene()
@@ -93,7 +93,8 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     figure.SetBackground(background[0], background[1], background[2])
 
     for (sls, color, name) in \
-            vut.tract_generator(tg, bundle, bundle_dict, colors):
+            vut.tract_generator(sft, affine, bundle, bundle_dict, colors):
+        sls = list(sls)
         if name == "all_bundles":
             color = line_colors(sls)
 

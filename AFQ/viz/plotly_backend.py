@@ -69,48 +69,50 @@ def set_layout(figure, color=None):
     )
 
 
-def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
-    x_pts = []
-    y_pts = []
-    z_pts = []
+def _draw_streamlines(figure, sls, color, name, cbv=None):
+    color = np.asarray(color)
+    n_points = 100
+
+    bundle_shape = ((n_points+1)*sls._offsets.shape[0])
+    # dtype object so None can be stored
+    x_pts = np.zeros(bundle_shape)
+    y_pts = np.zeros(bundle_shape)
+    z_pts = np.zeros(bundle_shape)
 
     if cbv is not None:
-        customdata = []
-        line_color = []
-        cbv_max = cbv.max()
-        color_max = color.max()
+        customdata = np.zeros(bundle_shape)
+        line_color = np.zeros((bundle_shape, 3))
+        color_constant =  (color / color.max()) * (1.4 / cbv.max())
     else:
         customdata = None
         line_color = _color_arr2str(color)
 
-    for sl in sls:
-        # resample streamline to n_points
-        if sl.shape[0] > n_points:
-            sl = dps.set_number_of_points(sl, n_points)
+    for cumul_offset, curr_offset in enumerate(sls._offsets):
+        sl = sls._data[curr_offset:curr_offset+sls._lengths[cumul_offset]]
+        sl = dps.set_number_of_points(sl, n_points)
 
         # add sl to lines
-        x_pts.extend(sl[:, 0])
-        x_pts.append(None)  # don't draw between streamlines
-        y_pts.extend(sl[:, 1])
-        y_pts.append(None)
-        z_pts.extend(sl[:, 2])
-        z_pts.append(None)
+        total_offset = (n_points+1)*cumul_offset
+        x_pts[total_offset:total_offset+n_points] = sl[:, 0]
+        x_pts[total_offset+n_points] = np.nan  # don't draw between streamlines
+        y_pts[total_offset:total_offset+n_points] = sl[:, 1]
+        y_pts[total_offset+n_points] = np.nan
+        z_pts[total_offset:total_offset+n_points] = sl[:, 2]
+        z_pts[total_offset+n_points] = np.nan
 
         if cbv is not None:
-            for brightness in cbv[
+            brightness = cbv[
                 sl[:, 0].astype(int),
                 sl[:, 1].astype(int),
                 sl[:, 2].astype(int)
-            ]:
-                line_color.append(
-                    _color_arr2str(  # slight saturation, brighter is better
-                        np.round(
-                            brightness / cbv_max * color / color_max * 1.4,
-                            3)))
-                customdata.append(str(brightness))
+            ]
 
-            line_color.append(f"rgba(0, 0, 0, 0)")
-            customdata.append("")
+            line_color[total_offset:total_offset+n_points, :] = \
+                np.outer(brightness, color_constant)
+            customdata[total_offset:total_offset+n_points] = brightness
+
+            line_color[total_offset+n_points, :] = [0, 0, 0]
+            customdata[total_offset+n_points] = 0
 
     figure.add_trace(
         go.Scatter3d(
@@ -129,17 +131,17 @@ def _draw_streamlines(figure, sls, color, name, n_points=100, cbv=None):
     )
 
 
-def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
+def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
                       colors=None, color_by_volume=None, figure=None,
-                      background=(1, 1, 1), resample=100, interact=False,
-                      inline=False):
+                      background=(1, 1, 1), interact=False, inline=False):
     """
     Visualize bundles in 3D
 
     Parameters
     ----------
-    trk : str, list, or Streamlines
-        The streamline information
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information
+        or a path to a trk file
 
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
@@ -147,13 +149,13 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
 
     bundle_dict : dict, optional
         Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the trk
+        a key `'uid'` with values as integers for selection from the sft
         metadata. Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
     bundle : str or int, optional
         The name of a bundle to select from among the keys in `bundle_dict`
-        or an integer for selection from the trk metadata.
+        or an integer for selection from the sft metadata.
 
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
@@ -181,8 +183,6 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     Plotly Figure object
     """
 
-    tg = vut.tract_loader(trk, affine)
-
     if color_by_volume is not None:
         color_by_volume = vut.load_volume(color_by_volume)
 
@@ -192,13 +192,12 @@ def visualize_bundles(trk, affine=None, bundle_dict=None, bundle=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name) in \
-            vut.tract_generator(tg, bundle, bundle_dict, colors):
+            vut.tract_generator(sft, affine, bundle, bundle_dict, colors):
         _draw_streamlines(
             figure,
             sls,
             color,
             name,
-            n_points=resample,
             cbv=color_by_volume)
 
     return _inline_interact(figure, interact, inline)

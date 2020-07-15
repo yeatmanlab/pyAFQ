@@ -10,6 +10,9 @@ import IPython.display as display
 import matplotlib.pyplot as plt
 
 import nibabel as nib
+from dipy.io.streamline import load_tractogram
+from dipy.tracking.utils import transform_tracking_output
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
@@ -63,37 +66,6 @@ def viz_import_msg_error(module):
     return msg
 
 
-def tract_loader(trk, affine):
-    """
-    Loads tracts
-    Helper function
-
-    Parameters
-    ----------
-    trk : str, list, or Streamlines
-        The streamline information.
-
-    affine : ndarray
-       An affine transformation to apply to the streamlines.
-
-    Returns
-    -------
-    Tractogram
-    """
-    viz_logger.info("Loading tractography...")
-    if isinstance(trk, str):
-        trk = nib.streamlines.load(trk)
-        tg = trk.tractogram
-    else:
-        # Assume these are streamlines (as list or Streamlines object):
-        tg = nib.streamlines.Tractogram(trk)
-
-    if affine is not None:
-        tg = tg.apply_affine(np.linalg.inv(affine))
-
-    return tg
-
-
 def bundle_selector(bundle_dict, colors, b):
     """
     Selects bundle and color
@@ -139,7 +111,7 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(tg, bundle, bundle_dict, colors):
+def tract_generator(sft, affine, bundle, bundle_dict, colors):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -150,12 +122,22 @@ def tract_generator(tg, bundle, bundle_dict, colors):
 
     Parameters
     ----------
-    trk : Tractogram
-        Tractogram to pull streamlines from.
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information
+        or a path to a trk file
+
+    affine : ndarray
+       An affine transformation to apply to the streamlines.
 
     bundle : str or int
         The name of a bundle to select from among the keys in `bundle_dict`
         or an integer for selection from the trk metadata.
+
+    bundle_dict : dict, optional
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the sft
+        metadata. Default: bundles are either not identified, or identified
+        only as unique integers in the metadata.
 
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
@@ -164,27 +146,40 @@ def tract_generator(tg, bundle, bundle_dict, colors):
 
     Returns
     -------
-    list of streamlines, RGB numpy array, str
+    Statefule Tractogram streamlines, RGB numpy array, str
     """
-    streamlines = tg.streamlines
-    viz_logger.info("Generating lines from tractography...")
+
+    if isinstance(sft, str):
+        viz_logger.info("Loading Stateful Tractogram...")
+        sft = load_tractogram(sft, 'same', Space.VOX, bbox_valid_check=False)
+
+    if affine is not None:
+        viz_logger.info("Transforming Stateful Tractogram...")
+        sft = StatefulTractogram.from_sft(
+            transform_tracking_output(sft.streamlines, affine),
+            sft,
+            data_per_streamline=sft.data_per_streamline)
+        
+
+    streamlines = sft.streamlines
+    viz_logger.info("Generating colorful lines from tractography...")
 
     if colors is None:
         # Use the color dict provided
         colors = COLOR_DICT
 
-    if list(tg.data_per_streamline.keys()) == []:
+    if list(sft.data_per_streamline.keys()) == []:
         # There are no bundles in here:
-        yield list(streamlines), [0.5, 0.5, 0.5], "all_bundles"
+        yield streamlines, [0.5, 0.5, 0.5], "all_bundles"
 
     else:
         # There are bundles:
         if bundle is None:
             # No selection: visualize all of them:
 
-            for b in np.unique(tg.data_per_streamline['bundle']):
-                idx = np.where(tg.data_per_streamline['bundle'] == b)[0]
-                these_sls = list(streamlines[idx])
+            for b in np.unique(sft.data_per_streamline['bundle']):
+                idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
+                these_sls = streamlines[idx]
                 color, b_name = bundle_selector(bundle_dict, colors, b)
                 yield these_sls, color, b_name
 
@@ -197,8 +192,8 @@ def tract_generator(tg, bundle, bundle_dict, colors):
                 # It's already a UID:
                 uid = bundle
 
-            idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-            these_sls = list(streamlines[idx])
+            idx = np.where(sft.data_per_streamline['bundle'] == uid)[0]
+            these_sls = streamlines[idx]
             color, b_name = bundle_selector(bundle_dict, colors, uid)
             yield these_sls, color, b_name
 
