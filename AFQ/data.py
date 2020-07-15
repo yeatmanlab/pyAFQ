@@ -383,7 +383,7 @@ def fetch_hcp(subjects,
         data_files[op.join(sess_dir, 'anat', f'sub-{subject}_T1w.nii.gz')] =\
             f'{study}/{subject}/T1w/T1w_acpc_dc.nii.gz'
         data_files[op.join(sess_dir, 'anat',
-                           f'sub-{subject}_aparc+aseg.nii.gz')] =\
+                           f'sub-{subject}_aparc+aseg_seg.nii.gz')] =\
             f'{study}/{subject}/T1w/aparc+aseg.nii.gz'
 
     for k in data_files.keys():
