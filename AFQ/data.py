@@ -390,25 +390,17 @@ def fetch_hcp(subjects,
         if not op.exists(k):
             bucket.download_file(data_files[k], k)
     # Create the BIDS dataset description file text
-    dataset_description = {
-         "BIDSVersion": "1.0.0",
-         "Name": "HCP",
-         "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
-         "Subjects": subjects}
-
-    desc_file = op.join(my_path, study, 'dataset_description.json')
-    with open(desc_file, 'w') as outfile:
-        json.dump(dataset_description, outfile)
+    hcp_acknowledgements = """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
+    to_bids_description(op.join(my_path, study),
+                        **{"Name": study,
+                           "Acknowledgements": hcp_acknowledgements,
+                           "Subjects": subjects})
 
     # Create the BIDS derivatives description file text
-    dataset_description = {
-         "BIDSVersion": "1.0.0",
-         "Name": "HCP",
-         "Acknowledgements": """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
-         "PipelineDescription": {'Name': 'dmriprep'}}
-    desc_file = op.join(base_dir, 'dataset_description.json')
-    with open(desc_file, 'w') as outfile:
-        json.dump(dataset_description, outfile)
+    to_bids_description(base_dir,
+                        **{"Name": study,
+                           "Acknowledgements": hcp_acknowledgements,
+                           "PipelineDescription": {'Name': 'dmriprep'}})
 
     return data_files, op.join(my_path, study)
 
