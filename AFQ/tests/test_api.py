@@ -257,6 +257,15 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (400, 5)
 
+    myafq.plot_tract_profiles()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
+
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
+
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
     shutil.rmtree(op.join(myafq.data_frame['results_dir'][0],
