@@ -82,7 +82,7 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
     if cbv is not None:
         customdata = np.zeros(bundle_shape)
         line_color = np.zeros((bundle_shape, 3))
-        color_constant =  (color / color.max()) * (1.4 / cbv.max())
+        color_constant = (color / color.max()) * (1.4 / cbv.max())
     else:
         customdata = None
         line_color = _color_arr2str(color)

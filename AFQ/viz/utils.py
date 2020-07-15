@@ -159,7 +159,6 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors):
             transform_tracking_output(sft.streamlines, affine),
             sft,
             data_per_streamline=sft.data_per_streamline)
-        
 
     streamlines = sft.streamlines
     viz_logger.info("Generating colorful lines from tractography...")
