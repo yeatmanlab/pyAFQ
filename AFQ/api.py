@@ -213,8 +213,8 @@ class AFQ(object):
             Default: True
 
         reg_algo : string, optional
-            Algorithm to use for registration. Can be either 'syn' or 'slr'.
-            Default: 'syn'
+            Algorithm to use for registration.
+            Can be one of: {"syn", "slr"}. Default: "syn"
 
         reg_template : str or nib.Nifti1Image, optional.
             Template which defines static image space  (defaults to the MNI T2)
