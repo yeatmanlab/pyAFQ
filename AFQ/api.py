@@ -187,8 +187,8 @@ class AFQ(object):
             The value of b under which it is considered to be b0. Default: 0.
 
         odf_model : string, optional
-            Which model to use for determining directions in tractography
-            {"DTI", "DKI", "CSD"}. Default: "DTI"
+            Which model to use for determining directions in tractography.
+            Can be one of: {"DTI", "DKI", "CSD"}. Default: "DTI"
 
         directions : string, optional
             How to select directions for tracking (deterministic or
