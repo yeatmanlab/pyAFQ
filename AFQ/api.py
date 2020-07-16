@@ -656,7 +656,7 @@ class AFQ(object):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            reg_subject_img, _ = self._reg_img(row, self.reg_subject)
+            reg_subject_img, _ = self._reg_img(self.reg_subject, row)
             _, aff = reg.affine_registration(
                 reg_subject_img.get_fdata(),
                 self.reg_template_img.get_fdata(),
@@ -718,9 +718,9 @@ class AFQ(object):
                 reg_prealign = None
 
             reg_template_img, reg_template_sls = \
-                self._reg_img(row, self.reg_template)
+                self._reg_img(self.reg_template, row)
             reg_subject_img, reg_subject_sls = \
-                self._reg_img(row, self.reg_subject)
+                self._reg_img(self.reg_subject, row)
 
             if self.reg_algo == "slr":
                 mapping = reg.slr_registration(
