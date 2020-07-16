@@ -179,8 +179,8 @@ def test_AFQ_slr():
         dmriprep='vistasoft',
         segmentation='freesurfer',
         reg_algo='slr',
-        moving='subject_sls',
-        static='hcp_atlas')
+        reg_subject='subject_sls',
+        reg_template='hcp_atlas')
     myafq.export_rois()
 
 
@@ -194,8 +194,8 @@ def test_AFQ_slr():
 #     myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
 #                                           'derivatives', 'dmriprep'),
 #                     sub_prefix='sub',
-#                     moving='dti_fa_template',
-#                     static='dti_fa_subject')
+#                     reg_template='dti_fa_template',
+#                     reg_subject='dti_fa_subject')
 #     myafq.export_rois()
 
 

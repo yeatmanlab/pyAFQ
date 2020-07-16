@@ -75,8 +75,8 @@ scalars_model = 'DTI'
 scalars = ['dti_fa', 'dti_md']
 
 [template]
-moving="b0"
-static="mni"
+reg_subject="b0"
+reg_template="mni"
 mask_templ=True
 reg_algo="syn"
 
@@ -148,7 +148,6 @@ with open(afq_metadata_file, 'w') as ff:
     toml.dump(config, ff)
 
 seg_suffix = files.get("seg_suffix", "seg")
-reg_template = files.get("reg_template", None)
 
 tracking = config.get("tracking", {})
 tracking_params = {}
@@ -181,8 +180,8 @@ force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 viz_backend = compute.get("viz_backend", 'fury')
 
-moving = compute.get("moving", "b0")
-static = compute.get("static", "mni")
+reg_subject = compute.get("reg_subject", "b0")
+reg_template = compute.get("reg_template", "mni")
 mask_templ = compute.get("mask_templ", True)
 reg_algo = compute.get("reg_algo", "syn")
 
@@ -194,10 +193,9 @@ myafq = api.AFQ(bids_path,
                 bundle_names=bundle_names,
                 dask_it=dask_it,
                 force_recompute=force_recompute,
-                reg_template=reg_template,
                 wm_criterion=wm_criterion,
-                moving=moving,
-                static=static,
+                reg_subject=reg_subject,
+                reg_template=reg_template,
                 mask_templ=mask_templ,
                 reg_algo=reg_algo,
                 virtual_frame_buffer=virtual_frame_buffer,

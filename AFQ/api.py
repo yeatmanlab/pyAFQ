@@ -139,20 +139,20 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
 class AFQ(object):
     """
     """
+
     def __init__(self,
                  bids_path,
                  dmriprep='dmriprep',
                  segmentation='dmriprep',
                  seg_suffix='seg',
                  b0_threshold=0,
-                 moving="b0",
-                 static="mni",
+                 reg_subject="b0",
+                 reg_template="mni",
                  mask_templ=True,
                  reg_algo="syn",
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
-                 reg_template=None,
                  scalars=["dti_fa", "dti_md"],
                  wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
                  use_prealign=True,
@@ -194,19 +194,20 @@ class AFQ(object):
             How to select directions for tracking (deterministic or
             probablistic) {"det", "prob"}. Default: "det".
 
-        moving : str or Nifti1Image, optional
+        reg_subject : str or Nifti1Image, optional
             The source image data to be registered.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni", "b0", "dti_fa_subject", "dti_fa_template",
             "subject_sls", or "hcp_atlas",
             image data will be loaded automatically.
 
-        static : str or Nifti1Image, optional
+        reg_template : str or Nifti1Image, optional
             The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni", "b0", "dti_fa_subject", "dti_fa_template",
             "subject_sls", or "hcp_atlas",
             image data will be loaded automatically.
+            (defaults to the MNI T2)
 
         mask_templ : bool, optional
             Whether to mask the chosen template(s) with a brain-mask
@@ -215,11 +216,6 @@ class AFQ(object):
         reg_algo : string, optional
             Algorithm to use for registration.
             Can be one of: {"syn", "slr"}. Default: "syn"
-
-        reg_template : str or nib.Nifti1Image, optional.
-            Template which defines static image space  (defaults to the MNI T2)
-            If set to 'static', will use static template.
-            Default: None.
 
         dask_it : bool, optional
             Whether to use a dask DataFrame object
@@ -265,8 +261,8 @@ class AFQ(object):
         self.force_recompute = force_recompute
 
         self.wm_criterion = wm_criterion
-        self.moving = moving
-        self.static = static
+        self.reg_subject = reg_subject
+        self.reg_template = reg_template
         self.mask_templ = mask_templ
         self.reg_algo = reg_algo.lower()
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
@@ -303,19 +299,11 @@ class AFQ(object):
 
         self.clean_params = default_clean_params
 
-        if reg_template is None:
-            self.reg_template = afd.read_mni_template(mask=self.mask_templ)
-        elif reg_template == 'static':
-            self.reg_template = self._reg_img(img=self.static)
-        else:
-            if not isinstance(reg_template, nib.Nifti1Image):
-                reg_template = nib.load(reg_template)
-            self.reg_template = reg_template
-
         # Create the bundle dict after reg_template has been resolved:
+        self.reg_template_img, _ = self._reg_img(self.reg_template)
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
-                                            resample_to=reg_template)
+                                            resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'afq')
@@ -626,7 +614,7 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
-    def _reg_img(self, row=None, img="mni"):
+    def _reg_img(self, img, row=None):
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni":
@@ -642,7 +630,7 @@ class AFQ(object):
                 tg = load_tractogram(self._streamlines(row),
                                      img,
                                      Space.VOX)
-                return tg.streamlines, img.affine, img.shape
+                return img, tg.streamlines
             elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
                     afd.afq_home,
@@ -652,29 +640,27 @@ class AFQ(object):
                     'whole_brain_MNI.trk')
                 if not op.exists(atlas_fname):
                     afd.fetch_hcp_atlas_16_bundles()
+                img = afd.read_mni_template(mask=self.mask_templ)
                 hcp_atlas = load_tractogram(
                     atlas_fname,
-                    'same', bbox_valid_check=False)
-                shape = nib.streamlines.load(
-                    atlas_fname,
-                    lazy_load=True).header['dimensions']
+                    img, bbox_valid_check=False)
 
-                return hcp_atlas.streamlines, hcp_atlas.affine, shape
+                return img, hcp_atlas.streamlines
             else:
                 img = nib.load(img)
 
-        return img.get_fdata(), img.affine, img.shape
+        return img, None
 
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            moving_data, moving_affine, _ = self._reg_img(row, self.moving)
-            static_data, static_affine, _ = self._reg_img(row, self.static)
-            _, aff = reg.affine_registration(moving_data,
-                                             static_data,
-                                             moving_affine,
-                                             static_affine)
+            reg_subject_img, _ = self._reg_img(row, self.reg_subject)
+            _, aff = reg.affine_registration(
+                reg_subject_img.get_fdata(),
+                self.reg_template_img.get_fdata(),
+                reg_subject_img.affine,
+                self.reg_template_img.affine)
             np.save(prealign_file, aff)
             meta_fname = self._get_fname(
                 row, '_prealign_from-DWI_to-MNI_xfm.json')
@@ -700,7 +686,7 @@ class AFQ(object):
 
             mapping_file = self._mapping(row)
             mapping = reg.read_mapping(mapping_file, b0_file,
-                                       self.reg_template,
+                                       self.reg_template_img,
                                        prealign=reg_prealign)
 
             warped_b0 = mapping.transform(mean_b0)
@@ -730,23 +716,24 @@ class AFQ(object):
             else:
                 reg_prealign = None
 
-            static_data, static_affine, static_shape = \
-                self._reg_img(row, self.static)
-            moving_data, moving_affine, moving_shape = \
-                self._reg_img(row, self.moving)
+            reg_template_img, reg_template_sls = \
+                self._reg_img(row, self.reg_template)
+            reg_subject_img, reg_subject_sls = \
+                self._reg_img(row, self.reg_subject)
 
             if self.reg_algo == "slr":
                 mapping = reg.slr_registration(
-                    moving_data, static_data,
-                    moving_affine=moving_affine,
-                    moving_shape=moving_shape,
-                    static_affine=static_affine,
-                    static_shape=static_shape)
+                    reg_subject_sls, reg_template_sls,
+                    moving_affine=reg_subject_img.affine,
+                    moving_shape=reg_subject_img.shape,
+                    static_affine=reg_template_img.affine,
+                    static_shape=reg_template_img.shape)
             else:
                 _, mapping = reg.syn_registration(
-                    moving_data, static_data,
-                    moving_affine=moving_affine,
-                    static_affine=static_affine,
+                    reg_subject_img.get_fdata(),
+                    reg_template_img.get_fdata(),
+                    moving_affine=reg_subject_img.affine,
+                    static_affine=reg_template_img.affine,
                     prealign=reg_prealign)
 
             if self.use_prealign:
@@ -876,7 +863,7 @@ class AFQ(object):
                                            row['dwi_file'],
                                            row['bval_file'],
                                            row['bvec_file'],
-                                           reg_template=self.reg_template,
+                                           reg_template=self.reg_template_img,
                                            mapping=self._mapping(row),
                                            reg_prealign=reg_prealign)
 
@@ -1025,11 +1012,11 @@ class AFQ(object):
 
             mapping = reg.read_mapping(self._mapping(row),
                                        row['dwi_file'],
-                                       self.reg_template,
+                                       self.reg_template_img,
                                        prealign=reg_prealign_inv)
 
             template_xform = mapping.transform_inverse(
-                self.reg_template.get_fdata())
+                self.reg_template_img.get_fdata())
             self.log_and_save_nii(nib.Nifti1Image(template_xform,
                                                   row['dwi_affine']),
                                   template_xform_file)
@@ -1045,7 +1032,7 @@ class AFQ(object):
 
         mapping = reg.read_mapping(self._mapping(row),
                                    row['dwi_file'],
-                                   self.reg_template,
+                                   self.reg_template_img,
                                    prealign=reg_prealign_inv)
 
         rois_dir = op.join(row['results_dir'], 'ROIs')

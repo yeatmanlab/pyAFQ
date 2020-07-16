@@ -51,7 +51,7 @@
         "id": "template_group",
         "name": "Template Group",
         "description": "Parameters related to registering to a template.",
-        "members": ["moving", "static", "mask_templ", "reg_algo"]
+        "members": ["reg_subject", "reg_template", "mask_templ", "reg_algo"]
     }
     ],
     "inputs": [
@@ -449,18 +449,18 @@
         "optional": true
     },
     {
-        "id": "moving",
-        "name": "moving",
+        "id": "reg_subject",
+        "name": "reg subject",
         "type": "String",
-        "value-key": "[MOVING]",
+        "value-key": "[REG_SUBJECT]",
         "default-value": "b0",
         "optional": true
     },
     {
-        "id": "static",
-        "name": "static",
+        "id": "reg_template",
+        "name": "reg template",
         "type": "String",
-        "value-key": "[STATIC]",
+        "value-key": "[REG_TEMPLATE]",
         "default-value": "mni",
         "optional": true
     },
@@ -552,8 +552,8 @@
             "return_idx = [CLEANING_RETURN_IDX]",
             "",
             "[template]",
-            "moving=[MOVING]",
-            "static=[STATIC]",
+            "reg_subject=[REG_SUBJECT]",
+            "reg_template=[REG_TEMPLATE]",
             "mask_templ=[MASK_TEMPL]",
             "reg_algo=[REG_ALGO]",
             "",
