@@ -287,7 +287,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (400, 5)
+    assert tract_profiles.shape == (500, 5)
 
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
