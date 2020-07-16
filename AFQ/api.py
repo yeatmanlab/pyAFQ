@@ -629,7 +629,8 @@ class AFQ(object):
                 img = nib.load(row['dwi_file'])
                 tg = load_tractogram(self._streamlines(row),
                                      img,
-                                     Space.VOX)
+                                     Space.VOX,
+                                     bbox_valid_check=False)
                 return img, tg.streamlines
             elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
@@ -643,7 +644,7 @@ class AFQ(object):
                 img = afd.read_mni_template(mask=self.mask_templ)
                 hcp_atlas = load_tractogram(
                     atlas_fname,
-                    img, bbox_valid_check=False)
+                    'same', bbox_valid_check=False)
 
                 return img, hcp_atlas.streamlines
             else:
