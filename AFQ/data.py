@@ -627,14 +627,14 @@ class S3BIDSSubject:
             'raw': [
                 op.abspath(op.join(
                     directory,
-                    split_key(key)
+                    split_key(key).lstrip('/')
                 )) for key in self.s3_keys['raw']
             ],
             'derivatives': {
                 dt: [
                     op.abspath(op.join(
                         directory,
-                        split_key(s3key)
+                        split_key(s3key).lstrip('/')
                     )) for s3key in s3keys
                 ] for dt, s3keys in self.s3_keys['derivatives'].items()
             }
