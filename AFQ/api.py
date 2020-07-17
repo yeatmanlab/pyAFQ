@@ -146,6 +146,8 @@ class AFQ(object):
                  segmentation='dmriprep',
                  seg_suffix='seg',
                  b0_threshold=0,
+                 target_b_val=None,
+                 target_b_sensitivity=5,
                  reg_subject="b0",
                  reg_template="mni",
                  mask_templ=True,
@@ -259,6 +261,13 @@ class AFQ(object):
         self.logger = logging.getLogger('AFQ.api')
 
         self.force_recompute = force_recompute
+
+        if target_b_val is not None:
+            self.target_b_upper = target_b_val + target_b_sensitivity
+            self.target_b_lower = target_b_val - target_b_sensitivity
+        else:
+            self.target_b_upper = None
+            self.target_b_lower = None
 
         self.wm_criterion = wm_criterion
         self.reg_subject = reg_subject
@@ -417,12 +426,21 @@ class AFQ(object):
         self.logger.info(f"Saving {fname}")
         save_tractogram(sft, fname, bbox_valid_check=False)
 
+    def _get_data_gtab(self, row):
+        img = nib.load(row['dwi_file'])
+        data = img.get_fdata()
+        gtab = row['gtab']
+        if self.target_b_lower is not None:
+            data = data[
+                ...,
+                (gtab.bvals < self.target_b_upper)
+                and (gtab.bvals > self.target_b_lower)]
+        return data, gtab, img
+
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
         if self.force_recompute or not op.exists(b0_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, img = self._get_data_gtab(row)
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
             self.log_and_save_nii(mean_b0_img, b0_file)
@@ -464,9 +482,7 @@ class AFQ(object):
     def _dti(self, row):
         dti_params_file = self._get_fname(row, '_model-DTI_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(dti_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             dtf = dti_fit(gtab, data, mask=mask)
@@ -492,9 +508,7 @@ class AFQ(object):
     def _dki(self, row):
         dki_params_file = self._get_fname(row, '_model-DKI_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(dki_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             dkf = dki_fit(gtab, data, mask=mask)
@@ -512,9 +526,7 @@ class AFQ(object):
     def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,):
         csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(csd_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             csdf = csd_fit(gtab, data, mask=mask,
@@ -749,8 +761,7 @@ class AFQ(object):
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
-            dwi_img = nib.load(row['dwi_file'])
-            dwi_data = dwi_img.get_fdata()
+            dwi_data, _, dwi_img = self._get_data_gtab(row)
 
             if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
                 # If we found a white matter segmentation in the
@@ -1297,8 +1308,8 @@ class AFQ(object):
                 include_seg=True)
 
             visualize_tract_profiles(tract_profiles,
-                                         scalar=scalar,
-                                         file_name=fname)
+                                     scalar=scalar,
+                                     file_name=fname)
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
