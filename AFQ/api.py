@@ -187,7 +187,7 @@ class AFQ(object):
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
-        
+
         target_b_val : float, optional
             Which b value you want to use from the dataset.
             If None, all are used. Default: None
@@ -466,19 +466,27 @@ class AFQ(object):
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if self.force_recompute or not op.exists(brain_mask_file):
-            b0_file = self._b0(row)
-            mean_b0_img = nib.load(b0_file)
-            mean_b0 = mean_b0_img.get_fdata()
-            _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                        autocrop, dilate=dilate)
-            be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                     mean_b0_img.affine)
-            self.log_and_save_nii(be_img, brain_mask_file)
-            meta = dict(source=b0_file,
-                        median_radius=median_radius,
-                        numpass=numpass,
-                        autocrop=autocrop,
-                        vol_idx=vol_idx)
+            if 'seg_file' in row.index:
+                brain_mask, meta = \
+                    self._mask_from_seg(row, [0], not_equal=True)
+                self.log_and_save_nii(
+                    nib.Nifti1Image(brain_mask.astype(np.float32),
+                                    row['dwi_affine']),
+                    brain_mask_file)
+            else:
+                b0_file = self._b0(row)
+                mean_b0_img = nib.load(b0_file)
+                mean_b0 = mean_b0_img.get_fdata()
+                _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
+                                            autocrop, dilate=dilate)
+                be_img = nib.Nifti1Image(brain_mask.astype(int),
+                                         mean_b0_img.affine)
+                self.log_and_save_nii(be_img, brain_mask_file)
+                meta = dict(source=b0_file,
+                            median_radius=median_radius,
+                            numpass=numpass,
+                            autocrop=autocrop,
+                            vol_idx=vol_idx)
             meta_fname = self._get_fname(row, '_brain_mask.json')
             afd.write_json(meta_fname, meta)
         return brain_mask_file
@@ -769,28 +777,36 @@ class AFQ(object):
 
         return mapping_file
 
+    def _mask_from_seg(self, row, wm_labels, not_equal=False):
+        dwi_data, _, dwi_img = self._get_data_gtab(row)
+
+        # If we found a white matter segmentation in the
+        # expected location:
+        seg_img = nib.load(row['seg_file'])
+        seg_data_orig = seg_img.get_fdata()
+        # For different sets of labels, extract all the voxels that
+        # have any of these values:
+        wm_mask = np.zeros(seg_data_orig.shape)
+        for l in wm_labels:
+            if not_equal:
+                wm_mask = wm_mask + (seg_data_orig != l)
+            else:
+                wm_mask = wm_mask + (seg_data_orig == l)
+
+        # Resample to DWI data:
+        wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+                                        seg_img.affine,
+                                        dwi_img.affine)).astype(int)
+        meta = dict(source=row['seg_file'],
+                    wm_criterion=wm_labels)
+
+        return wm_mask, meta
+
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
-            dwi_data, _, dwi_img = self._get_data_gtab(row)
-
             if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
-                # If we found a white matter segmentation in the
-                # expected location:
-                seg_img = nib.load(row['seg_file'])
-                seg_data_orig = seg_img.get_fdata()
-                # For different sets of labels, extract all the voxels that
-                # have any of these values:
-                wm_mask = np.sum(np.concatenate(
-                    [(seg_data_orig == l)[..., None]
-                     for l in self.wm_criterion], -1), -1)
-
-                # Resample to DWI data:
-                wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                                                seg_img.affine,
-                                                dwi_img.affine)).astype(int)
-                meta = dict(source=row['seg_file'],
-                            wm_criterion=self.wm_criterion)
+                wm_mask, meta = self._mask_from_seg(row, self.wm_criterion)
             else:
                 # Otherwise, we'll identify the white matter based on FA:
                 fa_fname = self._dti_fa(row)
