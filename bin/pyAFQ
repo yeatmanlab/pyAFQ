@@ -73,6 +73,8 @@ bundles = {api.BUNDLES}
 seg_algo = 'AFQ'
 scalars_model = 'DTI'
 scalars = ['dti_fa', 'dti_md']
+target_b_val=None
+target_b_sensitivity=50.0
 
 [template]
 reg_subject="b0"
@@ -168,6 +170,8 @@ bundles = config.get("bundles", {})
 bundle_names = bundles.get("bundles", api.BUNDLES)
 scalars_model = bundles.get("scalars_model", "DTI")
 scalars = bundles.get("scalars", ["fa", "md"])
+target_b_val = bundles.get("target_b_val", None)
+target_b_sensitivity = bundles.get("target_b_sensitivity", 50.0)
 
 cleaning = config.get("cleaning", {})
 clean_params = {}
@@ -180,10 +184,11 @@ force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 viz_backend = compute.get("viz_backend", 'fury')
 
-reg_subject = compute.get("reg_subject", "b0")
-reg_template = compute.get("reg_template", "mni")
-mask_templ = compute.get("mask_templ", True)
-reg_algo = compute.get("reg_algo", "syn")
+template = config.get("template", {})
+reg_subject = template.get("reg_subject", "b0")
+reg_template = template.get("reg_template", "mni")
+mask_templ = template.get("mask_templ", True)
+reg_algo = template.get("reg_algo", "syn")
 
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,

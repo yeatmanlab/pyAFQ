@@ -147,7 +147,7 @@ class AFQ(object):
                  seg_suffix='seg',
                  b0_threshold=0,
                  target_b_val=None,
-                 target_b_sensitivity=5,
+                 target_b_sensitivity=50.0,
                  reg_subject="b0",
                  reg_template="mni",
                  mask_templ=True,
@@ -187,6 +187,17 @@ class AFQ(object):
 
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
+        
+        target_b_val : float, optional
+            Which b value you want to use from the dataset.
+            If None, all are used. Default: None
+
+        target_b_sensitivity : float, optional
+            Sensitivity of target_b_val.
+            Only used if target_b_val is not None.
+            B values selected will be in the range
+            target_b_val +/- target_b_sensitivity
+            Default: 50
 
         odf_model : string, optional
             Which model to use for determining directions in tractography.
@@ -426,11 +437,11 @@ class AFQ(object):
         self.logger.info(f"Saving {fname}")
         save_tractogram(sft, fname, bbox_valid_check=False)
 
-    def _get_data_gtab(self, row):
+    def _get_data_gtab(self, row, filter_b=True):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
         gtab = row['gtab']
-        if self.target_b_lower is not None:
+        if filter_b and (self.target_b_lower is not None):
             data = data[
                 ...,
                 (gtab.bvals < self.target_b_upper)
@@ -440,7 +451,7 @@ class AFQ(object):
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
         if self.force_recompute or not op.exists(b0_file):
-            data, gtab, img = self._get_data_gtab(row)
+            data, gtab, img = self._get_data_gtab(row, filter_b=False)
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
             self.log_and_save_nii(mean_b0_img, b0_file)

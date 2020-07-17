@@ -20,7 +20,8 @@
         "id": "bundles_group",
         "name": "Bundles Group",
         "description": "Parameters related to bundles of interest.",
-        "members": ["bundles", "bundles_seg_algo", "scalars_model", "scalars"]
+        "members": ["bundles", "bundles_seg_algo", "scalars_model", "scalars", 
+                    "target_b_val", "target_b_sensitivity"]
     },
     {
         "id": "tracking_group",
@@ -94,6 +95,22 @@
         "value-key": "[BUNDLES_SEG_ALGO]",
         "value-choices": ["AFQ", "Reco"],
         "default-value": "AFQ",
+        "optional": true
+    },
+    {
+        "id": "target_b_val",
+        "name": "target b val",
+        "type": "Number",
+        "value-key": "[TARGET_B_VAL]",
+        "default-value": "None",
+        "optional": true
+    },
+    {
+        "id": "target_b_sensitivity",
+        "name": "target b sensitivity",
+        "type": "Number",
+        "value-key": "[TARGET_B_SENSITIVITY]",
+        "default-value": 50.0,
         "optional": true
     },
     {
@@ -506,6 +523,8 @@
             "[bundles]",
             "bundles = ['[BUNDLES]']",
             "seg_algo = '[BUNDLES_SEG_ALGO]'",
+            "target_b_val = [TARGET_B_VAL]",
+            "target_b_sensitivity = [TARGET_B_SENSITIVITY]",
             "scalars_model = '[SCALARS_MODEL]'",
             "scalars = ['[SCALARS]']",
             "",
