@@ -786,15 +786,15 @@ class AFQ(object):
         seg_data_orig = seg_img.get_fdata()
         # For different sets of labels, extract all the voxels that
         # have any of these values:
-        wm_mask = np.zeros(seg_data_orig.shape)
+        wm_mask = np.zeros(seg_data_orig.shape, dtype=bool)
         for label in wm_labels:
             if not_equal:
-                wm_mask = wm_mask + (seg_data_orig != label)
+                wm_mask = np.logical_or(wm_mask, (seg_data_orig != label))
             else:
-                wm_mask = wm_mask + (seg_data_orig == label)
+                wm_mask = np.logical_or(wm_mask, (seg_data_orig == label))
 
         # Resample to DWI data:
-        wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
+        wm_mask = np.round(reg.resample(wm_mask.astype(float), dwi_data[..., 0],
                                         seg_img.affine,
                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
