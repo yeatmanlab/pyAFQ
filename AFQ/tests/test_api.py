@@ -325,7 +325,7 @@ def test_AFQ_data_waypoint():
     from_file = pd.read_csv(op.join(myafq.afq_path, 'tract_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (400, 7)
+    assert combined_profiles.shape == (500, 7)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
