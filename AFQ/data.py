@@ -828,10 +828,10 @@ class S3BIDSStudy:
         if not isinstance(s3_prefix, str):
             raise TypeError('`s3_prefix` must be a string.')
 
-        if not (subjects is None or
-                isinstance(subjects, int) or
-                isinstance(subjects, str) or
-                all(isinstance(s, str) for s in subjects)):
+        if not (subjects is None
+                or isinstance(subjects, int)
+                or isinstance(subjects, str)
+                or all(isinstance(s, str) for s in subjects)):
             raise TypeError('`subjects` must be an int, string or a '
                             'sequence of strings.')
 
