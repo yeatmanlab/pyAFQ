@@ -1263,7 +1263,6 @@ class AFQ(object):
             try:
                 figure = self.viz.visualize_bundles(
                     bundles_file,
-                    affine=row['dwi_affine'],
                     color_by_volume=color_by_volume,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
