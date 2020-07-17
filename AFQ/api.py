@@ -787,11 +787,11 @@ class AFQ(object):
         # For different sets of labels, extract all the voxels that
         # have any of these values:
         wm_mask = np.zeros(seg_data_orig.shape)
-        for l in wm_labels:
+        for label in wm_labels:
             if not_equal:
-                wm_mask = wm_mask + (seg_data_orig != l)
+                wm_mask = wm_mask + (seg_data_orig != label)
             else:
-                wm_mask = wm_mask + (seg_data_orig == l)
+                wm_mask = wm_mask + (seg_data_orig == label)
 
         # Resample to DWI data:
         wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
