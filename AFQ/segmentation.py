@@ -434,7 +434,7 @@ class Segmentation:
                     aal_atlas['atlas'],
                     op.join(self.save_intermediates,
                             'AAL_registered_to_template.nii.gz'))
-            
+
             aal_atlas = aal_atlas['atlas'].get_fdata()
             # We need to calculate the size of a voxel, so we can transform
             # from mm to voxel units:

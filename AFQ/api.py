@@ -794,7 +794,8 @@ class AFQ(object):
                 wm_mask = np.logical_or(wm_mask, (seg_data_orig == label))
 
         # Resample to DWI data:
-        wm_mask = np.round(reg.resample(wm_mask.astype(float), dwi_data[..., 0],
+        wm_mask = np.round(reg.resample(wm_mask.astype(float),
+                                        dwi_data[..., 0],
                                         seg_img.affine,
                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
