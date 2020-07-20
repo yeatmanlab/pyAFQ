@@ -1080,7 +1080,7 @@ def create_anisotropic_power_map(dwi, gtab, mask=None):
         Data to greate map with.
 
     gtab : GradientTable
-        A GradientTable with all the gradient information. 
+        A GradientTable with all the gradient information.
 
     mask : str or nifti1image, optional
         mask to mask the data with.
