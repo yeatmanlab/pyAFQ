@@ -211,14 +211,14 @@ class AFQ(object):
             The source image data to be registered.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni_T2", "b0", "dti_fa_subject", "dti_fa_template",
-            "subject_sls", "hcp_atlas", "mni_T1", or "power map,"
+            "subject_sls", "hcp_atlas", "mni_T1", or "power_map,"
             image data will be loaded automatically.
 
         reg_template : str or Nifti1Image, optional
             The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni_T2", "b0", "dti_fa_subject", "dti_fa_template",
-            "subject_sls", "hcp_atlas", "mni_T1", or "power map,"
+            "subject_sls", "hcp_atlas", "mni_T1", or "power_map,"
             image data will be loaded automatically.
             (defaults to the MNI T2)
 
