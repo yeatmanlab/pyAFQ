@@ -149,7 +149,7 @@ class AFQ(object):
                  target_b_val=None,
                  target_b_sensitivity=50.0,
                  reg_subject="b0",
-                 reg_template="mni",
+                 reg_template="mni_T2",
                  mask_templ=True,
                  reg_algo="syn",
                  bundle_names=BUNDLES,
@@ -210,15 +210,15 @@ class AFQ(object):
         reg_subject : str or Nifti1Image, optional
             The source image data to be registered.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
-            If "mni", "b0", "dti_fa_subject", "dti_fa_template",
-            "subject_sls", or "hcp_atlas",
+            If "mni_T2", "b0", "dti_fa_subject", "dti_fa_template",
+            "subject_sls", "hcp_atlas", "mni_T1", or "power map,"
             image data will be loaded automatically.
 
         reg_template : str or Nifti1Image, optional
             The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
-            If "mni", "b0", "dti_fa_subject", "dti_fa_template",
-            "subject_sls", or "hcp_atlas",
+            If "mni_T2", "b0", "dti_fa_subject", "dti_fa_template",
+            "subject_sls", "hcp_atlas", "mni_T1", or "power map,"
             image data will be loaded automatically.
             (defaults to the MNI T2)
 
@@ -645,17 +645,32 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
+    def _anisotropic_power_map(self, row):
+        pmap_file = self._get_fname(
+            row, '_anisotropic_power_map.nii.gz')
+        if self.force_recompute or not op.exists(pmap_file):
+            dwi_data, gtab, _ = self._get_data_gtab(row)
+            mask = self._brain_mask(row)
+            pmap = afd.create_anisotropic_power_map(dwi_data, gtab, mask)
+            self.log_and_save_nii(pmap, pmap_file)
+
+        return pmap_file
+
     def _reg_img(self, img, row=None):
         if isinstance(img, str):
             img_l = img.lower()
-            if img_l == "mni":
-                img = afd.read_mni_template(mask=self.mask_templ)
+            if img_l == "mni_T2":
+                img = afd.read_mni_template(mask=self.mask_templ, weight=2)
+            if img_l == "mni_T1":
+                img = afd.read_mni_template(mask=self.mask_templ, weight=1)
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
             elif img_l == "dti_fa_subject":
                 img = nib.load(self._dti_fa(row))
             elif img_l == "dti_fa_template":
                 img = afd.read_fa_template(mask=self.mask_templ)
+            elif img_l == "power_map":
+                img = nib.load(self._anisotropic_power_map(row))
             elif img_l == "subject_sls":
                 img = nib.load(row['dwi_file'])
                 tg = load_tractogram(self._streamlines(row),

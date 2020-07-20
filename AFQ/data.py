@@ -16,6 +16,8 @@ import logging
 import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
+import dipy.reconst.shm as shm
+import dipy.reconst.csdeconv as csdeconv
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
@@ -964,10 +966,10 @@ def _apply_mask(template_img, resolution=1):
     return nib.Nifti1Image(out_data, template_img.affine)
 
 
-def read_mni_template(resolution=1, mask=True):
+def read_mni_template(resolution=1, mask=True, weight=2):
     """
 
-    Reads the MNI T2w template
+    Reads the MNI T1w or T2w template
 
     Parameters
     ----------
@@ -978,15 +980,21 @@ def read_mni_template(resolution=1, mask=True):
         Whether to mask the data with a brain-mask before returning the image.
         Default : True
 
+    weight: number or str, optional
+        Which relaxation technique to use.
+        Should be either 1 or 2, correponding to T1 or T2.
+        Default : 2
+
     Returns
     -------
-    nib.Nifti1Image class instance containing masked or unmasked T2 template.
+    nib.Nifti1Image class instance
+    containing masked or unmasked T1w or template.
 
     """
     template_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
                                           desc=None,
                                           resolution=resolution,
-                                          suffix='T2w',
+                                          suffix=f'T{weight}w',
                                           extension='nii.gz')))
     if not mask:
         return template_img
@@ -1060,3 +1068,47 @@ def read_fa_template(mask=True):
         return template_img
     else:
         return _apply_mask(template_img, 1)
+
+
+def create_anisotropic_power_map(dwi, gtab, mask=None):
+    """
+    Creates an anisotropic power map.
+
+    Parameters
+    ----------
+    dwi : str or nifti1image
+        Data to greate map with.
+
+    gtab : GradientTable
+        A GradientTable with all the gradient information. 
+
+    mask : str or nifti1image, optional
+        mask to mask the data with.
+        Default: None.
+
+    Returns
+    -------
+    nib.Nifti1Image class instance containing an anisotropic power map.
+    """
+
+    if isinstance(dwi, str):
+        dwi = nib.load(dwi)
+    dwi_data = dwi.get_fdata()
+    dwi_affine = dwi.affine
+
+    if isinstance(mask, str):
+        mask = nib.load(mask)
+    mask = mask.get_fdata()
+
+    model = shm.QballModel(gtab, 8)
+    sphere = dpd.get_sphere('symmetric724')
+    peaks = csdeconv.peaks_from_model(
+        model=model,
+        data=dwi_data,
+        sphere=sphere,
+        relative_peak_threshold=.5,
+        min_separation_angle=25,
+        mask=mask)
+    ap = shm.anisotropic_power(peaks.shm_coeff)
+
+    return nib.Nifti1Image(ap, dwi_affine)
