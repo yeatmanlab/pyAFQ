@@ -260,7 +260,7 @@
         "min-list-entries": 1,
         "list-separator": ", ",
         "value-key": "[WM_CRITERION]",
-        "default-value": [250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+        "default-value": 0.1,
         "description": "The values specified correspond to all whitematter regions in the FreeSurfer aparc+aseg parcellation or an FA threshold to use.",
         "optional": true
     },

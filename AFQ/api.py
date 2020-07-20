@@ -156,7 +156,7 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 wm_criterion=0.1,
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -241,9 +241,11 @@ class AFQ(object):
         wm_criterion : list or float, optional
             This is either a list of the labels of the white matter in the
             segmentation file or (if a float is provided) the threshold FA to
-            use for creating the white-matter mask. Default: the white matter
-            values for the segmentation provided with the HCP data, including
-            labels for midbrain: [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+            use for creating the white-matter mask. For example, the white
+            matter values for the segmentation provided with the HCP data
+            including labels for midbrain are:
+            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+            Default: 0.1
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the

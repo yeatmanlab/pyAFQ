@@ -96,7 +96,7 @@ But additional configuration options can be provided for the following values::
     min_length = 10
     max_length = 1000
     odf_model = 'DTI'
-    wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+    wm_criterion = 0.1
 
     [segmentation]
     nb_points = false
