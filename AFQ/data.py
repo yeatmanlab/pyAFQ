@@ -1070,17 +1070,22 @@ def read_fa_template(mask=True):
         return _apply_mask(template_img, 1)
 
 
-def create_anisotropic_power_map(dwi, gtab, mask=None):
+def create_anisotropic_power_map(dwi, gtab, dwi_affine=None, mask=None):
     """
     Creates an anisotropic power map.
 
     Parameters
     ----------
-    dwi : str or nifti1image
+    dwi : str, ndarray, or nifti1image
         Data to greate map with.
 
     gtab : GradientTable
         A GradientTable with all the gradient information.
+
+    dwi_affine : ndarray, optional
+        Affine associated with the dwi data.
+        If None, will attempt to use affine from dwi image.
+        Default: None.
 
     mask : str or nifti1image, optional
         mask to mask the data with.
@@ -1093,8 +1098,13 @@ def create_anisotropic_power_map(dwi, gtab, mask=None):
 
     if isinstance(dwi, str):
         dwi = nib.load(dwi)
-    dwi_data = dwi.get_fdata()
-    dwi_affine = dwi.affine
+    if isinstance(dwi, nib.Nifti1Image):
+        dwi_data = dwi.get_fdata()
+    else:
+        dwi_data = dwi
+
+    if dwi_affine is None:
+        dwi_affine = dwi.affine
 
     if isinstance(mask, str):
         mask = nib.load(mask)

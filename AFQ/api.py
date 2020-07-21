@@ -651,9 +651,10 @@ class AFQ(object):
         pmap_file = self._get_fname(
             row, '_anisotropic_power_map.nii.gz')
         if self.force_recompute or not op.exists(pmap_file):
-            dwi_data, gtab, _ = self._get_data_gtab(row)
+            dwi_data, gtab, img = self._get_data_gtab(row)
             mask = self._brain_mask(row)
-            pmap = afd.create_anisotropic_power_map(dwi_data, gtab, mask)
+            pmap = afd.create_anisotropic_power_map(
+                dwi_data, gtab, img.affine, mask)
             self.log_and_save_nii(pmap, pmap_file)
 
         return pmap_file
@@ -661,9 +662,9 @@ class AFQ(object):
     def _reg_img(self, img, row=None):
         if isinstance(img, str):
             img_l = img.lower()
-            if img_l == "mni_T2":
+            if img_l == "mni_t2":
                 img = afd.read_mni_template(mask=self.mask_templ, weight=2)
-            if img_l == "mni_T1":
+            if img_l == "mni_t1":
                 img = afd.read_mni_template(mask=self.mask_templ, weight=1)
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
