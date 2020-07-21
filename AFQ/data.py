@@ -855,6 +855,7 @@ class S3BIDSStudy:
         self._random_seed = random_seed
         self._anon = anon
         self._subject_class = _subject_class
+        self._local_directories = []
 
         # Get a list of all subjects in the study
         self._all_subjects = self._list_all_subjects()
@@ -930,6 +931,11 @@ class S3BIDSStudy:
     def non_sub_s3_keys(self):
         """A dict of S3 keys that are not in subject directories"""
         return self._non_subject_s3_keys
+
+    @property
+    def local_directories(self):
+        """A list of local directories to which this study has been downloaded"""
+        return self._local_directories
 
     @property
     def use_participants_tsv(self):
@@ -1087,6 +1093,9 @@ class S3BIDSStudy:
         --------
         AFQ.data.S3BIDSSubject.download()
         """
+        self._local_directories.append(directory)
+        self._local_directories = set(self._local_directories)
+
         results = [delayed(sub.download)(
             directory=directory,
             include_derivs=include_derivs,
