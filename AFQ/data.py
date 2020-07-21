@@ -1052,7 +1052,12 @@ class S3BIDSStudy:
 
         return subjects
 
-    def download(self, directory,
+    def _download_non_sub_keys(self, directory):
+        fs = s3fs.S3FileSystem(anon=self.anon)
+        for fn in self.non_sub_s3_keys['raw']:
+            fs.get(fn, op.join(directory, op.basename(fn)))
+
+    def download(self, directory, include_non_sub_raw_keys=False,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
 
@@ -1060,6 +1065,11 @@ class S3BIDSStudy:
         ----------
         directory : str
             Directory to which to download subject files
+
+        include_non_sub_raw_keys : bool, default=False
+            If True, download all keys in self.non_sub_s3_keys also.
+            This is useful if the non_sub_s3_keys contain files
+            common to all subjects that should be inherited.
 
         include_derivs : bool or str, default=False
             If True, download all derivatives files. If False, do not.
@@ -1232,7 +1242,7 @@ class HBNSite(S3BIDSStudy):
 
         return non_sub_s3_keys
 
-    def download(self, directory,
+    def download(self, directory, include_non_sub_raw_keys=False,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
 
@@ -1257,15 +1267,13 @@ class HBNSite(S3BIDSStudy):
         --------
         AFQ.data.S3BIDSSubject.download()
         """
-        results = [delayed(sub.download)(
+        super().download(
             directory=directory,
+            include_non_sub_raw_keys=include_non_sub_raw_keys,
             include_derivs=include_derivs,
             overwrite=overwrite,
-            pbar=pbar,
-            pbar_idx=idx,
-        ) for idx, sub in enumerate(self.subjects)]
-
-        compute(*results, scheduler='threads')
+            pbar=pbar
+        )
 
         to_bids_description(
             directory,
