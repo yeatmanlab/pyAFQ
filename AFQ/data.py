@@ -1231,6 +1231,48 @@ class HBNSite(S3BIDSStudy):
         }
 
         return non_sub_s3_keys
+
+    def download(self, directory,
+                 include_derivs=False, overwrite=False, pbar=True):
+        """Download files for each subject in the study
+
+        Parameters
+        ----------
+        directory : str
+            Directory to which to download subject files
+
+        include_derivs : bool or str, default=False
+            If True, download all derivatives files. If False, do not.
+            If a string or sequence of strings is passed, this will
+            only download derivatives that match the string(s) (e.g.
+            ["dmriprep", "afq"]).
+
+        overwrite : bool, default=False
+            If True, overwrite files for each subject
+
+        pbar : bool, default=True
+            If True, include progress bar
+
+        See Also
+        --------
+        AFQ.data.S3BIDSSubject.download()
+        """
+        results = [delayed(sub.download)(
+            directory=directory,
+            include_derivs=include_derivs,
+            overwrite=overwrite,
+            pbar=pbar,
+            pbar_idx=idx,
+        ) for idx, sub in enumerate(self.subjects)]
+
+        compute(*results, scheduler='threads')
+
+        to_bids_description(
+            directory,
+            **{"BIDSVersion": "1.0.0",
+               "Name": "HBN Study, " + self.site})
+
+
 # +--------------------------------------------------+
 # | End S3BIDSStudy classes and supporting functions |
 # +--------------------------------------------------+
