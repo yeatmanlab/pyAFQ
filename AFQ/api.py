@@ -1185,7 +1185,7 @@ class AFQ(object):
                         include_seg=True))
 
                 fname = op.join(fname[0], roi_dir, fname[1])
-                self.viz.create_gif(figure, fname, creating_many=True)
+                self.viz.create_gif(figure, fname)
             if export_as_html:
                 roi_dir = op.join(row['results_dir'], 'viz_bundles')
                 os.makedirs(roi_dir, exist_ok=True)
@@ -1204,9 +1204,6 @@ class AFQ(object):
 
                 fname = op.join(fname[0], roi_dir, fname[1])
                 figure.write_html(fname)
-
-        if export_as_gif:
-            self.viz.stop_creating_gifs()
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])

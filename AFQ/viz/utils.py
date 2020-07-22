@@ -336,7 +336,6 @@ class Viz:
             self.visualize_roi = AFQ.viz.fury_backend.visualize_roi
             self.visualize_volume = AFQ.viz.fury_backend.visualize_volume
             self.create_gif = AFQ.viz.fury_backend.create_gif
-            self.stop_creating_gifs = AFQ.viz.fury_backend.stop_creating_gifs
         elif backend == "plotly":
             try:
                 import AFQ.viz.plotly_backend
@@ -346,8 +345,6 @@ class Viz:
             self.visualize_roi = AFQ.viz.plotly_backend.visualize_roi
             self.visualize_volume = AFQ.viz.plotly_backend.visualize_volume
             self.create_gif = AFQ.viz.plotly_backend.create_gif
-            self.stop_creating_gifs = \
-                AFQ.viz.plotly_backend.stop_creating_gifs
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
