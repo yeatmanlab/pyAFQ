@@ -1542,7 +1542,8 @@ class AFQ(object):
         df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
         return df
 
-    def std_export(self):
+    def export_all(self):
+        """ Exports all the possible outputs"""
         self.export_registered_b0()
         self.get_template_xform()
         self.export_bundles()
