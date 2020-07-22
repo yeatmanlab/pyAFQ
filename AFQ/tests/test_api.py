@@ -357,9 +357,9 @@ def test_AFQ_data_waypoint():
     # Bare bones config only points to the files:
     config = ConfigUpdater()
     config.add_section("BIDS")
-    config["bids_path"] = bids_path
-    config["dmriprep"] = 'vistasoft'
-    config["segmentation"] = 'freesurfer'
+    config["BIDS"]["bids_path"] = bids_path
+    config["BIDS"]["dmriprep"] = 'vistasoft'
+    config["BIDS"]["segmentation"] = 'freesurfer'
 
     config_file = op.join(tmpdir.name, "afq_config.ini")
     with open(config_file, 'w') as ff:
