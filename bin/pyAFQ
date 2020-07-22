@@ -1,18 +1,25 @@
 #!/usr/bin/env python
 
 import warnings
-from argparse import ArgumentParser
-import os
 import os.path as op
-import toml
+import os
+import pathlib
 import datetime
 import platform
+from ast import literal_eval
+
+from funcargparse import FuncArgParser
+from argparse import ArgumentParser, FileType
+from cli2gui import Cli2Gui
+from configupdater import ConfigUpdater
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
+    print("Loading AFQ libraries...")
+
     import AFQ
-    from AFQ import api
+    import AFQ.api as api
     from AFQ.utils.bin import get_default_args
     import AFQ.segmentation as seg
     import AFQ.tractography as aft
@@ -20,6 +27,44 @@ with warnings.catch_warnings():
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
+
+use_config_gui = True
+bin_folder = pathlib.Path(__file__).parent.absolute()
+gui_image = op.join(bin_folder, "./example_image.png")
+gui_background_color = "#ffffcc"
+gui_text_color = "#663300"
+gui_input_box_color = "#ffffff"
+gui_button_color = "#ffff66"
+gui_theme = \
+    [gui_button_color, "#ffffff", "#ffffff", "#ffffff", "#ffffff",
+     "#ffffff", gui_text_color, "#ffffff", "#ffffff", "#ffffff",
+     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
+     gui_background_color, gui_input_box_color, "#ffffff", "#ffffff",
+     "#ffffff", "#ffffff", "#ffffff", "#ffffff"]
+gui_sizes = \
+    {"title_size": 36,  # room for title
+     "label_size": (58, None),  # room for text
+     "input_size": (24, 1),  # width by height of input button
+     "button": (12, 1),
+     "padding": (5, 10),
+     "helpText_size": 2,  # flaky, may interfere with buttons
+     "text_size": 16}  # text size of buttons
+usage = \
+    f"""pyAFQ /path/to/afq_config.ini
+
+Runs full AFQ processing as specified in the configuration file.
+
+To not run the CLI with a GUI, use --disable-cli2gui .
+
+To not open a GUI for editing the config file, use --disable-config2gui .
+
+For details about configuration, see instructions in:
+https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+"""
+config_usage = \
+    f"""Optionally update parameters in the selected config file.
+After updating, the config file will be used to run pyAFQ."""
+
 
 def process_defaults(defaults_dict):
     defaults_list = []
@@ -38,189 +83,183 @@ def process_defaults(defaults_dict):
     return defaults_list
 
 
-track_defaults = get_default_args(aft.track)
-track_defaults_list = process_defaults(track_defaults)
-seg_defaults = get_default_args(seg.Segmentation.__init__)
-seg_defaults_list = process_defaults(seg_defaults)
-clean_defaults = get_default_args(seg.clean_bundle)
-clean_defaults_list = process_defaults(clean_defaults)
+def parse_cli():
+    # cli_parser parses user arguments from CLI,
+    # It is also what gooey uses to make the GUI
+    cli_parser = ArgumentParser(usage=usage)
 
-# For all lists that contain a "None" default value, replace it with an
-# empty string to not break toml syntax. As of Feb-7-2020, that is only
-# track_defaults_list and seg_defaults_list
-none_val = "''"
-replace_none = lambda myl, rep=none_val: [v.replace('None', rep) for v in myl]
-track_defaults_list = replace_none(track_defaults_list)
-seg_defaults_list = replace_none(seg_defaults_list)
+    cli_parser.add_argument(
+        dest='config',
+        action="store",
+        type=FileType('w'),
+        help="Path to config file. For example, /path/to/afq_config.ini")
 
-usage = f"""pyAFQ /path/to/afq_config.toml
+    cli_parser.add_argument(
+        '-t', '--notrack', action="store_true", default=False,
+        help="Disable the use of pyAFQ being recorded by Google Analytics. ")
 
-Runs full AFQ processing as specified in the configuration file.
+    cli_parser.add_argument(
+        '--disable-config2gui', action="store_true", default=False,
+        help="Disable the GUI for editing the config file. ")
 
-For details about configuration, see instructions in:
-https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+    opts = cli_parser.parse_args()
 
-The default values of the configuration are:
+    if not opts.notrack:
+        logger.info(
+            "Your use of pyAFQ is being recorded using Google Analytics. "
+            "For more information, please refer to the pyAFQ documentation: "
+            "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  # noqa
+            "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
+        import popylar
+        popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
+    opts.config.close()
+    use_config_gui = not opts.disable_config2gui
 
-```
-[files]
-bids_path = '/path/to/bids/dataset/'
-dmriprep = 'dmriprep'
-segmentation = 'freesurfer'
-
-[bundles]
-bundles = {api.BUNDLES}
-seg_algo = 'AFQ'
-scalars_model = 'DTI'
-scalars = ['dti_fa', 'dti_md']
-target_b_val=None
-target_b_sensitivity=50.0
-
-[template]
-reg_subject="b0"
-reg_template="mni_t2"
-mask_template=True
-
-[tracking]
-{chr(10).join(track_defaults_list)}
-wm_criterion = 0.1
-
-[segmentation]
-{chr(10).join(seg_defaults_list)}
-
-[cleaning]
-{chr(10).join(clean_defaults_list)}
-
-[compute]
-dask_it = false
-force_recompute = false
-virtual_frame_buffer = false
-viz_backend = 'fury'
-```
-"""
-
-parser = ArgumentParser(usage)
-
-parser.add_argument(dest='config', action="store", type=str,
-                    help="Path to config file")
-
-parser.add_argument('--notrack', action="store_true", default=False)
-
-opts = parser.parse_args()
-
-if not opts.notrack:
-    logger.info(
-        "Your use of pyAFQ is being recorded using Google Analytics. "
-        "For more information, please refer to the pyAFQ documentation: "
-        "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  #noqa
-        "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
-    import popylar
-    popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
-
-config = toml.load(opts.config)
-# Delete empty values that are intended to be "None" so that the parser can
-# substitute default values in appropriately
-for component in config.keys():
-    config[component] = {k: v
-                         for k, v in config[component].items()
-                         if v != eval(none_val)}
-
-files = config.get("files", {})
-
-bids_path = files.get("bids_path")
-
-if bids_path is None:
-    raise RuntimeError("Config file must provide bids_path")
-
-dmriprep = files.get("dmriprep", "dmriprep")
-segmentation_path = files.get("segmentation", "freesurfer")
-
-config['pyAFQ'] = {}
-config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
-config['pyAFQ']['version'] = AFQ.__version__
-config['pyAFQ']['platform'] = platform.system()
-
-afq_path = op.join(bids_path, 'derivatives', 'afq')
-os.makedirs(afq_path, exist_ok=True)
-
-afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
-
-with open(afq_metadata_file, 'w') as ff:
-    toml.dump(config, ff)
-
-seg_suffix = files.get("seg_suffix", "seg")
-
-tracking = config.get("tracking", {})
-tracking_params = {}
-for k, v in track_defaults.items():
-    tracking_params[k] = tracking.get(k, v)
-
-wm_criterion = tracking.get(
-    "wm_criterion",
-    0.1)
-
-segmentation = config.get("segmentation", {})
-segmentation_params = {}
-for k, v in seg_defaults.items():
-    segmentation_params[k] = segmentation.get(k, v)
-b0_threshold = segmentation_params.get("b0_threshold", 0)
-
-bundles = config.get("bundles", {})
-bundle_names = bundles.get("bundles", api.BUNDLES)
-scalars_model = bundles.get("scalars_model", "DTI")
-scalars = bundles.get("scalars", ["fa", "md"])
-target_b_val = bundles.get("target_b_val", None)
-target_b_sensitivity = bundles.get("target_b_sensitivity", 50.0)
-
-cleaning = config.get("cleaning", {})
-clean_params = {}
-for k, v in clean_defaults.items():
-    clean_params[k] = cleaning.get(k, v)
-
-compute = config.get("compute", {})
-dask_it = compute.get("dask_it", False)
-force_recompute = compute.get("force_recompute", False)
-virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
-viz_backend = compute.get("viz_backend", 'fury')
-
-template = config.get("template", {})
-reg_subject = template.get("reg_subject", "b0")
-reg_template = template.get("reg_template", "mni_t2")
-mask_template = template.get("mask_template", True)
-
-myafq = api.AFQ(bids_path,
-                dmriprep=dmriprep,
-                segmentation=segmentation_path,
-                seg_suffix=seg_suffix,
-                b0_threshold=float(b0_threshold),
-                bundle_names=bundle_names,
-                dask_it=dask_it,
-                force_recompute=force_recompute,
-                wm_criterion=wm_criterion,
-                reg_subject=reg_subject,
-                reg_template=reg_template,
-                mask_template=mask_template,
-                virtual_frame_buffer=virtual_frame_buffer,
-                viz_backend=viz_backend,
-                segmentation_params=segmentation_params,
-                tracking_params=tracking_params,
-                clean_params=clean_params)
+    return opts.config.name, use_config_gui
 
 
-# Do all the things:
-myafq.set_dti_cfa()
-myafq.set_dti_pdd()
-myafq.set_template_xform()
-if segmentation_params["seg_algo"].lower() == "afq":
-    myafq.export_rois()
-    myafq.viz_ROIs(export_as_gif=True)
-    myafq.viz_bundles(export_as_gif=True)
-    myafq.plot_tract_profiles()
-myafq.export_bundles()
-myafq.combine_profiles()
+def parse_doc(use_config_gui):
+    # doc_parser organizes the docstring for AFQ.api.AFQ
+    docstr_parser = FuncArgParser()
+    docstr_parser.setup_args(api.AFQ.__init__)
 
-# If you got this far, you can report on time ended and record that:
-config['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+    track_defaults = get_default_args(aft.track)
+    track_defaults_list = process_defaults(track_defaults)
+    seg_defaults = get_default_args(seg.Segmentation.__init__)
+    seg_defaults_list = process_defaults(seg_defaults)
+    clean_defaults = get_default_args(seg.clean_bundle)
+    clean_defaults_list = process_defaults(clean_defaults)
 
-with open(afq_metadata_file, 'w') as ff:
-    toml.dump(config, ff)
+    docstr_parser.append2help(
+        'segmentation_params',
+        " Parameters Include: \n\t" + "\n\t".join(seg_defaults_list))
+    docstr_parser.append2help(
+        'tracking_params',
+        " Parameters Include: \n\t" + "\n\t".join(track_defaults_list))
+    docstr_parser.append2help(
+        'clean_params',
+        " Parameters Include: \n\t" + "\n\t".join(clean_defaults_list))
+
+    if use_config_gui:
+        docstr_parser.create_arguments()
+        # if bids path becomes a path to a file
+        # use update_arg here to make bids_path into a File
+        # that way we can use the GUI for files
+        opts = docstr_parser.parse_args()
+    else:
+        opts = {}
+
+    return docstr_parser.unfinished_arguments, opts
+
+
+def parse_config_run_afq(config_file, doc_args, cli_args):
+    # cfparser parses the config .ini file
+    cfparser = ConfigUpdater()
+    if not op.exists(config_file):
+        open(config_file, 'w').close()
+    cfparser.read(config_file)
+
+    # iterate over all arguments in docstring
+    for arg, info in doc_args.items():
+        try:
+            section, desc = info['help'].split('[')[1].split(']')
+        except KeyError:
+            logger.warning(
+                "We are missing a valid description for the "
+                + "AFQ argument " + arg)
+            continue
+
+        # updates any arguments not currently in .ini
+        if not cfparser.has_option(section, arg):
+            if not cfparser.has_section(section):
+                cfparser.add_section(section)
+            if 'default' in info and info['default'] is not None:
+                default = info['default']
+            else:
+                default = "''"
+            cfparser[section][arg] = default
+
+            for desc_line in desc.splitlines():
+                cfparser[section][arg].add_before.comment(
+                    desc_line, comment_prefix=';')
+
+        # use command line arguments to set new defaults
+        if arg in cli_args:
+            new_default = getattr(cli_args, arg)
+            if new_default is not None:
+                cfparser[section][arg] = new_default
+
+    # update metadata section of config file
+    if not cfparser.has_section('METADATA'):
+        cfparser.add_section('METADATA')
+    cfparser['METADATA']['utc_time_started'] = \
+        datetime.datetime.now().isoformat('T')
+    cfparser['METADATA']['version'] = AFQ.__version__
+    cfparser['METADATA']['platform'] = platform.system()
+
+    cfparser.update_file()
+
+    # read updated arguments from cfparser
+    kwargs = {}
+    for section in cfparser.sections():
+        if section == 'METADATA':
+            continue
+        for option in cfparser.options(section):
+            val = cfparser[section][option].value
+            if option == 'bids_path':
+                bids_path = literal_eval(val)
+                afq_path = op.join(bids_path, 'derivatives', 'afq')
+                os.makedirs(afq_path, exist_ok=True)
+            else:
+                if val == "''":
+                    val = None
+                logger.info(f"{option} set to {val}")
+                try:
+                    kwargs[option] = literal_eval(val)
+                except ValueError:
+                    kwargs[option] = val
+
+    myafq = api.AFQ(bids_path, **kwargs)
+
+    # Do all the things:
+    myafq.set_dti_cfa()
+    myafq.set_dti_pdd()
+    myafq.set_template_xform()
+    if kwargs["segmentation_params"] is None\
+            or "seg_algo" not in kwargs["segmentation_params"]\
+            or kwargs["segmentation_params"]["seg_algo"].lower() == "afq":
+        myafq.export_rois()
+        myafq.viz_ROIs(export_as_gif=True)
+        myafq.viz_bundles(export_as_gif=True)
+        myafq.plot_tract_profiles()
+    myafq.export_bundles()
+    myafq.combine_profiles()
+
+    # If you got this far, you can report on time ended and record that:
+    cfparser['METADATA']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+    cfparser.update_file()
+
+
+if __name__ == '__main__':
+    parse_cli_gui = Cli2Gui(
+        program_name="pyAFQ",
+        program_description=usage,
+        image=gui_image,
+        sizes=gui_sizes,
+        auto_enable=True,
+        theme=gui_theme,
+        darktheme=None)(parse_cli)
+
+    config_file, use_config_gui = parse_cli_gui()
+
+    parse_doc_gui = Cli2Gui(
+        program_name="pyAFQ Configuration",
+        program_description=config_usage,
+        image=gui_image,
+        sizes=gui_sizes,
+        auto_enable=use_config_gui,
+        theme=gui_theme,
+        darktheme=None)(parse_doc)
+
+    doc_args, cli_args = parse_doc_gui(use_config_gui)
+    parse_config_run_afq(config_file, doc_args, cli_args)
