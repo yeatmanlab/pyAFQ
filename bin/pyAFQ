@@ -91,7 +91,7 @@ def parse_cli():
     cli_parser.add_argument(
         dest='config',
         action="store",
-        type=FileType('w'),
+        type=FileType('r'),
         help="Path to config file. For example, /path/to/afq_config.ini")
 
     cli_parser.add_argument(
@@ -156,6 +156,7 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
     # cfparser parses the config .ini file
     cfparser = ConfigUpdater()
     if not op.exists(config_file):
+        logger.info(f"Configuration file did not exist; created.")
         open(config_file, 'w').close()
     cfparser.read(config_file)
 
@@ -177,6 +178,7 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
                 default = info['default']
             else:
                 default = "''"
+            logger.info(f"{arg} added to configuration file.")
             cfparser[section][arg] = default
 
             for desc_line in desc.splitlines():
@@ -187,6 +189,8 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
         if arg in cli_args:
             new_default = getattr(cli_args, arg)
             if new_default is not None:
+                logger.info(
+                    f"{arg} set to {new_default} in configuration file.")
                 cfparser[section][arg] = new_default
 
     # update metadata section of config file
@@ -206,18 +210,19 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
             continue
         for option in cfparser.options(section):
             val = cfparser[section][option].value
+            if val == "''":
+                val = None
+            logger.info(f"{option} set to {val}")
+            try:
+                val = literal_eval(val)
+            except (ValueError, SyntaxError):
+                pass
             if option == 'bids_path':
-                bids_path = literal_eval(val)
+                bids_path = val
                 afq_path = op.join(bids_path, 'derivatives', 'afq')
                 os.makedirs(afq_path, exist_ok=True)
             else:
-                if val == "''":
-                    val = None
-                logger.info(f"{option} set to {val}")
-                try:
-                    kwargs[option] = literal_eval(val)
-                except ValueError:
-                    kwargs[option] = val
+                kwargs[option] = val
 
     myafq = api.AFQ(bids_path, **kwargs)
 
