@@ -363,7 +363,7 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
-    cmd = "pyAFQ " + config_file
+    cmd = "pyAFQ --disable-cli2gui --disable-config2gui " + config_file
     out = os.system(cmd)
     assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
