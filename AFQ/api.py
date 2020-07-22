@@ -861,7 +861,7 @@ class AFQ(object):
                 fname = self._wm_mask(row)
                 mask_data = nib.load(fname).get_fdata().astype(bool)
             elif mask in self.scalars:
-                fname = self._scalar_dict[mask](row)
+                fname = self._scalar_dict[mask](self, row)
                 mask_data = nib.load(fname).get_fdata()
             elif mask == "full":
                 fname = "Entire Volume"
