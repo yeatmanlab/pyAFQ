@@ -1541,3 +1541,14 @@ class AFQ(object):
         df = pd.concat(dfs)
         df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
         return df
+
+    def std_export(self):
+        self.export_registered_b0()
+        self.get_template_xform()
+        self.export_bundles()
+        self.get_tract_profiles()
+        self.viz_bundles(export_as_gif=True)
+        if self.seg_algo == "afq":
+            self.viz_ROIs(export_as_gif=True)
+            self.export_rois()
+        self.combine_profiles()
