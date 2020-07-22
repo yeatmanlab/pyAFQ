@@ -14,9 +14,9 @@ from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
-          seed_mask=None, n_seeds=1, random_seeds=False, rng_seed=None,
-          stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10,
-          max_length=1000, odf_model="DTI"):
+          seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
+          rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
+          min_length=10, max_length=1000, odf_model="DTI"):
     """
     Tractography
 
@@ -34,8 +34,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The discretization of direction getting. default:
         dipy.data.default_sphere.
     seed_mask : array, optional.
-        Binary mask describing the ROI within which we seed for tracking.
-        Default to the entire volume.
+        Float or binary mask describing the ROI within which we seed for
+        tracking.
+        Default to the entire volume (all ones).
+    seed_threshold : float, optional.
+        A value of the stop_mask below which tracking is terminated.
+        Default to 0.
     n_seeds : int or 2D array, optional.
         The seeding density: if this is an int, it is is how many seeds in each
         voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
@@ -49,7 +53,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         random seed used to generate random seeds if random_seeds is
         set to True. Default: None
     stop_mask : array, optional.
-        A floating point value that determines a stopping criterion (e.g. FA).
+        A float or binary mask that determines a stopping criterion (e.g. FA).
         Default to no stopping (all ones).
     stop_threshold : float, optional.
         A value of the stop_mask below which tracking is terminated. Default to
@@ -82,6 +86,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
+        else:
+            seed_mask = seed_mask > seed_threshold
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
                                                seed_count_per_voxel=False,

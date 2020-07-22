@@ -264,8 +264,15 @@ class AFQ(object):
             of the seg.Segmentation object
 
         tracking_params: dict, optional
-            The parameters for tracking. Default: use the default behavior of
-            the aft.track function.
+            The parameters for tracking.
+
+            Parameters with suffix_mask are handled differently by this api.
+            Masks which are strings that are in scalars or are "wm_mask"
+            will be replaced by the corresponding mask. Masks which are paths
+            will be loaded. All masks set to None will default to "wm_mask".
+            To track the entire volume, set mask to "full".
+
+            Default: use the default behavior of the aft.track function.
 
         clean_params: dict, optional
             The parameters for cleaning. Default: use the default behavior of
@@ -298,6 +305,8 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend)
 
         default_tracking_params = get_default_args(aft.track)
+        default_tracking_params["seed_mask"] = "wm_mask"
+        default_tracking_params["stop_mask"] = "wm_mask"
         # Replace the defaults only for kwargs for which a non-default value was
         # given:
         if tracking_params is not None:
@@ -846,6 +855,25 @@ class AFQ(object):
 
         return wm_mask_file
 
+    def _get_mask(self, row, mask):
+        if isinstance(mask, str):
+            if mask == "wm_mask":
+                fname = self._wm_mask(row)
+                mask_data = nib.load(fname).get_fdata().astype(bool)
+            elif mask in self.scalars:
+                fname = self._scalar_dict[mask](row)
+                mask_data = nib.load(fname).get_fdata()
+            elif mask == "full":
+                fname = "Entire Volume"
+                mask_data = None
+            else:
+                fname = mask
+                mask_data = nib.load(fname).get_fdata()
+            return mask_data, fname
+        else:
+            return mask, "custom"
+
+
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
 
@@ -861,11 +889,13 @@ class AFQ(object):
                 params_file = self._csd(row)
             elif odf_model == "DKI":
                 params_file = self._dki(row)
-            wm_mask_fname = self._wm_mask(row)
-            wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
-            self.tracking_params['seed_mask'] = wm_mask
-            self.tracking_params['stop_mask'] = wm_mask
-            sft = aft.track(params_file, **self.tracking_params)
+
+            tracking_params = self.tracking_params.copy()
+            tracking_params['seed_mask'], seed_mask_desc =\
+                self._get_mask(row, self.tracking_params['seed_mask'])
+            tracking_params['stop_mask'], stop_mask_desc =\
+                self._get_mask(row, self.tracking_params['stop_mask'])
+            sft = aft.track(params_file, **tracking_params)
             sft.to_vox()
             meta_directions = {"det": "deterministic",
                                "prob": "probabilistic"}
@@ -876,10 +906,10 @@ class AFQ(object):
                     self.tracking_params["directions"]],
                 Count=len(sft.streamlines),
                 Seeding=dict(
-                    ROI=wm_mask_fname,
+                    ROI=seed_mask_desc,
                     n_seeds=self.tracking_params["n_seeds"],
                     random_seeds=self.tracking_params["random_seeds"]),
-                Constraints=dict(AnatomicalImage=wm_mask_fname),
+                Constraints=dict(AnatomicalImage=stop_mask_desc),
                 Parameters=dict(
                     Units="mm",
                     StepSize=self.tracking_params["step_size"],
