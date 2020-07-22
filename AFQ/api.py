@@ -1490,15 +1490,16 @@ class AFQ(object):
                     xform_color_by_volume=False,
                     inline=False,
                     interactive=False):
-        self.data_frame.apply(self._viz_bundles, axis=1,
-                              export_as_gif=export_as_gif,
-                              export_as_html=export_as_html,
-                              volume=volume,
-                              xform_volume=xform_volume,
-                              color_by_volume=color_by_volume,
-                              xform_color_by_volume=xform_color_by_volume,
-                              inline=inline,
-                              interactive=interactive)
+        return self.data_frame.apply(
+            self._viz_bundles, axis=1,
+            export_as_gif=export_as_gif,
+            export_as_html=export_as_html,
+            volume=volume,
+            xform_volume=xform_volume,
+            color_by_volume=color_by_volume,
+            xform_color_by_volume=xform_color_by_volume,
+            inline=inline,
+            interactive=interactive)
 
     def viz_ROIs(self,
                  bundle_names=None,
