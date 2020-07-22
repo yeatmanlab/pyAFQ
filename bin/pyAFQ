@@ -30,7 +30,7 @@ with warnings.catch_warnings():
 
 use_config_gui = True
 bin_folder = pathlib.Path(__file__).parent.absolute()
-gui_image = op.join(bin_folder, "example_image.png")
+gui_image = op.join(bin_folder, "../example_image.png")
 gui_background_color = "#ffffcc"
 gui_text_color = "#663300"
 gui_input_box_color = "#ffffff"
