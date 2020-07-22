@@ -113,16 +113,11 @@ def scene_rotate_forward(scene):
     return scene
 
 
-def stop_creating_gifs():
-    pass
-
-
 def create_gif(figure,
                file_name,
                n_frames=60,
                zoom=1,
                z_offset=0.5,
-               creating_many=False,
                size=(600, 600),
                rotate_forward=True):
     """
@@ -144,11 +139,6 @@ def create_gif(figure,
     zoom: int, optional
         How much to magnify the figure in the fig.
         Default: 1
-
-    creating_many: bool, optional
-        Whether or not you intend to repeatedly call this function.
-        Can speed up performance when using plotly.
-        Default: False
 
     size: tuple, optional
         Size of the gif.

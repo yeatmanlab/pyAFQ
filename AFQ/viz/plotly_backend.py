@@ -203,26 +203,11 @@ def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
     return _inline_interact(figure, interact, inline)
 
 
-def stop_creating_gifs():
-    try:
-        plotly.io.orca.shutdown_server()
-    except ValueError:
-        ValueError(_orca_err())
-
-
-def _orca_err():
-    return ("pyAFQ is trying to generate gifs using plotly. "
-            + "This requires orca, which cannot be installed via pip. "
-            + "See: https://github.com/plotly/orca \n"
-            + "Or consider using fury to visualize with pyAFQ instead")
-
-
 def create_gif(figure,
                file_name,
                n_frames=60,
                zoom=2.5,
                z_offset=0.5,
-               creating_many=False,
                size=(600, 600)):
     """
     Convert a Plotly Figure object into a gif
@@ -244,11 +229,6 @@ def create_gif(figure,
         How much to magnify the figure in the fig.
         Default: 2.5
 
-    creating_many: bool, optional
-        Whether or not you intend to repeatedly call this function.
-        Can speed up performance when using plotly.
-        Default: False
-
     size: tuple, optional
         Size of the gif.
         Default: (600, 600)
@@ -262,13 +242,7 @@ def create_gif(figure,
                      y=np.sin(theta) * zoom, z=z_offset)
         )
         figure.update_layout(scene_camera=camera)
-        try:
-            figure.write_image(tdir + f"/tgif{i}.png")
-        except ValueError:
-            ValueError(_orca_err())
-
-    if not creating_many:
-        stop_creating_gifs()
+        figure.write_image(tdir + f"/tgif{i}.png")
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
                       png_fname="tgif", add_zeros=False)
