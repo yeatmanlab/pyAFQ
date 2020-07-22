@@ -664,7 +664,7 @@ class AFQ(object):
             img_l = img.lower()
             if img_l == "mni_t2":
                 img = afd.read_mni_template(mask=self.mask_templ, weight=2)
-            if img_l == "mni_t1":
+            elif img_l == "mni_t1":
                 img = afd.read_mni_template(mask=self.mask_templ, weight=1)
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
