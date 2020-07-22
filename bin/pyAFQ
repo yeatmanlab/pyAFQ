@@ -78,7 +78,7 @@ target_b_sensitivity=50.0
 
 [template]
 reg_subject="b0"
-reg_template="mni"
+reg_template="mni_t2"
 mask_templ=True
 reg_algo="syn"
 
@@ -186,7 +186,7 @@ viz_backend = compute.get("viz_backend", 'fury')
 
 template = config.get("template", {})
 reg_subject = template.get("reg_subject", "b0")
-reg_template = template.get("reg_template", "mni")
+reg_template = template.get("reg_template", "mni_t2")
 mask_templ = template.get("mask_templ", True)
 reg_algo = template.get("reg_algo", "syn")
 

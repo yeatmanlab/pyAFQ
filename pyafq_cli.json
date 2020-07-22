@@ -478,7 +478,7 @@
         "name": "reg template",
         "type": "String",
         "value-key": "[REG_TEMPLATE]",
-        "default-value": "mni",
+        "default-value": "mni_t2",
         "optional": true
     },
     {
