@@ -303,7 +303,7 @@ class AFQ(object):
 
             self.reg_algo = 'slr'
         else:
-            self.reg_subject = 'syn'
+            self.reg_algo = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
 
         self.scalars = scalars
