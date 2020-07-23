@@ -167,36 +167,38 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-# def test_AFQ_slr():
-#     """
-#     Test if API can run using slr map
-#     """
-#     tmpdir = nbtmp.InTemporaryDirectory()
-#     afd.organize_stanford_data(path=tmpdir.name)
-#     bids_path = op.join(tmpdir.name, 'stanford_hardi')
-#     myafq = api.AFQ(
-#         bids_path=bids_path,
-#         dmriprep='vistasoft',
-#         segmentation='freesurfer',
-#         reg_algo='slr',
-#         reg_subject='subject_sls',
-#         reg_template='hcp_atlas')
-#     myafq.export_rois()
+@pytest.mark.slow
+def test_AFQ_slr():
+    """
+    Test if API can run using slr map
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        reg_algo='slr',
+        reg_subject='subject_sls',
+        reg_template='hcp_atlas')
+    myafq.export_rois()
 
 
 # Requires large download
-# def test_AFQ_FA():
-#     """
-#     Test if API can run registeration with FA
-#     """
-#     tmpdir = nbtmp.InTemporaryDirectory()
-#     afd.organize_stanford_data(path=tmpdir.name)
-#     myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-#                                           'derivatives', 'dmriprep'),
-#                     sub_prefix='sub',
-#                     reg_template='dti_fa_template',
-#                     reg_subject='dti_fa_subject')
-#     myafq.export_rois()
+@pytest.mark.slow
+def test_AFQ_FA():
+    """
+    Test if API can run registeration with FA
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub',
+                    reg_template='dti_fa_template',
+                    reg_subject='dti_fa_subject')
+    myafq.export_rois()
 
 
 def test_DKI_profile():
