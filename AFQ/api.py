@@ -291,7 +291,7 @@ class AFQ(object):
         self.reg_subject = reg_subject
         self.reg_template = reg_template
         self.mask_template = mask_template
-        if reg_subject == 'b0' or reg_template == 'hcp_atlas':
+        if reg_subject == 'subject_sls' or reg_template == 'hcp_atlas':
             if reg_template != 'hcp_atlas':
                 self.logger.error(
                     "If reg_subject is 'subject_sls',"
