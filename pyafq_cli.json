@@ -52,7 +52,7 @@
         "id": "template_group",
         "name": "Template Group",
         "description": "Parameters related to registering to a template.",
-        "members": ["reg_subject", "reg_template", "mask_template", "reg_algo"]
+        "members": ["reg_subject", "reg_template", "mask_template"]
     }
     ],
     "inputs": [
@@ -491,14 +491,6 @@
         "optional": true
     },
     {
-        "id": "reg_algo",
-        "name": "reg_algo",
-        "type": "String",
-        "value-key": "[REG_ALGO]",
-        "default-value": "syn",
-        "optional": true
-    },
-    {
         "id": "dask_it",
         "name": "dask it",
         "type": "String",
@@ -574,7 +566,6 @@
             "reg_subject=[REG_SUBJECT]",
             "reg_template=[REG_TEMPLATE]",
             "mask_template=[MASK_TEMPLATE]",
-            "reg_algo=[REG_ALGO]",
             "",
             "[compute]",
             "dask_it = [DASK_IT]",

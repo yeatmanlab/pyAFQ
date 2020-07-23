@@ -180,7 +180,6 @@ def test_AFQ_slr():
         bids_path=bids_path,
         dmriprep='vistasoft',
         segmentation='freesurfer',
-        reg_algo='slr',
         reg_subject='subject_sls',
         reg_template='hcp_atlas')
     myafq.export_rois()

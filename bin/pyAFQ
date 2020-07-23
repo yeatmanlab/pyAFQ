@@ -80,7 +80,6 @@ target_b_sensitivity=50.0
 reg_subject="b0"
 reg_template="mni_t2"
 mask_template=True
-reg_algo="syn"
 
 [tracking]
 {chr(10).join(track_defaults_list)}
@@ -188,7 +187,6 @@ template = config.get("template", {})
 reg_subject = template.get("reg_subject", "b0")
 reg_template = template.get("reg_template", "mni_t2")
 mask_template = template.get("mask_template", True)
-reg_algo = template.get("reg_algo", "syn")
 
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,
@@ -202,7 +200,6 @@ myafq = api.AFQ(bids_path,
                 reg_subject=reg_subject,
                 reg_template=reg_template,
                 mask_template=mask_template,
-                reg_algo=reg_algo,
                 virtual_frame_buffer=virtual_frame_buffer,
                 viz_backend=viz_backend,
                 segmentation_params=segmentation_params,

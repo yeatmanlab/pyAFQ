@@ -151,7 +151,6 @@ class AFQ(object):
                  reg_subject="b0",
                  reg_template="mni_T2",
                  mask_template=True,
-                 reg_algo="syn",
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
@@ -212,21 +211,22 @@ class AFQ(object):
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "b0", "dti_fa_subject", "subject_sls", or "power_map,"
             image data will be loaded automatically.
+            If "subject_sls" is used, slr registration will be used
+            and reg_template should be "hcp_atlas".
+            Default: "b0"
 
         reg_template : str or Nifti1Image, optional
             The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
             image data will be loaded automatically.
-            (defaults to the MNI T2)
+            If "hcp_atlas" is used, slr registration will be used
+            and reg_subject should be "subject_sls".
+            Default: "mni_T2"
 
         mask_template : bool, optional
             Whether to mask the chosen template(s) with a brain-mask
             Default: True
-
-        reg_algo : string, optional
-            Algorithm to use for registration.
-            Can be one of: {"syn", "slr"}. Default: "syn"
 
         dask_it : bool, optional
             Whether to use a dask DataFrame object
@@ -291,7 +291,19 @@ class AFQ(object):
         self.reg_subject = reg_subject
         self.reg_template = reg_template
         self.mask_template = mask_template
-        self.reg_algo = reg_algo.lower()
+        if reg_subject == 'b0' or reg_template == 'hcp_atlas':
+            if reg_template != 'hcp_atlas':
+                self.logger.error(
+                    "If reg_subject is 'subject_sls',"
+                    + " reg_template must be 'hcp_atlas'")
+            if reg_subject != 'b0':
+                self.logger.error(
+                    "If reg_template is 'hcp_atlas',"
+                    + " reg_subject must be 'subject_sls'")
+
+            self.reg_algo = 'slr'
+        else:
+            self.reg_subject = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
 
         self.scalars = scalars
