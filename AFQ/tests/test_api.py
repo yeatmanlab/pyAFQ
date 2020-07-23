@@ -7,6 +7,7 @@ import toml
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 import pandas as pd
 from pandas.testing import assert_series_equal

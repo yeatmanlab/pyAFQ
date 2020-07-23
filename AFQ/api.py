@@ -150,7 +150,7 @@ class AFQ(object):
                  target_b_sensitivity=50.0,
                  reg_subject="b0",
                  reg_template="mni_T2",
-                 mask_templ=True,
+                 mask_template=True,
                  reg_algo="syn",
                  bundle_names=BUNDLES,
                  dask_it=False,
@@ -222,7 +222,7 @@ class AFQ(object):
             image data will be loaded automatically.
             (defaults to the MNI T2)
 
-        mask_templ : bool, optional
+        mask_template : bool, optional
             Whether to mask the chosen template(s) with a brain-mask
             Default: True
 
@@ -292,7 +292,7 @@ class AFQ(object):
         self.wm_criterion = wm_criterion
         self.reg_subject = reg_subject
         self.reg_template = reg_template
-        self.mask_templ = mask_templ
+        self.mask_template = mask_template
         self.reg_algo = reg_algo.lower()
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
 
@@ -672,15 +672,15 @@ class AFQ(object):
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni_t2":
-                img = afd.read_mni_template(mask=self.mask_templ, weight=2)
+                img = afd.read_mni_template(mask=self.mask_template, weight=2)
             elif img_l == "mni_t1":
-                img = afd.read_mni_template(mask=self.mask_templ, weight=1)
+                img = afd.read_mni_template(mask=self.mask_template, weight=1)
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
             elif img_l == "dti_fa_subject":
                 img = nib.load(self._dti_fa(row))
             elif img_l == "dti_fa_template":
-                img = afd.read_fa_template(mask=self.mask_templ)
+                img = afd.read_fa_template(mask=self.mask_template)
             elif img_l == "power_map":
                 img = nib.load(self._anisotropic_power_map(row))
             elif img_l == "subject_sls":
@@ -699,7 +699,7 @@ class AFQ(object):
                     'whole_brain_MNI.trk')
                 if not op.exists(atlas_fname):
                     afd.fetch_hcp_atlas_16_bundles()
-                img = afd.read_mni_template(mask=self.mask_templ)
+                img = afd.read_mni_template(mask=self.mask_template)
                 hcp_atlas = load_tractogram(
                     atlas_fname,
                     'same', bbox_valid_check=False)

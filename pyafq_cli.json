@@ -52,7 +52,7 @@
         "id": "template_group",
         "name": "Template Group",
         "description": "Parameters related to registering to a template.",
-        "members": ["reg_subject", "reg_template", "mask_templ", "reg_algo"]
+        "members": ["reg_subject", "reg_template", "mask_template", "reg_algo"]
     }
     ],
     "inputs": [
@@ -482,10 +482,10 @@
         "optional": true
     },
     {
-        "id": "mask_templ",
-        "name": "mask_templ",
+        "id": "mask_template",
+        "name": "mask template",
         "type": "String",
-        "value-key": "[MASK_TEMPL]",
+        "value-key": "[MASK_TEMPLATE]",
         "value-choices": ["false", "true"],
         "default-value": "true",
         "optional": true
@@ -573,7 +573,7 @@
             "[template]",
             "reg_subject=[REG_SUBJECT]",
             "reg_template=[REG_TEMPLATE]",
-            "mask_templ=[MASK_TEMPL]",
+            "mask_template=[MASK_TEMPLATE]",
             "reg_algo=[REG_ALGO]",
             "",
             "[compute]",
