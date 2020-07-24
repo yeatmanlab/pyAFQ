@@ -499,7 +499,7 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
 
     subjects = profiles[0]['subjectID'].unique()
     bundles = positions.keys()
-    if len(csv_fnames == 2):
+    if len(csv_fnames) == 2:
         percent_diffs = pd.DataFrame(index=bundles, columns=subjects)
     for subject in subjects:
         fig, axes = plt.subplots(5, 5)
@@ -539,7 +539,7 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
             ax.set_title(bundle)
             ax.legend(names)
 
-            if len(csv_fnames == 2):
+            if len(csv_fnames) == 2:
                 percent_diffs.at[bundle, subject] = \
                     np.mean((bundle_profiles[0] - bundle_profiles[1]) /
                             (bundle_profiles[0] + bundle_profiles[1]))
