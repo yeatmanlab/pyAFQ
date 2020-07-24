@@ -1015,9 +1015,9 @@ fetch_biobank_templates = \
         unzip=True)
 
 
-def read_fa_template(mask=True):
+def read_ukbb_fa_template(mask=True):
     """
-    Reads the FA template
+    Reads the UK Biobank FA template
 
     Parameters
     ----------

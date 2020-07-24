@@ -688,7 +688,7 @@ class AFQ(object):
             elif img_l == "dti_fa_subject":
                 img = nib.load(self._dti_fa(row))
             elif img_l == "dti_fa_template":
-                img = afd.read_fa_template(mask=self.mask_template)
+                img = afd.read_ukbb_fa_template(mask=self.mask_template)
             elif img_l == "power_map":
                 img = nib.load(self._anisotropic_power_map(row))
             elif img_l == "subject_sls":
