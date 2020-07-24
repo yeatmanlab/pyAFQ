@@ -78,7 +78,7 @@ But additional configuration options can be provided for the following values::
     dmriprep_path = '/path/to/dmriprep/folder'
 
     [bundles]
-    bundles = ['ATR', 'CGC', 'CST', 'HCC', 'IFO', 'ILF', 'SLF', 'ARC', 'UNC', 'FA', 'FP']
+    bundles = ['ATR', 'CGC', 'CST', 'IFO', 'ILF', 'SLF', 'ARC', 'UNC', 'FA', 'FP']
     seg_algo = 'AFQ'
     scalars_model = 'DTI'
     scalars = ['dti_fa', 'dti_md']
