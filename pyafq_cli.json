@@ -77,7 +77,7 @@
                           "F_R", "UF_L", "AF_L", "CC_ForcepsMajor",
                           "CC_ForcepsMinor", "CST_L", "IFOF_L", "C_R",
                           "IFOF_R"],
-        "default-value": ["ATR", "CGC", "CST", "HCC", "IFO", "ILF",
+        "default-value": ["ATR", "CGC", "CST", "IFO", "ILF",
                           "SLF", "ARC", "UNC", "FA", "FP"],
         "optional": true
     },

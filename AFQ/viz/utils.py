@@ -46,9 +46,8 @@ COLOR_DICT = OrderedDict({"ATR_L": tableau_20_rgb[0],
 POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
                          "CST_L": (1, 1), "CST_R": (1, 3),
                          "CGC_L": (3, 1), "CGC_R": (3, 3),
-                         "HCC_L": (4, 1), "HCC_R": (4, 3),
                          "FP": (4, 2), "FA": (0, 2),
-                         "IFO_L": (4, 0), "IFO_R": (4, 4),
+                         "IFO_L": (4, 1), "IFO_R": (4, 3),
                          "ILF_L": (3, 0), "ILF_R": (3, 4),
                          "SLF_L": (2, 1), "SLF_R": (2, 3),
                          "ARC_L": (2, 0), "ARC_R": (2, 4),
@@ -402,6 +401,8 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     axes[1, 2].axis("off")
     axes[2, 2].axis("off")
     axes[3, 2].axis("off")
+    axes[4, 0].axis("off")
+    axes[4, 4].axis("off")
 
     if (file_name is not None):
         fig.savefig(file_name)

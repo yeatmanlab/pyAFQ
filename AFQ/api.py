@@ -45,7 +45,7 @@ def do_preprocessing():
     raise NotImplementedError
 
 
-BUNDLES = ["ATR", "CGC", "CST", "HCC", "IFO", "ILF", "SLF", "ARC", "UNC",
+BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
 DIPY_GH = "https://github.com/nipy/dipy/blob/master/dipy/"
