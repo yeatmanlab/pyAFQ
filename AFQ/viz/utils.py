@@ -486,7 +486,9 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
     for i, is_mat in enumerate(is_mats):
         profiles[i]['subjectID'] = \
             profiles[i]['subjectID'].apply(
-                lambda x: pd.to_numeric(''.join(c for c in x if x.isdigit())))
+                lambda x: pd.to_numeric(
+                    ''.join(c for c in x if x.isdigit())
+                ) if isinstance(x, str) else x)
         if is_mat:
             profiles[i]['tractID'] = \
                 profiles[i]['tractID'].apply(
