@@ -870,16 +870,13 @@ class S3BIDSStudy:
             subjects = prng.choice(sorted(self._all_subjects),
                                    size=subjects,
                                    replace=False)
-            if n_subs == 1:
-                subjects = [subjects]
         elif subjects == 'all':
             # if "all," retrieve all subjects
             subjects = sorted(self._all_subjects)
         elif isinstance(subjects, str):
             # if a string, just get that one subject
             subjects = [subjects]
-        # The last case for subjects is what we want. No transformation
-        # needed.
+        # The last case for subjects is what we want. No transformation needed.
 
         if not set(subjects) <= set(self._all_subjects):
             raise ValueError(
