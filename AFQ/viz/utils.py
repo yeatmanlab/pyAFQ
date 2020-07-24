@@ -425,7 +425,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     return fig, axes
 
 
-def compare_profiles_from_csv(CSVs, names, is_mats=False,
+def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                               scalar="dti_fa", mat_scalar="fa",
                               min_fa=0.0, max_fa=1.0,
                               file_name=None,
@@ -438,7 +438,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
 
     Parameters
     ----------
-    CSVs : list of filenames
+    csv_fnames : list of filenames
         Filenames for the two CSVs containing tract porfiles to compare.
         Will obtain subject list from the first file.
 
@@ -477,10 +477,10 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
         Default: MAT_2_PYTHON
     """
     if isinstance(is_mats, bool):
-        is_mats = [is_mats] * len(CSVs)
+        is_mats = [is_mats] * len(csv_fnames)
 
     profiles = []
-    for csv_filename in CSVs:
+    for csv_filename in csv_fnames:
         profiles.append(pd.read_csv(csv_filename))
 
     for i, is_mat in enumerate(is_mats):
@@ -497,7 +497,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
 
     subjects = profiles[0]['subjectID'].unique()
     bundles = positions.keys()
-    if len(CSVs == 2):
+    if len(csv_fnames == 2):
         percent_diffs = pd.DataFrame(index=bundles, columns=subjects)
     for subject in subjects:
         fig, axes = plt.subplots(5, 5)
@@ -537,7 +537,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
             ax.set_title(bundle)
             ax.legend(names)
 
-            if len(CSVs == 2):
+            if len(csv_fnames == 2):
                 percent_diffs.at[bundle, subject] = \
                     np.mean((bundle_profiles[0] - bundle_profiles[1]) /
                             (bundle_profiles[0] + bundle_profiles[1]))
