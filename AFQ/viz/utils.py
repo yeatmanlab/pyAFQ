@@ -486,8 +486,8 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
     for i, is_mat in enumerate(is_mats):
         profiles[i]['subjectID'] = \
             profiles[i]['subjectID'].apply(
-                lambda x: pd.to_numeric(
-                    ''.join(c for c in x if x.isdigit())
+                lambda x: int(
+                    ''.join(c for c in x if c.isdigit())
                 ) if isinstance(x, str) else x)
         if is_mat:
             profiles[i]['tractID'] = \
@@ -514,8 +514,9 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
         axes[4, 0].axis("off")
         axes[4, 4].axis("off")
         for bundle in bundles:
+            both_found = True
             ax = axes[positions[bundle][0], positions[bundle][1]]
-            bundle_profiles = []
+            bundle_profiles = [None]*len(csv_fnames)
             for i, is_mat in enumerate(is_mats):
                 if is_mat:
                     this_scalar = mat_scalar
@@ -532,18 +533,19 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                 if (len(bundle_profiles[i]) > 0):
                     ax.plot(bundle_profiles[i])
                 else:
+                    both_found = False
                     print(
                         'No streamlines found for subject '
                         + str(subject) + ' for bundle '
                         + bundle + ' for CSV ' + name)
             ax.set_title(bundle)
-            ax.legend(names)
 
-            if len(csv_fnames) == 2:
+            if len(csv_fnames) == 2 and both_found:
                 percent_diffs.at[bundle, subject] = \
                     np.mean((bundle_profiles[0] - bundle_profiles[1]) /
                             (bundle_profiles[0] + bundle_profiles[1]))
 
+        fig.legend(names, loc='center')
         if (file_name is not None):
             fig.savefig(file_name + str(subject))
             plt.ion()
