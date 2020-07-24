@@ -502,15 +502,17 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
     for subject in subjects:
         fig, axes = plt.subplots(5, 5)
         plt.tight_layout()
-        ax = axes[positions[bundle][0], positions[bundle][1]]
         fig.set_size_inches((12, 12))
         fig.suptitle('Subject ' + str(subject))
         axes[0, 0].axis("off")
         axes[0, -1].axis("off")
         axes[1, 2].axis("off")
         axes[2, 2].axis("off")
-        axes[3, 2].axis("off") # this should be put in a function for both to use
+        axes[3, 2].axis("off")
+        axes[4, 0].axis("off")
+        axes[4, 4].axis("off")
         for bundle in bundles:
+            ax = axes[positions[bundle][0], positions[bundle][1]]
             bundle_profiles = []
             for i, is_mat in enumerate(is_mats):
                 if is_mat:
