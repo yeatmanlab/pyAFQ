@@ -966,7 +966,7 @@ def _apply_mask(template_img, resolution=1):
     return nib.Nifti1Image(out_data, template_img.affine)
 
 
-def read_mni_template(resolution=1, mask=True, weight=2):
+def read_mni_template(resolution=1, mask=True, weight="T2w"):
     """
 
     Reads the MNI T1w or T2w template
@@ -980,10 +980,10 @@ def read_mni_template(resolution=1, mask=True, weight=2):
         Whether to mask the data with a brain-mask before returning the image.
         Default : True
 
-    weight: number or str, optional
+    weight: str, optional
         Which relaxation technique to use.
-        Should be either 1 or 2, correponding to T1 or T2.
-        Default : 2
+        Should be either "T2w" or "T1w".
+        Default : "T2w"
 
     Returns
     -------
@@ -994,7 +994,7 @@ def read_mni_template(resolution=1, mask=True, weight=2):
     template_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
                                           desc=None,
                                           resolution=resolution,
-                                          suffix=f'T{weight}w',
+                                          suffix=weight,
                                           extension='nii.gz')))
     if not mask:
         return template_img
