@@ -146,8 +146,8 @@ class AFQ(object):
                  segmentation='dmriprep',
                  seg_suffix='seg',
                  b0_threshold=0,
-                 target_b_val=None,
-                 target_b_sensitivity=50.0,
+                 min_bval=None,
+                 max_bval=None,
                  reg_subject="b0",
                  reg_template="mni_T2",
                  mask_template=True,
@@ -187,16 +187,13 @@ class AFQ(object):
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
 
-        target_b_val : float, optional
-            Which b value you want to use from the dataset.
-            If None, all are used. Default: None
+        min_bval : float, optional
+            Minimum b value you want to use from the dataset (other than b0).
+            If None, there is no minimum limit. Default: None
 
-        target_b_sensitivity : float, optional
-            Sensitivity of target_b_val.
-            Only used if target_b_val is not None.
-            B values selected will be in the range
-            target_b_val +/- target_b_sensitivity
-            Default: 50
+        max_bval : float, optional
+            Maximum b value you want to use from the dataset (other than b0).
+            If None, there is no maximum limit. Default: None
 
         odf_model : string, optional
             Which model to use for determining directions in tractography.
@@ -280,12 +277,8 @@ class AFQ(object):
 
         self.force_recompute = force_recompute
 
-        if target_b_val is not None:
-            self.target_b_upper = target_b_val + target_b_sensitivity
-            self.target_b_lower = target_b_val - target_b_sensitivity
-        else:
-            self.target_b_upper = None
-            self.target_b_lower = None
+        self.max_bval = max_bval
+        self.min_bval = min_bval
 
         self.wm_criterion = wm_criterion
         self.reg_subject = reg_subject
@@ -296,7 +289,7 @@ class AFQ(object):
                 self.logger.error(
                     "If reg_subject is 'subject_sls',"
                     + " reg_template must be 'hcp_atlas'")
-            if reg_subject != 'b0':
+            if reg_subject != 'subject_sls':
                 self.logger.error(
                     "If reg_template is 'hcp_atlas',"
                     + " reg_subject must be 'subject_sls'")
@@ -462,11 +455,16 @@ class AFQ(object):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
         gtab = row['gtab']
-        if filter_b and (self.target_b_lower is not None):
+        if filter_b and (self.min_bval is not None):
             data = data[
                 ...,
-                (gtab.bvals < self.target_b_upper)
-                and (gtab.bvals > self.target_b_lower)]
+                (gtab.bvals >= self.min_bval)
+                or (gtab.bvals <= self.b0_threshold)]
+        if filter_b and (self.max_bval is not None):
+            data = data[
+                ...,
+                (gtab.bvals <= self.max_bval)
+                or (gtab.bvals <= self.b0_threshold)]
         return data, gtab, img
 
     def _b0(self, row):
