@@ -4,6 +4,7 @@ import logging
 import tempfile
 
 import numpy as np
+import pandas as pd
 from palettable.tableau import Tableau_20
 import imageio as io
 import IPython.display as display
@@ -52,6 +53,19 @@ POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
                          "SLF_L": (2, 1), "SLF_R": (2, 3),
                          "ARC_L": (2, 0), "ARC_R": (2, 4),
                          "UNC_L": (0, 1), "UNC_R": (0, 3)})
+
+MAT_2_PYTHON = OrderedDict(
+    {'Right Corticospinal': 'CST_R', 'Left Corticospinal': 'CST_L',
+     'Right Uncinate': 'UNC_R', 'Left Uncinate': 'UNC_L',
+     'Left IFOF': 'IFO_L', 'Right IFOF': 'IFO_R',
+     'Right Arcuate': 'ARC_R', 'Left Arcuate': 'ARC_L',
+     'Right Thalamic Radiation': 'ATR_R', 'Left Thalamic Radiation': 'ATR_L',
+     'Right Cingulum Cingulate': 'CGC_R', 'Left Cingulum Cingulate': 'CGC_L',
+     'Right Cingulum Hippocampus': 'HCC_R',
+     'Left Cingulum Hippocampus': 'HCC_L',
+     'Callosum Forceps Major': 'FP', 'Callosum Forceps Minor': 'FA',
+     'Right ILF': 'ILF_R', 'Left ILF': 'ILF_L',
+     'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L'})
 
 
 def viz_import_msg_error(module):
@@ -409,6 +423,128 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
         plt.ion()
 
     return fig, axes
+
+
+def compare_profiles_from_csv(CSVs, names, is_mats=False,
+                              scalar="dti_fa", mat_scalar="fa",
+                              min_fa=0.0, max_fa=1.0,
+                              file_name=None,
+                              positions=POSITIONS,
+                              mat_converter=MAT_2_PYTHON):
+    """
+    Compare all tract profiles for a scalar from two different CSVs.
+    Plots tract profiles for both in one plot.
+    Uses contrast index of profiles for comparison if only two CSVs provided.
+
+    Parameters
+    ----------
+    CSVs : list of filenames
+        Filenames for the two CSVs containing tract porfiles to compare.
+        Will obtain subject list from the first file.
+
+    names : list of strings
+       Name to use to identify the data from the corresponding CSV.
+
+    is_mats : bool or list of bools, optional
+        Whether or not the csv was generated from Matlab AFQ or pyAFQ.
+        Default: False
+
+    scalar : string, optional
+       Scalar to use in plots. Default: "dti_fa".
+    
+    mat_scalar : string, optional
+        Corresponding mAFQ name for the scalar.
+
+    min_fa : float, optional
+        Minimum FA used for y-axis bounds. Default: 0.0
+
+    max_fa : float, optional
+        Maximum FA used for y-axis bounds. Default: 1.0
+
+    file_name : string, optional
+        If not None, figures will be saved to this file name
+        plus the subject ID. If only two CSVs are given,
+        a contrast index will be calculated for each bundle / subject
+        and saved to this filename plus '_contrast_index' as a csv.
+        Default: None
+
+    positions : dictionary, optional
+        Dictionary that maps bundle names to position in plot.
+        Default: POSITIONS
+    
+    mat_converter : dictionary, optional
+        Dictionary that maps matlab bundle names to python bundle names.
+        Default: MAT_2_PYTHON
+    """
+    if isinstance(is_mats, bool):
+        is_mats = [is_mats] * len(CSVs)
+
+    profiles = []
+    for csv_filename in CSVs:
+        profiles.append(pd.read_csv(csv_filename))
+    
+    for i, is_mat in enumerate(is_mats):
+        profiles[i]['subjectID'] = \
+            profiles[i]['subjectID'].apply(
+                lambda x: pd.to_numeric(''.join(c for c in x if x.isdigit())))
+        if is_mat:
+            profiles[i]['tractID'] = \
+                profiles[i]['tractID'].apply(
+                    lambda x: mat_converter[x])
+
+    if (file_name is not None):
+        plt.ioff()
+
+    subjects = profiles[0]['subjectID'].unique()
+    bundles = positions.keys()
+    if len(CSVs == 2):
+        percent_diffs = pd.DataFrame(index=bundles, columns=subjects)
+    for subject in subjects:
+        fig, axes = plt.subplots(5, 5)
+        plt.tight_layout()
+        ax = axes[positions[bundle][0], positions[bundle][1]]
+        fig.set_size_inches((12, 12))
+        fig.suptitle('Subject ' + str(subject))
+        axes[0, 0].axis("off")
+        axes[0, -1].axis("off")
+        axes[1, 2].axis("off")
+        axes[2, 2].axis("off")
+        axes[3, 2].axis("off") # this should be put in a function for both to use
+        for bundle in bundles:
+            bundle_profiles = []
+            for i, is_mat in enumerate(is_mats):
+                if is_mat:
+                    this_scalar = mat_scalar
+                    this_bundle_col = 'tractID'
+                else:
+                    this_scalar = scalar
+                    this_bundle_col = 'bundle'
+                bundle_profiles[i] = profiles[i][
+                    (profiles[i]['subjectID'] == subject)
+                    & (profiles[i][this_bundle_col] == bundle)
+                    ][this_scalar].to_numpy()[1:]
+            ax = axes[positions[bundle][0], positions[bundle][1]]
+            for i, name in enumerate(names):
+                if (len(bundle_profiles[i]) > 0):
+                    ax.plot(bundle_profiles[i])
+                else:
+                    print(
+                        'No streamlines found for subject '
+                        + str(subject) + ' for bundle '
+                        + bundle + ' for CSV ' + name)
+            ax.set_title(bundle)
+            ax.legend(names)
+
+            if len(CSVs == 2):
+                percent_diffs.at[bundle, subject] = \
+                    np.mean((bundle_profiles[0] - bundle_profiles[1])/\
+                        (bundle_profiles[0] + bundle_profiles[1]))
+
+        if (file_name is not None):
+            fig.savefig(file_name + str(subject))
+            plt.ion()
+
+    percent_diffs.to_csv(file_name, index=False)
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
