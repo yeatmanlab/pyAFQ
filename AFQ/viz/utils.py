@@ -451,7 +451,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
 
     scalar : string, optional
        Scalar to use in plots. Default: "dti_fa".
-    
+
     mat_scalar : string, optional
         Corresponding mAFQ name for the scalar.
 
@@ -471,7 +471,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
     positions : dictionary, optional
         Dictionary that maps bundle names to position in plot.
         Default: POSITIONS
-    
+
     mat_converter : dictionary, optional
         Dictionary that maps matlab bundle names to python bundle names.
         Default: MAT_2_PYTHON
@@ -482,7 +482,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
     profiles = []
     for csv_filename in CSVs:
         profiles.append(pd.read_csv(csv_filename))
-    
+
     for i, is_mat in enumerate(is_mats):
         profiles[i]['subjectID'] = \
             profiles[i]['subjectID'].apply(
@@ -524,7 +524,7 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
                 bundle_profiles[i] = profiles[i][
                     (profiles[i]['subjectID'] == subject)
                     & (profiles[i][this_bundle_col] == bundle)
-                    ][this_scalar].to_numpy()[1:]
+                ][this_scalar].to_numpy()[1:]
             ax = axes[positions[bundle][0], positions[bundle][1]]
             for i, name in enumerate(names):
                 if (len(bundle_profiles[i]) > 0):
@@ -539,8 +539,8 @@ def compare_profiles_from_csv(CSVs, names, is_mats=False,
 
             if len(CSVs == 2):
                 percent_diffs.at[bundle, subject] = \
-                    np.mean((bundle_profiles[0] - bundle_profiles[1])/\
-                        (bundle_profiles[0] + bundle_profiles[1]))
+                    np.mean((bundle_profiles[0] - bundle_profiles[1]) /
+                            (bundle_profiles[0] + bundle_profiles[1]))
 
         if (file_name is not None):
             fig.savefig(file_name + str(subject))
