@@ -1784,18 +1784,13 @@ def combine_profiles_in_folder(tract_profile_folder, outfile):
     -------
     Ouput CSV's pandas dataframe.
     """
-    paths = []
-    for path in Path(tract_profile_folder).rglob('*profiles.csv'):
-        paths.append(path)
-
     dfs = []
-    for path in paths:
-        profiles = pd.read_csv(path.name)
-        fname = path.parts[-1]
+    for path in Path(tract_profile_folder).rglob('*profiles.csv'):
+        profiles = pd.read_csv(path)
 
-        subject_name = fname.split('sub-')[1].split('_')[0]
-        if 'ses-' in fname:
-            session_name = fname.split('ses-')[1].split('_')[0]
+        subject_name = path.name.split('sub-')[1].split('_')[0]
+        if 'ses-' in path.name:
+            session_name = path.name.split('ses-')[1].split('_')[0]
         else:
             session_name = 'unknown'
 
