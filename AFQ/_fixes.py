@@ -14,17 +14,16 @@ import math
 
 class ConformedAffineMap(AffineMap):
     """
-    Modifies AffineMap API to match functionality of DiffeomorphicMap.
-    Important for SLR maps to be indistinguishable from SYN maps
-    in terms of API.
+    Modifies AffineMap API to match DiffeomorphicMap API.
+    Important for SLR maps API to be indistinguishable from SYN maps API.
     """
     def transform(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform_inverse(*args, **kwargs)
+        return super().transform(*args, **kwargs)
 
     def transform_inverse(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)
+        return super().transform_inverse(*args, **kwargs)
 
 
 def spherical_harmonics(m, n, theta, phi):
