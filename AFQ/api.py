@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import pandas as pd
 import dask.dataframe as ddf
-import glob
 import os
 import os.path as op
-from pathlib import PurePath
+from pathlib import Path
 import json
 
 import numpy as np
@@ -1750,16 +1749,9 @@ class AFQ(object):
         self.data_frame.apply(self._export_registered_b0, axis=1)
 
     def combine_profiles(self):
-        dfs = []
-        for ii, fname in enumerate(self.tract_profiles):
-            profiles = pd.read_csv(fname)
-            profiles['subjectID'] = self.data_frame['subject'].iloc[ii]
-            profiles['sessionID'] = op.split(self.data_frame['ses'].iloc[ii])[-1]
-            dfs.append(profiles)
-
-        df = pd.concat(dfs)
-        df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
-        return df
+        return combine_profiles_in_folder(
+            self.afq_path,
+            op.join(self.afq_path, 'tract_profiles_combined.csv'))
 
     def export_all(self):
         """ Exports all the possible outputs"""
@@ -1772,3 +1764,45 @@ class AFQ(object):
             self.viz_ROIs(export_as_gif=True)
             self.export_rois()
         self.combine_profiles()
+
+
+def combine_profiles_in_folder(tract_profile_folder, outfile):
+    """
+    Combine tract profiles from different subjects / sessions
+    into one CSV.
+
+    Parameters
+    ----------
+    tract_profile_folder : path to folder
+        Folder with all tract profiles you wish to merge.
+        Will also search subdirectories recursively.
+        It will select all files of the form '*profiles.csv'.
+    outfile : filename
+        Filename for the output CSV.
+
+    Returns
+    -------
+    Ouput CSV's pandas dataframe.
+    """
+    paths = []
+    for path in Path(tract_profile_folder).rglob('*profiles.csv'):
+        paths.append(path)
+
+    dfs = []
+    for path in paths:
+        profiles = pd.read_csv(path.name)
+        fname = path.parts[-1]
+
+        subject_name = fname.split('sub-')[1].split('_')[0]
+        if 'ses-' in fname:
+            session_name = fname.split('ses-')[1].split('_')[0]
+        else:
+            session_name = 'unknown'
+
+        profiles['subjectID'] = subject_name
+        profiles['sessionID'] = session_name
+        dfs.append(profiles)
+
+    df = pd.concat(dfs)
+    df.to_csv(outfile, index=False)
+    return df
