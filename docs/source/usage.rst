@@ -56,8 +56,8 @@ software, and organizing the data, run::
 pointing the program to the location of a configuration file. This will run
 whole-brain tractography, segment the tracts, and extract tract-profiles for
 each tract, generating a CSV file under
-`study/derivatives/afq/tract_profiles.csv` that contains the tract profiles for
-all participants/tracts/statistics.
+`study/derivatives/afq/tract_profiles_combined.csv` that contains the tract
+profiles for all participants/tracts/statistics.
 
 The pyAFQ configuration file
 ----------------------------

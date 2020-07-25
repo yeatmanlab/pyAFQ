@@ -367,7 +367,7 @@ def test_AFQ_data_waypoint():
     out = os.system(cmd)
     assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
-    from_file = pd.read_csv(op.join(myafq.afq_path, 'tract_profiles.csv'))
+    from_file = pd.read_csv(op.join(myafq.afq_path, 'tract_profiles_combined.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
     assert combined_profiles.shape == (500, 7)
