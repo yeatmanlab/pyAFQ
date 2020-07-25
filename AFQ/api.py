@@ -680,9 +680,11 @@ class AFQ(object):
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni_t2":
-                img = afd.read_mni_template(mask=self.mask_template, weight="T2w")
+                img = afd.read_mni_template(
+                    mask=self.mask_template, weight="T2w")
             elif img_l == "mni_t1":
-                img = afd.read_mni_template(mask=self.mask_template, weight="T1w")
+                img = afd.read_mni_template(
+                    mask=self.mask_template, weight="T1w")
             elif img_l == "b0":
                 img = nib.load(self._b0(row))
             elif img_l == "dti_fa_subject":

@@ -1,5 +1,5 @@
 # code copied from:
-# https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option #noqa
+# https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option # noqa
 import pytest
 
 
