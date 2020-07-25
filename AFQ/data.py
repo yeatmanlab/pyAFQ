@@ -1838,8 +1838,8 @@ def s3fs_nifti_read(fname, fs=None):
     -------
     nib.Nifti1Image class instance
 
-    Note
-    ----
+    Notes
+    -----
     Because the image is lazily loaded, data stored in the file
     is not transferred until `get_fdata` is called.
 
