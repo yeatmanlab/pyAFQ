@@ -1,5 +1,6 @@
 from setuptools import setup
 import string
+import os.path as op
 from setuptools_scm import get_version
 
 
@@ -22,7 +23,8 @@ def local_version(version):
 
 opts = dict(use_scm_version={"root": ".", "relative_to": __file__,
                              "write_to": "AFQ/version.py",
-                             "local_scheme": local_version})
+                             "local_scheme": local_version},
+            scripts=[op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')])
 
 
 if __name__ == '__main__':
