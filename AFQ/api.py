@@ -16,6 +16,7 @@ from dipy.segment.mask import median_otsu
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile
 
 from bids.layout import BIDSLayout
@@ -298,6 +299,7 @@ class AFQ(object):
         else:
             self.reg_algo = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
+        self.b0_threshold = b0_threshold
 
         self.scalars = scalars
 
@@ -454,17 +456,19 @@ class AFQ(object):
     def _get_data_gtab(self, row, filter_b=True):
         img = nib.load(row['dwi_file'])
         data = img.get_fdata()
-        gtab = row['gtab']
+        bvals, bvecs = read_bvals_bvecs(row['bval_file'], row['bvec_file'])
         if filter_b and (self.min_bval is not None):
-            data = data[
-                ...,
-                (gtab.bvals >= self.min_bval)
-                or (gtab.bvals <= self.b0_threshold)]
+            valid_b = (bvals >= self.min_bval) or (bvals <= self.b0_threshold)
+            data = data[..., valid_b]
+            bvals = bvals[valid_b]
+            bvecs = bvecs[valid_b]
         if filter_b and (self.max_bval is not None):
-            data = data[
-                ...,
-                (gtab.bvals <= self.max_bval)
-                or (gtab.bvals <= self.b0_threshold)]
+            valid_b = (bvals <= self.max_bval) or (bvals <= self.b0_threshold)
+            data = data[..., valid_b]
+            bvals = bvals[valid_b]
+            bvecs = bvecs[valid_b]
+        gtab = dpg.gradient_table(bvals, bvecs,
+                                  b0_threshold=self.b0_threshold)
         return data, gtab, img
 
     def _b0(self, row):
