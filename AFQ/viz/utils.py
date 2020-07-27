@@ -542,8 +542,8 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
 
             if len(csv_fnames) == 2 and both_found:
                 percent_diffs.at[bundle, subject] = \
-                    np.mean((bundle_profiles[0] - bundle_profiles[1]) /
-                            (bundle_profiles[0] + bundle_profiles[1]))
+                    np.mean((bundle_profiles[0] - bundle_profiles[1])
+                            / (bundle_profiles[0] + bundle_profiles[1]))
 
         fig.legend(names, loc='center')
         if (file_name is not None):
