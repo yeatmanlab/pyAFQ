@@ -480,6 +480,12 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
     mat_converter : dictionary, optional
         Dictionary that maps matlab bundle names to python bundle names.
         Default: MAT_2_PYTHON
+
+    Returns
+    -------
+        if only two file names are passed in, 
+        returns a pandas dataframe of percent differences.
+        Otherwise returns None.
     """
     if isinstance(is_mats, bool):
         is_mats = [is_mats] * len(csv_fnames)
@@ -562,7 +568,11 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
             fig.savefig(file_name + str(subject))
             plt.ion()
 
-    percent_diffs.to_csv(file_name, index=False)
+    if len(csv_fnames) == 2:
+        percent_diffs.to_csv(file_name)
+        return percent_diffs
+    else:
+        return None
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
