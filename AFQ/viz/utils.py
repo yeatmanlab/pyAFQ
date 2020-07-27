@@ -483,7 +483,7 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
 
     Returns
     -------
-        if only two file names are passed in, 
+        if only two file names are passed in,
         returns a pandas dataframe of percent differences.
         Otherwise returns None.
     """
