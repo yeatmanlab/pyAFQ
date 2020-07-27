@@ -457,10 +457,10 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
         Corresponding mAFQ name for the scalar.
 
     min_scalar : float, optional
-        Minimum FA used for y-axis bounds. Default: 0.0
+        Minimum value used for y-axis bounds. Default: 0.0
 
-    max_fa : float, optional
-        Maximum FA used for y-axis bounds. Default: 1.0
+    max_scalar : float, optional
+        Maximum value used for y-axis bounds. Default: 1.0
 
     mat_scale : float, optional
         Factor to scale the matlab data by if it is in different units than
@@ -547,8 +547,9 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                         + bundle + ' for CSV ' + name)
             ax.set_title(bundle)
             ax.set_ylim([min_scalar, max_scalar])
-            ax.set_yticks([0.2, 0.4, 0.6]*max_scalar)
-            ax.set_yticklabels([0.2, 0.4, 0.6]*max_scalar)
+            y_ticks = np.asarray([0.2, 0.4, 0.6])*max_scalar
+            ax.set_yticks(y_ticks)
+            ax.set_yticklabels(y_ticks)
             ax.set_xticklabels([])
 
             if len(csv_fnames) == 2 and both_found:
