@@ -427,7 +427,8 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
 
 def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                               scalar="dti_fa", mat_scalar="fa",
-                              min_fa=0.0, max_fa=1.0,
+                              min_scalar=0.0, max_scalar=1.0,
+                              mat_scale=1.0,
                               file_name=None,
                               positions=POSITIONS,
                               mat_converter=MAT_2_PYTHON):
@@ -455,11 +456,15 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
     mat_scalar : string, optional
         Corresponding mAFQ name for the scalar.
 
-    min_fa : float, optional
+    min_scalar : float, optional
         Minimum FA used for y-axis bounds. Default: 0.0
 
     max_fa : float, optional
         Maximum FA used for y-axis bounds. Default: 1.0
+
+    mat_scale : float, optional
+        Factor to scale the matlab data by if it is in different units than
+        pyAFQ. Default: 1.0
 
     file_name : string, optional
         If not None, figures will be saved to this file name
@@ -528,6 +533,8 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                     (profiles[i]['subjectID'] == subject)
                     & (profiles[i][this_bundle_col] == bundle)
                 ][this_scalar].to_numpy()[1:]
+                if is_mat:
+                    bundle_profiles[i] = bundle_profiles[i]*mat_scale
             ax = axes[positions[bundle][0], positions[bundle][1]]
             for i, name in enumerate(names):
                 if (len(bundle_profiles[i]) > 0):
@@ -539,6 +546,10 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                         + str(subject) + ' for bundle '
                         + bundle + ' for CSV ' + name)
             ax.set_title(bundle)
+            ax.set_ylim([min_scalar, max_scalar])
+            ax.set_yticks([0.2, 0.4, 0.6]*max_scalar)
+            ax.set_yticklabels([0.2, 0.4, 0.6]*max_scalar)
+            ax.set_xticklabels([])
 
             if len(csv_fnames) == 2 and both_found:
                 percent_diffs.at[bundle, subject] = \
