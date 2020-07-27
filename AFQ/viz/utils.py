@@ -526,15 +526,15 @@ def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
                 if is_mat:
                     this_scalar = mat_scalar
                     this_bundle_col = 'tractID'
+                    this_scale = mat_scale
                 else:
                     this_scalar = scalar
                     this_bundle_col = 'bundle'
+                    this_scale = 1.0
                 bundle_profiles[i] = profiles[i][
                     (profiles[i]['subjectID'] == subject)
                     & (profiles[i][this_bundle_col] == bundle)
-                ][this_scalar].to_numpy()[1:]
-                if is_mat:
-                    bundle_profiles[i] = bundle_profiles[i]*mat_scale
+                ][this_scalar].to_numpy()[1:]*this_scale
             ax = axes[positions[bundle][0], positions[bundle][1]]
             for i, name in enumerate(names):
                 if (len(bundle_profiles[i]) > 0):
