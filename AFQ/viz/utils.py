@@ -54,7 +54,7 @@ POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
                          "ARC_L": (2, 0), "ARC_R": (2, 4),
                          "UNC_L": (0, 1), "UNC_R": (0, 3)})
 
-MAT_2_PYTHON = OrderedDict(
+BUNDLE_MAT_2_PYTHON = \
     {'Right Corticospinal': 'CST_R', 'Left Corticospinal': 'CST_L',
      'Right Uncinate': 'UNC_R', 'Left Uncinate': 'UNC_L',
      'Left IFOF': 'IFO_L', 'Right IFOF': 'IFO_R',
@@ -65,7 +65,14 @@ MAT_2_PYTHON = OrderedDict(
      'Left Cingulum Hippocampus': 'HCC_L',
      'Callosum Forceps Major': 'FP', 'Callosum Forceps Minor': 'FA',
      'Right ILF': 'ILF_R', 'Left ILF': 'ILF_L',
-     'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L'})
+     'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L'}
+
+CSV_MAT_2_PYTHON = \
+    {'fa': 'dti_fa', 'md': 'dti_md',
+     'tractID': 'bundle'}
+
+SCALE_MAT_2_PYTHON = \
+    {'dti_md': 0.001}
 
 
 def viz_import_msg_error(module):
@@ -425,154 +432,222 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     return fig, axes
 
 
-def compare_profiles_from_csv(csv_fnames, names, is_mats=False,
-                              scalar="dti_fa", mat_scalar="fa",
-                              min_scalar=0.0, max_scalar=1.0,
-                              mat_scale=1.0,
-                              file_name=None,
-                              positions=POSITIONS,
-                              mat_converter=MAT_2_PYTHON):
+class CSVcomparison():
     """
-    Compare all tract profiles for a scalar from two different CSVs.
-    Plots tract profiles for both in one plot.
-    Uses contrast index of profiles for comparison if only two CSVs provided.
-
-    Parameters
-    ----------
-    csv_fnames : list of filenames
-        Filenames for the two CSVs containing tract porfiles to compare.
-        Will obtain subject list from the first file.
-
-    names : list of strings
-       Name to use to identify the data from the corresponding CSV.
-
-    is_mats : bool or list of bools, optional
-        Whether or not the csv was generated from Matlab AFQ or pyAFQ.
-        Default: False
-
-    scalar : string, optional
-       Scalar to use in plots. Default: "dti_fa".
-
-    mat_scalar : string, optional
-        Corresponding mAFQ name for the scalar.
-
-    min_scalar : float, optional
-        Minimum value used for y-axis bounds. Default: 0.0
-
-    max_scalar : float, optional
-        Maximum value used for y-axis bounds. Default: 1.0
-
-    mat_scale : float, optional
-        Factor to scale the matlab data by if it is in different units than
-        pyAFQ. Default: 1.0
-
-    file_name : string, optional
-        If not None, figures will be saved to this file name
-        plus the subject ID. If only two CSVs are given,
-        a contrast index will be calculated for each bundle / subject
-        and saved to this filename plus '_contrast_index' as a csv.
-        Default: None
-
-    positions : dictionary, optional
-        Dictionary that maps bundle names to position in plot.
-        Default: POSITIONS
-
-    mat_converter : dictionary, optional
-        Dictionary that maps matlab bundle names to python bundle names.
-        Default: MAT_2_PYTHON
-
-    Returns
-    -------
-        if only two file names are passed in,
-        returns a pandas dataframe of percent differences.
-        Otherwise returns None.
+    Compare different CSVs, using:
+    tract profiles, contrast indices,
+    scan-rescan reliability using Pearson's r.
     """
-    if isinstance(is_mats, bool):
-        is_mats = [is_mats] * len(csv_fnames)
 
-    profiles = []
-    for csv_filename in csv_fnames:
-        profiles.append(pd.read_csv(csv_filename))
+    def __init__(self, csv_fnames, names, is_mats=False,
+                 mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
+                 mat_column_converter=CSV_MAT_2_PYTHON,
+                 mat_scale_converter=SCALE_MAT_2_PYTHON):
+        """
+        Load in csv files, converting from matlab if necessary.
 
-    for i, is_mat in enumerate(is_mats):
-        profiles[i]['subjectID'] = \
-            profiles[i]['subjectID'].apply(
-                lambda x: int(
-                    ''.join(c for c in x if c.isdigit())
-                ) if isinstance(x, str) else x)
-        if is_mat:
-            profiles[i]['tractID'] = \
-                profiles[i]['tractID'].apply(
-                    lambda x: mat_converter[x])
+        Parameters
+        ----------
+        csv_fnames : list of filenames
+            Filenames for the two CSVs containing tract porfiles to compare.
+            Will obtain subject list from the first file.
 
-    if (file_name is not None):
-        plt.ioff()
+        names : list of strings
+            Name to use to identify each CSV dataset.
 
-    subjects = profiles[0]['subjectID'].unique()
-    bundles = positions.keys()
-    if len(csv_fnames) == 2:
-        percent_diffs = pd.DataFrame(index=bundles, columns=subjects)
-    for subject in subjects:
-        fig, axes = plt.subplots(5, 5)
-        plt.tight_layout()
-        fig.set_size_inches((12, 12))
-        fig.suptitle('Subject ' + str(subject))
-        axes[0, 0].axis("off")
-        axes[0, -1].axis("off")
-        axes[1, 2].axis("off")
-        axes[2, 2].axis("off")
-        axes[3, 2].axis("off")
-        axes[4, 0].axis("off")
-        axes[4, 4].axis("off")
-        for bundle in bundles:
-            both_found = True
-            ax = axes[positions[bundle][0], positions[bundle][1]]
-            bundle_profiles = [None]*len(csv_fnames)
-            for i, is_mat in enumerate(is_mats):
-                if is_mat:
-                    this_scalar = mat_scalar
-                    this_bundle_col = 'tractID'
-                    this_scale = mat_scale
-                else:
-                    this_scalar = scalar
-                    this_bundle_col = 'bundle'
-                    this_scale = 1.0
-                bundle_profiles[i] = profiles[i][
-                    (profiles[i]['subjectID'] == subject)
-                    & (profiles[i][this_bundle_col] == bundle)
-                ][this_scalar].to_numpy()[1:]*this_scale
-            ax = axes[positions[bundle][0], positions[bundle][1]]
-            for i, name in enumerate(names):
-                if (len(bundle_profiles[i]) > 0):
-                    ax.plot(bundle_profiles[i])
-                else:
-                    both_found = False
-                    print(
-                        'No streamlines found for subject '
-                        + str(subject) + ' for bundle '
-                        + bundle + ' for CSV ' + name)
-            ax.set_title(bundle)
-            ax.set_ylim([min_scalar, max_scalar])
-            y_ticks = np.asarray([0.2, 0.4, 0.6])*max_scalar
-            ax.set_yticks(y_ticks)
-            ax.set_yticklabels(y_ticks)
-            ax.set_xticklabels([])
+        is_mats : bool or list of bools, optional
+            Whether or not the csv was generated from Matlab AFQ or pyAFQ.
+            Default: False
 
-            if len(csv_fnames) == 2 and both_found:
-                percent_diffs.at[bundle, subject] = \
-                    np.mean((bundle_profiles[0] - bundle_profiles[1])
-                            / (bundle_profiles[0] + bundle_profiles[1]))
+        mat_bundle_converter : dictionary, optional
+            Dictionary that maps matlab bundle names to python bundle names.
+            Default: BUNDLE_MAT_2_PYTHON
 
-        fig.legend(names, loc='center')
-        if (file_name is not None):
-            fig.savefig(file_name + str(subject))
+        mat_column_converter : dictionary, optional
+            Dictionary that maps matlab column names to python column names.
+            Default: CSV_MAT_2_PYTHON
+
+        mat_scale_converter : dictionary, optional
+            Dictionary that maps scalar names to how they should be scaled
+            to match pyAFQ's scale for that scalar.
+            Default: SCALE_MAT_2_PYTHON
+        """
+        self.logger = logging.getLogger('AFQ.csv')
+        if isinstance(is_mats, bool):
+            is_mats = [is_mats] * len(csv_fnames)
+
+        self.csv_dict = {}
+        for i, fname in enumerate(csv_fnames):
+            profile = pd.read_csv(fname)
+            profile['subjectID'] = \
+                profile['subjectID'].apply(
+                    lambda x: int(
+                        ''.join(c for c in x if c.isdigit())
+                    ) if isinstance(x, str) else x)
+
+            if is_mats[i]:
+                profile.rename(
+                    columns=mat_column_converter, inplace=True)
+                profile['bundle'] = \
+                    profile['bundle'].apply(
+                        lambda x: mat_bundle_converter[x])
+                for scalar, scale in enumerate(mat_scale_converter):
+                    profile[scalar] = \
+                        profile[scalar].apply(lambda x: x * scale)
+
+            self.csv_dict[names[i]] = profile
+
+    def _warn_not_found(self, subject, bundle, name):
+        self.logger.warning(
+            'No streamlines found for subject '
+            + str(subject) + ' for bundle '
+            + bundle + ' for CSV ' + name)
+
+    def tract_profiles(self, names=None, scalar="dti_fa",
+                       min_scalar=0.0, max_scalar=1.0,
+                       out_file_name=None,
+                       positions=POSITIONS):
+        """
+        Compare all tract profiles for a scalar from different CSVs.
+        Plots tract profiles for all in one plot.
+
+        Bundles taken from positions argument.
+        Subjects taken from first dataset.
+
+        Parameters
+        ----------
+        names : list of strings, optional
+            Names of datasets to plot profiles of.
+            If None, all datasets are used.
+            Default: None
+
+        scalar : string, optional
+            Scalar to use in plots. Default: "dti_fa".
+
+        min_scalar : float, optional
+            Minimum value used for y-axis bounds. Default: 0.0
+
+        max_scalar : float, optional
+            Maximum value used for y-axis bounds. Default: 1.0
+
+        out_file_name : string, optional
+            If not None, figures will be saved to this file name
+            plus the subject ID.
+            Default: None
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
+        """
+        if (out_file_name is not None):
+            plt.ioff()
+        if names is None:
+            names = list(self.csv_dict.keys())
+
+        subjects = self.csv_dict[names[0]]['subjectID'].unique()
+        bundles = positions.keys()
+
+        for subject in subjects:
+            fig, axes = plt.subplots(5, 5)
+            plt.tight_layout()
+            fig.set_size_inches((12, 12))
+            fig.suptitle('Subject ' + str(subject))
+            axes[0, 0].axis("off")
+            axes[0, -1].axis("off")
+            axes[1, 2].axis("off")
+            axes[2, 2].axis("off")
+            axes[3, 2].axis("off")
+            axes[4, 0].axis("off")
+            axes[4, 4].axis("off")
+            for bundle in bundles:
+                ax = axes[positions[bundle][0], positions[bundle][1]]
+                for name in names:
+                    profile = self.csv_dict[name]
+                    profile = profile[
+                        (profile['subjectID'] == subject)
+                        & (profile['bundle'] == bundle)
+                    ][scalar].to_numpy()[1:]
+                    if (len(profile) > 0):
+                        ax.plot(profile)
+                    else:
+                        self._warn_not_found(subject, bundle, name)
+                ax.set_title(bundle)
+                ax.set_ylim([min_scalar, max_scalar])
+                y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
+                ax.set_yticks(y_ticks)
+                ax.set_yticklabels(y_ticks)
+                ax.set_xticklabels([])
+
+            fig.legend(names, loc='center')
+            if (out_file_name is not None):
+                fig.savefig(out_file_name + str(subject))
+
+        if (out_file_name is not None):
             plt.ion()
 
-    if len(csv_fnames) == 2:
-        percent_diffs.to_csv(file_name)
-        return percent_diffs
-    else:
-        return None
+    def contrast_index(self, names=None, scalar="dti_fa", out_file_name=None):
+        """
+        Calculate the contrast index for each bundle in two datasets.
+        Bundles and subjects taken from first dataset.
+
+        Parameters
+        ----------
+        names : list of strings, optional
+            Names of datasets to plot profiles of.
+            If None, all datasets are used.
+            Should be a total of only two datasets.
+            Default: None
+
+        scalar : string, optional
+            Scalar to use for the contrast index. Default: "dti_fa".
+
+        out_file_name : string, optional
+            If not None, contrast index will be saved to this file as a CSV.
+            Default: None
+
+        Returns
+        -------
+        Pandas dataframe of contrast indices
+        with subjects as columns and bundles as rows.
+        """
+        if names is None:
+            names = list(self.csv_dict.keys())
+        if len(names) != 2:
+            self.logger.error("To calculate the contrast index,"
+                              + "only two dataset names should be given")
+            return None
+
+        subjects = self.csv_dict[names[0]]['subjectID'].unique()
+        bundles = self.csv_dict[names[0]]['bundle'].unique()
+        contrast_index = pd.DataFrame(index=bundles, columns=subjects)
+        for subject in subjects:
+            for bundle in bundles:
+                profiles = [None] * 2
+                both_found = True
+                for i, name in enumerate(names):
+                    profile = self.csv_dict[name]
+                    profiles[i] = profile[
+                        (profile['subjectID'] == subject)
+                        & (profile['bundle'] == bundle)
+                    ][scalar].to_numpy()[1:]
+                    if len(profiles[i]) < 1:
+                        both_found = False
+                        self._warn_not_found(subject, bundle, name)
+                if both_found:
+                    contrast_index.at[bundle, subject] = \
+                        np.mean((profiles[0] - profiles[1])
+                                / (profiles[0] + profiles[1]))
+        if out_file_name is not None:
+            contrast_index.to_csv(out_file_name)
+        return contrast_index
+
+    def correlation_plots(self, names=None,
+                          scalars=["dti_fa", "dti_md"],
+                          out_file_name=None):
+        """
+        Plot the scan-rescan reliability using Pearson's r for some scalars.
+        """
+        pass
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
