@@ -504,11 +504,20 @@ class CSVcomparison():
 
             self.profile_dict[names[i]] = profile
 
-    def _warn_not_found(self, subject, bundle, name):
+    def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
-            'No streamlines found for subject '
-            + str(subject) + ' for bundle '
-            + bundle + ' for CSV ' + name)
+            'No scalars found for scalar' + scalar
+            + ' for subject ' + str(subject)
+            + ' for bundle ' + bundle
+            + ' for CSV ' + name)
+
+    def _warn_nans(self, scalar, subject, bundle, name):
+        self.logger.warning(
+            'NaNs found in scalar' + scalar
+            + ' for subject ' + str(subject)
+            + ' for bundle ' + bundle
+            + ' for CSV ' + name
+            + '. These Nans were replaced with 0.')
 
     def _get_fname(self, func_name, now, f_name):
         f_name = op.join(
@@ -518,6 +527,22 @@ class CSVcomparison():
             f_name)
         os.makedirs(f_name, exist_ok=True)
         return f_name
+    
+    def _get_profile(self, name, bundle, subject, scalar):
+        profile = self.profile_dict[name]
+        single_profile = profile[
+            (profile['subjectID'] == subject)
+            & (profile['bundle'] == bundle)
+        ][scalar].to_numpy()
+        if len(single_profile) < 1:
+            self._warn_not_found(scalar, subject, bundle, name)
+            return None
+        else:
+            nans = np.isnan(single_profile)
+            if np.sum(nans) > 1:
+                self._warn_nans(scalar, subject, bundle, name)
+                single_profile[nans] = 0
+            return single_profile
 
     def tract_profiles(self, names=None, scalar="dti_fa",
                        min_scalar=0.0, max_scalar=1.0,
@@ -578,15 +603,9 @@ class CSVcomparison():
             for bundle in bundles:
                 ax = axes[positions[bundle][0], positions[bundle][1]]
                 for name in names:
-                    profile = self.profile_dict[name]
-                    profile = profile[
-                        (profile['subjectID'] == subject)
-                        & (profile['bundle'] == bundle)
-                    ][scalar].to_numpy()
-                    if (len(profile) > 0):
+                    profile = self._get_profile(name, bundle, subject, scalar)
+                    if profile is not None:
                         ax.plot(profile)
-                    else:
-                        self._warn_not_found(subject, bundle, name)
                 ax.set_title(bundle)
                 ax.set_ylim([min_scalar, max_scalar])
                 y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
@@ -641,14 +660,10 @@ class CSVcomparison():
                 profiles = [None] * 2
                 both_found = True
                 for i, name in enumerate(names):
-                    profile = self.profile_dict[name]
-                    profiles[i] = profile[
-                        (profile['subjectID'] == subject)
-                        & (profile['bundle'] == bundle)
-                    ][scalar].to_numpy()
-                    if len(profiles[i]) < 1:
+                    profiles[i] = self._get_profile(
+                        name, bundle, subject, scalar)
+                    if profiles[i] is not None:
                         both_found = False
-                        self._warn_not_found(subject, bundle, name)
                 if both_found:
                     contrast_index.at[bundle, subject] = \
                         np.nanmean((profiles[0] - profiles[1])
@@ -710,16 +725,12 @@ class CSVcomparison():
                     profile = self.profile_dict[name]
                     profiles = np.zeros((len(subjects), 100))
                     for i, subject in enumerate(subjects):
-                        single_profile = profile[
-                            (profile['subjectID'] == subject)
-                            & (profile['bundle'] == bundle)
-                        ][scalar].to_numpy()
-                        if len(single_profile) < 1:
-                            self._warn_not_found(subject, bundle, name)
-                        else:
+                        single_profile = self._get_profile(
+                            name, bundle, subject, scalar)
+                        if single_profile is not None:
                             profiles[i] = single_profile
                     concatenated_bundles[j] = profiles.flatten()
-                scalar_coef[k] = np.corrcoef(concatenated_bundles)
+                scalar_coef[k] = np.corrcoef(concatenated_bundles)[0][1]
             all_coef[l] = scalar_coef
 
         x = np.arange(len(bundles))
