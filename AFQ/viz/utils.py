@@ -712,10 +712,13 @@ class CSVcomparison():
             return None
 
         all_coef = np.zeros((len(scalars), len(bundles)))
-        for l, scalar in enumerate(scalars):
+        all_std = np.zeros((len(scalars), len(bundles)))
+        for m, scalar in enumerate(scalars):
             scalar_coef = np.zeros(len(bundles))
+            scalar_std = np.zeros(len(bundles))
             for k, bundle in enumerate(bundles):
-                concatenated_bundles = np.zeros((2, 100 * len(self.subjects)))
+                bundle_profiles = np.zeros((2, len(self.subjects), 100))
+                bundle_coefs = np.zeros(len(self.subjects))
                 for j, name in enumerate(names):
                     profiles = np.zeros((len(self.subjects), 100))
                     for i, subject in enumerate(self.subjects):
@@ -723,9 +726,14 @@ class CSVcomparison():
                             name, bundle, subject, scalar)
                         if single_profile is not None:
                             profiles[i] = single_profile
-                    concatenated_bundles[j] = profiles.flatten()
-                scalar_coef[k] = np.corrcoef(concatenated_bundles)[0][1]
-            all_coef[l] = scalar_coef
+                    bundle_profiles[j] = profiles
+                for i in range(len(self.subjects)):
+                    bundle_pair = bundle_profiles[:, i, :]
+                    bundle_coefs[i] = np.corrcoef(bundle_pair)[0][1]
+                scalar_coef[k] = np.mean(bundle_coefs)
+                scalar_std[k] = np.std(bundle_coefs)
+            all_coef[m] = scalar_coef
+            all_std[m] = scalar_std
 
         width = 0.6
         spacing = 2
@@ -733,8 +741,12 @@ class CSVcomparison():
         x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
         fig, ax = plt.subplots()
-        for l, scalar in enumerate(scalars):
-            ax.bar(x + x_shift[l], all_coef[l], width, label=scalar)
+        for m, scalar in enumerate(scalars):
+            ax.bar(x + x_shift[m],
+                   all_coef[m],
+                   width,
+                   label=scalar,
+                   yerr=all_std[m])
 
         ax.set_ylabel('Pearson\'s r')
         ax.set_xticks(x)
