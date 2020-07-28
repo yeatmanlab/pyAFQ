@@ -3,7 +3,6 @@ import os.path as op
 import os
 import logging
 import tempfile
-import datetime
 
 import numpy as np
 import pandas as pd
@@ -442,6 +441,7 @@ class CSVcomparison():
     """
 
     def __init__(self, out_folder, csv_fnames, names, is_mats=False,
+                 subjects=None,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -463,6 +463,11 @@ class CSVcomparison():
         is_mats : bool or list of bools, optional
             Whether or not the csv was generated from Matlab AFQ or pyAFQ.
             Default: False
+
+        subjects : list of str, optional
+            List of subjects to consider.
+            If None, will use all subjects in first dataset.
+            Default: None
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
@@ -503,6 +508,7 @@ class CSVcomparison():
                         profile[scalar].apply(lambda x: x * scale)
 
             self.profile_dict[names[i]] = profile
+        self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
 
     def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
@@ -519,11 +525,10 @@ class CSVcomparison():
             + ' for CSV ' + name
             + '. These Nans were replaced with 0.')
 
-    def _get_fname(self, func_name, now, f_name):
+    def _get_fname(self, folder, f_name):
         f_folder = op.join(
             self.out_folder,
-            func_name,
-            now)
+            folder)
         os.makedirs(f_folder, exist_ok=True)
         return op.join(f_folder, f_name)
 
@@ -550,9 +555,7 @@ class CSVcomparison():
         """
         Compare all tract profiles for a scalar from different CSVs.
         Plots tract profiles for all in one plot.
-
         Bundles taken from positions argument.
-        Subjects taken from first dataset.
 
         Parameters
         ----------
@@ -578,16 +581,14 @@ class CSVcomparison():
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
         """
-        now = datetime.datetime.now().isoformat('T')
         if not show_plots:
             plt.ioff()
         if names is None:
             names = list(self.profile_dict.keys())
 
-        subjects = self.profile_dict[names[0]]['subjectID'].unique()
         bundles = positions.keys()
 
-        for subject in subjects:
+        for subject in self.subjects:
             fig, axes = plt.subplots(5, 5)
             plt.tight_layout()
             fig.set_size_inches((12, 12))
@@ -614,7 +615,9 @@ class CSVcomparison():
 
             fig.legend(names, loc='center')
             fig.savefig(
-                self._get_fname("tract_profiles", now, f"sub-{subject}"))
+                self._get_fname(
+                    f"tract_profiles/{scalar}",
+                    f"{'_'.join(names)}_sub-{subject}"))
 
         if not show_plots:
             plt.ion()
@@ -623,7 +626,6 @@ class CSVcomparison():
                        bundles=POSITIONS.keys()):
         """
         Calculate the contrast index for each bundle in two datasets.
-        List of subjects taken from first dataset.
 
         Parameters
         ----------
@@ -644,7 +646,6 @@ class CSVcomparison():
         Pandas dataframe of contrast indices
         with subjects as columns and bundles as rows.
         """
-        now = datetime.datetime.now().isoformat('T')
         if names is None:
             names = list(self.profile_dict.keys())
         if len(names) != 2:
@@ -652,9 +653,8 @@ class CSVcomparison():
                               + "only two dataset names should be given")
             return None
 
-        subjects = self.profile_dict[names[0]]['subjectID'].unique()
-        contrast_index = pd.DataFrame(index=bundles, columns=subjects)
-        for subject in subjects:
+        contrast_index = pd.DataFrame(index=bundles, columns=self.subjects)
+        for subject in self.subjects:
             for bundle in bundles:
                 profiles = [None] * 2
                 both_found = True
@@ -669,8 +669,7 @@ class CSVcomparison():
                                    / (profiles[0] + profiles[1]))
 
         contrast_index.to_csv(self._get_fname(
-            "contrast_index",
-            now,
+            f"contrast_index/{scalar}",
             f"{names[0]}_vs_{names[1]}"))
         return contrast_index
 
@@ -680,7 +679,6 @@ class CSVcomparison():
                           show_plots=False):
         """
         Plot the scan-rescan reliability using Pearson's r for some scalars.
-        List of subjects taken from first dataset.
 
         Parameters
         ----------
@@ -704,7 +702,6 @@ class CSVcomparison():
         -------
         Matplotlib figure and axes.
         """
-        now = datetime.datetime.now().isoformat('T')
         if not show_plots:
             plt.ioff()
         if names is None:
@@ -714,15 +711,14 @@ class CSVcomparison():
                               + "only two dataset names should be given")
             return None
 
-        subjects = self.profile_dict[names[0]]['subjectID'].unique()
         all_coef = np.zeros((len(scalars), len(bundles)))
         for l, scalar in enumerate(scalars):
             scalar_coef = np.zeros(len(bundles))
             for k, bundle in enumerate(bundles):
-                concatenated_bundles = np.zeros((2, 100 * len(subjects)))
+                concatenated_bundles = np.zeros((2, 100 * len(self.subjects)))
                 for j, name in enumerate(names):
-                    profiles = np.zeros((len(subjects), 100))
-                    for i, subject in enumerate(subjects):
+                    profiles = np.zeros((len(self.subjects), 100))
+                    for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
                             name, bundle, subject, scalar)
                         if single_profile is not None:
@@ -733,8 +729,8 @@ class CSVcomparison():
 
         width = 0.6
         spacing = 2
-        x = np.arange(len(bundles))*spacing
-        x_shift = np.linspace(-0.5*width, 0.5*width, num=len(scalars))
+        x = np.arange(len(bundles)) * spacing
+        x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
         fig, ax = plt.subplots()
         for l, scalar in enumerate(scalars):
@@ -743,6 +739,7 @@ class CSVcomparison():
         ax.set_ylabel('Pearson\'s r')
         ax.set_xticks(x)
         ax.set_xticklabels(bundles)
+        ax.set_title(f"{names[0]}_vs_{names[1]}")
         ax.legend()
 
         plt.setp(ax.get_xticklabels(),
@@ -750,8 +747,7 @@ class CSVcomparison():
                  horizontalalignment='right')
         fig.tight_layout()
         fig.savefig(self._get_fname(
-            "corr_plots",
-            now,
+            f"corr_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
 
         if not show_plots:
