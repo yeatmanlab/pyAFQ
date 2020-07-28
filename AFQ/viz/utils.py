@@ -520,14 +520,13 @@ class CSVcomparison():
             + '. These Nans were replaced with 0.')
 
     def _get_fname(self, func_name, now, f_name):
-        f_name = op.join(
+        f_folder = op.join(
             self.out_folder,
             func_name,
-            now,
-            f_name)
-        os.makedirs(f_name, exist_ok=True)
-        return f_name
-    
+            now)
+        os.makedirs(f_folder, exist_ok=True)
+        return op.join(f_folder, f_name)
+
     def _get_profile(self, name, bundle, subject, scalar):
         profile = self.profile_dict[name]
         single_profile = profile[
@@ -636,7 +635,7 @@ class CSVcomparison():
 
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
-        
+
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
 
@@ -670,7 +669,7 @@ class CSVcomparison():
                                    / (profiles[0] + profiles[1]))
 
         contrast_index.to_csv(self._get_fname(
-            "/contrast_index/",
+            "contrast_index",
             now,
             f"{names[0]}_vs_{names[1]}"))
         return contrast_index
@@ -693,7 +692,7 @@ class CSVcomparison():
 
         scalars : list of strings, optional
             Scalars to correlate. Default: ["dti_fa", "dti_md"].
-        
+
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
 
@@ -714,15 +713,14 @@ class CSVcomparison():
             self.logger.error("To plot correlations,"
                               + "only two dataset names should be given")
             return None
-        
+
         subjects = self.profile_dict[names[0]]['subjectID'].unique()
         all_coef = np.zeros((len(scalars), len(bundles)))
         for l, scalar in enumerate(scalars):
             scalar_coef = np.zeros(len(bundles))
             for k, bundle in enumerate(bundles):
-                concatenated_bundles = np.zeros((2, 100*len(subjects)))
+                concatenated_bundles = np.zeros((2, 100 * len(subjects)))
                 for j, name in enumerate(names):
-                    profile = self.profile_dict[name]
                     profiles = np.zeros((len(subjects), 100))
                     for i, subject in enumerate(subjects):
                         single_profile = self._get_profile(
@@ -739,17 +737,17 @@ class CSVcomparison():
 
         fig, ax = plt.subplots()
         for l, scalar in enumerate(scalars):
-            ax.bar(x + x_shift[l], all_coef[l], width, label=scalar_coef)
+            ax.bar(x + x_shift[l], all_coef[l], width, label=scalars)
 
         ax.set_ylabel('Pearson\'s r')
         ax.set_title('Scan re-scan reliability')
         ax.set_xticks(x)
-        ax.set_xticklabels(scalars)
+        ax.set_xticklabels(bundles)
         ax.legend()
 
         fig.tight_layout()
         fig.savefig(self._get_fname(
-            "/corr_plots/",
+            "corr_plots",
             now,
             f"{names[0]}_vs_{names[1]}"))
 
