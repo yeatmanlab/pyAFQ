@@ -7,6 +7,7 @@ import toml
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 import pandas as pd
 from pandas.testing import assert_series_equal
@@ -161,10 +162,43 @@ def test_AFQ_data():
             segmentation='freesurfer',
             use_prealign=use_prealign)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
-                        nib.load(myafq['dwi_file'][0]).shape[:3])
+                         nib.load(myafq['dwi_file'][0]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
-                        nib.load(myafq.dti[0]).shape[:3])
+                         nib.load(myafq.dti[0]).shape[:3])
         myafq.export_rois()
+
+
+@pytest.mark.slow
+def test_AFQ_slr():
+    """
+    Test if API can run using slr map
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        reg_subject='subject_sls',
+        reg_template='hcp_atlas')
+    myafq.export_rois()
+
+
+# Requires large download
+@pytest.mark.slow
+def test_AFQ_FA():
+    """
+    Test if API can run registeration with FA
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
+                                          'derivatives', 'dmriprep'),
+                    sub_prefix='sub',
+                    reg_template='dti_fa_template',
+                    reg_subject='dti_fa_subject')
+    myafq.export_rois()
 
 
 def test_DKI_profile():
@@ -255,7 +289,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (400, 5)
+    assert tract_profiles.shape == (500, 5)
 
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
@@ -293,7 +327,7 @@ def test_AFQ_data_waypoint():
     from_file = pd.read_csv(op.join(myafq.afq_path, 'tract_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (400, 7)
+    assert combined_profiles.shape == (500, 7)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:

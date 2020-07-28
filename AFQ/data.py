@@ -4,16 +4,20 @@ import os
 import os.path as op
 import json
 from glob import glob
+import shutil
 
 import boto3
 import s3fs
 
 import numpy as np
 import pandas as pd
+import logging
 
 import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
+import dipy.reconst.shm as shm
+import dipy.reconst.csdeconv as csdeconv
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
@@ -758,22 +762,22 @@ def bundles_to_aal(bundles, atlas=None):
         atlas = read_aal_atlas()['atlas']
 
     endpoint_dict = {
-        "ATR_L": [None, ['leftfrontal']],
-        "ATR_R": [None, ['rightfrontal']],
+        "ATR_L": [['leftfrontal'], None],
+        "ATR_R": [['rightfrontal'], None],
         "CST_L": [['cstinferior'], ['cstsuperior']],
         "CST_R": [['cstinferior'], ['cstsuperior']],
         "CGC_L": [['leftcingpost'], None],
         "CGC_R": [['rightcingpost'], None],
         "HCC_L": [None, None],
         "HCC_R": [None, None],
-        "FP": [['leftoccipital'], ['rightoccipital']],
-        "FA": [['leftfrontal'], ['rightfrontal']],
+        "FP": [['rightoccipital'], ['leftoccipital']],
+        "FA": [['rightfrontal'], ['leftfrontal']],
         "IFO_L": [['leftoccipital'], ['leftifoffront']],
         "IFO_R": [['rightoccipital'], ['rightifoffront']],
         "ILF_L": [['leftoccipital'], ['leftilftemp']],
         "ILF_R": [['rightoccipital'], ['rightilftemp']],
-        "SLF_L": [['leftinfparietal'], ['leftslffrontal']],
-        "SLF_R": [['rightinfparietal'], ['rightslffrontal']],
+        "SLF_L": [['leftslffrontal'], ['leftinfparietal']],
+        "SLF_R": [['rightslffrontal'], ['rightinfparietal']],
         "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
         "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
         "ARC_L": [['leftfrontal'], ['leftarctemp']],
@@ -926,10 +930,46 @@ def s3fs_json_write(data, fname, fs=None):
         json.dump(data, ff)
 
 
-def read_mni_template(resolution=1, mask=True):
+def _apply_mask(template_img, resolution=1):
+    """
+    Helper function, gets MNI brain mask and applies it to template_img.
+
+    Parameters
+    ----------
+    template_img : nib.Nifti1Image
+        Unmasked template
+    resolution : int, optional
+        Resolution of mask. Default: 1
+
+    Returns
+    -------
+    Masked template as nib.Nifti1Image
+    """
+    mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
+                                      resolution=resolution,
+                                      desc='brain',
+                                      suffix='mask')))
+
+    template_data = template_img.get_fdata()
+    mask_data = mask_img.get_fdata()
+
+    if mask_data.shape != template_data.shape:
+        mask_img = nib.Nifti1Image(
+            reg.resample(mask_data,
+                         template_data,
+                         mask_img.affine,
+                         template_img.affine),
+            template_img.affine)
+        mask_data = mask_img.get_fdata()
+
+    out_data = template_data * mask_data
+    return nib.Nifti1Image(out_data, template_img.affine)
+
+
+def read_mni_template(resolution=1, mask=True, weight="T2w"):
     """
 
-    Reads the MNI T2w template
+    Reads the MNI T1w or T2w template
 
     Parameters
     ----------
@@ -940,25 +980,145 @@ def read_mni_template(resolution=1, mask=True):
         Whether to mask the data with a brain-mask before returning the image.
         Default : True
 
+    weight: str, optional
+        Which relaxation technique to use.
+        Should be either "T2w" or "T1w".
+        Default : "T2w"
+
     Returns
     -------
-    nib.Nifti1Image class instance containing masked or unmasked T2 template.
+    nib.Nifti1Image class instance
+    containing masked or unmasked T1w or template.
 
     """
     template_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
                                           desc=None,
                                           resolution=resolution,
-                                          suffix='T2w',
+                                          suffix=weight,
                                           extension='nii.gz')))
     if not mask:
         return template_img
     else:
-        mask_img = nib.load(str(tflow.get('MNI152NLin2009cAsym',
-                                          resolution=resolution,
-                                          desc='brain',
-                                          suffix='mask')))
+        return _apply_mask(template_img, resolution)
 
-        template_data = template_img.get_fdata()
-        mask_data = mask_img.get_fdata()
-        out_data = template_data * mask_data
-        return nib.Nifti1Image(out_data, template_img.affine)
+
+fetch_biobank_templates = \
+    _make_fetcher(
+        "fetch_biobank_templates",
+        op.join(afq_home,
+                'biobank_templates'),
+        "http://biobank.ctsu.ox.ac.uk/showcase/showcase/docs/",
+        ["bmri_group_means.zip"],
+        ["bmri_group_means.zip"],
+        data_size="1.1 GB",
+        doc="Download UK Biobank templates",
+        unzip=True)
+
+
+def read_ukbb_fa_template(mask=True):
+    """
+    Reads the UK Biobank FA template
+
+    Parameters
+    ----------
+    mask : bool, optional
+        Whether to mask the data with a brain-mask before returning the image.
+        Default : True
+
+    Returns
+    -------
+    nib.Nifti1Image class instance containing the FA template.
+
+    """
+    fa_folder = op.join(
+        afq_home,
+        'biobank_templates',
+        'UKBiobank_BrainImaging_GroupMeanTemplates'
+    )
+    fa_path = op.join(
+        fa_folder,
+        'dti_FA.nii.gz'
+    )
+
+    if not op.exists(fa_path):
+        logger = logging.getLogger('AFQ.data')
+        logger.warning(
+            "Downloading brain MRI group mean statistics from UK Biobank. "
+            + "This download is approximately 1.1 GB. "
+            + "It is currently necessary to access the FA template.")
+
+        files, folder = fetch_biobank_templates()
+
+        # remove zip
+        for filename in files:
+            os.remove(op.join(folder, filename))
+
+        # remove non-FA related directories
+        for filename in os.listdir(fa_folder):
+            full_path = op.join(fa_folder, filename)
+            if full_path != fa_path:
+                if os.path.isfile(full_path):
+                    os.remove(full_path)
+                else:
+                    shutil.rmtree(full_path)
+
+    template_img = nib.load(fa_path)
+
+    if not mask:
+        return template_img
+    else:
+        return _apply_mask(template_img, 1)
+
+
+def create_anisotropic_power_map(dwi, gtab, dwi_affine=None, mask=None):
+    """
+    Creates an anisotropic power map.
+
+    Parameters
+    ----------
+    dwi : str, ndarray, or nifti1image
+        Data to greate map with.
+
+    gtab : GradientTable
+        A GradientTable with all the gradient information.
+
+    dwi_affine : ndarray, optional
+        Affine associated with the dwi data.
+        If None, will attempt to use affine from dwi image.
+        Default: None.
+
+    mask : str or nifti1image, optional
+        mask to mask the data with.
+        Default: None.
+
+    Returns
+    -------
+    nib.Nifti1Image class instance containing an anisotropic power map.
+    """
+
+    if isinstance(dwi, str):
+        dwi = nib.load(dwi)
+    if isinstance(dwi, nib.Nifti1Image):
+        dwi_data = dwi.get_fdata()
+    else:
+        dwi_data = dwi
+
+    if dwi_affine is None:
+        dwi_affine = dwi.affine
+
+    if isinstance(mask, str):
+        mask = nib.load(mask)
+    mask = mask.get_fdata()
+
+    model = shm.QballModel(gtab, 8)
+    sphere = dpd.get_sphere('symmetric724')
+    peaks = csdeconv.peaks_from_model(
+        model=model,
+        data=dwi_data,
+        sphere=sphere,
+        relative_peak_threshold=.5,
+        min_separation_angle=25,
+        mask=mask)
+    ap = shm.anisotropic_power(peaks.shm_coeff)
+
+    return nib.Nifti1Image(ap, dwi_affine)

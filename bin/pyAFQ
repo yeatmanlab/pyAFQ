@@ -73,10 +73,17 @@ bundles = {api.BUNDLES}
 seg_algo = 'AFQ'
 scalars_model = 'DTI'
 scalars = ['dti_fa', 'dti_md']
+target_b_val=None
+target_b_sensitivity=50.0
+
+[template]
+reg_subject="b0"
+reg_template="mni_t2"
+mask_template=True
 
 [tracking]
 {chr(10).join(track_defaults_list)}
-wm_criterion = [250, 251, 252, 253, 254, 255, 41, 2, 16, 77]
+wm_criterion = 0.1
 
 [segmentation]
 {chr(10).join(seg_defaults_list)}
@@ -142,7 +149,6 @@ with open(afq_metadata_file, 'w') as ff:
     toml.dump(config, ff)
 
 seg_suffix = files.get("seg_suffix", "seg")
-reg_template = files.get("reg_template", None)
 
 tracking = config.get("tracking", {})
 tracking_params = {}
@@ -151,7 +157,7 @@ for k, v in track_defaults.items():
 
 wm_criterion = tracking.get(
     "wm_criterion",
-    [250, 251, 252, 253, 254, 255, 41, 2, 16, 77])
+    0.1)
 
 segmentation = config.get("segmentation", {})
 segmentation_params = {}
@@ -163,6 +169,8 @@ bundles = config.get("bundles", {})
 bundle_names = bundles.get("bundles", api.BUNDLES)
 scalars_model = bundles.get("scalars_model", "DTI")
 scalars = bundles.get("scalars", ["fa", "md"])
+target_b_val = bundles.get("target_b_val", None)
+target_b_sensitivity = bundles.get("target_b_sensitivity", 50.0)
 
 cleaning = config.get("cleaning", {})
 clean_params = {}
@@ -175,6 +183,11 @@ force_recompute = compute.get("force_recompute", False)
 virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
 viz_backend = compute.get("viz_backend", 'fury')
 
+template = config.get("template", {})
+reg_subject = template.get("reg_subject", "b0")
+reg_template = template.get("reg_template", "mni_t2")
+mask_template = template.get("mask_template", True)
+
 myafq = api.AFQ(bids_path,
                 dmriprep=dmriprep,
                 segmentation=segmentation_path,
@@ -183,8 +196,10 @@ myafq = api.AFQ(bids_path,
                 bundle_names=bundle_names,
                 dask_it=dask_it,
                 force_recompute=force_recompute,
-                reg_template=reg_template,
                 wm_criterion=wm_criterion,
+                reg_subject=reg_subject,
+                reg_template=reg_template,
+                mask_template=mask_template,
                 virtual_frame_buffer=virtual_frame_buffer,
                 viz_backend=viz_backend,
                 segmentation_params=segmentation_params,

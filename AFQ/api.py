@@ -16,6 +16,7 @@ from dipy.segment.mask import median_otsu
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile
 
 from bids.layout import BIDSLayout
@@ -139,18 +140,23 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
 class AFQ(object):
     """
     """
+
     def __init__(self,
                  bids_path,
                  dmriprep='dmriprep',
                  segmentation='dmriprep',
                  seg_suffix='seg',
                  b0_threshold=0,
+                 min_bval=None,
+                 max_bval=None,
+                 reg_subject="b0",
+                 reg_template="mni_T2",
+                 mask_template=True,
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
-                 reg_template=None,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+                 wm_criterion=0.1,
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -182,13 +188,43 @@ class AFQ(object):
         b0_threshold : int, optional
             The value of b under which it is considered to be b0. Default: 0.
 
+        min_bval : float, optional
+            Minimum b value you want to use from the dataset (other than b0).
+            If None, there is no minimum limit. Default: None
+
+        max_bval : float, optional
+            Maximum b value you want to use from the dataset (other than b0).
+            If None, there is no maximum limit. Default: None
+
         odf_model : string, optional
-            Which model to use for determining directions in tractography
-            {"DTI", "DKI", "CSD"}. Default: "DTI"
+            Which model to use for determining directions in tractography.
+            Can be one of: {"DTI", "DKI", "CSD"}. Default: "DTI"
 
         directions : string, optional
             How to select directions for tracking (deterministic or
             probablistic) {"det", "prob"}. Default: "det".
+
+        reg_subject : str or Nifti1Image, optional
+            The source image data to be registered.
+            Can either be a Nifti1Image, a path to a Nifti1Image, or
+            If "b0", "dti_fa_subject", "subject_sls", or "power_map,"
+            image data will be loaded automatically.
+            If "subject_sls" is used, slr registration will be used
+            and reg_template should be "hcp_atlas".
+            Default: "b0"
+
+        reg_template : str or Nifti1Image, optional
+            The target image data for registration.
+            Can either be a Nifti1Image, a path to a Nifti1Image, or
+            If "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+            image data will be loaded automatically.
+            If "hcp_atlas" is used, slr registration will be used
+            and reg_subject should be "subject_sls".
+            Default: "mni_T2"
+
+        mask_template : bool, optional
+            Whether to mask the chosen template(s) with a brain-mask
+            Default: True
 
         dask_it : bool, optional
             Whether to use a dask DataFrame object
@@ -201,9 +237,11 @@ class AFQ(object):
         wm_criterion : list or float, optional
             This is either a list of the labels of the white matter in the
             segmentation file or (if a float is provided) the threshold FA to
-            use for creating the white-matter mask. Default: the white matter
-            values for the segmentation provided with the HCP data, including
-            labels for midbrain: [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+            use for creating the white-matter mask. For example, the white
+            matter values for the segmentation provided with the HCP data
+            including labels for midbrain are:
+            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
+            Default: 0.1
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the
@@ -222,8 +260,15 @@ class AFQ(object):
             of the seg.Segmentation object
 
         tracking_params: dict, optional
-            The parameters for tracking. Default: use the default behavior of
-            the aft.track function.
+            The parameters for tracking.
+
+            Parameters with suffix_mask are handled differently by this api.
+            Masks which are strings that are in scalars or are "wm_mask"
+            will be replaced by the corresponding mask. Masks which are paths
+            will be loaded. All masks set to None will default to "wm_mask".
+            To track the entire volume, set mask to "full".
+
+            Default: use the default behavior of the aft.track function.
 
         clean_params: dict, optional
             The parameters for cleaning. Default: use the default behavior of
@@ -233,8 +278,28 @@ class AFQ(object):
 
         self.force_recompute = force_recompute
 
+        self.max_bval = max_bval
+        self.min_bval = min_bval
+
         self.wm_criterion = wm_criterion
-        self.use_prealign = use_prealign
+        self.reg_subject = reg_subject
+        self.reg_template = reg_template
+        self.mask_template = mask_template
+        if reg_subject == 'subject_sls' or reg_template == 'hcp_atlas':
+            if reg_template != 'hcp_atlas':
+                self.logger.error(
+                    "If reg_subject is 'subject_sls',"
+                    + " reg_template must be 'hcp_atlas'")
+            if reg_subject != 'subject_sls':
+                self.logger.error(
+                    "If reg_template is 'hcp_atlas',"
+                    + " reg_subject must be 'subject_sls'")
+
+            self.reg_algo = 'slr'
+        else:
+            self.reg_algo = 'syn'
+        self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
+        self.b0_threshold = b0_threshold
 
         self.scalars = scalars
 
@@ -245,6 +310,8 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend)
 
         default_tracking_params = get_default_args(aft.track)
+        default_tracking_params["seed_mask"] = "wm_mask"
+        default_tracking_params["stop_mask"] = "wm_mask"
         # Replace the defaults only for kwargs for which a non-default value was
         # given:
         if tracking_params is not None:
@@ -268,17 +335,11 @@ class AFQ(object):
 
         self.clean_params = default_clean_params
 
-        if reg_template is None:
-            self.reg_template = afd.read_mni_template()
-        else:
-            if not isinstance(reg_template, nib.Nifti1Image):
-                reg_template = nib.load(reg_template)
-            self.reg_template = reg_template
-
         # Create the bundle dict after reg_template has been resolved:
+        self.reg_template_img, _ = self._reg_img(self.reg_template)
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
-                                            resample_to=reg_template)
+                                            resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'afq')
@@ -392,12 +453,28 @@ class AFQ(object):
         self.logger.info(f"Saving {fname}")
         save_tractogram(sft, fname, bbox_valid_check=False)
 
+    def _get_data_gtab(self, row, filter_b=True):
+        img = nib.load(row['dwi_file'])
+        data = img.get_fdata()
+        bvals, bvecs = read_bvals_bvecs(row['bval_file'], row['bvec_file'])
+        if filter_b and (self.min_bval is not None):
+            valid_b = (bvals >= self.min_bval) or (bvals <= self.b0_threshold)
+            data = data[..., valid_b]
+            bvals = bvals[valid_b]
+            bvecs = bvecs[valid_b]
+        if filter_b and (self.max_bval is not None):
+            valid_b = (bvals <= self.max_bval) or (bvals <= self.b0_threshold)
+            data = data[..., valid_b]
+            bvals = bvals[valid_b]
+            bvecs = bvecs[valid_b]
+        gtab = dpg.gradient_table(bvals, bvecs,
+                                  b0_threshold=self.b0_threshold)
+        return data, gtab, img
+
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
         if self.force_recompute or not op.exists(b0_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, img = self._get_data_gtab(row, filter_b=False)
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
             self.log_and_save_nii(mean_b0_img, b0_file)
@@ -412,19 +489,27 @@ class AFQ(object):
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if self.force_recompute or not op.exists(brain_mask_file):
-            b0_file = self._b0(row)
-            mean_b0_img = nib.load(b0_file)
-            mean_b0 = mean_b0_img.get_fdata()
-            _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                        autocrop, dilate=dilate)
-            be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                     mean_b0_img.affine)
-            self.log_and_save_nii(be_img, brain_mask_file)
-            meta = dict(source=b0_file,
-                        median_radius=median_radius,
-                        numpass=numpass,
-                        autocrop=autocrop,
-                        vol_idx=vol_idx)
+            if 'seg_file' in row.index:
+                brain_mask, meta = \
+                    self._mask_from_seg(row, [0], not_equal=True)
+                self.log_and_save_nii(
+                    nib.Nifti1Image(brain_mask.astype(np.float32),
+                                    row['dwi_affine']),
+                    brain_mask_file)
+            else:
+                b0_file = self._b0(row)
+                mean_b0_img = nib.load(b0_file)
+                mean_b0 = mean_b0_img.get_fdata()
+                _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
+                                            autocrop, dilate=dilate)
+                be_img = nib.Nifti1Image(brain_mask.astype(int),
+                                         mean_b0_img.affine)
+                self.log_and_save_nii(be_img, brain_mask_file)
+                meta = dict(source=b0_file,
+                            median_radius=median_radius,
+                            numpass=numpass,
+                            autocrop=autocrop,
+                            vol_idx=vol_idx)
             meta_fname = self._get_fname(row, '_brain_mask.json')
             afd.write_json(meta_fname, meta)
         return brain_mask_file
@@ -439,9 +524,7 @@ class AFQ(object):
     def _dti(self, row):
         dti_params_file = self._get_fname(row, '_model-DTI_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(dti_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             dtf = dti_fit(gtab, data, mask=mask)
@@ -467,9 +550,7 @@ class AFQ(object):
     def _dki(self, row):
         dki_params_file = self._get_fname(row, '_model-DKI_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(dki_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             dkf = dki_fit(gtab, data, mask=mask)
@@ -487,9 +568,7 @@ class AFQ(object):
     def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,):
         csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(csd_params_file):
-            img = nib.load(row['dwi_file'])
-            data = img.get_fdata()
-            gtab = row['gtab']
+            data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
             csdf = csd_fit(gtab, data, mask=mask,
@@ -589,20 +668,72 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
+    def _anisotropic_power_map(self, row):
+        pmap_file = self._get_fname(
+            row, '_anisotropic_power_map.nii.gz')
+        if self.force_recompute or not op.exists(pmap_file):
+            dwi_data, gtab, img = self._get_data_gtab(row)
+            mask = self._brain_mask(row)
+            pmap = afd.create_anisotropic_power_map(
+                dwi_data, gtab, img.affine, mask)
+            self.log_and_save_nii(pmap, pmap_file)
+
+        return pmap_file
+
+    def _reg_img(self, img, row=None):
+        if isinstance(img, str):
+            img_l = img.lower()
+            if img_l == "mni_t2":
+                img = afd.read_mni_template(
+                    mask=self.mask_template, weight="T2w")
+            elif img_l == "mni_t1":
+                img = afd.read_mni_template(
+                    mask=self.mask_template, weight="T1w")
+            elif img_l == "b0":
+                img = nib.load(self._b0(row))
+            elif img_l == "dti_fa_subject":
+                img = nib.load(self._dti_fa(row))
+            elif img_l == "dti_fa_template":
+                img = afd.read_ukbb_fa_template(mask=self.mask_template)
+            elif img_l == "power_map":
+                img = nib.load(self._anisotropic_power_map(row))
+            elif img_l == "subject_sls":
+                img = nib.load(row['dwi_file'])
+                tg = load_tractogram(self._streamlines(row),
+                                     img,
+                                     Space.VOX,
+                                     bbox_valid_check=False)
+                return img, tg.streamlines
+            elif img_l == "hcp_atlas":
+                atlas_fname = op.join(
+                    afd.afq_home,
+                    'hcp_atlas_16_bundles',
+                    'Atlas_in_MNI_Space_16_bundles',
+                    'whole_brain',
+                    'whole_brain_MNI.trk')
+                if not op.exists(atlas_fname):
+                    afd.fetch_hcp_atlas_16_bundles()
+                img = afd.read_mni_template(mask=self.mask_template)
+                hcp_atlas = load_tractogram(
+                    atlas_fname,
+                    'same', bbox_valid_check=False)
+
+                return img, hcp_atlas.streamlines
+            else:
+                img = nib.load(img)
+
+        return img, None
+
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            moving = nib.load(self._b0(row))
-            static = afd.read_mni_template()
-            moving_data = moving.get_fdata()
-            moving_affine = moving.affine
-            static_data = static.get_fdata()
-            static_affine = static.affine
-            _, aff = reg.affine_registration(moving_data,
-                                             static_data,
-                                             moving_affine,
-                                             static_affine)
+            reg_subject_img, _ = self._reg_img(self.reg_subject, row)
+            _, aff = reg.affine_registration(
+                reg_subject_img.get_fdata(),
+                self.reg_template_img.get_fdata(),
+                reg_subject_img.affine,
+                self.reg_template_img.affine)
             np.save(prealign_file, aff)
             meta_fname = self._get_fname(
                 row, '_prealign_from-DWI_to-MNI_xfm.json')
@@ -628,7 +759,7 @@ class AFQ(object):
 
             mapping_file = self._mapping(row)
             mapping = reg.read_mapping(mapping_file, b0_file,
-                                       self.reg_template,
+                                       self.reg_template_img,
                                        prealign=reg_prealign)
 
             warped_b0 = mapping.transform(mean_b0)
@@ -639,61 +770,85 @@ class AFQ(object):
         return b0_warped_file
 
     def _mapping(self, row):
-        if self.use_prealign:
-            mapping_file = self._get_fname(
-                row,
-                '_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        mapping_file = self._get_fname(
+            row,
+            '_mapping_from-DWI_to_MNI_xfm')
+        meta_fname = self._get_fname(row, '_mapping_reg')
+        if not self.use_prealign:
+            mapping_file = mapping_file + '_without_prealign'
+            meta_fname = meta_fname + '_without_prealign'
+        if self.reg_algo == "slr":
+            mapping_file = mapping_file + '.npy'
         else:
-            mapping_file = self._get_fname(
-                row,
-                '_mapping_from-DWI_to_MNI_xfm'
-                + '_without_prealign.nii.gz')
+            mapping_file = mapping_file + '.nii.gz'
+        meta_fname = meta_fname + '.json'
 
         if self.force_recompute or not op.exists(mapping_file):
-            gtab = row['gtab']
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
                 reg_prealign = None
 
-            warped_b0, mapping = reg.syn_register_dwi(
-                row['dwi_file'], gtab,
-                template=self.reg_template,
-                prealign=reg_prealign)
+            reg_template_img, reg_template_sls = \
+                self._reg_img(self.reg_template, row)
+            reg_subject_img, reg_subject_sls = \
+                self._reg_img(self.reg_subject, row)
+
+            if self.reg_algo == "slr":
+                mapping = reg.slr_registration(
+                    reg_subject_sls, reg_template_sls,
+                    moving_affine=reg_subject_img.affine,
+                    moving_shape=reg_subject_img.shape,
+                    static_affine=reg_template_img.affine,
+                    static_shape=reg_template_img.shape)
+            else:
+                _, mapping = reg.syn_registration(
+                    reg_subject_img.get_fdata(),
+                    reg_template_img.get_fdata(),
+                    moving_affine=reg_subject_img.affine,
+                    static_affine=reg_template_img.affine,
+                    prealign=reg_prealign)
 
             if self.use_prealign:
                 mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
 
             reg.write_mapping(mapping, mapping_file)
-            meta_fname = self._get_fname(row, '_mapping_reg_prealign.json')
             meta = dict(type="displacementfield")
             afd.write_json(meta_fname, meta)
 
         return mapping_file
 
+    def _mask_from_seg(self, row, wm_labels, not_equal=False):
+        dwi_data, _, dwi_img = self._get_data_gtab(row)
+
+        # If we found a white matter segmentation in the
+        # expected location:
+        seg_img = nib.load(row['seg_file'])
+        seg_data_orig = seg_img.get_fdata()
+        # For different sets of labels, extract all the voxels that
+        # have any of these values:
+        wm_mask = np.zeros(seg_data_orig.shape, dtype=bool)
+        for label in wm_labels:
+            if not_equal:
+                wm_mask = np.logical_or(wm_mask, (seg_data_orig != label))
+            else:
+                wm_mask = np.logical_or(wm_mask, (seg_data_orig == label))
+
+        # Resample to DWI data:
+        wm_mask = np.round(reg.resample(wm_mask.astype(float),
+                                        dwi_data[..., 0],
+                                        seg_img.affine,
+                                        dwi_img.affine)).astype(int)
+        meta = dict(source=row['seg_file'],
+                    wm_criterion=wm_labels)
+
+        return wm_mask, meta
+
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
-            dwi_img = nib.load(row['dwi_file'])
-            dwi_data = dwi_img.get_fdata()
-
             if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
-                # If we found a white matter segmentation in the
-                # expected location:
-                seg_img = nib.load(row['seg_file'])
-                seg_data_orig = seg_img.get_fdata()
-                # For different sets of labels, extract all the voxels that
-                # have any of these values:
-                wm_mask = np.sum(np.concatenate(
-                    [(seg_data_orig == l)[..., None]
-                     for l in self.wm_criterion], -1), -1)
-
-                # Resample to DWI data:
-                wm_mask = np.round(reg.resample(wm_mask, dwi_data[..., 0],
-                                                seg_img.affine,
-                                                dwi_img.affine)).astype(int)
-                meta = dict(source=row['seg_file'],
-                            wm_criterion=self.wm_criterion)
+                wm_mask, meta = self._mask_from_seg(row, self.wm_criterion)
             else:
                 # Otherwise, we'll identify the white matter based on FA:
                 fa_fname = self._dti_fa(row)
@@ -714,6 +869,25 @@ class AFQ(object):
 
         return wm_mask_file
 
+    def _get_mask(self, row, mask):
+        if isinstance(mask, str):
+            if mask == "wm_mask":
+                fname = self._wm_mask(row)
+                mask_data = nib.load(fname).get_fdata().astype(bool)
+            elif mask in self.scalars:
+                fname = self._scalar_dict[mask](self, row)
+                mask_data = nib.load(fname).get_fdata()
+            elif mask == "full":
+                fname = "Entire Volume"
+                mask_data = None
+            else:
+                fname = mask
+                mask_data = nib.load(fname).get_fdata()
+            return mask_data, fname
+        else:
+            return mask, "custom"
+
+
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
 
@@ -729,11 +903,13 @@ class AFQ(object):
                 params_file = self._csd(row)
             elif odf_model == "DKI":
                 params_file = self._dki(row)
-            wm_mask_fname = self._wm_mask(row)
-            wm_mask = nib.load(wm_mask_fname).get_fdata().astype(bool)
-            self.tracking_params['seed_mask'] = wm_mask
-            self.tracking_params['stop_mask'] = wm_mask
-            sft = aft.track(params_file, **self.tracking_params)
+
+            tracking_params = self.tracking_params.copy()
+            tracking_params['seed_mask'], seed_mask_desc =\
+                self._get_mask(row, self.tracking_params['seed_mask'])
+            tracking_params['stop_mask'], stop_mask_desc =\
+                self._get_mask(row, self.tracking_params['stop_mask'])
+            sft = aft.track(params_file, **tracking_params)
             sft.to_vox()
             meta_directions = {"det": "deterministic",
                                "prob": "probabilistic"}
@@ -744,10 +920,10 @@ class AFQ(object):
                     self.tracking_params["directions"]],
                 Count=len(sft.streamlines),
                 Seeding=dict(
-                    ROI=wm_mask_fname,
+                    ROI=seed_mask_desc,
                     n_seeds=self.tracking_params["n_seeds"],
                     random_seeds=self.tracking_params["random_seeds"]),
-                Constraints=dict(AnatomicalImage=wm_mask_fname),
+                Constraints=dict(AnatomicalImage=stop_mask_desc),
                 Parameters=dict(
                     Units="mm",
                     StepSize=self.tracking_params["step_size"],
@@ -789,7 +965,7 @@ class AFQ(object):
                                            row['dwi_file'],
                                            row['bval_file'],
                                            row['bvec_file'],
-                                           reg_template=self.reg_template,
+                                           reg_template=self.reg_template_img,
                                            mapping=self._mapping(row),
                                            reg_prealign=reg_prealign)
 
@@ -929,14 +1105,20 @@ class AFQ(object):
     def _template_xform(self, row):
         template_xform_file = self._get_fname(row, "_template_xform.nii.gz")
         if self.force_recompute or not op.exists(template_xform_file):
-            reg_prealign = np.load(self._reg_prealign(row))
+            if self.use_prealign:
+                reg_prealign_inv = np.linalg.inv(
+                    np.load(self._reg_prealign(row))
+                )
+            else:
+                reg_prealign_inv = None
+
             mapping = reg.read_mapping(self._mapping(row),
                                        row['dwi_file'],
-                                       self.reg_template,
-                                       prealign=np.linalg.inv(reg_prealign))
+                                       self.reg_template_img,
+                                       prealign=reg_prealign_inv)
 
             template_xform = mapping.transform_inverse(
-                self.reg_template.get_fdata())
+                self.reg_template_img.get_fdata())
             self.log_and_save_nii(nib.Nifti1Image(template_xform,
                                                   row['dwi_affine']),
                                   template_xform_file)
@@ -952,7 +1134,7 @@ class AFQ(object):
 
         mapping = reg.read_mapping(self._mapping(row),
                                    row['dwi_file'],
-                                   self.reg_template,
+                                   self.reg_template_img,
                                    prealign=reg_prealign_inv)
 
         rois_dir = op.join(row['results_dir'], 'ROIs')
@@ -1144,7 +1326,6 @@ class AFQ(object):
             try:
                 figure = self.viz.visualize_bundles(
                     bundles_file,
-                    affine=row['dwi_affine'],
                     color_by_volume=color_by_volume,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
@@ -1216,8 +1397,8 @@ class AFQ(object):
                 include_seg=True)
 
             visualize_tract_profiles(tract_profiles,
-                                         scalar=scalar,
-                                         file_name=fname)
+                                     scalar=scalar,
+                                     file_name=fname)
 
     def _get_affine(self, fname):
         return nib.load(fname).affine

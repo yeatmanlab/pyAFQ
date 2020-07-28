@@ -10,9 +10,8 @@ from dipy.align.imwarp import (SymmetricDiffeomorphicRegistration,
                                DiffeomorphicMap)
 
 from dipy.align.imaffine import (transform_centers_of_mass,
-                                 AffineMap,
                                  MutualInformationMetric,
-                                 AffineRegistration)
+                                 AffineRegistration, AffineMap)
 
 from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D,
@@ -20,13 +19,15 @@ from dipy.align.transforms import (TranslationTransform3D,
 
 import dipy.core.gradients as dpg
 import dipy.data as dpd
-from dipy.align.streamlinear import StreamlineLinearRegistration
+from dipy.align.streamlinear import \
+    StreamlineLinearRegistration, whole_brain_slr
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import transform_tracking_output
 from dipy.io.streamline import load_tractogram, load_trk
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
+from AFQ._fixes import ConformedAffineMap
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
@@ -152,8 +153,12 @@ def write_mapping(mapping, fname):
         Full path to the nifti file storing the mapping
 
     """
-    mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
-    nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid), fname)
+    if isinstance(mapping, DiffeomorphicMap):
+        mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
+        nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid),
+                 fname)
+    else:
+        np.save(fname, mapping.affine)
 
 
 def read_mapping(disp, domain_img, codomain_img, prealign=None):
@@ -162,9 +167,11 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
 
     Parameters
     ----------
-    disp : str or Nifti1Image
-        A file of image containing the mapping displacement field in each voxel
+    disp : str, Nifti1Image, or ndarray
+        If string, file must of an image or ndarray.
+        If image, contains the mapping displacement field in each voxel
         Shape (x, y, z, 3, 2)
+        If ndarray, contains affine transformation used for mapping
 
     domain_img : str or Nifti1Image
 
@@ -175,7 +182,10 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
     A :class:`DiffeomorphicMap` object
     """
     if isinstance(disp, str):
-        disp = nib.load(disp)
+        if "nii.gz" in disp:
+            disp = nib.load(disp)
+        else:
+            disp = np.load(disp)
 
     if isinstance(domain_img, str):
         domain_img = nib.load(domain_img)
@@ -183,18 +193,27 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
     if isinstance(codomain_img, str):
         codomain_img = nib.load(codomain_img)
 
-    mapping = DiffeomorphicMap(3, disp.shape[:3],
-                               disp_grid2world=np.linalg.inv(disp.affine),
-                               domain_shape=domain_img.shape[:3],
-                               domain_grid2world=domain_img.affine,
-                               codomain_shape=codomain_img.shape,
-                               codomain_grid2world=codomain_img.affine,
-                               prealign=prealign)
+    if isinstance(disp, nib.Nifti1Image):
+        mapping = DiffeomorphicMap(3, disp.shape[:3],
+                                   disp_grid2world=np.linalg.inv(disp.affine),
+                                   domain_shape=domain_img.shape[:3],
+                                   domain_grid2world=domain_img.affine,
+                                   codomain_shape=codomain_img.shape,
+                                   codomain_grid2world=codomain_img.affine,
+                                   prealign=prealign)
 
-    disp_data = disp.get_fdata().astype(np.float32)
-    mapping.forward = disp_data[..., 0]
-    mapping.backward = disp_data[..., 1]
-    mapping.is_inverse = True
+        disp_data = disp.get_fdata().astype(np.float32)
+        mapping.forward = disp_data[..., 0]
+        mapping.backward = disp_data[..., 1]
+        mapping.is_inverse = True
+    else:
+        mapping = ConformedAffineMap(disp,
+                                     domain_grid_shape=reduce_shape(
+                                         domain_img.shape),
+                                     domain_grid2world=domain_img.affine,
+                                     codomain_grid_shape=reduce_shape(
+                                         codomain_img.shape),
+                                     codomain_grid2world=codomain_img.affine)
 
     return mapping
 
@@ -276,7 +295,6 @@ def affine_registration(moving, static,
                         sigmas=[5.0, 2.5, 0.0],
                         factors=[4, 2, 1],
                         params0=None):
-
     """
     Find the affine transformation between two 3D images.
 
@@ -443,3 +461,50 @@ def streamline_registration(moving, static, n_points=100,
         aligned = transform_tracking_output(aligned, np.linalg.inv(srm.matrix))
 
     return aligned, srm.matrix
+
+
+def reduce_shape(shape):
+    """
+    Reduce dimension in shape to 3 if possible
+    """
+    try:
+        return shape[:3]
+    except TypeError:
+        return shape
+
+
+def slr_registration(moving_data, static_data,
+                     moving_affine=None, static_affine=None,
+                     moving_shape=None, static_shape=None, **kwargs):
+    """Register a source image (moving) to a target image (static).
+
+    Parameters
+    ----------
+    moving : ndarray
+        The source tractography data to be registered
+    moving_affine : ndarray
+        The affine associated with the moving (source) data.
+    moving_shape : ndarray
+        The shape of the space associated with the static (target) data.
+    static : ndarray
+        The target tractography data for registration
+    static_affine : ndarray
+        The affine associated with the static (target) data.
+    static_shape : ndarray
+        The shape of the space associated with the static (target) data.
+
+    **kwargs:
+        kwargs are passed into whole_brain_slr
+
+    Returns
+    -------
+    AffineMap
+    """
+    _, transform, _, _ = whole_brain_slr(
+        static_data, moving_data, x0='affine', verbose=False, **kwargs)
+
+    return ConformedAffineMap(transform,
+                              codomain_grid_shape=reduce_shape(static_shape),
+                              codomain_grid2world=static_affine,
+                              domain_grid_shape=reduce_shape(moving_shape),
+                              domain_grid2world=moving_affine)

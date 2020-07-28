@@ -20,7 +20,8 @@
         "id": "bundles_group",
         "name": "Bundles Group",
         "description": "Parameters related to bundles of interest.",
-        "members": ["bundles", "bundles_seg_algo", "scalars_model", "scalars"]
+        "members": ["bundles", "bundles_seg_algo", "scalars_model", "scalars", 
+                    "target_b_val", "target_b_sensitivity"]
     },
     {
         "id": "tracking_group",
@@ -46,6 +47,12 @@
         "description": "Parameters related to cleaning.",
         "members": ["n_points", "clean_rounds", "distance_threshold",
                     "length_threshold", "min_sl", "stat", "cleaning_return_idx"]
+    },
+    {
+        "id": "template_group",
+        "name": "Template Group",
+        "description": "Parameters related to registering to a template.",
+        "members": ["reg_subject", "reg_template", "mask_template"]
     }
     ],
     "inputs": [
@@ -88,6 +95,22 @@
         "value-key": "[BUNDLES_SEG_ALGO]",
         "value-choices": ["AFQ", "Reco"],
         "default-value": "AFQ",
+        "optional": true
+    },
+    {
+        "id": "target_b_val",
+        "name": "target b val",
+        "type": "Number",
+        "value-key": "[TARGET_B_VAL]",
+        "default-value": "None",
+        "optional": true
+    },
+    {
+        "id": "target_b_sensitivity",
+        "name": "target b sensitivity",
+        "type": "Number",
+        "value-key": "[TARGET_B_SENSITIVITY]",
+        "default-value": 50.0,
         "optional": true
     },
     {
@@ -237,7 +260,7 @@
         "min-list-entries": 1,
         "list-separator": ", ",
         "value-key": "[WM_CRITERION]",
-        "default-value": [250, 251, 252, 253, 254, 255, 41, 2, 16, 77],
+        "default-value": 0.1,
         "description": "The values specified correspond to all whitematter regions in the FreeSurfer aparc+aseg parcellation or an FA threshold to use.",
         "optional": true
     },
@@ -443,6 +466,31 @@
         "optional": true
     },
     {
+        "id": "reg_subject",
+        "name": "reg subject",
+        "type": "String",
+        "value-key": "[REG_SUBJECT]",
+        "default-value": "b0",
+        "optional": true
+    },
+    {
+        "id": "reg_template",
+        "name": "reg template",
+        "type": "String",
+        "value-key": "[REG_TEMPLATE]",
+        "default-value": "mni_t2",
+        "optional": true
+    },
+    {
+        "id": "mask_template",
+        "name": "mask template",
+        "type": "String",
+        "value-key": "[MASK_TEMPLATE]",
+        "value-choices": ["false", "true"],
+        "default-value": "true",
+        "optional": true
+    },
+    {
         "id": "dask_it",
         "name": "dask it",
         "type": "String",
@@ -467,6 +515,8 @@
             "[bundles]",
             "bundles = ['[BUNDLES]']",
             "seg_algo = '[BUNDLES_SEG_ALGO]'",
+            "target_b_val = [TARGET_B_VAL]",
+            "target_b_sensitivity = [TARGET_B_SENSITIVITY]",
             "scalars_model = '[SCALARS_MODEL]'",
             "scalars = ['[SCALARS]']",
             "",
@@ -511,6 +561,11 @@
             "min_sl = [MIN_SL]",
             "stat = '[STAT]'",
             "return_idx = [CLEANING_RETURN_IDX]",
+            "",
+            "[template]",
+            "reg_subject=[REG_SUBJECT]",
+            "reg_template=[REG_TEMPLATE]",
+            "mask_template=[MASK_TEMPLATE]",
             "",
             "[compute]",
             "dask_it = [DASK_IT]",

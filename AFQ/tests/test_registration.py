@@ -12,12 +12,13 @@ import dipy.core.gradients as dpg
 from AFQ.registration import (syn_registration, register_series, register_dwi,
                               c_of_mass, translation, rigid, affine,
                               streamline_registration, write_mapping,
-                              read_mapping, syn_register_dwi, DiffeomorphicMap)
+                              read_mapping, syn_register_dwi, DiffeomorphicMap,
+                              slr_registration)
 
 import AFQ.data as afd
 
 from dipy.tracking.utils import transform_tracking_output
-from dipy.io.streamline import load_trk, save_trk
+from dipy.io.streamline import load_trk, save_trk, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 MNI_T2 = afd.read_mni_template()
@@ -54,6 +55,53 @@ def test_syn_registration():
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
         mapping_fname = op.join(tmpdir, 'mapping.nii.gz')
+        write_mapping(mapping, mapping_fname)
+        file_mapping = read_mapping(mapping_fname,
+                                    subset_b0_img,
+                                    subset_t2_img)
+
+        # Test that it has the same effect on the data:
+        warped_from_file = file_mapping.transform(subset_b0)
+        npt.assert_equal(warped_from_file, warped_moving)
+
+        # Test that it is, attribute by attribute, identical:
+        for k in mapping.__dict__:
+            assert (np.all(mapping.__getattribute__(k) ==
+                           file_mapping.__getattribute__(k)))
+
+
+def test_slr_registration():
+    # have to import subject sls
+    file_dict = afd.read_stanford_hardi_tractography()
+    streamlines = file_dict['tractography_subsampled.trk']
+
+    # have to import sls atlas
+    afd.fetch_hcp_atlas_16_bundles()
+    atlas_fname = op.join(
+        afd.afq_home,
+        'hcp_atlas_16_bundles',
+        'Atlas_in_MNI_Space_16_bundles',
+        'whole_brain',
+        'whole_brain_MNI.trk')
+    hcp_atlas = load_tractogram(
+        atlas_fname,
+        'same', bbox_valid_check=False)
+
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        mapping = slr_registration(streamlines,
+                                   hcp_atlas.streamlines,
+                                   moving_affine=subset_b0_img.affine,
+                                   static_affine=subset_t2_img.affine,
+                                   moving_shape=subset_b0_img.shape,
+                                   static_shape=subset_t2_img.shape,
+                                   progressive=False,
+                                   greater_than=10,
+                                   rm_small_clusters=1,
+                                   rng=np.random.RandomState(seed=8))
+        warped_moving = mapping.transform(subset_b0)
+
+        npt.assert_equal(warped_moving.shape, subset_t2.shape)
+        mapping_fname = op.join(tmpdir, 'mapping.npy')
         write_mapping(mapping, mapping_fname)
         file_mapping = read_mapping(mapping_fname,
                                     subset_b0_img,

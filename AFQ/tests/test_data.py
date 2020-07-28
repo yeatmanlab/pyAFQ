@@ -41,12 +41,12 @@ def test_bundles_to_aal():
 
     targets = afd.bundles_to_aal(["ATR_L"], atlas)
     npt.assert_equal(targets,
-                     [[None, np.array(np.where(atlas[..., 0] == 1)).T]])
+                     [[np.array(np.where(atlas[..., 0] == 1)).T, None]])
 
 
     atlas[0, 0, 1, 0] = 2
 
     targets = afd.bundles_to_aal(["ATR_L", "ATR_R"], atlas)
     npt.assert_equal(targets,
-                     [[None, np.array(np.where(atlas[..., 0] == 1)).T],
-                      [None, np.array(np.where(atlas[..., 0] == 2)).T]])
+                     [[np.array(np.where(atlas[..., 0] == 1)).T, None],
+                      [np.array(np.where(atlas[..., 0] == 2)).T, None]])
