@@ -582,7 +582,7 @@ class CSVcomparison():
                     profile = profile[
                         (profile['subjectID'] == subject)
                         & (profile['bundle'] == bundle)
-                    ][scalar].to_numpy()[1:]
+                    ][scalar].to_numpy()
                     if (len(profile) > 0):
                         ax.plot(profile)
                     else:
@@ -645,7 +645,7 @@ class CSVcomparison():
                     profiles[i] = profile[
                         (profile['subjectID'] == subject)
                         & (profile['bundle'] == bundle)
-                    ][scalar].to_numpy()[1:]
+                    ][scalar].to_numpy()
                     if len(profiles[i]) < 1:
                         both_found = False
                         self._warn_not_found(subject, bundle, name)
@@ -662,7 +662,8 @@ class CSVcomparison():
 
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
-                          bundles=POSITIONS.keys()):
+                          bundles=POSITIONS.keys(),
+                          show_plots=False):
         """
         Plot the scan-rescan reliability using Pearson's r for some scalars.
         List of subjects taken from first dataset.
@@ -681,11 +682,17 @@ class CSVcomparison():
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
 
+        show_plots : bool, optional
+            Whether to show plots if in an interactive environment.
+            Default: False
+
         Returns
         -------
         Matplotlib figure and axes.
         """
         now = datetime.datetime.now().isoformat('T')
+        if not show_plots:
+            plt.ioff()
         if names is None:
             names = list(self.profile_dict.keys())
         if len(names) != 2:
@@ -706,7 +713,7 @@ class CSVcomparison():
                         single_profile = profile[
                             (profile['subjectID'] == subject)
                             & (profile['bundle'] == bundle)
-                        ][scalar].to_numpy()[1:]
+                        ][scalar].to_numpy()
                         if len(single_profile) < 1:
                             self._warn_not_found(subject, bundle, name)
                         else:
@@ -735,6 +742,8 @@ class CSVcomparison():
             now,
             f"{names[0]}_vs_{names[1]}"))
 
+        if not show_plots:
+            plt.ion()
         return fig, ax
 
 
