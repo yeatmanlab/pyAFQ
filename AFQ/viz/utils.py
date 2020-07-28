@@ -1,7 +1,9 @@
 from collections import OrderedDict
 import os.path as op
+import os
 import logging
 import tempfile
+import datetime
 
 import numpy as np
 import pandas as pd
@@ -439,7 +441,7 @@ class CSVcomparison():
     scan-rescan reliability using Pearson's r.
     """
 
-    def __init__(self, csv_fnames, names, is_mats=False,
+    def __init__(self, out_folder, csv_fnames, names, is_mats=False,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -448,6 +450,9 @@ class CSVcomparison():
 
         Parameters
         ----------
+        out_folder : path, optional
+            Folder where outputs of this class's methods will be saved.
+
         csv_fnames : list of filenames
             Filenames for the two CSVs containing tract porfiles to compare.
             Will obtain subject list from the first file.
@@ -473,10 +478,12 @@ class CSVcomparison():
             Default: SCALE_MAT_2_PYTHON
         """
         self.logger = logging.getLogger('AFQ.csv')
+        self.out_folder = out_folder
+
         if isinstance(is_mats, bool):
             is_mats = [is_mats] * len(csv_fnames)
 
-        self.csv_dict = {}
+        self.profile_dict = {}
         for i, fname in enumerate(csv_fnames):
             profile = pd.read_csv(fname)
             profile['subjectID'] = \
@@ -491,11 +498,11 @@ class CSVcomparison():
                 profile['bundle'] = \
                     profile['bundle'].apply(
                         lambda x: mat_bundle_converter[x])
-                for scalar, scale in enumerate(mat_scale_converter):
+                for scalar, scale in mat_scale_converter.items():
                     profile[scalar] = \
                         profile[scalar].apply(lambda x: x * scale)
 
-            self.csv_dict[names[i]] = profile
+            self.profile_dict[names[i]] = profile
 
     def _warn_not_found(self, subject, bundle, name):
         self.logger.warning(
@@ -503,9 +510,18 @@ class CSVcomparison():
             + str(subject) + ' for bundle '
             + bundle + ' for CSV ' + name)
 
+    def _get_fname(self, func_name, now, f_name):
+        f_name = op.join(
+            self.out_folder,
+            func_name,
+            now,
+            f_name)
+        os.makedirs(f_name, exist_ok=True)
+        return f_name
+
     def tract_profiles(self, names=None, scalar="dti_fa",
                        min_scalar=0.0, max_scalar=1.0,
-                       out_file_name=None,
+                       show_plots=False,
                        positions=POSITIONS):
         """
         Compare all tract profiles for a scalar from different CSVs.
@@ -530,21 +546,21 @@ class CSVcomparison():
         max_scalar : float, optional
             Maximum value used for y-axis bounds. Default: 1.0
 
-        out_file_name : string, optional
-            If not None, figures will be saved to this file name
-            plus the subject ID.
-            Default: None
+        show_plots : bool, optional
+            Whether to show plots if in an interactive environment.
+            Default: False
 
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
         """
-        if (out_file_name is not None):
+        now = datetime.datetime.now().isoformat('T')
+        if not show_plots:
             plt.ioff()
         if names is None:
-            names = list(self.csv_dict.keys())
+            names = list(self.profile_dict.keys())
 
-        subjects = self.csv_dict[names[0]]['subjectID'].unique()
+        subjects = self.profile_dict[names[0]]['subjectID'].unique()
         bundles = positions.keys()
 
         for subject in subjects:
@@ -562,7 +578,7 @@ class CSVcomparison():
             for bundle in bundles:
                 ax = axes[positions[bundle][0], positions[bundle][1]]
                 for name in names:
-                    profile = self.csv_dict[name]
+                    profile = self.profile_dict[name]
                     profile = profile[
                         (profile['subjectID'] == subject)
                         & (profile['bundle'] == bundle)
@@ -579,16 +595,17 @@ class CSVcomparison():
                 ax.set_xticklabels([])
 
             fig.legend(names, loc='center')
-            if (out_file_name is not None):
-                fig.savefig(out_file_name + str(subject))
+            fig.savefig(
+                self._get_fname("tract_profiles", now, f"sub-{subject}"))
 
-        if (out_file_name is not None):
+        if not show_plots:
             plt.ion()
 
-    def contrast_index(self, names=None, scalar="dti_fa", out_file_name=None):
+    def contrast_index(self, names=None, scalar="dti_fa",
+                       bundles=POSITIONS.keys()):
         """
         Calculate the contrast index for each bundle in two datasets.
-        Bundles and subjects taken from first dataset.
+        List of subjects taken from first dataset.
 
         Parameters
         ----------
@@ -600,32 +617,31 @@ class CSVcomparison():
 
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
-
-        out_file_name : string, optional
-            If not None, contrast index will be saved to this file as a CSV.
-            Default: None
+        
+        bundles : list of strings, optional
+            Bundles to correlate. Default: POSITIONS.keys()
 
         Returns
         -------
         Pandas dataframe of contrast indices
         with subjects as columns and bundles as rows.
         """
+        now = datetime.datetime.now().isoformat('T')
         if names is None:
-            names = list(self.csv_dict.keys())
+            names = list(self.profile_dict.keys())
         if len(names) != 2:
             self.logger.error("To calculate the contrast index,"
                               + "only two dataset names should be given")
             return None
 
-        subjects = self.csv_dict[names[0]]['subjectID'].unique()
-        bundles = self.csv_dict[names[0]]['bundle'].unique()
+        subjects = self.profile_dict[names[0]]['subjectID'].unique()
         contrast_index = pd.DataFrame(index=bundles, columns=subjects)
         for subject in subjects:
             for bundle in bundles:
                 profiles = [None] * 2
                 both_found = True
                 for i, name in enumerate(names):
-                    profile = self.csv_dict[name]
+                    profile = self.profile_dict[name]
                     profiles[i] = profile[
                         (profile['subjectID'] == subject)
                         & (profile['bundle'] == bundle)
@@ -635,19 +651,91 @@ class CSVcomparison():
                         self._warn_not_found(subject, bundle, name)
                 if both_found:
                     contrast_index.at[bundle, subject] = \
-                        np.mean((profiles[0] - profiles[1])
-                                / (profiles[0] + profiles[1]))
-        if out_file_name is not None:
-            contrast_index.to_csv(out_file_name)
+                        np.nanmean((profiles[0] - profiles[1])
+                                   / (profiles[0] + profiles[1]))
+
+        contrast_index.to_csv(self._get_fname(
+            "/contrast_index/",
+            now,
+            f"{names[0]}_vs_{names[1]}"))
         return contrast_index
 
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
-                          out_file_name=None):
+                          bundles=POSITIONS.keys()):
         """
         Plot the scan-rescan reliability using Pearson's r for some scalars.
+        List of subjects taken from first dataset.
+
+        Parameters
+        ----------
+        names : list of strings, optional
+            Names of datasets to plot profiles of.
+            If None, all datasets are used.
+            Should be a total of only two datasets.
+            Default: None
+
+        scalars : list of strings, optional
+            Scalars to correlate. Default: ["dti_fa", "dti_md"].
+        
+        bundles : list of strings, optional
+            Bundles to correlate. Default: POSITIONS.keys()
+
+        Returns
+        -------
+        Matplotlib figure and axes.
         """
-        pass
+        now = datetime.datetime.now().isoformat('T')
+        if names is None:
+            names = list(self.profile_dict.keys())
+        if len(names) != 2:
+            self.logger.error("To plot correlations,"
+                              + "only two dataset names should be given")
+            return None
+        
+        subjects = self.profile_dict[names[0]]['subjectID'].unique()
+        all_coef = np.zeros((len(scalars), len(bundles)))
+        for l, scalar in enumerate(scalars):
+            scalar_coef = np.zeros(len(bundles))
+            for k, bundle in enumerate(bundles):
+                concatenated_bundles = np.zeros((2, 100*len(subjects)))
+                for j, name in enumerate(names):
+                    profile = self.profile_dict[name]
+                    profiles = np.zeros((len(subjects), 100))
+                    for i, subject in enumerate(subjects):
+                        single_profile = profile[
+                            (profile['subjectID'] == subject)
+                            & (profile['bundle'] == bundle)
+                        ][scalar].to_numpy()[1:]
+                        if len(single_profile) < 1:
+                            self._warn_not_found(subject, bundle, name)
+                        else:
+                            profiles[i] = single_profile
+                    concatenated_bundles[j] = profiles.flatten()
+                scalar_coef[k] = np.corrcoef(concatenated_bundles)
+            all_coef[l] = scalar_coef
+
+        x = np.arange(len(bundles))
+        x_shift = np.linspace(-0.5, 0.5, num=len(scalars))
+        width = 0.1
+
+        fig, ax = plt.subplots()
+        for l, scalar in enumerate(scalars):
+            ax.bar(x + x_shift[l], all_coef[l], width, label=scalar_coef)
+
+        ax.set_ylabel('Pearson\'s r')
+        ax.set_title('Scan re-scan reliability')
+        ax.set_xticks(x)
+        ax.set_xticklabels(scalars)
+        ax.legend()
+
+        fig.tight_layout()
+        fig.savefig(self._get_fname(
+            "/corr_plots/",
+            now,
+            f"{names[0]}_vs_{names[1]}"))
+
+        return fig, ax
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
