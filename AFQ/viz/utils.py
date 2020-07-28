@@ -538,7 +538,7 @@ class CSVcomparison():
             return None
         else:
             nans = np.isnan(single_profile)
-            if np.sum(nans) > 1:
+            if np.sum(nans) > 0:
                 self._warn_nans(scalar, subject, bundle, name)
                 single_profile[nans] = 0
             return single_profile
@@ -731,20 +731,23 @@ class CSVcomparison():
                 scalar_coef[k] = np.corrcoef(concatenated_bundles)[0][1]
             all_coef[l] = scalar_coef
 
-        x = np.arange(len(bundles))
-        x_shift = np.linspace(-0.5, 0.5, num=len(scalars))
-        width = 0.1
+        width = 0.6
+        spacing = 2
+        x = np.arange(len(bundles))*spacing
+        x_shift = np.linspace(-0.5*width, 0.5*width, num=len(scalars))
 
         fig, ax = plt.subplots()
         for l, scalar in enumerate(scalars):
-            ax.bar(x + x_shift[l], all_coef[l], width, label=scalars)
+            ax.bar(x + x_shift[l], all_coef[l], width, label=scalar)
 
         ax.set_ylabel('Pearson\'s r')
-        ax.set_title('Scan re-scan reliability')
         ax.set_xticks(x)
         ax.set_xticklabels(bundles)
         ax.legend()
 
+        plt.setp(ax.get_xticklabels(),
+                 rotation=45,
+                 horizontalalignment='right')
         fig.tight_layout()
         fig.savefig(self._get_fname(
             "corr_plots",
