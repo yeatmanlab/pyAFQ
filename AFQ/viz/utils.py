@@ -517,13 +517,22 @@ class CSVcomparison():
             + ' for bundle ' + bundle
             + ' for CSV ' + name)
 
-    def _warn_nans(self, scalar, subject, bundle, name):
-        self.logger.warning(
+    def _warn_nans(self, scalar, subject, bundle, name, repl_nan):
+        message = (
             'NaNs found in scalar' + scalar
             + ' for subject ' + str(subject)
             + ' for bundle ' + bundle
-            + ' for CSV ' + name
-            + '. These Nans were replaced with 0.')
+            + ' for CSV ' + name)
+        if repl_nan:
+            message = message + '. These Nans were replaced with 0.'
+        self.logger.warning(message)
+
+    def _warn_many_nans(self, scalar, subject, bundle, name):
+        self.logger.warning(
+            'More than 10 NaNs found in scalar' + scalar
+            + ' for subject ' + str(subject)
+            + ' for bundle ' + bundle
+            + ' for CSV ' + name)
 
     def _get_fname(self, folder, f_name):
         f_folder = op.join(
@@ -532,24 +541,36 @@ class CSVcomparison():
         os.makedirs(f_folder, exist_ok=True)
         return op.join(f_folder, f_name)
 
-    def _get_profile(self, name, bundle, subject, scalar):
+    def _get_profile(self, name, bundle, subject, scalar, repl_nan=True):
         profile = self.profile_dict[name]
         single_profile = profile[
             (profile['subjectID'] == subject)
             & (profile['bundle'] == bundle)
         ][scalar].to_numpy()
+        nans = np.isnan(single_profile)
         if len(single_profile) < 1:
             self._warn_not_found(scalar, subject, bundle, name)
             return None
-        else:
-            nans = np.isnan(single_profile)
-            if np.sum(nans) > 0:
-                self._warn_nans(scalar, subject, bundle, name)
+
+        if np.sum(nans) > 10:
+            self._warn_many_nans(scalar, subject, bundle, name)
+            return None
+
+        if np.sum(nans) > 0:
+            self._warn_nans(scalar, subject, bundle, name, repl_nan)
+            if repl_nan:
                 single_profile[nans] = 0
-            return single_profile
+
+        return single_profile
 
     def masked_corr(self, arr):
-        return np.ma.corrcoef(np.ma.masked_invalid(arr))[0][1]
+        mask = np.logical_not(
+            np.logical_or(
+                np.isnan(arr[0, ...]),
+                np.isnan(arr[1, ...])))
+        if np.sum(mask) < 1:
+            return 0
+        return np.corrcoef(arr[:, mask])[0][1]
 
     def tract_profiles(self, names=None, scalar="dti_fa",
                        min_scalar=0.0, max_scalar=1.0,
@@ -731,17 +752,17 @@ class CSVcomparison():
                 for j, name in enumerate(names):
                     for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
-                            name, bundle, subject, scalar)
+                            name, bundle, subject, scalar, repl_nan=False)
                         if single_profile is None:
                             bundle_profiles[j, i] = np.nan
                             bundle_means[j, i] = np.nan
                         else:
                             bundle_profiles[j, i] = single_profile
-                            bundle_means[j, i] = np.mean(single_profile)
+                            bundle_means[j, i] = np.nanmean(single_profile)
                 for i in range(len(self.subjects)):
                     bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
-                all_xsess_mean_coef[m, k] = np.mean(bundle_coefs)
-                all_xsess_std[m, k] = np.std(bundle_coefs)
+                all_xsess_mean_coef[m, k] = np.nanmean(bundle_coefs)
+                all_xsess_std[m, k] = np.nanstd(bundle_coefs)
                 all_xsub_coef_mean[m, k] = self.masked_corr(bundle_means)
         width = 0.6
         spacing = 2
@@ -768,13 +789,11 @@ class CSVcomparison():
         axes[0].set_xticklabels(bundles)
         axes[0].set_title(
             f"{names[0]}_vs_{names[1]}_profile_reliability")
-        axes[0].legend()
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
         axes[1].set_xticks(x)
         axes[1].set_xticklabels(bundles)
         axes[1].set_title(
             f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
-        axes[1].legend()
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -782,6 +801,12 @@ class CSVcomparison():
         plt.setp(axes[1].get_xticklabels(),
                  rotation=45,
                  horizontalalignment='right')
+
+        fig.legend(
+            scalars,
+            loc='lower right',
+            bbox_to_anchor=(0.5, 0.15, 0.5, 0.5),
+            fontsize='small')
         fig.tight_layout()
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
