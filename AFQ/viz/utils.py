@@ -673,6 +673,12 @@ class CSVcomparison():
             f"{names[0]}_vs_{names[1]}"))
         return contrast_index
 
+    # this could be own function:
+    # reliability profiles: correlate each node from every subject across sesssions
+    # could also make histograms for cross session profiles
+
+    # Cross subject: average the scalar in each tract for each subject, correlate across session
+    # Cross session profile shape reliability: what we already have,
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           bundles=POSITIONS.keys(),
@@ -711,60 +717,73 @@ class CSVcomparison():
                               + "only two dataset names should be given")
             return None
 
-        all_coef = np.zeros((len(scalars), len(bundles)))
-        all_std = np.zeros((len(scalars), len(bundles)))
+        all_xsess_mean_coef = np.zeros((len(scalars), len(bundles)))
+        all_xsess_std = np.zeros((len(scalars), len(bundles)))
+        all_xsub_coef_mean = np.zeros((len(scalars), len(bundles)))
         for m, scalar in enumerate(scalars):
-            scalar_coef = np.zeros(len(bundles))
-            scalar_std = np.zeros(len(bundles))
             for k, bundle in enumerate(bundles):
                 bundle_profiles = np.zeros((2, len(self.subjects), 100))
+                bundle_means = np.zeros((2, len(self.subjects)))
                 bundle_coefs = np.zeros(len(self.subjects))
                 for j, name in enumerate(names):
-                    profiles = np.zeros((len(self.subjects), 100))
                     for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
                             name, bundle, subject, scalar)
                         if single_profile is not None:
-                            profiles[i] = single_profile
-                    bundle_profiles[j] = profiles
+                            bundle_profiles[j, i] = single_profile
+                            bundle_means[j, i] = np.mean(single_profile)
                 for i in range(len(self.subjects)):
-                    bundle_pair = bundle_profiles[:, i, :]
-                    bundle_coefs[i] = np.corrcoef(bundle_pair)[0][1]
-                scalar_coef[k] = np.mean(bundle_coefs)
-                scalar_std[k] = np.std(bundle_coefs)
-            all_coef[m] = scalar_coef
-            all_std[m] = scalar_std
-
+                    bundle_coefs[i] = np.corrcoef(bundle_profiles[:, i, :])[0][1]
+                all_xsess_mean_coef[m, k] = np.mean(bundle_coefs)
+                all_xsess_std[m, k] = np.std(bundle_coefs)
+                all_xsub_coef_mean[m, k] = np.corrcoef(bundle_means)
         width = 0.6
         spacing = 2
         x = np.arange(len(bundles)) * spacing
         x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
-        fig, ax = plt.subplots()
+        fig, axes = plt.subplots(2, 1)
         for m, scalar in enumerate(scalars):
-            ax.bar(x + x_shift[m],
-                   all_coef[m],
-                   width,
-                   label=scalar,
-                   yerr=all_std[m])
+            axes[0, 0].bar(
+                x + x_shift[m],
+                all_xsess_mean_coef[m],
+                width,
+                label=scalar,
+                yerr=all_xsess_std[m])
+            axes[1, 0].bar(
+                x + x_shift[m],
+                all_xsub_coef_mean[m],
+                width,
+                label=scalar
+            )
 
-        ax.set_ylabel('Pearson\'s r')
-        ax.set_xticks(x)
-        ax.set_xticklabels(bundles)
-        ax.set_title(f"{names[0]}_vs_{names[1]}")
-        ax.legend()
+        axes[0, 0].set_ylabel('Mean of Pearson\'s r of profiles')
+        axes[0, 0].set_xticks(x)
+        axes[0, 0].set_xticklabels(bundles)
+        axes[0, 0].set_title(
+            f"{names[0]}_vs_{names[1]}_profile_reliability")
+        axes[0, 0].legend()
+        axes[1, 0].set_ylabel('Pearson\'s r of mean of profiles')
+        axes[1, 0].set_xticks(x)
+        axes[1, 0].set_xticklabels(bundles)
+        axes[1, 0].set_title(
+            f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
+        axes[1, 0].legend()
 
-        plt.setp(ax.get_xticklabels(),
+        plt.setp(axes[0, 0].get_xticklabels(),
+                 rotation=45,
+                 horizontalalignment='right')
+        plt.setp(axes[1, 0].get_xticklabels(),
                  rotation=45,
                  horizontalalignment='right')
         fig.tight_layout()
         fig.savefig(self._get_fname(
-            f"corr_plots/{'_'.join(scalars)}",
+            f"rel_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
 
         if not show_plots:
             plt.ion()
-        return fig, ax
+        return fig, axes
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
