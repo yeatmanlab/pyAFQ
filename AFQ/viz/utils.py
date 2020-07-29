@@ -701,12 +701,8 @@ class CSVcomparison():
             f"{names[0]}_vs_{names[1]}"))
         return contrast_index
 
-    # this could be own function:
     # reliability profiles: correlate each node from every subject across sesssions
-    # could also make histograms for cross session profiles
 
-    # Cross subject: average the scalar in each tract for each subject, correlate across session
-    # Cross session profile shape reliability: what we already have,
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           bundles=POSITIONS.keys(),
@@ -746,8 +742,9 @@ class CSVcomparison():
             return None
 
         # extract relevant statistics / data from profiles
-        all_profile_coef = np.zeros((len(scalars), len(bundles), len(self.subjects)))
         all_sub_coef = np.zeros((len(scalars), len(bundles)))
+        all_profile_coef = np.zeros((len(scalars), len(bundles), len(self.subjects)))
+        all_node_coef = np.zeros((len(scalars), len(bundles), 100))
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(bundles):
                 bundle_profiles = np.zeros((2, len(self.subjects), 100))
@@ -767,13 +764,19 @@ class CSVcomparison():
                     bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
                 all_profile_coef[m, k] = bundle_coefs
 
+                node_coefs = np.zeros(len(self.subjects))
+                for i in range(100):
+                    node_coefs[i] = self.masked_corr(bundle_profiles[:, :, i])
+                all_node_coef[m, k] = bundle_coefs
+
         # plot histograms of subject pearson r's
         for m, scalar in enumerate(scalars):
-            maxi = all_profile_coef.max()
-            mini = all_profile_coef.min()
+            maxi = all_profile_coef[m].max()
+            mini = all_profile_coef[m].min()
             bins = np.linspace(mini, maxi, 10)
             fig, axes = self._get_brain_axes(
-                f"Distribution of Pearson's r between profiles")
+                (f"Distribution of Pearson's r between {scalar} profiles,"
+                f" {names[0]}_vs_{names[1]}"))
             for k, bundle in enumerate(bundles):
                 ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                 bundle_coefs = all_profile_coef[m, k, :]
@@ -782,7 +785,27 @@ class CSVcomparison():
             fig.savefig(
                 self._get_fname(
                     f"rel_plots/{scalar}/verbose",
-                    f"profile_r_distributions"))
+                    f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
+
+        # plot node reliability profile
+        for m, scalar in enumerate(scalars):
+            maxi = all_node_coef[m].max()
+            mini = all_node_coef[m].min()
+            fig, axes = self._get_brain_axes(
+                (f"{scalar} node reliability profiles,"
+                f" {names[0]}_vs_{names[1]}"))
+            for k, bundle in enumerate(bundles):
+                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+                ax.set_title(bundle)
+                ax.set_ylim([mini, maxi])
+                y_ticks = np.asarray([0.2, 0.4, 0.6])*maxi
+                ax.set_yticks(y_ticks)
+                ax.set_yticklabels(y_ticks)
+                ax.set_xticklabels([])
+            fig.savefig(
+                self._get_fname(
+                    f"rel_plots/{scalar}/verbose",
+                    f"{names[0]}_vs_{names[1]}_node_profiles"))
 
         # plot bar plots of pearson's r
         width = 0.6
