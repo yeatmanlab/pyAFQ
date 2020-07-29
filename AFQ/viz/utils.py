@@ -563,6 +563,20 @@ class CSVcomparison():
 
         return single_profile
 
+    def _get_brain_axes(self, suptitle):
+        fig, axes = plt.subplots(5, 5)
+        plt.tight_layout()
+        fig.set_size_inches((12, 12))
+        fig.suptitle(suptitle)
+        axes[0, 0].axis("off")
+        axes[0, -1].axis("off")
+        axes[1, 2].axis("off")
+        axes[2, 2].axis("off")
+        axes[3, 2].axis("off")
+        axes[4, 0].axis("off")
+        axes[4, 4].axis("off")
+        return fig, axes
+
     def masked_corr(self, arr):
         mask = np.logical_not(
             np.logical_or(
@@ -613,17 +627,7 @@ class CSVcomparison():
         bundles = positions.keys()
 
         for subject in self.subjects:
-            fig, axes = plt.subplots(5, 5)
-            plt.tight_layout()
-            fig.set_size_inches((12, 12))
-            fig.suptitle('Subject ' + str(subject))
-            axes[0, 0].axis("off")
-            axes[0, -1].axis("off")
-            axes[1, 2].axis("off")
-            axes[2, 2].axis("off")
-            axes[3, 2].axis("off")
-            axes[4, 0].axis("off")
-            axes[4, 4].axis("off")
+            fig, axes = self._get_brain_axes('Subject ' + str(subject))
             for bundle in bundles:
                 ax = axes[positions[bundle][0], positions[bundle][1]]
                 for name in names:
@@ -741,29 +745,46 @@ class CSVcomparison():
                               + "only two dataset names should be given")
             return None
 
-        all_xsess_mean_coef = np.zeros((len(scalars), len(bundles)))
-        all_xsess_std = np.zeros((len(scalars), len(bundles)))
-        all_xsub_coef_mean = np.zeros((len(scalars), len(bundles)))
+        # extract relevant statistics / data from profiles
+        all_profile_coef = np.zeros((len(scalars), len(bundles), len(self.subjects)))
+        all_sub_coef = np.zeros((len(scalars), len(bundles)))
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(bundles):
                 bundle_profiles = np.zeros((2, len(self.subjects), 100))
-                bundle_means = np.zeros((2, len(self.subjects)))
-                bundle_coefs = np.zeros(len(self.subjects))
                 for j, name in enumerate(names):
                     for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
                             name, bundle, subject, scalar, repl_nan=False)
                         if single_profile is None:
                             bundle_profiles[j, i] = np.nan
-                            bundle_means[j, i] = np.nan
                         else:
                             bundle_profiles[j, i] = single_profile
-                            bundle_means[j, i] = np.nanmean(single_profile)
+                all_sub_coef[m, k] = self.masked_corr(
+                    np.nanmean(bundle_profiles, axis=2))
+
+                bundle_coefs = np.zeros(len(self.subjects))
                 for i in range(len(self.subjects)):
                     bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
-                all_xsess_mean_coef[m, k] = np.nanmean(bundle_coefs)
-                all_xsess_std[m, k] = np.nanstd(bundle_coefs)
-                all_xsub_coef_mean[m, k] = self.masked_corr(bundle_means)
+                all_profile_coef[m, k] = bundle_coefs
+
+        # plot histograms of subject pearson r's
+        for m, scalar in enumerate(scalars):
+            maxi = all_profile_coef.max()
+            mini = all_profile_coef.min()
+            bins = np.linspace(mini, maxi, 10)
+            fig, axes = self._get_brain_axes(
+                f"Distribution of Pearson's r between profiles")
+            for k, bundle in enumerate(bundles):
+                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+                bundle_coefs = all_profile_coef[m, k, :]
+                ax.hist(bundle_coefs, bins)
+                ax.set_title(bundle)
+            fig.savefig(
+                self._get_fname(
+                    f"rel_plots/{scalar}/verbose",
+                    f"profile_r_distributions"))
+
+        # plot bar plots of pearson's r
         width = 0.6
         spacing = 2
         x = np.arange(len(bundles)) * spacing
@@ -771,15 +792,17 @@ class CSVcomparison():
 
         fig, axes = plt.subplots(2, 1)
         for m, scalar in enumerate(scalars):
+            bundle_prof_means = np.nanmean(all_profile_coef[m], axis=1)
+            bundle_prof_stds = np.nanstd(all_profile_coef[m], axis=1)
             axes[0].bar(
                 x + x_shift[m],
-                all_xsess_mean_coef[m],
+                bundle_prof_means,
                 width,
                 label=scalar,
-                yerr=all_xsess_std[m])
+                yerr=bundle_prof_stds)
             axes[1].bar(
                 x + x_shift[m],
-                all_xsub_coef_mean[m],
+                all_sub_coef[m],
                 width,
                 label=scalar
             )
