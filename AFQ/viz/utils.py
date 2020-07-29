@@ -764,48 +764,51 @@ class CSVcomparison():
                     bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
                 all_profile_coef[m, k] = bundle_coefs
 
-                node_coefs = np.zeros(len(self.subjects))
+                node_coefs = np.zeros(100)
                 for i in range(100):
                     node_coefs[i] = self.masked_corr(bundle_profiles[:, :, i])
-                all_node_coef[m, k] = bundle_coefs
+                all_node_coef[m, k] = node_coefs
 
         # plot histograms of subject pearson r's
-        for m, scalar in enumerate(scalars):
-            maxi = all_profile_coef[m].max()
-            mini = all_profile_coef[m].min()
-            bins = np.linspace(mini, maxi, 10)
-            fig, axes = self._get_brain_axes(
-                (f"Distribution of Pearson's r between {scalar} profiles,"
-                f" {names[0]}_vs_{names[1]}"))
-            for k, bundle in enumerate(bundles):
-                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                bundle_coefs = all_profile_coef[m, k, :]
-                ax.hist(bundle_coefs, bins)
-                ax.set_title(bundle)
-            fig.savefig(
-                self._get_fname(
-                    f"rel_plots/{scalar}/verbose",
-                    f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
+        maxi = all_profile_coef.max()
+        mini = all_profile_coef.min()
+        bins = np.linspace(mini, maxi, 10)
+        fig, axes = self._get_brain_axes(
+            (f"Distribution of Pearson's r between {scalar} profiles,"
+            f" {names[0]}_vs_{names[1]}"))
+        for k, bundle in enumerate(bundles):
+            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            for m, scalar in enumerate(scalars):
+                bundle_coefs = all_profile_coef[m, k]
+                ax.hist(bundle_coefs, bins, alpha=0.5, label=scalar)
+            ax.set_title(bundle)
+
+        fig.legend(scalars, loc='center')
+        fig.savefig(
+            self._get_fname(
+                f"rel_plots/{'_'.join(scalars)}/verbose",
+                f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
 
         # plot node reliability profile
-        for m, scalar in enumerate(scalars):
-            maxi = all_node_coef[m].max()
-            mini = all_node_coef[m].min()
-            fig, axes = self._get_brain_axes(
-                (f"{scalar} node reliability profiles,"
-                f" {names[0]}_vs_{names[1]}"))
-            for k, bundle in enumerate(bundles):
-                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                ax.set_title(bundle)
-                ax.set_ylim([mini, maxi])
-                y_ticks = np.asarray([0.2, 0.4, 0.6])*maxi
-                ax.set_yticks(y_ticks)
-                ax.set_yticklabels(y_ticks)
-                ax.set_xticklabels([])
-            fig.savefig(
-                self._get_fname(
-                    f"rel_plots/{scalar}/verbose",
-                    f"{names[0]}_vs_{names[1]}_node_profiles"))
+        all_node_coef[np.isnan(all_node_coef)] = 0
+        maxi = all_node_coef.max()
+        mini = all_node_coef.min()
+        fig, axes = self._get_brain_axes(
+            (f"{scalar} node reliability profiles,"
+            f" {names[0]}_vs_{names[1]}"))
+        for k, bundle in enumerate(bundles):
+            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            for m, scalar in enumerate(scalars):
+                ax.plot(all_node_coef[m, k], label=scalar)
+            ax.set_title(bundle)
+            ax.set_ylim([mini, maxi])
+            ax.set_xticklabels([])
+
+        fig.legend(scalars, loc='center')
+        fig.savefig(
+            self._get_fname(
+                f"rel_plots/{'_'.join(scalars)}/verbose",
+                f"{names[0]}_vs_{names[1]}_node_profiles"))
 
         # plot bar plots of pearson's r
         width = 0.6
