@@ -548,6 +548,9 @@ class CSVcomparison():
                 single_profile[nans] = 0
             return single_profile
 
+    def masked_corr(self, arr):
+        return np.ma.corrcoef(np.ma.masked_invalid(arr))[0][1]
+
     def tract_profiles(self, names=None, scalar="dti_fa",
                        min_scalar=0.0, max_scalar=1.0,
                        show_plots=False,
@@ -729,14 +732,17 @@ class CSVcomparison():
                     for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
                             name, bundle, subject, scalar)
-                        if single_profile is not None:
+                        if single_profile is None:
+                            bundle_profiles[j, i] = np.nan
+                            bundle_means[j, i] = np.nan
+                        else:
                             bundle_profiles[j, i] = single_profile
                             bundle_means[j, i] = np.mean(single_profile)
                 for i in range(len(self.subjects)):
-                    bundle_coefs[i] = np.corrcoef(bundle_profiles[:, i, :])[0][1]
+                    bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
                 all_xsess_mean_coef[m, k] = np.mean(bundle_coefs)
                 all_xsess_std[m, k] = np.std(bundle_coefs)
-                all_xsub_coef_mean[m, k] = np.corrcoef(bundle_means)
+                all_xsub_coef_mean[m, k] = self.masked_corr(bundle_means)
         width = 0.6
         spacing = 2
         x = np.arange(len(bundles)) * spacing
@@ -744,36 +750,36 @@ class CSVcomparison():
 
         fig, axes = plt.subplots(2, 1)
         for m, scalar in enumerate(scalars):
-            axes[0, 0].bar(
+            axes[0].bar(
                 x + x_shift[m],
                 all_xsess_mean_coef[m],
                 width,
                 label=scalar,
                 yerr=all_xsess_std[m])
-            axes[1, 0].bar(
+            axes[1].bar(
                 x + x_shift[m],
                 all_xsub_coef_mean[m],
                 width,
                 label=scalar
             )
 
-        axes[0, 0].set_ylabel('Mean of Pearson\'s r of profiles')
-        axes[0, 0].set_xticks(x)
-        axes[0, 0].set_xticklabels(bundles)
-        axes[0, 0].set_title(
+        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
+        axes[0].set_xticks(x)
+        axes[0].set_xticklabels(bundles)
+        axes[0].set_title(
             f"{names[0]}_vs_{names[1]}_profile_reliability")
-        axes[0, 0].legend()
-        axes[1, 0].set_ylabel('Pearson\'s r of mean of profiles')
-        axes[1, 0].set_xticks(x)
-        axes[1, 0].set_xticklabels(bundles)
-        axes[1, 0].set_title(
+        axes[0].legend()
+        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
+        axes[1].set_xticks(x)
+        axes[1].set_xticklabels(bundles)
+        axes[1].set_title(
             f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
-        axes[1, 0].legend()
+        axes[1].legend()
 
-        plt.setp(axes[0, 0].get_xticklabels(),
+        plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
                  horizontalalignment='right')
-        plt.setp(axes[1, 0].get_xticklabels(),
+        plt.setp(axes[1].get_xticklabels(),
                  rotation=45,
                  horizontalalignment='right')
         fig.tight_layout()
