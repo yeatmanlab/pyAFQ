@@ -701,8 +701,6 @@ class CSVcomparison():
             f"{names[0]}_vs_{names[1]}"))
         return contrast_index
 
-    # reliability profiles: correlate each node from every subject across sesssions
-
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           bundles=POSITIONS.keys(),
@@ -743,7 +741,8 @@ class CSVcomparison():
 
         # extract relevant statistics / data from profiles
         all_sub_coef = np.zeros((len(scalars), len(bundles)))
-        all_profile_coef = np.zeros((len(scalars), len(bundles), len(self.subjects)))
+        all_profile_coef = \
+            np.zeros((len(scalars), len(bundles), len(self.subjects)))
         all_node_coef = np.zeros((len(scalars), len(bundles), 100))
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(bundles):
@@ -761,7 +760,8 @@ class CSVcomparison():
 
                 bundle_coefs = np.zeros(len(self.subjects))
                 for i in range(len(self.subjects)):
-                    bundle_coefs[i] = self.masked_corr(bundle_profiles[:, i, :])
+                    bundle_coefs[i] = \
+                        self.masked_corr(bundle_profiles[:, i, :])
                 all_profile_coef[m, k] = bundle_coefs
 
                 node_coefs = np.zeros(100)
@@ -775,7 +775,7 @@ class CSVcomparison():
         bins = np.linspace(mini, maxi, 10)
         fig, axes = self._get_brain_axes(
             (f"Distribution of Pearson's r between {scalar} profiles,"
-            f" {names[0]}_vs_{names[1]}"))
+                f" {names[0]}_vs_{names[1]}"))
         for k, bundle in enumerate(bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
@@ -795,7 +795,7 @@ class CSVcomparison():
         mini = all_node_coef.min()
         fig, axes = self._get_brain_axes(
             (f"{scalar} node reliability profiles,"
-            f" {names[0]}_vs_{names[1]}"))
+                f" {names[0]}_vs_{names[1]}"))
         for k, bundle in enumerate(bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
@@ -836,13 +836,11 @@ class CSVcomparison():
         axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
         axes[0].set_xticks(x)
         axes[0].set_xticklabels(bundles)
-        axes[0].set_title(
-            f"{names[0]}_vs_{names[1]}_profile_reliability")
+        axes[0].set_title("profile_reliability")
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
         axes[1].set_xticks(x)
         axes[1].set_xticklabels(bundles)
-        axes[1].set_title(
-            f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
+        axes[1].set_title(f"intersubejct_reliability")
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -851,6 +849,7 @@ class CSVcomparison():
                  rotation=45,
                  horizontalalignment='right')
 
+        fig.suptitle(f"{names[0]}_vs_{names[1]}")
         fig.legend(
             scalars,
             loc='lower right',
