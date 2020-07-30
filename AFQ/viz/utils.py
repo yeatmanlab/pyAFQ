@@ -817,15 +817,17 @@ class CSVcomparison():
         x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
         fig, axes = plt.subplots(2, 1)
+        bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
+        bundle_prof_stds = np.nanstd(all_profile_coef, axis=2)
+        maxi = np.maximum(bundle_prof_means.max(), all_sub_coef.max())
+        mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
         for m, scalar in enumerate(scalars):
-            bundle_prof_means = np.nanmean(all_profile_coef[m], axis=1)
-            bundle_prof_stds = np.nanstd(all_profile_coef[m], axis=1)
             axes[0].bar(
                 x + x_shift[m],
-                bundle_prof_means,
+                bundle_prof_means[m],
                 width,
                 label=scalar,
-                yerr=bundle_prof_stds)
+                yerr=bundle_prof_stds[m])
             axes[1].bar(
                 x + x_shift[m],
                 all_sub_coef[m],
@@ -834,10 +836,12 @@ class CSVcomparison():
             )
 
         axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
+        axes[0].set_ylim([mini, maxi])
         axes[0].set_xticks(x)
         axes[0].set_xticklabels(bundles)
         axes[0].set_title("profile_reliability")
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
+        axes[1].set_ylim([mini, maxi])
         axes[1].set_xticks(x)
         axes[1].set_xticklabels(bundles)
         axes[1].set_title(f"intersubejct_reliability")
