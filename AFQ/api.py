@@ -889,7 +889,6 @@ class AFQ(object):
         else:
             return mask, "custom"
 
-
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
 
