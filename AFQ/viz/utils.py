@@ -512,24 +512,24 @@ class CSVcomparison():
 
     def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
-            'No scalars found for scalar' + scalar
+            'No scalars found for scalar ' + scalar
             + ' for subject ' + str(subject)
             + ' for bundle ' + bundle
             + ' for CSV ' + name)
 
     def _warn_nans(self, scalar, subject, bundle, name, repl_nan):
         message = (
-            'NaNs found in scalar' + scalar
+            'NaNs found in scalar ' + scalar
             + ' for subject ' + str(subject)
             + ' for bundle ' + bundle
             + ' for CSV ' + name)
         if repl_nan:
             message = message + '. These Nans were replaced with 0.'
-        self.logger.warning(message)
+        self.logger.info(message)
 
     def _warn_many_nans(self, scalar, subject, bundle, name):
         self.logger.warning(
-            'More than 10 NaNs found in scalar' + scalar
+            'More than 10 NaNs found in scalar ' + scalar
             + ' for subject ' + str(subject)
             + ' for bundle ' + bundle
             + ' for CSV ' + name)
@@ -703,6 +703,7 @@ class CSVcomparison():
 
     def correlation_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
+                          ylims=None,
                           bundles=POSITIONS.keys(),
                           show_plots=False):
         """
@@ -718,6 +719,10 @@ class CSVcomparison():
 
         scalars : list of strings, optional
             Scalars to correlate. Default: ["dti_fa", "dti_md"].
+        
+        ylims : 2-tuple of floats, optional
+            Limits of the y-axis. Useful to synchronize axes across graphs.
+            Default: None.
 
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
@@ -791,8 +796,12 @@ class CSVcomparison():
 
         # plot node reliability profile
         all_node_coef[np.isnan(all_node_coef)] = 0
-        maxi = all_node_coef.max()
-        mini = all_node_coef.min()
+        if ylims is None:
+            maxi = all_node_coef.max()
+            mini = all_node_coef.min()
+        else:
+            maxi = ylims[1]
+            mini = ylims[2]
         fig, axes = self._get_brain_axes(
             (f"node reliability profiles,"
                 f" {names[0]}_vs_{names[1]}"))
@@ -819,8 +828,12 @@ class CSVcomparison():
         fig, axes = plt.subplots(2, 1)
         bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
         bundle_prof_stds = np.nanstd(all_profile_coef, axis=2)
-        maxi = np.maximum(bundle_prof_means.max(), all_sub_coef.max())
-        mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
+        if ylims is None:
+            maxi = np.maximum(bundle_prof_means.max(), all_sub_coef.max())
+            mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
+        else:
+            maxi = ylims[1]
+            mini = ylims[2]
         for m, scalar in enumerate(scalars):
             axes[0].bar(
                 x + x_shift[m],
