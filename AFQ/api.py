@@ -458,12 +458,14 @@ class AFQ(object):
         data = img.get_fdata()
         bvals, bvecs = read_bvals_bvecs(row['bval_file'], row['bvec_file'])
         if filter_b and (self.min_bval is not None):
-            valid_b = (bvals >= self.min_bval) or (bvals <= self.b0_threshold)
+            valid_b = np.logical_or(
+                (bvals >= self.min_bval), (bvals <= self.b0_threshold))
             data = data[..., valid_b]
             bvals = bvals[valid_b]
             bvecs = bvecs[valid_b]
         if filter_b and (self.max_bval is not None):
-            valid_b = (bvals <= self.max_bval) or (bvals <= self.b0_threshold)
+            valid_b = np.logical_or(
+                (bvals <= self.max_bval), (bvals <= self.b0_threshold))
             data = data[..., valid_b]
             bvals = bvals[valid_b]
             bvecs = bvecs[valid_b]

@@ -168,6 +168,25 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
+def test_AFQ_anisotropic():
+    """
+    Test if API can run without prealign
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        min_bval=990,
+        max_bval=1010,
+        b0_threshold=50,
+        reg_template="mni_T1",
+        reg_subject="power_map")
+    myafq.export_rois()
+
+
 @pytest.mark.slow
 def test_AFQ_slr():
     """
