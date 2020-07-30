@@ -774,7 +774,7 @@ class CSVcomparison():
         mini = all_profile_coef.min()
         bins = np.linspace(mini, maxi, 10)
         fig, axes = self._get_brain_axes(
-            (f"Distribution of Pearson's r between {scalar} profiles,"
+            (f"Distribution of Pearson's r between profiles,"
                 f" {names[0]}_vs_{names[1]}"))
         for k, bundle in enumerate(bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
@@ -794,7 +794,7 @@ class CSVcomparison():
         maxi = all_node_coef.max()
         mini = all_node_coef.min()
         fig, axes = self._get_brain_axes(
-            (f"{scalar} node reliability profiles,"
+            (f"node reliability profiles,"
                 f" {names[0]}_vs_{names[1]}"))
         for k, bundle in enumerate(bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
