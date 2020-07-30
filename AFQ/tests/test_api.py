@@ -179,8 +179,8 @@ def test_AFQ_anisotropic():
         bids_path=bids_path,
         dmriprep='vistasoft',
         segmentation='freesurfer',
-        min_bval=990,
-        max_bval=1010,
+        min_bval=1990,
+        max_bval=2010,
         b0_threshold=50,
         reg_template="mni_T1",
         reg_subject="power_map")
