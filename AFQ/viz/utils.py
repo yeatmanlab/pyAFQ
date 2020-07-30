@@ -582,7 +582,7 @@ class CSVcomparison():
             np.logical_or(
                 np.isnan(arr[0, ...]),
                 np.isnan(arr[1, ...])))
-        if np.sum(mask) < 1:
+        if np.sum(mask) < 2:
             return 0
         return np.corrcoef(arr[:, mask])[0][1]
 
@@ -706,7 +706,7 @@ class CSVcomparison():
                           bundles=POSITIONS.keys(),
                           show_plots=False):
         """
-        Plot the scan-rescan reliability using Pearson's r for some scalars.
+        Plot the scan-rescan reliability using Pearson's r for 2 scalars.
 
         Parameters
         ----------
@@ -855,7 +855,7 @@ class CSVcomparison():
             loc='lower right',
             bbox_to_anchor=(0.5, 0.15, 0.5, 0.5),
             fontsize='small')
-        fig.tight_layout()
+        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
