@@ -719,7 +719,7 @@ class CSVcomparison():
 
         scalars : list of strings, optional
             Scalars to correlate. Default: ["dti_fa", "dti_md"].
-        
+
         ylims : 2-tuple of floats, optional
             Limits of the y-axis. Useful to synchronize axes across graphs.
             Default: None.
@@ -801,7 +801,7 @@ class CSVcomparison():
             mini = all_node_coef.min()
         else:
             maxi = ylims[1]
-            mini = ylims[2]
+            mini = ylims[0]
         fig, axes = self._get_brain_axes(
             (f"node reliability profiles,"
                 f" {names[0]}_vs_{names[1]}"))
@@ -833,7 +833,7 @@ class CSVcomparison():
             mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
         else:
             maxi = ylims[1]
-            mini = ylims[2]
+            mini = ylims[0]
         for m, scalar in enumerate(scalars):
             axes[0].bar(
                 x + x_shift[m],
