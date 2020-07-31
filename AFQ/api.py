@@ -21,7 +21,8 @@ from dipy.stats.analysis import afq_profile
 
 from bids.layout import BIDSLayout
 
-from .version import version as pyafq_version
+import AFQ.__version__ as pyafq_version
+
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
 from AFQ.dki import _fit as dki_fit
