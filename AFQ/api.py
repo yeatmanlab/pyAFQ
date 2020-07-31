@@ -21,7 +21,8 @@ from dipy.stats.analysis import afq_profile
 
 from bids.layout import BIDSLayout
 
-import AFQ.__version__ as pyafq_version
+from setuptools_scm import get_version
+pyafq_version = get_version(root='..', relative_to=__file__)
 
 import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
