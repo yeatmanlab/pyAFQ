@@ -185,7 +185,7 @@ def test_AFQ_anisotropic():
         b0_threshold=50,
         reg_template="mni_T1",
         reg_subject="power_map")
-    
+
     _, gtab, _ = myafq._get_data_gtab(myafq.data_frame.iloc[0])
 
     # check the b0s mask is correct
