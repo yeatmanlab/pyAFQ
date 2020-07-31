@@ -23,4 +23,4 @@ AUTHOR = "pyAFQ developers"
 AUTHOR_EMAIL = "arokem@gmail.com"
 PLATFORMS = "OS Independent"
 SCRIPTS = [op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')]
-PYTHON_REQUIRES='>=3.6'
+PYTHON_REQUIRES = '>=3.6'
