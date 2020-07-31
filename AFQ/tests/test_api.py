@@ -170,7 +170,8 @@ def test_AFQ_data():
 
 def test_AFQ_anisotropic():
     """
-    Test if API can run without prealign
+    Test if API can run using anisotropic registration
+    with a specific selection of b vals
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
@@ -184,6 +185,21 @@ def test_AFQ_anisotropic():
         b0_threshold=50,
         reg_template="mni_T1",
         reg_subject="power_map")
+    
+    _, gtab, _ = myafq._get_data_gtab(myafq.data_frame.iloc[0])
+
+    # check the b0s mask is correct
+    b0s_mask = np.zeros(160, dtype=bool)
+    b0s_mask[0:10] = True
+    npt.assert_equal(gtab.b0s_mask, b0s_mask)
+
+    # check that only b values in the b val range passed
+    bvals_in_range = \
+        np.logical_and((gtab.bvals > 1990), (gtab.bvals < 2010))
+    bvals_in_range_or_0 = \
+        np.logical_or(bvals_in_range, gtab.b0s_mask)
+    npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
+
     myafq.export_rois()
 
 
