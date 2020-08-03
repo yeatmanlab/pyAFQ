@@ -10,8 +10,8 @@ from ast import literal_eval
 
 from funcargparse import FuncArgParser
 from argparse import ArgumentParser, FileType
-from cli2gui import Cli2Gui
 from configupdater import ConfigUpdater
+# from cli2gui import Cli2Gui
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -28,35 +28,33 @@ with warnings.catch_warnings():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
 
-use_config_gui = True
-bin_folder = pathlib.Path(__file__).parent.absolute()
-gui_image = op.join(bin_folder, "../example_image.png")
-gui_background_color = "#ffffcc"
-gui_text_color = "#663300"
-gui_input_box_color = "#ffffff"
-gui_button_color = "#ffff66"
-gui_theme = \
-    [gui_button_color, "#ffffff", "#ffffff", "#ffffff", "#ffffff",
-     "#ffffff", gui_text_color, "#ffffff", "#ffffff", "#ffffff",
-     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
-     gui_background_color, gui_input_box_color, "#ffffff", "#ffffff",
-     "#ffffff", "#ffffff", "#ffffff", "#ffffff"]
-gui_sizes = \
-    {"title_size": 36,  # room for title
-     "label_size": (58, None),  # room for text
-     "input_size": (24, 1),  # width by height of input button
-     "button": (12, 1),
-     "padding": (5, 10),
-     "helpText_size": 2,  # flaky, may interfere with buttons
-     "text_size": 16}  # text size of buttons
+# These options were used to make cli2gui video
+# use_config_gui = True
+# bin_folder = pathlib.Path(__file__).parent.absolute()
+# gui_image = op.join(bin_folder, "../example_image.png")
+# gui_background_color = "#ffffcc"
+# gui_text_color = "#663300"
+# gui_input_box_color = "#ffffff"
+# gui_button_color = "#ffff66"
+# gui_theme = \
+#     [gui_button_color, "#ffffff", "#ffffff", "#ffffff", "#ffffff",
+#      "#ffffff", gui_text_color, "#ffffff", "#ffffff", "#ffffff",
+#      "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
+#      gui_background_color, gui_input_box_color, "#ffffff", "#ffffff",
+#      "#ffffff", "#ffffff", "#ffffff", "#ffffff"]
+# gui_sizes = \
+#     {"title_size": 36,  # room for title
+#      "label_size": (58, None),  # room for text
+#      "input_size": (24, 1),  # width by height of input button
+#      "button": (12, 1),
+#      "padding": (5, 10),
+#      "helpText_size": 2,  # flaky, may interfere with buttons
+#      "text_size": 16}  # text size of buttons
+
 usage = \
     f"""pyAFQ /path/to/afq_config.ini
 
 Runs full AFQ processing as specified in the configuration file.
-
-To not run the CLI with a GUI, use --disable-cli2gui .
-
-To not open a GUI for editing the config file, use --disable-config2gui .
 
 For details about configuration, see instructions in:
 https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
@@ -84,8 +82,7 @@ def process_defaults(defaults_dict):
 
 
 def parse_cli():
-    # cli_parser parses user arguments from CLI,
-    # It is also what gooey uses to make the GUI
+    # cli_parser parses user arguments from CLI
     cli_parser = ArgumentParser(usage=usage)
 
     cli_parser.add_argument(
@@ -98,9 +95,9 @@ def parse_cli():
         '-t', '--notrack', action="store_true", default=False,
         help="Disable the use of pyAFQ being recorded by Google Analytics. ")
 
-    cli_parser.add_argument(
-        '--disable-config2gui', action="store_true", default=False,
-        help="Disable the GUI for editing the config file. ")
+    # cli_parser.add_argument(
+    #     '--disable-config2gui', action="store_true", default=False,
+    #     help="Disable the GUI for editing the config file. ")
 
     opts = cli_parser.parse_args()
 
@@ -113,12 +110,12 @@ def parse_cli():
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
     opts.config.close()
-    use_config_gui = not opts.disable_config2gui
+    # use_config_gui = not opts.disable_config2gui
 
-    return opts.config.name, use_config_gui
+    return opts.config.name  #, use_config_gui
 
 
-def parse_doc(use_config_gui):
+def parse_doc():
     # doc_parser organizes the docstring for AFQ.api.AFQ
     docstr_parser = FuncArgParser()
     docstr_parser.setup_args(api.AFQ.__init__)
@@ -140,16 +137,7 @@ def parse_doc(use_config_gui):
         'clean_params',
         " Parameters Include: \n\t" + "\n\t".join(clean_defaults_list))
 
-    if use_config_gui:
-        docstr_parser.create_arguments()
-        # if bids path becomes a path to a file
-        # use update_arg here to make bids_path into a File
-        # that way we can use the GUI for files
-        opts = docstr_parser.parse_args()
-    else:
-        opts = {}
-
-    return docstr_parser.unfinished_arguments, opts
+    return docstr_parser.unfinished_arguments
 
 
 def parse_config_run_afq(config_file, doc_args, cli_args):
@@ -246,25 +234,25 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
 
 
 if __name__ == '__main__':
-    parse_cli_gui = Cli2Gui(
-        program_name="pyAFQ",
-        program_description=usage,
-        image=gui_image,
-        sizes=gui_sizes,
-        auto_enable=True,
-        theme=gui_theme,
-        darktheme=None)(parse_cli)
+    # parse_cli_gui = Cli2Gui(
+    #     program_name="pyAFQ",
+    #     program_description=usage,
+    #     image=gui_image,
+    #     sizes=gui_sizes,
+    #     auto_enable=True,
+    #     theme=gui_theme,
+    #     darktheme=None)(parse_cli)
 
-    config_file, use_config_gui = parse_cli_gui()
+    config_file = parse_cli()
 
-    parse_doc_gui = Cli2Gui(
-        program_name="pyAFQ Configuration",
-        program_description=config_usage,
-        image=gui_image,
-        sizes=gui_sizes,
-        auto_enable=use_config_gui,
-        theme=gui_theme,
-        darktheme=None)(parse_doc)
+    # parse_doc_gui = Cli2Gui(
+    #     program_name="pyAFQ Configuration",
+    #     program_description=config_usage,
+    #     image=gui_image,
+    #     sizes=gui_sizes,
+    #     auto_enable=use_config_gui,
+    #     theme=gui_theme,
+    #     darktheme=None)(parse_doc)
 
-    doc_args, cli_args = parse_doc_gui(use_config_gui)
-    parse_config_run_afq(config_file, doc_args, cli_args)
+    doc_args = parse_doc()
+    parse_config_run_afq(config_file, doc_args, {})
