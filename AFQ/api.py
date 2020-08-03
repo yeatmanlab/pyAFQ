@@ -221,11 +221,9 @@ class AFQ(object):
             [COMPUTE] Whether to recompute or ignore existing derivatives.
             This parameter can be turned on/off dynamically.
             Default: False
-        reg_template : nib.Nifti1Image, optional
-            [REGISTRATION] registration template to use.
-            If None, T2w MNI template is used. Default: None.
         scalars : list of strings, optional
             [BUNDLES] List of scalars to use.
+            Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
         wm_criterion : list or float, optional
             [REGISTRATION] This is either a list of the labels of the white
