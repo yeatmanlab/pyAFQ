@@ -877,6 +877,17 @@ class CSVcomparison():
             f"rel_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
 
+        extent = axes[1].get_window_extent().transformed(
+            fig.dpi_scale_trans.inverted())
+        axes[1].set_title(
+            f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
+        fig.savefig(
+            self._get_fname(
+                f"rel_plots/{'_'.join(scalars)}",
+                f"{names[0]}_vs_{names[1]}_intersubject"),
+            bbox_inches=extent.expanded(1.1, 1.2))
+        axes[1].set_title(f"intersubejct_reliability")
+
         if not show_plots:
             plt.ion()
         return fig, axes
