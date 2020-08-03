@@ -885,7 +885,7 @@ class CSVcomparison():
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}",
                 f"{names[0]}_vs_{names[1]}_intersubject"),
-            bbox_inches=extent.expanded(1.1, 1.2))
+            bbox_inches=extent.translated(0, -0.2).expanded(1.4, 2.0))
         axes[1].set_title(f"intersubejct_reliability")
 
         if not show_plots:
