@@ -143,7 +143,6 @@ def fit_anisotropic_power_map(dwi, gtab, mask=None):
         mask = nib.load(mask)
     mask = mask.get_fdata()
 
-    #model = shm.QballModel(gtab, 8)
     model = _model(gtab, dwi_data)
     sphere = dpd.get_sphere('symmetric724')
     peaks = csd.peaks_from_model(

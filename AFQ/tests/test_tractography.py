@@ -4,8 +4,8 @@ import numpy.testing as npt
 
 import nibabel.tmpdirs as nbtmp
 
-from AFQ.csd import fit_csd
-from AFQ.dti import fit_dti
+from AFQ.models.csd import fit_csd
+from AFQ.models.dti import fit_dti
 from AFQ.tractography import track
 from AFQ.utils.testing import make_tracking_data
 

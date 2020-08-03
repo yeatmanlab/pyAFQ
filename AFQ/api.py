@@ -23,10 +23,10 @@ from bids.layout import BIDSLayout
 
 from .version import version as pyafq_version
 import AFQ.data as afd
-from AFQ.dti import _fit as dti_fit
-from AFQ.dki import _fit as dki_fit
-from AFQ.csd import _fit as csd_fit
-from AFQ.csd import fit_anisotropic_power_map
+from AFQ.models.dti import _fit as dti_fit
+from AFQ.models.dki import _fit as dki_fit
+from AFQ.models.csd import _fit as csd_fit
+from AFQ.models.csd import fit_anisotropic_power_map
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.dki as dpy_dki
