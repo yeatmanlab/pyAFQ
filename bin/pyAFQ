@@ -88,7 +88,7 @@ def parse_cli():
     cli_parser.add_argument(
         dest='config',
         action="store",
-        type=FileType('r'),
+        # type=FileType('r'),
         help="Path to config file. For example, /path/to/afq_config.ini")
 
     cli_parser.add_argument(
@@ -109,10 +109,10 @@ def parse_cli():
             "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
-    opts.config.close()
+    # opts.config.close()
     # use_config_gui = not opts.disable_config2gui
 
-    return opts.config.name  #, use_config_gui
+    return opts.config  #.name, use_config_gui
 
 
 def parse_doc():
