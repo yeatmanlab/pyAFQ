@@ -26,6 +26,7 @@ import AFQ.data as afd
 from AFQ.dti import _fit as dti_fit
 from AFQ.dki import _fit as dki_fit
 from AFQ.csd import _fit as csd_fit
+from AFQ.csd import fit_anisotropic_power_map
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.dki as dpy_dki
@@ -589,6 +590,19 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return csd_params_file
 
+    def _anisotropic_power_map(self, row):
+        pmap_file = self._get_fname(
+            row, '_anisotropic_power_map.nii.gz')
+        if self.force_recompute or not op.exists(pmap_file):
+            dwi_data, gtab, img = self._get_data_gtab(row)
+            mask = self._brain_mask(row)
+            pmap = fit_anisotropic_power_map(
+                dwi_data, gtab, mask)
+            pmap = nib.Nifti1Image(pmap, img.affine)
+            self.log_and_save_nii(pmap, pmap_file)
+
+        return pmap_file
+
     def _dti_fa(self, row):
         dti_fa_file = self._get_fname(row, '_model-DTI_FA.nii.gz')
         if self.force_recompute or not op.exists(dti_fa_file):
@@ -669,18 +683,6 @@ class AFQ(object):
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
-
-    def _anisotropic_power_map(self, row):
-        pmap_file = self._get_fname(
-            row, '_anisotropic_power_map.nii.gz')
-        if self.force_recompute or not op.exists(pmap_file):
-            dwi_data, gtab, img = self._get_data_gtab(row)
-            mask = self._brain_mask(row)
-            pmap = afd.create_anisotropic_power_map(
-                dwi_data, gtab, img.affine, mask)
-            self.log_and_save_nii(pmap, pmap_file)
-
-        return pmap_file
 
     def _reg_img(self, img, row=None):
         if isinstance(img, str):

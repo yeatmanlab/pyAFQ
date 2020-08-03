@@ -202,21 +202,11 @@ def test_AFQ_anisotropic():
         np.logical_or(bvals_in_range, gtab.b0s_mask)
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
-    # check the mapping is approximately equal to the reference mapping
-    file_dict = afd.read_stanford_hardi_tractography()
-    mapping = file_dict['mapping.nii.gz']
-    forward = mapping.get_fdata().astype(np.float32)[..., 0]
-    my_mapping = nib.load(myafq._mapping(row))
-    my_forward = my_mapping.get_fdata().astype(np.float32)[..., 0]
-
-    resampled_my_forward = np.zeros(forward.shape)
-    for i in range(3):
-        resampled_my_forward[..., i] = reg.resample(
-            my_forward[..., i],
-            forward[..., i],
-            my_mapping.affine,
-            mapping.affine)
-    npt.assert_array_almost_equal(forward, resampled_my_forward, decimal=-1)
+    # check that the apm map was made
+    myafq.export_rois()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
 
 
 @pytest.mark.slow

@@ -6,6 +6,7 @@ import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
 from dipy.reconst import shm
+import dipy.data as dpd
 import AFQ.utils.models as ut
 
 # Monkey patch fixed spherical harmonics for conda
@@ -31,7 +32,7 @@ def _model(gtab, data, response=None, sh_order=None):
 
     if response is None:
         response, _ = csd.auto_response(gtab, data, roi_radius=10,
-                                            fa_thr=0.7)
+                                        fa_thr=0.7)
 
     csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
                                                    sh_order=sh_order)
@@ -95,7 +96,6 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files,
                                             b0_threshold=b0_threshold)
 
-
     csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
                   lambda_=lambda_, tau=tau)
 
@@ -109,3 +109,50 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     fname = op.join(out_dir, 'csd_sh_coeff.nii.gz')
     nib.save(nib.Nifti1Image(csdfit.shm_coeff, aff), fname)
     return fname
+
+
+def fit_anisotropic_power_map(dwi, gtab, mask=None):
+    """
+    Fits an anisotropic power map.
+
+    Parameters
+    ----------
+    dwi : str, ndarray, or nifti1image
+        Data to greate map with.
+
+    gtab : GradientTable
+        A GradientTable with all the gradient information.
+
+    mask : str or nifti1image, optional
+        mask to mask the data with.
+        Default: None.
+
+    Returns
+    -------
+    ndarray containing an anisotropic power map.
+    """
+
+    if isinstance(dwi, str):
+        dwi = nib.load(dwi)
+    if isinstance(dwi, nib.Nifti1Image):
+        dwi_data = dwi.get_fdata()
+    else:
+        dwi_data = dwi
+
+    if isinstance(mask, str):
+        mask = nib.load(mask)
+    mask = mask.get_fdata()
+
+    #model = shm.QballModel(gtab, 8)
+    model = _model(gtab, dwi_data)
+    sphere = dpd.get_sphere('symmetric724')
+    peaks = csd.peaks_from_model(
+        model=model,
+        data=dwi_data,
+        sphere=sphere,
+        relative_peak_threshold=.5,
+        min_separation_angle=25,
+        mask=mask)
+    ap = shm.anisotropic_power(peaks.shm_coeff)
+
+    return ap
