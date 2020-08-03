@@ -202,7 +202,7 @@ def test_AFQ_anisotropic():
         np.logical_or(bvals_in_range, gtab.b0s_mask)
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
-    # load reference mapping and my mapping
+    # check the mapping is approximately equal to the reference mapping
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     forward = mapping.get_fdata().astype(np.float32)[..., 0]
