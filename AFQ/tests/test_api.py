@@ -27,6 +27,7 @@ from AFQ import api
 import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
+import AFQ.registration as reg
 
 
 def touch(fname, times=None):
@@ -186,7 +187,8 @@ def test_AFQ_anisotropic():
         reg_template="mni_T1",
         reg_subject="power_map")
 
-    _, gtab, _ = myafq._get_data_gtab(myafq.data_frame.iloc[0])
+    row = myafq.data_frame.iloc[0]
+    _, gtab, _ = myafq._get_data_gtab(row)
 
     # check the b0s mask is correct
     b0s_mask = np.zeros(160, dtype=bool)
@@ -200,7 +202,21 @@ def test_AFQ_anisotropic():
         np.logical_or(bvals_in_range, gtab.b0s_mask)
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
-    myafq.export_rois()
+    # load reference mapping and my mapping
+    file_dict = afd.read_stanford_hardi_tractography()
+    mapping = file_dict['mapping.nii.gz']
+    forward = mapping.get_fdata().astype(np.float32)[..., 0]
+    my_mapping = nib.load(myafq._mapping(row))
+    my_forward = my_mapping.get_fdata().astype(np.float32)[..., 0]
+
+    resampled_my_forward = np.zeros(forward.shape)
+    for i in range(3):
+        resampled_my_forward[..., i] = reg.resample(
+            my_forward[..., i],
+            forward[..., i],
+            my_mapping.affine,
+            mapping.affine)
+    npt.assert_array_almost_equal(forward, resampled_my_forward, decimal=-1)
 
 
 @pytest.mark.slow
@@ -228,11 +244,13 @@ def test_AFQ_FA():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                          'derivatives', 'dmriprep'),
-                    sub_prefix='sub',
-                    reg_template='dti_fa_template',
-                    reg_subject='dti_fa_subject')
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        reg_template='dti_fa_template',
+        reg_subject='dti_fa_subject')
     myafq.export_rois()
 
 
