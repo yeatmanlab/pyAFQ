@@ -17,7 +17,8 @@ import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
 import dipy.reconst.shm as shm
-import dipy.reconst.csdeconv as csdeconv
+from dipy.reconst import csdeconv as csd
+from AFQ.csd import _model as csdmodel 
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
@@ -1110,9 +1111,10 @@ def create_anisotropic_power_map(dwi, gtab, dwi_affine=None, mask=None):
         mask = nib.load(mask)
     mask = mask.get_fdata()
 
-    model = shm.QballModel(gtab, 8)
+    #model = shm.QballModel(gtab, 8)
+    model = csdmodel(gtab, dwi_data)
     sphere = dpd.get_sphere('symmetric724')
-    peaks = csdeconv.peaks_from_model(
+    peaks = csd.peaks_from_model(
         model=model,
         data=dwi_data,
         sphere=sphere,

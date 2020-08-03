@@ -15,10 +15,9 @@ shm.spherical_harmonics = spherical_harmonics
 __all__ = ["fit_csd"]
 
 
-def _fit(gtab, data, mask, response=None, sh_order=None,
-         lambda_=1, tau=0.1):
+def _model(gtab, data, response=None, sh_order=None):
     """
-    Helper function that does the core of fitting a model to data.
+    Helper function that defines a CSD model.
     """
     if sh_order is None:
         ndata = np.sum(~gtab.b0s_mask)
@@ -31,14 +30,19 @@ def _fit(gtab, data, mask, response=None, sh_order=None,
             sh_order = 8
 
     if response is None:
-        response, ratio = csd.auto_response(gtab, data, roi_radius=10,
+        response, _ = csd.auto_response(gtab, data, roi_radius=10,
                                             fa_thr=0.7)
 
     csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
                                                    sh_order=sh_order)
-    csdfit = csdmodel.fit(data, mask=mask)
+    return csdmodel
 
-    return csdfit
+
+def _fit(gtab, data, mask, response=None, sh_order=None, lambda_=1, tau=0.1):
+    """
+    Helper function that does the core of fitting a model to data.
+    """
+    return _model(gtab, data, response, sh_order).fit(data, mask=mask)
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
