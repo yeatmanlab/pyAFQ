@@ -2,7 +2,7 @@
 
 
 from AFQ.utils.bin import model_input_parser
-from AFQ import dki
+from AFQ.models import dki
 
 usage = """pyAFQ_dkimicro"""
 parser = model_input_parser(usage)

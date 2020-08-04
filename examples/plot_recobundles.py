@@ -30,7 +30,7 @@ from dipy.io.stateful_tractogram import Space
 import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
-import AFQ.dti as dti
+import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 import AFQ.api as api
 

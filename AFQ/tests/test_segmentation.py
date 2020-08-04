@@ -17,7 +17,7 @@ import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.segmentation as seg
-import AFQ.dti as dti
+import AFQ.models.dti as dti
 from AFQ.utils.volume import patch_up_roi
 
 

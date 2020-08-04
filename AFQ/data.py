@@ -16,8 +16,6 @@ import logging
 import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
-import dipy.reconst.shm as shm
-import dipy.reconst.csdeconv as csdeconv
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
@@ -1068,57 +1066,3 @@ def read_ukbb_fa_template(mask=True):
         return template_img
     else:
         return _apply_mask(template_img, 1)
-
-
-def create_anisotropic_power_map(dwi, gtab, dwi_affine=None, mask=None):
-    """
-    Creates an anisotropic power map.
-
-    Parameters
-    ----------
-    dwi : str, ndarray, or nifti1image
-        Data to greate map with.
-
-    gtab : GradientTable
-        A GradientTable with all the gradient information.
-
-    dwi_affine : ndarray, optional
-        Affine associated with the dwi data.
-        If None, will attempt to use affine from dwi image.
-        Default: None.
-
-    mask : str or nifti1image, optional
-        mask to mask the data with.
-        Default: None.
-
-    Returns
-    -------
-    nib.Nifti1Image class instance containing an anisotropic power map.
-    """
-
-    if isinstance(dwi, str):
-        dwi = nib.load(dwi)
-    if isinstance(dwi, nib.Nifti1Image):
-        dwi_data = dwi.get_fdata()
-    else:
-        dwi_data = dwi
-
-    if dwi_affine is None:
-        dwi_affine = dwi.affine
-
-    if isinstance(mask, str):
-        mask = nib.load(mask)
-    mask = mask.get_fdata()
-
-    model = shm.QballModel(gtab, 8)
-    sphere = dpd.get_sphere('symmetric724')
-    peaks = csdeconv.peaks_from_model(
-        model=model,
-        data=dwi_data,
-        sphere=sphere,
-        relative_peak_threshold=.5,
-        min_separation_angle=25,
-        mask=mask)
-    ap = shm.anisotropic_power(peaks.shm_coeff)
-
-    return nib.Nifti1Image(ap, dwi_affine)

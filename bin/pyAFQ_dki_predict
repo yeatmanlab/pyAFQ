@@ -3,7 +3,7 @@
 from AFQ.utils.bin import model_predict_input_parser
 import numpy as np
 import dipy.core.gradients as dpg
-from AFQ import dki
+from AFQ.models import dki
 
 usage = """pyAFQ_dki_predict"""
 parser = model_predict_input_parser(usage)

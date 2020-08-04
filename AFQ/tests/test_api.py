@@ -27,6 +27,7 @@ from AFQ import api
 import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
+import AFQ.registration as reg
 
 
 def touch(fname, times=None):
@@ -168,6 +169,46 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
+def test_AFQ_anisotropic():
+    """
+    Test if API can run using anisotropic registration
+    with a specific selection of b vals
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        min_bval=1990,
+        max_bval=2010,
+        b0_threshold=50,
+        reg_template="mni_T1",
+        reg_subject="power_map")
+
+    row = myafq.data_frame.iloc[0]
+    _, gtab, _ = myafq._get_data_gtab(row)
+
+    # check the b0s mask is correct
+    b0s_mask = np.zeros(160, dtype=bool)
+    b0s_mask[0:10] = True
+    npt.assert_equal(gtab.b0s_mask, b0s_mask)
+
+    # check that only b values in the b val range passed
+    bvals_in_range = \
+        np.logical_and((gtab.bvals > 1990), (gtab.bvals < 2010))
+    bvals_in_range_or_0 = \
+        np.logical_or(bvals_in_range, gtab.b0s_mask)
+    npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
+
+    # check that the apm map was made
+    myafq.export_rois()
+    assert op.exists(op.join(
+        myafq.data_frame['results_dir'][0],
+        'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
+
+
 @pytest.mark.slow
 def test_AFQ_slr():
     """
@@ -193,11 +234,13 @@ def test_AFQ_FA():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    myafq = api.AFQ(dmriprep_path=op.join(tmpdir.name, 'stanford_hardi',
-                                          'derivatives', 'dmriprep'),
-                    sub_prefix='sub',
-                    reg_template='dti_fa_template',
-                    reg_subject='dti_fa_subject')
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation='freesurfer',
+        reg_template='dti_fa_template',
+        reg_subject='dti_fa_subject')
     myafq.export_rois()
 
 
