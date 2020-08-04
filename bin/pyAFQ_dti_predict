@@ -4,7 +4,7 @@ import numpy as np
 import dipy.core.gradients as dpg
 
 from AFQ.utils.bin import model_predict_input_parser
-from AFQ import dti
+from AFQ.models import dti
 
 usage = """pyAFQ_dti_predict [options]"""
 parser = model_predict_input_parser(usage)

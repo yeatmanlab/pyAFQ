@@ -9,7 +9,7 @@ import nibabel.tmpdirs as nbtmp
 import dipy.data as dpd
 from dipy.reconst.shm import calculate_max_order
 
-from AFQ import csd
+from AFQ.models import csd
 
 
 def test_fit_csd():

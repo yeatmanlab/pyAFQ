@@ -10,7 +10,7 @@ import nibabel.tmpdirs as nbtmp
 import dipy.data as dpd
 import dipy.core.gradients as dpg
 
-from AFQ import dki
+from AFQ.models import dki
 from AFQ.utils.testing import make_dki_data
 
 

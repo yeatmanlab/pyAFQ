@@ -12,7 +12,7 @@ from dipy.core.geometry import vector_norm
 import dipy.core.gradients as dpg
 import dipy.data as dpd
 
-from AFQ import dti
+from AFQ.models import dti
 from AFQ._fixes import in_place_norm
 from AFQ.utils.testing import make_dti_data
 
