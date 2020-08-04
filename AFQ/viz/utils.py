@@ -702,7 +702,7 @@ class LongitudinalCSVComparison():
                 for i, name in enumerate(names):
                     profiles[i] = self._get_profile(
                         name, bundle, subject, scalar)
-                    if profiles[i] is not None:
+                    if profiles[i] is None:
                         both_found = False
                 if both_found:
                     this_contrast_index = \
@@ -711,7 +711,7 @@ class LongitudinalCSVComparison():
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                     ax.plot(this_contrast_index, label=scalar)
                     ax.set_title(bundle)
-                    ax.set_ylim([0, 1])
+                    ax.set_ylim([-1, 1])
                     ax.set_xticklabels([])
                     contrast_index.at[bundle, subject] = \
                         np.nanmean(this_contrast_index)
