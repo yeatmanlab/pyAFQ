@@ -654,7 +654,7 @@ class LongitudinalCSVComparison():
             plt.ion()
 
     def contrast_index(self, names=None, scalar="dti_fa",
-                       bundles=POSITIONS.keys(), show_plots=False):
+                       bundles=list(POSITIONS.keys()), show_plots=False):
         """
         Calculate the contrast index for each bundle in two datasets.
 
@@ -670,7 +670,7 @@ class LongitudinalCSVComparison():
             Scalar to use for the contrast index. Default: "dti_fa".
 
         bundles : list of strings, optional
-            Bundles to correlate. Default: POSITIONS.keys()
+            Bundles to correlate. Default: list(POSITIONS.keys())
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -727,6 +727,68 @@ class LongitudinalCSVComparison():
         if not show_plots:
             plt.ion()
         return contrast_index
+
+    def lateral_contrast_index(self, names=None, scalar="dti_fa",
+                               bundles=list(POSITIONS.keys()),
+                               show_plots=False):
+        """
+        Calculate the contrast index for each bundle in two datasets.
+
+        Parameters
+        ----------
+        names : list of strings, optional
+            Names of datasets to plot profiles of.
+            If None, all datasets are used.
+            Default: None
+
+        scalar : string, optional
+            Scalar to use for the contrast index. Default: "dti_fa".
+
+        bundles : list of strings, optional
+            Bundles to correlate.
+            Every other bundle will be laterally correlated.
+            There must be an even number of bundles.
+            Default: list(POSITIONS.keys())
+
+        show_plots : bool, optional
+            Whether to show plots if in an interactive environment.
+            Default: False
+        """
+        if not show_plots:
+            plt.ioff()
+
+        if names is None:
+            names = list(self.profile_dict.keys())
+
+        for subject in self.subjects:
+            fig, axes = self._get_brain_axes(
+                f"Lateral Contrast Indices by Bundle")
+            for j in range(0, len(bundles), 2):
+                bundle = bundles[j]
+                other_bundle = bundles[j+1]
+                for i, name in enumerate(names):
+                    profile = self._get_profile(
+                        name, bundle, subject, scalar)
+                    other_profile = self._get_profile(
+                        name, other_bundle, subject, scalar)
+
+                    if (profile is not None) and (other_profile is not None):
+                        lateral_contrast_index = \
+                            (profile - other_profile) \
+                            / (profile + other_profile)
+                        ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+                        ax.plot(lateral_contrast_index, label=name)
+                        ax.set_title(f"{bundle} vs {other_bundle}")
+                        ax.set_ylim([-1, 1])
+                        ax.set_xticklabels([])
+            fig.legend(names, loc='center')
+            fig.savefig(
+                self._get_fname(
+                    f"contrast_plots/{scalar}/",
+                    f"{'_'.join(names)}_lateral_contrast_index"))
+
+        if not show_plots:
+            plt.ion()
 
     def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
