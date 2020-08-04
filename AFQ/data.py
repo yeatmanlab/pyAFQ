@@ -306,11 +306,11 @@ def get_s3_client(anon=True):
 
     Parameters
     ----------
-    anon : bool, default=True
+    anon : bool
         Whether to use anonymous connection (public buckets only).
         If False, uses the key/secret given, or boto’s credential
         resolver (client_kwargs, environment, variables, config files,
-        EC2 IAM server, in that order)
+        EC2 IAM server, in that order). Default: True
 
     Returns
     -------
@@ -340,11 +340,11 @@ def _ls_s3fs(s3_prefix, anon=True):
         AWS S3 key for the study or site "directory" that contains all
         of the subjects
 
-    anon : bool, default=True
+    anon : bool
         Whether to use anonymous connection (public buckets only).
         If False, uses the key/secret given, or boto’s credential
         resolver (client_kwargs, environment, variables, config files,
-        EC2 IAM server, in that order)
+        EC2 IAM server, in that order). Default: True
 
     Returns
     -------
@@ -389,11 +389,11 @@ def _get_matching_s3_keys(bucket, prefix='', suffix='', anon=True):
     suffix : str, optional
         Only fetch keys that end with this suffix
 
-    anon : bool, default=True
+    anon : bool
         Whether to use anonymous connection (public buckets only).
         If False, uses the key/secret given, or boto’s credential
         resolver (client_kwargs, environment, variables, config files,
-        EC2 IAM server, in that order)
+        EC2 IAM server, in that order). Default: True
 
     Yields
     ------
@@ -446,15 +446,15 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
     key : str
         S3 key for the object to download
 
-    overwrite : bool, default=False
+    overwrite : bool
         If True, overwrite file if it already exists.
-        If False, skip download and return
+        If False, skip download and return. Default: False
 
-    anon : bool, default=True
+    anon : bool
         Whether to use anonymous connection (public buckets only).
         If False, uses the key/secret given, or boto’s credential
         resolver (client_kwargs, environment, variables, config files,
-        EC2 IAM server, in that order)
+        EC2 IAM server, in that order). Default: True
     """
     # Create the directory and file if necessary
     s3 = get_s3_client(anon=anon)
@@ -584,20 +584,20 @@ class S3BIDSSubject:
         directory : str
             Directory to which to download subject files
 
-        include_derivs : bool or str, default=False
+        include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
             If a string or sequence of strings is passed, this will
             only download derivatives that match the string(s) (e.g.
-            ['dmriprep', 'afq']).
+            ['dmriprep', 'afq']). Default: False
 
-        overwrite : bool, default=False
-            If True, overwrite files for each subject
+        overwrite : bool
+            If True, overwrite files for each subject. Default: False
 
-        pbar : bool, default=True
-            If True, include download progress bar
+        pbar : bool
+            If True, include download progress bar. Default: True
 
-        pbar_idx : int, default=0
-            Progress bar index for multithreaded progress bars
+        pbar_idx : int
+            Progress bar index for multithreaded progress bars. Default: 0
         """
         if not isinstance(directory, str):
             raise TypeError('directory must be a string.')
@@ -792,32 +792,34 @@ class S3BIDSStudy:
         s3_prefix : str
             The S3 prefix common to all of the study objects on S3
 
-        subjects : str, sequence(str), int, or None, default=None
+        subjects : str, sequence(str), int, or None
             If int, retrieve S3 keys for the first `subjects` subjects.
             If "all", retrieve all subjects. If str or sequence of
             strings, retrieve S3 keys for the specified subjects. If
-            None, retrieve S3 keys for the first subject.
+            None, retrieve S3 keys for the first subject. Default: None
 
-        anon : bool, default=True
+        anon : bool
             Whether to use anonymous connection (public buckets only).
             If False, uses the key/secret given, or boto’s credential
             resolver (client_kwargs, environment, variables, config
-            files, EC2 IAM server, in that order)
+            files, EC2 IAM server, in that order). Default: True
 
-        use_participants_tsv : bool, default=False
+        use_participants_tsv : bool
             If True, use the particpants tsv files to retrieve subject
             identifiers. This is faster but may not catch all subjects.
-            Sometimes the tsv files are outdated.
+            Sometimes the tsv files are outdated. Default: False
 
-        random_seed : int or None, default=None
+        random_seed : int or None
             Random seed for selection of subjects if `subjects` is an
-            integer. Use the same random seed for reproducibility
+            integer. Use the same random seed for reproducibility.
+            Default: None
 
-        _subject_class : object, default=S3BIDSSubject
+        _subject_class : object
             The subject class to be used for this study. This parameter
-            has a leading underscore because you probably don't want to
-            change it. If you do change it, you must provide a class
-            that quacks like AFQ.data.S3BIDSSubject
+            has a leading underscore because you probably don't want
+            to change it. If you do change it, you must provide a
+            class that quacks like AFQ.data.S3BIDSSubject. Default:
+            S3BIDSSubject
         """
         if not isinstance(study_id, str):
             raise TypeError('`study_id` must be a string.')
@@ -1069,22 +1071,22 @@ class S3BIDSStudy:
         directory : str
             Directory to which to download subject files
 
-        include_non_sub_raw_keys : bool, default=False
+        include_non_sub_raw_keys : bool
             If True, download all keys in self.non_sub_s3_keys also.
-            This is useful if the non_sub_s3_keys contain files
-            common to all subjects that should be inherited.
+            This is useful if the non_sub_s3_keys contain files common
+            to all subjects that should be inherited. Default: False
 
-        include_derivs : bool or str, default=False
+        include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
             If a string or sequence of strings is passed, this will
             only download derivatives that match the string(s) (e.g.
-            ["dmriprep", "afq"]).
+            ["dmriprep", "afq"]). Default: False
 
-        overwrite : bool, default=False
-            If True, overwrite files for each subject
+        overwrite : bool
+            If True, overwrite files for each subject. Default: False
 
-        pbar : bool, default=True
-            If True, include progress bar
+        pbar : bool
+            If True, include progress bar. Default: True
 
         See Also
         --------
@@ -1131,20 +1133,21 @@ class HBNSite(S3BIDSStudy):
         s3_prefix : str
             The S3 prefix common to all of the study objects on S3
 
-        subjects : str, sequence(str), int, or None, default=None
+        subjects : str, sequence(str), int, or None
             If int, retrieve S3 keys for the first `subjects` subjects.
             If "all", retrieve all subjects. If str or sequence of
             strings, retrieve S3 keys for the specified subjects. If
-            None, retrieve S3 keys for the first subject.
+            None, retrieve S3 keys for the first subject. Default: None
 
-        use_participants_tsv : bool, default=False
+        use_participants_tsv : bool
             If True, use the particpants tsv files to retrieve subject
             identifiers. This is faster but may not catch all subjects.
-            Sometimes the tsv files are outdated.
+            Sometimes the tsv files are outdated. Default: False
 
-        random_seed : int or None, default=None
+        random_seed : int or None
             Random seed for selection of subjects if `subjects` is an
-            integer. Use the same random seed for reproducibility
+            integer. Use the same random seed for reproducibility.
+            Default: None
         """
         valid_sites = ["Site-SI", "Site-RU", "Site-CBIC", "Site-CUNY"]
         if site not in valid_sites:
@@ -1257,17 +1260,17 @@ class HBNSite(S3BIDSStudy):
         directory : str
             Directory to which to download subject files
 
-        include_derivs : bool or str, default=False
+        include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
             If a string or sequence of strings is passed, this will
             only download derivatives that match the string(s) (e.g.
-            ["dmriprep", "afq"]).
+            ["dmriprep", "afq"]). Default: False
 
-        overwrite : bool, default=False
-            If True, overwrite files for each subject
+        overwrite : bool
+            If True, overwrite files for each subject. Default: False
 
-        pbar : bool, default=True
-            If True, include progress bar
+        pbar : bool
+            If True, include progress bar. Default: True
 
         See Also
         --------
