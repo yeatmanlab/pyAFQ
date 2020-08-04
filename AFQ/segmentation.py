@@ -167,6 +167,7 @@ class Segmentation:
                 (not op.exists(save_intermediates)):
             os.makedirs(save_intermediates, exist_ok=True)
         self.save_intermediates = save_intermediates
+        self.clip_edges = clip_edges
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
