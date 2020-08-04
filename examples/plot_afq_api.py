@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 import pandas as pd
 
-from AFQ.models import api
+from AFQ import api
 import AFQ.data as afd
 
 
