@@ -1090,7 +1090,7 @@ class S3BIDSStudy:
 
         See Also
         --------
-        AFQ.data.S3BIDSSubject.download()
+        AFQ.data.S3BIDSSubject.download
         """
         self._local_directories.append(directory)
         self._local_directories = set(self._local_directories)
@@ -1224,7 +1224,7 @@ class HBNSite(S3BIDSStudy):
 
         See Also
         --------
-        AFQ.data.S3BIDSStudy._get_non_subject_s3_keys()
+        AFQ.data.S3BIDSStudy._get_non_subject_s3_keys
         """
         non_sub_s3_keys = {}
 
@@ -1274,7 +1274,7 @@ class HBNSite(S3BIDSStudy):
 
         See Also
         --------
-        AFQ.data.S3BIDSSubject.download()
+        AFQ.data.S3BIDSSubject.download
         """
         super().download(
             directory=directory,
