@@ -250,10 +250,10 @@ class AFQ(object):
             One of {"fury", "plotly"}.
             Default: "fury"
         segmentation_params : dict, optional
-            [SEGMENTATION] The parameters for segmentation.
+            The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
-            [TRACKING] The parameters for tracking.
+            The parameters for tracking.
             Parameters with suffix_mask are handled differently by this api.
             Masks which are strings that are in scalars or are "wm_mask"
             will be replaced by the corresponding mask. Masks which are paths
@@ -261,7 +261,7 @@ class AFQ(object):
             To track the entire volume, set mask to "full".
             Default: use the default behavior of the aft.track function.
         clean_params: dict, optional
-            [CLEANING] The parameters for cleaning.
+            The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
             function.
         '''

@@ -61,6 +61,7 @@ class Segmentation:
                  save_intermediates=None):
         """
         Segment streamlines into bundles.
+
         Parameters
         ----------
         nb_points : int, boolean
@@ -88,7 +89,7 @@ class Segmentation:
             Keep streamlines that have length greater than this value
                 during whole brain SLR.
             Default: 50.
-        b0_theshold : float.
+        b0_threshold : float.
             Using AFQ Algorithm.
             All b-values with values less than or equal to `bo_threshold` are
             considered as b0s i.e. without diffusion weighting.
@@ -682,11 +683,11 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     """
     Clean a segmented fiber group based on the Mahalnobis distance of
     each streamline
+
     Parameters
     ----------
     tg : StatefulTractogram class instance
         A whole-brain tractogram to be segmented.
-
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
@@ -703,7 +704,6 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     stat : callable or str, optional.
         The statistic of each node relative to which the Mahalanobis is
         calculated. Default: `np.mean` (but can also use median, etc.)
-
     return_idx : bool
         Whether to return indices in the original streamlines.
         Default: False.

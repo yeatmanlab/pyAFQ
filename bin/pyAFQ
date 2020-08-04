@@ -58,10 +58,10 @@ Runs full AFQ processing as specified in the configuration file.
 
 For details about configuration, see instructions in:
 https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+
+The default configuration file looks like:
+
 """
-config_usage = \
-    f"""Optionally update parameters in the selected config file.
-After updating, the config file will be used to run pyAFQ."""
 
 
 def process_defaults(defaults_dict):
@@ -81,9 +81,54 @@ def process_defaults(defaults_dict):
     return defaults_list
 
 
-def parse_cli():
+def _val_to_toml(v):
+    if v is None:
+        return "''"
+    if isinstance(v, str):
+        return f"'{v}'"
+    elif isinstance(v, bool):
+        if v:
+            return "true"
+        else:
+            return "false"
+    elif callable(v):
+        return f"'{v.__name__}'"
+    else:
+        return f"{v}"
+
+def _toml_to_val(v):
+    if v == '':
+        return None
+    if v[0] == "'" and v[-1] == "'":
+        return v[1:-1]
+    elif v == "true":
+        return True
+    elif v == "false":
+        return False
+    elif '.' in v:
+        return float(v)
+    else:
+        return int(v)
+
+def _dict_to_toml(dictionary):
+    toml = ''
+    for section, args in dictionary.items():
+        toml = toml + f'[{section}]\n'
+        for arg, arg_info in args.items():
+            toml = toml + '\n'
+            toml = toml + arg_info['desc']
+            toml = toml + f"{arg} = {_val_to_toml(arg_info['default'])}\n"
+        toml = toml + '\n'
+    return toml + '\n'
+
+
+def _toml_to_dict(toml):
+    return {}
+
+
+def parse_cli(help_msg):
     # cli_parser parses user arguments from CLI
-    cli_parser = ArgumentParser(usage=usage)
+    cli_parser = ArgumentParser(usage=usage + _dict_to_toml(arg_dict))
 
     cli_parser.add_argument(
         dest='config',
@@ -95,10 +140,6 @@ def parse_cli():
         '-t', '--notrack', action="store_true", default=False,
         help="Disable the use of pyAFQ being recorded by Google Analytics. ")
 
-    # cli_parser.add_argument(
-    #     '--disable-config2gui', action="store_true", default=False,
-    #     help="Disable the GUI for editing the config file. ")
-
     opts = cli_parser.parse_args()
 
     if not opts.notrack:
@@ -109,35 +150,44 @@ def parse_cli():
             "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
-    # opts.config.close()
-    # use_config_gui = not opts.disable_config2gui
 
-    return opts.config  #.name, use_config_gui
+    return opts.config
 
 
-def parse_doc():
-    # doc_parser organizes the docstring for AFQ.api.AFQ
-    docstr_parser = FuncArgParser()
-    docstr_parser.setup_args(api.AFQ.__init__)
+def _func_dict_to_arg_dict(func_dict):
+    arg_dict = {}
+    for name, func in func_dict.items():
+        docstr_parser = FuncArgParser()
+        docstr_parser.setup_args(func)
+        for arg, info in docstr_parser.unfinished_arguments.items():
+            try:
+                if name == "AFQ":
+                    if '_params' in arg:
+                        continue
+                    section, desc = info['help'].split('[')[1].split(']')
+                else:
+                    section = name.upper()
+                    desc = info['help']
+            except KeyError:
+                logger.warning(
+                    "We are missing a valid description for the "
+                    + f"{name} argument {arg}")
+                continue
+            if section not in arg_dict.keys():
+                arg_dict[section] = {}
+            arg_dict[section][arg] = {}
+            if 'default' in info:
+                default = info['default']
+            else:
+                default = None
+            arg_dict[section][arg]['default'] = default
+            arg_dict[section][arg]['desc'] = ''
+            for desc_line in desc.splitlines():
+                f_desc_line = '# ' + desc_line.strip() + '\n'
+                arg_dict[section][arg]['desc'] = \
+                    arg_dict[section][arg]['desc'] + f_desc_line
 
-    track_defaults = get_default_args(aft.track)
-    track_defaults_list = process_defaults(track_defaults)
-    seg_defaults = get_default_args(seg.Segmentation.__init__)
-    seg_defaults_list = process_defaults(seg_defaults)
-    clean_defaults = get_default_args(seg.clean_bundle)
-    clean_defaults_list = process_defaults(clean_defaults)
-
-    docstr_parser.append2help(
-        'segmentation_params',
-        " Parameters Include: \n\t" + "\n\t".join(seg_defaults_list))
-    docstr_parser.append2help(
-        'tracking_params',
-        " Parameters Include: \n\t" + "\n\t".join(track_defaults_list))
-    docstr_parser.append2help(
-        'clean_params',
-        " Parameters Include: \n\t" + "\n\t".join(clean_defaults_list))
-
-    return docstr_parser.unfinished_arguments
+    return arg_dict
 
 
 def parse_config_run_afq(config_file, doc_args, cli_args):
@@ -153,9 +203,6 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
         try:
             section, desc = info['help'].split('[')[1].split(']')
         except KeyError:
-            logger.warning(
-                "We are missing a valid description for the "
-                + "AFQ argument " + arg)
             continue
 
         # updates any arguments not currently in .ini
@@ -234,25 +281,12 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
 
 
 if __name__ == '__main__':
-    # parse_cli_gui = Cli2Gui(
-    #     program_name="pyAFQ",
-    #     program_description=usage,
-    #     image=gui_image,
-    #     sizes=gui_sizes,
-    #     auto_enable=True,
-    #     theme=gui_theme,
-    #     darktheme=None)(parse_cli)
+    func_dict = {
+        "AFQ": api.AFQ.__init__,
+        "Tractography": aft.track,
+        "Segmentation": seg.Segmentation.__init__,
+        "Cleaning": seg.clean_bundle}
 
-    config_file = parse_cli()
-
-    # parse_doc_gui = Cli2Gui(
-    #     program_name="pyAFQ Configuration",
-    #     program_description=config_usage,
-    #     image=gui_image,
-    #     sizes=gui_sizes,
-    #     auto_enable=use_config_gui,
-    #     theme=gui_theme,
-    #     darktheme=None)(parse_doc)
-
-    doc_args = parse_doc()
-    parse_config_run_afq(config_file, doc_args, {})
+    arg_dict = _func_dict_to_arg_dict(func_dict)
+    config_file = parse_cli(arg_dict)
+    parse_config_run_afq(config_file, arg_dict, {})
