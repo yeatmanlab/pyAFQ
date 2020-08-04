@@ -1,8 +1,100 @@
-
+import botocore
 import numpy as np
 import numpy.testing as npt
+import os
+import os.path as op
+import pytest
+import s3fs
+import shutil
+
+from glob import glob
+from moto import mock_s3
+from uuid import uuid4
 
 import AFQ.data as afd
+
+DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "data")
+TEST_BUCKET = "test-bucket"
+TEST_DATASET = "ds000102-mimic"
+
+
+@pytest.fixture
+def temp_data_dir():
+    test_dir = str(uuid4())
+    os.mkdir(test_dir)
+
+    yield test_dir
+
+    shutil.rmtree(test_dir)
+
+
+@mock_s3
+def s3_setup():
+    """pytest fixture to put test_data directory on mock_s3"""
+    fs = s3fs.S3FileSystem()
+    client = afd.get_s3_client()
+    client.create_bucket(Bucket=TEST_BUCKET)
+    fs.put(
+        op.join(DATA_PATH, TEST_DATASET),
+        "/".join([TEST_BUCKET, TEST_DATASET]),
+        recursive=True,
+    )
+
+
+@mock_s3
+def test_get_s3_client():
+    client_anon = afd.get_s3_client(anon=True)
+    assert isinstance(client_anon, botocore.client.BaseClient)
+    assert client_anon.meta.service_model.service_id == "S3"
+    assert client_anon.meta.config.signature_version == botocore.UNSIGNED
+
+    client = afd.get_s3_client(anon=False)
+    assert isinstance(client, botocore.client.BaseClient)
+    assert client.meta.service_model.service_id == "S3"
+    assert isinstance(client.meta.config.signature_version, str)
+
+
+@mock_s3
+def test_get_matching_s3_keys():
+    s3_setup()
+
+    fnames = []
+    for pattern in ["**", "*/.*", "*/.*/.*", "*/.*/**"]:
+        fnames += [
+            s for s in glob(op.join(DATA_PATH, pattern), recursive=True) if op.isfile(s)
+        ]
+
+    fnames = [s.replace(DATA_PATH + "/", "") for s in fnames]
+
+    matching_keys = list(
+        afd._get_matching_s3_keys(bucket=TEST_BUCKET, prefix=TEST_DATASET)
+    )
+
+    assert set(fnames) == set(matching_keys)
+
+
+@mock_s3
+def test_download_from_s3(temp_data_dir):
+    s3_setup()
+
+    test_dir = temp_data_dir
+
+    matching_keys = list(
+        afd._get_matching_s3_keys(bucket=TEST_BUCKET, prefix=TEST_DATASET)
+    )
+
+    first_json_file = [m for m in matching_keys if m.endswith(".json")][0]
+    print(first_json_file)
+    print(TEST_BUCKET)
+
+    afd._download_from_s3(
+        fname=op.join(test_dir, "test_file"),
+        bucket=TEST_BUCKET,
+        key=first_json_file,
+        anon=False
+    )
+
+    assert op.isfile(op.join(test_dir, "test_file"))
 
 
 def test_aal_to_regions():

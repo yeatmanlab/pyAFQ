@@ -12,6 +12,7 @@ examples/*.npy
 build
 dist
 .DS_Store
+**.sw?
 **Untitled.ipynb
 pip-wheel-metadata
 pyAFQ.egg-info
