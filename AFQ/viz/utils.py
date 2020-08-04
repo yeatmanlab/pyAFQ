@@ -654,7 +654,7 @@ class LongitudinalCSVComparison():
             plt.ion()
 
     def contrast_index(self, names=None, scalar="dti_fa",
-                       bundles=POSITIONS.keys()):
+                       bundles=POSITIONS.keys(), show_plots=False):
         """
         Calculate the contrast index for each bundle in two datasets.
 
@@ -672,11 +672,18 @@ class LongitudinalCSVComparison():
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
 
+        show_plots : bool, optional
+            Whether to show plots if in an interactive environment.
+            Default: False
+
         Returns
         -------
         Pandas dataframe of contrast indices
         with subjects as columns and bundles as rows.
         """
+        if not show_plots:
+            plt.ioff()
+
         if names is None:
             names = list(self.profile_dict.keys())
         if len(names) != 2:
@@ -686,6 +693,9 @@ class LongitudinalCSVComparison():
 
         contrast_index = pd.DataFrame(index=bundles, columns=self.subjects)
         for subject in self.subjects:
+            fig, axes = self._get_brain_axes(
+                (f"Contrast Indices by Bundle, "
+                    f" {names[0]} vs {names[1]}"))
             for bundle in bundles:
                 profiles = [None] * 2
                 both_found = True
@@ -695,16 +705,30 @@ class LongitudinalCSVComparison():
                     if profiles[i] is not None:
                         both_found = False
                 if both_found:
+                    this_contrast_index = \
+                        (profiles[0] - profiles[1]) \
+                        / (profiles[0] + profiles[1])
+                    ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+                    ax.plot(this_contrast_index, label=scalar)
+                    ax.set_title(bundle)
+                    ax.set_ylim([0, 1])
+                    ax.set_xticklabels([])
                     contrast_index.at[bundle, subject] = \
-                        np.nanmean((profiles[0] - profiles[1])
-                                   / (profiles[0] + profiles[1]))
+                        np.nanmean(this_contrast_index)
+            fig.legend([scalar], loc='center')
+            fig.savefig(
+                self._get_fname(
+                    f"contrast_plots/{scalar}/",
+                    f"{names[0]}_vs_{names[1]}_contrast_index"))
 
         contrast_index.to_csv(self._get_fname(
             f"contrast_index/{scalar}",
             f"{names[0]}_vs_{names[1]}"))
+        if not show_plots:
+            plt.ion()
         return contrast_index
 
-    def correlation_plots(self, names=None,
+    def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           ylims=None,
                           bundles=POSITIONS.keys(),
