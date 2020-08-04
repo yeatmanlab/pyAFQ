@@ -872,6 +872,8 @@ class S3BIDSStudy:
             subjects = prng.choice(sorted(self._all_subjects),
                                    size=subjects,
                                    replace=False)
+            if isinstance(subjects, str):
+                subjects = [subjects]
         elif subjects == 'all':
             # if "all," retrieve all subjects
             subjects = sorted(self._all_subjects)

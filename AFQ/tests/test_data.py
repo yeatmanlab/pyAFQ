@@ -1,4 +1,5 @@
 import botocore
+import filecmp
 import numpy as np
 import numpy.testing as npt
 import os
@@ -95,6 +96,58 @@ def test_download_from_s3(temp_data_dir):
     )
 
     assert op.isfile(op.join(test_dir, "test_file"))
+
+
+@mock_s3
+def test_S3BIDSStudy(temp_data_dir):
+    s3_setup()
+
+    test_dir = temp_data_dir
+
+    study = afd.S3BIDSStudy(
+        study_id="test",
+        bucket=TEST_BUCKET,
+        s3_prefix=TEST_DATASET,
+        anon=False,
+        random_seed=42,
+        subjects=5
+    )
+
+    assert len(study.subjects)==5
+
+    study = afd.S3BIDSStudy(
+        study_id="test",
+        bucket=TEST_BUCKET,
+        s3_prefix=TEST_DATASET,
+        anon=False,
+        random_seed=42,
+    )
+
+    assert len(study.subjects)==1
+
+    study = afd.S3BIDSStudy(
+        study_id="test",
+        bucket=TEST_BUCKET,
+        s3_prefix=TEST_DATASET,
+        anon=False,
+        subjects="all"
+    )
+
+    assert len(study.subjects)==len(study._all_subjects)
+
+    study.download(test_dir)
+    study._download_non_sub_keys(test_dir)
+
+    s0 = study.subjects[0]
+    download_files = list(s0.files["raw"].values())
+    ref_dir = op.abspath(op.join(DATA_PATH, TEST_DATASET))
+    match, mismatch, errors = filecmp.cmpfiles(
+        ref_dir, test_dir, download_files, shallow=False
+    )
+
+    assert not mismatch
+    assert not errors
+    
 
 
 def test_aal_to_regions():
