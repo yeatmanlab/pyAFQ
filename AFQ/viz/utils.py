@@ -433,7 +433,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     return fig, axes
 
 
-class CSVcomparison():
+class LongitudinalCSVComparison():
     """
     Compare different CSVs, using:
     tract profiles, contrast indices,
@@ -508,7 +508,10 @@ class CSVcomparison():
                         profile[scalar].apply(lambda x: x * scale)
 
             self.profile_dict[names[i]] = profile
-        self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
+        if subjects is None:
+            self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
+        else:
+            self.subjects = subjects
 
     def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
