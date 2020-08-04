@@ -615,8 +615,6 @@ class Segmentation:
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
-            # Set this to nibabel.Streamlines object for output:
-            select_sl = dts.Streamlines(select_sl)
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
