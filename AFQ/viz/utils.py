@@ -687,7 +687,7 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
         if len(names) != 2:
-            self.logger.error("To calculate the contrast index,"
+            self.logger.error("To calculate the contrast index, "
                               + "only two dataset names should be given")
             return None
 
@@ -829,12 +829,13 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
         if len(names) != 2:
-            self.logger.error("To plot correlations,"
+            self.logger.error("To plot correlations, "
                               + "only two dataset names should be given")
             return None
 
         # extract relevant statistics / data from profiles
         all_sub_coef = np.zeros((len(scalars), len(bundles)))
+        all_sub_means = np.zeros((len(scalars), len(bundles), 2, len(self.subjects)))
         all_profile_coef = \
             np.zeros((len(scalars), len(bundles), len(self.subjects)))
         all_node_coef = np.zeros((len(scalars), len(bundles), 100))
@@ -849,8 +850,9 @@ class LongitudinalCSVComparison():
                             bundle_profiles[j, i] = np.nan
                         else:
                             bundle_profiles[j, i] = single_profile
-                all_sub_coef[m, k] = self.masked_corr(
-                    np.nanmean(bundle_profiles, axis=2))
+
+                all_sub_means[m, k] = np.nanmean(bundle_profiles, axis=2)
+                all_sub_coef[m, k] = self.masked_corr(all_sub_means)
 
                 bundle_coefs = np.zeros(len(self.subjects))
                 for i in range(len(self.subjects)):
@@ -907,6 +909,25 @@ class LongitudinalCSVComparison():
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_node_profiles"))
+
+        # plot mean profile scatter plots
+        maxi = all_sub_means.max()
+        mini = all_sub_means.min()
+        fig, axes = self._get_brain_axes(
+            (f"Distribution of mean profiles,"
+                f" {names[0]}_vs_{names[1]}"))
+        for k, bundle in enumerate(bundles):
+            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            for m, scalar in enumerate(scalars):
+                sub_means = all_sub_means[m, k]
+                ax.scatter(sub_means, label=scalar)
+            ax.set_title(bundle)
+
+        fig.legend(scalars, loc='center')
+        fig.savefig(
+            self._get_fname(
+                f"rel_plots/{'_'.join(scalars)}/verbose",
+                f"{names[0]}_vs_{names[1]}_mean_profiles"))
 
         # plot bar plots of pearson's r
         width = 0.6
