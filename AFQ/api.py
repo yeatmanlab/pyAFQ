@@ -157,7 +157,7 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion={"dti_fa", 0.1},
+                 wm_criterion={"dti_fa", ">0.1"},
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -240,7 +240,8 @@ class AFQ(object):
             segmentation file or (if a dictionary is provided) a series of
             scalar / threshold pairs used for creating the white-matter mask.
             In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
-            "dki_md" and each scalar mask will 'logical and' to make the
+            "dki_md", thresholds can be ">float" or "<float" where float
+            is some float, and each scalar mask will 'logical and' to make the
             white-matter mask. For an example of the former case,
             the white matter values for the segmentation provided
             with the HCP data including labels for midbrain are:
@@ -862,15 +863,25 @@ class AFQ(object):
                 wm_mask = None
                 fnames = []
                 thresholds = []
-                for scalar, threshold in self.wm_criterion:
+                for scalar, threshold in self.wm_criterion.items():
                     if scalar not in valid_scalars:
                         raise RuntimeError((
-                    f"wm_criterion scalars should be one of"
-                    f" {', '.join(valid_scalars)}"))
+                            f"wm_criterion scalars should be one of"
+                            f" {', '.join(valid_scalars)}"))
 
                     scalar_fname = self._scalar_dict[scalar](self, row)
-                    new_wm_mask = \
-                        nib.load(scalar_fname).get_fdata() > threshold
+                    threshold_val = float(threshold_val[1:])
+                    if threshold[0] == ">":
+                        new_wm_mask = \
+                            nib.load(scalar_fname).get_fdata() > threshold_val
+                    elif threshold[0] == "<":
+                        new_wm_mask = \
+                            nib.load(scalar_fname).get_fdata() < threshold_val
+                    else:
+                        raise RuntimeError("wm_criterion thresholds should be"
+                                           + " of the form "
+                                           + "\">float\" or \"<float\"")
+
                     if wm_mask is None:
                         wm_mask = new_wm_mask
                     else:
