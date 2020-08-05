@@ -7,10 +7,8 @@ import pathlib
 import datetime
 import platform
 import toml
-from ast import literal_eval
 
-from funcargparse import FuncArgParser
-from argparse import ArgumentParser, FileType
+from argparse import ArgumentParser
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -19,9 +17,7 @@ with warnings.catch_warnings():
 
     import AFQ
     import AFQ.api as api
-    from AFQ.utils.bin import get_default_args
-    import AFQ.segmentation as seg
-    import AFQ.tractography as aft
+    from AFQ.utils.bin import func_dict_to_arg_dict, dict_to_toml
 
     import logging
     logging.basicConfig(level=logging.INFO)
@@ -40,56 +36,8 @@ The default configuration file looks like:
 """
 
 
-def process_defaults(defaults_dict):
-    defaults_list = []
-    for k, v in defaults_dict.items():
-        if isinstance(v, str):
-            defaults_list.append(f"{k} = '{v}'")
-        elif isinstance(v, bool):
-            if v:
-                defaults_list.append(f"{k} = true")
-            else:
-                defaults_list.append(f"{k} = false")
-        elif callable(v):
-            defaults_list.append(f"{k} = '{v.__name__}'")
-        else:
-            defaults_list.append(f"{k} = {v}")
-    return defaults_list
-
-
-def _val_to_toml(v):
-    if v is None:
-        return "''"
-    if isinstance(v, str):
-        return f"'{v}'"
-    elif isinstance(v, bool):
-        if v:
-            return "true"
-        else:
-            return "false"
-    elif callable(v):
-        return f"'{v.__name__}'"
-    else:
-        return f"{v}"
-
-
-def _dict_to_toml(dictionary):
-    toml = ''
-    for section, args in dictionary.items():
-        toml = toml + f'[{section}]\n'
-        for arg, arg_info in args.items():
-            toml = toml + '\n'
-            if isinstance(arg_info, dict):
-                toml = toml + arg_info['desc']
-                toml = toml + f"{arg} = {_val_to_toml(arg_info['default'])}\n"
-            else:
-                toml = toml + f"{arg} = {_val_to_toml(arg_info)}\n"
-        toml = toml + '\n'
-    return toml + '\n'
-
-
 def parse_cli(help_msg):
-    cli_parser = ArgumentParser(usage=usage + _dict_to_toml(arg_dict))
+    cli_parser = ArgumentParser(usage=usage + dict_to_toml(arg_dict))
 
     cli_parser.add_argument(
         dest='config',
@@ -133,42 +81,6 @@ def parse_cli(help_msg):
     return opts.config, opts.generate_toml, opts.overwrite
 
 
-def _func_dict_to_arg_dict(func_dict):
-    arg_dict = {}
-    for name, func in func_dict.items():
-        docstr_parser = FuncArgParser()
-        docstr_parser.setup_args(func)
-        for arg, info in docstr_parser.unfinished_arguments.items():
-            try:
-                if name == "AFQ":
-                    if '_params' in arg:
-                        continue
-                    section, desc = info['help'].split('[')[1].split(']')
-                else:
-                    section = name.upper()
-                    desc = info['help']
-            except KeyError:
-                logger.warning(
-                    "We are missing a valid description for the "
-                    + f"{name} argument {arg}")
-                continue
-            if section not in arg_dict.keys():
-                arg_dict[section] = {}
-            arg_dict[section][arg] = {}
-            if 'default' in info:
-                default = info['default']
-            else:
-                default = None
-            arg_dict[section][arg]['default'] = default
-            arg_dict[section][arg]['desc'] = ''
-            for desc_line in desc.splitlines():
-                f_desc_line = '# ' + desc_line.strip() + '\n'
-                arg_dict[section][arg]['desc'] = \
-                    arg_dict[section][arg]['desc'] + f_desc_line
-
-    return arg_dict
-
-
 def generate_config(toml_file, default_arg_dict, overwrite=False):
     if not overwrite and op.exists(toml_file):
         raise FileExistsError(
@@ -177,7 +89,7 @@ def generate_config(toml_file, default_arg_dict, overwrite=False):
     + " add the argument --overwrite-config")
     logger.info("Generating default configuration file.")
     toml_file = open(toml_file, 'w')
-    toml_file.write(_dict_to_toml(default_arg_dict))
+    toml_file.write(dict_to_toml(default_arg_dict))
 
 
 def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
@@ -208,7 +120,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
     if overwrite:
         logger.info(f"Updating configuration file.")
         with open(toml_file, 'w') as ff:
-            ff.write(_dict_to_toml(default_arg_dict))
+            ff.write(dict_to_toml(default_arg_dict))
 
     if bids_path == '':
         raise RuntimeError("Config file must provide bids_path")
@@ -225,7 +137,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
 
     afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
     with open(afq_metadata_file, 'w') as ff:
-        ff.write(_dict_to_toml(default_arg_dict))
+        ff.write(dict_to_toml(default_arg_dict))
 
     myafq = api.AFQ(bids_path, **kwargs)
 
@@ -246,17 +158,11 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
     # If you got this far, you can report on time ended and record that:
     default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
     with open(afq_metadata_file, 'w') as ff:
-        ff.write(_dict_to_toml(default_arg_dict))
+        ff.write(dict_to_toml(default_arg_dict))
 
 
 if __name__ == '__main__':
-    func_dict = {
-        "AFQ": api.AFQ.__init__,
-        "Tractography": aft.track,
-        "Segmentation": seg.Segmentation.__init__,
-        "Cleaning": seg.clean_bundle}
-
-    arg_dict = _func_dict_to_arg_dict(func_dict)
+    arg_dict = func_dict_to_arg_dict(logger=logger)
     config_file, generate_only, overwrite = parse_cli(arg_dict)
     if generate_only:
         generate_config(config_file, arg_dict, overwrite)
