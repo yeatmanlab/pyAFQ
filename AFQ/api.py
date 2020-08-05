@@ -147,7 +147,7 @@ class AFQ(object):
                  dmriprep='dmriprep',
                  segmentation='dmriprep',
                  seg_suffix='seg',
-                 b0_threshold=0,
+                 b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
                  reg_template="mni_T1",
@@ -187,7 +187,7 @@ class AFQ(object):
             Can be one of: {"afq", "reco"}
 
         b0_threshold : int, optional
-            The value of b under which it is considered to be b0. Default: 0.
+            The value of b under which it is considered to be b0. Default: 50.
 
         min_bval : float, optional
             Minimum b value you want to use from the dataset (other than b0).
