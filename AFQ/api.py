@@ -157,7 +157,7 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion=0.1,
+                 wm_criterion={"dti_fa", 0.1},
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -237,12 +237,15 @@ class AFQ(object):
 
         wm_criterion : list or float, optional
             This is either a list of the labels of the white matter in the
-            segmentation file or (if a float is provided) the threshold FA to
-            use for creating the white-matter mask. For example, the white
-            matter values for the segmentation provided with the HCP data
-            including labels for midbrain are:
+            segmentation file or (if a dictionary is provided) a series of
+            scalar / threshold pairs used for creating the white-matter mask.
+            In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
+            "dki_md" and each scalar mask will 'logical and' to make the
+            white-matter mask. For an example of the former case,
+            the white matter values for the segmentation provided
+            with the HCP data including labels for midbrain are:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
-            Default: 0.1
+            Default: {"dti_fa", 0.1}
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the
@@ -854,12 +857,29 @@ class AFQ(object):
             if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
                 wm_mask, meta = self._mask_from_seg(row, self.wm_criterion)
             else:
-                # Otherwise, we'll identify the white matter based on FA:
-                fa_fname = self._dti_fa(row)
-                dti_fa = nib.load(fa_fname).get_fdata()
-                wm_mask = dti_fa > self.wm_criterion
-                meta = dict(source=fa_fname,
-                            fa_threshold=self.wm_criterion)
+                # Otherwise, we'll identify the white matter based on scalars:
+                valid_scalars = list(self._scalar_dict.keys())
+                wm_mask = None
+                fnames = []
+                thresholds = []
+                for scalar, threshold in self.wm_criterion:
+                    if scalar not in valid_scalars:
+                        raise RuntimeError((
+                    f"wm_criterion scalars should be one of"
+                    f" {', '.join(valid_scalars)}"))
+
+                    scalar_fname = self._scalar_dict[scalar](self, row)
+                    new_wm_mask = \
+                        nib.load(scalar_fname).get_fdata() > threshold
+                    if wm_mask is None:
+                        wm_mask = new_wm_mask
+                    else:
+                        wm_mask = np.logical_and(wm_mask, new_wm_mask)
+                    fnames.append(scalar_fname)
+                    thresholds.append(threshold)
+
+                meta = dict(sources=fnames,
+                            thresholds=thresholds)
 
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
