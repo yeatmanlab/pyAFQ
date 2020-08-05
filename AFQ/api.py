@@ -157,8 +157,12 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
+<<<<<<< HEAD
                  wm_criterion={'lb': {'dti_fa': 0.1},
                                'ub': {'dti_md': 0.003}},
+=======
+                 wm_criterion={"dti_fa": ">0.1", "dti_md": "<0.003"},
+>>>>>>> better default wm_criterion
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
