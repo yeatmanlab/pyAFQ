@@ -84,21 +84,24 @@ def parse_cli(help_msg):
 def generate_config(toml_file, default_arg_dict, overwrite=False):
     if not overwrite and op.exists(toml_file):
         raise FileExistsError(
-    "Config file already exists. "
-    + "If you want to overwrite this file,"
-    + " add the argument --overwrite-config")
+            "Config file already exists. "
+            + "If you want to overwrite this file,"
+            + " add the argument --overwrite-config")
     logger.info("Generating default configuration file.")
     toml_file = open(toml_file, 'w')
     toml_file.write(dict_to_toml(default_arg_dict))
 
 
-def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
+def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
+                         special_args={"CLEANING": "clean_params",
+                                       "SEGMENTATION": "segmentation_params",
+                                       "TRACTOGRAPHY": "tracking_params"}):
     # load configuration file
     if not op.exists(toml_file):
         raise FileExistsError(
-    "Config file does not exist. "
-    + "If you want to generate this file,"
-    + " add the argument --generate-config-only")
+            "Config file does not exist. "
+            + "If you want to generate this file,"
+            + " add the argument --generate-config-only")
     f_arg_dict = toml.load(toml_file)
 
     # extract arguments from file
@@ -112,9 +115,18 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
                 bids_path = default
             elif arg in default_arg_dict[section]:
                 if default == "''":
-                    kwargs[arg] = None
+                    val = None
                 else:
-                    kwargs[arg] = default
+                    val = default
+                is_special = False
+                for toml_key, doc_arg in special_args:
+                    if section is toml_key:
+                        if doc_arg not in kwargs:
+                            kwargs[doc_arg] = {}
+                        kwargs[doc_arg][arg] = val
+                        is_special = True
+                if not is_special:
+                    kwargs[section] = val
             if arg not in default_arg_dict[section]:
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
@@ -159,7 +171,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
     myafq.combine_profiles()
 
     # If you got this far, you can report on time ended and record that:
-    default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+    default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(
+    ).isoformat('T')
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
 
