@@ -6,12 +6,11 @@ import os
 import pathlib
 import datetime
 import platform
+import toml
 from ast import literal_eval
 
 from funcargparse import FuncArgParser
 from argparse import ArgumentParser, FileType
-from configupdater import ConfigUpdater
-# from cli2gui import Cli2Gui
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -27,29 +26,6 @@ with warnings.catch_warnings():
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
-
-# These options were used to make cli2gui video
-# use_config_gui = True
-# bin_folder = pathlib.Path(__file__).parent.absolute()
-# gui_image = op.join(bin_folder, "../example_image.png")
-# gui_background_color = "#ffffcc"
-# gui_text_color = "#663300"
-# gui_input_box_color = "#ffffff"
-# gui_button_color = "#ffff66"
-# gui_theme = \
-#     [gui_button_color, "#ffffff", "#ffffff", "#ffffff", "#ffffff",
-#      "#ffffff", gui_text_color, "#ffffff", "#ffffff", "#ffffff",
-#      "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
-#      gui_background_color, gui_input_box_color, "#ffffff", "#ffffff",
-#      "#ffffff", "#ffffff", "#ffffff", "#ffffff"]
-# gui_sizes = \
-#     {"title_size": 36,  # room for title
-#      "label_size": (58, None),  # room for text
-#      "input_size": (24, 1),  # width by height of input button
-#      "button": (12, 1),
-#      "padding": (5, 10),
-#      "helpText_size": 2,  # flaky, may interfere with buttons
-#      "text_size": 16}  # text size of buttons
 
 usage = \
     f"""pyAFQ /path/to/afq_config.ini
@@ -96,19 +72,6 @@ def _val_to_toml(v):
     else:
         return f"{v}"
 
-def _toml_to_val(v):
-    if v == '':
-        return None
-    if v[0] == "'" and v[-1] == "'":
-        return v[1:-1]
-    elif v == "true":
-        return True
-    elif v == "false":
-        return False
-    elif '.' in v:
-        return float(v)
-    else:
-        return int(v)
 
 def _dict_to_toml(dictionary):
     toml = ''
@@ -116,25 +79,41 @@ def _dict_to_toml(dictionary):
         toml = toml + f'[{section}]\n'
         for arg, arg_info in args.items():
             toml = toml + '\n'
-            toml = toml + arg_info['desc']
-            toml = toml + f"{arg} = {_val_to_toml(arg_info['default'])}\n"
+            if isinstance(arg_info, dict):
+                toml = toml + arg_info['desc']
+                toml = toml + f"{arg} = {_val_to_toml(arg_info['default'])}\n"
+            else:
+                toml = toml + f"{arg} = {_val_to_toml(arg_info)}\n"
         toml = toml + '\n'
     return toml + '\n'
 
 
-def _toml_to_dict(toml):
-    return {}
-
-
 def parse_cli(help_msg):
-    # cli_parser parses user arguments from CLI
     cli_parser = ArgumentParser(usage=usage + _dict_to_toml(arg_dict))
 
     cli_parser.add_argument(
         dest='config',
         action="store",
-        # type=FileType('r'),
-        help="Path to config file. For example, /path/to/afq_config.ini")
+        help="Path to config file. For example, /path/to/afq_config.toml")
+
+    cli_parser.add_argument(
+        '-g',
+        '--generate-config-only',
+        dest='generate_toml',
+        action="store_true",
+        default=False,
+        help="Generate a default config file at the path"
+        + " specified without running pyAFQ.")
+
+    cli_parser.add_argument(
+        '-o',
+        '--overwrite-config',
+        dest='overwrite',
+        action="store_true",
+        default=False,
+        help="Overwrite config file at the path"
+        + " with current arguments and comments,"
+        + " preserving previous defaults when applicable.")
 
     cli_parser.add_argument(
         '-t', '--notrack', action="store_true", default=False,
@@ -151,7 +130,7 @@ def parse_cli(help_msg):
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
-    return opts.config
+    return opts.config, opts.generate_toml, opts.overwrite
 
 
 def _func_dict_to_arg_dict(func_dict):
@@ -190,74 +169,63 @@ def _func_dict_to_arg_dict(func_dict):
     return arg_dict
 
 
-def parse_config_run_afq(config_file, doc_args, cli_args):
-    # cfparser parses the config .ini file
-    cfparser = ConfigUpdater()
-    if not op.exists(config_file):
-        logger.info(f"Configuration file did not exist; created.")
-        open(config_file, 'w').close()
-    cfparser.read(config_file)
+def generate_config(toml_file, default_arg_dict, overwrite=False):
+    if not overwrite and op.exists(toml_file):
+        raise FileExistsError(
+    "Config file already exists. "
+    + "If you want to overwrite this file,"
+    + " add the argument --overwrite-config")
+    logger.info("Generating default configuration file.")
+    toml_file = open(toml_file, 'w')
+    toml_file.write(_dict_to_toml(default_arg_dict))
 
-    # iterate over all arguments in docstring
-    for arg, info in doc_args.items():
-        try:
-            section, desc = info['help'].split('[')[1].split(']')
-        except KeyError:
-            continue
 
-        # updates any arguments not currently in .ini
-        if not cfparser.has_option(section, arg):
-            if not cfparser.has_section(section):
-                cfparser.add_section(section)
-            if 'default' in info and info['default'] is not None:
-                default = info['default']
-            else:
-                default = "''"
-            logger.info(f"{arg} added to configuration file.")
-            cfparser[section][arg] = default
+def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
+    # load configuration file
+    if not op.exists(toml_file):
+        raise FileExistsError(
+    "Config file does not exist. "
+    + "If you want to generate this file,"
+    + " add the argument --generate-config-only")
+    f_arg_dict = toml.load(toml_file)
 
-            for desc_line in desc.splitlines():
-                cfparser[section][arg].add_before.comment(
-                    desc_line, comment_prefix=';')
-
-        # use command line arguments to set new defaults
-        if arg in cli_args:
-            new_default = getattr(cli_args, arg)
-            if new_default is not None:
-                logger.info(
-                    f"{arg} set to {new_default} in configuration file.")
-                cfparser[section][arg] = new_default
-
-    # update metadata section of config file
-    if not cfparser.has_section('METADATA'):
-        cfparser.add_section('METADATA')
-    cfparser['METADATA']['utc_time_started'] = \
-        datetime.datetime.now().isoformat('T')
-    cfparser['METADATA']['version'] = AFQ.__version__
-    cfparser['METADATA']['platform'] = platform.system()
-
-    cfparser.update_file()
-
-    # read updated arguments from cfparser
+    # extract arguments from file
     kwargs = {}
-    for section in cfparser.sections():
-        if section == 'METADATA':
-            continue
-        for option in cfparser.options(section):
-            val = cfparser[section][option].value
-            if val == "''":
-                val = None
-            logger.info(f"{option} set to {val}")
-            try:
-                val = literal_eval(val)
-            except (ValueError, SyntaxError):
-                pass
-            if option == 'bids_path':
-                bids_path = val
-                afq_path = op.join(bids_path, 'derivatives', 'afq')
-                os.makedirs(afq_path, exist_ok=True)
-            else:
-                kwargs[option] = val
+    bids_path = ''
+    for section, args in f_arg_dict.items():
+        for i, arg_default_pair in enumerate(args):
+            for arg, default in arg_default_pair.items():
+                default_arg_dict[section][arg]['default'] = default
+                if arg == 'bids_path':
+                    bids_path = default
+                else:
+                    if default == "''":
+                        kwargs[arg] = None
+                    else:
+                        kwargs[arg] = default
+
+    # if overwrite, write new file with updated docs / args
+    if overwrite:
+        logger.info(f"Updating configuration file.")
+        with open(toml_file, 'w') as ff:
+            ff.write(_dict_to_toml(default_arg_dict))
+
+    if bids_path == '':
+        raise RuntimeError("Config file must provide bids_path")
+
+    # generate metadata file for this run
+    default_arg_dict['pyAFQ'] = {}
+    default_arg_dict['pyAFQ']['utc_time_started'] = \
+        datetime.datetime.now().isoformat('T')
+    default_arg_dict['pyAFQ']['version'] = AFQ.__version__
+    default_arg_dict['pyAFQ']['platform'] = platform.system()
+
+    afq_path = op.join(bids_path, 'derivatives', 'afq')
+    os.makedirs(afq_path, exist_ok=True)
+
+    afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(_dict_to_toml(default_arg_dict))
 
     myafq = api.AFQ(bids_path, **kwargs)
 
@@ -276,8 +244,9 @@ def parse_config_run_afq(config_file, doc_args, cli_args):
     myafq.combine_profiles()
 
     # If you got this far, you can report on time ended and record that:
-    cfparser['METADATA']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
-    cfparser.update_file()
+    default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(_dict_to_toml(default_arg_dict))
 
 
 if __name__ == '__main__':
@@ -288,5 +257,8 @@ if __name__ == '__main__':
         "Cleaning": seg.clean_bundle}
 
     arg_dict = _func_dict_to_arg_dict(func_dict)
-    config_file = parse_cli(arg_dict)
-    parse_config_run_afq(config_file, arg_dict, {})
+    config_file, generate_only, overwrite = parse_cli(arg_dict)
+    if generate_only:
+        generate_config(config_file, arg_dict, overwrite)
+    else:
+        parse_config_run_afq(config_file, arg_dict, overwrite)

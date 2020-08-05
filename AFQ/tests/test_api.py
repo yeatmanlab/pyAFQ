@@ -3,7 +3,7 @@ import os
 import os.path as op
 import shutil
 
-from configupdater import ConfigUpdater
+import toml
 
 import numpy as np
 import numpy.testing as npt
@@ -355,15 +355,13 @@ def test_AFQ_data_waypoint():
     print("Running the CLI:")
 
     # Bare bones config only points to the files:
-    config = ConfigUpdater()
-    config.add_section("BIDS")
-    config["BIDS"]["bids_path"] = bids_path
-    config["BIDS"]["dmriprep"] = 'vistasoft'
-    config["BIDS"]["segmentation"] = 'freesurfer'
+    config = dict(BIDS=dict(bids_path=bids_path,
+                            dmriprep='vistasoft',
+                            segmentation='freesurfer'))
 
-    config_file = op.join(tmpdir.name, "afq_config.ini")
+    config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:
-        config.write(ff)
+        toml.dump(config, ff)
 
     cmd = "pyAFQ " + config_file
     out = os.system(cmd)
