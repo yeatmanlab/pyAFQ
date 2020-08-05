@@ -52,7 +52,7 @@ class Segmentation:
                  reduction_thr=40,
                  refine=False,
                  pruning_thr=6,
-                 b0_threshold=0,
+                 b0_threshold=50,
                  prob_threshold=0,
                  rng=None,
                  return_idx=False,
@@ -92,7 +92,7 @@ class Segmentation:
             Using AFQ Algorithm.
             All b-values with values less than or equal to `bo_threshold` are
             considered as b0s i.e. without diffusion weighting.
-            Default: 0.
+            Default: 50.
         prob_threshold : float.
             Using AFQ Algorithm.
             Initial cleaning of fiber groups is done using probability maps
