@@ -119,7 +119,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
                 else:
                     val = default
                 is_special = False
-                for toml_key, doc_arg in special_args:
+                for toml_key, doc_arg in special_args.items():
                     if section is toml_key:
                         if doc_arg not in kwargs:
                             kwargs[doc_arg] = {}
