@@ -835,7 +835,8 @@ class LongitudinalCSVComparison():
 
         # extract relevant statistics / data from profiles
         all_sub_coef = np.zeros((len(scalars), len(bundles)))
-        all_sub_means = np.zeros((len(scalars), len(bundles), 2, len(self.subjects)))
+        all_sub_means = np.zeros(
+            (len(scalars), len(bundles), 2, len(self.subjects)))
         all_profile_coef = \
             np.zeros((len(scalars), len(bundles), len(self.subjects)))
         all_node_coef = np.zeros((len(scalars), len(bundles), 100))
