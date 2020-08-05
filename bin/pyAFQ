@@ -126,7 +126,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
                         kwargs[doc_arg][arg] = val
                         is_special = True
                 if not is_special:
-                    kwargs[section] = val
+                    kwargs[arg] = val
             if arg not in default_arg_dict[section]:
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
