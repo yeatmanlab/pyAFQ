@@ -870,7 +870,7 @@ class AFQ(object):
                             f" {', '.join(valid_scalars)}"))
 
                     scalar_fname = self._scalar_dict[scalar](self, row)
-                    threshold_val = float(threshold_val[1:])
+                    threshold_val = float(threshold[1:])
                     if threshold[0] == ">":
                         new_wm_mask = \
                             nib.load(scalar_fname).get_fdata() > threshold_val
