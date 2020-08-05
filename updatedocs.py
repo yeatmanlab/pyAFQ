@@ -1,3 +1,4 @@
+# flake8: noqa
 # This updates usage.rst to the latest cli
 # Developers can run this after modifying any arguments the user can see
 
@@ -88,7 +89,7 @@ See an example configuration file below::
 """
 
 epilogue = \
-"""
+    """
 pyAFQ will store a copy of the configuration file alongside the computed
 results. Note that the `title` variable and `[metadata]` section are both for
 users to enter any title/metadata they would like and pyAFQ will generally
