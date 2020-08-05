@@ -105,20 +105,19 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False):
     kwargs = {}
     bids_path = ''
     for section, args in f_arg_dict.items():
-        for i, arg_default_pair in enumerate(args):
-            for arg, default in arg_default_pair.items():
-                if section not in default_arg_dict:
-                    default_arg_dict[section] = {}
-                if arg == 'bids_path':
-                    bids_path = default
-                elif arg in default_arg_dict[section]:
-                    if default == "''":
-                        kwargs[arg] = None
-                    else:
-                        kwargs[arg] = default
-                if arg not in default_arg_dict[section]:
-                    default_arg_dict[section][arg] = {}
-                default_arg_dict[section][arg]['default'] = default
+        for arg, default in args.items():
+            if section not in default_arg_dict:
+                default_arg_dict[section] = {}
+            if arg == 'bids_path':
+                bids_path = default
+            elif arg in default_arg_dict[section]:
+                if default == "''":
+                    kwargs[arg] = None
+                else:
+                    kwargs[arg] = default
+            if arg not in default_arg_dict[section]:
+                default_arg_dict[section][arg] = {}
+            default_arg_dict[section][arg]['default'] = default
 
     # if overwrite, write new file with updated docs / args
     if overwrite:
