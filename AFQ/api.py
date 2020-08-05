@@ -157,7 +157,7 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion={"dti_fa", ">0.1"},
+                 wm_criterion={"dti_fa": ">0.1", "dti_md": "<0.003"},
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
