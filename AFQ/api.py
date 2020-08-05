@@ -150,8 +150,8 @@ class AFQ(object):
                  b0_threshold=0,
                  min_bval=None,
                  max_bval=None,
-                 reg_subject="b0",
-                 reg_template="mni_T2",
+                 reg_template="mni_T1",
+                 reg_subject="power_map",
                  mask_template=True,
                  bundle_names=BUNDLES,
                  dask_it=False,
@@ -212,7 +212,7 @@ class AFQ(object):
             image data will be loaded automatically.
             If "subject_sls" is used, slr registration will be used
             and reg_template should be "hcp_atlas".
-            Default: "b0"
+            Default: "power_map"
 
         reg_template : str or Nifti1Image, optional
             The target image data for registration.
@@ -221,7 +221,7 @@ class AFQ(object):
             image data will be loaded automatically.
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".
-            Default: "mni_T2"
+            Default: "mni_T1"
 
         mask_template : bool, optional
             Whether to mask the chosen template(s) with a brain-mask
