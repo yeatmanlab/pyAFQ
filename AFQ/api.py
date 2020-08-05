@@ -826,7 +826,7 @@ class AFQ(object):
 
         return mapping_file
 
-    def _mask_from_seg(self, row, wm_labels, not_equal=False):
+    def _mask_from_seg(self, row, image_labels, not_equal=False):
         dwi_data, _, dwi_img = self._get_data_gtab(row)
 
         # If we found a white matter segmentation in the
@@ -836,7 +836,7 @@ class AFQ(object):
         # For different sets of labels, extract all the voxels that
         # have any of these values:
         wm_mask = np.zeros(seg_data_orig.shape, dtype=bool)
-        for label in wm_labels:
+        for label in image_labels:
             if not_equal:
                 wm_mask = np.logical_or(wm_mask, (seg_data_orig != label))
             else:
@@ -848,7 +848,7 @@ class AFQ(object):
                                         seg_img.affine,
                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
-                    wm_criterion=wm_labels)
+                    wm_criterion=image_labels)
 
         return wm_mask, meta
 
