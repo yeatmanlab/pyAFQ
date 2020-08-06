@@ -1,41 +1,8 @@
-from setuptools import find_packages
+from setuptools import setup
 import string
 import os.path as op
-from setuptools_scm import get_version
 import glob
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-here = op.abspath(op.dirname(__file__))
-
-# Get metadata from the AFQ/version.py file:
-meta_file = op.join(here, 'AFQ', '_meta.py')
-with open(meta_file) as f:
-    exec(f.read())
-
-REQUIRES = []
-with open(op.join(here, 'requirements.txt')) as f:
-    ll = f.readline()[:-1]
-    while ll:
-        REQUIRES.append(ll)
-        ll = f.readline()[:-1]
-
-EXTRAS_REQUIRE = {}
-for extra_req_file in glob.glob(op.join(here, 'requirements-*.txt')):
-    extra_name = extra_req_file.split('-')[1].split('.')[0]
-    extra_reqs = []
-    with open(extra_req_file) as f:
-        ll = f.readline()[:-1]
-        while ll:
-            extra_reqs.append(ll)
-            ll = f.readline()[:-1]
-    EXTRAS_REQUIRE[extra_name] = extra_reqs
-
-with open(op.join(here, 'README.md'), encoding='utf-8') as f:
-    LONG_DESCRIPTION = f.read()
+from setuptools_scm import get_version
 
 
 def local_version(version):
