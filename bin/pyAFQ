@@ -160,7 +160,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
     myafq.set_dti_cfa()
     myafq.set_dti_pdd()
     myafq.set_template_xform()
-    if kwargs["segmentation_params"] is None\
+    if "segmentation_params" not in kwargs\
+        or kwargs["segmentation_params"] is None\
             or "seg_algo" not in kwargs["segmentation_params"]\
             or kwargs["segmentation_params"]["seg_algo"].lower() == "afq":
         myafq.export_rois()
