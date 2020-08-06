@@ -8,7 +8,8 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
+from dipy.tracking.stopping_criterion import BinaryStoppingCriterion,\
+    ThresholdStoppingCriterion
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
@@ -38,7 +39,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         tracking.
         Default to the entire volume (all ones).
     seed_threshold : float, optional.
-        A value of the stop_mask below which tracking is terminated.
+        A value of the seed_mask below which tracking is terminated.
         Default to 0.
     n_seeds : int or 2D array, optional.
         The seeding density: if this is an int, it is is how many seeds in each
@@ -86,7 +87,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
-        else:
+        elif seed_mask.dtype != 'bool':
             seed_mask = seed_mask > seed_threshold
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
@@ -120,16 +121,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if stop_mask is None:
         stop_mask = np.ones(params_img.shape[:3])
 
-    threshold_classifier = ThresholdStoppingCriterion(stop_mask,
-                                                      stop_threshold)
+    if stop_mask.dtype == 'bool':
+        stopping_criterion = BinaryStoppingCriterion(stop_mask)
+    else:
+        stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+                                                        stop_threshold)
+
     logger.info("Tracking...")
 
-    return _local_tracking(seeds, dg, threshold_classifier, params_img,
+    return _local_tracking(seeds, dg, stopping_criterion, params_img,
                            step_size=step_size, min_length=min_length,
                            max_length=max_length, random_seed=rng_seed)
 
 
-def _local_tracking(seeds, dg, threshold_classifier, params_img,
+def _local_tracking(seeds, dg, stopping_criterion, params_img,
                     step_size=0.5, min_length=10, max_length=1000,
                     random_seed=None):
     """
@@ -138,7 +143,7 @@ def _local_tracking(seeds, dg, threshold_classifier, params_img,
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
     tracker = VerboseLocalTracking(dg,
-                                   threshold_classifier,
+                                   stopping_criterion,
                                    seeds,
                                    params_img.affine,
                                    step_size=step_size,
