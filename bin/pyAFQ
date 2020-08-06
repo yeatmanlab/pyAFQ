@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import warnings
-import os.path as op
+from argparse import ArgumentParser
 import os
-import pathlib
+import os.path as op
+import toml
 import datetime
 import platform
-import toml
 
-from argparse import ArgumentParser
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
