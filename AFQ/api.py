@@ -50,7 +50,7 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
-DIPY_GH = "https://github.com/nipy/dipy/blob/master/dipy/"
+DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
