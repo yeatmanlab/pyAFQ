@@ -864,7 +864,7 @@ class AFQ(object):
                 # Otherwise, we'll identify the white matter based on scalars:
                 valid_scalars = list(self._scalar_dict.keys())
                 wm_mask = None
-                bounds = []
+                filenames = []
                 for bound, constraint in self.wm_criterion.items():
                     for scalar, threshold in constraint.items():
                         if scalar not in valid_scalars:
@@ -877,12 +877,10 @@ class AFQ(object):
                             new_wm_mask = \
                                 nib.load(
                                     scalar_fname).get_fdata() > threshold
-                            for_meta_bound_type = " > "
                         elif bound == "ub":
                             new_wm_mask = \
                                 nib.load(
                                     scalar_fname).get_fdata() < threshold
-                            for_meta_bound_type = " < "
                         else:
                             raise RuntimeError("wm_criterion dictionary "
                                                + " formatted incorrectly. See"
@@ -892,12 +890,11 @@ class AFQ(object):
                             wm_mask = new_wm_mask
                         else:
                             wm_mask = np.logical_and(wm_mask, new_wm_mask)
-                        bounds.append(
-                            scalar_fname
-                            + for_meta_bound_type
-                            + str(threshold))
+                        filenames.append(scalar_fname)
 
-                meta = dict(bounds=bounds)
+                meta = dict(
+                    criterion=self.wm_criterion,
+                    filenames=filenames)
 
             # Dilate to be sure to reach the gray matter:
             wm_mask = binary_dilation(wm_mask) > 0
