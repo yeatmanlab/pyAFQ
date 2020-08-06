@@ -5,6 +5,7 @@ import logging
 import tempfile
 
 import numpy as np
+from scipy.stats import sem
 import pandas as pd
 from palettable.tableau import Tableau_20
 import imageio as io
@@ -942,7 +943,7 @@ class LongitudinalCSVComparison():
 
         fig, axes = plt.subplots(2, 1)
         bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
-        bundle_prof_stds = np.nanstd(all_profile_coef, axis=2)
+        bundle_prof_stds = sem(all_profile_coef, axis=2, nan_policy='omit')
         if ylims is None:
             maxi = np.maximum(bundle_prof_means.max(), all_sub_coef.max())
             mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
