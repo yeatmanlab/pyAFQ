@@ -187,15 +187,13 @@ for bundle in bundles:
 print("Extracting tract profiles...")
 for bundle in bundles:
     sft = load_tractogram(f'./{bundle}_afq.trk', img, to_space=Space.VOX)
-    fig, ax = plt.subplots(1)
     if len(sft.streamlines) > 3:
+        fig, ax = plt.subplots(1)
         weights = gaussian_weights(sft.streamlines)
-    else:
-        weights = None
-    profile = afq_profile(FA_data, sft.streamlines,
-                          np.eye(4), weights=weights)
-    ax.plot(profile)
-    ax.set_title(bundle)
+        profile = afq_profile(FA_data, sft.streamlines,
+                            np.eye(4), weights=weights)
+        ax.plot(profile)
+        ax.set_title(bundle)
 
 plt.show()
 
