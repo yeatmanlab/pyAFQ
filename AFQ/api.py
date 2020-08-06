@@ -832,28 +832,28 @@ class AFQ(object):
     def _mask_from_seg(self, row, image_labels, not_equal=False):
         dwi_data, _, dwi_img = self._get_data_gtab(row)
 
-        # If we found a white matter segmentation in the
+        # If we found a segmentation file in the
         # expected location:
         seg_img = nib.load(row['seg_file'])
         seg_data_orig = seg_img.get_fdata()
         # For different sets of labels, extract all the voxels that
         # have any of these values:
-        wm_mask = np.zeros(seg_data_orig.shape, dtype=bool)
+        seg_mask = np.zeros(seg_data_orig.shape, dtype=bool)
         for label in image_labels:
             if not_equal:
-                wm_mask = np.logical_or(wm_mask, (seg_data_orig != label))
+                seg_mask = np.logical_or(seg_mask, (seg_data_orig != label))
             else:
-                wm_mask = np.logical_or(wm_mask, (seg_data_orig == label))
+                seg_mask = np.logical_or(seg_mask, (seg_data_orig == label))
 
         # Resample to DWI data:
-        wm_mask = np.round(reg.resample(wm_mask.astype(float),
+        seg_mask = np.round(reg.resample(seg_mask.astype(float),
                                         dwi_data[..., 0],
                                         seg_img.affine,
                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
                     wm_criterion=image_labels)
 
-        return wm_mask, meta
+        return seg_mask, meta
 
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
