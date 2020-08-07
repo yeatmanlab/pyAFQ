@@ -17,7 +17,7 @@ import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
-from dipy.stats.analysis import afq_profile
+from dipy.stats.analysis import afq_profile, gaussian_weights
 
 from bids.layout import BIDSLayout
 
@@ -1116,7 +1116,8 @@ class AFQ(object):
                     this_profile[ii] = afq_profile(
                         scalar_data,
                         this_sl,
-                        row["dwi_affine"])
+                        row["dwi_affine"],
+                        weights=gaussian_weights(this_profile))
                     profiles[ii].extend(list(this_profile[ii]))
                 nodes = list(np.arange(this_profile[0].shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
