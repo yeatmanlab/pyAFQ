@@ -1086,7 +1086,7 @@ class AFQ(object):
 
         return clean_bundles_file
 
-    def _tract_profiles(self, row, weighting=None):
+    def _tract_profiles(self, row):
         profiles_file = self._get_fname(row, '_profiles.csv')
         if self.force_recompute or not op.exists(profiles_file):
             bundles_file = self._clean_bundles(row)
