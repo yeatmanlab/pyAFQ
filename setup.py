@@ -24,10 +24,9 @@ def local_version(version):
 
 opts = dict(
     use_scm_version={"root": ".", "relative_to": __file__,
-                             "write_to": op.join("AFQ", "version.py"),
-                             "local_scheme": local_version},
-    scripts=[op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')]
-    )
+                     "write_to": op.join("AFQ", "version.py"),
+                     "local_scheme": local_version},
+    scripts=[op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')])
 
 
 if __name__ == '__main__':
