@@ -11,12 +11,13 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
-
+from dipy.tracking.local_tracking import ParticleFilteringTracking
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=10, max_length=1000, odf_model="DTI"):
+          min_length=10, max_length=1000, odf_model="DTI",
+          tracker="local"):
     """
     Tractography
 
@@ -48,7 +49,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         to generate within the mask.
     random_seeds : bool
         Whether to generate a total of n_seeds random seeds in the mask.
-        Default: XXX.
+        Default: False.
     rng_seed : int
         random seed used to generate random seeds if random_seeds is
         set to True. Default: None
@@ -67,9 +68,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
         One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
+    tracker : str, optional
+        Which strategy to use in tracking. This can be the standard local
+        tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
+        One of {"local", "pft"}. Default: "local"
+
     Returns
     -------
     list of streamlines ()
+
+    References
+    ----------
+    .. [Girard2014] Girard, G., Whittingstall, K., Deriche, R., &
+        Descoteaux, M. Towards quantitative connectivity analysis: reducing
+        tractography biases. NeuroImage, 98, 266-278, 2014.
     """
     logger = logging.getLogger('AFQ.tractography')
 
@@ -128,27 +140,33 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                         stop_threshold)
 
     logger.info("Tracking...")
+    if tracker == "local":
+        my_tracker = VerboseLocalTracking
+    elif tracker == "pft":
+        my_tracker = ParticleFilteringTracking
 
-    return _local_tracking(seeds, dg, stopping_criterion, params_img,
-                           step_size=step_size, min_length=min_length,
-                           max_length=max_length, random_seed=rng_seed)
+    return _tracking(seeds, dg, stopping_criterion, params_img,
+                     step_size=step_size, min_length=min_length,
+                     max_length=max_length, random_seed=rng_seed,
+                     tracker=my_tracker)
 
 
-def _local_tracking(seeds, dg, stopping_criterion, params_img,
-                    step_size=0.5, min_length=10, max_length=1000,
-                    random_seed=None):
+def _tracking(seeds, dg, stopping_criterion, params_img,
+              step_size=0.5, min_length=10, max_length=1000,
+              random_seed=None, tracker=VerboseLocalTracking):
     """
     Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(dg,
-                                   stopping_criterion,
-                                   seeds,
-                                   params_img.affine,
-                                   step_size=step_size,
-                                   min_length=min_length,
-                                   max_length=max_length,
-                                   random_seed=random_seed)
+
+    tracker = tracker(dg,
+                      stopping_criterion,
+                      seeds,
+                      params_img.affine,
+                      step_size=step_size,
+                      min_length=min_length,
+                      max_length=max_length,
+                      random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)

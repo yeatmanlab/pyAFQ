@@ -32,28 +32,31 @@ def test_csd_tracking():
                         sh_order=8, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
-            sl = track(fname, directions,
-                       odf_model="CSD",
-                       max_angle=30.,
-                       sphere=None,
-                       seed_mask=None,
-                       n_seeds=seeds,
-                       stop_mask=None,
-                       step_size=step_size,
-                       min_length=min_length).streamlines
+            for tracker in ["local", "pft"]:
+                sl = track(fname, directions,
+                        odf_model="CSD",
+                        max_angle=30.,
+                        sphere=None,
+                        seed_mask=None,
+                        n_seeds=seeds,
+                        stop_mask=None,
+                        step_size=step_size,
+                        min_length=min_length,
+                        tracker=tracker).streamlines
 
-            npt.assert_(len(sl[0]) >= step_size * min_length)
+                npt.assert_(len(sl[0]) >= step_size * min_length)
 
 
 def test_dti_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
-        sl = track(fdict['params'],
-                   directions,
-                   max_angle=30.,
-                   sphere=None,
-                   seed_mask=None,
-                   n_seeds=1,
-                   step_size=step_size,
-                   min_length=min_length).streamlines
-        npt.assert_(len(sl[0]) >= min_length * step_size)
+        for tracker in ["local", "pft"]:
+            sl = track(fdict['params'],
+                    directions,
+                    max_angle=30.,
+                    sphere=None,
+                    seed_mask=None,
+                    n_seeds=1,
+                    step_size=step_size,
+                    min_length=min_length).streamlines
+            npt.assert_(len(sl[0]) >= min_length * step_size)
