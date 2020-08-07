@@ -1,3 +1,0 @@
-vtk==8.1.2
-fury==0.5.1
-xvfbwrapper==0.2.9
