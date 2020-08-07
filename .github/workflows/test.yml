@@ -28,6 +28,4 @@ jobs:
     - name: Test
       run: |
         export TEST_WITH_XVFB=true
-        mkdir for_test
-        cd for_test
-        py.test --pyargs AFQ --cov-report term-missing --cov=AFQ
+        cd && mkdir for_test && cd for_test && py.test AFQ --cov-report term-missing --cov=AFQ
