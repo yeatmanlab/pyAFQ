@@ -1827,7 +1827,7 @@ def s3fs_nifti_write(img, fname, fs=None):
         ff.write(data)
 
 
-def s3fs_nifti_read(fname, fs=None):
+def s3fs_nifti_read(fname, fs=None, anon=False):
     """
     Lazily reads a nifti image from S3.
 
@@ -1838,6 +1838,11 @@ def s3fs_nifti_read(fname, fs=None):
         of the file to be read.
     fs : an s3fs.S3FileSystem class instance, optional
         A file-system to refer to. Default to create a new file-system.
+    anon : bool
+        Whether to use anonymous connection (public buckets only).
+        If False, uses the key/secret given, or boto’s credential
+        resolver (client_kwargs, environment, variables, config files,
+        EC2 IAM server, in that order). Default: True
 
     Returns
     -------
@@ -1850,7 +1855,7 @@ def s3fs_nifti_read(fname, fs=None):
 
     """
     if fs is None:
-        fs = s3fs.S3FileSystem()
+        fs = s3fs.S3FileSystem(anon=anon)
     with fs.open(fname) as ff:
         zz = gzip.open(ff)
         rr = zz.read()
@@ -1898,7 +1903,7 @@ def read_json(fname):
     return out
 
 
-def s3fs_json_read(fname, fs=None):
+def s3fs_json_read(fname, fs=None, anon=False):
     """
     Reads json directly from S3
 
@@ -1908,10 +1913,14 @@ def s3fs_json_read(fname, fs=None):
         Full path (including bucket name and extension) to the file on S3.
     fs : an s3fs.S3FileSystem class instance, optional
         A file-system to refer to. Default to create a new file-system.
-
+    anon : bool
+        Whether to use anonymous connection (public buckets only).
+        If False, uses the key/secret given, or boto’s credential
+        resolver (client_kwargs, environment, variables, config files,
+        EC2 IAM server, in that order). Default: True
     """
     if fs is None:
-        fs = s3fs.S3FileSystem()
+        fs = s3fs.S3FileSystem(anon=anon)
     with fs.open(fname) as ff:
         data = json.load(ff)
     return data
