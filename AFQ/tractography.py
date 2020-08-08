@@ -10,8 +10,9 @@ import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
-from AFQ._fixes import VerboseLocalTracking, tensor_odf
-from dipy.tracking.local_tracking import ParticleFilteringTracking
+from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
+                        tensor_odf)
+
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
@@ -141,32 +142,46 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     logger.info("Tracking...")
     if tracker == "local":
-        my_tracker = VerboseLocalTracking
+        return _local_tracking(seeds, dg, threshold_classifier, params_img,
+                               step_size=step_size, min_length=min_length,
+                               max_length=max_length, random_seed=rng_seed)
     elif tracker == "pft":
-        my_tracker = ParticleFilteringTracking
-
-    return _tracking(seeds, dg, stopping_criterion, params_img,
-                     step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed,
-                     tracker=my_tracker)
+        return _pft_tracking()
 
 
-def _tracking(seeds, dg, stopping_criterion, params_img,
-              step_size=0.5, min_length=10, max_length=1000,
-              random_seed=None, tracker=VerboseLocalTracking):
+def _local_tracking(seeds, dg, threshold_classifier, params_img,
+                    step_size=0.5, min_length=10, max_length=1000,
+                    random_seed=None):
     """
     Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
+    tracker = VerboseLocalTracking(dg,
+                                   threshold_classifier,
+                                   seeds,
+                                   params_img.affine,
+                                   step_size=step_size,
+                                   min_length=min_length,
+                                   max_length=max_length,
+                                   random_seed=random_seed)
 
-    tracker = tracker(dg,
-                      stopping_criterion,
-                      seeds,
-                      params_img.affine,
-                      step_size=step_size,
-                      min_length=min_length,
-                      max_length=max_length,
-                      random_seed=random_seed)
+    return StatefulTractogram(tracker, params_img, Space.RASMM)
+
+
+def _pft_tracking(seeds, dg, threshold_classifier, params_img,
+                  step_size=0.5, min_length=10, max_length=1000,
+                  random_seed=None):
+    tracker = VerboseParticleFilteringTracking(dg,
+                                        threshold_classifier,
+                                        seeds,
+                                        params_img.affine,
+                                        step_size,
+                                        maxlen=max_length,
+                                        pft_back_tracking_dist=2,
+                                        pft_front_tracking_dist=1,
+                                        pft_max_trial=20,
+                                        particle_count=15,
+                                        random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)

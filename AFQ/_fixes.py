@@ -4,7 +4,8 @@ from scipy.special import lpmv, gammaln
 
 from tqdm import tqdm
 from dipy.align import Bunch
-from dipy.tracking.local_tracking import LocalTracking
+from dipy.tracking.local_tracking import (LocalTracking,
+                                          ParticleFilteringTracking)
 from dipy.align.imaffine import AffineMap
 import random
 
@@ -42,12 +43,7 @@ def spherical_harmonics(m, n, theta, phi):
 TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 
-class VerboseLocalTracking(LocalTracking):
-    def __init__(self, *args, min_length=10, max_length=1000, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.min_length = min_length
-        self.max_length = max_length
-
+class VerboseTrackingMixin():
     def _generate_streamlines(self):
         """A streamline generator"""
 
@@ -95,6 +91,21 @@ class VerboseLocalTracking(LocalTracking):
                     continue
                 else:
                     yield streamline
+
+
+class VerboseLocalTracking(LocalTracking, VerboseTrackingMixin):
+    def __init__(self, *args, min_length=10, max_length=1000, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.min_length = min_length
+        self.max_length = max_length
+
+
+class VerboseParticleFilterTracking(ParticleFilteringTracking,
+                                    VerboseTrackingMixin):
+    def __init__(self, *args, min_length=10, max_length=1000, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.min_length = min_length
+        self.max_length = max_lengths
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
