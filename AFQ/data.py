@@ -457,7 +457,7 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
         EC2 IAM server, in that order). Default: True
     """
     # Create the directory and file if necessary
-    fs = s3fs.S3FiieSystem(anon=anon)
+    fs = s3fs.S3FileSystem(anon=anon)
     if overwrite or not op.exists(fname):
         fs.get("/".join([bucket, key]), fname)
 
@@ -1054,12 +1054,14 @@ class S3BIDSStudy:
 
         return subjects
 
-    def _download_non_sub_keys(self, directory):
+    def _download_non_sub_keys(self, directory, select="all"):
         fs = s3fs.S3FileSystem(anon=self.anon)
         for fn in self.non_sub_s3_keys['raw']:
-            fs.get(fn, op.join(directory, op.basename(fn)))
+            if select == "all" or any([s in fn for s in select]):
+                fs.get(fn, op.join(directory, op.basename(fn)))
 
-    def download(self, directory, include_non_sub_raw_keys=False,
+    def download(self, directory, include_modality_agnostic=False,
+                 include_dataset_description=True,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
 
@@ -1068,10 +1070,12 @@ class S3BIDSStudy:
         directory : str
             Directory to which to download subject files
 
-        include_non_sub_raw_keys : bool
-            If True, download all keys in self.non_sub_s3_keys also.
-            This is useful if the non_sub_s3_keys contain files common
-            to all subjects that should be inherited. Default: False
+        include_modality_agnostic : bool, "all" or any subset of ["dataset_description.json", "CHANGES", "README", "LICENSE"]
+            If True or "all", download all keys in self.non_sub_s3_keys
+            also. If a subset of ["dataset_description.json", "CHANGES",
+            "README", "LICENSE"], download only those files. This is
+            useful if the non_sub_s3_keys contain files common to all
+            subjects that should be inherited. Default: False
 
         include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
@@ -1091,6 +1095,22 @@ class S3BIDSStudy:
         """
         self._local_directories.append(directory)
         self._local_directories = set(self._local_directories)
+
+        if include_modality_agnostic is True or include_modality_agnostic == "all":
+            _download_non_sub_keys(directory, select="all")
+        elif include_modality_agnostic is not False:
+            # Subset selection
+            valid_set = {"dataset_description.json",
+                         "CHANGES",
+                         "README",
+                         "LICENSE"}
+            if not set(include_modality_agnostic) <= valid_set:
+                raise ValueError(
+                    "include_modality_agnostic must be either a boolean, 'all', "
+                    "or a subset of {valid_set}".format(valid_set=valid_set)
+                )
+
+            _download_non_sub_keys(directory, select=include_modality_agnostic)
 
         results = [delayed(sub.download)(
             directory=directory,
@@ -1254,7 +1274,7 @@ class HBNSite(S3BIDSStudy):
 
         return non_sub_s3_keys
 
-    def download(self, directory, include_non_sub_raw_keys=False,
+    def download(self, directory, include_modality_agnostic=False,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
 
@@ -1262,6 +1282,13 @@ class HBNSite(S3BIDSStudy):
         ----------
         directory : str
             Directory to which to download subject files
+
+        include_modality_agnostic : bool, "all" or any subset of ["dataset_description.json", "CHANGES", "README", "LICENSE"]
+            If True or "all", download all keys in self.non_sub_s3_keys
+            also. If a subset of ["dataset_description.json", "CHANGES",
+            "README", "LICENSE"], download only those files. This is
+            useful if the non_sub_s3_keys contain files common to all
+            subjects that should be inherited. Default: False
 
         include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
@@ -1281,7 +1308,7 @@ class HBNSite(S3BIDSStudy):
         """
         super().download(
             directory=directory,
-            include_non_sub_raw_keys=include_non_sub_raw_keys,
+            include_modality_agnostic=include_modality_agnostic,
             include_derivs=include_derivs,
             overwrite=overwrite,
             pbar=pbar
