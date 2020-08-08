@@ -457,15 +457,9 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
         EC2 IAM server, in that order). Default: True
     """
     # Create the directory and file if necessary
-    s3 = get_s3_client(anon=anon)
-    Path(op.dirname(fname)).mkdir(parents=True, exist_ok=True)
-    try:
-        Path(fname).touch(exist_ok=overwrite)
-
-        # Download the file
-        s3.download_file(Bucket=bucket, Key=key, Filename=fname)
-    except FileExistsError:
-        pass
+    fs = s3fs.S3FiieSystem(anon=anon)
+    if overwrite or not op.exists(fname):
+        fs.get("/".join([bucket, key]), fname)
 
 
 class S3BIDSSubject:
