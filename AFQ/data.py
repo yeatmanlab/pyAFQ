@@ -459,6 +459,7 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
     # Create the directory and file if necessary
     fs = s3fs.S3FileSystem(anon=anon)
     if overwrite or not op.exists(fname):
+        Path(op.dirname(fname)).mkdir(parents=True, exist_ok=True)
         fs.get("/".join([bucket, key]), fname)
 
 
@@ -1317,9 +1318,9 @@ class HBNSite(S3BIDSStudy):
         to_bids_description(
             directory,
             **{"BIDSVersion": "1.0.0",
-               "Name": "HBN Study, " + self.site},
+               "Name": "HBN Study, " + self.site,
                "DatasetType": "raw",
-               "Subjects": [s.subject_id for s in self.subjects])
+               "Subjects": [s.subject_id for s in self.subjects]})
 
 
 # +--------------------------------------------------+
