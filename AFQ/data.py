@@ -1283,7 +1283,9 @@ class HBNSite(S3BIDSStudy):
         to_bids_description(
             directory,
             **{"BIDSVersion": "1.0.0",
-               "Name": "HBN Study, " + self.site})
+               "Name": "HBN Study, " + self.site},
+               "DatasetType": "raw",
+               "Subjects": [s.subject_id for s in self.subjects])
 
 
 # +--------------------------------------------------+
