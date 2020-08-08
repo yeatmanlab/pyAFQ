@@ -147,8 +147,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         my_tracker = VerboseParticleFilteringTracking
 
     return _tracking(my_tracker, seeds, dg, threshold_classifier, params_img,
-                         step_size=step_size, min_length=min_length,
-                         max_length=max_length, random_seed=rng_seed)
+                     step_size=step_size, min_length=min_length,
+                     max_length=max_length, random_seed=rng_seed)
 
 def _tracking(tracker, seeds, dg, threshold_classifier, params_img,
               step_size=0.5, min_length=10, max_length=1000,

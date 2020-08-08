@@ -33,16 +33,18 @@ def test_csd_tracking():
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
             for tracker in ["local", "pft"]:
-                sl = track(fname, directions,
-                        odf_model="CSD",
-                        max_angle=30.,
-                        sphere=None,
-                        seed_mask=None,
-                        n_seeds=seeds,
-                        stop_mask=None,
-                        step_size=step_size,
-                        min_length=min_length,
-                        tracker=tracker).streamlines
+                sl = track(
+                    fname,
+                    directions,
+                    odf_model="CSD",
+                    max_angle=30.,
+                    sphere=None,
+                    seed_mask=None,
+                    n_seeds=seeds,
+                    stop_mask=None,
+                    step_size=step_size,
+                    min_length=min_length,
+                    tracker=tracker).streamlines
 
                 npt.assert_(len(sl[0]) >= step_size * min_length)
 
@@ -51,12 +53,13 @@ def test_dti_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
         for tracker in ["local", "pft"]:
-            sl = track(fdict['params'],
-                    directions,
-                    max_angle=30.,
-                    sphere=None,
-                    seed_mask=None,
-                    n_seeds=1,
-                    step_size=step_size,
-                    min_length=min_length).streamlines
+            sl = track(
+                fdict['params'],
+                directions,
+                max_angle=30.,
+                sphere=None,
+                seed_mask=None,
+                n_seeds=1,
+                step_size=step_size,
+                min_length=min_length).streamlines
             npt.assert_(len(sl[0]) >= min_length * step_size)
