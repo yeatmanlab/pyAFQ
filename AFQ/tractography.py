@@ -122,7 +122,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         stop_mask = np.ones(params_img.shape[:3])
 
     if stop_mask.dtype == 'bool':
-        stopping_criterion = BinaryStoppingCriterion(stop_mask)
+        stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+                                                        0.7)
     else:
         stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                         stop_threshold)
