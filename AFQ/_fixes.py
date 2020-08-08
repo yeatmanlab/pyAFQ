@@ -100,8 +100,8 @@ class VerboseLocalTracking(LocalTracking, VerboseTrackingMixin):
         self.max_length = max_length
 
 
-class VerboseParticleFilterTracking(ParticleFilteringTracking,
-                                    VerboseTrackingMixin):
+class VerboseParticleFilteringTracking(ParticleFilteringTracking,
+                                       VerboseTrackingMixin):
     def __init__(self, *args, min_length=10, max_length=1000, **kwargs):
         super().__init__(*args, **kwargs)
         self.min_length = min_length
