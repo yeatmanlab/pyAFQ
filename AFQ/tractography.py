@@ -142,46 +142,31 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     logger.info("Tracking...")
     if tracker == "local":
-        return _local_tracking(seeds, dg, threshold_classifier, params_img,
-                               step_size=step_size, min_length=min_length,
-                               max_length=max_length, random_seed=rng_seed)
+        my_tracker = VerboseLocalTracking
     elif tracker == "pft":
-        return _pft_tracking()
+        my_tracker = VerboseParticleFilteringTracking
 
+    return _tracking(my_tracker, seeds, dg, threshold_classifier, params_img,
+                         step_size=step_size, min_length=min_length,
+                         max_length=max_length, random_seed=rng_seed)
 
-def _local_tracking(seeds, dg, threshold_classifier, params_img,
-                    step_size=0.5, min_length=10, max_length=1000,
-                    random_seed=None):
+def _tracking(tracker, seeds, dg, threshold_classifier, params_img,
+              step_size=0.5, min_length=10, max_length=1000,
+              random_seed=None):
     """
     Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(dg,
-                                   threshold_classifier,
-                                   seeds,
-                                   params_img.affine,
-                                   step_size=step_size,
-                                   min_length=min_length,
-                                   max_length=max_length,
-                                   random_seed=random_seed)
 
-    return StatefulTractogram(tracker, params_img, Space.RASMM)
-
-
-def _pft_tracking(seeds, dg, threshold_classifier, params_img,
-                  step_size=0.5, min_length=10, max_length=1000,
-                  random_seed=None):
-    tracker = VerboseParticleFilteringTracking(dg,
-                                        threshold_classifier,
-                                        seeds,
-                                        params_img.affine,
-                                        step_size,
-                                        maxlen=max_length,
-                                        pft_back_tracking_dist=2,
-                                        pft_front_tracking_dist=1,
-                                        pft_max_trial=20,
-                                        particle_count=15,
-                                        random_seed=random_seed)
+    tracker = tracker(
+        dg,
+        threshold_classifier,
+        seeds,
+        params_img.affine,
+        step_size=step_size,
+        min_length=min_length,
+        max_length=max_length,
+        random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)
