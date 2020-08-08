@@ -1117,7 +1117,7 @@ class AFQ(object):
                         scalar_data,
                         this_sl,
                         row["dwi_affine"],
-                        weights=gaussian_weights(this_profile))
+                        weights=gaussian_weights(this_sl))
                     profiles[ii].extend(list(this_profile[ii]))
                 nodes = list(np.arange(this_profile[0].shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
