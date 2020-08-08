@@ -464,7 +464,7 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
 
 class S3BIDSSubject:
     """A single study subject hosted on AWS S3"""
-    def __init__(self, subject_id, study, site=None):
+    def __init__(self, subject_id, study):
         """Initialize a Subject instance
 
         Parameters
@@ -474,9 +474,6 @@ class S3BIDSSubject:
 
         study : AFQ.data.S3BIDSStudy
             The S3BIDSStudy for which this subject was a participant
-
-        site : str, optional
-            Site-ID for the site from which this subject's data was collected
         """
         if not isinstance(subject_id, str):
             raise TypeError('subject_id must be a string.')
@@ -484,12 +481,8 @@ class S3BIDSSubject:
         if not isinstance(study, S3BIDSStudy):
             raise TypeError('study must be an instance of S3BIDSStudy.')
 
-        if not (site is None or isinstance(site, str)):
-            raise TypeError('site must be a string or None.')
-
         self._subject_id = subject_id
         self._study = study
-        self._site = site
         self._get_s3_keys()
         self._files = {'raw': {}, 'derivatives': {}}
 
@@ -502,11 +495,6 @@ class S3BIDSSubject:
     def study(self):
         """The study in which this subject participated"""
         return self._study
-
-    @property
-    def site(self):
-        """The site at which this subject was a participant"""
-        return self._site
 
     @property
     def s3_keys(self):
@@ -529,7 +517,7 @@ class S3BIDSSubject:
 
     def __repr__(self):
         return (f'{type(self).__name__}(subject_id={self.subject_id}, '
-                f'study_id={self.study.study_id}, site={self.site}')
+                f'study_id={self.study.study_id}')
 
     def _get_s3_keys(self):
         """Get all required S3 keys for this subject
@@ -721,11 +709,25 @@ class HBNSubject(S3BIDSSubject):
         site : str, optional
             Site-ID for the site from which this subject's data was collected
         """
+        if not (site is None or isinstance(site, str)):
+            raise TypeError('site must be a string or None.')
+
+        self._site = site
+
         super().__init__(
             subject_id=subject_id,
             study=study,
             site=site
         )
+
+    @property
+    def site(self):
+        """The site at which this subject was a participant"""
+        return self._site
+
+    def __repr__(self):
+        return (f'{type(self).__name__}(subject_id={self.subject_id}, '
+                f'study_id={self.study.study_id}, site={self.site}')
 
     def _get_s3_keys(self):
         """Get all required S3 keys for this subject
@@ -950,8 +952,7 @@ class S3BIDSStudy:
     def _get_subject(self, subject_id):
         """Return a Subject instance from a subject-ID"""
         return self._subject_class(subject_id=subject_id,
-                                   study=self,
-                                   site=None)
+                                   study=self)
 
     def _get_derivative_types(self):
         """Return a list of available derivatives pipelines
@@ -1167,6 +1168,12 @@ class HBNSite(S3BIDSStudy):
     def site(self):
         """The HBN site"""
         return self._site
+
+    def _get_subject(self, subject_id):
+        """Return a Subject instance from a subject-ID"""
+        return self._subject_class(subject_id=subject_id,
+                                   study=self,
+                                   site=self.site)
 
     def _get_derivative_types(self):
         """Return a list of available derivatives pipelines
