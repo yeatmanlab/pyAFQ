@@ -1061,7 +1061,8 @@ class S3BIDSStudy:
             if select == "all" or any([s in fn for s in select]):
                 fs.get(fn, op.join(directory, op.basename(fn)))
 
-    def download(self, directory, include_modality_agnostic=False,
+    def download(self, directory,
+                 include_modality_agnostic=("dataset_description.json",),
                  include_dataset_description=True,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
@@ -1076,7 +1077,7 @@ class S3BIDSStudy:
             also. If a subset of ["dataset_description.json", "CHANGES",
             "README", "LICENSE"], download only those files. This is
             useful if the non_sub_s3_keys contain files common to all
-            subjects that should be inherited. Default: False
+            subjects that should be inherited. Default: ("dataset_description.json",)
 
         include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
