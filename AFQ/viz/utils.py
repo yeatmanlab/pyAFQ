@@ -443,6 +443,8 @@ class LongitudinalCSVComparison():
 
     def __init__(self, out_folder, csv_fnames, names, is_mats=False,
                  subjects=None,
+                 scalar_bounds={'lb': {'dti_fa': 0.2},
+                                'ub': {'dti_md': 0.002}},
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -469,6 +471,13 @@ class LongitudinalCSVComparison():
             List of subjects to consider.
             If None, will use all subjects in first dataset.
             Default: None
+        
+        scalar_bounds : dictionary, optional
+            A dictionary with a lower bound and upper bound containting a
+            series of scalar / threshold pairs used as a white-matter mask
+            on the profiles (any values outside of the threshold will be
+            marked NaN and not used or set to 0, depending on the case).
+            Default: {'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
@@ -508,11 +517,36 @@ class LongitudinalCSVComparison():
                     profile[scalar] = \
                         profile[scalar].apply(lambda x: x * scale)
 
+            for bound, constraint in scalar_bounds.items():
+                for scalar, threshold in constraint.items():
+                    profile[scalar] = \
+                        profile[scalar].apply(
+                            lambda x: self._threshold_scalar(
+                                bound,
+                                threshold,
+                                x))
+
             self.profile_dict[names[i]] = profile
         if subjects is None:
             self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
         else:
             self.subjects = subjects
+
+    def _threshold_scalar(self, bound, threshold, val):
+        if bound == "lb":
+            if val > threshold:
+                return val
+            else:
+                return np.nan 
+        elif bound == "ub":
+            if val < threshold:
+                return val
+            else:
+                return np.nan 
+        else:
+            raise RuntimeError("scalar_bounds dictionary "
+                                + " formatted incorrectly. See"
+                                + " the default for reference")
 
     def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
