@@ -8,8 +8,7 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.tracking.stopping_criterion import BinaryStoppingCriterion,\
-    ThresholdStoppingCriterion
+from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
 
 from AFQ._fixes import VerboseLocalTracking, tensor_odf
 
@@ -123,7 +122,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     if stop_mask.dtype == 'bool':
         stopping_criterion = ThresholdStoppingCriterion(stop_mask,
-                                                        0.7)
+                                                        0.5)
     else:
         stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                         stop_threshold)
