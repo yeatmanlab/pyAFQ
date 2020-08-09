@@ -471,7 +471,7 @@ class LongitudinalCSVComparison():
             List of subjects to consider.
             If None, will use all subjects in first dataset.
             Default: None
-        
+
         scalar_bounds : dictionary, optional
             A dictionary with a lower bound and upper bound containting a
             series of scalar / threshold pairs used as a white-matter mask
@@ -537,16 +537,16 @@ class LongitudinalCSVComparison():
             if val > threshold:
                 return val
             else:
-                return np.nan 
+                return np.nan
         elif bound == "ub":
             if val < threshold:
                 return val
             else:
-                return np.nan 
+                return np.nan
         else:
             raise RuntimeError("scalar_bounds dictionary "
-                                + " formatted incorrectly. See"
-                                + " the default for reference")
+                               + " formatted incorrectly. See"
+                               + " the default for reference")
 
     def _warn_not_found(self, scalar, subject, bundle, name):
         self.logger.warning(
@@ -800,7 +800,7 @@ class LongitudinalCSVComparison():
                 f"Lateral Contrast Indices by Bundle")
             for j in range(0, len(bundles), 2):
                 bundle = bundles[j]
-                other_bundle = bundles[j+1]
+                other_bundle = bundles[j + 1]
                 for i, name in enumerate(names):
                     profile = self._get_profile(
                         name, bundle, subject, scalar)
