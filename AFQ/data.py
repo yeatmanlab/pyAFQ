@@ -1055,7 +1055,7 @@ class S3BIDSStudy:
 
         return subjects
 
-    def _download_non_sub_keys(self, directory, select="all"):
+    def _download_non_sub_keys(self, directory, select=("dataset_description.json",)):
         fs = s3fs.S3FileSystem(anon=self.anon)
         for fn in self.non_sub_s3_keys['raw']:
             if select == "all" or any([s in fn for s in select]):
@@ -1098,7 +1098,7 @@ class S3BIDSStudy:
         self._local_directories = set(self._local_directories)
 
         if include_modality_agnostic is True or include_modality_agnostic == "all":
-            _download_non_sub_keys(directory, select="all")
+            self._download_non_sub_keys(directory, select="all")
         elif include_modality_agnostic is not False:
             # Subset selection
             valid_set = {"dataset_description.json",
@@ -1111,7 +1111,7 @@ class S3BIDSStudy:
                     "or a subset of {valid_set}".format(valid_set=valid_set)
                 )
 
-            _download_non_sub_keys(directory, select=include_modality_agnostic)
+            self._download_non_sub_keys(directory, select=include_modality_agnostic)
 
         results = [delayed(sub.download)(
             directory=directory,
