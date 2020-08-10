@@ -1,3 +1,4 @@
+AFQ/version.py
 *.pyc
 *.ipynb_checkpoints
 .coverage*
@@ -8,4 +9,10 @@ docs/source/auto_examples
 examples/*.nii.gz
 examples/*.trk
 examples/*.npy
+build
+dist
 .DS_Store
+**.sw?
+**Untitled.ipynb
+pip-wheel-metadata
+pyAFQ.egg-info
