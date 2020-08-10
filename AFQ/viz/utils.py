@@ -445,6 +445,7 @@ class LongitudinalCSVComparison():
                  subjects=None,
                  scalar_bounds={'lb': {'dti_fa': 0.2},
                                 'ub': {'dti_md': 0.002}},
+                 percent_nan_tol=10,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -479,6 +480,11 @@ class LongitudinalCSVComparison():
             marked NaN and not used or set to 0, depending on the case).
             Default: {'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}
 
+        percent_nan_tol : int, optional
+            Percentage of NaNs tolerable. If a profile has less than this
+            percentage of NaNs, NaNs are interpolated. If it has more,
+            the profile is thrown out.
+
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
             Default: BUNDLE_MAT_2_PYTHON
@@ -494,6 +500,7 @@ class LongitudinalCSVComparison():
         """
         self.logger = logging.getLogger('AFQ.csv')
         self.out_folder = out_folder
+        self.percent_nan_tol = percent_nan_tol
 
         if isinstance(is_mats, bool):
             is_mats = [is_mats] * len(csv_fnames)
@@ -548,30 +555,6 @@ class LongitudinalCSVComparison():
                                + " formatted incorrectly. See"
                                + " the default for reference")
 
-    def _warn_not_found(self, scalar, subject, bundle, name):
-        self.logger.warning(
-            'No scalars found for scalar ' + scalar
-            + ' for subject ' + str(subject)
-            + ' for bundle ' + bundle
-            + ' for CSV ' + name)
-
-    def _warn_nans(self, scalar, subject, bundle, name, repl_nan):
-        message = (
-            'NaNs found in scalar ' + scalar
-            + ' for subject ' + str(subject)
-            + ' for bundle ' + bundle
-            + ' for CSV ' + name)
-        if repl_nan:
-            message = message + '. These Nans were replaced with 0.'
-        self.logger.info(message)
-
-    def _warn_many_nans(self, scalar, subject, bundle, name):
-        self.logger.warning(
-            'More than 10 NaNs found in scalar ' + scalar
-            + ' for subject ' + str(subject)
-            + ' for bundle ' + bundle
-            + ' for CSV ' + name)
-
     def _get_fname(self, folder, f_name):
         f_folder = op.join(
             self.out_folder,
@@ -586,18 +569,31 @@ class LongitudinalCSVComparison():
             & (profile['bundle'] == bundle)
         ][scalar].to_numpy()
         nans = np.isnan(single_profile)
+        percent_nan = np.sum(nans) / 100
         if len(single_profile) < 1:
-            self._warn_not_found(scalar, subject, bundle, name)
+            self.logger.warning(
+                'No scalars found for scalar ' + scalar
+                + ' for subject ' + str(subject)
+                + ' for bundle ' + bundle
+                + ' for CSV ' + name)
             return None
 
-        if np.sum(nans) > 10:
-            self._warn_many_nans(scalar, subject, bundle, name)
-            return None
-
-        if np.sum(nans) > 0:
-            self._warn_nans(scalar, subject, bundle, name, repl_nan)
-            if repl_nan:
-                single_profile[nans] = 0
+        if percent_nan > 0:
+            message = (
+                f'{percent_nan}% NaNs found in scalar ' + scalar
+                + ' for subject ' + str(subject)
+                + ' for bundle ' + bundle
+                + ' for CSV ' + name)
+            if np.sum(nans) > self.percent_nan_tol:
+                self.logger.warn(message + '. Profile ignored. ')
+                return None
+            else:
+                self.logger.info(message + '. NaNs interpolated. ')
+                non_nan = np.logical_not(nans)
+                single_profile[nans] = np.interp(
+                    nans.nonzero()[0],
+                    non_nan.nonzero()[0],
+                    single_profile[non_nan])
 
         return single_profile
 
