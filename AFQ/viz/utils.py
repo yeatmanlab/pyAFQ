@@ -569,7 +569,7 @@ class LongitudinalCSVComparison():
             & (profile['bundle'] == bundle)
         ][scalar].to_numpy()
         nans = np.isnan(single_profile)
-        percent_nan = np.sum(nans) / 100
+        percent_nan = np.sum(nans)
         if len(single_profile) < 1:
             self.logger.warning(
                 'No scalars found for scalar ' + scalar
