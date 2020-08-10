@@ -17,7 +17,7 @@ import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
-from dipy.stats.analysis import afq_profile
+from dipy.stats.analysis import afq_profile, gaussian_weights
 
 from bids.layout import BIDSLayout
 
@@ -157,7 +157,8 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion=0.1,
+                 wm_criterion={'lb': {'dti_fa': 0.2},
+                               'ub': {'dti_md': 0.002}},
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -237,12 +238,18 @@ class AFQ(object):
 
         wm_criterion : list or float, optional
             This is either a list of the labels of the white matter in the
-            segmentation file or (if a float is provided) the threshold FA to
-            use for creating the white-matter mask. For example, the white
-            matter values for the segmentation provided with the HCP data
-            including labels for midbrain are:
+            segmentation file or (if a dictionary is provided) a lower bound
+            and upper bound containting a series of scalar / threshold pairs
+            used for creating the white-matter mask.
+            In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
+            "dki_md", thresholds are floats, and 'lb' / 'ub' mean lower and
+            upper bounds respectively (see the format in the default). Each
+            scalar mask will 'logical and' to make the white-matter mask.
+            For an example of the former case,
+            the white matter values for the segmentation provided
+            with the HCP data including labels for midbrain are:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
-            Default: 0.1
+            Default: {'lb': {'dti_fa': 0.1}, 'ub': {'dti_md': 0.003}}
 
         use_prealign : bool, optional
             Whether to perform pre-alignment before perforiming the
@@ -266,7 +273,7 @@ class AFQ(object):
             Parameters with suffix_mask are handled differently by this api.
             Masks which are strings that are in scalars or are "wm_mask"
             will be replaced by the corresponding mask. Masks which are paths
-            will be loaded. All masks set to None will default to "wm_mask".
+            will be loaded. All masks set to None will default to "dti_fa".
             To track the entire volume, set mask to "full".
 
             Default: use the default behavior of the aft.track function.
@@ -311,8 +318,10 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend)
 
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = "wm_mask"
-        default_tracking_params["stop_mask"] = "wm_mask"
+        default_tracking_params["seed_mask"] = "dti_fa"
+        default_tracking_params["stop_mask"] = "dti_fa"
+        default_tracking_params["seed_threshold"] = 0.2
+        default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value was
         # given:
         if tracking_params is not None:
@@ -822,31 +831,31 @@ class AFQ(object):
 
         return mapping_file
 
-    def _mask_from_seg(self, row, wm_labels, not_equal=False):
+    def _mask_from_seg(self, row, image_labels, not_equal=False):
         dwi_data, _, dwi_img = self._get_data_gtab(row)
 
-        # If we found a white matter segmentation in the
+        # If we found a segmentation file in the
         # expected location:
         seg_img = nib.load(row['seg_file'])
         seg_data_orig = seg_img.get_fdata()
         # For different sets of labels, extract all the voxels that
         # have any of these values:
-        wm_mask = np.zeros(seg_data_orig.shape, dtype=bool)
-        for label in wm_labels:
+        seg_mask = np.zeros(seg_data_orig.shape, dtype=bool)
+        for label in image_labels:
             if not_equal:
-                wm_mask = np.logical_or(wm_mask, (seg_data_orig != label))
+                seg_mask = np.logical_or(seg_mask, (seg_data_orig != label))
             else:
-                wm_mask = np.logical_or(wm_mask, (seg_data_orig == label))
+                seg_mask = np.logical_or(seg_mask, (seg_data_orig == label))
 
         # Resample to DWI data:
-        wm_mask = np.round(reg.resample(wm_mask.astype(float),
+        seg_mask = np.round(reg.resample(seg_mask.astype(float),
                                         dwi_data[..., 0],
                                         seg_img.affine,
                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
-                    wm_criterion=wm_labels)
+                    wm_criterion=image_labels)
 
-        return wm_mask, meta
+        return seg_mask, meta
 
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
@@ -854,15 +863,40 @@ class AFQ(object):
             if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
                 wm_mask, meta = self._mask_from_seg(row, self.wm_criterion)
             else:
-                # Otherwise, we'll identify the white matter based on FA:
-                fa_fname = self._dti_fa(row)
-                dti_fa = nib.load(fa_fname).get_fdata()
-                wm_mask = dti_fa > self.wm_criterion
-                meta = dict(source=fa_fname,
-                            fa_threshold=self.wm_criterion)
+                # Otherwise, we'll identify the white matter based on scalars:
+                valid_scalars = list(self._scalar_dict.keys())
+                wm_mask = None
+                filenames = []
+                for bound, constraint in self.wm_criterion.items():
+                    for scalar, threshold in constraint.items():
+                        if scalar not in valid_scalars:
+                            raise RuntimeError((
+                                f"wm_criterion scalars should be one of"
+                                f" {', '.join(valid_scalars)}"))
 
-            # Dilate to be sure to reach the gray matter:
-            wm_mask = binary_dilation(wm_mask) > 0
+                        scalar_fname = self._scalar_dict[scalar](self, row)
+                        if bound == "lb":
+                            new_wm_mask = \
+                                nib.load(
+                                    scalar_fname).get_fdata() > threshold
+                        elif bound == "ub":
+                            new_wm_mask = \
+                                nib.load(
+                                    scalar_fname).get_fdata() < threshold
+                        else:
+                            raise RuntimeError("wm_criterion dictionary "
+                                               + " formatted incorrectly. See"
+                                               + " the default for reference")
+
+                        if wm_mask is None:
+                            wm_mask = new_wm_mask
+                        else:
+                            wm_mask = np.logical_and(wm_mask, new_wm_mask)
+                        filenames.append(scalar_fname)
+
+                meta = dict(
+                    criterion=self.wm_criterion,
+                    filenames=filenames)
 
             self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(np.float32),
                                                   row['dwi_affine']),
@@ -1054,7 +1088,7 @@ class AFQ(object):
 
         return clean_bundles_file
 
-    def _tract_profiles(self, row, weighting=None):
+    def _tract_profiles(self, row):
         profiles_file = self._get_fname(row, '_profiles.csv')
         if self.force_recompute or not op.exists(profiles_file):
             bundles_file = self._clean_bundles(row)
@@ -1084,7 +1118,8 @@ class AFQ(object):
                     this_profile[ii] = afq_profile(
                         scalar_data,
                         this_sl,
-                        row["dwi_affine"])
+                        row["dwi_affine"],
+                        weights=gaussian_weights(this_sl))
                     profiles[ii].extend(list(this_profile[ii]))
                 nodes = list(np.arange(this_profile[0].shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
