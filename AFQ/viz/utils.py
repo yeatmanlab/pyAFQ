@@ -767,7 +767,8 @@ class LongitudinalCSVComparison():
                                bundles=list(POSITIONS.keys()),
                                show_plots=False):
         """
-        Calculate the contrast index for each bundle in two datasets.
+        Calculate the lateral contrast index for each bundle in a given
+        dataset, for each dataset in names.
 
         Parameters
         ----------
