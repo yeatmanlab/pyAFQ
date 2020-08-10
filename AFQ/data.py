@@ -966,9 +966,10 @@ class S3BIDSStudy:
         s3_prefix = '/'.join([self.bucket, self.s3_prefix])
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
-        if 'derivatives' in nonsub_keys:
+        derivatives_prefix = '/'.join([s3_prefix, 'derivatives'])
+        if derivatives_prefix in nonsub_keys:
             return _ls_s3fs(
-                s3_prefix='/'.join([s3_prefix, 'derivatives']),
+                s3_prefix=derivatives_prefix,
                 anon=self.anon
             )['other']
         else:
@@ -1212,10 +1213,11 @@ class HBNSite(S3BIDSStudy):
         s3_prefix = '/'.join([self.bucket, self.s3_prefix])
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
+        derivatives_prefix = '/'.join([s3_prefix, 'derivatives'])
 
-        if any(['derivatives' in key for key in nonsub_keys]):
+        if any([derivatives_prefix in key for key in nonsub_keys]):
             deriv_subs = _ls_s3fs(
-                s3_prefix='/'.join([s3_prefix, 'derivatives']),
+                s3_prefix=derivatives_prefix,
                 anon=self.anon
             )['subjects']
 
