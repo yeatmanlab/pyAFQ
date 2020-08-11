@@ -136,13 +136,8 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
 
-    # Test with the return_idx kwarg set to True:
-    segmentation = seg.Segmentation(seg_algo='Reco',
-                                    progressive=False,
-                                    greater_than=10,
-                                    rm_small_clusters=1,
-                                    rng=np.random.RandomState(seed=8),
-                                    return_idx=True)
+    # Test with the clip_edges kwarg set to True:
+    segmentation = seg.Segmentation(clip_edges=True)
 
     fiber_groups = segmentation.segment(bundles,
                                         tg,
