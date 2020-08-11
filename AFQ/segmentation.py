@@ -160,7 +160,7 @@ class Segmentation:
         self.refine = refine
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
-        self.filter_by_endpoints = filter_by_endpoints
+        self.filter_by_endpoints = (filter_by_endpoints and not clip_edges)
         self.dist_to_aal = dist_to_aal
 
         if (save_intermediates is not None) and \
