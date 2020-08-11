@@ -215,6 +215,9 @@ class AFQ(object):
             [REGISTRATION] Whether to mask the chosen template(s)
             with a brain-mask.
             Default: True
+        bundle_names : list of strings, optional
+            [BUNDLES] List of bundle names to include in segmentation.
+            Default: BUNDLES
         dask_it : bool, optional
             [COMPUTE] Whether to use a dask DataFrame object
         force_recompute : bool, optional

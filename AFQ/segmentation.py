@@ -79,6 +79,22 @@ class Segmentation:
             Remove clusters that have less than this value
                 during whole brain SLR.
             Default: 50
+        model_clust_thr : int
+            Parameter passed on to recognize for Recobundles.
+            See Recobundles documentation.
+            Default: 40
+        reduction_thr : int
+            Parameter passed on to recognize for Recobundles.
+            See Recobundles documentation.
+            Default: 40
+        refine : bool
+            Parameter passed on to recognize for Recobundles.
+            See Recobundles documentation.
+            Default: False
+        pruning_thr : int
+            Parameter passed on to recognize for Recobundles.
+            See Recobundles documentation.
+            Default: 6
         progressive : boolean, optional
             Using RecoBundles Algorithm.
             Whether or not to use progressive technique
@@ -688,6 +704,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     ----------
     tg : StatefulTractogram class instance
         A whole-brain tractogram to be segmented.
+    n_points : int, optional
+        Number of points to resample streamlines to.
+        Default: 100
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from
         the mean of extracted bundles. Default: 5
