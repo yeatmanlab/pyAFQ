@@ -1051,6 +1051,7 @@ class S3BIDSStudy:
         fs = s3fs.S3FileSystem(anon=self.anon)
         for fn in self.non_sub_s3_keys['raw']:
             if select == "all" or any([s in fn for s in select]):
+                Path(directory).mkdir(parents=True, exist_ok=True)
                 fs.get(fn, op.join(directory, op.basename(fn)))
 
     def download(self, directory,
