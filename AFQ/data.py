@@ -465,6 +465,7 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
 
 class S3BIDSSubject:
     """A single study subject hosted on AWS S3"""
+
     def __init__(self, subject_id, study):
         """Initialize a Subject instance
 
@@ -646,8 +647,8 @@ class S3BIDSSubject:
             elif include_derivs is False:
                 pass
             elif (isinstance(include_derivs, str)
-                # In this case, filter only derivatives S3 keys that
-                # include the `include_derivs` string as a substring
+                  # In this case, filter only derivatives S3 keys that
+                  # include the `include_derivs` string as a substring
                   and include_derivs in dt):
                 deriv_pairs += [(k, f) for k, f in deriv_zips[dt]]
                 self._files['derivatives'][dt] = {
@@ -694,6 +695,7 @@ class HBNSubject(S3BIDSSubject):
     --------
     AFQ.data.S3BIDSSubject
     """
+
     def __init__(self, subject_id, study, site=None):
         """Initialize a Subject instance
 
@@ -771,6 +773,7 @@ class HBNSubject(S3BIDSSubject):
 
 class S3BIDSStudy:
     """A BIDS-compliant study hosted on AWS S3"""
+
     def __init__(self, study_id, bucket, s3_prefix, subjects=None,
                  anon=True, use_participants_tsv=False, random_seed=None,
                  _subject_class=S3BIDSSubject):
@@ -1030,7 +1033,7 @@ class S3BIDSStudy:
                     response.get('Body')
                 ).participant_id.values)
 
-            subject_set = get_subs_from_tsv_key(s3_key)
+            subject_set = get_subs_from_tsv_key(tsv_key)
             subjects = list(subject_set)
         else:
             s3_prefix = '/'.join([self.bucket, self.s3_prefix])
@@ -1047,16 +1050,40 @@ class S3BIDSStudy:
 
         return subjects
 
-    def _download_non_sub_keys(self, directory, select=("dataset_description.json",)):
+    def _download_non_sub_keys(self, directory,
+                               select=("dataset_description.json",),
+                               filenames=None):
         fs = s3fs.S3FileSystem(anon=self.anon)
-        for fn in self.non_sub_s3_keys['raw']:
+        if filenames is None:
+            filenames = self.non_sub_s3_keys['raw']
+        for fn in filenames:
             if select == "all" or any([s in fn for s in select]):
                 Path(directory).mkdir(parents=True, exist_ok=True)
                 fs.get(fn, op.join(directory, op.basename(fn)))
 
+    def _download_derivative_descriptions(self, include_derivs, directory):
+        for derivative in self.derivative_types:
+            if include_derivs is True \
+                or (isinstance(include_derivs, str)
+                    and include_derivs == op.basename(derivative)) \
+                or (isinstance(include_derivs, list)
+                    and all(isinstance(s, str) for s in include_derivs)
+                    and any([deriv in derivative for
+                             deriv in include_derivs])):
+                filenames = \
+                    _ls_s3fs(s3_prefix=derivative, anon=self.anon)['other']
+                deriv_directory = op.join(
+                    directory, *derivative.split('/')[-2:])
+                self._download_non_sub_keys(
+                    deriv_directory,
+                    select=("dataset_description.json",),
+                    filenames=filenames)
+
     def download(self, directory,
                  include_modality_agnostic=("dataset_description.json",),
-                 include_derivs=False, overwrite=False, pbar=True):
+                 include_derivs=False,
+                 include_derivs_dataset_description=True,
+                 overwrite=False, pbar=True):
         """Download files for each subject in the study
 
         Parameters
@@ -1076,6 +1103,10 @@ class S3BIDSStudy:
             If a string or sequence of strings is passed, this will
             only download derivatives that match the string(s) (e.g.
             ["dmriprep", "afq"]). Default: False
+
+        include_derivs_dataset_description : bool
+            Used only if include_derivs is not False. If True,
+            dataset_description.json downloaded for each derivative.
 
         overwrite : bool
             If True, overwrite files for each subject. Default: False
@@ -1104,7 +1135,14 @@ class S3BIDSStudy:
                     "or a subset of {valid_set}".format(valid_set=valid_set)
                 )
 
-            self._download_non_sub_keys(directory, select=include_modality_agnostic)
+            self._download_non_sub_keys(
+                directory, select=include_modality_agnostic)
+
+        # download dataset_description.json for derivatives
+        if (include_derivs is not False) \
+                and include_derivs_dataset_description:
+            self._download_derivative_descriptions(
+                include_derivs, directory)
 
         results = [delayed(sub.download)(
             directory=directory,
@@ -1124,6 +1162,7 @@ class HBNSite(S3BIDSStudy):
     --------
     AFQ.data.S3BIDSStudy
     """
+
     def __init__(self, site, study_id='HBN', bucket='fcp-indi',
                  s3_prefix='data/Projects/HBN/MRI',
                  subjects=None, use_participants_tsv=False,
