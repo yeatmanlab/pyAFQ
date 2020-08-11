@@ -115,8 +115,7 @@ def test_segment():
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
 
     # Test with the clip_edges kwarg set to True:
-    segmentation = seg.Segmentation(clip_edges=True,
-                                    filter_by_endpoints=False)
+    segmentation = seg.Segmentation(clip_edges=True)
 
     fiber_groups = segmentation.segment(bundles,
                                         tg,

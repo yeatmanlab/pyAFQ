@@ -160,7 +160,7 @@ class Segmentation:
         self.refine = refine
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
-        self.filter_by_endpoints = (filter_by_endpoints and not clip_edges)
+        self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_aal = dist_to_aal
 
         if (save_intermediates is not None) and \
@@ -560,10 +560,6 @@ class Segmentation:
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
-                if self.clip_edges:
-                    if min0 == min1:
-                        min1 = min1 + 1
-                    select_sl[idx] = select_sl[idx][min0:min1]
 
             # Set this to StatefulTractogram object for filtering/output:
             select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
@@ -616,6 +612,21 @@ class Segmentation:
 
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
+            
+            if self.clip_edges:
+                self.logger.info("Clipping Streamlines by ROI")
+                for idx in range(len(select_sl)):
+                    min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
+                    min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+
+                    # If the point that is closest to the first ROI
+                    # is the same as the point closest to the second ROI,
+                    # include the surrounding points to make a streamline. 
+                    if min0 == min1:  
+                        min1 = min1 + 1
+                        min0 = min0 - 1
+
+                    select_sl[idx] = select_sl[idx][min0:min1]
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
