@@ -12,7 +12,7 @@ def contrast_index(x1, x2):
     x2 : ndarray of floats
         An ndarray to compare. The contrast index will have negative values
         where x2 > x1.
-    
+
     Returns
     -------
     contrast_index : ndarray of floats
