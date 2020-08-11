@@ -1,3 +1,4 @@
+
 Using pyAFQ
 ===========
 
@@ -70,68 +71,11 @@ minimum, the file should contain information about the location of the
     dmriprep_folder = '/path/to/study/derivatives/dmriprep'
 
 
-But additional configuration options can be provided for the following values::
+But additional configuration options can be provided.
+See an example configuration file below::
 
-    title = "My AFQ analysis"
-
-    [files]
-    dmriprep_path = '/path/to/dmriprep/folder'
-
-    [bundles]
-    bundles = ['ATR', 'CGC', 'CST', 'IFO', 'ILF', 'SLF', 'ARC', 'UNC', 'FA', 'FP']
-    seg_algo = 'AFQ'
-    scalars_model = 'DTI'
-    scalars = ['dti_fa', 'dti_md']
-
-    [tracking]
-    directions = 'det'
-    max_angle = 30.0
-    sphere = None
-    seed_mask = None
-    n_seeds = 1
-    random_seeds = false
-    stop_mask = None
-    stop_threshold = 0
-    step_size = 0.5
-    min_length = 10
-    max_length = 1000
-    odf_model = 'DTI'
-    wm_criterion = 0.1
-
-    [segmentation]
-    nb_points = false
-    seg_algo = 'AFQ'
-    progressive = true
-    greater_than = 50
-    rm_small_clusters = 50
-    model_clust_thr = 40
-    reduction_thr = 40
-    refine = false
-    pruning_thr = 6
-    b0_threshold = 0
-    prob_threshold = 0
-    rng = None
-    return_idx = false
-    filter_by_endpoints = true
-    dist_to_aal = 4
-
-    [cleaning]
-    n_points = 100
-    clean_rounds = 5
-    distance_threshold = 5
-    length_threshold = 4
-    min_sl = 20
-    stat = 'mean'
-    return_idx = false
-
-    [compute]
-    dask_it = false
-
-    [metadata]
-    a_string = "A string with some description"
-    list_of_values = ["val1", 1, 2, 3]
-    some_boolean = true
-
+    [EXAMPLE FILE HERE]
+    
 pyAFQ will store a copy of the configuration file alongside the computed
 results. Note that the `title` variable and `[metadata]` section are both for
 users to enter any title/metadata they would like and pyAFQ will generally

@@ -8,219 +8,179 @@ import toml
 import datetime
 import platform
 
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
+    print("Loading AFQ libraries...")
+
     import AFQ
-    from AFQ import api
-    from AFQ.utils.bin import get_default_args
-    import AFQ.segmentation as seg
-    import AFQ.tractography as aft
+    import AFQ.api as api
+    from AFQ.utils.bin import func_dict_to_arg_dict, dict_to_toml
 
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
 
-def process_defaults(defaults_dict):
-    defaults_list = []
-    for k, v in defaults_dict.items():
-        if isinstance(v, str):
-            defaults_list.append(f"{k} = '{v}'")
-        elif isinstance(v, bool):
-            if v:
-                defaults_list.append(f"{k} = true")
-            else:
-                defaults_list.append(f"{k} = false")
-        elif callable(v):
-            defaults_list.append(f"{k} = '{v.__name__}'")
-        else:
-            defaults_list.append(f"{k} = {v}")
-    return defaults_list
-
-
-track_defaults = get_default_args(aft.track)
-track_defaults_list = process_defaults(track_defaults)
-seg_defaults = get_default_args(seg.Segmentation.__init__)
-seg_defaults_list = process_defaults(seg_defaults)
-clean_defaults = get_default_args(seg.clean_bundle)
-clean_defaults_list = process_defaults(clean_defaults)
-
-# For all lists that contain a "None" default value, replace it with an
-# empty string to not break toml syntax. As of Feb-7-2020, that is only
-# track_defaults_list and seg_defaults_list
-none_val = "''"
-replace_none = lambda myl, rep=none_val: [v.replace('None', rep) for v in myl]
-track_defaults_list = replace_none(track_defaults_list)
-seg_defaults_list = replace_none(seg_defaults_list)
-
-usage = f"""pyAFQ /path/to/afq_config.toml
+usage = \
+    f"""pyAFQ /path/to/afq_config.toml
 
 Runs full AFQ processing as specified in the configuration file.
 
 For details about configuration, see instructions in:
 https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
 
-The default values of the configuration are:
+The default configuration file looks like:
 
-```
-[files]
-bids_path = '/path/to/bids/dataset/'
-dmriprep = 'dmriprep'
-segmentation = 'freesurfer'
-
-[bundles]
-bundles = {api.BUNDLES}
-seg_algo = 'AFQ'
-scalars_model = 'DTI'
-scalars = ['dti_fa', 'dti_md']
-target_b_val=None
-target_b_sensitivity=50.0
-
-[template]
-reg_subject="b0"
-reg_template="mni_t2"
-mask_template=True
-
-[tracking]
-{chr(10).join(track_defaults_list)}
-wm_criterion = 0.1
-
-[segmentation]
-{chr(10).join(seg_defaults_list)}
-
-[cleaning]
-{chr(10).join(clean_defaults_list)}
-
-[compute]
-dask_it = false
-force_recompute = false
-virtual_frame_buffer = false
-viz_backend = 'fury'
-```
 """
 
-parser = ArgumentParser(usage)
 
-parser.add_argument(dest='config', action="store", type=str,
-                    help="Path to config file")
+def parse_cli(help_msg):
+    cli_parser = ArgumentParser(usage=usage + dict_to_toml(arg_dict))
 
-parser.add_argument('--notrack', action="store_true", default=False)
+    cli_parser.add_argument(
+        dest='config',
+        action="store",
+        help="Path to config file. For example, /path/to/afq_config.toml")
 
-opts = parser.parse_args()
+    cli_parser.add_argument(
+        '-g',
+        '--generate-config-only',
+        dest='generate_toml',
+        action="store_true",
+        default=False,
+        help="Generate a default config file at the path"
+        + " specified without running pyAFQ.")
 
-if not opts.notrack:
-    logger.info(
-        "Your use of pyAFQ is being recorded using Google Analytics. "
-        "For more information, please refer to the pyAFQ documentation: "
-        "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  #noqa
-        "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
-    import popylar
-    popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
+    cli_parser.add_argument(
+        '-o',
+        '--overwrite-config',
+        dest='overwrite',
+        action="store_true",
+        default=False,
+        help="Overwrite config file at the path"
+        + " with current arguments and comments,"
+        + " preserving previous defaults when applicable.")
 
-config = toml.load(opts.config)
-# Delete empty values that are intended to be "None" so that the parser can
-# substitute default values in appropriately
-for component in config.keys():
-    config[component] = {k: v
-                         for k, v in config[component].items()
-                         if v != eval(none_val)}
+    cli_parser.add_argument(
+        '-t', '--notrack', action="store_true", default=False,
+        help="Disable the use of pyAFQ being recorded by Google Analytics. ")
 
-files = config.get("files", {})
+    opts = cli_parser.parse_args()
 
-bids_path = files.get("bids_path")
+    if not opts.notrack:
+        logger.info(
+            "Your use of pyAFQ is being recorded using Google Analytics. "
+            "For more information, please refer to the pyAFQ documentation: "
+            "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  # noqa
+            "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
+        import popylar
+        popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
-if bids_path is None:
-    raise RuntimeError("Config file must provide bids_path")
-
-dmriprep = files.get("dmriprep", "dmriprep")
-segmentation_path = files.get("segmentation", "freesurfer")
-
-config['pyAFQ'] = {}
-config['pyAFQ']['utc_time_started'] = datetime.datetime.now().isoformat('T')
-config['pyAFQ']['version'] = AFQ.__version__
-config['pyAFQ']['platform'] = platform.system()
-
-afq_path = op.join(bids_path, 'derivatives', 'afq')
-os.makedirs(afq_path, exist_ok=True)
-
-afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
-
-with open(afq_metadata_file, 'w') as ff:
-    toml.dump(config, ff)
-
-seg_suffix = files.get("seg_suffix", "seg")
-
-tracking = config.get("tracking", {})
-tracking_params = {}
-for k, v in track_defaults.items():
-    tracking_params[k] = tracking.get(k, v)
-
-wm_criterion = tracking.get(
-    "wm_criterion",
-    0.1)
-
-segmentation = config.get("segmentation", {})
-segmentation_params = {}
-for k, v in seg_defaults.items():
-    segmentation_params[k] = segmentation.get(k, v)
-b0_threshold = segmentation_params.get("b0_threshold", 0)
-
-bundles = config.get("bundles", {})
-bundle_names = bundles.get("bundles", api.BUNDLES)
-scalars_model = bundles.get("scalars_model", "DTI")
-scalars = bundles.get("scalars", ["fa", "md"])
-target_b_val = bundles.get("target_b_val", None)
-target_b_sensitivity = bundles.get("target_b_sensitivity", 50.0)
-
-cleaning = config.get("cleaning", {})
-clean_params = {}
-for k, v in clean_defaults.items():
-    clean_params[k] = cleaning.get(k, v)
-
-compute = config.get("compute", {})
-dask_it = compute.get("dask_it", False)
-force_recompute = compute.get("force_recompute", False)
-virtual_frame_buffer = compute.get("virtual_frame_buffer", False)
-viz_backend = compute.get("viz_backend", 'fury')
-
-template = config.get("template", {})
-reg_subject = template.get("reg_subject", "b0")
-reg_template = template.get("reg_template", "mni_t2")
-mask_template = template.get("mask_template", True)
-
-myafq = api.AFQ(bids_path,
-                dmriprep=dmriprep,
-                segmentation=segmentation_path,
-                seg_suffix=seg_suffix,
-                b0_threshold=float(b0_threshold),
-                bundle_names=bundle_names,
-                dask_it=dask_it,
-                force_recompute=force_recompute,
-                wm_criterion=wm_criterion,
-                reg_subject=reg_subject,
-                reg_template=reg_template,
-                mask_template=mask_template,
-                virtual_frame_buffer=virtual_frame_buffer,
-                viz_backend=viz_backend,
-                segmentation_params=segmentation_params,
-                tracking_params=tracking_params,
-                clean_params=clean_params)
+    return opts.config, opts.generate_toml, opts.overwrite
 
 
-# Do all the things:
-myafq.set_dti_cfa()
-myafq.set_dti_pdd()
-myafq.set_template_xform()
-if segmentation_params["seg_algo"].lower() == "afq":
-    myafq.export_rois()
-    myafq.viz_ROIs(export_as_gif=True)
-    myafq.viz_bundles(export_as_gif=True)
-    myafq.plot_tract_profiles()
-myafq.export_bundles()
-myafq.combine_profiles()
+def generate_config(toml_file, default_arg_dict, overwrite=False):
+    if not overwrite and op.exists(toml_file):
+        raise FileExistsError(
+            "Config file already exists. "
+            + "If you want to overwrite this file,"
+            + " add the argument --overwrite-config")
+    logger.info("Generating default configuration file.")
+    toml_file = open(toml_file, 'w')
+    toml_file.write(dict_to_toml(default_arg_dict))
 
-# If you got this far, you can report on time ended and record that:
-config['pyAFQ']['utc_time_ended'] = datetime.datetime.now().isoformat('T')
 
-with open(afq_metadata_file, 'w') as ff:
-    toml.dump(config, ff)
+def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
+                         special_args={"CLEANING": "clean_params",
+                                       "SEGMENTATION": "segmentation_params",
+                                       "TRACTOGRAPHY": "tracking_params"}):
+    # load configuration file
+    if not op.exists(toml_file):
+        raise FileExistsError(
+            "Config file does not exist. "
+            + "If you want to generate this file,"
+            + " add the argument --generate-config-only")
+    f_arg_dict = toml.load(toml_file)
+
+    # extract arguments from file
+    kwargs = {}
+    bids_path = ''
+    for section, args in f_arg_dict.items():
+        for arg, default in args.items():
+            if section not in default_arg_dict:
+                default_arg_dict[section] = {}
+            if arg == 'bids_path':
+                bids_path = default
+            elif arg in default_arg_dict[section]:
+                if default == "''":
+                    val = None
+                else:
+                    val = default
+                is_special = False
+                for toml_key, doc_arg in special_args.items():
+                    if section is toml_key:
+                        if doc_arg not in kwargs:
+                            kwargs[doc_arg] = {}
+                        kwargs[doc_arg][arg] = val
+                        is_special = True
+                if not is_special:
+                    kwargs[arg] = val
+            if arg not in default_arg_dict[section]:
+                default_arg_dict[section][arg] = {}
+            default_arg_dict[section][arg]['default'] = default
+
+    # if overwrite, write new file with updated docs / args
+    if overwrite:
+        logger.info(f"Updating configuration file.")
+        with open(toml_file, 'w') as ff:
+            ff.write(dict_to_toml(default_arg_dict))
+
+    if bids_path == '':
+        raise RuntimeError("Config file must provide bids_path")
+
+    # generate metadata file for this run
+    default_arg_dict['pyAFQ'] = {}
+    default_arg_dict['pyAFQ']['utc_time_started'] = \
+        datetime.datetime.now().isoformat('T')
+    default_arg_dict['pyAFQ']['version'] = AFQ.__version__
+    default_arg_dict['pyAFQ']['platform'] = platform.system()
+
+    afq_path = op.join(bids_path, 'derivatives', 'afq')
+    os.makedirs(afq_path, exist_ok=True)
+
+    afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(dict_to_toml(default_arg_dict))
+
+    myafq = api.AFQ(bids_path, **kwargs)
+
+    # Do all the things:
+    myafq.set_dti_cfa()
+    myafq.set_dti_pdd()
+    myafq.set_template_xform()
+    if "segmentation_params" not in kwargs\
+        or kwargs["segmentation_params"] is None\
+            or "seg_algo" not in kwargs["segmentation_params"]\
+            or kwargs["segmentation_params"]["seg_algo"].lower() == "afq":
+        myafq.export_rois()
+        myafq.viz_ROIs(export_as_gif=True)
+        myafq.viz_bundles(export_as_gif=True)
+        myafq.plot_tract_profiles()
+    myafq.export_bundles()
+    myafq.combine_profiles()
+
+    # If you got this far, you can report on time ended and record that:
+    default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(
+    ).isoformat('T')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(dict_to_toml(default_arg_dict))
+
+
+if __name__ == '__main__':
+    arg_dict = func_dict_to_arg_dict(logger=logger)
+    config_file, generate_only, overwrite = parse_cli(arg_dict)
+    if generate_only:
+        generate_config(config_file, arg_dict, overwrite)
+    else:
+        parse_config_run_afq(config_file, arg_dict, overwrite)

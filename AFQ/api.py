@@ -165,82 +165,74 @@ class AFQ(object):
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
-        """
+        '''
+        Initialize an AFQ object.
 
+        Parameters
+        ----------
         bids_path : str
-            The path to preprocessed diffusion data organized in a BIDS
+            [BIDS] The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
-
         dmriprep : str, optional.
-            The name of the pipeline used to preprocess the DWI data.
+            [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "dmriprep".
-
-        freesurfer : str
-            The name of the pipeline used to generate a segmentation image.
+        segmentation : str
+            [BIDS] The name of the pipeline used to generate
+            a segmentation image.
             Default: "dmriprep"
-
         seg_suffix : str, optional.
-            The suffix that identifies the segmentation image. Default: "seg".
-
-        seg_algo : str
-            Which algorithm to use for segmentation.
-            Can be one of: {"afq", "reco"}
-
+            [BIDS] The suffix that identifies the segmentation image.
+            Default: "seg".
         b0_threshold : int, optional
-            The value of b under which it is considered to be b0. Default: 50.
-
+            [REGISTRATION] The value of b under which
+            it is considered to be b0. Default: 50.
         min_bval : float, optional
-            Minimum b value you want to use from the dataset (other than b0).
+            [REGISTRATION] Minimum b value you want to use
+            from the dataset (other than b0).
             If None, there is no minimum limit. Default: None
-
         max_bval : float, optional
-            Maximum b value you want to use from the dataset (other than b0).
+            [REGISTRATION] Maximum b value you want to use
+            from the dataset (other than b0).
             If None, there is no maximum limit. Default: None
-
-        odf_model : string, optional
-            Which model to use for determining directions in tractography.
-            Can be one of: {"DTI", "DKI", "CSD"}. Default: "DTI"
-
-        directions : string, optional
-            How to select directions for tracking (deterministic or
-            probablistic) {"det", "prob"}. Default: "det".
-
         reg_subject : str or Nifti1Image, optional
-            The source image data to be registered.
+            [REGISTRATION] The source image data to be registered.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "b0", "dti_fa_subject", "subject_sls", or "power_map,"
             image data will be loaded automatically.
             If "subject_sls" is used, slr registration will be used
             and reg_template should be "hcp_atlas".
             Default: "power_map"
-
         reg_template : str or Nifti1Image, optional
-            The target image data for registration.
+            [REGISTRATION] The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
             If "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
             image data will be loaded automatically.
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".
             Default: "mni_T1"
-
         mask_template : bool, optional
-            Whether to mask the chosen template(s) with a brain-mask
+            [REGISTRATION] Whether to mask the chosen template(s)
+            with a brain-mask.
             Default: True
-
+        bundle_names : list of strings, optional
+            [BUNDLES] List of bundle names to include in segmentation.
+            Default: BUNDLES
         dask_it : bool, optional
-            Whether to use a dask DataFrame object
-
+            [COMPUTE] Whether to use a dask DataFrame object
         force_recompute : bool, optional
-            Whether to recompute or ignore existing derivatives.
+            [COMPUTE] Whether to recompute or ignore existing derivatives.
             This parameter can be turned on/off dynamically.
             Default: False
-
+        scalars : list of strings, optional
+            [BUNDLES] List of scalars to use.
+            Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
+            Default: ["dti_fa", "dti_md"]
         wm_criterion : list or float, optional
-            This is either a list of the labels of the white matter in the
-            segmentation file or (if a dictionary is provided) a lower bound
-            and upper bound containting a series of scalar / threshold pairs
-            used for creating the white-matter mask.
+            [REGISTRATION] This is either a list of the labels of the white
+            matter in the segmentation file or (if a dictionary is provided)
+            a lower bound and upper bound containting a series of
+            scalar / threshold pairs used for creating the white-matter mask.
             In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
             "dki_md", thresholds are floats, and 'lb' / 'ub' mean lower and
             upper bounds respectively (see the format in the default). Each
@@ -250,38 +242,32 @@ class AFQ(object):
             with the HCP data including labels for midbrain are:
             [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
             Default: {'lb': {'dti_fa': 0.1}, 'ub': {'dti_md': 0.003}}
-
         use_prealign : bool, optional
-            Whether to perform pre-alignment before perforiming the
-            diffeomorphic mapping in registration. Default: True
-
+            [REGISTRATION] Whether to perform pre-alignment before perforiming
+            the diffeomorphic mapping in registration. Default: True
         virtual_frame_buffer : bool, optional
-            Whether to use a virtual fram buffer. This is neccessary if
+            [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
-
         viz_backend : str, optional
-            Which visualization backend to us. One of {"fury", "plotly"}.
+            [VIZ] Which visualization backend to us.
+            One of {"fury", "plotly"}.
             Default: "fury"
-
         segmentation_params : dict, optional
-            The parameters for segmentation. Default: use the default behavior
-            of the seg.Segmentation object
-
+            The parameters for segmentation.
+            Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
             The parameters for tracking.
-
             Parameters with suffix_mask are handled differently by this api.
             Masks which are strings that are in scalars or are "wm_mask"
             will be replaced by the corresponding mask. Masks which are paths
             will be loaded. All masks set to None will default to "dti_fa".
             To track the entire volume, set mask to "full".
-
             Default: use the default behavior of the aft.track function.
-
         clean_params: dict, optional
-            The parameters for cleaning. Default: use the default behavior of
-            the seg.clean_bundle function.
-        """
+            The parameters for cleaning.
+            Default: use the default behavior of the seg.clean_bundle
+            function.
+        '''
         self.logger = logging.getLogger('AFQ.api')
 
         self.force_recompute = force_recompute

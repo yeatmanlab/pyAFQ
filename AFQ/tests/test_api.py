@@ -355,9 +355,9 @@ def test_AFQ_data_waypoint():
     print("Running the CLI:")
 
     # Bare bones config only points to the files:
-    config = dict(files=dict(bids_path=bids_path,
-                             dmriprep='vistasoft',
-                             segmentation='freesurfer'))
+    config = dict(BIDS=dict(bids_path=bids_path,
+                            dmriprep='vistasoft',
+                            segmentation='freesurfer'))
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:
