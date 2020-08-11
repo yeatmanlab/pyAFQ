@@ -459,7 +459,7 @@ class LongitudinalCSVComparison():
             Folder where outputs of this class's methods will be saved.
 
         csv_fnames : list of filenames
-            Filenames for the two CSVs containing tract porfiles to compare.
+            Filenames for the two CSVs containing tract profiles to compare.
             Will obtain subject list from the first file.
 
         names : list of strings
