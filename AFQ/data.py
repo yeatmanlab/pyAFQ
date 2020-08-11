@@ -1056,7 +1056,6 @@ class S3BIDSStudy:
 
     def download(self, directory,
                  include_modality_agnostic=("dataset_description.json",),
-                 include_dataset_description=True,
                  include_derivs=False, overwrite=False, pbar=True):
         """Download files for each subject in the study
 
