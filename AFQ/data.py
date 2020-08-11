@@ -533,9 +533,7 @@ class S3BIDSSubject:
                              self.subject_id]).lstrip('/'),
             'derivatives': {
                 dt: '/'.join([
-                    self.study.s3_prefix,
-                    'derivatives',
-                    dt,
+                    *dt.split('/')[1:],  # removes bucket name
                     self.subject_id
                 ]).lstrip('/') for dt in self.study.derivative_types
             },
@@ -998,15 +996,8 @@ class S3BIDSStudy:
 
         nonsub_deriv_keys = []
         for dt in self.derivative_types:
-            s3_prefix = '/'.join([
-                self.bucket,
-                self.s3_prefix,
-                'derivatives',
-                dt
-            ])
-
             nonsub_deriv_keys.append(_ls_s3fs(
-                s3_prefix=s3_prefix,
+                s3_prefix=dt,
                 anon=self.anon
             )['other'])
 
