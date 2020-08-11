@@ -561,9 +561,6 @@ class Segmentation:
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
 
-            # Set this to StatefulTractogram object for filtering/output:
-            select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
-
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
                 # Create binary masks and warp these into subject's DWI space:
@@ -583,7 +580,7 @@ class Segmentation:
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
 
-                new_select_sl = clean_by_endpoints(select_sl.streamlines,
+                new_select_sl = clean_by_endpoints(select_sl,
                                                    aal_idx[0],
                                                    aal_idx[1],
                                                    tol=dist_to_aal,
@@ -606,10 +603,7 @@ class Segmentation:
                     select_idx = select_idx[0][temp_select_idx]
                     new_select_sl = temp_select_sl
 
-                select_sl = StatefulTractogram(new_select_sl,
-                                               self.img,
-                                               Space.RASMM)
-
+                select_sl = new_select_sl
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
@@ -627,6 +621,10 @@ class Segmentation:
                         min0 = min0 - 1
 
                     select_sl[idx] = select_sl[idx][min0:min1]
+
+            select_sl = StatefulTractogram(select_sl,
+                                           self.img,
+                                           Space.RASMM)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
