@@ -19,7 +19,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
-from AFQ.utils.stats import contrast_index
+from AFQ.utils.stats import contrast_index as calc_contrast_index
 
 __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
@@ -738,7 +738,7 @@ class LongitudinalCSVComparison():
                         both_found = False
                 if both_found:
                     this_contrast_index = \
-                        contrast_index(profiles[0], profiles[1])
+                        calc_contrast_index(profiles[0], profiles[1])
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                     ax.plot(this_contrast_index, label=scalar)
                     ax.set_title(bundle)
@@ -806,7 +806,7 @@ class LongitudinalCSVComparison():
 
                     if (profile is not None) and (other_profile is not None):
                         lateral_contrast_index = \
-                            contrast_index(profile, other_profile)
+                            calc_contrast_index(profile, other_profile)
                         ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                         ax.plot(lateral_contrast_index, label=name)
                         ax.set_title(f"{bundle} vs {other_bundle}")
