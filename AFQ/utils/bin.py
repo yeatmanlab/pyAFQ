@@ -124,7 +124,7 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
                 else:
                     section = name.upper()
                     desc = info['help']
-            except KeyError:
+            except (KeyError, IndexError):
                 if logger is not None:
                     logger.warning(
                         "We are missing a valid description for the "
