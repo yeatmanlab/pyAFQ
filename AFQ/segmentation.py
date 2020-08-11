@@ -561,6 +561,8 @@ class Segmentation:
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
                 if self.clip_edges:
+                    if min0 == min1:
+                        min1 = min1 + 1
                     select_sl[idx] = select_sl[idx][min0:min1]
 
             # Set this to StatefulTractogram object for filtering/output:
