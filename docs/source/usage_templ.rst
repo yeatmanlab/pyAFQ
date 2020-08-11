@@ -1,13 +1,4 @@
-# This updates usage.rst to the latest cli
-# Developers can run this after modifying any arguments the user can see
 
-from AFQ.utils.bin import func_dict_to_arg_dict, dict_to_toml
-
-arg_dict = func_dict_to_arg_dict()
-example_config = dict_to_toml(arg_dict)
-example_config = '    ' + example_config.replace('\n', '\n    ')
-
-prologue = """
 Using pyAFQ
 ===========
 
@@ -15,8 +6,8 @@ Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
 The pyAFQ software assumes that your data is organized according to a format
-that emulates the `BIDS <http://bids.neuroimaging.io/>`_ format. Anatomical
-data and segmentation are optional. If a T1-weighted anatomical image and its
+that emulates the `BIDS <http://bids.neuroimaging.io/>`_ format. Anatomical data
+and segmentation are optional. If a T1-weighted anatomical image and its
 segmentation are not provided, the software will use the diffusion data to
 estimate the parts of the image that comprise the white matter.
 
@@ -83,12 +74,8 @@ minimum, the file should contain information about the location of the
 But additional configuration options can be provided.
 See an example configuration file below::
 
-    title = "My AFQ analysis"
-
-"""
-
-epilogue = \
-    """
+    [EXAMPLE FILE HERE]
+    
 pyAFQ will store a copy of the configuration file alongside the computed
 results. Note that the `title` variable and `[metadata]` section are both for
 users to enter any title/metadata they would like and pyAFQ will generally
@@ -98,8 +85,7 @@ Usage tracking with Google Analytics
 ------------------------------------
 
 To be able to assess usage of the software, we are recording each use of the
-CLI as an event in Google Analytics, using::
-    `popylar <https://popylar.github.io>`_
+CLI as an event in Google Analytics, using `popylar <https://popylar.github.io>`_
 
 The only information that we are recording is the fact that the CLI was called.
 In addition, through Google Analytics, we will have access to very general
@@ -113,7 +99,3 @@ Opting out of this usage tracking can be done by calling the CLI with the
 `--notrack` flag::
 
     pyAFQ /path/to/config.toml --notrack
-"""
-
-with open('./docs/source/usage.rst', 'w') as ff:
-    ff.write(prologue + example_config + epilogue)

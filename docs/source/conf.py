@@ -11,9 +11,9 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
+
+import sys, os
+sys.path.append(os.path.abspath('sphinxext'))
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -50,6 +50,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'autoapi.extension',
     'numpydoc',
+    'updatedocs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
