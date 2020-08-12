@@ -102,7 +102,7 @@ def val_to_toml(v):
 
 
 def dict_to_toml(dictionary):
-    toml = ''
+    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n\n'
     for section, args in dictionary.items():
         toml = toml + f'[{section}]\n'
         for arg, arg_info in args.items():
