@@ -792,8 +792,9 @@ class S3BIDSStudy:
         subjects : str, sequence(str), int, or None
             If int, retrieve S3 keys for the first `subjects` subjects.
             If "all", retrieve all subjects. If str or sequence of
-            strings, retrieve S3 keys for the specified subjects. If
-            None, retrieve S3 keys for the first subject. Default: None
+            strings, retrieve S3 keys for the specified subjects. If sequence
+            of ints, then for each int n retrieve S3 keys for the nth subject.
+            If None, retrieve S3 keys for the first subject. Default: None
 
         anon : bool
             Whether to use anonymous connection (public buckets only).
@@ -862,13 +863,21 @@ class S3BIDSStudy:
         self._non_subject_s3_keys = self._get_non_subject_s3_keys()
 
         # Convert `subjects` into a sequence of subjectID strings
-        if subjects is None or isinstance(subjects, int):
+        if subjects is None or isinstance(subjects, int) \
+                or (isinstance(subjects, list)
+                    and isinstance(subjects[0], int)):
             # if subjects is an int, get that many random subjects
-            n_subs = subjects if subjects is not None else 1
             prng = np.random.RandomState(random_seed)
-            subjects = prng.choice(sorted(self._all_subjects),
-                                   size=subjects,
-                                   replace=False)
+            randomized_subjects = self._all_subjects.copy()
+            prng.shuffle(randomized_subjects)
+
+            if subjects is None:
+                subjects = randomized_subjects[0]
+            elif isinstance(subjects, int):
+                subjects = randomized_subjects[:subjects]
+            else:
+                subjects = randomized_subjects[subjects]
+
             if isinstance(subjects, str):
                 subjects = [subjects]
         elif subjects == 'all':
