@@ -717,8 +717,7 @@ class HBNSubject(S3BIDSSubject):
 
         super().__init__(
             subject_id=subject_id,
-            study=study,
-            site=site
+            study=study
         )
 
     @property
