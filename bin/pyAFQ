@@ -158,17 +158,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
     # Do all the things:
     myafq.set_dti_cfa()
     myafq.set_dti_pdd()
-    myafq.set_template_xform()
-    if "segmentation_params" not in kwargs\
-        or kwargs["segmentation_params"] is None\
-            or "seg_algo" not in kwargs["segmentation_params"]\
-            or kwargs["segmentation_params"]["seg_algo"].lower() == "afq":
-        myafq.export_rois()
-        myafq.viz_ROIs(export_as_gif=True)
-        myafq.viz_bundles(export_as_gif=True)
-        myafq.plot_tract_profiles()
-    myafq.export_bundles()
-    myafq.combine_profiles()
+    myafq.export_all()
 
     # If you got this far, you can report on time ended and record that:
     default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(
