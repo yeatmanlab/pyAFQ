@@ -336,7 +336,7 @@ class AFQ(object):
                                             resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
-        self.afq_path = op.join(bids_path, 'afq')
+        self.afq_path = op.join(bids_path, 'derivatives', 'afq')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
