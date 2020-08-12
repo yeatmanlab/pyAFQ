@@ -877,7 +877,7 @@ class S3BIDSStudy:
             elif isinstance(subjects, int):
                 subjects = randomized_subjects[:subjects]
             else:
-                subjects = randomized_subjects[subjects]
+                subjects = [randomized_subjects[i] for i in subjects]
 
             if isinstance(subjects, str):
                 subjects = [subjects]
