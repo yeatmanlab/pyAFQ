@@ -16,7 +16,7 @@ with warnings.catch_warnings():
 
     import AFQ
     import AFQ.api as api
-    from AFQ.utils.bin import func_dict_to_arg_dict, dict_to_toml
+    from AFQ.utils.bin import func_dict_to_arg_dict, dict_to_toml, toml_to_val
 
     import logging
     logging.basicConfig(level=logging.INFO)
@@ -113,10 +113,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
             if arg == 'bids_path':
                 bids_path = default
             elif arg in default_arg_dict[section]:
-                if default == "''":
-                    val = None
-                else:
-                    val = default
+                val = toml_to_val(default)
                 is_special = False
                 for toml_key, doc_arg in special_args.items():
                     if section == toml_key:

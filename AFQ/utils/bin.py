@@ -2,6 +2,7 @@ import inspect
 import toml
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
+from ast import literal_eval
 
 
 def parse_string(option, opt, value, parser):
@@ -66,6 +67,15 @@ def get_default_args(func):
         for k, v in signature.parameters.items()
         if v.default is not inspect.Parameter.empty
     }
+
+
+def toml_to_val(t):
+    if isinstance(t, str) and len(t) < 1:
+        return None
+    elif isinstance(t, str) and t[0] == '{':
+        return literal_eval(t)  # interpret as dictionary
+    else:
+        return t
 
 
 def val_to_toml(v):
