@@ -75,6 +75,9 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
+        clip_edges : bool
+            Whether to clip the streamlines to be only in between the ROIs.
+            Default: False
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
