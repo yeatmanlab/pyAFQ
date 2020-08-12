@@ -831,9 +831,10 @@ class S3BIDSStudy:
         if not (subjects is None
                 or isinstance(subjects, int)
                 or isinstance(subjects, str)
-                or all(isinstance(s, str) for s in subjects)):
-            raise TypeError('`subjects` must be an int, string or a '
-                            'sequence of strings.')
+                or all(isinstance(s, str) for s in subjects)
+                or all(isinstance(s, int) for s in subjects)):
+            raise TypeError('`subjects` must be an int, string, '
+                            'sequence of strings, or a sequence of ints.')
 
         if not isinstance(anon, bool):
             raise TypeError('`anon` must be of type bool.')
