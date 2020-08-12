@@ -12,6 +12,8 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_series_equal
 
+from bids.exceptions import BIDSValidationError
+
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
@@ -28,6 +30,7 @@ import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
+import AFQ.utils.bin as afb
 
 
 def touch(fname, times=None):
@@ -254,6 +257,19 @@ def test_DKI_profile():
                     dmriprep='dipy')
     myafq.get_dki_fa()
     myafq.get_dki_md()
+
+
+def test_auto_cli():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    config_file = op.join(tmpdir.name, 'test.toml')
+
+    arg_dict = afb.func_dict_to_arg_dict()
+    arg_dict['BIDS']['bids_path']['default'] = tmpdir.name
+    afb.generate_config(config_file, arg_dict, False)
+    try:
+        afb.parse_config_run_afq(config_file, arg_dict, False)
+    except BIDSValidationError:
+        pass  # made it into the api
 
 
 @xvfb_it

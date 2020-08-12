@@ -1,5 +1,11 @@
 import inspect
 import toml
+import datetime
+import platform
+import os.path as op
+import os
+from ast import literal_eval
+
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
@@ -68,6 +74,15 @@ def get_default_args(func):
     }
 
 
+def toml_to_val(t):
+    if isinstance(t, str) and len(t) < 1:
+        return None
+    elif isinstance(t, str) and t[0] == '{':
+        return literal_eval(t)  # interpret as dictionary
+    else:
+        return t
+
+
 def val_to_toml(v):
     if v is None:
         return "''"
@@ -80,12 +95,14 @@ def val_to_toml(v):
             return "false"
     elif callable(v):
         return f"'{v.__name__}'"
+    elif isinstance(v, dict):
+        return f"\"{v}\""
     else:
         return f"{v}"
 
 
 def dict_to_toml(dictionary):
-    toml = ''
+    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n\n'
     for section, args in dictionary.items():
         toml = toml + f'[{section}]\n'
         for arg, arg_info in args.items():
@@ -145,3 +162,93 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
                     arg_dict[section][arg]['desc'] + f_desc_line
 
     return arg_dict
+
+
+def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
+                         logger=None,
+                         special_args={"CLEANING": "clean_params",
+                                       "SEGMENTATION": "segmentation_params",
+                                       "TRACTOGRAPHY": "tracking_params"}):
+    import AFQ.api as api
+    from AFQ import __version__
+    # load configuration file
+    if not op.exists(toml_file):
+        raise FileExistsError(
+            "Config file does not exist. "
+            + "If you want to generate this file,"
+            + " add the argument --generate-config-only")
+    f_arg_dict = toml.load(toml_file)
+
+    # extract arguments from file
+    kwargs = {}
+    bids_path = ''
+    for section, args in f_arg_dict.items():
+        for arg, default in args.items():
+            if section not in default_arg_dict:
+                default_arg_dict[section] = {}
+            if arg == 'bids_path':
+                bids_path = default
+            elif arg in default_arg_dict[section]:
+                val = toml_to_val(default)
+                is_special = False
+                for toml_key, doc_arg in special_args.items():
+                    if section == toml_key:
+                        if doc_arg not in kwargs:
+                            kwargs[doc_arg] = {}
+                        kwargs[doc_arg][arg] = val
+                        is_special = True
+                if not is_special:
+                    kwargs[arg] = val
+            if arg not in default_arg_dict[section]:
+                default_arg_dict[section][arg] = {}
+            default_arg_dict[section][arg]['default'] = default
+
+    # if overwrite, write new file with updated docs / args
+    if overwrite:
+        if logger is not None:
+            logger.info(f"Updating configuration file.")
+        with open(toml_file, 'w') as ff:
+            ff.write(dict_to_toml(default_arg_dict))
+
+    if bids_path == '':
+        raise RuntimeError("Config file must provide bids_path")
+
+    # generate metadata file for this run
+    default_arg_dict['pyAFQ'] = {}
+    default_arg_dict['pyAFQ']['utc_time_started'] = \
+        datetime.datetime.now().isoformat('T')
+    default_arg_dict['pyAFQ']['version'] = __version__
+    default_arg_dict['pyAFQ']['platform'] = platform.system()
+
+    afq_path = op.join(bids_path, 'derivatives', 'afq')
+    os.makedirs(afq_path, exist_ok=True)
+
+    afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(dict_to_toml(default_arg_dict))
+
+    myafq = api.AFQ(bids_path, **kwargs)
+
+    # Do all the things:
+    myafq.set_dti_cfa()
+    myafq.set_dti_pdd()
+    myafq.export_all()
+
+    # If you got this far, you can report on time ended and record that:
+    default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(
+    ).isoformat('T')
+    with open(afq_metadata_file, 'w') as ff:
+        ff.write(dict_to_toml(default_arg_dict))
+
+
+def generate_config(toml_file, default_arg_dict, overwrite=False,
+                    logger=None):
+    if not overwrite and op.exists(toml_file):
+        raise FileExistsError(
+            "Config file already exists. "
+            + "If you want to overwrite this file,"
+            + " add the argument --overwrite-config")
+    if logger is not None:
+        logger.info("Generating default configuration file.")
+    toml_file = open(toml_file, 'w')
+    toml_file.write(dict_to_toml(default_arg_dict))
