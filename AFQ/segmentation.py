@@ -45,6 +45,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
+                 clip_edges=False,
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -74,6 +75,9 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
+        clip_edges : bool
+            Whether to clip the streamlines to be only in between the ROIs.
+            Default: False
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
@@ -166,6 +170,7 @@ class Segmentation:
                 (not op.exists(save_intermediates)):
             os.makedirs(save_intermediates, exist_ok=True)
         self.save_intermediates = save_intermediates
+        self.clip_edges = clip_edges
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
@@ -559,9 +564,6 @@ class Segmentation:
                 if min0 > min1:
                     select_sl[idx] = select_sl[idx][::-1]
 
-            # Set this to StatefulTractogram object for filtering/output:
-            select_sl = StatefulTractogram(select_sl, self.img, Space.VOX)
-
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
                 # Create binary masks and warp these into subject's DWI space:
@@ -581,7 +583,7 @@ class Segmentation:
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
 
-                new_select_sl = clean_by_endpoints(select_sl.streamlines,
+                new_select_sl = clean_by_endpoints(select_sl,
                                                    aal_idx[0],
                                                    aal_idx[1],
                                                    tol=dist_to_aal,
@@ -604,12 +606,28 @@ class Segmentation:
                     select_idx = select_idx[0][temp_select_idx]
                     new_select_sl = temp_select_sl
 
-                select_sl = StatefulTractogram(new_select_sl,
-                                               self.img,
-                                               Space.RASMM)
-
+                select_sl = new_select_sl
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
+
+            if self.clip_edges:
+                self.logger.info("Clipping Streamlines by ROI")
+                for idx in range(len(select_sl)):
+                    min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
+                    min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+
+                    # If the point that is closest to the first ROI
+                    # is the same as the point closest to the second ROI,
+                    # include the surrounding points to make a streamline.
+                    if min0 == min1:
+                        min1 = min1 + 1
+                        min0 = min0 - 1
+
+                    select_sl[idx] = select_sl[idx][min0:min1]
+
+            select_sl = StatefulTractogram(select_sl,
+                                           self.img,
+                                           Space.RASMM)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
