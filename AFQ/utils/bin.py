@@ -141,6 +141,8 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
                 else:
                     section = name.upper()
                     desc = info['help']
+                    if 'positional' in info and info['positional']:
+                        continue
             except (KeyError, IndexError) as error:
                 if logger is not None:
                     logger.error(
