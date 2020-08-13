@@ -869,7 +869,7 @@ class S3BIDSStudy:
                     and isinstance(subjects[0], int)):
             # if subjects is an int, get that many random subjects
             prng = np.random.RandomState(random_seed)
-            randomized_subjects = self._all_subjects.copy()
+            randomized_subjects = sorted(self._all_subjects.copy())
             prng.shuffle(randomized_subjects)
 
             if subjects is None:
