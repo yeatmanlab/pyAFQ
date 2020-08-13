@@ -278,21 +278,6 @@ def test_run_using_auto_cli():
     afd.organize_stanford_data(path=tmpdir.name)
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     config_file = op.join(tmpdir.name, 'test.toml')
-    seed_mask_fname = op.join(tmpdir.name, 'seed_mask.nii.gz')
-
-    # set up tractography seed mask
-    templates = afd.read_templates()
-    seed_mask = np.logical_or(
-        np.logical_or(
-            templates['CST_roi1_L'].get_fdata(),
-            templates['CST_roi1_R'].get_fdata()),
-        np.logical_or(
-            templates['CST_roi2_L'].get_fdata(),
-            templates['CST_roi2_R'].get_fdata()))
-    nib.save(
-        nib.Nifti1Image(
-            seed_mask.astype(float), templates['CST_roi1_L'].affine),
-        seed_mask_fname)
 
     arg_dict = afb.func_dict_to_arg_dict()
 
@@ -303,10 +288,8 @@ def test_run_using_auto_cli():
     arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
     arg_dict['BIDS']['segmentation']['default'] = 'freesurfer'
     arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
-    arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 10
+    arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY']['random_seeds']['default'] = True
-    arg_dict['TRACTOGRAPHY']['seed_mask']['default'] = seed_mask_fname
-    arg_dict['TRACTOGRAPHY']['seed_threshold']['default'] = 0.5
 
     afb.generate_config(config_file, arg_dict, False)
     afb.parse_config_run_afq(config_file, arg_dict, False)
