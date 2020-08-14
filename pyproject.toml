@@ -2,7 +2,6 @@
 requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
 build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
-[pytest]
 addopts = "--strict-markers"
 markers = [
     "slow: marks tests as slow to run (deselect with '--runslow')",
