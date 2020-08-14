@@ -369,10 +369,10 @@ class Viz:
             self.visualize_volume = AFQ.viz.plotly_backend.visualize_volume
             self.create_gif = AFQ.viz.plotly_backend.create_gif
         else:
-            TypeError("Visualization backend should be"
-                      + " either 'plotly' or 'fury'. "
-                      + "It is currently set to %s"
-                      % backend)
+            raise TypeError("Visualization backend should be"
+                            + " either 'plotly' or 'fury'. "
+                            + "It is currently set to %s"
+                            % backend)
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
