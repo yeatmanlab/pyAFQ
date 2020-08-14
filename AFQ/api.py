@@ -833,9 +833,9 @@ class AFQ(object):
 
         # Resample to DWI data:
         seg_mask = np.round(reg.resample(seg_mask.astype(float),
-                                        dwi_data[..., 0],
-                                        seg_img.affine,
-                                        dwi_img.affine)).astype(int)
+                                         dwi_data[..., 0],
+                                         seg_img.affine,
+                                         dwi_img.affine)).astype(int)
         meta = dict(source=row['seg_file'],
                     wm_criterion=image_labels)
 
@@ -1265,8 +1265,7 @@ class AFQ(object):
         return volume, color_by_volume
 
     def _viz_bundles(self, row,
-                     export_as_gif=False,
-                     export_as_html=False,
+                     export=False,
                      inline=False,
                      interactive=False,
                      volume=None,
@@ -1293,33 +1292,28 @@ class AFQ(object):
                                             inline=inline,
                                             figure=figure)
 
-        if export_as_gif:
-            fname = self._get_fname(
-                row,
-                f'_viz.gif',
-                include_track=True,
-                include_seg=True)
+        if export:
+            if self.viz.backend == 'fury':
+                fname = self._get_fname(
+                    row,
+                    f'_viz.gif',
+                    include_track=True,
+                    include_seg=True)
 
-            self.viz.create_gif(figure, fname)
+                self.viz.create_gif(figure, fname)
+            else:
+                fname = self._get_fname(
+                    row,
+                    f'_viz.html',
+                    include_track=True,
+                    include_seg=True)
 
-        if export_as_html:
-            if self.viz.backend != 'plotly':
-                raise TypeError(
-                    "Viz library must be set to plotly to export html files"
-                )
-            fname = self._get_fname(
-                row,
-                f'_viz.html',
-                include_track=True,
-                include_seg=True)
-
-            figure.write_html(fname)
+                figure.write_html(fname)
         return figure
 
     def _viz_ROIs(self, row,
                   bundle_names=None,
-                  export_as_gif=False,
-                  export_as_html=False,
+                  export=False,
                   inline=False,
                   interactive=False,
                   volume=None,
@@ -1376,37 +1370,33 @@ class AFQ(object):
                         interact=False,
                         figure=figure)
 
-            if export_as_gif:
-                roi_dir = op.join(row['results_dir'], 'viz_bundles')
-                os.makedirs(roi_dir, exist_ok=True)
-                fname = op.split(
-                    self._get_fname(
-                        row,
-                        f'_{bundle_name}'
-                        f'_viz.gif',
-                        include_track=True,
-                        include_seg=True))
+            if export:
+                if self.viz.backend == 'fury':
+                    roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                    os.makedirs(roi_dir, exist_ok=True)
+                    fname = op.split(
+                        self._get_fname(
+                            row,
+                            f'_{bundle_name}'
+                            f'_viz.gif',
+                            include_track=True,
+                            include_seg=True))
 
-                fname = op.join(fname[0], roi_dir, fname[1])
-                self.viz.create_gif(figure, fname)
-            if export_as_html:
-                roi_dir = op.join(row['results_dir'], 'viz_bundles')
-                os.makedirs(roi_dir, exist_ok=True)
-                if self.viz.backend != 'plotly':
-                    raise TypeError(
-                        "Viz library must be set to plotly"
-                        + " to export html files"
-                    )
-                fname = op.split(
-                    self._get_fname(
-                        row,
-                        f'_{bundle_name}'
-                        f'_viz.html',
-                        include_track=True,
-                        include_seg=True))
+                    fname = op.join(fname[0], roi_dir, fname[1])
+                    self.viz.create_gif(figure, fname)
+                else:
+                    roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                    os.makedirs(roi_dir, exist_ok=True)
+                    fname = op.split(
+                        self._get_fname(
+                            row,
+                            f'_{bundle_name}'
+                            f'_viz.html',
+                            include_track=True,
+                            include_seg=True))
 
-                fname = op.join(fname[0], roi_dir, fname[1])
-                figure.write_html(fname)
+                    fname = op.join(fname[0], roi_dir, fname[1])
+                    figure.write_html(fname)
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1685,8 +1675,7 @@ class AFQ(object):
         self.data_frame.apply(self._export_bundles, axis=1)
 
     def viz_bundles(self,
-                    export_as_gif=False,
-                    export_as_html=False,
+                    export=False,
                     volume=None,
                     xform_volume=False,
                     color_by_volume=None,
@@ -1695,8 +1684,7 @@ class AFQ(object):
                     interactive=False):
         return self.data_frame.apply(
             self._viz_bundles, axis=1,
-            export_as_gif=export_as_gif,
-            export_as_html=export_as_html,
+            export=export,
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
@@ -1706,8 +1694,7 @@ class AFQ(object):
 
     def viz_ROIs(self,
                  bundle_names=None,
-                 export_as_gif=False,
-                 export_as_html=False,
+                 export=False,
                  volume=None,
                  xform_volume=False,
                  color_by_volume=None,
@@ -1718,8 +1705,7 @@ class AFQ(object):
             self._viz_ROIs,
             axis=1,
             bundle_names=bundle_names,
-            export_as_gif=export_as_gif,
-            export_as_html=export_as_html,
+            export=export,
             inline=inline,
             interactive=interactive,
             volume=volume,
@@ -1751,8 +1737,8 @@ class AFQ(object):
         self.get_template_xform()
         self.export_bundles()
         self.get_tract_profiles()
-        self.viz_bundles(export_as_gif=True)
+        self.viz_bundles(export=True)
         if self.seg_algo == "afq":
-            self.viz_ROIs(export_as_gif=True)
+            self.viz_ROIs(export=True)
             self.export_rois()
         self.combine_profiles()
