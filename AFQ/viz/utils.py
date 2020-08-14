@@ -372,7 +372,7 @@ class Viz:
             TypeError("Visualization backend should be"
                       + " either 'plotly' or 'fury'. "
                       + "It is currently set to %s"
-                      % self.viz.backend)
+                      % backend)
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
