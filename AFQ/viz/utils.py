@@ -370,7 +370,7 @@ class Viz:
             self.create_gif = AFQ.viz.plotly_backend.create_gif
         else:
             TypeError("Visualization backend should be"
-                      + " either 'plotly' or 'fury'")
+                      + " either 'plotly' or 'fury'. It is currently set to %s"%self.viz.backend)
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
