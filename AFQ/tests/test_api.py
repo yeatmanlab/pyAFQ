@@ -249,6 +249,7 @@ def test_AFQ_FA():
     myafq.export_rois()
 
 
+@pytest.mark.slow
 def test_DKI_profile():
     """
     Test using API to profile dki
