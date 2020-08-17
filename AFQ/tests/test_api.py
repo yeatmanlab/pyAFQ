@@ -137,6 +137,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
+@pytest.mark.slow
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
