@@ -35,15 +35,15 @@ tg.to_vox()
 streamlines = tg.streamlines
 templates = afd.read_templates()
 bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
-                                templates['CST_roi2_L']],
-                        'rules': [True, True],
-                        'prob_map': templates['CST_L_prob_map'],
-                        'cross_midline': None},
-            'CST_R': {'ROIs': [templates['CST_roi1_R'],
-                                templates['CST_roi1_R']],
-                        'rules': [True, True],
-                        'prob_map': templates['CST_R_prob_map'],
-                        'cross_midline': None}}
+                              templates['CST_roi2_L']],
+                     'rules': [True, True],
+                     'prob_map': templates['CST_L_prob_map'],
+                     'cross_midline': None},
+           'CST_R': {'ROIs': [templates['CST_roi1_R'],
+                              templates['CST_roi1_R']],
+                     'rules': [True, True],
+                     'prob_map': templates['CST_R_prob_map'],
+                     'cross_midline': None}}
 
 
 def test_segment():
@@ -76,13 +76,13 @@ def test_segment():
 def test_segment_no_prob():
     # What if you don't have probability maps?
     bundles_no_prob = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
-                                  templates['CST_roi2_L']],
-                         'rules': [True, True],
-                         'cross_midline': False},
-               'CST_R': {'ROIs': [templates['CST_roi1_R'],
-                                  templates['CST_roi1_R']],
-                         'rules': [True, True],
-                         'cross_midline': False}}
+                                          templates['CST_roi2_L']],
+                                 'rules': [True, True],
+                                 'cross_midline': False},
+                       'CST_R': {'ROIs': [templates['CST_roi1_R'],
+                                          templates['CST_roi1_R']],
+                                 'rules': [True, True],
+                                 'cross_midline': False}}
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles_no_prob,
@@ -191,14 +191,13 @@ def test_clean_by_endpoints():
     npt.assert_equal(list(clean_sl), sl[:2])
     npt.assert_equal(clean_idx, np.array([0, 1]))
 
-
     # If tol=1, the third streamline also gets included
     clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], tol=1, atlas=atlas)
     npt.assert_equal(list(clean_sl), sl[:3])
 
     # Provide the Nx3 array of indices instead.
-    idx_start = np.array(np.where(atlas==1)).T
-    idx_end = np.array(np.where(atlas==3)).T
+    idx_start = np.array(np.where(atlas == 1)).T
+    idx_end = np.array(np.where(atlas == 3)).T
 
     clean_sl = seg.clean_by_endpoints(sl, idx_start, idx_end, atlas=atlas)
     npt.assert_equal(list(clean_sl), np.array([sl[0]]))
@@ -206,4 +205,3 @@ def test_clean_by_endpoints():
     # Sometimes no requirement for one side:
     clean_sl = seg.clean_by_endpoints(sl, [1], None, atlas=atlas)
     npt.assert_equal(list(clean_sl), [sl[0], sl[2], sl[3]])
-
