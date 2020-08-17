@@ -8,6 +8,18 @@ Module Contents
 ---------------
 
 
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.data.read_callosum_templates
+   AFQ.data.read_templates
+   AFQ.data.fetch_hcp
+   AFQ.data.read_stanford_hardi_tractography
+   AFQ.data.organize_stanford_data
+
+
 .. data:: fetch_callosum_templates
    
 
@@ -78,7 +90,7 @@ Module Contents
        !! processed by numpydoc !!
 
 
-.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, aws_access_key_id=None, aws_secret_access_key=None)
+.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
 
    Fetch HCP diffusion data and arrange it in a manner that resembles the
    BIDS [R8494a6c36190-1]_ specification.
@@ -98,6 +110,9 @@ Module Contents
        **path** : string, optional
            Path to save files into. Default: '~/AFQ_data'
 
+       **study** : string, optional
+           Which HCP study to grab. Default: 'HCP_1200'
+
        **aws_access_key_id** : string, optional
            AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
            set to False.
@@ -108,7 +123,10 @@ Module Contents
 
    :Returns:
 
-       dict with remote and local names of these files.
+       dict with remote and local names of these files,
+           ..
+
+       path to BIDS derivative dataset
            ..
 
 

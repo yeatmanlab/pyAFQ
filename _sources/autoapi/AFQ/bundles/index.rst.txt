@@ -7,6 +7,14 @@
 Module Contents
 ---------------
 
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.bundles.Bundles
+
+
 
 .. py:class:: Bundles(reference='same', space=Space.RASMM, origin=Origin.NIFTI, bundles_dict=None, using_idx=False)
 

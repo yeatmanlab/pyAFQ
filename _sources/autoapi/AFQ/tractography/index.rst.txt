@@ -8,7 +8,16 @@ Module Contents
 ---------------
 
 
-.. function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, n_seeds=1, random_seeds=False, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI')
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tractography.track
+   AFQ.tractography._local_tracking
+
+
+.. function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI')
 
    Tractography
 
@@ -31,8 +40,13 @@ Module Contents
            dipy.data.default_sphere.
 
        **seed_mask** : array, optional.
-           Binary mask describing the ROI within which we seed for tracking.
-           Default to the entire volume.
+           Float or binary mask describing the ROI within which we seed for
+           tracking.
+           Default to the entire volume (all ones).
+
+       **seed_threshold** : float, optional.
+           A value of the seed_mask below which tracking is terminated.
+           Default to 0.
 
        **n_seeds** : int or 2D array, optional.
            The seeding density: if this is an int, it is is how many seeds in each
@@ -45,8 +59,12 @@ Module Contents
            Whether to generate a total of n_seeds random seeds in the mask.
            Default: XXX.
 
+       **rng_seed** : int
+           random seed used to generate random seeds if random_seeds is
+           set to True. Default: None
+
        **stop_mask** : array, optional.
-           A floating point value that determines a stopping criterion (e.g. FA).
+           A float or binary mask that determines a stopping criterion (e.g. FA).
            Default to no stopping (all ones).
 
        **stop_threshold** : float, optional.
@@ -92,7 +110,7 @@ Module Contents
        !! processed by numpydoc !!
 
 
-.. function:: _local_tracking(seeds, dg, threshold_classifier, params_img, step_size=0.5, min_length=10, max_length=1000)
+.. function:: _local_tracking(seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)
 
    Helper function
 

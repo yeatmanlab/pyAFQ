@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.tractography &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -51,9 +52,9 @@
 
 
 <div class="viewcode-block" id="track"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography.track">[docs]</a><span class="k">def</span> <span class="nf">track</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;det&quot;</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="mf">30.</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">seed_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_seeds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-          <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;DTI&quot;</span><span class="p">):</span>
+          <span class="n">seed_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_seeds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">rng_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+          <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;DTI&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tractography</span>
 
@@ -71,8 +72,12 @@
 <span class="sd">        The discretization of direction getting. default:</span>
 <span class="sd">        dipy.data.default_sphere.</span>
 <span class="sd">    seed_mask : array, optional.</span>
-<span class="sd">        Binary mask describing the ROI within which we seed for tracking.</span>
-<span class="sd">        Default to the entire volume.</span>
+<span class="sd">        Float or binary mask describing the ROI within which we seed for</span>
+<span class="sd">        tracking.</span>
+<span class="sd">        Default to the entire volume (all ones).</span>
+<span class="sd">    seed_threshold : float, optional.</span>
+<span class="sd">        A value of the seed_mask below which tracking is terminated.</span>
+<span class="sd">        Default to 0.</span>
 <span class="sd">    n_seeds : int or 2D array, optional.</span>
 <span class="sd">        The seeding density: if this is an int, it is is how many seeds in each</span>
 <span class="sd">        voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
@@ -82,8 +87,11 @@
 <span class="sd">    random_seeds : bool</span>
 <span class="sd">        Whether to generate a total of n_seeds random seeds in the mask.</span>
 <span class="sd">        Default: XXX.</span>
+<span class="sd">    rng_seed : int</span>
+<span class="sd">        random seed used to generate random seeds if random_seeds is</span>
+<span class="sd">        set to True. Default: None</span>
 <span class="sd">    stop_mask : array, optional.</span>
-<span class="sd">        A floating point value that determines a stopping criterion (e.g. FA).</span>
+<span class="sd">        A float or binary mask that determines a stopping criterion (e.g. FA).</span>
 <span class="sd">        Default to no stopping (all ones).</span>
 <span class="sd">    stop_threshold : float, optional.</span>
 <span class="sd">        A value of the stop_mask below which tracking is terminated. Default to</span>
@@ -116,10 +124,13 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_seeds</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">seed_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">seed_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+            <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">seed_mask</span> <span class="o">&gt;</span> <span class="n">seed_threshold</span>
         <span class="k">if</span> <span class="n">random_seeds</span><span class="p">:</span>
             <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">random_seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">seeds_count</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
                                                <span class="n">seed_count_per_voxel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                               <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">)</span>
+                                               <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span>
+                                               <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span>
                                         <span class="n">density</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
@@ -147,29 +158,36 @@
     <span class="k">if</span> <span class="n">stop_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
 
-    <span class="n">threshold_classifier</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
-                                                      <span class="n">stop_threshold</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">stop_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+        <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                        <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                        <span class="n">stop_threshold</span><span class="p">)</span>
+
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">threshold_classifier</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
                            <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-                           <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">)</span></div>
+                           <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_local_tracking"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography._local_tracking">[docs]</a><span class="k">def</span> <span class="nf">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">threshold_classifier</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
-                    <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="_local_tracking"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography._local_tracking">[docs]</a><span class="k">def</span> <span class="nf">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+                    <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                    <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">seeds</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">tracker</span> <span class="o">=</span> <span class="n">VerboseLocalTracking</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span>
-                                   <span class="n">threshold_classifier</span><span class="p">,</span>
+                                   <span class="n">stopping_criterion</span><span class="p">,</span>
                                    <span class="n">seeds</span><span class="p">,</span>
                                    <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
                                    <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
                                    <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-                                   <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">)</span>
+                                   <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+                                   <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span></div>
 </pre></div>
@@ -242,7 +260,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

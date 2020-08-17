@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -40,9 +41,22 @@
 <span id="afq-segmentation"></span><h1><a class="reference internal" href="#module-AFQ.segmentation" title="AFQ.segmentation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a><a class="headerlink" href="#module-AFQ.segmentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.segmentation.Segmentation" title="AFQ.segmentation.Segmentation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segmentation</span></code></a>(nb_points=False, seg_algo=’AFQ’, clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=50, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt id="AFQ.segmentation.Segmentation">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_points</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'AFQ'</span></em>, <em class="sig-param"><span class="n">progressive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">greater_than</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">rm_small_clusters</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">model_clust_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">reduction_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">refine</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pruning_thr</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">prob_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_idx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">filter_by_endpoints</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dist_to_aal</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">save_intermediates</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_points</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'AFQ'</span></em>, <em class="sig-param"><span class="n">clip_edges</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progressive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">greater_than</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">rm_small_clusters</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">model_clust_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">reduction_thr</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">refine</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pruning_thr</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">prob_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_idx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">filter_by_endpoints</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dist_to_aal</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">save_intermediates</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.segment">
 <code class="sig-name descname">segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">tg</span></em>, <em class="sig-param"><span class="n">fdata</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbvec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_prealign</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">img_affine</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">¶</a></dt>
@@ -200,6 +214,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -275,7 +290,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

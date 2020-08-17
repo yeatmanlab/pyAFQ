@@ -20,6 +20,7 @@ Introductory examples.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
+     :alt: AFQ API
 
      :ref:`sphx_glr_auto_examples_plot_afq_api.py`
 
@@ -40,6 +41,7 @@ Introductory examples.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_tract_profile_thumb.png
+     :alt: Plotting tract profiles
 
      :ref:`sphx_glr_auto_examples_plot_tract_profile.py`
 
@@ -60,6 +62,7 @@ Introductory examples.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_recobundles_thumb.png
+     :alt: Plotting tract profiles using RecoBundles
 
      :ref:`sphx_glr_auto_examples_plot_recobundles.py`
 

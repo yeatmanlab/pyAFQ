@@ -10,7 +10,9 @@ Subpackages
    :titlesonly:
    :maxdepth: 3
 
+   models/index.rst
    utils/index.rst
+   viz/index.rst
 
 
 Submodules
@@ -19,21 +21,37 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
-   _meta/index.rst
    api/index.rst
    bundles/index.rst
-   csd/index.rst
    data/index.rst
-   dki/index.rst
-   dti/index.rst
    registration/index.rst
    segmentation/index.rst
    tractography/index.rst
-   viz/index.rst
 
 
 Package Contents
 ----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.AFQ
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.read_callosum_templates
+   AFQ.read_templates
+   AFQ.fetch_hcp
+   AFQ.read_stanford_hardi_tractography
+   AFQ.organize_stanford_data
+   AFQ.make_bundle_dict
 
 
 .. data:: fetch_callosum_templates
@@ -106,7 +124,7 @@ Package Contents
        !! processed by numpydoc !!
 
 
-.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, aws_access_key_id=None, aws_secret_access_key=None)
+.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
 
    Fetch HCP diffusion data and arrange it in a manner that resembles the
    BIDS [R8494a6c36190-1]_ specification.
@@ -126,6 +144,9 @@ Package Contents
        **path** : string, optional
            Path to save files into. Default: '~/AFQ_data'
 
+       **study** : string, optional
+           Which HCP study to grab. Default: 'HCP_1200'
+
        **aws_access_key_id** : string, optional
            AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
            set to False.
@@ -136,7 +157,10 @@ Package Contents
 
    :Returns:
 
-       dict with remote and local names of these files.
+       dict with remote and local names of these files,
+           ..
+
+       path to BIDS derivative dataset
            ..
 
 
@@ -223,78 +247,9 @@ Package Contents
        !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(dmriprep_path, sub_prefix='sub', dwi_folder='dwi', dwi_file='*dwi', anat_folder='anat', anat_file='*T1w*', seg_file='*aparc+aseg*', b0_threshold=0, bundle_names=BUNDLES, dask_it=False, force_recompute=False, reg_template=None, scalars=['dti_fa', 'dti_md'], wm_labels=[250, 251, 252, 253, 254, 255, 41, 2, 16, 77], use_prealign=True, tracking_params=None, segmentation_params=None, clean_params=None)
+.. py:class:: AFQ(bids_path, dmriprep='dmriprep', segmentation='dmriprep', seg_suffix='seg', b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', mask_template=True, bundle_names=BUNDLES, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], wm_criterion={'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}, use_prealign=True, virtual_frame_buffer=False, viz_backend='fury', tracking_params=None, segmentation_params=None, clean_params=None)
 
    Bases: :class:`object`
-
-       This is file folder structure that AFQ requires in your study folder::
-
-   |    study
-   |      ├-derivatives
-   |            ├-dmriprep
-   |                ├── sub01
-   |                │   ├── sess01
-   |                │   │   ├── anat
-   |                │   │   │   ├── sub-01_sess-01_aparc+aseg.nii.gz
-   |                │   │   │   └── sub-01_sess-01_T1.nii.gz
-   |                │   │   └── dwi
-   |                │   │       ├── sub-01_sess-01_dwi.bvals
-   |                │   │       ├── sub-01_sess-01_dwi.bvecs
-   |                │   │       └── sub-01_sess-01_dwi.nii.gz
-   |                │   └── sess02
-   |                │       ├── anat
-   |                │       │   ├── sub-01_sess-02_aparc+aseg.nii.gz
-   |                │       │   └── sub-01_sess-02_T1w.nii.gz
-   |                │       └── dwi
-   |                │           ├── sub-01_sess-02_dwi.bvals
-   |                │           ├── sub-01_sess-02_dwi.bvecs
-   |                │           └── sub-01_sess-02_dwi.nii.gz
-   |                └── sub02
-   |                   ├── sess01
-   |                   │   ├── anat
-   |                   │       ├── sub-02_sess-01_aparc+aseg.nii.gz
-   |                   │   │   └── sub-02_sess-01_T1w.nii.gz
-   |                   │   └── dwi
-   |                   │       ├── sub-02_sess-01_dwi.bvals
-   |                   │       ├── sub-02_sess-01_dwi.bvecs
-   |                   │       └── sub-02_sess-01_dwi.nii.gz
-   |                   └── sess02
-   |                       ├── anat
-   |                       │   ├── sub-02_sess-02_aparc+aseg.nii.gz
-   |                       │   └── sub-02_sess-02_T1w.nii.gz
-   |                       └── dwi
-   |                           ├── sub-02_sess-02_dwi.bvals
-   |                           ├── sub-02_sess-02_dwi.bvecs
-   |                           └── sub-02_sess-02_dwi.nii.gz
-
-       This structure can be automatically generated from BIDS-compliant
-       data [R63cbc1df923a-1]_, using the dmriprep software [R63cbc1df923a-2]_ and BIDS app.
-
-
-
-
-
-
-
-
-
-
-   .. rubric:: Notes
-
-   The structure of the file-system required here resembles that specified
-   by BIDS [R63cbc1df923a-1]_. In the future, this will be organized according to the
-   BIDS derivatives specification, as we require preprocessed, rather than
-   raw data.
-
-   .. [R63cbc1df923a-1] Gorgolewski et al. (2016). The brain imaging data structure,
-          a format for organizing and describing outputs of neuroimaging
-          experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
-
-   .. [R63cbc1df923a-2] https://github.com/nipy/dmriprep
-
-
-
-
 
    ..
        !! processed by numpydoc !!
@@ -412,6 +367,10 @@ Package Contents
 
 
 
+   .. method:: _get_data_gtab(self, row, filter_b=True)
+
+
+
    .. method:: _b0(self, row)
 
 
@@ -440,6 +399,10 @@ Package Contents
 
 
 
+   .. method:: _anisotropic_power_map(self, row)
+
+
+
    .. method:: _dti_fa(self, row)
 
 
@@ -464,6 +427,10 @@ Package Contents
 
 
 
+   .. method:: _reg_img(self, img, row=None)
+
+
+
    .. method:: _reg_prealign(self, row)
 
 
@@ -476,7 +443,15 @@ Package Contents
 
 
 
-   .. method:: _wm_mask(self, row, wm_fa_thresh=0.2)
+   .. method:: _mask_from_seg(self, row, image_labels, not_equal=False)
+
+
+
+   .. method:: _wm_mask(self, row)
+
+
+
+   .. method:: _get_mask(self, row, mask)
 
 
 
@@ -492,7 +467,7 @@ Package Contents
 
 
 
-   .. method:: _tract_profiles(self, row, weighting=None)
+   .. method:: _tract_profiles(self, row)
 
 
 
@@ -508,11 +483,19 @@ Package Contents
 
 
 
-   .. method:: _export_bundle_gif(self, row)
+   .. method:: _viz_prepare_vols(self, row, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
 
 
 
-   .. method:: _export_ROI_gifs(self, row)
+   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
+
+
+
+   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
+
+
+
+   .. method:: _plot_tract_profiles(self, row)
 
 
 
@@ -520,7 +503,7 @@ Package Contents
 
 
 
-   .. method:: _get_fname(self, row, suffix)
+   .. method:: _get_fname(self, row, suffix, include_track=False, include_seg=False)
 
 
 
@@ -696,11 +679,15 @@ Package Contents
 
 
 
-   .. method:: export_bundle_gif(self)
+   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, inline=False, interactive=False)
 
 
 
-   .. method:: export_ROI_gifs(self)
+   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, inline=False, interactive=False)
+
+
+
+   .. method:: plot_tract_profiles(self)
 
 
 
@@ -710,6 +697,30 @@ Package Contents
 
    .. method:: combine_profiles(self)
 
+
+
+   .. method:: export_all(self)
+
+
+      Exports all the possible outputs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 

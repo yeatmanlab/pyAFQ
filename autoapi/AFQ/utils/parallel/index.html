@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.utils.parallel &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -18,7 +19,7 @@
     <script src="../../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="AFQ.utils.streamlines" href="../streamlines/index.html" />
+    <link rel="next" title="AFQ.utils.stats" href="../stats/index.html" />
     <link rel="prev" title="AFQ.utils.models" href="../models/index.html" />
    
   <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
@@ -40,6 +41,19 @@
 <span id="afq-utils-parallel"></span><h1><a class="reference internal" href="#module-AFQ.utils.parallel" title="AFQ.utils.parallel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.parallel</span></code></a><a class="headerlink" href="#module-AFQ.utils.parallel" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.parallel.parfor" title="AFQ.utils.parallel.parfor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parfor</span></code></a>(func, in_list, out_shape=None, n_jobs=-1, engine=’joblib’, backend=’threading’, func_args=[], func_kwargs={})</p></td>
+<td><p>Parallel for loop for numpy arrays</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt id="AFQ.utils.parallel.parfor">
 <code class="sig-prename descclassname">AFQ.utils.parallel.</code><code class="sig-name descname">parfor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">in_list</span></em>, <em class="sig-param"><span class="n">out_shape</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">engine</span><span class="o">=</span><span class="default_value">'joblib'</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'threading'</span></em>, <em class="sig-param"><span class="n">func_args</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">func_kwargs</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/parallel.html#parfor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.parallel.parfor" title="Permalink to this definition">¶</a></dt>
@@ -77,6 +91,7 @@ parallelization.</p>
 </dl>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -122,7 +137,7 @@ parallelization.</p>
   <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><ul>
       <li>Previous: <a href="../models/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
-      <li>Next: <a href="../streamlines/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
+      <li>Next: <a href="../stats/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.stats</span></code></a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -156,7 +171,7 @@ parallelization.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

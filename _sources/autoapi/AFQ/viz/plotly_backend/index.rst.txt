@@ -1,0 +1,385 @@
+:mod:`AFQ.viz.plotly_backend`
+=============================
+
+.. py:module:: AFQ.viz.plotly_backend
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.plotly_backend.Axes
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.plotly_backend._inline_interact
+   AFQ.viz.plotly_backend._to_color_range
+   AFQ.viz.plotly_backend._color_arr2str
+   AFQ.viz.plotly_backend.set_layout
+   AFQ.viz.plotly_backend._draw_streamlines
+   AFQ.viz.plotly_backend.visualize_bundles
+   AFQ.viz.plotly_backend.create_gif
+   AFQ.viz.plotly_backend._draw_roi
+   AFQ.viz.plotly_backend.visualize_roi
+   AFQ.viz.plotly_backend._draw_slice
+   AFQ.viz.plotly_backend._name_from_enum
+   AFQ.viz.plotly_backend._draw_slices
+   AFQ.viz.plotly_backend.visualize_volume
+
+
+.. data:: viz_logger
+   
+
+   
+
+.. function:: _inline_interact(figure, show, show_inline)
+
+   Helper function to reuse across viz functions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: _to_color_range(num)
+
+
+.. function:: _color_arr2str(color_arr, opacity=1.0)
+
+
+.. function:: set_layout(figure, color=None)
+
+
+.. function:: _draw_streamlines(figure, sls, color, name, cbv=None)
+
+
+.. function:: visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, figure=None, background=(1, 1, 1), interact=False, inline=False)
+
+   Visualize bundles in 3D
+
+
+   :Parameters:
+
+       **sft** : Stateful Tractogram, str
+           A Stateful Tractogram containing streamline information
+           or a path to a trk file
+
+       **affine** : ndarray, optional
+           An affine transformation to apply to the streamlines before
+           visualization. Default: no transform.
+
+       **bundle_dict** : dict, optional
+           Keys are names of bundles and values are dicts that should include
+           a key `'uid'` with values as integers for selection from the sft
+           metadata. Default: bundles are either not identified, or identified
+           only as unique integers in the metadata.
+
+       **bundle** : str or int, optional
+           The name of a bundle to select from among the keys in `bundle_dict`
+           or an integer for selection from the sft metadata.
+
+       **colors** : dict or list
+           If this is a dict, keys are bundle names and values are RGB tuples.
+           If this is a list, each item is an RGB tuple. Defaults to a list
+           with Tableau 20 RGB values
+
+       **background** : tuple, optional
+           RGB values for the background. Default: (1, 1, 1), which is white
+           background.
+
+       **figure** : Plotly Figure object, optional
+           If provided, the visualization will be added to this Figure. Default:
+           Initialize a new Figure.
+
+       **interact** : bool
+           Whether to open the visualization in an interactive window.
+           Default: False
+
+       **inline** : bool
+           Whether to embed the interactivevisualization inline in a notebook.
+           Only works in the notebook context. Default: False.
+
+   :Returns:
+
+       Plotly Figure object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: create_gif(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, size=(600, 600))
+
+   Convert a Plotly Figure object into a gif
+
+
+   :Parameters:
+
+       **figure: Plotly Figure object**
+           Figure to be converted to a gif
+
+       **file_name: str**
+           File to save gif to.
+
+       **n_frames: int, optional**
+           Number of frames in gif.
+           Will be evenly distributed throughout the rotation.
+           Default: 60
+
+       **zoom: float, optional**
+           How much to magnify the figure in the fig.
+           Default: 2.5
+
+       **size: tuple, optional**
+           Size of the gif.
+           Default: (600, 600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: _draw_roi(figure, roi, name, color, opacity)
+
+
+.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
+
+   Render a region of interest into a volume
+
+
+   :Parameters:
+
+       **roi** : str or Nifti1Image
+           The ROI information
+
+       **affine_or_mapping** : ndarray, Nifti1Image, or str, optional
+           An affine transformation or mapping to apply to the ROIs before
+           visualization. Default: no transform.
+
+       **static_img: str or Nifti1Image, optional**
+           Template to resample roi to.
+           Default: None
+
+       **roi_affine: ndarray, optional**
+           Default: None
+
+       **static_affine: ndarray, optional**
+           Default: None
+
+       **reg_template: str or Nifti1Image, optional**
+           Template to use for registration.
+           Default: None
+
+       **name: str, optional**
+           Name of ROI for the legend.
+           Default: 'ROI'
+
+       **color** : ndarray, optional
+           RGB color for ROI.
+           Default: np.array([0.9999, 0, 0])
+
+       **opacity** : float, optional
+           Opacity of ROI.
+           Default: 1.0
+
+       **figure** : Plotly Figure object, optional
+           If provided, the visualization will be added to this Figure. Default:
+           Initialize a new Figure.
+
+       **interact** : bool
+           Whether to open the visualization in an interactive window.
+           Default: False
+
+       **inline** : bool
+           Whether to embed the interactive visualization inline in a notebook.
+           Only works in the notebook context. Default: False.
+
+   :Returns:
+
+       Plotly Figure object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: Axes
+
+   Bases: :class:`enum.IntEnum`
+
+   Enum where members are also (and must be) ints
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. attribute:: X
+      :annotation: = 0
+
+      
+
+   .. attribute:: Y
+      :annotation: = 1
+
+      
+
+   .. attribute:: Z
+      :annotation: = 2
+
+      
+
+
+.. function:: _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0)
+
+
+.. function:: _name_from_enum(axis)
+
+
+.. function:: _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0)
+
+
+.. function:: visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, slider_definition=20, which_plane=None)
+
+   Visualize a volume
+
+
+   :Parameters:
+
+       **volume** : ndarray or str
+           3d volume to visualize.
+
+       **figure** : Plotly Figure object, optional
+           If provided, the visualization will be added to this Figure. Default:
+           Initialize a new Figure.
+
+       **show_x** : bool, optional
+           Whether to show Coronal Slice.
+           Default: True
+
+       **show_x** : bool, optional
+           Whether to show Sagittal Slice.
+           Default: True
+
+       **show_x** : bool, optional
+           Whether to show Axial Slice.
+           Default: True
+
+       **opacity** : float, optional
+           Opacity of slices.
+           Default: 1.0
+
+       **slider_definition** : int, optional
+           How many discrete positions the slices can take.
+           If 0, slices are stationary.
+           Default: 50
+
+       **which_plane** : str, optional
+           Which plane can be moved with a slider.
+           Should be 'Coronal', 'Axial', 'Sagittal', or None.
+           If None, slices are stationary.
+           Note: If slices are not stationary,
+           do not add any more traces to the figure.
+           Default: 'Coronal'
+
+       **interact** : bool
+           Whether to open the visualization in an interactive window.
+           Default: False
+
+       **inline** : bool
+           Whether to embed the interactive visualization inline in a notebook.
+           Only works in the notebook context. Default: False.
+
+   :Returns:
+
+       Plotly Figure object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

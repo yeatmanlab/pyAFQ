@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.models.dki &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="AFQ.models.dti" href="../dti/index.html" />
+    <link rel="prev" title="AFQ.models.csd" href="../csd/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.models.dki">
+<span id="afq-models-dki"></span><h1><a class="reference internal" href="#module-AFQ.models.dki" title="AFQ.models.dki"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a><a class="headerlink" href="#module-AFQ.models.dki" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.models.dki.fit_dki" title="AFQ.models.dki.fit_dki"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_dki</span></code></a>(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0)</p></td>
+<td><p>Fit the DKI model, save files with derived maps</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.models.dki.predict" title="AFQ.models.dki.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(params_file, gtab, S0_file=None, out_dir=None)</p></td>
+<td><p>Create a signal prediction from DKI params</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="AFQ.models.dki.fit_dki">
+<code class="sig-prename descclassname">AFQ.models.dki.</code><code class="sig-name descname">fit_dki</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_kurtosis</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">max_kurtosis</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/models/dki.html#fit_dki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.models.dki.fit_dki" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the DKI model, save files with derived maps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_files</strong><span class="classifier">str or list</span></dt><dd><p>Files containing DWI data. If this is a str, that’s the full path to a
+single file. If it’s a list, each entry is a full path.</p>
+</dd>
+<dt><strong>bval_files</strong><span class="classifier">str or list</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>bvec_files</strong><span class="classifier">str or list</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>mask</strong><span class="classifier">ndarray, optional</span></dt><dd><p>Binary mask, set to True or 1 in voxels to be processed.
+Default: Process all voxels.</p>
+</dd>
+<dt><strong>min_kurtosis</strong><span class="classifier">float, optional</span></dt><dd><p>The minimal plausible value of kurtosis. Default: -1.</p>
+</dd>
+<dt><strong>max_kurtosis</strong><span class="classifier">float, optional</span></dt><dd><p>The maximal plausible value of kurtosis. Default: 3.</p>
+</dd>
+<dt><strong>out_dir</strong><span class="classifier">str, optional</span></dt><dd><p>A full path to a directory to store the maps that get computed.
+Default: maps get stored in the same directory as the last DWI file
+in <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>b0_threshold</strong><span class="classifier">float</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>file_paths</strong><span class="classifier">a dict with the derived maps that were computed and full-paths</span></dt><dd></dd>
+<dt>to the files containing these maps.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.models.dki.predict">
+<code class="sig-prename descclassname">AFQ.models.dki.</code><code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">gtab</span></em>, <em class="sig-param"><span class="n">S0_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/models/dki.html#predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.models.dki.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a signal prediction from DKI params</p>
+<dl class="simple">
+<dt>params_file<span class="classifier">str</span></dt><dd><p>Full path to a file with parameters saved from a DKI fit</p>
+</dd>
+<dt>gtab<span class="classifier">GradientTable object</span></dt><dd><p>The gradient table to predict for</p>
+</dd>
+<dt>S0_file<span class="classifier">str</span></dt><dd><p>Full path to a nifti file that contains S0 measurements to incorporate
+into the prediction. If the file contains 4D data, the volumes that
+contain the S0 data must be the same as the gtab.b0s_mask.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><ul>
+      <li>Previous: <a href="../csd/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
+      <li>Next: <a href="../dti/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/AFQ/models/dki/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

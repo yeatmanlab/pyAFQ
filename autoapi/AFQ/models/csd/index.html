@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.models.csd &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="AFQ.models.dki" href="../dki/index.html" />
+    <link rel="prev" title="AFQ.models" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-AFQ.models.csd">
+<span id="afq-models-csd"></span><h1><a class="reference internal" href="#module-AFQ.models.csd" title="AFQ.models.csd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a><a class="headerlink" href="#module-AFQ.models.csd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.models.csd.fit_csd" title="AFQ.models.csd.fit_csd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_csd</span></code></a>(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=0, sh_order=None, lambda_=1, tau=0.1, out_dir=None)</p></td>
+<td><p>Fit the CSD model and save file with SH coefficients.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="AFQ.models.csd.fit_csd">
+<code class="sig-prename descclassname">AFQ.models.csd.</code><code class="sig-name descname">fit_csd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">response</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">sh_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lambda_</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/models/csd.html#fit_csd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.models.csd.fit_csd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the CSD model and save file with SH coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_files</strong><span class="classifier">str or list.</span></dt><dd><p>Files containing DWI data. If this is a str, that’s the full path to a
+single file. If it’s a list, each entry is a full path.</p>
+</dd>
+<dt><strong>bval_files</strong><span class="classifier">str or list.</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>bvec_files</strong><span class="classifier">str or list.</span></dt><dd><p>Equivalent to <cite>data_files</cite>.</p>
+</dd>
+<dt><strong>mask</strong><span class="classifier">ndarray, optional.</span></dt><dd><p>Binary mask, set to True or 1 in voxels to be processed.
+Default: Process all voxels.</p>
+</dd>
+<dt><strong>response: tuple, optional.</strong></dt><dd><p>The response function to be used by CSD, as a tuple with two elements.
+The first is the eigen-values as an (3,) ndarray and the second is
+the signal value for the response function without diffusion-weighting
+(i.e. S0). If not provided, auto_response will be used to calculate
+these values.</p>
+</dd>
+<dt><strong>b0_threshold</strong><span class="classifier">float,optional.</span></dt><dd><p>The value of diffusion-weighting under which we consider it to be
+equivalent to 0. Default:0</p>
+</dd>
+<dt><strong>sh_order</strong><span class="classifier">int, optional.</span></dt><dd><p>default: infer the number of parameters from the number of data
+volumes, but no larger than 8.</p>
+</dd>
+<dt><strong>lambda_</strong><span class="classifier">float, optional.</span></dt><dd><p>weight given to the constrained-positivity regularization part of
+the deconvolution equation. Default: 1</p>
+</dd>
+<dt><strong>tau</strong><span class="classifier">float, optional.</span></dt><dd><p>threshold controlling the amplitude below which the corresponding
+fODF is assumed to be zero.  Ideally, tau should be set to
+zero. However, to improve the stability of the algorithm, tau is
+set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+(see <a href="#id2"><span class="problematic" id="id1">[1]_</span></a>). Default: 0.1</p>
+</dd>
+<dt><strong>out_dir</strong><span class="classifier">str, optional</span></dt><dd><p>A full path to a directory to store the maps that get computed.
+Default: file with coefficients gets stored in the same directory as
+the first DWI file in <cite>data_files</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fname</strong><span class="classifier">the full path to the file containing the SH coefficients.</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
+  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a></li>
+      <li>Next: <a href="../dki/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/AFQ/models/csd/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

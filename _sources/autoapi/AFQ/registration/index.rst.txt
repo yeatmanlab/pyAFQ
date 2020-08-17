@@ -16,6 +16,26 @@ Module Contents
 ---------------
 
 
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.registration.syn_registration
+   AFQ.registration.syn_register_dwi
+   AFQ.registration.write_mapping
+   AFQ.registration.read_mapping
+   AFQ.registration.resample
+   AFQ.registration.c_of_mass
+   AFQ.registration.translation
+   AFQ.registration.rigid
+   AFQ.registration.affine
+   AFQ.registration.affine_registration
+   AFQ.registration.register_series
+   AFQ.registration.register_dwi
+   AFQ.registration.streamline_registration
+
+
 .. function:: syn_registration(moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric='CC', dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None)
 
    Register a source image (moving) to a target image (static).
@@ -156,9 +176,11 @@ Module Contents
 
    :Parameters:
 
-       **disp** : str or Nifti1Image
-           A file of image containing the mapping displacement field in each voxel
+       **disp** : str, Nifti1Image, or ndarray
+           If string, file must of an image or ndarray.
+           If image, contains the mapping displacement field in each voxel
            Shape (x, y, z, 3, 2)
+           If ndarray, contains affine transformation used for mapping
 
        **domain_img** : str or Nifti1Image
            ..

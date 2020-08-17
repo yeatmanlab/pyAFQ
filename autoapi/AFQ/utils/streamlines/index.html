@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.utils.streamlines &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -19,7 +20,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="AFQ.utils.volume" href="../volume/index.html" />
-    <link rel="prev" title="AFQ.utils.parallel" href="../parallel/index.html" />
+    <link rel="prev" title="AFQ.utils.stats" href="../stats/index.html" />
    
   <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
   
@@ -40,6 +41,28 @@
 <span id="afq-utils-streamlines"></span><h1><a class="reference internal" href="#module-AFQ.utils.streamlines" title="AFQ.utils.streamlines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a><a class="headerlink" href="#module-AFQ.utils.streamlines" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.add_bundles" title="AFQ.utils.streamlines.add_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_bundles</span></code></a>(t1, t2)</p></td>
+<td><p>Combine two bundles, using the second bundles’ affine and</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.bundles_to_tgram" title="AFQ.utils.streamlines.bundles_to_tgram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bundles_to_tgram</span></code></a>(bundles, bundle_dict, reference)</p></td>
+<td><p>Create a StatefulTractogram object from bundles and their</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.tgram_to_bundles" title="AFQ.utils.streamlines.tgram_to_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tgram_to_bundles</span></code></a>(tgram, bundle_dict, reference)</p></td>
+<td><p>Convert a StatefulTractogram object to a dict with StatefulTractogram</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.split_streamline" title="AFQ.utils.streamlines.split_streamline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_streamline</span></code></a>(streamlines, sl_to_split, split_idx)</p></td>
+<td><p>Given a Streamlines object, split one of the underlying streamlines</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt id="AFQ.utils.streamlines.add_bundles">
 <code class="sig-prename descclassname">AFQ.utils.streamlines.</code><code class="sig-name descname">add_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t1</span></em>, <em class="sig-param"><span class="n">t2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#add_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.streamlines.add_bundles" title="Permalink to this definition">¶</a></dt>
@@ -109,6 +132,7 @@ objects for each bundle.</p>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -151,7 +175,7 @@ objects for each bundle.</p>
   <li><a href="../../../index.html">API Reference</a><ul>
   <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><ul>
-      <li>Previous: <a href="../parallel/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.parallel</span></code></a></li>
+      <li>Previous: <a href="../stats/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.stats</span></code></a></li>
       <li>Next: <a href="../volume/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
   </ul></li>
   </ul></li>
@@ -186,7 +210,7 @@ objects for each bundle.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,0 +1,101 @@
+:mod:`AFQ.viz.utils`
+====================
+
+.. py:module:: AFQ.viz.utils
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.utils.Viz
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.utils.visualize_tract_profiles
+   AFQ.viz.utils.visualize_gif_inline
+
+
+.. py:class:: Viz(backend='fury')
+
+
+.. function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', min_fa=0.0, max_fa=1.0, file_name=None, positions=POSITIONS)
+
+   Visualize all tract profiles for a scalar in one plot
+
+
+   :Parameters:
+
+       **tract_profiles** : pandas dataframe
+           Pandas dataframe of tract_profiles. For example,
+           tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])
+
+       **scalar** : string, optional
+           Scalar to use in plots. Default: "dti_fa".
+
+       **min_fa** : float, optional
+           Minimum FA used for y-axis bounds. Default: 0.0
+
+       **max_fa** : float, optional
+           Maximum FA used for y-axis bounds. Default: 1.0
+
+       **file_name** : string, optional
+           File name to save figure to if not None. Default: None
+
+       **positions** : dictionary, optional
+           Dictionary that maps bundle names to position in plot.
+           Default: POSITIONS
+
+   :Returns:
+
+       Matplotlib figure and axes.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: visualize_gif_inline(fname, use_s3fs=False)
+
+   Display a gif inline, possible from s3fs 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

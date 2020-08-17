@@ -1,0 +1,17 @@
+:mod:`AFQ.models`
+=================
+
+.. py:module:: AFQ.models
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   csd/index.rst
+   dki/index.rst
+   dti/index.rst
+
+

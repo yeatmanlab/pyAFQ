@@ -4,115 +4,14 @@
 .. py:module:: AFQ.viz
 
 
-Module Contents
----------------
-
-
-.. data:: tbl_interleavecs
-   :annotation: = [[31, 119, 180], [41, 145, 219], [174, 199, 232], [215, 228, 244], [255, 127, 14], [255, 154, 66], [255, 187, 120], [255, 214, 173], [44, 160, 44], [55, 200, 55], [152, 223, 138], [188, 234, 179], [214, 39, 40], [223, 83, 83], [255, 152, 150], [255, 200, 199], [148, 103, 189], [172, 138, 204], [197, 176, 213], [221, 208, 230], [140, 86, 75], [169, 108, 96], [196, 156, 148], [213, 185, 179], [227, 119, 194], [236, 162, 214], [247, 182, 210], [252, 227, 238], [127, 127, 127], [153, 153, 153], [199, 199, 199], [224, 224, 224], [188, 189, 34], [220, 220, 56], [219, 219, 141], [232, 232, 181], [23, 190, 207], [48, 214, 232], [158, 218, 229], [199, 234, 240]]
-
-   
-
-.. data:: color_dict
-   
-
-   
-
-.. function:: _inline_interact(scene, inline, interact)
-
-   Helper function to reuse across viz functions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. function:: visualize_bundles(trk, affine_or_mapping=None, bundle=None, scene=None, colors=tbl_interleavecs, bundle_names=None, inline=False, interact=False)
-
-   Visualize bundles in 3D using VTK
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. function:: scene_rotate_forward(scene)
-
-
-.. function:: create_gif(scene, file_name, n_frames=60, size=(600, 600))
-
-
-.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, scene=None, color=np.array([1, 0, 0]), opacity=1.0, inline=False, interact=False)
-
-   Render a region of interest into a VTK viz as a volume
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. function:: visualize_volume(volume, x=None, y=None, z=None, scene=None, inline=True, interact=False)
-
-   Visualize a volume
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   fury_backend/index.rst
+   plotly_backend/index.rst
+   utils/index.rst
 
 

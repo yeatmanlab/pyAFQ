@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.registration &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -19,7 +20,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.segmentation" href="../segmentation/index.html" />
-    <link rel="prev" title="AFQ.dti" href="../dti/index.html" />
+    <link rel="prev" title="AFQ.data" href="../data/index.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
@@ -42,6 +43,55 @@
 </p>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_registration</span></code></a>(moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric=’CC’, dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None)</p></td>
+<td><p>Register a source image (moving) to a target image (static).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.syn_register_dwi" title="AFQ.registration.syn_register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_register_dwi</span></code></a>(dwi, gtab, template=None, **syn_kwargs)</p></td>
+<td><p>Register DWI data to a template.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.write_mapping" title="AFQ.registration.write_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_mapping</span></code></a>(mapping, fname)</p></td>
+<td><p>Write out a syn registration mapping to file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.read_mapping" title="AFQ.registration.read_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_mapping</span></code></a>(disp, domain_img, codomain_img, prealign=None)</p></td>
+<td><p>Read a syn registration mapping from a nifti file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.resample" title="AFQ.registration.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a>(moving, static, moving_affine, static_affine)</p></td>
+<td><p>Resample an image from one space to another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.c_of_mass" title="AFQ.registration.c_of_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">c_of_mass</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.translation" title="AFQ.registration.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.rigid" title="AFQ.registration.rigid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.affine" title="AFQ.registration.affine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.affine_registration" title="AFQ.registration.affine_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine_registration</span></code></a>(moving, static, moving_affine=None, static_affine=None, nbins=32, sampling_prop=None, metric=’MI’, pipeline=[c_of_mass, translation, rigid, affine], level_iters=[10000, 1000, 100], sigmas=[5.0, 2.5, 0.0], factors=[4, 2, 1], params0=None)</p></td>
+<td><p>Find the affine transformation between two 3D images.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.register_series" title="AFQ.registration.register_series"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_series</span></code></a>(series, ref, pipeline)</p></td>
+<td><p>Register a series to a reference image.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.register_dwi" title="AFQ.registration.register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_dwi</span></code></a>(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[c_of_mass, translation, rigid, affine], out_dir=None)</p></td>
+<td><p>Register a DWI data-set</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.streamline_registration" title="AFQ.registration.streamline_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streamline_registration</span></code></a>(moving, static, n_points=100, native_resampled=False)</p></td>
+<td><p>Register two collections of streamlines (‘bundles’) to each other</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt id="AFQ.registration.syn_registration">
 <code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step_length</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'CC'</span></em>, <em class="sig-param"><span class="n">dim</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">level_iters</span><span class="o">=</span><span class="default_value">[10, 10, 5]</span></em>, <em class="sig-param"><span class="n">sigma_diff</span><span class="o">=</span><span class="default_value">2.0</span></em>, <em class="sig-param"><span class="n">radius</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">prealign</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_registration" title="Permalink to this definition">¶</a></dt>
@@ -130,8 +180,10 @@ source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>disp</strong><span class="classifier">str or Nifti1Image</span></dt><dd><p>A file of image containing the mapping displacement field in each voxel
-Shape (x, y, z, 3, 2)</p>
+<dt><strong>disp</strong><span class="classifier">str, Nifti1Image, or ndarray</span></dt><dd><p>If string, file must of an image or ndarray.
+If image, contains the mapping displacement field in each voxel
+Shape (x, y, z, 3, 2)
+If ndarray, contains affine transformation used for mapping</p>
 </dd>
 <dt><strong>domain_img</strong><span class="classifier">str or Nifti1Image</span></dt><dd></dd>
 <dt><strong>codomain_img</strong><span class="classifier">str or Nifti1Image</span></dt><dd></dd>
@@ -263,6 +315,7 @@ the static group.</p>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -304,7 +357,7 @@ the static group.</p>
   <li><a href="../../../index.html">Documentation overview</a><ul>
   <li><a href="../../index.html">API Reference</a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../dti/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.dti</span></code></a></li>
+      <li>Previous: <a href="../data/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a></li>
       <li>Next: <a href="../segmentation/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
   </ul></li>
   </ul></li>
@@ -338,7 +391,7 @@ the static group.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

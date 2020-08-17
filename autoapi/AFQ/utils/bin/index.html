@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.utils.bin &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -40,6 +41,46 @@
 <span id="afq-utils-bin"></span><h1><a class="reference internal" href="#module-AFQ.utils.bin" title="AFQ.utils.bin"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a><a class="headerlink" href="#module-AFQ.utils.bin" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.parse_string" title="AFQ.utils.bin.parse_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_string</span></code></a>(option, opt, value, parser)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.model_input_parser" title="AFQ.utils.bin.model_input_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_input_parser</span></code></a>(usage)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.model_predict_input_parser" title="AFQ.utils.bin.model_predict_input_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_predict_input_parser</span></code></a>(usage)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.get_default_args" title="AFQ.utils.bin.get_default_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_args</span></code></a>(func)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.toml_to_val" title="AFQ.utils.bin.toml_to_val"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toml_to_val</span></code></a>(t)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.val_to_toml" title="AFQ.utils.bin.val_to_toml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">val_to_toml</span></code></a>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.dict_to_toml" title="AFQ.utils.bin.dict_to_toml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_to_toml</span></code></a>(dictionary)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.func_dict_to_arg_dict" title="AFQ.utils.bin.func_dict_to_arg_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_dict_to_arg_dict</span></code></a>(func_dict=None, logger=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.parse_config_run_afq" title="AFQ.utils.bin.parse_config_run_afq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_config_run_afq</span></code></a>(toml_file, default_arg_dict, overwrite=False, logger=None, special_args={‘CLEANING’: ‘clean_params’, ‘SEGMENTATION’: ‘segmentation_params’, ‘TRACTOGRAPHY’: ‘tracking_params’})</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.generate_config" title="AFQ.utils.bin.generate_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_config</span></code></a>(toml_file, default_arg_dict, overwrite=False, logger=None)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt id="AFQ.utils.bin.parse_string">
 <code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">parse_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option</span></em>, <em class="sig-param"><span class="n">opt</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">parser</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.parse_string" title="Permalink to this definition">¶</a></dt>
@@ -60,6 +101,37 @@
 <code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">get_default_args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#get_default_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.get_default_args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt id="AFQ.utils.bin.toml_to_val">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">toml_to_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#toml_to_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.toml_to_val" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.bin.val_to_toml">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">val_to_toml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#val_to_toml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.val_to_toml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.bin.dict_to_toml">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">dict_to_toml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#dict_to_toml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.dict_to_toml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.bin.func_dict_to_arg_dict">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">func_dict_to_arg_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#func_dict_to_arg_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.func_dict_to_arg_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.bin.parse_config_run_afq">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">parse_config_run_afq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">toml_file</span></em>, <em class="sig-param"><span class="n">default_arg_dict</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">special_args</span><span class="o">=</span><span class="default_value">{'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_config_run_afq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.parse_config_run_afq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.bin.generate_config">
+<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">generate_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">toml_file</span></em>, <em class="sig-param"><span class="n">default_arg_dict</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#generate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.generate_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -139,7 +211,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

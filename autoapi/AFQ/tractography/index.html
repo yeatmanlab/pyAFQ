@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.tractography &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -18,7 +19,6 @@
     <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="AFQ.viz" href="../viz/index.html" />
     <link rel="prev" title="AFQ.segmentation" href="../segmentation/index.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
@@ -40,9 +40,25 @@
 <span id="afq-tractography"></span><h1><a class="reference internal" href="#module-AFQ.tractography" title="AFQ.tractography"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><a class="headerlink" href="#module-AFQ.tractography" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tractography.track" title="AFQ.tractography.track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track</span></code></a>(params_file, directions=’det’, max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model=’DTI’)</p></td>
+<td><p>Tractography</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tractography._local_tracking" title="AFQ.tractography._local_tracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_local_tracking</span></code></a>(seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)</p></td>
+<td><p>Helper function</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt id="AFQ.tractography.track">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">directions</span><span class="o">=</span><span class="default_value">'det'</span></em>, <em class="sig-param"><span class="n">max_angle</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_seeds</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">random_seeds</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stop_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">odf_model</span><span class="o">=</span><span class="default_value">'DTI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">directions</span><span class="o">=</span><span class="default_value">'det'</span></em>, <em class="sig-param"><span class="n">max_angle</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">n_seeds</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">random_seeds</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng_seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">odf_model</span><span class="o">=</span><span class="default_value">'DTI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tractography</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -58,8 +74,12 @@ One of: {“deterministic” | “probablistic”}</p>
 <dt><strong>sphere</strong><span class="classifier">Sphere object, optional.</span></dt><dd><p>The discretization of direction getting. default:
 dipy.data.default_sphere.</p>
 </dd>
-<dt><strong>seed_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>Binary mask describing the ROI within which we seed for tracking.
-Default to the entire volume.</p>
+<dt><strong>seed_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>Float or binary mask describing the ROI within which we seed for
+tracking.
+Default to the entire volume (all ones).</p>
+</dd>
+<dt><strong>seed_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>A value of the seed_mask below which tracking is terminated.
+Default to 0.</p>
 </dd>
 <dt><strong>n_seeds</strong><span class="classifier">int or 2D array, optional.</span></dt><dd><p>The seeding density: if this is an int, it is is how many seeds in each
 voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D
@@ -70,7 +90,10 @@ to generate within the mask.</p>
 <dt><strong>random_seeds</strong><span class="classifier">bool</span></dt><dd><p>Whether to generate a total of n_seeds random seeds in the mask.
 Default: XXX.</p>
 </dd>
-<dt><strong>stop_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>A floating point value that determines a stopping criterion (e.g. FA).
+<dt><strong>rng_seed</strong><span class="classifier">int</span></dt><dd><p>random seed used to generate random seeds if random_seeds is
+set to True. Default: None</p>
+</dd>
+<dt><strong>stop_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>A float or binary mask that determines a stopping criterion (e.g. FA).
 Default to no stopping (all ones).</p>
 </dd>
 <dt><strong>stop_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>A value of the stop_mask below which tracking is terminated. Default to
@@ -95,10 +118,11 @@ the edge of the image)</p>
 
 <dl class="py function">
 <dt id="AFQ.tractography._local_tracking">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seeds</span></em>, <em class="sig-param"><span class="n">dg</span></em>, <em class="sig-param"><span class="n">threshold_classifier</span></em>, <em class="sig-param"><span class="n">params_img</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seeds</span></em>, <em class="sig-param"><span class="n">dg</span></em>, <em class="sig-param"><span class="n">stopping_criterion</span></em>, <em class="sig-param"><span class="n">params_img</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function</p>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -143,7 +167,6 @@ the edge of the image)</p>
   <li><a href="../../index.html">API Reference</a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
       <li>Previous: <a href="../segmentation/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
-      <li>Next: <a href="../viz/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -176,7 +199,7 @@ the edge of the image)</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

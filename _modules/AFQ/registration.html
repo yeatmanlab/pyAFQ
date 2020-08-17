@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.registration &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -47,9 +48,8 @@
                                <span class="n">DiffeomorphicMap</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">dipy.align.imaffine</span> <span class="kn">import</span> <span class="p">(</span><span class="n">transform_centers_of_mass</span><span class="p">,</span>
-                                 <span class="n">AffineMap</span><span class="p">,</span>
                                  <span class="n">MutualInformationMetric</span><span class="p">,</span>
-                                 <span class="n">AffineRegistration</span><span class="p">)</span>
+                                 <span class="n">AffineRegistration</span><span class="p">,</span> <span class="n">AffineMap</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">dipy.align.transforms</span> <span class="kn">import</span> <span class="p">(</span><span class="n">TranslationTransform3D</span><span class="p">,</span>
                                    <span class="n">RigidTransform3D</span><span class="p">,</span>
@@ -57,13 +57,15 @@
 
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
-<span class="kn">from</span> <span class="nn">dipy.align.streamlinear</span> <span class="kn">import</span> <span class="n">StreamlineLinearRegistration</span>
+<span class="kn">from</span> <span class="nn">dipy.align.streamlinear</span> <span class="kn">import</span> \
+    <span class="n">StreamlineLinearRegistration</span><span class="p">,</span> <span class="n">whole_brain_slr</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">set_number_of_points</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.utils</span> <span class="kn">import</span> <span class="n">transform_tracking_output</span>
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">mut</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.streamlines</span> <span class="k">as</span> <span class="nn">sut</span>
+<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="n">ConformedAffineMap</span>
 
 <span class="n">syn_metric_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;CC&#39;</span><span class="p">:</span> <span class="n">CCMetric</span><span class="p">,</span>
                    <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="n">EMMetric</span><span class="p">,</span>
@@ -189,8 +191,12 @@
 <span class="sd">        Full path to the nifti file storing the mapping</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mapping_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mapping</span><span class="o">.</span><span class="n">forward</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">mapping</span><span class="o">.</span><span class="n">backward</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mapping_data</span><span class="p">,</span> <span class="n">mapping</span><span class="o">.</span><span class="n">codomain_world2grid</span><span class="p">),</span> <span class="n">fname</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">DiffeomorphicMap</span><span class="p">):</span>
+        <span class="n">mapping_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mapping</span><span class="o">.</span><span class="n">forward</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">mapping</span><span class="o">.</span><span class="n">backward</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mapping_data</span><span class="p">,</span> <span class="n">mapping</span><span class="o">.</span><span class="n">codomain_world2grid</span><span class="p">),</span>
+                 <span class="n">fname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mapping</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="read_mapping"><a class="viewcode-back" href="../../autoapi/AFQ/registration/index.html#AFQ.registration.read_mapping">[docs]</a><span class="k">def</span> <span class="nf">read_mapping</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="n">domain_img</span><span class="p">,</span> <span class="n">codomain_img</span><span class="p">,</span> <span class="n">prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -199,9 +205,11 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    disp : str or Nifti1Image</span>
-<span class="sd">        A file of image containing the mapping displacement field in each voxel</span>
+<span class="sd">    disp : str, Nifti1Image, or ndarray</span>
+<span class="sd">        If string, file must of an image or ndarray.</span>
+<span class="sd">        If image, contains the mapping displacement field in each voxel</span>
 <span class="sd">        Shape (x, y, z, 3, 2)</span>
+<span class="sd">        If ndarray, contains affine transformation used for mapping</span>
 
 <span class="sd">    domain_img : str or Nifti1Image</span>
 
@@ -212,7 +220,10 @@
 <span class="sd">    A :class:`DiffeomorphicMap` object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">disp</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">disp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;nii.gz&quot;</span> <span class="ow">in</span> <span class="n">disp</span><span class="p">:</span>
+            <span class="n">disp</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">disp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">disp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">disp</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain_img</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">domain_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">domain_img</span><span class="p">)</span>
@@ -220,18 +231,27 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">codomain_img</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">codomain_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">codomain_img</span><span class="p">)</span>
 
-    <span class="n">mapping</span> <span class="o">=</span> <span class="n">DiffeomorphicMap</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">disp</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
-                               <span class="n">disp_grid2world</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">disp</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-                               <span class="n">domain_shape</span><span class="o">=</span><span class="n">domain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
-                               <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">domain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                               <span class="n">codomain_shape</span><span class="o">=</span><span class="n">codomain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-                               <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">codomain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                               <span class="n">prealign</span><span class="o">=</span><span class="n">prealign</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">DiffeomorphicMap</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">disp</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+                                   <span class="n">disp_grid2world</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">disp</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                                   <span class="n">domain_shape</span><span class="o">=</span><span class="n">domain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+                                   <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">domain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                   <span class="n">codomain_shape</span><span class="o">=</span><span class="n">codomain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                                   <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">codomain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                   <span class="n">prealign</span><span class="o">=</span><span class="n">prealign</span><span class="p">)</span>
 
-    <span class="n">disp_data</span> <span class="o">=</span> <span class="n">disp</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">mapping</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="n">disp_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">mapping</span><span class="o">.</span><span class="n">backward</span> <span class="o">=</span> <span class="n">disp_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="n">mapping</span><span class="o">.</span><span class="n">is_inverse</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">disp_data</span> <span class="o">=</span> <span class="n">disp</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">mapping</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="n">disp_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">mapping</span><span class="o">.</span><span class="n">backward</span> <span class="o">=</span> <span class="n">disp_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">mapping</span><span class="o">.</span><span class="n">is_inverse</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">ConformedAffineMap</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span>
+                                     <span class="n">domain_grid_shape</span><span class="o">=</span><span class="n">reduce_shape</span><span class="p">(</span>
+                                         <span class="n">domain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                     <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">domain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                     <span class="n">codomain_grid_shape</span><span class="o">=</span><span class="n">reduce_shape</span><span class="p">(</span>
+                                         <span class="n">codomain_img</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                     <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">codomain_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">mapping</span></div>
 
@@ -313,7 +333,6 @@
                         <span class="n">sigmas</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
                         <span class="n">factors</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                         <span class="n">params0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the affine transformation between two 3D images.</span>
 
@@ -480,6 +499,53 @@
         <span class="n">aligned</span> <span class="o">=</span> <span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">aligned</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">srm</span><span class="o">.</span><span class="n">matrix</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">srm</span><span class="o">.</span><span class="n">matrix</span></div>
+
+
+<span class="k">def</span> <span class="nf">reduce_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reduce dimension in shape to 3 if possible</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">shape</span>
+
+
+<span class="k">def</span> <span class="nf">slr_registration</span><span class="p">(</span><span class="n">moving_data</span><span class="p">,</span> <span class="n">static_data</span><span class="p">,</span>
+                     <span class="n">moving_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">moving_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Register a source image (moving) to a target image (static).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    moving : ndarray</span>
+<span class="sd">        The source tractography data to be registered</span>
+<span class="sd">    moving_affine : ndarray</span>
+<span class="sd">        The affine associated with the moving (source) data.</span>
+<span class="sd">    moving_shape : ndarray</span>
+<span class="sd">        The shape of the space associated with the static (target) data.</span>
+<span class="sd">    static : ndarray</span>
+<span class="sd">        The target tractography data for registration</span>
+<span class="sd">    static_affine : ndarray</span>
+<span class="sd">        The affine associated with the static (target) data.</span>
+<span class="sd">    static_shape : ndarray</span>
+<span class="sd">        The shape of the space associated with the static (target) data.</span>
+
+<span class="sd">    **kwargs:</span>
+<span class="sd">        kwargs are passed into whole_brain_slr</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    AffineMap</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">whole_brain_slr</span><span class="p">(</span>
+        <span class="n">static_data</span><span class="p">,</span> <span class="n">moving_data</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ConformedAffineMap</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span>
+                              <span class="n">codomain_grid_shape</span><span class="o">=</span><span class="n">reduce_shape</span><span class="p">(</span><span class="n">static_shape</span><span class="p">),</span>
+                              <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">static_affine</span><span class="p">,</span>
+                              <span class="n">domain_grid_shape</span><span class="o">=</span><span class="n">reduce_shape</span><span class="p">(</span><span class="n">moving_shape</span><span class="p">),</span>
+                              <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">moving_affine</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -550,7 +616,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

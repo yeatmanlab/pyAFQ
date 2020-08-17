@@ -8,6 +8,14 @@ Module Contents
 ---------------
 
 
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.volume.patch_up_roi
+
+
 .. function:: patch_up_roi(roi)
 
    After being non-linearly transformed, ROIs tend to have holes in them.

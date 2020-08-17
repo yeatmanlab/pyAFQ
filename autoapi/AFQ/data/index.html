@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -18,8 +19,8 @@
     <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="AFQ.dki" href="../dki/index.html" />
-    <link rel="prev" title="AFQ.csd" href="../csd/index.html" />
+    <link rel="next" title="AFQ.registration" href="../registration/index.html" />
+    <link rel="prev" title="AFQ.bundles" href="../bundles/index.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
@@ -40,6 +41,31 @@
 <span id="afq-data"></span><h1><a class="reference internal" href="#module-AFQ.data" title="AFQ.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><a class="headerlink" href="#module-AFQ.data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.data.read_callosum_templates" title="AFQ.data.read_callosum_templates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_callosum_templates</span></code></a>(resample_to=False)</p></td>
+<td><p>Load AFQ callosum templates from file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.data.read_templates" title="AFQ.data.read_templates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_templates</span></code></a>(resample_to=False)</p></td>
+<td><p>Load AFQ templates from file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.data.fetch_hcp" title="AFQ.data.fetch_hcp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch_hcp</span></code></a>(subjects, hcp_bucket=’hcp-openaccess’, profile_name=’hcp’, path=None, study=’HCP_1200’, aws_access_key_id=None, aws_secret_access_key=None)</p></td>
+<td><p>Fetch HCP diffusion data and arrange it in a manner that resembles the</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.data.read_stanford_hardi_tractography" title="AFQ.data.read_stanford_hardi_tractography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_stanford_hardi_tractography</span></code></a>()</p></td>
+<td><p>Reads a minimal tractography from the Stanford dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.data.organize_stanford_data" title="AFQ.data.organize_stanford_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_stanford_data</span></code></a>(path=None)</p></td>
+<td><p>Create the expected file-system structure for the Stanford HARDI data-set.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py data">
 <dt id="AFQ.data.fetch_callosum_templates">
 <code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_callosum_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_callosum_templates" title="Permalink to this definition">¶</a></dt>
@@ -80,7 +106,7 @@
 
 <dl class="py function">
 <dt id="AFQ.data.fetch_hcp">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subjects</span></em>, <em class="sig-param"><span class="n">hcp_bucket</span><span class="o">=</span><span class="default_value">'hcp-openaccess'</span></em>, <em class="sig-param"><span class="n">profile_name</span><span class="o">=</span><span class="default_value">'hcp'</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_access_key_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_secret_access_key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subjects</span></em>, <em class="sig-param"><span class="n">hcp_bucket</span><span class="o">=</span><span class="default_value">'hcp-openaccess'</span></em>, <em class="sig-param"><span class="n">profile_name</span><span class="o">=</span><span class="default_value">'hcp'</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">study</span><span class="o">=</span><span class="default_value">'HCP_1200'</span></em>, <em class="sig-param"><span class="n">aws_access_key_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_secret_access_key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch HCP diffusion data and arrange it in a manner that resembles the
 BIDS <a class="reference internal" href="../index.html#r8494a6c36190-1" id="id1">[1]</a> specification.</p>
 <dl class="field-list simple">
@@ -94,6 +120,8 @@ BIDS <a class="reference internal" href="../index.html#r8494a6c36190-1" id="id1"
 </dd>
 <dt><strong>path</strong><span class="classifier">string, optional</span></dt><dd><p>Path to save files into. Default: ‘~/AFQ_data’</p>
 </dd>
+<dt><strong>study</strong><span class="classifier">string, optional</span></dt><dd><p>Which HCP study to grab. Default: ‘HCP_1200’</p>
+</dd>
 <dt><strong>aws_access_key_id</strong><span class="classifier">string, optional</span></dt><dd><p>AWS credentials to HCP AWS S3. Will only be used if <cite>profile_name</cite> is
 set to False.</p>
 </dd>
@@ -104,7 +132,8 @@ set to False.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>dict with remote and local names of these files.</dt><dd></dd>
+<dt>dict with remote and local names of these files,</dt><dd></dd>
+<dt>path to BIDS derivative dataset</dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -143,6 +172,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 <dd><p>Create the expected file-system structure for the Stanford HARDI data-set.</p>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -186,8 +216,8 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
   <li><a href="../../../index.html">Documentation overview</a><ul>
   <li><a href="../../index.html">API Reference</a><ul>
   <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../csd/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.csd</span></code></a></li>
-      <li>Next: <a href="../dki/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.dki</span></code></a></li>
+      <li>Previous: <a href="../bundles/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a></li>
+      <li>Next: <a href="../registration/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -220,7 +250,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

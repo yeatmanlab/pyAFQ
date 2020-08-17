@@ -7,8 +7,16 @@
 Module Contents
 ---------------
 
+Classes
+~~~~~~~
 
-.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=0, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
+.. autoapisummary::
+
+   AFQ.segmentation.Segmentation
+
+
+
+.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=50, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
 
    .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=0, img_affine=None)
 

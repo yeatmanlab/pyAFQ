@@ -1,0 +1,1185 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.viz.utils &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for AFQ.viz.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">sem</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">palettable.tableau</span> <span class="kn">import</span> <span class="n">Tableau_20</span>
+<span class="kn">import</span> <span class="nn">imageio</span> <span class="k">as</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="nn">display</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.utils</span> <span class="kn">import</span> <span class="n">transform_tracking_output</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.stats</span> <span class="kn">import</span> <span class="n">contrast_index</span> <span class="k">as</span> <span class="n">calc_contrast_index</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Viz&quot;</span><span class="p">,</span> <span class="s2">&quot;visualize_tract_profiles&quot;</span><span class="p">,</span> <span class="s2">&quot;visualize_gif_inline&quot;</span><span class="p">]</span>
+
+<span class="n">viz_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;AFQ.viz&quot;</span><span class="p">)</span>
+<span class="n">tableau_20_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Tableau_20</span><span class="o">.</span><span class="n">colors</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span> <span class="o">-</span> <span class="mf">0.0001</span>
+
+<span class="n">COLOR_DICT</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                          <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                          <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                          <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                          <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+                          <span class="s2">&quot;HCC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+                          <span class="s2">&quot;HCC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
+                          <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
+                          <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
+                          <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+                          <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span>
+                          <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span>
+                          <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span>
+                          <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span>
+                          <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span>
+                          <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span>
+                          <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span>
+                          <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span>
+                          <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20_rgb</span><span class="p">[</span><span class="mi">19</span><span class="p">]})</span>
+
+<span class="n">POSITIONS</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                         <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                         <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                         <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                         <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                         <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                         <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                         <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                         <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+
+<span class="n">BUNDLE_MAT_2_PYTHON</span> <span class="o">=</span> \
+    <span class="p">{</span><span class="s1">&#39;Right Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Left IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;Right IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Left Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Callosum Forceps Major&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;Callosum Forceps Minor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">}</span>
+
+<span class="n">CSV_MAT_2_PYTHON</span> <span class="o">=</span> \
+    <span class="p">{</span><span class="s1">&#39;fa&#39;</span><span class="p">:</span> <span class="s1">&#39;dti_fa&#39;</span><span class="p">,</span> <span class="s1">&#39;md&#39;</span><span class="p">:</span> <span class="s1">&#39;dti_md&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;tractID&#39;</span><span class="p">:</span> <span class="s1">&#39;bundle&#39;</span><span class="p">}</span>
+
+<span class="n">SCALE_MAT_2_PYTHON</span> <span class="o">=</span> \
+    <span class="p">{</span><span class="s1">&#39;dti_md&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">viz_import_msg_error</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Alerts user to install the appropriate viz module &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;To use </span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> visualizations in pyAFQ, you will need &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;to have </span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> installed. &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;You can do that by installing pyAFQ with &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;`pip install AFQ[</span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">]`, or by &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;separately installing </span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">: &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;`pip install </span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">`.&quot;</span>
+    <span class="k">return</span> <span class="n">msg</span>
+
+
+<span class="k">def</span> <span class="nf">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Selects bundle and color</span>
+<span class="sd">    from the given bundle dictionary and color informaiton</span>
+<span class="sd">    Helper function</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bundle_dict : dict, optional</span>
+<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
+<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the trk</span>
+<span class="sd">        metadata. Default: bundles are either not identified, or identified</span>
+<span class="sd">        only as unique integers in the metadata.</span>
+
+<span class="sd">    bundle : str or int, optional</span>
+<span class="sd">        The name of a bundle to select from among the keys in `bundle_dict`</span>
+<span class="sd">        or an integer for selection from the trk metadata.</span>
+
+<span class="sd">    colors : dict or list</span>
+<span class="sd">        If this is a dict, keys are bundle names and values are RGB tuples.</span>
+<span class="sd">        If this is a list, each item is an RGB tuple. Defaults to a list</span>
+<span class="sd">        with Tableau 20 RGB values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    RGB tuple and str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">b_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bundle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># We&#39;ll choose a color from a rotating list:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_list</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">color_list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># We have a mapping from UIDs to bundle names:</span>
+        <span class="k">for</span> <span class="n">b_name_iter</span><span class="p">,</span> <span class="n">b_iter</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">b_iter</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                <span class="n">b_name</span> <span class="o">=</span> <span class="n">b_name_iter</span>
+                <span class="k">break</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span>
+
+
+<span class="k">def</span> <span class="nf">tract_generator</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates bundles of streamlines from the tractogram.</span>
+<span class="sd">    Only generates from relevant bundle if bundle is set.</span>
+<span class="sd">    Uses bundle_dict and colors to assign colors if set.</span>
+<span class="sd">    Otherwise, returns all streamlines.</span>
+
+<span class="sd">    Helper function</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sft : Stateful Tractogram, str</span>
+<span class="sd">        A Stateful Tractogram containing streamline information</span>
+<span class="sd">        or a path to a trk file</span>
+
+<span class="sd">    affine : ndarray</span>
+<span class="sd">       An affine transformation to apply to the streamlines.</span>
+
+<span class="sd">    bundle : str or int</span>
+<span class="sd">        The name of a bundle to select from among the keys in `bundle_dict`</span>
+<span class="sd">        or an integer for selection from the trk metadata.</span>
+
+<span class="sd">    bundle_dict : dict, optional</span>
+<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
+<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the sft</span>
+<span class="sd">        metadata. Default: bundles are either not identified, or identified</span>
+<span class="sd">        only as unique integers in the metadata.</span>
+
+<span class="sd">    colors : dict or list</span>
+<span class="sd">        If this is a dict, keys are bundle names and values are RGB tuples.</span>
+<span class="sd">        If this is a list, each item is an RGB tuple. Defaults to a list</span>
+<span class="sd">        with Tableau 20 RGB values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Statefule Tractogram streamlines, RGB numpy array, str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Stateful Tractogram...&quot;</span><span class="p">)</span>
+        <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;same&#39;</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span> <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">affine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Transforming Stateful Tractogram...&quot;</span><span class="p">)</span>
+        <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="o">.</span><span class="n">from_sft</span><span class="p">(</span>
+            <span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">affine</span><span class="p">),</span>
+            <span class="n">sft</span><span class="p">,</span>
+            <span class="n">data_per_streamline</span><span class="o">=</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">)</span>
+
+    <span class="n">streamlines</span> <span class="o">=</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span>
+    <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating colorful lines from tractography...&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Use the color dict provided</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">COLOR_DICT</span>
+
+    <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="c1"># There are no bundles in here:</span>
+        <span class="k">yield</span> <span class="n">streamlines</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="s2">&quot;all_bundles&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># There are bundles:</span>
+        <span class="k">if</span> <span class="n">bundle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No selection: visualize all of them:</span>
+
+            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]):</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">these_sls</span> <span class="o">=</span> <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span> <span class="o">=</span> <span class="n">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Select just one to visualize:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># We need to find the UID:</span>
+                <span class="n">uid</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># It&#39;s already a UID:</span>
+                <span class="n">uid</span> <span class="o">=</span> <span class="n">bundle</span>
+
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">these_sls</span> <span class="o">=</span> <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span> <span class="o">=</span> <span class="n">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span>
+
+
+<span class="k">def</span> <span class="nf">gif_from_pngs</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">gif_fname</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span>
+                  <span class="n">png_fname</span><span class="o">=</span><span class="s2">&quot;tgif&quot;</span><span class="p">,</span> <span class="n">add_zeros</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function</span>
+<span class="sd">        Stitches together gif from screenshots</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">add_zeros</span><span class="p">:</span>
+        <span class="n">fname_suffix10</span> <span class="o">=</span> <span class="s2">&quot;00000&quot;</span>
+        <span class="n">fname_suffix100</span> <span class="o">=</span> <span class="s2">&quot;0000&quot;</span>
+        <span class="n">fname_suffix1000</span> <span class="o">=</span> <span class="s2">&quot;000&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fname_suffix10</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">fname_suffix100</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">fname_suffix1000</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_frames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">angle_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">png_fname</span><span class="si">}{</span><span class="n">fname_suffix10</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">angle_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">png_fname</span><span class="si">}{</span><span class="n">fname_suffix100</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">angle_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">png_fname</span><span class="si">}{</span><span class="n">fname_suffix1000</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">angle_fname</span><span class="p">)))</span>
+
+    <span class="n">io</span><span class="o">.</span><span class="n">mimsave</span><span class="p">(</span><span class="n">gif_fname</span><span class="p">,</span> <span class="n">angles</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">prepare_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">affine_or_mapping</span><span class="p">,</span> <span class="n">static_img</span><span class="p">,</span>
+                <span class="n">roi_affine</span><span class="p">,</span> <span class="n">static_affine</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the ROI</span>
+<span class="sd">    Possibly perform a transformation on an ROI</span>
+<span class="sd">    Helper function</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    roi : str or Nifti1Image</span>
+<span class="sd">        The ROI information.</span>
+<span class="sd">        If str, ROI will be loaded using the str as a path.</span>
+
+<span class="sd">    affine_or_mapping : ndarray, Nifti1Image, or str</span>
+<span class="sd">       An affine transformation or mapping to apply to the ROI before</span>
+<span class="sd">       visualization. Default: no transform.</span>
+
+<span class="sd">    static_img: str or Nifti1Image</span>
+<span class="sd">        Template to resample roi to.</span>
+
+<span class="sd">    roi_affine: ndarray</span>
+
+<span class="sd">    static_affine: ndarray</span>
+
+<span class="sd">    reg_template: str or Nifti1Image</span>
+<span class="sd">        Template to use for registration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing ROI...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">affine_or_mapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">affine_or_mapping</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="c1"># This is an affine:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">static_img</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">roi_affine</span> <span class="ow">is</span> <span class="kc">None</span>
+                    <span class="ow">or</span> <span class="n">static_affine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If using an affine to transform an ROI, &quot;</span>
+                                 <span class="s2">&quot;need to also specify all of the following&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;inputs: `static_img`, `roi_affine`, &quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;`static_affine`&quot;</span><span class="p">)</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">static_img</span><span class="p">,</span> <span class="n">roi_affine</span><span class="p">,</span> <span class="n">static_affine</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Assume it is  a mapping:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">affine_or_mapping</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">affine_or_mapping</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">reg_template</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">static_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;If using a mapping to transform an ROI, need to &quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;also specify all of the following inputs: &quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;`reg_template`, `static_img`&quot;</span><span class="p">)</span>
+                <span class="n">affine_or_mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">affine_or_mapping</span><span class="p">,</span>
+                                                     <span class="n">static_img</span><span class="p">,</span>
+                                                     <span class="n">reg_template</span><span class="p">)</span>
+
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span><span class="n">affine_or_mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                                   <span class="n">roi</span><span class="p">,</span>
+                                   <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">roi</span>
+
+
+<span class="k">def</span> <span class="nf">load_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a volume</span>
+<span class="sd">    Helper function</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume : ndarray or str</span>
+<span class="sd">        3d volume to load.</span>
+<span class="sd">        If string, it is used as a file path.</span>
+<span class="sd">        If it is an ndarray, it is simply returned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Volume...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">volume</span>
+
+
+<div class="viewcode-block" id="Viz"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/utils/index.html#AFQ.viz.utils.Viz">[docs]</a><span class="k">class</span> <span class="nc">Viz</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;fury&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up visualization preferences.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            backend : str, optional</span>
+<span class="sd">                Should be either &quot;fury&quot; or &quot;plotly&quot;.</span>
+<span class="sd">                Default: &quot;fury&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;fury&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">AFQ.viz.fury_backend</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;fury&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_bundles</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">fury_backend</span><span class="o">.</span><span class="n">visualize_bundles</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_roi</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">fury_backend</span><span class="o">.</span><span class="n">visualize_roi</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_volume</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">fury_backend</span><span class="o">.</span><span class="n">visualize_volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_gif</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">fury_backend</span><span class="o">.</span><span class="n">create_gif</span>
+        <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;plotly&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">AFQ.viz.plotly_backend</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plotly&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_bundles</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">plotly_backend</span><span class="o">.</span><span class="n">visualize_bundles</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_roi</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">plotly_backend</span><span class="o">.</span><span class="n">visualize_roi</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_volume</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">plotly_backend</span><span class="o">.</span><span class="n">visualize_volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_gif</span> <span class="o">=</span> <span class="n">AFQ</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">plotly_backend</span><span class="o">.</span><span class="n">create_gif</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Visualization backend should be&quot;</span>
+                            <span class="o">+</span> <span class="s2">&quot; either &#39;plotly&#39; or &#39;fury&#39;. &quot;</span>
+                            <span class="o">+</span> <span class="s2">&quot;It is currently set to </span><span class="si">%s</span><span class="s2">&quot;</span>
+                            <span class="o">%</span> <span class="n">backend</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="visualize_tract_profiles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/utils/index.html#AFQ.viz.utils.visualize_tract_profiles">[docs]</a><span class="k">def</span> <span class="nf">visualize_tract_profiles</span><span class="p">(</span><span class="n">tract_profiles</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="n">min_fa</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                             <span class="n">max_fa</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="n">POSITIONS</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualize all tract profiles for a scalar in one plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tract_profiles : pandas dataframe</span>
+<span class="sd">        Pandas dataframe of tract_profiles. For example,</span>
+<span class="sd">        tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])</span>
+
+<span class="sd">    scalar : string, optional</span>
+<span class="sd">       Scalar to use in plots. Default: &quot;dti_fa&quot;.</span>
+
+<span class="sd">    min_fa : float, optional</span>
+<span class="sd">        Minimum FA used for y-axis bounds. Default: 0.0</span>
+
+<span class="sd">    max_fa : float, optional</span>
+<span class="sd">        Maximum FA used for y-axis bounds. Default: 1.0</span>
+
+<span class="sd">    file_name : string, optional</span>
+<span class="sd">        File name to save figure to if not None. Default: None</span>
+
+<span class="sd">    positions : dictionary, optional</span>
+<span class="sd">        Dictionary that maps bundle names to position in plot.</span>
+<span class="sd">        Default: POSITIONS</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        Matplotlib figure and axes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">positions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">positions</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">positions</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">fa</span> <span class="o">=</span> <span class="n">tract_profiles</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">tract_profiles</span><span class="p">[</span><span class="s2">&quot;bundle&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">bundle</span><span class="p">)</span>
+        <span class="p">][</span><span class="n">scalar</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">COLOR_DICT</span><span class="p">[</span><span class="n">bundle</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">min_fa</span><span class="p">,</span> <span class="n">max_fa</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span></div>
+
+
+<span class="k">class</span> <span class="nc">LongitudinalCSVComparison</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare different CSVs, using:</span>
+<span class="sd">    tract profiles, contrast indices,</span>
+<span class="sd">    scan-rescan reliability using Pearson&#39;s r.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_folder</span><span class="p">,</span> <span class="n">csv_fnames</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">is_mats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">subjects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">scalar_bounds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lb&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dti_fa&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">},</span>
+                                <span class="s1">&#39;ub&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dti_md&#39;</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">}},</span>
+                 <span class="n">percent_nan_tol</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">mat_bundle_converter</span><span class="o">=</span><span class="n">BUNDLE_MAT_2_PYTHON</span><span class="p">,</span>
+                 <span class="n">mat_column_converter</span><span class="o">=</span><span class="n">CSV_MAT_2_PYTHON</span><span class="p">,</span>
+                 <span class="n">mat_scale_converter</span><span class="o">=</span><span class="n">SCALE_MAT_2_PYTHON</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load in csv files, converting from matlab if necessary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out_folder : path, optional</span>
+<span class="sd">            Folder where outputs of this class&#39;s methods will be saved.</span>
+
+<span class="sd">        csv_fnames : list of filenames</span>
+<span class="sd">            Filenames for the two CSVs containing tract profiles to compare.</span>
+<span class="sd">            Will obtain subject list from the first file.</span>
+
+<span class="sd">        names : list of strings</span>
+<span class="sd">            Name to use to identify each CSV dataset.</span>
+
+<span class="sd">        is_mats : bool or list of bools, optional</span>
+<span class="sd">            Whether or not the csv was generated from Matlab AFQ or pyAFQ.</span>
+<span class="sd">            Default: False</span>
+
+<span class="sd">        subjects : list of str, optional</span>
+<span class="sd">            List of subjects to consider.</span>
+<span class="sd">            If None, will use all subjects in first dataset.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        scalar_bounds : dictionary, optional</span>
+<span class="sd">            A dictionary with a lower bound and upper bound containting a</span>
+<span class="sd">            series of scalar / threshold pairs used as a white-matter mask</span>
+<span class="sd">            on the profiles (any values outside of the threshold will be</span>
+<span class="sd">            marked NaN and not used or set to 0, depending on the case).</span>
+<span class="sd">            Default: {&#39;lb&#39;: {&#39;dti_fa&#39;: 0.2}, &#39;ub&#39;: {&#39;dti_md&#39;: 0.002}}</span>
+
+<span class="sd">        percent_nan_tol : int, optional</span>
+<span class="sd">            Percentage of NaNs tolerable. If a profile has less than this</span>
+<span class="sd">            percentage of NaNs, NaNs are interpolated. If it has more,</span>
+<span class="sd">            the profile is thrown out.</span>
+
+<span class="sd">        mat_bundle_converter : dictionary, optional</span>
+<span class="sd">            Dictionary that maps matlab bundle names to python bundle names.</span>
+<span class="sd">            Default: BUNDLE_MAT_2_PYTHON</span>
+
+<span class="sd">        mat_column_converter : dictionary, optional</span>
+<span class="sd">            Dictionary that maps matlab column names to python column names.</span>
+<span class="sd">            Default: CSV_MAT_2_PYTHON</span>
+
+<span class="sd">        mat_scale_converter : dictionary, optional</span>
+<span class="sd">            Dictionary that maps scalar names to how they should be scaled</span>
+<span class="sd">            to match pyAFQ&#39;s scale for that scalar.</span>
+<span class="sd">            Default: SCALE_MAT_2_PYTHON</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.csv&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_folder</span> <span class="o">=</span> <span class="n">out_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percent_nan_tol</span> <span class="o">=</span> <span class="n">percent_nan_tol</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_mats</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">is_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_mats</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_fnames</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">csv_fnames</span><span class="p">):</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span>
+                        <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">())</span>
+                    <span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_mats</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="n">mat_column_converter</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">mat_bundle_converter</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">mat_scale_converter</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">profile</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">profile</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">bound</span><span class="p">,</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">scalar_bounds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="n">constraint</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">profile</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">profile</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_scalar</span><span class="p">(</span>
+                                <span class="n">bound</span><span class="p">,</span>
+                                <span class="n">threshold</span><span class="p">,</span>
+                                <span class="n">x</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="p">[</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="k">if</span> <span class="n">subjects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="p">[</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;subjectID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="n">subjects</span>
+
+    <span class="k">def</span> <span class="nf">_threshold_scalar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bound</span> <span class="o">==</span> <span class="s2">&quot;lb&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">bound</span> <span class="o">==</span> <span class="s2">&quot;ub&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;scalar_bounds dictionary &quot;</span>
+                               <span class="o">+</span> <span class="s2">&quot; formatted incorrectly. See&quot;</span>
+                               <span class="o">+</span> <span class="s2">&quot; the default for reference&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">f_name</span><span class="p">):</span>
+        <span class="n">f_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_folder</span><span class="p">,</span>
+            <span class="n">folder</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">f_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f_folder</span><span class="p">,</span> <span class="n">f_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">repl_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">single_profile</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">subject</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">bundle</span><span class="p">)</span>
+        <span class="p">][</span><span class="n">scalar</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">nans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">single_profile</span><span class="p">)</span>
+        <span class="n">percent_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nans</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">single_profile</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;No scalars found for scalar &#39;</span> <span class="o">+</span> <span class="n">scalar</span>
+                <span class="o">+</span> <span class="s1">&#39; for subject &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s1">&#39; for bundle &#39;</span> <span class="o">+</span> <span class="n">bundle</span>
+                <span class="o">+</span> <span class="s1">&#39; for CSV &#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">percent_nan</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">percent_nan</span><span class="si">}</span><span class="s1">% NaNs found in scalar &#39;</span> <span class="o">+</span> <span class="n">scalar</span>
+                <span class="o">+</span> <span class="s1">&#39; for subject &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s1">&#39; for bundle &#39;</span> <span class="o">+</span> <span class="n">bundle</span>
+                <span class="o">+</span> <span class="s1">&#39; for CSV &#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nans</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">percent_nan_tol</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s1">&#39;. Profile ignored. &#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s1">&#39;. NaNs interpolated. &#39;</span><span class="p">)</span>
+                <span class="n">non_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nans</span><span class="p">)</span>
+                <span class="n">single_profile</span><span class="p">[</span><span class="n">nans</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">nans</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">non_nan</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">single_profile</span><span class="p">[</span><span class="n">non_nan</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">single_profile</span>
+
+    <span class="k">def</span> <span class="nf">_get_brain_axes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suptitle</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">suptitle</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span>
+
+    <span class="k">def</span> <span class="nf">masked_corr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">])))</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span>
+                       <span class="n">min_scalar</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_scalar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                       <span class="n">show_plots</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">positions</span><span class="o">=</span><span class="n">POSITIONS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare all tract profiles for a scalar from different CSVs.</span>
+<span class="sd">        Plots tract profiles for all in one plot.</span>
+<span class="sd">        Bundles taken from positions argument.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names : list of strings, optional</span>
+<span class="sd">            Names of datasets to plot profiles of.</span>
+<span class="sd">            If None, all datasets are used.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        scalar : string, optional</span>
+<span class="sd">            Scalar to use in plots. Default: &quot;dti_fa&quot;.</span>
+
+<span class="sd">        min_scalar : float, optional</span>
+<span class="sd">            Minimum value used for y-axis bounds. Default: 0.0</span>
+
+<span class="sd">        max_scalar : float, optional</span>
+<span class="sd">            Maximum value used for y-axis bounds. Default: 1.0</span>
+
+<span class="sd">        show_plots : bool, optional</span>
+<span class="sd">            Whether to show plots if in an interactive environment.</span>
+<span class="sd">            Default: False</span>
+
+<span class="sd">        positions : dictionary, optional</span>
+<span class="sd">            Dictionary that maps bundle names to position in plot.</span>
+<span class="sd">            Default: POSITIONS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">bundles</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span><span class="s1">&#39;Subject &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">subject</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">positions</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">positions</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                    <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_profile</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">min_scalar</span><span class="p">,</span> <span class="n">max_scalar</span><span class="p">])</span>
+                <span class="n">y_ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span> <span class="o">*</span> <span class="n">max_scalar</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">y_ticks</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">y_ticks</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;tract_profiles/</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2">_sub-</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">contrast_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span>
+                       <span class="n">bundles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">POSITIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">show_plots</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the contrast index for each bundle in two datasets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names : list of strings, optional</span>
+<span class="sd">            Names of datasets to plot profiles of.</span>
+<span class="sd">            If None, all datasets are used.</span>
+<span class="sd">            Should be a total of only two datasets.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        scalar : string, optional</span>
+<span class="sd">            Scalar to use for the contrast index. Default: &quot;dti_fa&quot;.</span>
+
+<span class="sd">        bundles : list of strings, optional</span>
+<span class="sd">            Bundles to correlate. Default: list(POSITIONS.keys())</span>
+
+<span class="sd">        show_plots : bool, optional</span>
+<span class="sd">            Whether to show plots if in an interactive environment.</span>
+<span class="sd">            Default: False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Pandas dataframe of contrast indices</span>
+<span class="sd">        with subjects as columns and bundles as rows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;To calculate the contrast index, &quot;</span>
+                              <span class="o">+</span> <span class="s2">&quot;only two dataset names should be given&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">contrast_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">bundles</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contrast Indices by Bundle, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+                <span class="n">profiles</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+                <span class="n">both_found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                    <span class="n">profiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_profile</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">profiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">both_found</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">both_found</span><span class="p">:</span>
+                    <span class="n">this_contrast_index</span> <span class="o">=</span> \
+                        <span class="n">calc_contrast_index</span><span class="p">(</span><span class="n">profiles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">profiles</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">this_contrast_index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">scalar</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+                    <span class="n">contrast_index</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">this_contrast_index</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">scalar</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;contrast_plots/</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_contrast_index&quot;</span><span class="p">))</span>
+
+        <span class="n">contrast_index</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;contrast_index/</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">contrast_index</span>
+
+    <span class="k">def</span> <span class="nf">lateral_contrast_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span>
+                               <span class="n">bundles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">POSITIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                               <span class="n">show_plots</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the lateral contrast index for each bundle in a given</span>
+<span class="sd">        dataset, for each dataset in names.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names : list of strings, optional</span>
+<span class="sd">            Names of datasets to plot profiles of.</span>
+<span class="sd">            If None, all datasets are used.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        scalar : string, optional</span>
+<span class="sd">            Scalar to use for the contrast index. Default: &quot;dti_fa&quot;.</span>
+
+<span class="sd">        bundles : list of strings, optional</span>
+<span class="sd">            Bundles to correlate.</span>
+<span class="sd">            Every other bundle will be laterally correlated.</span>
+<span class="sd">            There must be an even number of bundles.</span>
+<span class="sd">            Default: list(POSITIONS.keys())</span>
+
+<span class="sd">        show_plots : bool, optional</span>
+<span class="sd">            Whether to show plots if in an interactive environment.</span>
+<span class="sd">            Default: False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Lateral Contrast Indices by Bundle&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">bundle</span> <span class="o">=</span> <span class="n">bundles</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">other_bundle</span> <span class="o">=</span> <span class="n">bundles</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                    <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_profile</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span>
+                    <span class="n">other_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_profile</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">other_bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">other_profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">lateral_contrast_index</span> <span class="o">=</span> \
+                            <span class="n">calc_contrast_index</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">other_profile</span><span class="p">)</span>
+                        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lateral_contrast_index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">other_bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;contrast_plots/</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2">_lateral_contrast_index&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">reliability_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">scalars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">],</span>
+                          <span class="n">ylims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">bundles</span><span class="o">=</span><span class="n">POSITIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+                          <span class="n">show_plots</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the scan-rescan reliability using Pearson&#39;s r for 2 scalars.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names : list of strings, optional</span>
+<span class="sd">            Names of datasets to plot profiles of.</span>
+<span class="sd">            If None, all datasets are used.</span>
+<span class="sd">            Should be a total of only two datasets.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        scalars : list of strings, optional</span>
+<span class="sd">            Scalars to correlate. Default: [&quot;dti_fa&quot;, &quot;dti_md&quot;].</span>
+
+<span class="sd">        ylims : 2-tuple of floats, optional</span>
+<span class="sd">            Limits of the y-axis. Useful to synchronize axes across graphs.</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        bundles : list of strings, optional</span>
+<span class="sd">            Bundles to correlate. Default: POSITIONS.keys()</span>
+
+<span class="sd">        show_plots : bool, optional</span>
+<span class="sd">            Whether to show plots if in an interactive environment.</span>
+<span class="sd">            Default: False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Matplotlib figure and axes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;To plot correlations, &quot;</span>
+                              <span class="o">+</span> <span class="s2">&quot;only two dataset names should be given&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># extract relevant statistics / data from profiles</span>
+        <span class="n">all_sub_coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">)))</span>
+        <span class="n">all_sub_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)))</span>
+        <span class="n">all_profile_coef</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)))</span>
+        <span class="n">all_node_coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">),</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scalars</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
+                <span class="n">bundle_profiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">),</span> <span class="mi">100</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subject</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">):</span>
+                        <span class="n">single_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_profile</span><span class="p">(</span>
+                            <span class="n">name</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">repl_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">single_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">bundle_profiles</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">bundle_profiles</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">single_profile</span>
+
+                <span class="n">all_sub_means</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">bundle_profiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">all_sub_coef</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masked_corr</span><span class="p">(</span><span class="n">all_sub_means</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+
+                <span class="n">bundle_coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)):</span>
+                    <span class="n">bundle_coefs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">masked_corr</span><span class="p">(</span><span class="n">bundle_profiles</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">all_profile_coef</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_coefs</span>
+
+                <span class="n">node_coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+                    <span class="n">node_coefs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masked_corr</span><span class="p">(</span><span class="n">bundle_profiles</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="n">all_node_coef</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_coefs</span>
+
+        <span class="c1"># plot histograms of subject pearson r&#39;s</span>
+        <span class="n">maxi</span> <span class="o">=</span> <span class="n">all_profile_coef</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">mini</span> <span class="o">=</span> <span class="n">all_profile_coef</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span>
+            <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distribution of Pearson&#39;s r between profiles,&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scalars</span><span class="p">):</span>
+                <span class="n">bundle_coefs</span> <span class="o">=</span> <span class="n">all_profile_coef</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bundle_coefs</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">scalar</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;rel_plots/</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">/verbose&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_profile_r_distributions&quot;</span><span class="p">))</span>
+
+        <span class="c1"># plot node reliability profile</span>
+        <span class="n">all_node_coef</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">all_node_coef</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">ylims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">maxi</span> <span class="o">=</span> <span class="n">all_node_coef</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">mini</span> <span class="o">=</span> <span class="n">all_node_coef</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">maxi</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mini</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span>
+            <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;node reliability profiles,&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scalars</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">all_node_coef</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">scalar</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;rel_plots/</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">/verbose&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_node_profiles&quot;</span><span class="p">))</span>
+
+        <span class="c1"># plot mean profile scatter plots</span>
+        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scalars</span><span class="p">):</span>
+            <span class="n">this_sub_means</span> <span class="o">=</span> <span class="n">all_sub_means</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="n">maxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">this_sub_means</span><span class="p">)</span>
+            <span class="n">mini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">this_sub_means</span><span class="p">)</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_brain_axes</span><span class="p">(</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distribution of mean profiles,&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">POSITIONS</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                    <span class="n">this_sub_means</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">this_sub_means</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">])</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;rel_plots/</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">/verbose&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s2">_mean_profiles&quot;</span><span class="p">))</span>
+
+        <span class="c1"># plot bar plots of pearson&#39;s r</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="mf">0.6</span>
+        <span class="n">spacing</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">))</span> <span class="o">*</span> <span class="n">spacing</span>
+        <span class="n">x_shift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">))</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">bundle_prof_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">all_profile_coef</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">bundle_prof_stds</span> <span class="o">=</span> <span class="n">sem</span><span class="p">(</span><span class="n">all_profile_coef</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s1">&#39;omit&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ylims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">maxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bundle_prof_means</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">all_sub_coef</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="n">mini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">bundle_prof_means</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">all_sub_coef</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">maxi</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mini</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scalars</span><span class="p">):</span>
+            <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+                <span class="n">x</span> <span class="o">+</span> <span class="n">x_shift</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                <span class="n">bundle_prof_means</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                <span class="n">width</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">scalar</span><span class="p">,</span>
+                <span class="n">yerr</span><span class="o">=</span><span class="n">bundle_prof_stds</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+            <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+                <span class="n">x</span> <span class="o">+</span> <span class="n">x_shift</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                <span class="n">all_sub_coef</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                <span class="n">width</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">scalar</span>
+            <span class="p">)</span>
+
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Mean of</span><span class="se">\n</span><span class="s1">Pearson</span><span class="se">\&#39;</span><span class="s1">s r</span><span class="se">\n</span><span class="s1">of profiles&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">bundles</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;profile_reliability&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Pearson</span><span class="se">\&#39;</span><span class="s1">s r</span><span class="se">\n</span><span class="s1">of mean</span><span class="se">\n</span><span class="s1">of profiles&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">mini</span><span class="p">,</span> <span class="n">maxi</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">bundles</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;intersubejct_reliability&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span>
+                 <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                 <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span>
+                 <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                 <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+            <span class="n">scalars</span><span class="p">,</span>
+            <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">,</span>
+            <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;rel_plots/</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_intersubejct_reliability&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;rel_plots/</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_intersubject&quot;</span><span class="p">),</span>
+            <span class="n">bbox_inches</span><span class="o">=</span><span class="n">extent</span><span class="o">.</span><span class="n">translated</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">)</span><span class="o">.</span><span class="n">expanded</span><span class="p">(</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;intersubejct_reliability&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_plots</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span>
+
+
+<div class="viewcode-block" id="visualize_gif_inline"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/utils/index.html#AFQ.viz.utils.visualize_gif_inline">[docs]</a><span class="k">def</span> <span class="nf">visualize_gif_inline</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">use_s3fs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display a gif inline, possible from s3fs &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">use_s3fs</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">s3fs</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+        <span class="n">tdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+        <span class="n">fname_remote</span> <span class="o">=</span> <span class="n">fname</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="s2">&quot;fig.gif&quot;</span><span class="p">)</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fname_remote</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+
+    <span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../AFQ.html">AFQ</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>
