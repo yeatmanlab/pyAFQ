@@ -151,6 +151,7 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 11))
 
 
+@pytest.mark.slow
 def test_AFQ_data():
     """
     Test if API can run without prealign
@@ -172,6 +173,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
+@pytest.mark.slow
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -304,7 +306,10 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
-    tracking_params = dict(odf_model="DTI")
+    tracking_params = dict(odf_model="DTI",
+                           seed_mask="roi_mask",
+                           n_seeds=100,
+                           random_seeds=True)
     segmentation_params = dict(filter_by_endpoints=False,
                                seg_algo="AFQ",
                                return_idx=True)
@@ -393,10 +398,16 @@ def test_AFQ_data_waypoint():
     # Test the CLI:
     print("Running the CLI:")
 
-    # Bare bones config only points to the files:
+    # Set up config to use the same parameters as above:
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft',
-                            segmentation='freesurfer'))
+                            segmentation='freesurfer'),
+                  BUNDLES=dict(bundle_names=bundle_names),
+                  REGISTRATION=dict(scalars=["dti_fa", "dti_md"],
+                                    wm_criterion=0.2),
+                  TRACTOGRAPHY=tracking_params,
+                  SEGMENTATION=segmentation_params,
+                  CLEANING=clean_params)
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:

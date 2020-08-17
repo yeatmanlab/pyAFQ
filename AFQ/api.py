@@ -909,7 +909,9 @@ class AFQ(object):
 
                             if mask_data is None:
                                 mask_data = np.zeros(warped_roi.shape)
-                            mask_data = np.logical_or(mask_data, warped_roi)
+                            mask_data = np.logical_or(
+                                mask_data,
+                                warped_roi.astype(bool))
                 fname = "ROI Mask"
             elif mask in self.scalars:
                 fname = self._scalar_dict[mask](self, row)
