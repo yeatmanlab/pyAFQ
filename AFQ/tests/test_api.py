@@ -137,7 +137,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
@@ -152,7 +152,7 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 11))
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_data():
     """
     Test if API can run without prealign
@@ -174,7 +174,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -215,7 +215,7 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_slr():
     """
     Test if API can run using slr map
@@ -233,7 +233,7 @@ def test_AFQ_slr():
 
 
 # Requires large download
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_FA():
     """
     Test if API can run registeration with FA
@@ -250,7 +250,7 @@ def test_AFQ_FA():
     myafq.export_rois()
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_DKI_profile():
     """
     Test using API to profile dki
@@ -276,7 +276,7 @@ def test_auto_cli():
         pass  # made it into the api
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_run_using_auto_cli():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)

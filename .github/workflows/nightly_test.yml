@@ -1,4 +1,4 @@
-name: Slow test suite
+name: Nightly test suite
 
 on:
   schedule:

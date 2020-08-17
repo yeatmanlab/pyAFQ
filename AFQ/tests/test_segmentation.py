@@ -72,7 +72,7 @@ def test_segment():
     npt.assert_equal(len(clean_sl), len(CST_R_sl))
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_segment_no_prob():
     # What if you don't have probability maps?
     bundles_no_prob = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
@@ -114,7 +114,7 @@ def test_segment_return_idx():
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_segment_clip_edges():
     # Test with the clip_edges kwarg set to True:
     segmentation = seg.Segmentation(clip_edges=True)
