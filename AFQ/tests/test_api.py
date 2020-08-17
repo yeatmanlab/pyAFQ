@@ -402,9 +402,10 @@ def test_AFQ_data_waypoint():
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft',
                             segmentation='freesurfer'),
-                  BUNDLES=dict(bundle_names=bundle_names),
-                  REGISTRATION=dict(scalars=["dti_fa", "dti_md"],
-                                    wm_criterion=0.2),
+                  BUNDLES=dict(
+                      bundle_names=bundle_names,
+                      scalars=["dti_fa", "dti_md"]),
+                  REGISTRATION=dict(wm_criterion=0.2),
                   TRACTOGRAPHY=tracking_params,
                   SEGMENTATION=segmentation_params,
                   CLEANING=clean_params)
