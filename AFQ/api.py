@@ -256,9 +256,10 @@ class AFQ(object):
         tracking_params: dict, optional
             The parameters for tracking.
             Parameters with suffix_mask are handled differently by this api.
-            Masks which are strings that are in scalars or are "wm_mask"
-            will be replaced by the corresponding mask. Masks which are paths
-            will be loaded. All masks set to None will default to "dti_fa".
+            Masks which are strings that are in scalars or are "wm_mask" or
+            "roi_mask" will be replaced by the corresponding mask.
+            Masks which are paths will be loaded.
+            All masks set to None will default to "dti_fa".
             To track the entire volume, set mask to "full".
             Default: use the default behavior of the aft.track function.
         clean_params: dict, optional
@@ -896,6 +897,20 @@ class AFQ(object):
             if mask == "wm_mask":
                 fname = self._wm_mask(row)
                 mask_data = nib.load(fname).get_fdata().astype(bool)
+            elif mask == "roi_mask":
+                mask_data = None
+                for bundle_name, bundle_info in self.bundle_dict.keys():
+                    for idx, roi in enumerate(bundle_info['ROIs']):
+                        if self.bundle_dict[bundle_name]['rules'][idx]:
+                            warped_roi = auv.patch_up_roi(
+                                self.mapping.transform_inverse(
+                                    roi.get_fdata().astype(np.float32),
+                                    interpolation='linear'))
+
+                            if mask_data is None:
+                                mask_data = np.zeros(warped_roi.shape)
+                            mask_data = np.logical_or(mask_data, warped_roi)
+                fname = "ROI Mask"
             elif mask in self.scalars:
                 fname = self._scalar_dict[mask](self, row)
                 mask_data = nib.load(fname).get_fdata()
