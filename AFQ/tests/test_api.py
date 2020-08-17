@@ -272,27 +272,27 @@ def test_auto_cli():
         pass  # made it into the api
 
 
-# @pytest.mark.slow
-# def test_run_using_auto_cli():
-#     tmpdir = nbtmp.InTemporaryDirectory()
-#     afd.organize_stanford_data(path=tmpdir.name)
-#     bids_path = op.join(tmpdir.name, 'stanford_hardi')
-#     config_file = op.join(tmpdir.name, 'test.toml')
+@pytest.mark.slow
+def test_run_using_auto_cli():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    config_file = op.join(tmpdir.name, 'test.toml')
 
-#     arg_dict = afb.func_dict_to_arg_dict()
+    arg_dict = afb.func_dict_to_arg_dict()
 
-#     # set our custom defaults for the toml file
-#     # It is easier to edit them here, than to parse the file and edit them
-#     # after the file is written
-#     arg_dict['BIDS']['bids_path']['default'] = bids_path
-#     arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
-#     arg_dict['BIDS']['segmentation']['default'] = 'freesurfer'
-#     arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
-#     arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
-#     arg_dict['TRACTOGRAPHY']['random_seeds']['default'] = True
+    # set our custom defaults for the toml file
+    # It is easier to edit them here, than to parse the file and edit them
+    # after the file is written
+    arg_dict['BIDS']['bids_path']['default'] = bids_path
+    arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
+    arg_dict['BIDS']['segmentation']['default'] = 'freesurfer'
+    arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
+    arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
+    arg_dict['TRACTOGRAPHY']['random_seeds']['default'] = True
 
-#     afb.generate_config(config_file, arg_dict, False)
-#     afb.parse_config_run_afq(config_file, arg_dict, False)
+    afb.generate_config(config_file, arg_dict, False)
+    afb.parse_config_run_afq(config_file, arg_dict, False)
 
 
 @xvfb_it
