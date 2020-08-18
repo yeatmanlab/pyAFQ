@@ -6,22 +6,20 @@ import AFQ.registration as reg
 
 
 class _Mask(object):
-    def __init__(self, combine):
+    def __init__(self, shape, combine):
         self.combine = combine
-
-    def get_empty_mask(self, shape):
         if self.combine == "or":
-            return np.zeros(shape, dtype=bool)
+            self.mask = np.zeros(shape, dtype=bool)
         elif self.combine == "and":
-            return np.ones(shape, dtype=bool)
+            self.mask = np.ones(shape, dtype=bool)
         else:
             self.combine_illdefined()
 
-    def combine_mask(self, mask, other_mask):
+    def combine_mask(self, other_mask):
         if self.combine == "or":
-            return np.logical_or(mask, other_mask)
+            self.mask = np.logical_or(self.mask, other_mask)
         elif self.combine == "and":
-            return np.logical_and(mask, other_mask)
+            self.mask = np.logical_and(self.mask, other_mask)
         else:
             self.combine_illdefined()
 
@@ -30,10 +28,18 @@ class _Mask(object):
             f"combine should be either 'or' or 'and',"
             f" you set combine to {self.combine}"))
 
+    def resample(self, data, affine, my_affine):
+        if ((data is not None)
+            and (affine is not None)
+            and (data[..., 0].shape != self.mask.shape)):
+            self.mask = np.round(reg.resample(self.mask.astype(float),
+                                     data[..., 0],
+                                     my_affine,
+                                     affine)).astype(int)
 
-class _MaskFile(_Mask):
+
+class _MaskFile(object):
     def __init__(self, suffix, scope, combine):
-        super().__init__(combine)
         self.suffix = suffix
         self.scope = scope
         self.fnames = {}
@@ -48,63 +54,73 @@ class _MaskFile(_Mask):
             return_type='filename',
             scope=self.scope)[0]
 
-    def get_path(self, subject, session):
-        return self.fnames[session][subject]
+    def get_path_data_affine(self, subject, session):
+        mask_file = self.fnames[session][subject]
+        mask_img = nib.load(mask_file)
+        return mask_file, mask_img.get_fdata(), mask_img.affine
 
 
 class LabelledMaskFile(_MaskFile):
     def __init__(self, suffix, scope=None, inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
-        super().__init__(suffix, scope, combine)
+        super().__init__(suffix, scope)
+        self.combine = combine
         self.ilabels = inclusive_labels
         self.elabels = exclusive_labels
 
-    def get_mask(self, dwi_data, dwi_affine, subject, session):
-        mask_file = super().get_path(subject, session)
-        mask_img = nib.load(mask_file)
-        mask_data_orig = mask_img.get_fdata()
+    def get_mask(self, subject, session, dwi_data=None, dwi_affine=None):
+        mask_file, mask_data_orig, mask_affine = \
+            self.get_path_data_affine(subject, session)
 
         # For different sets of labels, extract all the voxels that
         # have any / all of these values:
-        mask = super().get_empty_mask(mask_data_orig.shape, self.combine)
+        mask = _Mask(mask_data_orig.shape, self.combine)
         if self.ilabels is not None:
             for label in self.ilabels:
-                mask = super().combine_mask(mask, mask_data_orig == label)
+                mask.combine_mask(mask_data_orig == label)
         if self.elabels is not None:
             for label in self.elabels:
-                mask = super().combine_mask(mask, mask_data_orig != label)
+                mask.combine_mask(mask_data_orig != label)
 
         # Resample to DWI data:
-        mask = np.round(reg.resample(mask.astype(float),
-                                     dwi_data[..., 0],
-                                     mask_img.affine,
-                                     dwi_affine)).astype(int)
+        mask.resample(dwi_data, dwi_affine, mask_affine)
+
         meta = dict(source=mask_file,
                     inclusive_labels=self.ilabels,
                     exclusive_lavels=self.elabels,
                     combined_with=self.combine)
 
-        return mask, meta
+        return mask.mask, meta
 
 
 class ThresholdedMaskFile(_MaskFile):
     def __init__(self, suffix, scope=None, lower_bound=None,
                  upper_bound=None, combine="and"):
-        super().__init__(suffix, scope, combine)
+        super().__init__(suffix, scope)
+        self.combine = combine
         self.lb = lower_bound
         self.ub = upper_bound
 
     def get_mask(self, dwi_data, dwi_affine, subject, session):
-        mask_file = super().get_path(subject, session)
-        mask_data = nib.load(mask_file).get_fdata()
-        mask = super().get_empty_mask(mask_data.shape)
+        mask_file, mask_data_orig, mask_affine = \
+            self.get_path_data_affine(subject, session)
 
+        mask = _Mask(mask_data_orig.shape, self.combine)
         if self.ub is not None:
-            mask = super().combine_mask(mask, mask_data < self.ub)
+            mask.combine_mask(mask_data_orig < self.ub)
         if self.lb is not None:
-            mask = super().combine_mask(mask, mask_data > self.lb)
+            mask.combine_mask(mask_data_orig > self.lb)
+
+        # Resample to DWI data:
+        mask.resample(dwi_data, dwi_affine, mask_affine)
 
         meta = dict(source=mask_file,
                     upper_bound=self.ub,
                     lower_bound=self.lb,
                     combined_with=self.combine)
+
+        return mask.mask, meta
+
+
+class ThresholdedScalarMask():
+    pass
