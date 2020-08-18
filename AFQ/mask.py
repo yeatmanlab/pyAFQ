@@ -54,7 +54,7 @@ class _MaskFile(object):
             return_type='filename',
             scope=self.scope)[0]
 
-    def get_path_data_affine(self, row):
+    def get_path_data_affine(self, afq, row):
         mask_file = self.fnames[row['ses']][row['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
@@ -71,7 +71,7 @@ class LabelledMaskFile(_MaskFile):
     def get_mask(self, afq, row):
         dwi_data, _, dwi_img = afq._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(row)
+            self.get_path_data_affine(afq, row)
 
         # For different sets of labels, extract all the voxels that
         # have any / all of these values:
@@ -105,7 +105,7 @@ class ThresholdedMaskFile(_MaskFile):
     def get_mask(self, afq, row):
         dwi_data, _, dwi_img = afq._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(row)
+            self.get_path_data_affine(afq, row)
 
         mask = _Mask(mask_data_orig.shape, self.combine)
         if self.ub is not None:
@@ -124,7 +124,7 @@ class ThresholdedMaskFile(_MaskFile):
         return mask.mask, meta
 
 
-class ThresholdedScalarMask(object):
+class ThresholdedScalarMask(ThresholdedMaskFile):
     def __init__(self, scalar, lower_bound=None, upper_bound=None,
                  combine="and"):
         self.scalar_name = scalar
@@ -132,11 +132,12 @@ class ThresholdedScalarMask(object):
         self.lb = lower_bound
         self.ub = upper_bound
 
+    # overrides _MaskFile
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, afq, row):
-        dwi_data, _, dwi_img = afq._get_data_gtab(row)
+    # overrides _MaskFile
+    def get_path_data_affine(self, afq, row):
         valid_scalars = list(afq._scalar_dict.keys())
         if self.scalar_name not in valid_scalars:
             raise RuntimeError((
@@ -148,18 +149,4 @@ class ThresholdedScalarMask(object):
         scalar_img = nib.load(scalar_fname)
         scalar_data = scalar_img.get_fdata()
 
-        mask = _Mask(scalar_data.shape, self.combine)
-        if self.ub is not None:
-            mask.combine_mask(scalar_data < self.ub)
-        if self.lb is not None:
-            mask.combine_mask(scalar_data > self.lb)
-
-        # Resample to DWI data:
-        mask.resample(dwi_data, dwi_img.affine, scalar_img.affine)
-
-        meta = dict(source=scalar_fname,
-                    upper_bound=self.ub,
-                    lower_bound=self.lb,
-                    combined_with=self.combine)
-        
-        return mask.mask, meta
+        return scalar_fname, scalar_data, scalar_img.affine
