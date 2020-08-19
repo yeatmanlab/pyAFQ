@@ -137,6 +137,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
+@pytest.mark.nightly
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
@@ -151,6 +152,7 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 11))
 
 
+@pytest.mark.nightly
 def test_AFQ_data():
     """
     Test if API can run without prealign
@@ -172,6 +174,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
+@pytest.mark.nightly
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -212,7 +215,7 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_slr():
     """
     Test if API can run using slr map
@@ -230,7 +233,7 @@ def test_AFQ_slr():
 
 
 # Requires large download
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_AFQ_FA():
     """
     Test if API can run registeration with FA
@@ -247,6 +250,7 @@ def test_AFQ_FA():
     myafq.export_rois()
 
 
+@pytest.mark.nightly
 def test_DKI_profile():
     """
     Test using API to profile dki
@@ -272,7 +276,7 @@ def test_auto_cli():
         pass  # made it into the api
 
 
-@pytest.mark.slow
+@pytest.mark.nightly
 def test_run_using_auto_cli():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
@@ -304,7 +308,10 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
-    tracking_params = dict(odf_model="DTI")
+    tracking_params = dict(odf_model="DTI",
+                           seed_mask="roi_mask",
+                           n_seeds=100,
+                           random_seeds=True)
     segmentation_params = dict(filter_by_endpoints=False,
                                seg_algo="AFQ",
                                return_idx=True)
@@ -393,10 +400,17 @@ def test_AFQ_data_waypoint():
     # Test the CLI:
     print("Running the CLI:")
 
-    # Bare bones config only points to the files:
+    # Set up config to use the same parameters as above:
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft',
-                            segmentation='freesurfer'))
+                            segmentation='freesurfer'),
+                  BUNDLES=dict(
+                      bundle_names=bundle_names,
+                      scalars=["dti_fa", "dti_md"]),
+                  REGISTRATION=dict(wm_criterion=0.2),
+                  TRACTOGRAPHY=tracking_params,
+                  SEGMENTATION=segmentation_params,
+                  CLEANING=clean_params)
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:

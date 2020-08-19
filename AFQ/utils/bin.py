@@ -108,7 +108,8 @@ def dict_to_toml(dictionary):
         for arg, arg_info in args.items():
             toml = toml + '\n'
             if isinstance(arg_info, dict):
-                toml = toml + arg_info['desc']
+                if 'desc' in arg_info:
+                    toml = toml + arg_info['desc']
                 toml = toml + f"{arg} = {val_to_toml(arg_info['default'])}\n"
             else:
                 toml = toml + f"{arg} = {val_to_toml(arg_info)}\n"
