@@ -185,6 +185,9 @@ class ThresholdedMaskFile(MaskFile):
                  upper_bound=None, combine="and"):
         """
         Define a mask based on thresholding a file.
+        Note that this should not be used to directly make a seed mask
+        or a stop mask. In those cases, consider thresholding after
+        interpolation, as in the example for MaskFile.
 
         Parameters
         ----------
@@ -287,6 +290,9 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
                  combine="and"):
         """
         Define a mask based on thresholding a scalar mask.
+        Note that this should not be used to directly make a seed mask
+        or a stop mask. In those cases, consider thresholding after
+        interpolation, as in the example for ScalarMask.
 
         Parameters
         ----------
