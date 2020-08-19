@@ -118,12 +118,11 @@ def dict_to_toml(dictionary):
     toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
     toml = toml + '# Wrap object instantiations (such as masks) in quotes\n\n'
     for section, args in dictionary.items():
+        if section == "AFQ_desc":
+            toml = "# " + dictionary["AFQ_desc"].replace("\n", "\n# ")\
+                + "\n\n" + toml
+            continue
         toml = toml + f'[{section}]\n'
-        if section == "TRACTOGRAPHY":
-            toml = toml + (
-                '# Parameters with the suffix mask '
-                'which are also a mask from AFQ.mask,\n'
-                '# will be handled automatically by the api.\n')
         for arg, arg_info in args.items():
             toml = toml + '\n'
             if isinstance(arg_info, dict):
@@ -152,6 +151,8 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     for name, func in func_dict.items():
         docstr_parser = FuncArgParser()
         docstr_parser.setup_args(func)
+        if name == "AFQ":
+            arg_dict["AFQ_desc"] = docstr_parser.description
         for arg, info in docstr_parser.unfinished_arguments.items():
             try:
                 if name == "AFQ":

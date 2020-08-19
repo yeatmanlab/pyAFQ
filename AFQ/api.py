@@ -170,6 +170,14 @@ class AFQ(object):
                  clean_params=None):
         '''
         Initialize an AFQ object.
+        Some special notes on parameters:
+        In tracking_params, parameters with the suffix mask which are also
+        a mask from AFQ.mask will be handled automatically by the api.
+        You can set additional parameters for a given step of the process
+        by directly calling the relevant api function. For example,
+        to set the sh_order for csd to 4, call:
+        myafq._csd(sh_order=4)
+        before otherwise generating the csd file.
 
         Parameters
         ----------
@@ -252,8 +260,6 @@ class AFQ(object):
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
             The parameters for tracking.
-            Parameters with the suffix mask which are also
-            a mask from AFQ.mask will be handled automatically by the api.
             Default: use the default behavior of the aft.track function.
         clean_params: dict, optional
             The parameters for cleaning.
