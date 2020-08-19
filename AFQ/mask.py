@@ -253,7 +253,52 @@ class ThresholdedMaskFile(MaskFile):
         return mask.mask, meta
 
 
-class ThresholdedScalarMask(ThresholdedMaskFile):
+class ScalarMask(MaskFile):
+    def __init__(self, scalar):
+        """
+        Define a mask based on a scalar.
+        Does not apply any labels or thresholds;
+        Generates mask with floating point data.
+        Useful for seed and stop masks, where threshold can be applied
+        after interpolation (see example).
+
+        Parameters
+        ----------
+        scalar : str
+            Scalar to threshold.
+            Can be one of "dti_fa", "dti_md", "dki_fa", "dki_md".
+
+        Examples
+        --------
+        seed_mask = ScalarMask(
+            "dti_fa",
+            scope="dmriprep")
+        api.AFQ(tracking_params={"seed_mask": seed_mask,
+                                 "seed_threshold": 0.2})
+        """
+        self.scalar_name = scalar
+
+    # overrides _MaskFile
+    def find_path(self, bids_layout, subject, session):
+        pass
+
+    # overrides _MaskFile
+    def get_path_data_affine(self, afq, row):
+        valid_scalars = list(afq._scalar_dict.keys())
+        if self.scalar_name not in valid_scalars:
+            raise RuntimeError((
+                f"scalar should be one of"
+                f" {', '.join(valid_scalars)}"
+                f", you input {self.scalar_name}"))
+
+        scalar_fname = afq._scalar_dict[self.scalar_name](afq, row)
+        scalar_img = nib.load(scalar_fname)
+        scalar_data = scalar_img.get_fdata()
+
+        return scalar_fname, scalar_data, scalar_img.affine
+
+
+class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
     def __init__(self, scalar, lower_bound=None, upper_bound=None,
                  combine="and"):
         """
@@ -289,25 +334,6 @@ class ThresholdedScalarMask(ThresholdedMaskFile):
         self.combine = combine
         self.lb = lower_bound
         self.ub = upper_bound
-
-    # overrides _MaskFile
-    def find_path(self, bids_layout, subject, session):
-        pass
-
-    # overrides _MaskFile
-    def get_path_data_affine(self, afq, row):
-        valid_scalars = list(afq._scalar_dict.keys())
-        if self.scalar_name not in valid_scalars:
-            raise RuntimeError((
-                f"scalar should be one of"
-                f" {', '.join(valid_scalars)}"
-                f", you input {self.scalar_name}"))
-
-        scalar_fname = afq._scalar_dict[self.scalar_name](afq, row)
-        scalar_img = nib.load(scalar_fname)
-        scalar_data = scalar_img.get_fdata()
-
-        return scalar_fname, scalar_data, scalar_img.affine
 
 
 class CombinedMask(object):
