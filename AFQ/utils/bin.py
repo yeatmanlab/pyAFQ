@@ -11,6 +11,7 @@ from funcargparse import FuncArgParser
 
 from AFQ.mask import *  # interprets masks loaded from toml
 
+
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
 
@@ -80,6 +81,15 @@ def toml_to_val(t):
         return None
     elif isinstance(t, str) and t[0] == '{':
         return literal_eval(t)  # interpret as dictionary
+    elif isinstance(t, str) and "Mask" in t:
+        try:
+            mask = eval(t)
+        except NameError:
+            return t
+        if check_mask_methods(mask):
+            return mask
+        else:
+            return t
     else:
         return t
 
@@ -87,7 +97,9 @@ def toml_to_val(t):
 def val_to_toml(v):
     if v is None:
         return "''"
-    if isinstance(v, str):
+    elif check_mask_methods(v):
+        return f"'{v.str_for_toml()}'"
+    elif isinstance(v, str):
         return f"'{v}'"
     elif isinstance(v, bool):
         if v:
@@ -97,13 +109,14 @@ def val_to_toml(v):
     elif callable(v):
         return f"'{v.__name__}'"
     elif isinstance(v, dict):
-        return f"\"{v}\""
+        return f"'{v}'"
     else:
         return f"{v}"
 
 
 def dict_to_toml(dictionary):
-    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n\n'
+    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
+    toml = toml + '# Wrap object instantiations (such as masks) in quotes\n\n'
     for section, args in dictionary.items():
         toml = toml + f'[{section}]\n'
         if section == "TRACTOGRAPHY":

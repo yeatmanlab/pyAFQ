@@ -74,8 +74,50 @@ class _MaskCombiner(object):
             f" you set combine to {self.combine}"))
 
 
-class MaskFile(object):
-    def __init__(self, suffix, scope):
+def _arglist_to_string(args, get_attr=None):
+    '''
+    Helper function
+    Takes a list of arguments and unfolds them into a string.
+    If get_attr is not None, it will be used to get the attribute
+    corresponding to each argument instead.
+    '''
+    to_string = ""
+    for arg in args:
+        if arg == "self":
+            continue
+        if get_attr is not None:
+            arg = getattr(get_attr, arg)
+        if check_mask_methods(arg):
+            arg = arg.str_for_toml()
+        elif isinstance(arg, str):
+            arg = f"\"{arg}\""
+        elif isinstance(arg, list):
+            arg = "[" + _arglist_to_string(arg) + "]"
+        to_string = to_string + str(arg) + ', '
+    if to_string[-2:] == ', ':
+        to_string = to_string[:-2]
+    return to_string
+
+
+class _StrInstantiates(object):
+    '''
+    Helper class
+    Uses __init__ in str_for_toml to make string that will instantiate itself.
+    Assumes object will have attributes of same name as __init__ args.
+    This is important for reading/writing masks as arguments to config files.
+    '''
+
+    def str_for_toml(self):
+        return type(self).__name__\
+            + "("\
+            + _arglist_to_string(
+                self.__init__.__code__.co_varnames,
+                get_attr=self)\
+            + ')'
+
+
+class MaskFile(_StrInstantiates):
+    def __init__(self, suffix, scope='all'):
         """
         Define a mask based on a file.
         Does not apply any labels or thresholds;
@@ -89,8 +131,8 @@ class MaskFile(object):
             Suffix to pass to bids_layout.get() to identify the file.
         scope : str, optional
             Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from. If None, all scopes are searched.
-            Default: None
+            to get the file from.
+            Default: 'all'
 
         Examples
         --------
@@ -114,7 +156,7 @@ class MaskFile(object):
             return_type='filename',
             scope=self.scope)[0]
 
-    def get_path_data_affine(self, afq, row):
+    def get_path_data_affine(self, api, row):
         mask_file = self.fnames[row['ses']][row['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
@@ -122,11 +164,11 @@ class MaskFile(object):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask(self, afq, row):
+    def get_mask(self, api, row):
         # Load data
-        dwi_data, _, dwi_img = afq._get_data_gtab(row)
+        dwi_data, _, dwi_img = api._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(afq, row)
+            self.get_path_data_affine(api, row)
 
         # Apply any conditions on the data
         mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
@@ -138,10 +180,10 @@ class MaskFile(object):
             mask_affine,
             dwi_img.affine)
 
-        return mask_data, meta
+        return mask_data, dwi_img.affine, meta
 
 
-class FullMask(object):
+class FullMask(_StrInstantiates):
     """
     Define a mask which covers a full volume.
 
@@ -153,14 +195,16 @@ class FullMask(object):
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, afq, row):
-        # Load data to get shape
-        dwi_data, _, _ = afq._get_data_gtab(row)
+    def get_mask(self, api, row):
+        # Load data to get shape, affine
+        dwi_data, _, dwi_img = api._get_data_gtab(row)
 
-        return np.ones(dwi_data.shape), dict(source="Entire Volume")
+        return np.ones(dwi_data.shape),\
+            dwi_img.affine,\
+            dict(source="Entire Volume")
 
 
-class RoiMask(object):
+class RoiMask(_StrInstantiates):
     """
     Define a mask which is all ROIs or'd together.
 
@@ -173,13 +217,13 @@ class RoiMask(object):
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, afq, row):
+    def get_mask(self, api, row):
         mask_data = None
-        for bundle_name, bundle_info in afq.bundle_dict.keys():
+        for bundle_name, bundle_info in api.bundle_dict.keys():
             for idx, roi in enumerate(bundle_info['ROIs']):
-                if afq.bundle_dict[bundle_name]['rules'][idx]:
+                if api.bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.patch_up_roi(
-                        afq.mapping.transform_inverse(
+                        api.mapping.transform_inverse(
                             roi.get_fdata().astype(np.float32),
                             interpolation='linear'))
 
@@ -188,11 +232,11 @@ class RoiMask(object):
                     mask_data = np.logical_or(
                         mask_data,
                         warped_roi.astype(bool))
-        return mask_data, dict(source = "ROIs")
+        return mask_data, api["dwi_affine"], dict(source="ROIs")
 
 
 class LabelledMaskFile(MaskFile):
-    def __init__(self, suffix, scope=None, inclusive_labels=None,
+    def __init__(self, suffix, scope='all', inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
         """
         Define a mask based on labels in a file.
@@ -203,8 +247,8 @@ class LabelledMaskFile(MaskFile):
             Suffix to pass to bids_layout.get() to identify the file.
         scope : str, optional
             Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from. If None, all scopes are searched.
-            Default: None
+            to get the file from.
+            Default: 'all'
         inclusive_labels : list of ints, optional
             The labels from the file to include from the boolean mask.
             If None, no inclusive labels are applied.
@@ -231,30 +275,30 @@ class LabelledMaskFile(MaskFile):
         """
         super().__init__(suffix, scope)
         self.combine = combine
-        self.ilabels = inclusive_labels
-        self.elabels = exclusive_labels
+        self.inclusive_labels = inclusive_labels
+        self.exclusive_labels = exclusive_labels
 
-    # overrides _MaskFile
+    # overrides MaskFile
     def apply_conditions(self, mask_data_orig, mask_file):
         # For different sets of labels, extract all the voxels that
         # have any / all of these values:
         mask = _MaskCombiner(mask_data_orig.shape, self.combine)
-        if self.ilabels is not None:
-            for label in self.ilabels:
+        if self.inclusive_labels is not None:
+            for label in self.inclusive_labels:
                 mask.combine_mask(mask_data_orig == label)
-        if self.elabels is not None:
-            for label in self.elabels:
+        if self.exclusive_labels is not None:
+            for label in self.exclusive_labels:
                 mask.combine_mask(mask_data_orig != label)
 
         meta = dict(source=mask_file,
-                    inclusive_labels=self.ilabels,
-                    exclusive_lavels=self.elabels,
+                    inclusive_labels=self.inclusive_labels,
+                    exclusive_lavels=self.exclusive_labels,
                     combined_with=self.combine)
         return mask.mask, meta
 
 
 class ThresholdedMaskFile(MaskFile):
-    def __init__(self, suffix, scope=None, lower_bound=None,
+    def __init__(self, suffix, scope='all', lower_bound=None,
                  upper_bound=None, combine="and"):
         """
         Define a mask based on thresholding a file.
@@ -268,8 +312,8 @@ class ThresholdedMaskFile(MaskFile):
             Suffix to pass to bids_layout.get() to identify the file.
         scope : str, optional
             Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from. If None, all scopes are searched.
-            Default: None
+            to get the file from.
+            Default: 'all'
         lower_bound : float, optional
             Lower bound to generate boolean mask from data in the file.
             If None, no lower bound is applied.
@@ -294,21 +338,21 @@ class ThresholdedMaskFile(MaskFile):
         """
         super().__init__(suffix, scope)
         self.combine = combine
-        self.lb = lower_bound
-        self.ub = upper_bound
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
 
-    # overrides _MaskFile
+    # overrides MaskFile
     def apply_conditions(self, mask_data_orig, mask_file):
         # Apply thresholds
         mask = _MaskCombiner(mask_data_orig.shape, self.combine)
-        if self.ub is not None:
-            mask.combine_mask(mask_data_orig < self.ub)
-        if self.lb is not None:
-            mask.combine_mask(mask_data_orig > self.lb)
+        if self.upper_bound is not None:
+            mask.combine_mask(mask_data_orig < self.upper_bound)
+        if self.lower_bound is not None:
+            mask.combine_mask(mask_data_orig > self.lower_bound)
 
         meta = dict(source=mask_file,
-                    upper_bound=self.ub,
-                    lower_bound=self.lb,
+                    upper_bound=self.upper_bound,
+                    lower_bound=self.lower_bound,
                     combined_with=self.combine)
         return mask.mask, meta
 
@@ -336,22 +380,22 @@ class ScalarMask(MaskFile):
         api.AFQ(tracking_params={"seed_mask": seed_mask,
                                  "seed_threshold": 0.2})
         """
-        self.scalar_name = scalar
+        self.scalar = scalar
 
-    # overrides _MaskFile
+    # overrides MaskFile
     def find_path(self, bids_layout, subject, session):
         pass
 
-    # overrides _MaskFile
-    def get_path_data_affine(self, afq, row):
-        valid_scalars = list(afq._scalar_dict.keys())
-        if self.scalar_name not in valid_scalars:
+    # overrides MaskFile
+    def get_path_data_affine(self, api, row):
+        valid_scalars = list(api._scalar_dict.keys())
+        if self.scalar not in valid_scalars:
             raise RuntimeError((
                 f"scalar should be one of"
                 f" {', '.join(valid_scalars)}"
-                f", you input {self.scalar_name}"))
+                f", you input {self.scalar}"))
 
-        scalar_fname = afq._scalar_dict[self.scalar_name](afq, row)
+        scalar_fname = api._scalar_dict[self.scalar](api, row)
         scalar_img = nib.load(scalar_fname)
         scalar_data = scalar_img.get_fdata()
 
@@ -393,13 +437,13 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
             lower_bound=0.2)
         api.AFQ(tracking_params={"seed_mask": seed_mask})
         """
-        self.scalar_name = scalar
+        self.scalar = scalar
         self.combine = combine
-        self.lb = lower_bound
-        self.ub = upper_bound
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
 
 
-class CombinedMask(object):
+class CombinedMask(_StrInstantiates):
     def __init__(self, mask_list, combine="and"):
         """
         Define a mask by combining other masks.
@@ -434,11 +478,11 @@ class CombinedMask(object):
         for mask in self.mask_list:
             mask.find_path(bids_layout, subject, session)
 
-    def get_mask(self, afq, row):
+    def get_mask(self, api, row):
         mask = None
         metas = []
         for mask in self.mask_list:
-            next_mask, next_meta = mask.get_mask(afq, row)
+            next_mask, next_affine, next_meta = mask.get_mask(api, row)
             if mask is None:
                 mask = _MaskCombiner(next_mask.shape, self.combine)
             else:
@@ -448,4 +492,4 @@ class CombinedMask(object):
         meta = dict(sources=metas,
                     combined_with=self.combine)
 
-        return mask.mask, meta
+        return mask.mask, next_affine, meta

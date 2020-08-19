@@ -152,7 +152,6 @@ class AFQ(object):
                  reg_subject="power_map",
                  brain_mask=LabelledMaskFile(
                      "seg",
-                     scope="dmriprep",
                      exclusive_labels=[0]),
                  bundle_names=BUNDLES,
                  dask_it=False,
@@ -217,7 +216,7 @@ class AFQ(object):
             If "b0", the brain mask will be generated from b0.
             If None, no brain mask will not be applied.
             Default:
-            LabelledMaskFile("seg", scope="dmriprep", exclusive_labels=[0])
+            LabelledMaskFile("seg", exclusive_labels=[0])
         bundle_names : list of strings, optional
             [BUNDLES] List of bundle names to include in segmentation.
             Default: BUNDLES
@@ -271,14 +270,14 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.wm_mask = wm_mask
+        self.wm_mask_definition = wm_mask
         self.reg_subject = reg_subject
         self.reg_template = reg_template
         if brain_mask is None:
-            self.brain_mask = FullMask()
+            self.brain_mask_definition = FullMask()
             self.mask_template = False
         else:
-            self.brain_mask = brain_mask
+            self.brain_mask_definition = brain_mask
             self.mask_template = True
 
         if reg_subject == 'subject_sls' or reg_template == 'hcp_atlas':
@@ -415,17 +414,18 @@ class AFQ(object):
                         session
                     )
 
-                if (self.brain_mask is not "b0" and check_mask_methods(
-                        self.brain_mask, mask_name="brain_mask")):
-                    self.brain_mask.find_path(
+                if (self.brain_mask_definition is not "b0"
+                    and check_mask_methods(
+                        self.brain_mask_definition, mask_name="brain_mask")):
+                    self.brain_mask_definition.find_path(
                         bids_layout,
                         subject,
                         session
                     )
 
                 if check_mask_methods(
-                        self.wm_mask, mask_name="wm_mask"):
-                    self.wm_mask.find_path(
+                        self.wm_mask_definition, mask_name="wm_mask"):
+                    self.wm_mask_definition.find_path(
                         bids_layout,
                         subject,
                         session
@@ -494,8 +494,13 @@ class AFQ(object):
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if self.force_recompute or not op.exists(brain_mask_file):
-            if self.brain_mask is not "b0":
-                brain_mask, meta = self.brain_mask.get_mask(self, row)
+            if self.brain_mask_definition is not "b0":
+                brain_mask, brain_affine, meta = \
+                    self.brain_mask_definition.get_mask(self, row)
+                brain_mask_img = nib.Nifti1Image(
+                    brain_mask.astype(int),
+                    brain_affine)
+                self.log_and_save_nii(brain_mask_img, brain_mask_file)
             else:
                 b0_file = self._b0(row)
                 mean_b0_img = nib.load(b0_file)
@@ -822,10 +827,11 @@ class AFQ(object):
     def _wm_mask(self, row):
         wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
         if self.force_recompute or not op.exists(wm_mask_file):
-            wm_mask, meta = self.wm_mask.get_mask(self, row)
+            wm_mask, wm_mask_img, meta =\
+                self.wm_mask_definition.get_mask(self, row)
 
             self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(np.float32),
-                                                  row['dwi_affine']),
+                                                  wm_mask_img),
                                   wm_mask_file)
 
             meta_fname = self._get_fname(row, '_wm_mask.json')
@@ -851,13 +857,13 @@ class AFQ(object):
 
             tracking_params = self.tracking_params.copy()
             if check_mask_methods(self.tracking_params['seed_mask']):
-                tracking_params['seed_mask'], seed_mask_desc =\
+                tracking_params['seed_mask'], _, seed_mask_desc =\
                     self.tracking_params['seed_mask'].get_mask(self, row)
             else:
                 seed_mask_desc = dict(source=tracking_params['seed_mask'])
 
             if check_mask_methods(self.tracking_params['stop_mask']):
-                tracking_params['stop_mask'], stop_mask_desc =\
+                tracking_params['stop_mask'], _, stop_mask_desc =\
                     self.tracking_params['stop_mask'].get_mask(self, row)
             else:
                 stop_mask_desc = dict(source=tracking_params['stop_mask'])
