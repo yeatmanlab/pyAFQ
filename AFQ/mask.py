@@ -162,6 +162,7 @@ class MaskFile(_StrInstantiates):
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
+    # This function is set up to be overriden by other masks
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 

@@ -116,7 +116,7 @@ def val_to_toml(v):
 
 def dict_to_toml(dictionary):
     toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
-    toml = toml + '# Wrap object instantiations (such as masks) in quotes\n\n'
+    toml = toml + '# Wrap mask object instantiations in quotes\n\n'
     for section, args in dictionary.items():
         if section == "AFQ_desc":
             toml = "# " + dictionary["AFQ_desc"].replace("\n", "\n# ")\
