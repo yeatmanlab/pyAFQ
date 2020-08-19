@@ -4,27 +4,28 @@ import nibabel as nib
 
 import AFQ.registration as reg
 
+
 def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
     '''
     Helper function
     Resamples mask to dwi if necessary
     '''
-
+    mask_type = mask_data.dtype
     if ((dwi_data is not None)
         and (dwi_affine is not None)
             and (dwi_data[..., 0].shape != mask_data.shape)):
         return np.round(reg.resample(mask_data.astype(float),
-                                            dwi_data[..., 0],
-                                            mask_affine,
-                                            dwi_affine))
+                                     dwi_data[..., 0],
+                                     mask_affine,
+                                     dwi_affine)).astype(mask_type)
     else:
         return mask_data
 
 
-class _Mask(object):
+class _MaskCombiner(object):
     '''
     Helper Object
-    Manages common mask operations
+    Manages common mask combination operations
     '''
 
     def __init__(self, shape, combine):
@@ -48,13 +49,6 @@ class _Mask(object):
         raise TypeError((
             f"combine should be either 'or' or 'and',"
             f" you set combine to {self.combine}"))
-
-    def resample(self, data, affine, my_affine):
-        self.mask = _resample_mask(
-            self.mask,
-            data,
-            my_affine,
-            affine).astype(bool)
 
 
 class MaskFile(object):
@@ -102,19 +96,24 @@ class MaskFile(object):
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
+    def apply_conditions(self, mask_data_orig, mask_file):
+        return mask_data_orig, dict(source=mask_file)
+
     def get_mask(self, afq, row):
+        # Load data
         dwi_data, _, dwi_img = afq._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
             self.get_path_data_affine(afq, row)
 
+        # Apply any conditions on the data
+        mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
+
         # Resample to DWI data:
         mask_data = _resample_mask(
-            mask_data_orig,
+            mask_data,
             dwi_data,
             mask_affine,
             dwi_img.affine)
-
-        meta = dict(source=mask_file)
 
         return mask_data, meta
 
@@ -163,14 +162,10 @@ class LabelledMaskFile(MaskFile):
         self.elabels = exclusive_labels
 
     # overrides _MaskFile
-    def get_mask(self, afq, row):
-        dwi_data, _, dwi_img = afq._get_data_gtab(row)
-        mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(afq, row)
-
+    def apply_conditions(self, mask_data_orig, mask_file):
         # For different sets of labels, extract all the voxels that
         # have any / all of these values:
-        mask = _Mask(mask_data_orig.shape, self.combine)
+        mask = _MaskCombiner(mask_data_orig.shape, self.combine)
         if self.ilabels is not None:
             for label in self.ilabels:
                 mask.combine_mask(mask_data_orig == label)
@@ -178,14 +173,10 @@ class LabelledMaskFile(MaskFile):
             for label in self.elabels:
                 mask.combine_mask(mask_data_orig != label)
 
-        # Resample to DWI data:
-        mask.resample(dwi_data, dwi_img.affine, mask_affine)
-
         meta = dict(source=mask_file,
                     inclusive_labels=self.ilabels,
                     exclusive_lavels=self.elabels,
                     combined_with=self.combine)
-
         return mask.mask, meta
 
 
@@ -231,25 +222,18 @@ class ThresholdedMaskFile(MaskFile):
         self.ub = upper_bound
 
     # overrides _MaskFile
-    def get_mask(self, afq, row):
-        dwi_data, _, dwi_img = afq._get_data_gtab(row)
-        mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(afq, row)
-
-        mask = _Mask(mask_data_orig.shape, self.combine)
+    def apply_conditions(self, mask_data_orig, mask_file):
+        # Apply thresholds
+        mask = _MaskCombiner(mask_data_orig.shape, self.combine)
         if self.ub is not None:
             mask.combine_mask(mask_data_orig < self.ub)
         if self.lb is not None:
             mask.combine_mask(mask_data_orig > self.lb)
 
-        # Resample to DWI data:
-        mask.resample(dwi_data, dwi_img.affine, mask_affine)
-
         meta = dict(source=mask_file,
                     upper_bound=self.ub,
                     lower_bound=self.lb,
                     combined_with=self.combine)
-
         return mask.mask, meta
 
 
@@ -366,7 +350,7 @@ class CombinedMask(object):
         """
         self.mask_list = mask_list
         self.combine = combine
-    
+
     def find_path(self, bids_layout, subject, session):
         for mask in self.mask_list:
             mask.find_path(bids_layout, subject, session)
@@ -377,7 +361,7 @@ class CombinedMask(object):
         for mask in self.mask_list:
             next_mask, next_meta = mask.get_mask(afq, row)
             if mask is None:
-                mask = _Mask(next_mask.shape, self.combine)
+                mask = _MaskCombiner(next_mask.shape, self.combine)
             else:
                 mask.combine_mask(next_mask)
             metas.append(next_meta)
