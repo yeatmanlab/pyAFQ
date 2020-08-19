@@ -5,6 +5,28 @@ import nibabel as nib
 import AFQ.registration as reg
 
 
+def check_mask_methods(mask, mask_name=False):
+    '''
+    Helper function
+    Checks if mask is a valid mask.
+    If mask_name is not False, will throw an error stating the method
+    not found and the mask name.
+    '''
+    error = (mask_name is not False)
+    if not hasattr(mask, 'find_path'):
+        if error:
+            raise TypeError(f"find_path method not found in {mask_name}")
+        else:
+            return False
+    elif not hasattr(mask, 'get_mask'):
+        if error:
+            raise TypeError(f"get_mask method not found in {mask_name}")
+        else:
+            return False
+    else:
+        return True
+
+
 def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
     '''
     Helper function
@@ -116,6 +138,25 @@ class MaskFile(object):
             dwi_img.affine)
 
         return mask_data, meta
+
+
+class FullMask(object):
+    """
+    Define a mask which covers a full volume.
+
+    Examples
+    --------
+    brain_mask = FullMask()
+    """
+
+    def find_path(self, bids_layout, subject, session):
+        pass
+
+    def get_mask(self, afq, row):
+        # Load data to get shape
+        dwi_data, _, _ = afq._get_data_gtab(row)
+
+        return np.ones(dwi_data.shape), dict(source="Entire Volume")
 
 
 class LabelledMaskFile(MaskFile):
