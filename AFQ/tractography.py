@@ -66,7 +66,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
-        One of {"DTI", "CSD"}. Defaults to use "DTI"
+        One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
     Returns
     -------
     list of streamlines ()
