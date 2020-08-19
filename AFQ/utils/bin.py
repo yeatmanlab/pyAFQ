@@ -9,6 +9,7 @@ from ast import literal_eval
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
+from AFQ.mask import *  # interprets masks loaded from toml
 
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
@@ -105,6 +106,11 @@ def dict_to_toml(dictionary):
     toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n\n'
     for section, args in dictionary.items():
         toml = toml + f'[{section}]\n'
+        if section == "TRACTOGRAPHY":
+            toml = toml + (
+                '# Parameters with the suffix mask '
+                'which are also a mask from AFQ.mask,\n'
+                '# will be handled automatically by the api.\n')
         for arg, arg_info in args.items():
             toml = toml + '\n'
             if isinstance(arg_info, dict):
