@@ -34,7 +34,7 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
-from AFQ.mask import LabelledMaskFile, CombinedMask, \
+from AFQ.mask import B0Mask, CombinedMask, \
     ThresholdedScalarMask, ScalarMask, FullMask, check_mask_methods
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -150,9 +150,7 @@ class AFQ(object):
                  max_bval=None,
                  reg_template="mni_T1",
                  reg_subject="power_map",
-                 brain_mask=LabelledMaskFile(
-                     "seg",
-                     exclusive_labels=[0]),
+                 brain_mask=B0Mask(),
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
@@ -213,10 +211,9 @@ class AFQ(object):
             [REGISTRATION] This is the mask used to make
             the brain mask, which gets applied before registration to a
             template.
-            If "b0", the brain mask will be generated from b0.
-            If None, no brain mask will not be applied.
-            Default:
-            LabelledMaskFile("seg", exclusive_labels=[0])
+            If None, no brain mask will not be applied,
+            and no brain mask will be applied to the template.
+            Default: B0Mask()
         bundle_names : list of strings, optional
             [BUNDLES] List of bundle names to include in segmentation.
             Default: BUNDLES
@@ -255,8 +252,8 @@ class AFQ(object):
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
             The parameters for tracking.
-            Parameters with the suffix mask which are also a mask from AFQ.mask,
-            will be handled automatically by the api.
+            Parameters with the suffix mask which are also
+            a mask from AFQ.mask will be handled automatically by the api.
             Default: use the default behavior of the aft.track function.
         clean_params: dict, optional
             The parameters for cleaning.
@@ -494,27 +491,12 @@ class AFQ(object):
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if self.force_recompute or not op.exists(brain_mask_file):
-            if self.brain_mask_definition is not "b0":
-                brain_mask, brain_affine, meta = \
-                    self.brain_mask_definition.get_mask(self, row)
-                brain_mask_img = nib.Nifti1Image(
-                    brain_mask.astype(int),
-                    brain_affine)
-                self.log_and_save_nii(brain_mask_img, brain_mask_file)
-            else:
-                b0_file = self._b0(row)
-                mean_b0_img = nib.load(b0_file)
-                mean_b0 = mean_b0_img.get_fdata()
-                _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                            autocrop, dilate=dilate)
-                be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                         mean_b0_img.affine)
-                self.log_and_save_nii(be_img, brain_mask_file)
-                meta = dict(source=b0_file,
-                            median_radius=median_radius,
-                            numpass=numpass,
-                            autocrop=autocrop,
-                            vol_idx=vol_idx)
+            brain_mask, brain_affine, meta = \
+                self.brain_mask_definition.get_mask(self, row)
+            brain_mask_img = nib.Nifti1Image(
+                brain_mask.astype(int),
+                brain_affine)
+            self.log_and_save_nii(brain_mask_img, brain_mask_file)
             meta_fname = self._get_fname(row, '_brain_mask.json')
             afd.write_json(meta_fname, meta)
         return brain_mask_file

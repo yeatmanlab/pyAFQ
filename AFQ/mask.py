@@ -1,6 +1,7 @@
 import numpy as np
 
 import nibabel as nib
+from dipy.segment.mask import median_otsu
 
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
@@ -233,6 +234,38 @@ class RoiMask(_StrInstantiates):
                         mask_data,
                         warped_roi.astype(bool))
         return mask_data, api["dwi_affine"], dict(source="ROIs")
+
+
+class B0Mask(_StrInstantiates):
+    """
+    Define a mask using b0 and dipy's median_otsu.
+
+    Parameters
+    ----------
+    median_otsu_kwargs: dict, optional
+        Optional arguments to pass into dipy's median_otsu.
+        Default: {}
+
+    Examples
+    --------
+    brain_mask = B0Mask()
+    api.AFQ(brain_mask=brain_mask)
+    """
+
+    def __init__(self, median_otsu_kwargs={}):
+        self.median_otsu_kwargs = median_otsu_kwargs
+
+    def find_path(self, bids_layout, subject, session):
+        pass
+
+    def get_mask(self, api, row):
+        b0_file = api._b0(row)
+        mean_b0_img = nib.load(b0_file)
+        mean_b0 = mean_b0_img.get_fdata()
+        _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+        return mask_data, mean_b0_img.affine, dict(
+            source="median_otsu applied to b0",
+            median_otsu_kwargs=self.median_otsu_kwargs)
 
 
 class LabelledMaskFile(MaskFile):
