@@ -833,40 +833,6 @@ class AFQ(object):
 
         return wm_mask_file
 
-    def _get_mask(self, row, mask):
-        if isinstance(mask, str):
-            if mask == "wm_mask":
-                fname = self._wm_mask(row)
-                mask_data = nib.load(fname).get_fdata().astype(bool)
-            elif mask == "roi_mask":
-                mask_data = None
-                for bundle_name, bundle_info in self.bundle_dict.keys():
-                    for idx, roi in enumerate(bundle_info['ROIs']):
-                        if self.bundle_dict[bundle_name]['rules'][idx]:
-                            warped_roi = auv.patch_up_roi(
-                                self.mapping.transform_inverse(
-                                    roi.get_fdata().astype(np.float32),
-                                    interpolation='linear'))
-
-                            if mask_data is None:
-                                mask_data = np.zeros(warped_roi.shape)
-                            mask_data = np.logical_or(
-                                mask_data,
-                                warped_roi.astype(bool))
-                fname = "ROI Mask"
-            elif mask in self.scalars:
-                fname = self._scalar_dict[mask](self, row)
-                mask_data = nib.load(fname).get_fdata()
-            elif mask == "full":
-                fname = "Entire Volume"
-                mask_data = None
-            else:
-                fname = mask
-                mask_data = nib.load(fname).get_fdata()
-            return mask_data, fname
-        else:
-            return mask, "custom"
-
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
 
@@ -888,13 +854,13 @@ class AFQ(object):
                 tracking_params['seed_mask'], seed_mask_desc =\
                     self.tracking_params['seed_mask'].get_mask(self, row)
             else:
-                seed_mask_desc = "custom"
+                seed_mask_desc = dict(source=tracking_params['seed_mask'])
 
             if check_mask_methods(self.tracking_params['stop_mask']):
                 tracking_params['stop_mask'], stop_mask_desc =\
                     self.tracking_params['stop_mask'].get_mask(self, row)
             else:
-                stop_mask_desc = "custom"
+                stop_mask_desc = dict(source=tracking_params['stop_mask'])
             sft = aft.track(params_file, **tracking_params)
             sft.to_vox()
             meta_directions = {"det": "deterministic",
@@ -909,7 +875,7 @@ class AFQ(object):
                     ROI=seed_mask_desc,
                     n_seeds=self.tracking_params["n_seeds"],
                     random_seeds=self.tracking_params["random_seeds"]),
-                Constraints=dict(AnatomicalImage=stop_mask_desc),
+                Constraints=dict(ROI=stop_mask_desc),
                 Parameters=dict(
                     Units="mm",
                     StepSize=self.tracking_params["step_size"],

@@ -3,6 +3,7 @@ import numpy as np
 import nibabel as nib
 
 import AFQ.registration as reg
+import AFQ.utils.volume as auv
 
 
 def check_mask_methods(mask, mask_name=False):
@@ -157,6 +158,37 @@ class FullMask(object):
         dwi_data, _, _ = afq._get_data_gtab(row)
 
         return np.ones(dwi_data.shape), dict(source="Entire Volume")
+
+
+class RoiMask(object):
+    """
+    Define a mask which is all ROIs or'd together.
+
+    Examples
+    --------
+    seed_mask = RoiMask()
+    api.AFQ(tracking_params={"seed_mask": seed_mask})
+    """
+
+    def find_path(self, bids_layout, subject, session):
+        pass
+
+    def get_mask(self, afq, row):
+        mask_data = None
+        for bundle_name, bundle_info in afq.bundle_dict.keys():
+            for idx, roi in enumerate(bundle_info['ROIs']):
+                if afq.bundle_dict[bundle_name]['rules'][idx]:
+                    warped_roi = auv.patch_up_roi(
+                        afq.mapping.transform_inverse(
+                            roi.get_fdata().astype(np.float32),
+                            interpolation='linear'))
+
+                    if mask_data is None:
+                        mask_data = np.zeros(warped_roi.shape)
+                    mask_data = np.logical_or(
+                        mask_data,
+                        warped_roi.astype(bool))
+        return mask_data, dict(source = "ROIs")
 
 
 class LabelledMaskFile(MaskFile):
