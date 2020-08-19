@@ -4,6 +4,22 @@ import nibabel as nib
 
 import AFQ.registration as reg
 
+def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
+    '''
+    Helper function
+    Resamples mask to dwi if necessary
+    '''
+
+    if ((dwi_data is not None)
+        and (dwi_affine is not None)
+            and (dwi_data[..., 0].shape != mask_data.shape)):
+        return np.round(reg.resample(mask_data.astype(float),
+                                            dwi_data[..., 0],
+                                            mask_affine,
+                                            dwi_affine))
+    else:
+        return mask_data
+
 
 class _Mask(object):
     '''
@@ -34,22 +50,39 @@ class _Mask(object):
             f" you set combine to {self.combine}"))
 
     def resample(self, data, affine, my_affine):
-        if ((data is not None)
-            and (affine is not None)
-                and (data[..., 0].shape != self.mask.shape)):
-            self.mask = np.round(reg.resample(self.mask.astype(float),
-                                              data[..., 0],
-                                              my_affine,
-                                              affine)).astype(bool)
+        self.mask = _resample_mask(
+            self.mask,
+            data,
+            my_affine,
+            affine).astype(bool)
 
 
-class _MaskFile(object):
-    '''
-    Helper Object
-    Has common file / BIDS operations
-    '''
+class MaskFile(object):
+    def __init__(self, suffix, scope):
+        """
+        Define a mask based on a file.
+        Does not apply any labels or thresholds;
+        Generates mask with floating point data.
+        Useful for seed and stop masks, where threshold can be applied
+        after interpolation (see example).
 
-    def __init__(self, suffix, scope, combine):
+        Parameters
+        ----------
+        suffix : str
+            Suffix to pass to bids_layout.get() to identify the file.
+        scope : str, optional
+            Scope to pass to bids_layout.get() to specify the pipeline
+            to get the file from. If None, all scopes are searched.
+            Default: None
+
+        Examples
+        --------
+        seed_mask = MaskFile(
+            "WM_mask",
+            scope="dmriprep")
+        api.AFQ(tracking_params={"seed_mask": seed_mask,
+                                 "seed_threshold": 0.1})
+        """
         self.suffix = suffix
         self.scope = scope
         self.fnames = {}
@@ -69,8 +102,24 @@ class _MaskFile(object):
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
+    def get_mask(self, afq, row):
+        dwi_data, _, dwi_img = afq._get_data_gtab(row)
+        mask_file, mask_data_orig, mask_affine = \
+            self.get_path_data_affine(afq, row)
 
-class LabelledMaskFile(_MaskFile):
+        # Resample to DWI data:
+        mask_data = _resample_mask(
+            mask_data_orig,
+            dwi_data,
+            mask_affine,
+            dwi_img.affine)
+
+        meta = dict(source=mask_file)
+
+        return mask_data, meta
+
+
+class LabelledMaskFile(MaskFile):
     def __init__(self, suffix, scope=None, inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
         """
@@ -113,6 +162,7 @@ class LabelledMaskFile(_MaskFile):
         self.ilabels = inclusive_labels
         self.elabels = exclusive_labels
 
+    # overrides _MaskFile
     def get_mask(self, afq, row):
         dwi_data, _, dwi_img = afq._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
@@ -139,7 +189,7 @@ class LabelledMaskFile(_MaskFile):
         return mask.mask, meta
 
 
-class ThresholdedMaskFile(_MaskFile):
+class ThresholdedMaskFile(MaskFile):
     def __init__(self, suffix, scope=None, lower_bound=None,
                  upper_bound=None, combine="and"):
         """
@@ -180,6 +230,7 @@ class ThresholdedMaskFile(_MaskFile):
         self.lb = lower_bound
         self.ub = upper_bound
 
+    # overrides _MaskFile
     def get_mask(self, afq, row):
         dwi_data, _, dwi_img = afq._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
