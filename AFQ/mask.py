@@ -56,35 +56,6 @@ def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
         return mask_data
 
 
-class _MaskCombiner(object):
-    '''
-    Helper Object
-    Manages common mask combination operations
-    '''
-
-    def __init__(self, shape, combine):
-        self.combine = combine
-        if self.combine == "or":
-            self.mask = np.zeros(shape, dtype=bool)
-        elif self.combine == "and":
-            self.mask = np.ones(shape, dtype=bool)
-        else:
-            self.combine_illdefined()
-
-    def combine_mask(self, other_mask):
-        if self.combine == "or":
-            self.mask = np.logical_or(self.mask, other_mask)
-        elif self.combine == "and":
-            self.mask = np.logical_and(self.mask, other_mask)
-        else:
-            self.combine_illdefined()
-
-    def combine_illdefined(self):
-        raise TypeError((
-            f"combine should be either 'or' or 'and',"
-            f" you set combine to {self.combine}"))
-
-
 def _arglist_to_string(args, get_attr=None):
     '''
     Helper function
@@ -125,6 +96,37 @@ class StrInstantiatesMixin(object):
                 self.__init__.__code__.co_varnames,
                 get_attr=self)\
             + ')'
+
+
+class CombineMaskMixin(object):
+    """
+    Helper Class
+    Useful for making a mask by combining different conditions
+    """
+
+    def __init__(self, combine):
+        self.combine = combine
+
+    def reset_mask_draft(self, shape):
+        if self.combine == "or":
+            self.mask_draft = np.zeros(shape, dtype=bool)
+        elif self.combine == "and":
+            self.mask_draft = np.ones(shape, dtype=bool)
+        else:
+            self.combine_illdefined()
+
+    def __mul__(self, other_mask):
+        if self.combine == "or":
+            return np.logical_or(self.mask_draft, other_mask)
+        elif self.combine == "and":
+            return np.logical_and(self.mask_draft, other_mask)
+        else:
+            self.combine_illdefined()
+
+    def combine_illdefined(self):
+        raise TypeError((
+            f"combine should be either 'or' or 'and',"
+            f" you set combine to {self.combine}"))
 
 
 class MaskFile(StrInstantiatesMixin):
@@ -286,7 +288,7 @@ class B0Mask(StrInstantiatesMixin):
             median_otsu_kwargs=self.median_otsu_kwargs)
 
 
-class LabelledMaskFile(MaskFile):
+class LabelledMaskFile(MaskFile, CombineMaskMixin):
     def __init__(self, suffix, scope='all', inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
         """
@@ -324,8 +326,8 @@ class LabelledMaskFile(MaskFile):
             exclusive_labels=[0])
         api.AFQ(brain_mask=brain_mask)
         """
-        super().__init__(suffix, scope)
-        self.combine = combine
+        MaskFile.__init__(self, suffix, scope)
+        CombineMaskMixin.__init__(self, combine)
         self.inclusive_labels = inclusive_labels
         self.exclusive_labels = exclusive_labels
 
@@ -333,22 +335,22 @@ class LabelledMaskFile(MaskFile):
     def apply_conditions(self, mask_data_orig, mask_file):
         # For different sets of labels, extract all the voxels that
         # have any / all of these values:
-        mask = _MaskCombiner(mask_data_orig.shape, self.combine)
+        self.reset_mask_draft(mask_data_orig.shape)
         if self.inclusive_labels is not None:
             for label in self.inclusive_labels:
-                mask.combine_mask(mask_data_orig == label)
+                self.mask_draft = self * (mask_data_orig == label)
         if self.exclusive_labels is not None:
             for label in self.exclusive_labels:
-                mask.combine_mask(mask_data_orig != label)
+                self.mask_draft = self * (mask_data_orig != label)
 
         meta = dict(source=mask_file,
                     inclusive_labels=self.inclusive_labels,
                     exclusive_lavels=self.exclusive_labels,
                     combined_with=self.combine)
-        return mask.mask, meta
+        return self.mask_draft, meta
 
 
-class ThresholdedMaskFile(MaskFile):
+class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
     def __init__(self, suffix, scope='all', lower_bound=None,
                  upper_bound=None, combine="and"):
         """
@@ -387,25 +389,25 @@ class ThresholdedMaskFile(MaskFile):
             lower_bound=0.1)
         api.AFQ(brain_mask=brain_mask)
         """
-        super().__init__(suffix, scope)
-        self.combine = combine
+        MaskFile.__init__(self, suffix, scope)
+        CombineMaskMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
 
     # overrides MaskFile
     def apply_conditions(self, mask_data_orig, mask_file):
         # Apply thresholds
-        mask = _MaskCombiner(mask_data_orig.shape, self.combine)
+        self.reset_mask_draft(mask_data_orig.shape)
         if self.upper_bound is not None:
-            mask.combine_mask(mask_data_orig < self.upper_bound)
+            self.mask_draft = self * (mask_data_orig < self.upper_bound)
         if self.lower_bound is not None:
-            mask.combine_mask(mask_data_orig > self.lower_bound)
+            self.mask_draft = self * (mask_data_orig > self.lower_bound)
 
         meta = dict(source=mask_file,
                     upper_bound=self.upper_bound,
                     lower_bound=self.lower_bound,
                     combined_with=self.combine)
-        return mask.mask, meta
+        return self.mask_draft, meta
 
 
 class ScalarMask(MaskFile):
@@ -494,7 +496,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         self.upper_bound = upper_bound
 
 
-class CombinedMask(StrInstantiatesMixin):
+class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
     def __init__(self, mask_list, combine="and"):
         """
         Define a mask by combining other masks.
@@ -522,25 +524,25 @@ class CombinedMask(StrInstantiatesMixin):
                 upper_bound=0.002)])
         api.AFQ(tracking_params={"seed_mask": seed_mask})
         """
+        CombineMaskMixin.__init__(self, combine)
         self.mask_list = mask_list
-        self.combine = combine
 
     def find_path(self, bids_layout, subject, session):
         for mask in self.mask_list:
             mask.find_path(bids_layout, subject, session)
 
     def get_mask(self, api, row):
-        mask = None
+        self.mask_draft = None
         metas = []
         for mask in self.mask_list:
             next_mask, next_affine, next_meta = mask.get_mask(api, row)
-            if mask is None:
-                mask = _MaskCombiner(next_mask.shape, self.combine)
+            if self.mask_draft is None:
+                self.reset_mask_draft(next_mask.shape)
             else:
-                mask.combine_mask(next_mask)
+                self.mask_draft = self * (next_mask)
             metas.append(next_meta)
 
         meta = dict(sources=metas,
                     combined_with=self.combine)
 
-        return mask.mask, next_affine, meta
+        return self.mask_draft, next_affine, meta
