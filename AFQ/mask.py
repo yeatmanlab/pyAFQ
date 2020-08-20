@@ -7,6 +7,11 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 
 
+__all__ = ["MaskFile", "FullMask", "RoiMask", "B0Mask", "LabelledMaskFile",
+           "ThresholdedMaskFile", "ScalarMask", "ThresholdedScalarMask",
+           "CombinedMask", "check_mask_methods"]
+
+
 def check_mask_methods(mask, mask_name=False):
     '''
     Helper function
