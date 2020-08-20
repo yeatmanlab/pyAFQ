@@ -973,7 +973,7 @@ class S3BIDSStudy:
         list
             list of available derivatives pipelines
         """
-        s3_prefix = '/'.join([self.bucket, self.s3_prefix])
+        s3_prefix = '/'.join([self.bucket, self.s3_prefix]).rstrip("/")
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
         derivatives_prefix = '/'.join([s3_prefix, 'derivatives'])
@@ -999,7 +999,7 @@ class S3BIDSStudy:
         """
         non_sub_s3_keys = {}
 
-        s3_prefix = '/'.join([self.bucket, self.s3_prefix])
+        s3_prefix = '/'.join([self.bucket, self.s3_prefix]).rstrip("/")
 
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
@@ -1029,7 +1029,7 @@ class S3BIDSStudy:
             list of participant_ids
         """
         if self._use_participants_tsv:
-            tsv_key = '/'.join([self.s3_prefix, 'participants.tsv'])
+            tsv_key = '/'.join([self.s3_prefix, 'participants.tsv']).lstrip("/")
             s3 = get_s3_client(anon=self.anon)
 
             def get_subs_from_tsv_key(s3_key):
@@ -1045,7 +1045,7 @@ class S3BIDSStudy:
             subject_set = get_subs_from_tsv_key(tsv_key)
             subjects = list(subject_set)
         else:
-            s3_prefix = '/'.join([self.bucket, self.s3_prefix])
+            s3_prefix = '/'.join([self.bucket, self.s3_prefix]).rstrip("/")
             sub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                 anon=self.anon)['subjects']
 
@@ -1249,7 +1249,7 @@ class HBNSite(S3BIDSStudy):
         list
             list of available derivatives pipelines
         """
-        s3_prefix = '/'.join([self.bucket, self.s3_prefix])
+        s3_prefix = '/'.join([self.bucket, self.s3_prefix]).rstrip("/")
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
         derivatives_prefix = '/'.join([s3_prefix, 'derivatives'])
@@ -1294,7 +1294,7 @@ class HBNSite(S3BIDSStudy):
         """
         non_sub_s3_keys = {}
 
-        s3_prefix = '/'.join([self.bucket, self.s3_prefix])
+        s3_prefix = '/'.join([self.bucket, self.s3_prefix]).rstrip("/")
 
         nonsub_keys = _ls_s3fs(s3_prefix=s3_prefix,
                                anon=self.anon)['other']
