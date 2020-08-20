@@ -1057,7 +1057,7 @@ class S3BIDSStudy:
                 entities = layout.parse_file_entities(key)
                 subjects.append('sub-' + entities.get('subject'))
 
-        return subjects
+        return list(set(subjects))
 
     def _download_non_sub_keys(self, directory,
                                select=("dataset_description.json",),
