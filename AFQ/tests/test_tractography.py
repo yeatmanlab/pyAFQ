@@ -2,6 +2,7 @@ import os.path as op
 import numpy as np
 import numpy.testing as npt
 
+import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
 from AFQ.models.csd import fit_csd
@@ -25,41 +26,70 @@ min_length = 20
 step_size = 0.5
 
 
-def test_csd_tracking():
+def test_csd_local_tracking():
     for sh_order in [4, 8, 10]:
         fname = fit_csd(fdata, fbval, fbvec,
                         response=((0.0015, 0.0003, 0.0003), 100),
-                        sh_order=8, lambda_=1, tau=0.1, mask=None,
+                        sh_order=sh_order, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
-            for tracker in ["local", "pft"]:
-                sl = track(
-                    fname,
-                    directions,
-                    odf_model="CSD",
-                    max_angle=30.,
-                    sphere=None,
-                    seed_mask=None,
-                    n_seeds=seeds,
-                    stop_mask=None,
-                    step_size=step_size,
-                    min_length=min_length,
-                    tracker=tracker).streamlines
-
-                npt.assert_(len(sl[0]) >= step_size * min_length)
-
-
-def test_dti_tracking():
-    fdict = fit_dti(fdata, fbval, fbvec)
-    for directions in ["det", "prob"]:
-        for tracker in ["local", "pft"]:
             sl = track(
-                fdict['params'],
+                fname,
                 directions,
+                odf_model="CSD",
                 max_angle=30.,
                 sphere=None,
                 seed_mask=None,
-                n_seeds=1,
+                n_seeds=seeds,
+                stop_mask=None,
                 step_size=step_size,
-                min_length=min_length).streamlines
-            npt.assert_(len(sl[0]) >= min_length * step_size)
+                min_length=min_length,
+                tracker="local").streamlines
+
+            npt.assert_(len(sl[0]) >= step_size * min_length)
+
+
+def test_dti_local_tracking():
+    fdict = fit_dti(fdata, fbval, fbvec)
+    for directions in ["det", "prob"]:
+        sl = track(
+            fdict['params'],
+            directions,
+            max_angle=30.,
+            sphere=None,
+            seed_mask=None,
+            n_seeds=1,
+            step_size=step_size,
+            min_length=min_length,
+            tracker="local").streamlines
+        npt.assert_(len(sl[0]) >= min_length * step_size)
+
+
+def test_pft_tracking():
+    for fname in [fit_dti(fdata, fbval, fbvec)['params'],
+                  fit_csd(fdata, fbval, fbvec,
+                        response=((0.0015, 0.0003, 0.0003), 100),
+                        sh_order=8, lambda_=1, tau=0.1, mask=None,
+                        out_dir=tmpdir.name)]:
+        data_shape  = nib.load(fdata).shape
+        pve_wm_data = np.ones(data_shape[:3])
+        pve_gm_data = np.zeros(data_shape[:3])
+        pve_csf_data = np.zeros(data_shape[:3])
+        stop_threshold = (pve_wm_data, pve_gm_data, pve_csf_data)
+
+        for directions in ["det", "prob"]:
+            for stop_mask in ["ACT", "CMC"]:
+                sl = track(
+                    fname,
+                    directions,
+                    max_angle=30.,
+                    sphere=None,
+                    seed_mask=None,
+                    stop_mask=stop_mask,
+                    stop_threshold=stop_threshold,
+                    n_seeds=1,
+                    step_size=step_size,
+                    min_length=min_length,
+                    tracker="pft").streamlines
+                npt.assert_(len(sl[0]) >= min_length * step_size)
+
