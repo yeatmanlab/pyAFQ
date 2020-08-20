@@ -1029,7 +1029,8 @@ class S3BIDSStudy:
             list of participant_ids
         """
         if self._use_participants_tsv:
-            tsv_key = '/'.join([self.s3_prefix, 'participants.tsv']).lstrip("/")
+            tsv_key = "/".join([self.s3_prefix,
+                                "participants.tsv"]).lstrip("/")
             s3 = get_s3_client(anon=self.anon)
 
             def get_subs_from_tsv_key(s3_key):
