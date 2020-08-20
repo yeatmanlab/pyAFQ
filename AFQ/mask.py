@@ -29,6 +29,12 @@ def check_mask_methods(mask, mask_name=False):
             raise TypeError(f"get_mask method not found in {mask_name}")
         else:
             return False
+    elif not hasattr(mask, '__init__')\
+            or not hasattr(mask.__init__, '__code__'):
+        if mask_name:
+            raise TypeError(f"__init__ method not defined in {mask_name}")
+        else:
+            return False
     else:
         return True
 
@@ -198,6 +204,9 @@ class FullMask(StrInstantiatesMixin):
     brain_mask = FullMask()
     """
 
+    def __init__(self):
+        pass
+
     def find_path(self, bids_layout, subject, session):
         pass
 
@@ -219,6 +228,9 @@ class RoiMask(StrInstantiatesMixin):
     seed_mask = RoiMask()
     api.AFQ(tracking_params={"seed_mask": seed_mask})
     """
+
+    def __init__(self):
+        pass
 
     def find_path(self, bids_layout, subject, session):
         pass
