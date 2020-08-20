@@ -19,14 +19,13 @@ def check_mask_methods(mask, mask_name=False):
     If mask_name is not False, will throw an error stating the method
     not found and the mask name.
     '''
-    error = (mask_name is not False)
     if not hasattr(mask, 'find_path'):
-        if error:
+        if mask_name:
             raise TypeError(f"find_path method not found in {mask_name}")
         else:
             return False
     elif not hasattr(mask, 'get_mask'):
-        if error:
+        if mask_name:
             raise TypeError(f"get_mask method not found in {mask_name}")
         else:
             return False
