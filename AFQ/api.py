@@ -215,8 +215,8 @@ class AFQ(object):
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".
             Default: "mni_T1"
-        brain_mask : mask from AFQ.mask or str, optional
-            [REGISTRATION] This is the mask used to make
+        brain_mask : instance of a class defined in `AFQ.mask`, optional
+            [REGISTRATION] This will be used to create
             the brain mask, which gets applied before registration to a
             template.
             If None, no brain mask will not be applied,
@@ -235,9 +235,10 @@ class AFQ(object):
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
-        wm_mask : mask from AFQ.mask, optional
-            [REGISTRATION] This is the mask used to make
-            the white matter mask. Currently it is not used for anything.
+        wm_mask : instance of a class defined in `AFQ.mask`, optional
+            [REGISTRATION] This will be used to create
+            the white matter mask.
+            Currently the wm_mask is not used for anything.
             Default: CombinedMask(
                         [ThresholdedScalarMask(
                             "dti_fa",
