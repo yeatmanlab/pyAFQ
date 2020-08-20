@@ -155,13 +155,6 @@ class AFQ(object):
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_mask=CombinedMask(
-                     [ThresholdedScalarMask(
-                         "dti_fa",
-                         lower_bound=0.2),
-                      ThresholdedScalarMask(
-                         "dti_md",
-                         upper_bound=0.002)]),
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -235,17 +228,6 @@ class AFQ(object):
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
-        wm_mask : instance of a class defined in `AFQ.mask`, optional
-            [REGISTRATION] This will be used to create
-            the white matter mask.
-            Currently the wm_mask is not used for anything.
-            Default: CombinedMask(
-                        [ThresholdedScalarMask(
-                            "dti_fa",
-                            lower_bound=0.2),
-                        ThresholdedScalarMask(
-                            "dti_md",
-                            upper_bound=0.002)])
         use_prealign : bool, optional
             [REGISTRATION] Whether to perform pre-alignment before perforiming
             the diffeomorphic mapping in registration. Default: True
@@ -274,7 +256,6 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.wm_mask_definition = wm_mask
         self.reg_subject = reg_subject
         self.reg_template = reg_template
         if brain_mask is None:
@@ -422,14 +403,6 @@ class AFQ(object):
                     and check_mask_methods(
                         self.brain_mask_definition, mask_name="brain_mask")):
                     self.brain_mask_definition.find_path(
-                        bids_layout,
-                        subject,
-                        session
-                    )
-
-                if check_mask_methods(
-                        self.wm_mask_definition, mask_name="wm_mask"):
-                    self.wm_mask_definition.find_path(
                         bids_layout,
                         subject,
                         session
@@ -812,21 +785,6 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
 
         return mapping_file
-
-    def _wm_mask(self, row):
-        wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
-        if self.force_recompute or not op.exists(wm_mask_file):
-            wm_mask, wm_mask_img, meta =\
-                self.wm_mask_definition.get_mask(self, row)
-
-            self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(np.float32),
-                                                  wm_mask_img),
-                                  wm_mask_file)
-
-            meta_fname = self._get_fname(row, '_wm_mask.json')
-            afd.write_json(meta_fname, meta)
-
-        return wm_mask_file
 
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
@@ -1413,18 +1371,6 @@ class AFQ(object):
         return self.data_frame['brain_mask_file']
 
     brain_mask = property(get_brain_mask, set_brain_mask)
-
-    def set_wm_mask(self):
-        if 'wm_mask_file' not in self.data_frame.columns:
-            self.data_frame['wm_mask_file'] =\
-                self.data_frame.apply(self._wm_mask,
-                                      axis=1)
-
-    def get_wm_mask(self):
-        self.set_wm_mask()
-        return self.data_frame['wm_mask_file']
-
-    wm_mask = property(get_wm_mask, set_wm_mask)
 
     def set_dti(self):
         if 'dti_params_file' not in self.data_frame.columns:

@@ -319,8 +319,7 @@ def test_AFQ_data_waypoint():
                     scalars=["dti_fa", "dti_md"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
-                    clean_params=clean_params,
-                    wm_mask=ThresholdedScalarMask("dti_fa", lower_bound=0.2))
+                    clean_params=clean_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -405,9 +404,6 @@ def test_AFQ_data_waypoint():
                   BUNDLES=dict(
                       bundle_names=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
-                  REGISTRATION=dict(
-                      wm_mask="ThresholdedScalarMask(\"dti_fa\","
-                      + " lower_bound=0.2)"),
                   TRACTOGRAPHY=tracking_params,
                   SEGMENTATION=segmentation_params,
                   CLEANING=clean_params)
