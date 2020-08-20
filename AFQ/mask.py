@@ -104,7 +104,7 @@ def _arglist_to_string(args, get_attr=None):
     return to_string
 
 
-class _StrInstantiates(object):
+class StrInstantiatesMixin(object):
     '''
     Helper class
     Uses __init__ in str_for_toml to make string that will instantiate itself.
@@ -121,7 +121,7 @@ class _StrInstantiates(object):
             + ')'
 
 
-class MaskFile(_StrInstantiates):
+class MaskFile(StrInstantiatesMixin):
     def __init__(self, suffix, scope='all'):
         """
         Define a mask based on a file.
@@ -189,7 +189,7 @@ class MaskFile(_StrInstantiates):
         return mask_data, dwi_img.affine, meta
 
 
-class FullMask(_StrInstantiates):
+class FullMask(StrInstantiatesMixin):
     """
     Define a mask which covers a full volume.
 
@@ -210,7 +210,7 @@ class FullMask(_StrInstantiates):
             dict(source="Entire Volume")
 
 
-class RoiMask(_StrInstantiates):
+class RoiMask(StrInstantiatesMixin):
     """
     Define a mask which is all ROIs or'd together.
 
@@ -241,7 +241,7 @@ class RoiMask(_StrInstantiates):
         return mask_data, api["dwi_affine"], dict(source="ROIs")
 
 
-class B0Mask(_StrInstantiates):
+class B0Mask(StrInstantiatesMixin):
     """
     Define a mask using b0 and dipy's median_otsu.
 
@@ -482,7 +482,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         self.upper_bound = upper_bound
 
 
-class CombinedMask(_StrInstantiates):
+class CombinedMask(StrInstantiatesMixin):
     def __init__(self, mask_list, combine="and"):
         """
         Define a mask by combining other masks.
