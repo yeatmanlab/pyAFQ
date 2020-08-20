@@ -1614,3 +1614,7 @@ class AFQ(object):
             self.viz_ROIs(export=True)
             self.export_rois()
         self.combine_profiles()
+    
+    def upload_to_s3(self, s3fs, remote_path):
+        """ Upload entire AFQ derivatives folder to S3"""
+        s3fs.put(self.afq_path, remote_path, recursive=True)
