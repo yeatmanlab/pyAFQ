@@ -31,6 +31,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
+from AFQ.mask import RoiMask, ThresholdedScalarMask
 
 
 def touch(fname, times=None):
@@ -146,8 +147,7 @@ def test_AFQ_init():
         n_subjects = 3
         bids_path = create_dummy_bids_path(n_subjects, n_sessions)
         my_afq = api.AFQ(bids_path,
-                         dmriprep="synthetic",
-                         segmentation="synthetic")
+                         dmriprep="synthetic")
         npt.assert_equal(my_afq.data_frame.shape,
                          (n_subjects * n_sessions, 11))
 
@@ -165,7 +165,6 @@ def test_AFQ_data():
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
-            segmentation='freesurfer',
             use_prealign=use_prealign)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq['dwi_file'][0]).shape[:3])
@@ -186,7 +185,6 @@ def test_AFQ_anisotropic():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
-        segmentation='freesurfer',
         min_bval=1990,
         max_bval=2010,
         b0_threshold=50,
@@ -226,7 +224,6 @@ def test_AFQ_slr():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
-        segmentation='freesurfer',
         reg_subject='subject_sls',
         reg_template='hcp_atlas')
     myafq.export_rois()
@@ -244,7 +241,6 @@ def test_AFQ_FA():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
-        segmentation='freesurfer',
         reg_template='dti_fa_template',
         reg_subject='dti_fa_subject')
     myafq.export_rois()
@@ -290,7 +286,6 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS']['bids_path']['default'] = bids_path
     arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['BIDS']['segmentation']['default'] = 'freesurfer'
     arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
     arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY']['random_seeds']['default'] = True
@@ -309,7 +304,7 @@ def test_AFQ_data_waypoint():
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI",
-                           seed_mask="roi_mask",
+                           seed_mask=RoiMask(),
                            n_seeds=100,
                            random_seeds=True)
     segmentation_params = dict(filter_by_endpoints=False,
@@ -320,13 +315,11 @@ def test_AFQ_data_waypoint():
 
     myafq = api.AFQ(bids_path=bids_path,
                     dmriprep='vistasoft',
-                    segmentation='freesurfer',
                     bundle_names=bundle_names,
                     scalars=["dti_fa", "dti_md"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
-                    clean_params=clean_params,
-                    wm_criterion=0.2)
+                    clean_params=clean_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -401,13 +394,16 @@ def test_AFQ_data_waypoint():
     print("Running the CLI:")
 
     # Set up config to use the same parameters as above:
+    # ROI mask needs to be put in quotes in config
+    tracking_params = dict(odf_model="DTI",
+                           seed_mask="RoiMask()",
+                           n_seeds=100,
+                           random_seeds=True)
     config = dict(BIDS=dict(bids_path=bids_path,
-                            dmriprep='vistasoft',
-                            segmentation='freesurfer'),
+                            dmriprep='vistasoft'),
                   BUNDLES=dict(
                       bundle_names=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
-                  REGISTRATION=dict(wm_criterion=0.2),
                   TRACTOGRAPHY=tracking_params,
                   SEGMENTATION=segmentation_params,
                   CLEANING=clean_params)

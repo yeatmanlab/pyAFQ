@@ -34,6 +34,8 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
+from AFQ.mask import B0Mask, CombinedMask, \
+    ThresholdedScalarMask, ScalarMask, FullMask, check_mask_methods
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -142,21 +144,17 @@ class AFQ(object):
 
     def __init__(self,
                  bids_path,
-                 dmriprep='dmriprep',
-                 segmentation='dmriprep',
-                 seg_suffix='seg',
+                 dmriprep='all',
                  b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
                  reg_template="mni_T1",
                  reg_subject="power_map",
-                 mask_template=True,
+                 brain_mask=B0Mask(),
                  bundle_names=BUNDLES,
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
-                 wm_criterion={'lb': {'dti_fa': 0.2},
-                               'ub': {'dti_md': 0.002}},
                  use_prealign=True,
                  virtual_frame_buffer=False,
                  viz_backend="fury",
@@ -165,6 +163,14 @@ class AFQ(object):
                  clean_params=None):
         '''
         Initialize an AFQ object.
+        Some special notes on parameters:
+        In tracking_params, parameters with the suffix mask which are also
+        a mask from AFQ.mask will be handled automatically by the api.
+        You can set additional parameters for a given step of the process
+        by directly calling the relevant api function. For example,
+        to set the sh_order for csd to 4, call:
+        myafq._csd(sh_order=4)
+        before otherwise generating the csd file.
 
         Parameters
         ----------
@@ -175,13 +181,6 @@ class AFQ(object):
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "dmriprep".
-        segmentation : str
-            [BIDS] The name of the pipeline used to generate
-            a segmentation image.
-            Default: "dmriprep"
-        seg_suffix : str, optional.
-            [BIDS] The suffix that identifies the segmentation image.
-            Default: "seg".
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
@@ -209,10 +208,13 @@ class AFQ(object):
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".
             Default: "mni_T1"
-        mask_template : bool, optional
-            [REGISTRATION] Whether to mask the chosen template(s)
-            with a brain-mask.
-            Default: True
+        brain_mask : instance of a class defined in `AFQ.mask`, optional
+            [REGISTRATION] This will be used to create
+            the brain mask, which gets applied before registration to a
+            template.
+            If None, no brain mask will not be applied,
+            and no brain mask will be applied to the template.
+            Default: B0Mask()
         bundle_names : list of strings, optional
             [BUNDLES] List of bundle names to include in segmentation.
             Default: BUNDLES
@@ -226,20 +228,6 @@ class AFQ(object):
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
-        wm_criterion : list or float, optional
-            [REGISTRATION] This is either a list of the labels of the white
-            matter in the segmentation file or (if a dictionary is provided)
-            a lower bound and upper bound containting a series of
-            scalar / threshold pairs used for creating the white-matter mask.
-            In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
-            "dki_md", thresholds are floats, and 'lb' / 'ub' mean lower and
-            upper bounds respectively (see the format in the default). Each
-            scalar mask will 'logical and' to make the white-matter mask.
-            For an example of the former case,
-            the white matter values for the segmentation provided
-            with the HCP data including labels for midbrain are:
-            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].
-            Default: {'lb': {'dti_fa': 0.1}, 'ub': {'dti_md': 0.003}}
         use_prealign : bool, optional
             [REGISTRATION] Whether to perform pre-alignment before perforiming
             the diffeomorphic mapping in registration. Default: True
@@ -255,12 +243,6 @@ class AFQ(object):
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
             The parameters for tracking.
-            Parameters with suffix_mask are handled differently by this api.
-            Masks which are strings that are in scalars or are "wm_mask" or
-            "roi_mask" will be replaced by the corresponding mask.
-            Masks which are paths will be loaded.
-            All masks set to None will default to "dti_fa".
-            To track the entire volume, set mask to "full".
             Default: use the default behavior of the aft.track function.
         clean_params: dict, optional
             The parameters for cleaning.
@@ -274,10 +256,15 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.wm_criterion = wm_criterion
         self.reg_subject = reg_subject
         self.reg_template = reg_template
-        self.mask_template = mask_template
+        if brain_mask is None:
+            self.brain_mask_definition = FullMask()
+            self.mask_template = False
+        else:
+            self.brain_mask_definition = brain_mask
+            self.mask_template = True
+
         if reg_subject == 'subject_sls' or reg_template == 'hcp_atlas':
             if reg_template != 'hcp_atlas':
                 self.logger.error(
@@ -303,8 +290,8 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend)
 
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = "dti_fa"
-        default_tracking_params["stop_mask"] = "dti_fa"
+        default_tracking_params["seed_mask"] = ScalarMask("dti_fa")
+        default_tracking_params["stop_mask"] = ScalarMask("dti_fa")
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value was
@@ -369,8 +356,6 @@ class AFQ(object):
         dwi_file_list = []
         bvec_file_list = []
         bval_file_list = []
-        anat_file_list = []
-        seg_file_list = []
         results_dir_list = []
         for subject in self.subjects:
             for session in self.sessions:
@@ -399,24 +384,29 @@ class AFQ(object):
                                     suffix='dwi',
                                     return_type='filename',
                                     scope=dmriprep)[0])
-                this_t1w = bids_layout.get(
-                    subject=subject, session=session,
-                    extension='.nii.gz',
-                    suffix='T1w', return_type='filename',
-                    scope=segmentation)
 
-                this_seg = bids_layout.get(
-                    subject=subject, session=session,
-                    extension='.nii.gz',
-                    suffix=seg_suffix,
-                    return_type='filename',
-                    scope=segmentation)
+                if check_mask_methods(self.tracking_params["seed_mask"]):
+                    self.tracking_params["seed_mask"].find_path(
+                        bids_layout,
+                        subject,
+                        session
+                    )
 
-                if len(this_t1w):
-                    anat_file_list.append(this_t1w[0])
+                if check_mask_methods(self.tracking_params["stop_mask"]):
+                    self.tracking_params["stop_mask"].find_path(
+                        bids_layout,
+                        subject,
+                        session
+                    )
 
-                if len(this_seg):
-                    seg_file_list.append(this_seg[0])
+                if (self.brain_mask_definition is not "b0"
+                    and check_mask_methods(
+                        self.brain_mask_definition, mask_name="brain_mask")):
+                    self.brain_mask_definition.find_path(
+                        bids_layout,
+                        subject,
+                        session
+                    )
 
                 sub_list.append(subject)
                 ses_list.append(session)
@@ -427,11 +417,6 @@ class AFQ(object):
                                             bval_file=bval_file_list,
                                             ses=ses_list,
                                             results_dir=results_dir_list))
-        # Add these if they exist:
-        if len(seg_file_list):
-            self.data_frame['seg_file'] = seg_file_list
-        if len(anat_file_list):
-            self.data_frame['anat_file'] = anat_file_list
 
         if dask_it:
             self.data_frame = ddf.from_pandas(self.data_frame,
@@ -486,27 +471,12 @@ class AFQ(object):
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if self.force_recompute or not op.exists(brain_mask_file):
-            if 'seg_file' in row.index:
-                brain_mask, meta = \
-                    self._mask_from_seg(row, [0], not_equal=True)
-                self.log_and_save_nii(
-                    nib.Nifti1Image(brain_mask.astype(np.float32),
-                                    row['dwi_affine']),
-                    brain_mask_file)
-            else:
-                b0_file = self._b0(row)
-                mean_b0_img = nib.load(b0_file)
-                mean_b0 = mean_b0_img.get_fdata()
-                _, brain_mask = median_otsu(mean_b0, median_radius, numpass,
-                                            autocrop, dilate=dilate)
-                be_img = nib.Nifti1Image(brain_mask.astype(int),
-                                         mean_b0_img.affine)
-                self.log_and_save_nii(be_img, brain_mask_file)
-                meta = dict(source=b0_file,
-                            median_radius=median_radius,
-                            numpass=numpass,
-                            autocrop=autocrop,
-                            vol_idx=vol_idx)
+            brain_mask, brain_affine, meta = \
+                self.brain_mask_definition.get_mask(self, row)
+            brain_mask_img = nib.Nifti1Image(
+                brain_mask.astype(int),
+                brain_affine)
+            self.log_and_save_nii(brain_mask_img, brain_mask_file)
             meta_fname = self._get_fname(row, '_brain_mask.json')
             afd.write_json(meta_fname, meta)
         return brain_mask_file
@@ -816,116 +786,6 @@ class AFQ(object):
 
         return mapping_file
 
-    def _mask_from_seg(self, row, image_labels, not_equal=False):
-        dwi_data, _, dwi_img = self._get_data_gtab(row)
-
-        # If we found a segmentation file in the
-        # expected location:
-        seg_img = nib.load(row['seg_file'])
-        seg_data_orig = seg_img.get_fdata()
-        # For different sets of labels, extract all the voxels that
-        # have any of these values:
-        seg_mask = np.zeros(seg_data_orig.shape, dtype=bool)
-        for label in image_labels:
-            if not_equal:
-                seg_mask = np.logical_or(seg_mask, (seg_data_orig != label))
-            else:
-                seg_mask = np.logical_or(seg_mask, (seg_data_orig == label))
-
-        # Resample to DWI data:
-        seg_mask = np.round(reg.resample(seg_mask.astype(float),
-                                         dwi_data[..., 0],
-                                         seg_img.affine,
-                                         dwi_img.affine)).astype(int)
-        meta = dict(source=row['seg_file'],
-                    wm_criterion=image_labels)
-
-        return seg_mask, meta
-
-    def _wm_mask(self, row):
-        wm_mask_file = self._get_fname(row, '_wm_mask.nii.gz')
-        if self.force_recompute or not op.exists(wm_mask_file):
-            if 'seg_file' in row.index and isinstance(self.wm_criterion, list):
-                wm_mask, meta = self._mask_from_seg(row, self.wm_criterion)
-            else:
-                # Otherwise, we'll identify the white matter based on scalars:
-                valid_scalars = list(self._scalar_dict.keys())
-                wm_mask = None
-                filenames = []
-                for bound, constraint in self.wm_criterion.items():
-                    for scalar, threshold in constraint.items():
-                        if scalar not in valid_scalars:
-                            raise RuntimeError((
-                                f"wm_criterion scalars should be one of"
-                                f" {', '.join(valid_scalars)}"))
-
-                        scalar_fname = self._scalar_dict[scalar](self, row)
-                        if bound == "lb":
-                            new_wm_mask = \
-                                nib.load(
-                                    scalar_fname).get_fdata() > threshold
-                        elif bound == "ub":
-                            new_wm_mask = \
-                                nib.load(
-                                    scalar_fname).get_fdata() < threshold
-                        else:
-                            raise RuntimeError("wm_criterion dictionary "
-                                               + " formatted incorrectly. See"
-                                               + " the default for reference")
-
-                        if wm_mask is None:
-                            wm_mask = new_wm_mask
-                        else:
-                            wm_mask = np.logical_and(wm_mask, new_wm_mask)
-                        filenames.append(scalar_fname)
-
-                meta = dict(
-                    criterion=self.wm_criterion,
-                    filenames=filenames)
-
-            self.log_and_save_nii(nib.Nifti1Image(wm_mask.astype(np.float32),
-                                                  row['dwi_affine']),
-                                  wm_mask_file)
-
-            meta_fname = self._get_fname(row, '_wm_mask.json')
-            afd.write_json(meta_fname, meta)
-
-        return wm_mask_file
-
-    def _get_mask(self, row, mask):
-        if isinstance(mask, str):
-            if mask == "wm_mask":
-                fname = self._wm_mask(row)
-                mask_data = nib.load(fname).get_fdata().astype(bool)
-            elif mask == "roi_mask":
-                mask_data = None
-                for bundle_name, bundle_info in self.bundle_dict.keys():
-                    for idx, roi in enumerate(bundle_info['ROIs']):
-                        if self.bundle_dict[bundle_name]['rules'][idx]:
-                            warped_roi = auv.patch_up_roi(
-                                self.mapping.transform_inverse(
-                                    roi.get_fdata().astype(np.float32),
-                                    interpolation='linear'))
-
-                            if mask_data is None:
-                                mask_data = np.zeros(warped_roi.shape)
-                            mask_data = np.logical_or(
-                                mask_data,
-                                warped_roi.astype(bool))
-                fname = "ROI Mask"
-            elif mask in self.scalars:
-                fname = self._scalar_dict[mask](self, row)
-                mask_data = nib.load(fname).get_fdata()
-            elif mask == "full":
-                fname = "Entire Volume"
-                mask_data = None
-            else:
-                fname = mask
-                mask_data = nib.load(fname).get_fdata()
-            return mask_data, fname
-        else:
-            return mask, "custom"
-
     def _streamlines(self, row):
         odf_model = self.tracking_params["odf_model"]
 
@@ -943,10 +803,17 @@ class AFQ(object):
                 params_file = self._dki(row)
 
             tracking_params = self.tracking_params.copy()
-            tracking_params['seed_mask'], seed_mask_desc =\
-                self._get_mask(row, self.tracking_params['seed_mask'])
-            tracking_params['stop_mask'], stop_mask_desc =\
-                self._get_mask(row, self.tracking_params['stop_mask'])
+            if check_mask_methods(self.tracking_params['seed_mask']):
+                tracking_params['seed_mask'], _, seed_mask_desc =\
+                    self.tracking_params['seed_mask'].get_mask(self, row)
+            else:
+                seed_mask_desc = dict(source=tracking_params['seed_mask'])
+
+            if check_mask_methods(self.tracking_params['stop_mask']):
+                tracking_params['stop_mask'], _, stop_mask_desc =\
+                    self.tracking_params['stop_mask'].get_mask(self, row)
+            else:
+                stop_mask_desc = dict(source=tracking_params['stop_mask'])
             sft = aft.track(params_file, **tracking_params)
             sft.to_vox()
             meta_directions = {"det": "deterministic",
@@ -961,7 +828,7 @@ class AFQ(object):
                     ROI=seed_mask_desc,
                     n_seeds=self.tracking_params["n_seeds"],
                     random_seeds=self.tracking_params["random_seeds"]),
-                Constraints=dict(AnatomicalImage=stop_mask_desc),
+                Constraints=dict(ROI=stop_mask_desc),
                 Parameters=dict(
                     Units="mm",
                     StepSize=self.tracking_params["step_size"],
@@ -1504,18 +1371,6 @@ class AFQ(object):
         return self.data_frame['brain_mask_file']
 
     brain_mask = property(get_brain_mask, set_brain_mask)
-
-    def set_wm_mask(self):
-        if 'wm_mask_file' not in self.data_frame.columns:
-            self.data_frame['wm_mask_file'] =\
-                self.data_frame.apply(self._wm_mask,
-                                      axis=1)
-
-    def get_wm_mask(self):
-        self.set_wm_mask()
-        return self.data_frame['wm_mask_file']
-
-    wm_mask = property(get_wm_mask, set_wm_mask)
 
     def set_dti(self):
         if 'dti_params_file' not in self.data_frame.columns:

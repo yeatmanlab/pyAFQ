@@ -9,6 +9,8 @@ from ast import literal_eval
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
+from AFQ.mask import *  # interprets masks loaded from toml
+
 
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
@@ -79,6 +81,15 @@ def toml_to_val(t):
         return None
     elif isinstance(t, str) and t[0] == '{':
         return literal_eval(t)  # interpret as dictionary
+    elif isinstance(t, str) and "Mask" in t:
+        try:
+            mask = eval(t)
+        except NameError:
+            return t
+        if check_mask_methods(mask):
+            return mask
+        else:
+            return t
     else:
         return t
 
@@ -86,7 +97,9 @@ def toml_to_val(t):
 def val_to_toml(v):
     if v is None:
         return "''"
-    if isinstance(v, str):
+    elif check_mask_methods(v):
+        return f"'{v.str_for_toml()}'"
+    elif isinstance(v, str):
         return f"'{v}'"
     elif isinstance(v, bool):
         if v:
@@ -96,14 +109,19 @@ def val_to_toml(v):
     elif callable(v):
         return f"'{v.__name__}'"
     elif isinstance(v, dict):
-        return f"\"{v}\""
+        return f"'{v}'"
     else:
         return f"{v}"
 
 
 def dict_to_toml(dictionary):
-    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n\n'
+    toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
+    toml = toml + '# Wrap mask object instantiations in quotes\n\n'
     for section, args in dictionary.items():
+        if section == "AFQ_desc":
+            toml = "# " + dictionary["AFQ_desc"].replace("\n", "\n# ")\
+                + "\n\n" + toml
+            continue
         toml = toml + f'[{section}]\n'
         for arg, arg_info in args.items():
             toml = toml + '\n'
@@ -133,6 +151,8 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     for name, func in func_dict.items():
         docstr_parser = FuncArgParser()
         docstr_parser.setup_args(func)
+        if name == "AFQ":
+            arg_dict["AFQ_desc"] = docstr_parser.description
         for arg, info in docstr_parser.unfinished_arguments.items():
             try:
                 if name == "AFQ":
