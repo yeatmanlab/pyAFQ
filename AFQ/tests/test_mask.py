@@ -80,7 +80,7 @@ def test_find_path():
     print(bids_dir)
     bids_layout = BIDSLayout(bids_dir, derivatives=True)
 
-    mask_file = MaskFile("seg", scope='synthetic')
+    mask_file = MaskFile("seg", {'scope': 'synthetic'})
     mask_file.find_path(bids_layout, '01', '01')
     mask_file.find_path(bids_layout, '02', '01')
     mask_file.find_path(bids_layout, '01', '02')

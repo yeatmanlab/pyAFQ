@@ -130,7 +130,7 @@ class CombineMaskMixin(object):
 
 
 class MaskFile(StrInstantiatesMixin):
-    def __init__(self, suffix, scope='all'):
+    def __init__(self, suffix, filters={}):
         """
         Define a mask based on a file.
         Does not apply any labels or thresholds;
@@ -141,22 +141,22 @@ class MaskFile(StrInstantiatesMixin):
         Parameters
         ----------
         suffix : str
-            Suffix to pass to bids_layout.get() to identify the file.
-        scope : str, optional
-            Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from.
-            Default: 'all'
+            suffix to pass to bids_layout.get() to identify the file.
+        filters : str
+            Additional filters to pass to bids_layout.get() to identify
+            the file.
+            Default: {}
 
         Examples
         --------
         seed_mask = MaskFile(
             "WM_mask",
-            scope="dmriprep")
+            {"scope"="dmriprep"})
         api.AFQ(tracking_params={"seed_mask": seed_mask,
                                  "seed_threshold": 0.1})
         """
         self.suffix = suffix
-        self.scope = scope
+        self.filters = filters
         self.fnames = {}
 
     def find_path(self, bids_layout, subject, session):
@@ -165,9 +165,9 @@ class MaskFile(StrInstantiatesMixin):
         self.fnames[session][subject] = bids_layout.get(
             subject=subject, session=session,
             extension='.nii.gz',
-            suffix=self.suffix,
             return_type='filename',
-            scope=self.scope)[0]
+            suffix=self.suffix,
+            **self.filters)[0]
 
     def get_path_data_affine(self, api, row):
         mask_file = self.fnames[row['ses']][row['subject']]
@@ -289,7 +289,7 @@ class B0Mask(StrInstantiatesMixin):
 
 
 class LabelledMaskFile(MaskFile, CombineMaskMixin):
-    def __init__(self, suffix, scope='all', inclusive_labels=None,
+    def __init__(self, suffix, filters={}, inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
         """
         Define a mask based on labels in a file.
@@ -297,11 +297,11 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
         Parameters
         ----------
         suffix : str
-            Suffix to pass to bids_layout.get() to identify the file.
-        scope : str, optional
-            Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from.
-            Default: 'all'
+            suffix to pass to bids_layout.get() to identify the file.
+        filters : str
+            Additional filters to pass to bids_layout.get() to identify
+            the file.
+            Default: {}
         inclusive_labels : list of ints, optional
             The labels from the file to include from the boolean mask.
             If None, no inclusive labels are applied.
@@ -322,11 +322,11 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
         --------
         brain_mask = LabelledMaskFile(
             "aseg",
-            scope="dmriprep",
+            {"scope": "dmriprep"},
             exclusive_labels=[0])
         api.AFQ(brain_mask=brain_mask)
         """
-        MaskFile.__init__(self, suffix, scope)
+        MaskFile.__init__(self, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.inclusive_labels = inclusive_labels
         self.exclusive_labels = exclusive_labels
@@ -351,7 +351,7 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
 
 
 class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
-    def __init__(self, suffix, scope='all', lower_bound=None,
+    def __init__(self, suffix, filters={}, lower_bound=None,
                  upper_bound=None, combine="and"):
         """
         Define a mask based on thresholding a file.
@@ -362,11 +362,11 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
         Parameters
         ----------
         suffix : str
-            Suffix to pass to bids_layout.get() to identify the file.
-        scope : str, optional
-            Scope to pass to bids_layout.get() to specify the pipeline
-            to get the file from.
-            Default: 'all'
+            suffix to pass to bids_layout.get() to identify the file.
+        filters : str
+            Additional filters to pass to bids_layout.get() to identify
+            the file.
+            Default: {}
         lower_bound : float, optional
             Lower bound to generate boolean mask from data in the file.
             If None, no lower bound is applied.
@@ -385,11 +385,11 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
         --------
         brain_mask = ThresholdedMaskFile(
             "brain_mask",
-            scope="dmriprep",
+            {"scope"="dmriprep"},
             lower_bound=0.1)
         api.AFQ(brain_mask=brain_mask)
         """
-        MaskFile.__init__(self, suffix, scope)
+        MaskFile.__init__(self, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
