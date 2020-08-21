@@ -1679,15 +1679,15 @@ def combine_list_of_profiles(profile_fnames, out_file):
     dfs = []
     for fname in profile_fnames:
         profiles = pd.read_csv(fname)
-        profiles['sub'] = fname.split('sub-')[1].split('/')[0]
+        profiles['subjectID'] = fname.split('sub-')[1].split('/')[0]
         if 'ses-' in fname:
             session_name = fname.split('ses-')[1].split('/')[0]
         else:
             session_name = 'unknown'
-        profiles['ses'] = session_name
+        profiles['sessionID'] = session_name
         dfs.append(profiles)
 
     df = pd.concat(dfs)
-    os.makedirs(os.path.dirname(out_file), exist_ok=True)
+    os.makedirs(op.dirname(out_file), exist_ok=True)
     df.to_csv(out_file, index=False)
     return df
