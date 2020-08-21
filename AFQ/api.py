@@ -1679,5 +1679,6 @@ def combine_list_of_profiles(profile_fnames, out_file):
         dfs.append(profiles)
 
     df = pd.concat(dfs)
+    os.makedirs(os.path.dirname(out_file), exist_ok=True)
     df.to_csv(out_file, index=False)
     return df
