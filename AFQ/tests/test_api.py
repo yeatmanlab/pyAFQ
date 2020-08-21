@@ -272,7 +272,7 @@ def test_auto_cli():
         pass  # made it into the api
 
 
-@pytest.mark.skip(reason="causes segmentation fault, possibly running out of memory") # noqa
+@pytest.mark.skip(reason="causes segmentation fault, possibly running out of memory")  # noqa
 def test_run_using_auto_cli():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
