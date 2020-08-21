@@ -558,7 +558,7 @@ class S3BIDSSubject:
         self._s3_keys = s3_keys
 
     def download(self, directory, include_derivs=False, overwrite=False,
-                 pbar=True, pbar_idx=0):
+                 suffix=None, pbar=True, pbar_idx=0):
         """Download files from S3
 
         Parameters
@@ -574,6 +574,10 @@ class S3BIDSSubject:
 
         overwrite : bool
             If True, overwrite files for each subject. Default: False
+
+        suffix : str
+            Suffix, including extension, of file(s) to download.
+            Default: None
 
         pbar : bool
             If True, include download progress bar. Default: True
@@ -593,6 +597,9 @@ class S3BIDSSubject:
         if not isinstance(overwrite, bool):
             raise TypeError('overwrite must be a boolean.')
 
+        if (suffix is not None) and not(isinstance(suffix, str)):
+            raise TypeError('suffix must be a string.')
+
         if not isinstance(pbar, bool):
             raise TypeError('pbar must be a boolean.')
 
@@ -605,12 +612,26 @@ class S3BIDSSubject:
             else:
                 return key
 
+        s3_keys_raw = self.s3_keys['raw']
+        s3_keys_deriv = self.s3_keys['derivatives']
+
+        # Filter out keys that do not end with suffix
+        if suffix is not None:
+            s3_keys_raw = [
+                s3key for s3key in s3_keys_raw if s3key.endswith(suffix)
+            ]
+            s3_keys_deriv = {
+                dt: [
+                    s3key for s3key in s3keys if s3key.endswith(suffix)
+                ] for dt, s3keys in s3_keys_deriv.items()
+            }
+
         files = {
             'raw': [
                 op.abspath(op.join(
                     directory,
                     split_key(key).lstrip('/')
-                )) for key in self.s3_keys['raw']
+                )) for key in s3_keys_raw
             ],
             'derivatives': {
                 dt: [
@@ -618,11 +639,11 @@ class S3BIDSSubject:
                         directory,
                         split_key(s3key).lstrip('/')
                     )) for s3key in s3keys
-                ] for dt, s3keys in self.s3_keys['derivatives'].items()
+                ] for dt, s3keys in s3_keys_deriv.items()
             }
         }
 
-        raw_zip = list(zip(self.s3_keys['raw'], files['raw']))
+        raw_zip = list(zip(s3_keys_raw, files['raw']))
 
         # Populate files parameter
         self._files["raw"].update({k: f for k, f in raw_zip})
@@ -633,7 +654,7 @@ class S3BIDSSubject:
         deriv_zips = {
             dt: list(zip(
                 s3keys, files['derivatives'][dt]
-            )) for dt, s3keys in self.s3_keys['derivatives'].items()
+            )) for dt, s3keys in s3_keys_deriv.items()
         }
 
         deriv_pairs = []
@@ -1093,6 +1114,7 @@ class S3BIDSStudy:
                  include_modality_agnostic=("dataset_description.json",),
                  include_derivs=False,
                  include_derivs_dataset_description=True,
+                 suffix=None,
                  overwrite=False, pbar=True):
         """Download files for each subject in the study
 
@@ -1117,6 +1139,10 @@ class S3BIDSStudy:
         include_derivs_dataset_description : bool
             Used only if include_derivs is not False. If True,
             dataset_description.json downloaded for each derivative.
+
+        suffix : str
+            Suffix, including extension, of file(s) to download.
+            Default: None
 
         overwrite : bool
             If True, overwrite files for each subject. Default: False
@@ -1157,6 +1183,7 @@ class S3BIDSStudy:
         results = [delayed(sub.download)(
             directory=directory,
             include_derivs=include_derivs,
+            suffix=suffix,
             overwrite=overwrite,
             pbar=pbar,
             pbar_idx=idx,
