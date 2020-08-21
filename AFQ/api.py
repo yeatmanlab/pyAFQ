@@ -1593,7 +1593,7 @@ class AFQ(object):
 
     def combine_profiles(self):
         return combine_list_of_profiles(
-            self.afq_path,
+            self.tract_profiles,
             op.join(self.afq_path, 'tract_profiles.csv'))
 
     def export_all(self):
