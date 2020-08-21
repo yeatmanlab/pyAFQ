@@ -1638,10 +1638,13 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
             "get_profiles",
             bucket,
             study_s3_prefix,
+            subjects="all",
             anon=False)
         remote_study.download(
             t_dir,
+            include_modality_agnostic=False,
             include_derivs="afq",
+            include_derivs_dataset_description=False,
             suffix="profiles.csv")
         temp_study = BIDSLayout(t_dir, validate=False)
         if session is None:
@@ -1676,9 +1679,9 @@ def combine_list_of_profiles(profile_fnames, out_file):
     dfs = []
     for fname in profile_fnames:
         profiles = pd.read_csv(fname)
-        profiles['sub'] = fname.split('sub-')[1].split('_')[0]
+        profiles['sub'] = fname.split('sub-')[1].split('/')[0]
         if 'ses-' in fname:
-            session_name = fname.split('ses-')[1].split('_')[0]
+            session_name = fname.split('ses-')[1].split('/')[0]
         else:
             session_name = 'unknown'
         profiles['ses'] = session_name
