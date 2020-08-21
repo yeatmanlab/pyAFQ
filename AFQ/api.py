@@ -1651,7 +1651,7 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
                 return_type='filename')
         else:
             profiles = temp_study.get(
-                session=session
+                session=session,
                 extension='csv',
                 suffix='profiles',
                 return_type='filename')
