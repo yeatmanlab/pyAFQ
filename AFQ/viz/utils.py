@@ -828,7 +828,7 @@ class LongitudinalCSVComparison():
 
     def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
-                          ylims=None,
+                          ylims=[0.0, 1.0],
                           bundles=POSITIONS.keys(),
                           show_plots=False):
         """
@@ -847,7 +847,7 @@ class LongitudinalCSVComparison():
 
         ylims : 2-tuple of floats, optional
             Limits of the y-axis. Useful to synchronize axes across graphs.
-            Default: None.
+            Default: [0.0, 1.0].
 
         bundles : list of strings, optional
             Bundles to correlate. Default: POSITIONS.keys()
