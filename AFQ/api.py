@@ -1596,7 +1596,7 @@ class AFQ(object):
             self.tract_profiles,
             op.join(self.afq_path, 'tract_profiles.csv'))
 
-    def export_all(self):
+    def export_all(self, combine_profiles=True):
         """ Exports all the possible outputs"""
         self.export_registered_b0()
         self.get_template_xform()
@@ -1606,7 +1606,8 @@ class AFQ(object):
         if self.seg_algo == "afq":
             self.viz_ROIs(export=True)
             self.export_rois()
-        self.combine_profiles()
+        if combine_profiles:
+            self.combine_profiles()
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
