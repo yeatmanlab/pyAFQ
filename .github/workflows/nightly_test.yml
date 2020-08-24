@@ -2,7 +2,7 @@ name: Nightly test suite
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # every day at midnight
+    - cron: '0 7 * * *'  # every day at midnight, PST
 
 jobs:
   build:
