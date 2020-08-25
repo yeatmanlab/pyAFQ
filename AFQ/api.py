@@ -1592,18 +1592,11 @@ class AFQ(object):
         self.data_frame.apply(self._export_registered_b0, axis=1)
 
     def combine_profiles(self):
-        dfs = []
-        for ii, fname in enumerate(self.tract_profiles):
-            profiles = pd.read_csv(fname)
-            profiles['sub'] = self.data_frame['subject'].iloc[ii]
-            profiles['ses'] = op.split(self.data_frame['ses'].iloc[ii])[-1]
-            dfs.append(profiles)
+        return combine_list_of_profiles(
+            self.tract_profiles,
+            op.join(self.afq_path, 'tract_profiles.csv'))
 
-        df = pd.concat(dfs)
-        df.to_csv(op.join(self.afq_path, 'tract_profiles.csv'), index=False)
-        return df
-
-    def export_all(self):
+    def export_all(self, combine_profiles=True):
         """ Exports all the possible outputs"""
         self.export_registered_b0()
         self.get_template_xform()
@@ -1613,4 +1606,89 @@ class AFQ(object):
         if self.seg_algo == "afq":
             self.viz_ROIs(export=True)
             self.export_rois()
-        self.combine_profiles()
+        if combine_profiles:
+            self.combine_profiles()
+
+    def upload_to_s3(self, s3fs, remote_path):
+        """ Upload entire AFQ derivatives folder to S3"""
+        s3fs.put(self.afq_path, remote_path, recursive=True)
+
+
+def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
+                                      session=None):
+    """
+    Download and combine tract profiles from different subjects / sessions
+    on an s3 bucket into one CSV.
+    Parameters
+    ----------
+    outfile : filename
+        Filename for the combined output CSV.
+    bucket : str
+        The S3 bucket that contains the study data.
+    study_s3_prefix : str
+        The S3 prefix common to all of the study objects on S3.
+    session : str
+        Session to get CSVs from. If None, all sessions are used.
+        Default: None
+    Returns
+    -------
+    Ouput CSV's pandas dataframe.
+    """
+    with nib.tmpdirs.InTemporaryDirectory() as t_dir:
+        remote_study = afd.S3BIDSStudy(
+            "get_profiles",
+            bucket,
+            study_s3_prefix,
+            subjects="all",
+            anon=False)
+        remote_study.download(
+            t_dir,
+            include_modality_agnostic=False,
+            include_derivs="afq",
+            include_derivs_dataset_description=False,
+            suffix="profiles.csv")
+        temp_study = BIDSLayout(t_dir, validate=False)
+        if session is None:
+            profiles = temp_study.get(
+                extension='csv',
+                suffix='profiles',
+                return_type='filename')
+        else:
+            profiles = temp_study.get(
+                session=session,
+                extension='csv',
+                suffix='profiles',
+                return_type='filename')
+        df = combine_list_of_profiles(profiles, out_file)
+    return df
+
+
+def combine_list_of_profiles(profile_fnames, out_file):
+    """
+    Combine tract profiles from different subjects / sessions
+    into one CSV.
+    Parameters
+    ----------
+    profile_fnames : list of str
+        List of csv filenames.
+    outfile : filename
+        Filename for the combined output CSV.
+    Returns
+    -------
+    Ouput CSV's pandas dataframe.
+    """
+    dfs = []
+    for fname in profile_fnames:
+        profiles = pd.read_csv(fname)
+        profiles['subjectID'] = fname.split('sub-')[1].split('/')[0]
+        if 'ses-' in fname:
+            session_name = fname.split('ses-')[1].split('/')[0]
+        else:
+            session_name = 'unknown'
+        profiles['sessionID'] = session_name
+        dfs.append(profiles)
+
+    df = pd.concat(dfs)
+    os.makedirs(op.dirname(out_file), exist_ok=True)
+    df.to_csv(out_file, index=False)
+    return df
