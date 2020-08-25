@@ -615,8 +615,8 @@ class S3BIDSSubject:
         # Filter out keys that do not end with suffix
         if suffix is not None:
             s3_keys_raw = [
-                s3key for s3key in self.s3_keys['raw']\
-                    if s3key.endswith(suffix)
+                s3key for s3key in self.s3_keys['raw']
+                if s3key.endswith(suffix)
             ]
             s3_keys_deriv = {
                 dt: [
