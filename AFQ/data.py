@@ -623,6 +623,9 @@ class S3BIDSSubject:
                     s3key for s3key in s3keys if s3key.endswith(suffix)
                 ] for dt, s3keys in self.s3_keys['derivatives'].items()
             }
+        else:
+            s3_keys_raw = self.s3_keys['raw']
+            s3_keys_deriv = self.s3_keys['derivatives']
 
         files = {
             'raw': [
