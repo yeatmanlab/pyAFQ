@@ -612,18 +612,16 @@ class S3BIDSSubject:
             else:
                 return key
 
-        s3_keys_raw = self.s3_keys['raw']
-        s3_keys_deriv = self.s3_keys['derivatives']
-
         # Filter out keys that do not end with suffix
         if suffix is not None:
             s3_keys_raw = [
-                s3key for s3key in s3_keys_raw if s3key.endswith(suffix)
+                s3key for s3key in self.s3_keys['raw']\
+                    if s3key.endswith(suffix)
             ]
             s3_keys_deriv = {
                 dt: [
                     s3key for s3key in s3keys if s3key.endswith(suffix)
-                ] for dt, s3keys in s3_keys_deriv.items()
+                ] for dt, s3keys in self.s3_keys['derivatives'].items()
             }
 
         files = {
