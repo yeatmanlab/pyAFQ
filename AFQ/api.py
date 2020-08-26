@@ -367,23 +367,42 @@ class AFQ(object):
                 results_dir_list.append(results_dir)
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
-                dwi_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension='nii.gz', suffix='dwi',
-                                    return_type='filename',
-                                    scope=dmriprep)[0])
-                bvec_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bvec', 'bvecs'],
-                                    suffix='dwi',
-                                    return_type='filename',
-                                    scope=dmriprep)[0])
-                bval_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bval', 'bvals'],
-                                    suffix='dwi',
-                                    return_type='filename',
-                                    scope=dmriprep)[0])
+                if session is None:
+                    dwi_file_list.append(
+                        bids_layout.get(subject=subject,
+                                        extension='nii.gz', suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
+                    bvec_file_list.append(
+                        bids_layout.get(subject=subject,
+                                        extension=['bvec', 'bvecs'],
+                                        suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
+                    bval_file_list.append(
+                        bids_layout.get(subject=subject,
+                                        extension=['bval', 'bvals'],
+                                        suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
+                else:
+                    dwi_file_list.append(
+                        bids_layout.get(subject=subject, session=session,
+                                        extension='nii.gz', suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
+                    bvec_file_list.append(
+                        bids_layout.get(subject=subject, session=session,
+                                        extension=['bvec', 'bvecs'],
+                                        suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
+                    bval_file_list.append(
+                        bids_layout.get(subject=subject, session=session,
+                                        extension=['bval', 'bvals'],
+                                        suffix='dwi',
+                                        return_type='filename',
+                                        scope=dmriprep)[0])
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(

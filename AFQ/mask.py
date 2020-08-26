@@ -162,12 +162,20 @@ class MaskFile(StrInstantiatesMixin):
     def find_path(self, bids_layout, subject, session):
         if session not in self.fnames:
             self.fnames[session] = {}
-        self.fnames[session][subject] = bids_layout.get(
-            subject=subject, session=session,
-            extension='.nii.gz',
-            return_type='filename',
-            suffix=self.suffix,
-            **self.filters)[0]
+        if session is None:
+            self.fnames[session][subject] = bids_layout.get(
+                subject=subject,
+                extension='.nii.gz',
+                return_type='filename',
+                suffix=self.suffix,
+                **self.filters)[0]
+        else:
+            self.fnames[session][subject] = bids_layout.get(
+                subject=subject, session=session,
+                extension='.nii.gz',
+                return_type='filename',
+                suffix=self.suffix,
+                **self.filters)[0]
 
     def get_path_data_affine(self, api, row):
         mask_file = self.fnames[row['ses']][row['subject']]
