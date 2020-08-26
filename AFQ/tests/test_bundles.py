@@ -38,7 +38,7 @@ def test_bundles_class():
         bundles_og.save_bundles(file_path=tmpdir)
 
         # load bundles again
-        bundles = bdl.Bundles()
+        bundles = bdl.Bundles(reference=img)
         bundle_names = ['CST_L', 'CST_R']
         bundles.load_bundles(bundle_names, file_path=tmpdir)
 
