@@ -1130,7 +1130,7 @@ class AFQ(object):
                             f'_tractography.trk',
                             include_track=True,
                             include_seg=True))
-                    fname = op.join(fname[0], bundles_dir, fname[1])
+                    fname = op.join(bundles_dir, fname[1])
                     self.log_and_save_trk(this_tgm, fname)
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
