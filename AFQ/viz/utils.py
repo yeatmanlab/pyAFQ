@@ -502,7 +502,7 @@ class LongitudinalCSVComparison():
             In a profile of 100 nodes, percent_edges_removed=10 would remove
             5 nodes from each edge.
             Default: 10
-            
+
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
@@ -551,20 +551,19 @@ class LongitudinalCSVComparison():
                                 bound,
                                 threshold,
                                 x))
-            
+
             if percent_edges_removed > 0:
                 profile = profile.drop(profile[
                     (profile.node < percent_nan_tol // 2)
-                    or (profile.node > 100-(percent_nan_tol // 2))
+                    or (profile.node > 100 - (percent_nan_tol // 2))
                 ].index)
-
 
             self.profile_dict[names[i]] = profile
         if subjects is None:
             self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
         else:
             self.subjects = subjects
-        self.prof_len = 100 - (percent_nan_tol // 2)*2
+        self.prof_len = 100 - (percent_nan_tol // 2) * 2
 
     def _threshold_scalar(self, bound, threshold, val):
         if bound == "lb":
