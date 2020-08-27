@@ -498,7 +498,7 @@ class LongitudinalCSVComparison():
             Scalar values often change dramatically at the boundary between
             the grey matter and the white matter, and these effects can
             dominate plots. However, they are generally not interesting to us,
-            and have low intersubject reliability. 
+            and have low intersubject reliability.
             In a profile of 100 nodes, percent_edges_removed=10 would remove
             5 nodes from each edge.
             Default: 10
