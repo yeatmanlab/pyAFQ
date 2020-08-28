@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
 from dipy.tracking.utils import transform_tracking_output
+import dipy.tracking.streamlinespeed as dps
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.utils.volume as auv
@@ -134,7 +135,7 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(sft, affine, bundle, bundle_dict, colors):
+def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -167,6 +168,10 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors):
         If this is a list, each item is an RGB tuple. Defaults to a list
         with Tableau 20 RGB values
 
+    n_points : int or None
+        n_points to resample streamlines to before plotting. If None, no
+        resampling is done.
+
     Returns
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
@@ -192,6 +197,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors):
 
     if list(sft.data_per_streamline.keys()) == []:
         # There are no bundles in here:
+        if n_points is not None:
+            streamlines = dps.set_number_of_points(streamlines, n_points)
         yield streamlines, [0.5, 0.5, 0.5], "all_bundles"
 
     else:
@@ -202,6 +209,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors):
             for b in np.unique(sft.data_per_streamline['bundle']):
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
                 these_sls = streamlines[idx]
+                if n_points is not None:
+                    these_sls = dps.set_number_of_points(these_sls, n_points)
                 color, b_name = bundle_selector(bundle_dict, colors, b)
                 yield these_sls, color, b_name
 
@@ -216,6 +225,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors):
 
             idx = np.where(sft.data_per_streamline['bundle'] == uid)[0]
             these_sls = streamlines[idx]
+            if n_points is not None:
+                these_sls = dps.set_number_of_points(these_sls, n_points)
             color, b_name = bundle_selector(bundle_dict, colors, uid)
             yield these_sls, color, b_name
 
