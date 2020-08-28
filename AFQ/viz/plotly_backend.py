@@ -73,7 +73,7 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
     color = np.asarray(color)
     n_points = 100
 
-    bundle_shape = ((n_points+1)*sls._offsets.shape[0])
+    bundle_shape = ((n_points + 1) * sls._offsets.shape[0])
     # dtype object so None can be stored
     x_pts = np.zeros(bundle_shape)
     y_pts = np.zeros(bundle_shape)
@@ -88,17 +88,18 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
         line_color = _color_arr2str(color)
 
     for cumul_offset, curr_offset in enumerate(sls._offsets):
-        sl = sls._data[curr_offset:curr_offset+sls._lengths[cumul_offset]]
+        sl = sls._data[curr_offset:curr_offset + sls._lengths[cumul_offset]]
         sl = dps.set_number_of_points(sl, n_points)
 
         # add sl to lines
-        total_offset = (n_points+1)*cumul_offset
-        x_pts[total_offset:total_offset+n_points] = sl[:, 0]
-        x_pts[total_offset+n_points] = np.nan  # don't draw between streamlines
-        y_pts[total_offset:total_offset+n_points] = sl[:, 1]
-        y_pts[total_offset+n_points] = np.nan
-        z_pts[total_offset:total_offset+n_points] = sl[:, 2]
-        z_pts[total_offset+n_points] = np.nan
+        total_offset = (n_points + 1) * cumul_offset
+        x_pts[total_offset:total_offset + n_points] = sl[:, 0]
+        # don't draw between streamlines
+        x_pts[total_offset + n_points] = np.nan
+        y_pts[total_offset:total_offset + n_points] = sl[:, 1]
+        y_pts[total_offset + n_points] = np.nan
+        z_pts[total_offset:total_offset + n_points] = sl[:, 2]
+        z_pts[total_offset + n_points] = np.nan
 
         if cbv is not None:
             brightness = cbv[
@@ -107,12 +108,12 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
                 sl[:, 2].astype(int)
             ]
 
-            line_color[total_offset:total_offset+n_points, :] = \
+            line_color[total_offset:total_offset + n_points, :] = \
                 np.outer(brightness, color_constant)
-            customdata[total_offset:total_offset+n_points] = brightness
+            customdata[total_offset:total_offset + n_points] = brightness
 
-            line_color[total_offset+n_points, :] = [0, 0, 0]
-            customdata[total_offset+n_points] = 0
+            line_color[total_offset + n_points, :] = [0, 0, 0]
+            customdata[total_offset + n_points] = 0
 
     figure.add_trace(
         go.Scatter3d(
@@ -197,7 +198,7 @@ def visualize_bundles(sft, affine=None, n_points=100, bundle_dict=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name) in vut.tract_generator(
-        sft, affine, bundle, bundle_dict, colors, n_points):
+            sft, affine, bundle, bundle_dict, colors, n_points):
         _draw_streamlines(
             figure,
             sls,

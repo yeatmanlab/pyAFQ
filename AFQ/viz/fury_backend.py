@@ -98,7 +98,7 @@ def visualize_bundles(sft, affine=None, n_points=100, bundle_dict=None,
     figure.SetBackground(background[0], background[1], background[2])
 
     for (sls, color, name) in vut.tract_generator(
-        sft, affine, bundle, bundle_dict, colors, n_points):
+            sft, affine, bundle, bundle_dict, colors, n_points):
         sls = list(sls)
         if name == "all_bundles":
             color = line_colors(sls)
