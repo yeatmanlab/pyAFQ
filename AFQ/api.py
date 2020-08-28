@@ -399,7 +399,7 @@ class AFQ(object):
                         session
                     )
 
-                if (self.brain_mask_definition is not "b0"
+                if (self.brain_mask_definition != "b0"
                     and check_mask_methods(
                         self.brain_mask_definition, mask_name="brain_mask")):
                     self.brain_mask_definition.find_path(
