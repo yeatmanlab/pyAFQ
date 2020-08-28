@@ -12,6 +12,7 @@ import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
 import pandas as pd
+import plotly
 
 from AFQ import api
 import AFQ.data as afd
@@ -30,7 +31,8 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
-                dmriprep='vistasoft')
+                dmriprep='vistasoft',
+                viz_backend="plotly")
 
 ##########################################################################
 # Reading in DTI FA
@@ -65,10 +67,20 @@ ax.axis("off")
 # to the computation of the tract profiles. Therefore, it takes a little
 # while to run (about 40 minutes in a recent experiment run on a laptop).
 
-df = pd.read_csv(myafq.tract_profiles[0])
-for bundle in df['bundle'].unique():
-    fig, ax = plt.subplots(1)
-    ax.plot(df[(df['bundle'] == bundle)]['dti_fa'])
-    ax.set_title(bundle)
+# df = pd.read_csv(myafq.tract_profiles[0])
+# for bundle in df['bundle'].unique():
+#     fig, ax = plt.subplots(1)
+#     ax.plot(df[(df['bundle'] == bundle)]['dti_fa'])
+#     ax.set_title(bundle)
 
-plt.show()
+# plt.show()
+
+
+##########################################################################
+# Visualizations:
+# -------------------------
+#
+
+bundle_html = myafq.viz_bundles(export=True)
+plotly.io.show(bundle_html[0])
+
