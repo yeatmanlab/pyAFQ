@@ -399,9 +399,8 @@ class AFQ(object):
                         session
                     )
 
-                if (self.brain_mask_definition != "b0"
-                    and check_mask_methods(
-                        self.brain_mask_definition, mask_name="brain_mask")):
+                if check_mask_methods(
+                        self.brain_mask_definition, mask_name="brain_mask"):
                     self.brain_mask_definition.find_path(
                         bids_layout,
                         subject,
