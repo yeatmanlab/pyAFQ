@@ -1640,7 +1640,7 @@ class AFQ(object):
     def export_timing(self):
         self.data_frame.apply(self._export_timing, axis=1)
 
-    def export_all(self, combine_profiles=True):
+    def export_all(self):
         """ Exports all the possible outputs"""
         self.export_registered_b0()
         self.get_template_xform()
@@ -1650,7 +1650,7 @@ class AFQ(object):
         if self.seg_algo == "afq":
             self.viz_ROIs(export=True)
             self.export_rois()
-        if combine_profiles:
+        if len(self.tract_profiles) > 1:
             self.combine_profiles()
         self.export_timing()
 
