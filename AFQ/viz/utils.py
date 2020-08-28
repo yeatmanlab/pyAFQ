@@ -452,6 +452,7 @@ class LongitudinalCSVComparison():
                  scalar_bounds={'lb': {'dti_fa': 0.2},
                                 'ub': {'dti_md': 0.002}},
                  percent_nan_tol=10,
+                 percent_edges_removed=10,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -490,6 +491,18 @@ class LongitudinalCSVComparison():
             Percentage of NaNs tolerable. If a profile has less than this
             percentage of NaNs, NaNs are interpolated. If it has more,
             the profile is thrown out.
+            Default: 10
+
+        percent_edges_removed : int, optional
+            Percentage of nodes to remove from the edges of the profile.
+            Scalar values often change dramatically at the boundary between
+            the grey matter and the white matter, and these effects can
+            dominate plots. However, they are generally not interesting to us,
+            and have low intersubject reliability.
+            In a profile of 100 nodes, percent_edges_removed=10 would remove
+            5 nodes from each edge.
+            Default: 10
+
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
@@ -539,11 +552,18 @@ class LongitudinalCSVComparison():
                                 threshold,
                                 x))
 
+            if percent_edges_removed > 0:
+                profile = profile.drop(profile[np.logical_or(
+                    (profile.node < percent_nan_tol // 2),
+                    (profile.node >= 100 - (percent_nan_tol // 2))
+                )].index)
+
             self.profile_dict[names[i]] = profile
         if subjects is None:
             self.subjects = self.profile_dict[names[0]]['subjectID'].unique()
         else:
             self.subjects = subjects
+        self.prof_len = 100 - (percent_nan_tol // 2) * 2
 
     def _threshold_scalar(self, bound, threshold, val):
         if bound == "lb":
@@ -803,7 +823,7 @@ class LongitudinalCSVComparison():
             for j in range(0, len(bundles), 2):
                 bundle = bundles[j]
                 other_bundle = bundles[j + 1]
-                for i, name in enumerate(names):
+                for name in names:
                     profile = self._get_profile(
                         name, bundle, subject, scalar)
                     other_profile = self._get_profile(
@@ -875,10 +895,11 @@ class LongitudinalCSVComparison():
             (len(scalars), len(bundles), 2, len(self.subjects)))
         all_profile_coef = \
             np.zeros((len(scalars), len(bundles), len(self.subjects)))
-        all_node_coef = np.zeros((len(scalars), len(bundles), 100))
+        all_node_coef = np.zeros((len(scalars), len(bundles), self.prof_len))
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(bundles):
-                bundle_profiles = np.zeros((2, len(self.subjects), 100))
+                bundle_profiles =\
+                    np.zeros((2, len(self.subjects), self.prof_len))
                 for j, name in enumerate(names):
                     for i, subject in enumerate(self.subjects):
                         single_profile = self._get_profile(
@@ -897,8 +918,8 @@ class LongitudinalCSVComparison():
                         self.masked_corr(bundle_profiles[:, i, :])
                 all_profile_coef[m, k] = bundle_coefs
 
-                node_coefs = np.zeros(100)
-                for i in range(100):
+                node_coefs = np.zeros(self.prof_len)
+                for i in range(self.prof_len):
                     node_coefs[i] = self.masked_corr(bundle_profiles[:, :, i])
                 all_node_coef[m, k] = node_coefs
 
