@@ -399,13 +399,11 @@ class AFQ(object):
                         session
                     )
 
-                if check_mask_methods(
-                        self.brain_mask_definition, mask_name="brain_mask"):
-                    self.brain_mask_definition.find_path(
-                        bids_layout,
-                        subject,
-                        session
-                    )
+                self.brain_mask_definition.find_path(
+                    bids_layout,
+                    subject,
+                    session
+                )
 
                 sub_list.append(subject)
                 ses_list.append(session)
