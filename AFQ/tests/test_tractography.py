@@ -1,6 +1,7 @@
 import os.path as op
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
@@ -95,3 +96,31 @@ def test_pft_tracking():
                     tracker="pft").streamlines
                 npt.assert_(len(sl[0]) >= min_length * step_size)
 
+    # Test error handling:
+    with pytest.raises(RuntimeError):
+        track(
+            fname,
+            directions,
+            max_angle=30.,
+            sphere=None,
+            seed_mask=None,
+            stop_mask=None,  # Stop mask needs to be a string!
+            stop_threshold=stop_threshold,
+            n_seeds=1,
+            step_size=step_size,
+            min_length=min_length,
+            tracker="pft")
+
+    with pytest.raises(RuntimeError):
+        track(
+            fname,
+            directions,
+            max_angle=30.,
+            sphere=None,
+            seed_mask=None,
+            stop_mask=stop_mask,
+            stop_threshold=0,  # Stop threshold needs to be a tuple!
+            n_seeds=1,
+            step_size=step_size,
+            min_length=min_length,
+            tracker="pft")

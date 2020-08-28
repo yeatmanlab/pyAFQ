@@ -8,7 +8,7 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion, 
+from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
                                               ActStoppingCriterion)
 
@@ -58,14 +58,14 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         random seed used to generate random seeds if random_seeds is
         set to True. Default: None
     stop_mask : array or str, optional.
-        If array: A float or binary mask that determines a stopping criterion 
+        If array: A float or binary mask that determines a stopping criterion
         (e.g. FA).
         If str: "CMC" for Continuous Map Criterion [Girard2014]_.
                 "ACT" for Anatomically-constrained tractography [Smith2012]_.
-        Defaults to no stopping (all ones). A string is required if 
+        Defaults to no stopping (all ones). A string is required if
         the tracker is set to "pft".
     stop_threshold : float or tuple, optional.
-        If float, this a value of the stop_mask below which tracking is 
+        If float, this a value of the stop_mask below which tracking is
         terminated (and stop_mask has to be an array). Defaults to
         0 (this means that if no stop_mask is passed, we will stop only at
         the edge of the image). If this is a tuple, it contains a sequence
@@ -154,7 +154,16 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                                                             stop_threshold)
 
         my_tracker = VerboseLocalTracking
+
     elif tracker == "pft":
+        if not isinstance(stop_mask, str):
+            raise RuntimeError(
+            "You are using PFT tracking, but did not provide a string 'stop_mask' input. ",
+            "Possible inputs are: 'CMC' or 'ACT'")
+        if not isinstance(stop_threshold, tuple):
+            raise RuntimeError(
+            "You are using PFT tracking, but did not provide a tuple for `stop_threshold`",
+            "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
         pves = []
         vox_sizes = []
         for ii, pve in enumerate(stop_threshold):
@@ -164,7 +173,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
             vox_sizes.append(np.mean(pve.header.get_zooms()[:3]))
         average_voxel_size = np.mean(vox_sizes)
         pve_wm_data, pve_gm_data, pve_csf_data = pves
-        my_tracker = VerboseParticleFilteringTracking        
+        my_tracker = VerboseParticleFilteringTracking
         if stop_mask == "CMC":
             stopping_criterion = CmcStoppingCriterion.from_pve(
                 pve_wm_data,
