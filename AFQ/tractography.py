@@ -68,10 +68,11 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         If float, this a value of the stop_mask below which tracking is 
         terminated (and stop_mask has to be an array). Defaults to
         0 (this means that if no stop_mask is passed, we will stop only at
-        the edge of the image). If this is a tuple, it contains a 
-        tuple of arrays that is interpreted as: (pve_wm, pve_gm, pve_csf), 
-        which is used in particle filtering tractography. A tuple is 
-        required if tracker is set to "pft".
+        the edge of the image). If this is a tuple, it contains a sequence
+        that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
+        which is either a string (full path) or a nibabel img to be used
+        in particle filtering tractography. A tuple is required if tracker
+        is set to "pft".
     step_size : float, optional.
         The size (in mm) of a step of tractography. Default: 1.0
     min_length: int, optional
@@ -154,10 +155,17 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
         my_tracker = VerboseLocalTracking
     elif tracker == "pft":
-        pve_wm_data, pve_gm_data, pve_csf_data = stop_threshold
+        pves = []
+        vox_sizes = []
+        for ii, pve in enumerate(stop_threshold):
+            if isinstance(pve, str):
+                pve = nib.load(pve)
+            pves.append(pve.get_fdata())
+            vox_sizes.append(np.mean(pve.header.get_zooms()[:3]))
+        average_voxel_size = np.mean(vox_sizes)
+        pve_wm_data, pve_gm_data, pve_csf_data = pves
         my_tracker = VerboseParticleFilteringTracking        
         if stop_mask == "CMC":
-            average_voxel_size = np.mean(params_img.header.get_zooms()[:3])
             stopping_criterion = CmcStoppingCriterion.from_pve(
                 pve_wm_data,
                 pve_gm_data,

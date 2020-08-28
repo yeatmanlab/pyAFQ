@@ -71,10 +71,12 @@ def test_pft_tracking():
                         response=((0.0015, 0.0003, 0.0003), 100),
                         sh_order=8, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)]:
-        data_shape  = nib.load(fdata).shape
-        pve_wm_data = np.ones(data_shape[:3])
-        pve_gm_data = np.zeros(data_shape[:3])
-        pve_csf_data = np.zeros(data_shape[:3])
+        img = nib.load(fdata)
+        data_shape  = img.shape
+        data_affine = img.affine
+        pve_wm_data = nib.Nifti1Image(np.ones(data_shape[:3]), img.affine)
+        pve_gm_data = nib.Nifti1Image(np.zeros(data_shape[:3]), img.affine)
+        pve_csf_data = nib.Nifti1Image(np.zeros(data_shape[:3]), img.affine)
         stop_threshold = (pve_wm_data, pve_gm_data, pve_csf_data)
 
         for directions in ["det", "prob"]:
