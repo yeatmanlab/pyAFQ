@@ -422,7 +422,7 @@ class AFQ(object):
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             ses=ses_list,
-                                            timing = timing_dict.copy(),
+                                            timing=timing_dict.copy(),
                                             results_dir=results_dir_list))
 
         if dask_it:
@@ -1330,7 +1330,6 @@ class AFQ(object):
         df = pd.DataFrame.from_dict(row["timing"])
         timing_fname = self._get_fname(row, "_desc-timing", True, True)
         df.to_csv(timing_fname, index=False)
-            
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
@@ -1631,7 +1630,7 @@ class AFQ(object):
         return combine_list_of_profiles(
             self.tract_profiles,
             op.join(self.afq_path, 'tract_profiles.csv'))
-    
+
     def export_timing(self):
         self.data_frame.apply(self._export_timing, axis=1)
 
