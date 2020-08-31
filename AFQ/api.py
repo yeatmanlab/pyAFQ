@@ -419,7 +419,7 @@ class AFQ(object):
                 sub_list.append(subject)
                 ses_list.append(session)
                 timing_list.append(timing_dict.copy())
-        
+
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
