@@ -71,35 +71,34 @@ def set_layout(figure, color=None):
 
 def _draw_streamlines(figure, sls, color, name, cbv=None):
     color = np.asarray(color)
-    n_points = 100
 
-    bundle_shape = ((n_points + 1) * sls._offsets.shape[0])
+    plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
     # dtype object so None can be stored
-    x_pts = np.zeros(bundle_shape)
-    y_pts = np.zeros(bundle_shape)
-    z_pts = np.zeros(bundle_shape)
+    x_pts = np.zeros(plotting_shape)
+    y_pts = np.zeros(plotting_shape)
+    z_pts = np.zeros(plotting_shape)
 
     if cbv is not None:
-        customdata = np.zeros(bundle_shape)
-        line_color = np.zeros((bundle_shape, 3))
+        customdata = np.zeros(plotting_shape)
+        line_color = np.zeros((plotting_shape, 3))
         color_constant = (color / color.max()) * (1.4 / cbv.max())
     else:
         customdata = None
         line_color = _color_arr2str(color)
 
-    for cumul_offset, curr_offset in enumerate(sls._offsets):
-        sl = sls._data[curr_offset:curr_offset + sls._lengths[cumul_offset]]
-        sl = dps.set_number_of_points(sl, n_points)
+    for sl_index, plotting_offset in enumerate(sls._offsets):
+        sl_length = sls._lengths[sl_index]
+        sl = sls._data[plotting_offset:plotting_offset + sl_length]
 
         # add sl to lines
-        total_offset = (n_points + 1) * cumul_offset
-        x_pts[total_offset:total_offset + n_points] = sl[:, 0]
+        total_offset = plotting_offset + sl_index
+        x_pts[total_offset:total_offset + sl_length] = sl[:, 0]
         # don't draw between streamlines
-        x_pts[total_offset + n_points] = np.nan
-        y_pts[total_offset:total_offset + n_points] = sl[:, 1]
-        y_pts[total_offset + n_points] = np.nan
-        z_pts[total_offset:total_offset + n_points] = sl[:, 2]
-        z_pts[total_offset + n_points] = np.nan
+        x_pts[total_offset + sl_length] = np.nan
+        y_pts[total_offset:total_offset + sl_length] = sl[:, 1]
+        y_pts[total_offset + sl_length] = np.nan
+        z_pts[total_offset:total_offset + sl_length] = sl[:, 2]
+        z_pts[total_offset + sl_length] = np.nan
 
         if cbv is not None:
             brightness = cbv[
@@ -108,12 +107,12 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
                 sl[:, 2].astype(int)
             ]
 
-            line_color[total_offset:total_offset + n_points, :] = \
+            line_color[total_offset:total_offset + sl_length, :] = \
                 np.outer(brightness, color_constant)
-            customdata[total_offset:total_offset + n_points] = brightness
+            customdata[total_offset:total_offset + sl_length] = brightness
 
-            line_color[total_offset + n_points, :] = [0, 0, 0]
-            customdata[total_offset + n_points] = 0
+            line_color[total_offset + sl_length, :] = [0, 0, 0]
+            customdata[total_offset + sl_length] = 0
 
     figure.add_trace(
         go.Scatter3d(
