@@ -4,6 +4,7 @@ import dask.dataframe as ddf
 import os
 import os.path as op
 import json
+from time import time
 
 import numpy as np
 import nibabel as nib
@@ -322,6 +323,15 @@ class AFQ(object):
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=self.reg_template_img)
+
+        # Store relevant timing information
+        self.timing = {
+            "Tracking": 0,
+            "Registration": 0,
+            "Segmentation": 0,
+            "Cleaning": 0,
+            "Visualization": 0
+        }
 
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
@@ -759,6 +769,7 @@ class AFQ(object):
             reg_subject_img, reg_subject_sls = \
                 self._reg_img(self.reg_subject, row)
 
+            start_time = time()
             if self.reg_algo == "slr":
                 mapping = reg.slr_registration(
                     reg_subject_sls, reg_template_sls,
@@ -780,6 +791,8 @@ class AFQ(object):
             reg.write_mapping(mapping, mapping_file)
             meta = dict(type="displacementfield")
             afd.write_json(meta_fname, meta)
+            self.timing['Registration'] =\
+                self.timing['Registration'] + time() - start_time
 
         return mapping_file
 
@@ -811,6 +824,8 @@ class AFQ(object):
                     self.tracking_params['stop_mask'].get_mask(self, row)
             else:
                 stop_mask_desc = dict(source=tracking_params['stop_mask'])
+
+            start_time = time()
             sft = aft.track(params_file, **tracking_params)
             sft.to_vox()
             meta_directions = {"det": "deterministic",
@@ -839,6 +854,8 @@ class AFQ(object):
                 include_track=True)
             afd.write_json(meta_fname, meta)
             self.log_and_save_trk(sft, streamlines_file)
+            self.timing['Tractography'] =\
+                self.timing['Tractography'] + time() - start_time
 
         return streamlines_file
 
@@ -861,6 +878,7 @@ class AFQ(object):
             else:
                 reg_prealign = None
 
+            start_time = time()
             segmentation = seg.Segmentation(**self.segmentation_params)
             bundles = segmentation.segment(self.bundle_dict,
                                            tg,
@@ -885,6 +903,8 @@ class AFQ(object):
                         Parameters=self.segmentation_params)
             meta_fname = bundles_file.split('.')[0] + '.json'
             afd.write_json(meta_fname, meta)
+            self.timing['Segmentation'] =\
+                self.timing['Segmentation'] + time() - start_time
 
         return bundles_file
 
@@ -902,6 +922,7 @@ class AFQ(object):
                                   row['dwi_img'],
                                   Space.VOX)
 
+            start_time = time()
             tgram = nib.streamlines.Tractogram([], {'bundle': []})
             if self.clean_params['return_idx']:
                 return_idx = {}
@@ -950,6 +971,8 @@ class AFQ(object):
             if self.clean_params['return_idx']:
                 afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
                                return_idx)
+            self.timing['Cleaning'] =\
+                self.timing['Cleaning'] + time() - start_time
 
         return clean_bundles_file
 
@@ -1154,6 +1177,8 @@ class AFQ(object):
                      color_by_volume=None,
                      xform_color_by_volume=False):
         bundles_file = self._clean_bundles(row)
+
+        start_time = time()
         volume, color_by_volume = self._viz_prepare_vols(
             row,
             volume=volume,
@@ -1190,6 +1215,8 @@ class AFQ(object):
                     include_seg=True)
 
                 figure.write_html(fname)
+        self.timing['Visualization'] =\
+            self.timing['Visualization'] + time() - start_time
         return figure
 
     def _viz_ROIs(self, row,
@@ -1203,6 +1230,7 @@ class AFQ(object):
                   xform_color_by_volume=False):
         bundles_file = self._clean_bundles(row)
 
+        start_time = time()
         volume, color_by_volume = self._viz_prepare_vols(
             row,
             volume=volume,
@@ -1278,10 +1306,13 @@ class AFQ(object):
 
                     fname = op.join(fname[0], roi_dir, fname[1])
                     figure.write_html(fname)
+        self.timing['Visualization'] =\
+            self.timing['Visualization'] + time() - start_time
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
 
+        start_time = time()
         for scalar in self.scalars:
             fname = self._get_fname(
                 row,
@@ -1292,6 +1323,8 @@ class AFQ(object):
             visualize_tract_profiles(tract_profiles,
                                      scalar=scalar,
                                      file_name=fname)
+        self.timing['Visualization'] =\
+            self.timing['Visualization'] + time() - start_time
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
