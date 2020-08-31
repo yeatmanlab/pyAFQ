@@ -326,7 +326,7 @@ class AFQ(object):
 
         # Initialize dict to store relevant timing information
         timing_dict = {
-            "Tracking": 0,
+            "Tractography": 0,
             "Registration": 0,
             "Segmentation": 0,
             "Cleaning": 0,
