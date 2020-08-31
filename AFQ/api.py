@@ -1330,7 +1330,10 @@ class AFQ(object):
             row['timing']['Visualization'] + time() - start_time
 
     def _export_timing(self, row):
-        df = pd.DataFrame.from_dict(row["timing"])
+        df = pd.DataFrame.from_dict(
+            row["timing"],
+            'index',
+            columns=['Time (s)'])
         timing_fname = self._get_fname(row, "_desc-timing", True, True)
         df.to_csv(timing_fname, index=False)
 
