@@ -324,15 +324,6 @@ class AFQ(object):
                                             seg_algo=self.seg_algo,
                                             resample_to=self.reg_template_img)
 
-        # Store relevant timing information
-        self.timing = {
-            "Tracking": 0,
-            "Registration": 0,
-            "Segmentation": 0,
-            "Cleaning": 0,
-            "Visualization": 0
-        }
-
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
 
@@ -418,11 +409,20 @@ class AFQ(object):
                 sub_list.append(subject)
                 ses_list.append(session)
 
+        # Initialize dict to store relevant timing information
+        timing_dict = {
+            "Tracking": 0,
+            "Registration": 0,
+            "Segmentation": 0,
+            "Cleaning": 0,
+            "Visualization": 0
+        }
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             ses=ses_list,
+                                            timing = timing_dict.copy(),
                                             results_dir=results_dir_list))
 
         if dask_it:
@@ -791,8 +791,8 @@ class AFQ(object):
             reg.write_mapping(mapping, mapping_file)
             meta = dict(type="displacementfield")
             afd.write_json(meta_fname, meta)
-            self.timing['Registration'] =\
-                self.timing['Registration'] + time() - start_time
+            row['timing']['Registration'] =\
+                row['timing']['Registration'] + time() - start_time
 
         return mapping_file
 
@@ -854,8 +854,8 @@ class AFQ(object):
                 include_track=True)
             afd.write_json(meta_fname, meta)
             self.log_and_save_trk(sft, streamlines_file)
-            self.timing['Tractography'] =\
-                self.timing['Tractography'] + time() - start_time
+            row['timing']['Tractography'] =\
+                row['timing']['Tractography'] + time() - start_time
 
         return streamlines_file
 
@@ -903,8 +903,8 @@ class AFQ(object):
                         Parameters=self.segmentation_params)
             meta_fname = bundles_file.split('.')[0] + '.json'
             afd.write_json(meta_fname, meta)
-            self.timing['Segmentation'] =\
-                self.timing['Segmentation'] + time() - start_time
+            row['timing']['Segmentation'] =\
+                row['timing']['Segmentation'] + time() - start_time
 
         return bundles_file
 
@@ -971,8 +971,8 @@ class AFQ(object):
             if self.clean_params['return_idx']:
                 afd.write_json(clean_bundles_file.split('.')[0] + '_idx.json',
                                return_idx)
-            self.timing['Cleaning'] =\
-                self.timing['Cleaning'] + time() - start_time
+            row['timing']['Cleaning'] =\
+                row['timing']['Cleaning'] + time() - start_time
 
         return clean_bundles_file
 
@@ -1215,8 +1215,8 @@ class AFQ(object):
                     include_seg=True)
 
                 figure.write_html(fname)
-        self.timing['Visualization'] =\
-            self.timing['Visualization'] + time() - start_time
+        row['timing']['Visualization'] =\
+            row['timing']['Visualization'] + time() - start_time
         return figure
 
     def _viz_ROIs(self, row,
@@ -1306,8 +1306,8 @@ class AFQ(object):
 
                     fname = op.join(fname[0], roi_dir, fname[1])
                     figure.write_html(fname)
-        self.timing['Visualization'] =\
-            self.timing['Visualization'] + time() - start_time
+        row['timing']['Visualization'] =\
+            row['timing']['Visualization'] + time() - start_time
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1323,8 +1323,14 @@ class AFQ(object):
             visualize_tract_profiles(tract_profiles,
                                      scalar=scalar,
                                      file_name=fname)
-        self.timing['Visualization'] =\
-            self.timing['Visualization'] + time() - start_time
+        row['timing']['Visualization'] =\
+            row['timing']['Visualization'] + time() - start_time
+
+    def _export_timing(self, row):
+        df = pd.DataFrame.from_dict(row["timing"])
+        timing_fname = self._get_fname(row, "_desc-timing", True, True)
+        df.to_csv(timing_fname, index=False)
+            
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
@@ -1625,6 +1631,9 @@ class AFQ(object):
         return combine_list_of_profiles(
             self.tract_profiles,
             op.join(self.afq_path, 'tract_profiles.csv'))
+    
+    def export_timing(self):
+        self.data_frame.apply(self._export_timing, axis=1)
 
     def export_all(self, combine_profiles=True):
         """ Exports all the possible outputs"""
@@ -1638,6 +1647,7 @@ class AFQ(object):
             self.export_rois()
         if combine_profiles:
             self.combine_profiles()
+        self.export_timing()
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
