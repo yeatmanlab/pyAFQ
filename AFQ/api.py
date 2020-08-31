@@ -324,6 +324,15 @@ class AFQ(object):
                                             seg_algo=self.seg_algo,
                                             resample_to=self.reg_template_img)
 
+        # Initialize dict to store relevant timing information
+        timing_dict = {
+            "Tracking": 0,
+            "Registration": 0,
+            "Segmentation": 0,
+            "Cleaning": 0,
+            "Visualization": 0
+        }
+
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
 
@@ -357,6 +366,7 @@ class AFQ(object):
         dwi_file_list = []
         bvec_file_list = []
         bval_file_list = []
+        timing_list = []
         results_dir_list = []
         for subject in self.subjects:
             for session in self.sessions:
@@ -408,21 +418,14 @@ class AFQ(object):
 
                 sub_list.append(subject)
                 ses_list.append(session)
-
-        # Initialize dict to store relevant timing information
-        timing_dict = {
-            "Tracking": 0,
-            "Registration": 0,
-            "Segmentation": 0,
-            "Cleaning": 0,
-            "Visualization": 0
-        }
+                timing_list.append(timing_dict.copy())
+        
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             ses=ses_list,
-                                            timing=timing_dict.copy(),
+                                            timing=timing_list,
                                             results_dir=results_dir_list))
 
         if dask_it:
