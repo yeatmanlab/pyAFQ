@@ -186,7 +186,7 @@ class AFQ(object):
             Default: None
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
-            Default: "dmriprep".
+            Default: "all".
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
