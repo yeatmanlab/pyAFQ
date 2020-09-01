@@ -1180,7 +1180,8 @@ class AFQ(object):
                      volume=None,
                      xform_volume=False,
                      color_by_volume=None,
-                     xform_color_by_volume=False):
+                     xform_color_by_volume=False,
+                     n_points=None):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1199,6 +1200,7 @@ class AFQ(object):
         figure = self.viz.visualize_bundles(bundles_file,
                                             color_by_volume=color_by_volume,
                                             bundle_dict=self.bundle_dict,
+                                            n_points=n_points,
                                             interact=interactive,
                                             inline=inline,
                                             figure=figure)
@@ -1232,7 +1234,8 @@ class AFQ(object):
                   volume=None,
                   xform_volume=False,
                   color_by_volume=None,
-                  xform_color_by_volume=False):
+                  xform_color_by_volume=False,
+                  n_points=None):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1259,6 +1262,7 @@ class AFQ(object):
                     color_by_volume=color_by_volume,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
+                    n_points=n_points,
                     interact=False,
                     inline=False,
                     figure=figure)
@@ -1595,6 +1599,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
+                    n_points=None,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1604,6 +1609,7 @@ class AFQ(object):
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
             xform_color_by_volume=xform_color_by_volume,
+            n_points=n_points,
             inline=inline,
             interactive=interactive)
 
@@ -1614,6 +1620,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
+                 n_points=None,
                  inline=False,
                  interactive=False):
         self.data_frame.apply(
@@ -1626,7 +1633,8 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
-            xform_color_by_volume=xform_color_by_volume)
+            xform_color_by_volume=xform_color_by_volume,
+            n_points=n_points)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)

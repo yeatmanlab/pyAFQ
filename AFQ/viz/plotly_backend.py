@@ -136,7 +136,7 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
     )
 
 
-def visualize_bundles(sft, affine=None, n_points=100, bundle_dict=None,
+def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
