@@ -39,7 +39,7 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 
-def create_dummy_bids_path(n_subjects, n_sessions):
+def create_dummy_input_dataset(n_subjects, n_sessions):
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
 
     # Case where there are individual session folders within each subject's
@@ -145,8 +145,8 @@ def test_AFQ_init():
     """
     for n_sessions in [1, 2]:
         n_subjects = 3
-        bids_path = create_dummy_bids_path(n_subjects, n_sessions)
-        my_afq = api.AFQ(bids_path,
+        input_dataset = create_dummy_input_dataset(n_subjects, n_sessions)
+        my_afq = api.AFQ(input_dataset,
                          dmriprep="synthetic")
         npt.assert_equal(my_afq.data_frame.shape,
                          (n_subjects * n_sessions, 11))
@@ -159,11 +159,11 @@ def test_AFQ_data():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     for use_prealign in [True, False]:
 
         myafq = api.AFQ(
-            bids_path=bids_path,
+            input_dataset=input_dataset,
             dmriprep='vistasoft',
             use_prealign=use_prealign)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
@@ -181,9 +181,9 @@ def test_AFQ_anisotropic():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
-        bids_path=bids_path,
+        input_dataset=input_dataset,
         dmriprep='vistasoft',
         min_bval=1990,
         max_bval=2010,
@@ -220,9 +220,9 @@ def test_AFQ_slr():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
-        bids_path=bids_path,
+        input_dataset=input_dataset,
         dmriprep='vistasoft',
         reg_subject='subject_sls',
         reg_template='hcp_atlas')
@@ -237,9 +237,9 @@ def test_AFQ_FA():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
-        bids_path=bids_path,
+        input_dataset=input_dataset,
         dmriprep='vistasoft',
         reg_template='dti_fa_template',
         reg_subject='dti_fa_subject')
@@ -253,7 +253,7 @@ def test_DKI_profile():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
-    myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
+    myafq = api.AFQ(input_dataset=op.join(tmpdir.name, 'cfin_multib'),
                     dmriprep='dipy')
     myafq.get_dki_fa()
     myafq.get_dki_md()
@@ -264,7 +264,7 @@ def test_auto_cli():
     config_file = op.join(tmpdir.name, 'test.toml')
 
     arg_dict = afb.func_dict_to_arg_dict()
-    arg_dict['BIDS']['bids_path']['default'] = tmpdir.name
+    arg_dict['BIDS']['input_dataset']['default'] = tmpdir.name
     afb.generate_config(config_file, arg_dict, False)
     try:
         afb.parse_config_run_afq(config_file, arg_dict, False)
@@ -276,7 +276,7 @@ def test_auto_cli():
 def test_run_using_auto_cli():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     config_file = op.join(tmpdir.name, 'test.toml')
 
     arg_dict = afb.func_dict_to_arg_dict()
@@ -284,7 +284,7 @@ def test_run_using_auto_cli():
     # set our custom defaults for the toml file
     # It is easier to edit them here, than to parse the file and edit them
     # after the file is written
-    arg_dict['BIDS']['bids_path']['default'] = bids_path
+    arg_dict['BIDS']['input_dataset']['default'] = input_dataset
     arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
     arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
     arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
@@ -301,7 +301,7 @@ def test_AFQ_data_waypoint():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="DTI",
                            seed_mask=RoiMask(),
@@ -313,7 +313,7 @@ def test_AFQ_data_waypoint():
 
     clean_params = dict(return_idx=True)
 
-    myafq = api.AFQ(bids_path=bids_path,
+    myafq = api.AFQ(input_dataset=input_dataset,
                     dmriprep='vistasoft',
                     bundle_names=bundle_names,
                     scalars=["dti_fa", "dti_md"],
@@ -399,7 +399,7 @@ def test_AFQ_data_waypoint():
                            seed_mask="RoiMask()",
                            n_seeds=100,
                            random_seeds=True)
-    config = dict(BIDS=dict(bids_path=bids_path,
+    config = dict(BIDS=dict(input_dataset=input_dataset,
                             dmriprep='vistasoft'),
                   BUNDLES=dict(
                       bundle_names=bundle_names,

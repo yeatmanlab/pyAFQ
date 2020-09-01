@@ -28,7 +28,7 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 # Initialize an AFQ object:
 # ------------------------
 
-myafq = api.AFQ(bids_path=op.join(afd.afq_home,
+myafq = api.AFQ(input_dataset=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft')
 

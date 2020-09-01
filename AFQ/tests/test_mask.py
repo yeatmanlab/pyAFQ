@@ -5,7 +5,7 @@ from bids.layout import BIDSLayout
 
 import AFQ.mask as afm
 from AFQ.mask import *  # interprets masks from eval
-from AFQ.tests.test_api import create_dummy_bids_path
+from AFQ.tests.test_api import create_dummy_input_dataset
 
 
 def test_str_instantiates_mixin():
@@ -76,7 +76,7 @@ def test_resample_mask():
 
 
 def test_find_path():
-    bids_dir = create_dummy_bids_path(2, 2)
+    bids_dir = create_dummy_input_dataset(2, 2)
     print(bids_dir)
     bids_layout = BIDSLayout(bids_dir, derivatives=True)
 

@@ -1578,8 +1578,8 @@ def organize_cfin_data(path=None):
         os.makedirs(afq_home, exist_ok=True)
         path = afq_home
 
-    bids_path = op.join(path, 'cfin_multib',)
-    derivatives_path = op.join(bids_path, 'derivatives')
+    input_dataset = op.join(path, 'cfin_multib',)
+    derivatives_path = op.join(input_dataset, 'derivatives')
     dmriprep_folder = op.join(derivatives_path, 'dmriprep')
 
     if not op.exists(derivatives_path):
@@ -1595,7 +1595,7 @@ def organize_cfin_data(path=None):
         np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
 
     to_bids_description(
-        bids_path,
+        input_dataset,
         **{"BIDSVersion": "1.0.0",
            "Name": "CFIN",
            "Subjects": ["sub-01"]})
@@ -1615,8 +1615,8 @@ def organize_stanford_data(path=None):
         os.makedirs(afq_home, exist_ok=True)
         path = afq_home
 
-    bids_path = op.join(path, 'stanford_hardi',)
-    derivatives_path = op.join(bids_path, 'derivatives')
+    input_dataset = op.join(path, 'stanford_hardi',)
+    derivatives_path = op.join(input_dataset, 'derivatives')
     dmriprep_folder = op.join(derivatives_path, 'vistasoft')
     freesurfer_folder = op.join(derivatives_path, 'freesurfer')
 
@@ -1636,7 +1636,7 @@ def organize_stanford_data(path=None):
         np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
 
     # Dump out the description of the dataset
-    to_bids_description(bids_path,
+    to_bids_description(input_dataset,
                         **{"Name": "Stanford HARDI", "Subjects": ["sub-01"]})
 
     # And descriptions of the pipelines in the derivatives:
