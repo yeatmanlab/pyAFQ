@@ -204,13 +204,13 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
 
     # extract arguments from file
     kwargs = {}
-    bids_path = ''
+    input_dataset = ''
     for section, args in f_arg_dict.items():
         for arg, default in args.items():
             if section not in default_arg_dict:
                 default_arg_dict[section] = {}
-            if arg == 'bids_path':
-                bids_path = default
+            if arg == 'input_dataset':
+                input_dataset = default
             elif arg in default_arg_dict[section]:
                 val = toml_to_val(default)
                 is_special = False
@@ -233,8 +233,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
         with open(toml_file, 'w') as ff:
             ff.write(dict_to_toml(default_arg_dict))
 
-    if bids_path == '':
-        raise RuntimeError("Config file must provide bids_path")
+    if input_dataset == '':
+        raise RuntimeError("Config file must provide input_dataset")
 
     # generate metadata file for this run
     default_arg_dict['pyAFQ'] = {}
@@ -243,14 +243,14 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
     default_arg_dict['pyAFQ']['version'] = __version__
     default_arg_dict['pyAFQ']['platform'] = platform.system()
 
-    afq_path = op.join(bids_path, 'derivatives', 'afq')
+    afq_path = op.join(input_dataset, 'derivatives', 'afq')
     os.makedirs(afq_path, exist_ok=True)
 
     afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
 
-    myafq = api.AFQ(bids_path, **kwargs)
+    myafq = api.AFQ(input_dataset, **kwargs)
 
     # Do all the things:
     myafq.set_dti_cfa()

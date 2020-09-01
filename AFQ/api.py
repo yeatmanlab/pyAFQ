@@ -144,7 +144,7 @@ class AFQ(object):
     """
 
     def __init__(self,
-                 bids_path,
+                 input_dataset,
                  dmriprep='all',
                  b0_threshold=50,
                  min_bval=None,
@@ -175,7 +175,7 @@ class AFQ(object):
 
         Parameters
         ----------
-        bids_path : str
+        input_dataset : str
             [BIDS] The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
@@ -334,12 +334,12 @@ class AFQ(object):
         }
 
         # This is where all the outputs will go:
-        self.afq_path = op.join(bids_path, 'derivatives', 'afq')
+        self.afq_path = op.join(input_dataset, 'derivatives', 'afq')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
 
-        bids_layout = BIDSLayout(bids_path, derivatives=True)
+        bids_layout = BIDSLayout(input_dataset, derivatives=True)
         bids_description = bids_layout.description
 
         # Add required metadata file at top level (inheriting as needed):
