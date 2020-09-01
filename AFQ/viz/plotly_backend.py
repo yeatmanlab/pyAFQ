@@ -83,8 +83,9 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
         line_color = np.zeros((plotting_shape, 3))
         color_constant = (color / color.max()) * (1.4 / cbv.max())
     else:
-        customdata = None
-        line_color = _color_arr2str(color)
+        customdata = np.zeros(plotting_shape)
+        line_color = np.zeros((plotting_shape, 3))
+        color_constant = _color_arr2str(color)
 
     for sl_index, plotting_offset in enumerate(sls._offsets):
         sl_length = sls._lengths[sl_index]
@@ -110,6 +111,10 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
             line_color[total_offset:total_offset + sl_length, :] = \
                 np.outer(brightness, color_constant)
             customdata[total_offset:total_offset + sl_length] = brightness
+        else:
+            line_color[total_offset:total_offset + sl_length, :] = \
+                color_constant
+            customdata[total_offset:total_offset + sl_length] = name
 
             line_color[total_offset + sl_length, :] = [0, 0, 0]
             customdata[total_offset + sl_length] = 0
