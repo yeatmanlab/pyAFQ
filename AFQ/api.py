@@ -145,6 +145,7 @@ class AFQ(object):
 
     def __init__(self,
                  input_dataset,
+                 output_folder=None,
                  dmriprep='all',
                  b0_threshold=50,
                  min_bval=None,
@@ -179,6 +180,10 @@ class AFQ(object):
             [BIDS] The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
+        output_folder : str
+            [BIDS] The path to store AFQ's results in.
+            If None, uses op.join(input_dataset, 'derivatives', 'afq').
+            Default: None
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "dmriprep".
@@ -334,7 +339,10 @@ class AFQ(object):
         }
 
         # This is where all the outputs will go:
-        self.afq_path = op.join(input_dataset, 'derivatives', 'afq')
+        if output_folder is None:
+            self.afq_path = op.join(input_dataset, 'derivatives', 'afq')
+        else:
+            self.afq_path = output_folder
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
