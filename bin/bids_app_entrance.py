@@ -21,7 +21,8 @@ special_args_dict = {
 required_args = ['input_dataset', 'output_folder', 'analysis_level']
 
 arg_dict = func_dict_to_arg_dict()
-parser = ArgumentParser(description='pyAFQ BIDS App entrypoint script. ' + arg_dict["AFQ_desc"])
+parser = ArgumentParser(
+    description='pyAFQ BIDS App entrypoint script. ' + arg_dict["AFQ_desc"])
 
 for section, args in arg_dict.items():
     if section == "AFQ_desc":
