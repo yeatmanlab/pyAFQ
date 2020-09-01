@@ -30,7 +30,7 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 
 myafq = api.AFQ(input_dataset=op.join(afd.afq_home,
                                   'stanford_hardi'),
-                dmriprep='vistasoft')
+                pipeline='vistasoft')
 
 ##########################################################################
 # Reading in DTI FA

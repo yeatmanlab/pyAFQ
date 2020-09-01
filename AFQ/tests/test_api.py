@@ -147,7 +147,7 @@ def test_AFQ_init():
         n_subjects = 3
         input_dataset = create_dummy_input_dataset(n_subjects, n_sessions)
         my_afq = api.AFQ(input_dataset,
-                         dmriprep="synthetic")
+                         pipeline="synthetic")
         npt.assert_equal(my_afq.data_frame.shape,
                          (n_subjects * n_sessions, 11))
 
@@ -164,7 +164,7 @@ def test_AFQ_data():
 
         myafq = api.AFQ(
             input_dataset=input_dataset,
-            dmriprep='vistasoft',
+            pipeline='vistasoft',
             use_prealign=use_prealign)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq['dwi_file'][0]).shape[:3])
@@ -184,7 +184,7 @@ def test_AFQ_anisotropic():
     input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
         input_dataset=input_dataset,
-        dmriprep='vistasoft',
+        pipeline='vistasoft',
         min_bval=1990,
         max_bval=2010,
         b0_threshold=50,
@@ -223,7 +223,7 @@ def test_AFQ_slr():
     input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
         input_dataset=input_dataset,
-        dmriprep='vistasoft',
+        pipeline='vistasoft',
         reg_subject='subject_sls',
         reg_template='hcp_atlas')
     myafq.export_rois()
@@ -240,7 +240,7 @@ def test_AFQ_FA():
     input_dataset = op.join(tmpdir.name, 'stanford_hardi')
     myafq = api.AFQ(
         input_dataset=input_dataset,
-        dmriprep='vistasoft',
+        pipeline='vistasoft',
         reg_template='dti_fa_template',
         reg_subject='dti_fa_subject')
     myafq.export_rois()
@@ -254,7 +254,7 @@ def test_DKI_profile():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = api.AFQ(input_dataset=op.join(tmpdir.name, 'cfin_multib'),
-                    dmriprep='dipy')
+                    pipeline='dipy')
     myafq.get_dki_fa()
     myafq.get_dki_md()
 
@@ -314,7 +314,7 @@ def test_AFQ_data_waypoint():
     clean_params = dict(return_idx=True)
 
     myafq = api.AFQ(input_dataset=input_dataset,
-                    dmriprep='vistasoft',
+                    pipeline='vistasoft',
                     bundle_names=bundle_names,
                     scalars=["dti_fa", "dti_md"],
                     tracking_params=tracking_params,
@@ -400,7 +400,7 @@ def test_AFQ_data_waypoint():
                            n_seeds=100,
                            random_seeds=True)
     config = dict(BIDS=dict(input_dataset=input_dataset,
-                            dmriprep='vistasoft'),
+                            pipeline='vistasoft'),
                   BUNDLES=dict(
                       bundle_names=bundle_names,
                       scalars=["dti_fa", "dti_md"]),

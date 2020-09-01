@@ -146,7 +146,7 @@ class AFQ(object):
     def __init__(self,
                  input_dataset,
                  output_folder=None,
-                 dmriprep='all',
+                 pipeline='all',
                  b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
@@ -184,7 +184,7 @@ class AFQ(object):
             [BIDS] The path to store AFQ's results in.
             If None, uses op.join(input_dataset, 'derivatives', 'afq').
             Default: None
-        dmriprep : str, optional.
+        pipeline : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "all".
         b0_threshold : int, optional
@@ -390,19 +390,19 @@ class AFQ(object):
                     bids_layout.get(subject=subject, session=session,
                                     extension='nii.gz', suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=pipeline)[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
                                     suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=pipeline)[0])
                 bval_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bval', 'bvals'],
                                     suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=pipeline)[0])
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
