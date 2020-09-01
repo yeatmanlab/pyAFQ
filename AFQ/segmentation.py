@@ -388,7 +388,7 @@ class Segmentation:
         for roi in include_rois:
             # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if np.min(dist[-1]) > tol:
+            if len(dist[-1]) < 0 or np.min(dist[-1]) > tol:
                 # Too far from one of them:
                 return False, []
         # Apparently you checked all the ROIs and it was close to all of them
@@ -400,7 +400,8 @@ class Segmentation:
         """
         for roi in exclude_rois:
             # Use squared Euclidean distance, because it's faster:
-            if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
+            dist = cdist(sl, roi, 'sqeuclidean')
+            if len(dist) < 0 or np.min(dist) < tol:
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
