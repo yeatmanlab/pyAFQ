@@ -1147,6 +1147,8 @@ class AFQ(object):
             volume = nib.load(
                 self._scalar_dict[volume](self, row)).get_fdata()
 
+        if color_by_volume is None:
+            color_by_volume = self.scalars[0]
         if color_by_volume in self.scalars:
             color_by_volume = nib.load(
                 self._scalar_dict[volume](self, row)).get_fdata()
