@@ -114,7 +114,7 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
         else:
             line_color[total_offset:total_offset + sl_length, :] = \
                 color_constant
-            customdata[total_offset:total_offset + sl_length] = name
+            customdata[total_offset:total_offset + sl_length] = 1
 
             line_color[total_offset + sl_length, :] = [0, 0, 0]
             customdata[total_offset + sl_length] = 0
