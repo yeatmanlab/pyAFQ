@@ -29,7 +29,7 @@ The default configuration file looks like:
 """
 
 
-def parse_cli(help_msg):
+def parse_cli(arg_dict):
     cli_parser = ArgumentParser(usage=usage + afb.dict_to_toml(arg_dict))
 
     cli_parser.add_argument(
