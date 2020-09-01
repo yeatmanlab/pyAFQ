@@ -1151,7 +1151,7 @@ class AFQ(object):
             color_by_volume = self.scalars[0]
         if color_by_volume in self.scalars:
             color_by_volume = nib.load(
-                self._scalar_dict[volume](self, row)).get_fdata()
+                self._scalar_dict[color_by_volume](self, row)).get_fdata()
 
         if xform_volume or xform_color_by_volume:
             if self.use_prealign:
