@@ -146,6 +146,7 @@ class AFQ(object):
     def __init__(self,
                  input_dataset,
                  output_folder=None,
+                 participant_label=None,
                  pipeline='all',
                  b0_threshold=50,
                  min_bval=None,
@@ -183,6 +184,9 @@ class AFQ(object):
         output_folder : str
             [BIDS] The path to store AFQ's results in.
             If None, uses op.join(input_dataset, 'derivatives', 'afq').
+            Default: None
+        participant_label : str or list of str
+            [BIDS] Subjects to include. If None, all subjects are included.
             Default: None
         pipeline : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
@@ -363,6 +367,11 @@ class AFQ(object):
             json.dump(pipeline_description, outfile)
 
         self.subjects = bids_layout.get(return_type='id', target='subject')
+        if participant_label is not None:
+            if isinstance(participant_label, str):
+                participant_label = [participant_label]
+            self.subjects = list(set().union(self.subjects, participant_label))
+
         sessions = bids_layout.get(return_type='id', target='session')
         if len(sessions):
             self.sessions = sessions
