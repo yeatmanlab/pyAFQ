@@ -40,3 +40,6 @@ cp input/derivatives/afq/sub-01/*AFQ_viz.html output_html/afq.html
 
 mkdir -p output_figures/images
 cp input/derivatives/afq/sub-01/viz_bundles/*.html output_figures/images
+
+mkdir -p output_profiles/profiles
+cp input/derivatives/afq/sub-01/*profiles.csv output_profiles/profiles
