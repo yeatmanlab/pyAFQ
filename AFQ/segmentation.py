@@ -387,9 +387,13 @@ class Segmentation:
         dist = []
         for roi in include_rois:
             # Use squared Euclidean distance, because it's faster:
-            dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if len(dist[-1]) < 1 or np.min(dist[-1]) > tol:
-                # Too far from one of them:
+            try:
+                dist.append(cdist(sl, roi, 'sqeuclidean'))
+                if np.min(dist[-1]) > tol:
+                    # Too far from one of them:
+                    return False, []
+            except ValueError:
+                self.logger.warning(f"Defective streamline found: {sl}")
                 return False, []
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
@@ -400,8 +404,11 @@ class Segmentation:
         """
         for roi in exclude_rois:
             # Use squared Euclidean distance, because it's faster:
-            dist = cdist(sl, roi, 'sqeuclidean')
-            if len(dist) < 1 or np.min(dist) < tol:
+            try:
+                if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
+                    return False
+            except ValueError:
+                self.logger.warning(f"Defective streamline found: {sl}")
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
