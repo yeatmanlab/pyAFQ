@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+# This reorganizes input from brainlife (a config.json file)
+# into input for pyAFQ
+
+from argparse import ArgumentParser
+import subprocess
+
+parser = ArgumentParser()
+
+parser.add_argument(
+    dest='jsonstr',
+    action="store",
+    help="Contents of config.json file as a string")
+
+args = parser.parse_args()
+
+# str to json file
+with open("/config.json", 'w') as ff:
+    ff.write(args.jsonstr)
+
+# convert from json to toml
+subprocess.call("json2toml /config.json /config.toml")
+subprocess.call(
+    'cat <(echo "no_sections = True\n'
+    + 'bids_path = \"input\"\n'
+    + 'viz_backend=\"plotly\"\n")'
+    + '/config.toml > /temp_config.toml')
+subprocess.call("mv /temp_config.toml /config.toml")
+
+# run pyAFQ
+subprocess.call("/pyAFQ/bin/pyAFQ /config.toml")
+
+

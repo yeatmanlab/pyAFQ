@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Used by brainlife.io
 # inspired by https://github.com/brainlife/app-qsiprep/blob/master/main
 
 # organize inputs
@@ -14,16 +15,7 @@ cat <<EOF >input/dataset_description.json
 }
 EOF
 
-# convert config.json to config.toml
-python -m pip install --upgrade pip
-python -m pip install remarshal
-json2toml config.json config.toml
-
-# prepend args to config.toml
-cat <(echo "no_sections = True\nbids_path = \"input\"\nviz_backend=\"plotly\"\n") config.toml > temp_config.toml
-mv temp_config.toml config.toml
-
-./bin/pyAFQ config.toml
+time singularity run -e docker://36000/pyafqbl:master "`cat config.json`"
 
 # organize output
 mkdir -p output_tractography
