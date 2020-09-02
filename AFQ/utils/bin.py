@@ -202,6 +202,17 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
             + " add the argument --generate-config-only")
     f_arg_dict = toml.load(toml_file)
 
+    # toml specifies that sections must be inferred
+    if "no_sections" in f_arg_dict.keys():
+        new_f_arg_dict = {}
+        for section, args in default_arg_dict.items():
+            for arg, default in args.items():
+                if arg in f_arg_dict.keys():
+                    if section not in new_f_arg_dict:
+                        new_f_arg_dict[section] = {}
+                    new_f_arg_dict[section][arg] = f_arg_dict[arg]
+        f_arg_dict = new_f_arg_dict
+
     # extract arguments from file
     kwargs = {}
     bids_path = ''

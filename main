@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# inspired by https://github.com/brainlife/app-qsiprep/blob/master/main
+
+# organize inputs
+mkdir -p input/sub-${subject}/dwi
+cp $(jq -r .dwi config.json) input/sub-01/dwi/sub-01_dwi.nii.gz
+cp $(jq -r .bvecs config.json) input/sub-01/dwi/sub-01_dwi.bvec
+cp $(jq -r .bvals config.json) input/sub-01/dwi/sub-01_dwi.bval
+cat <<EOF >input/dataset_description.json
+{
+    "BIDSVersion": "1.0.0",
+    "Name": "pyAFQ input"
+}
+EOF
+
+# convert config.json to config.toml
+python -m pip install --upgrade pip
+python -m pip install remarshal
+json2toml config.json config.toml
+
+# prepend args to config.toml
+cat <(echo "no_sections = True\nbids_path = \"input\"\nviz_backend=\"plotly\"\n") config.toml > temp_config.toml
+mv temp_config.toml config.toml
+
+./bin/pyAFQ config.toml
+
+# organize output
+mkdir -p output_tractography
+cp input/derivatives/afq/sub-01/*prob_tractography.trk output_tractography/track.trk
+
+mkdir -p output_seg_tractography
+cp input/derivatives/afq/sub-01/*AFQ_tractography.trk output_seg_tractography/track.trk
+
+mkdir -p output_clean_tractography
+cp input/derivatives/afq/sub-01/*clean_tractography.trk output_clean_tractography/track.trk
+
+mkdir -p output_html
+cp input/derivatives/afq/sub-01/*AFQ_viz.html output_html/afq.html
+
+mkdir -p output_figures/images
+cp input/derivatives/afq/sub-01/viz_bundles/*.html output_figures/images
