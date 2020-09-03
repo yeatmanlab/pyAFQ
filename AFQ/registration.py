@@ -23,7 +23,8 @@ from dipy.align.streamlinear import \
     StreamlineLinearRegistration, whole_brain_slr
 from dipy.tracking.streamline import set_number_of_points
 from dipy.tracking.utils import transform_tracking_output
-from dipy.io.streamline import load_tractogram, load_trk
+from dipy.io.streamline import load_trk
+from AFQ._fixes import load_tractogram
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut

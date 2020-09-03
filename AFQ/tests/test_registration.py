@@ -18,7 +18,8 @@ from AFQ.registration import (syn_registration, register_series, register_dwi,
 import AFQ.data as afd
 
 from dipy.tracking.utils import transform_tracking_output
-from dipy.io.streamline import load_trk, save_trk, load_tractogram
+from dipy.io.streamline import load_trk, save_trk
+from AFQ._fixes import load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 MNI_T2 = afd.read_mni_template()

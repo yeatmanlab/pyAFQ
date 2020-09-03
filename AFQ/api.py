@@ -13,7 +13,8 @@ from scipy.ndimage.morphology import binary_dilation
 import dipy.core.gradients as dpg
 from dipy.segment.mask import median_otsu
 import dipy.tracking.utils as dtu
-from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.io.streamline import save_tractogram
+from AFQ._fixes import load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights

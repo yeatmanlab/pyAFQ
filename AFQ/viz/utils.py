@@ -13,7 +13,7 @@ import IPython.display as display
 import matplotlib.pyplot as plt
 
 import nibabel as nib
-from dipy.io.streamline import load_tractogram
+from AFQ._fixes import load_tractogram
 from dipy.tracking.utils import transform_tracking_output
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 

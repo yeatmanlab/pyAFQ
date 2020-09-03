@@ -21,7 +21,8 @@ import dipy.data as dpd
 from dipy.data import fetcher
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.io.streamline import save_tractogram
+from AFQ._fixes import load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
@@ -132,7 +133,7 @@ for kk in fiber_groups:
     sft = StatefulTractogram(fiber_groups[kk].streamlines,
                              img,
                              Space.RASMM)
-    save_tractogram(sft, './%s_reco.trk'%kk,
+    save_tractogram(sft, './%s_reco.trk' % kk,
                     bbox_valid_check=False)
 
 

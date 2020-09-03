@@ -15,7 +15,8 @@ import numpy as np
 import nibabel as nib
 import dipy.data as dpd
 from dipy.data import fetcher
-from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.io.streamline import save_tractogram
+from AFQ._fixes import load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space

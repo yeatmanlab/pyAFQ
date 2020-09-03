@@ -21,7 +21,8 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.data as dpd
 from dipy.data import fetcher
-from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.io.streamline import save_tractogram
+from AFQ._fixes import load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.testing.decorators import xvfb_it
 

@@ -24,7 +24,8 @@ import nibabel as nib
 from templateflow import api as tflow
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
-from dipy.io.streamline import load_tractogram, load_trk
+from dipy.io.streamline import load_trk
+from AFQ._fixes import load_tractogram
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
                                  ResampleFeature)
 

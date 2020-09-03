@@ -8,7 +8,8 @@ import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space, Origin
 
 from dipy.stats.analysis import afq_profile, gaussian_weights
-from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.io.streamline import save_tractogram
+from AFQ._fixes import load_tractogram
 
 import AFQ.segmentation as seg
 
