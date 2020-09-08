@@ -743,7 +743,7 @@ class AFQ(object):
             warped_b0 = mapping.transform(mean_b0)
 
             self.log_and_save_nii(nib.Nifti1Image(
-                warped_b0, row['dwi_affine']), b0_warped_file)
+                warped_b0, self.reg_template_img.affine), b0_warped_file)
 
         return b0_warped_file
 
