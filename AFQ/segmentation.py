@@ -393,7 +393,11 @@ class Segmentation:
                     # Too far from one of them:
                     return False, []
             except ValueError:
-                self.logger.warning(f"Defective streamline found: {sl}")
+                self.logger.warning(
+                    "See if UserWarning: Input image is entirely zero has"
+                    + " been printed above. It is likely caused by an ROI"
+                    + " with no voxels. Possibly due to problems in"
+                    + " registration.")
                 return False, []
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
@@ -408,7 +412,11 @@ class Segmentation:
                 if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
                     return False
             except ValueError:
-                self.logger.warning(f"Defective streamline found: {sl}")
+                self.logger.warning(
+                    "See if UserWarning: Input image is entirely zero has"
+                    + " been printed above. It is likely caused by an ROI"
+                    + " with no voxels. Possibly due to problems in"
+                    + " registration.")
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
