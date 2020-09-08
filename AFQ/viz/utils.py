@@ -386,8 +386,10 @@ class Viz:
                             % backend)
 
 
-def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
-                             max_fa=1.0, file_name=None, positions=POSITIONS):
+def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_scalar=None,
+                             max_scalar=None, file_name=None,
+                             use_fa_ticks=None,
+                             positions=POSITIONS):
     """
     Visualize all tract profiles for a scalar in one plot
 
@@ -400,14 +402,24 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     scalar : string, optional
        Scalar to use in plots. Default: "dti_fa".
 
-    min_fa : float, optional
-        Minimum FA used for y-axis bounds. Default: 0.0
+    min_scalar : float, optional
+        Minimum value used for y-axis bounds.
+        If None, ylim is not set.
+        Default: None
 
-    max_fa : float, optional
-        Maximum FA used for y-axis bounds. Default: 1.0
+    max_scalar : float, optional
+        Maximum value used for y-axis bounds.
+        If None, ylim is not set.
+        Default: None
 
     file_name : string, optional
         File name to save figure to if not None. Default: None
+
+    use_fa_ticks : bool, optional
+        Set min and max y limit to 0 and 1, and only use yticks at
+        0.2, 0.4, 0.6 . Useful for plotting FA. If None,
+        Set to "fa" in scalar.
+        Default: False
 
     positions : dictionary, optional
         Dictionary that maps bundle names to position in plot.
@@ -417,6 +429,8 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
     -------
         Matplotlib figure and axes.
     """
+    if use_fa_ticks is None:
+        use_fa_ticks = ("fa" in scalar)
 
     if (file_name is not None):
         plt.ioff()
@@ -429,10 +443,15 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_fa=0.0,
             (tract_profiles["bundle"] == bundle)
         ][scalar].values
         ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
-        ax.set_ylim([min_fa, max_fa])
-        ax.set_yticks([0.2, 0.4, 0.6])
-        ax.set_yticklabels([0.2, 0.4, 0.6])
-        ax.set_xticklabels([])
+
+        if (min_scalar is not None) and (max_scalar is not None):
+            ax.set_ylim([min_scalar, max_scalar])
+
+        if use_fa_ticks:
+            ax.set_ylim([0.0, 1.0])
+            ax.set_yticks([0.2, 0.4, 0.6])
+            ax.set_yticklabels([0.2, 0.4, 0.6])
+            ax.set_xticklabels([])
 
     fig.set_size_inches((12, 12))
 
