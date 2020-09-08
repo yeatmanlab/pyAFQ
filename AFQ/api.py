@@ -1141,9 +1141,17 @@ class AFQ(object):
                           xform_volume=False,
                           color_by_volume=None,
                           xform_color_by_volume=False):
-        if volume is None or color_by_volume == 'dti_fa':
-            fa_file = self._dti_fa(row)
-            fa_img = nib.load(fa_file).get_fdata()
+        if volume is None:
+            volume = self.scalars[0]
+        if volume in self.scalars:
+            volume = nib.load(
+                self._scalar_dict[volume](self, row)).get_fdata()
+
+        if color_by_volume is None:
+            color_by_volume = self.scalars[0]
+        if color_by_volume in self.scalars:
+            color_by_volume = nib.load(
+                self._scalar_dict[color_by_volume](self, row)).get_fdata()
 
         if xform_volume or xform_color_by_volume:
             if self.use_prealign:
@@ -1156,10 +1164,6 @@ class AFQ(object):
                                        row['dwi_file'],
                                        self.reg_template,
                                        prealign=reg_prealign_inv)
-        if volume is None:
-            volume = fa_img
-        if color_by_volume == 'dti_fa':
-            color_by_volume = fa_img
 
         if xform_volume:
             if isinstance(volume, str):
@@ -1178,7 +1182,8 @@ class AFQ(object):
                      volume=None,
                      xform_volume=False,
                      color_by_volume=None,
-                     xform_color_by_volume=False):
+                     xform_color_by_volume=False,
+                     n_points=None):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1197,6 +1202,7 @@ class AFQ(object):
         figure = self.viz.visualize_bundles(bundles_file,
                                             color_by_volume=color_by_volume,
                                             bundle_dict=self.bundle_dict,
+                                            n_points=n_points,
                                             interact=interactive,
                                             inline=inline,
                                             figure=figure)
@@ -1230,7 +1236,8 @@ class AFQ(object):
                   volume=None,
                   xform_volume=False,
                   color_by_volume=None,
-                  xform_color_by_volume=False):
+                  xform_color_by_volume=False,
+                  n_points=None):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1257,6 +1264,7 @@ class AFQ(object):
                     color_by_volume=color_by_volume,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
+                    n_points=n_points,
                     interact=False,
                     inline=False,
                     figure=figure)
@@ -1593,6 +1601,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
+                    n_points=None,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1602,6 +1611,7 @@ class AFQ(object):
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
             xform_color_by_volume=xform_color_by_volume,
+            n_points=n_points,
             inline=inline,
             interactive=interactive)
 
@@ -1612,6 +1622,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
+                 n_points=None,
                  inline=False,
                  interactive=False):
         self.data_frame.apply(
@@ -1624,7 +1635,8 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
-            xform_color_by_volume=xform_color_by_volume)
+            xform_color_by_volume=xform_color_by_volume,
+            n_points=n_points)
 
     def plot_tract_profiles(self):
         self.data_frame.apply(self._plot_tract_profiles, axis=1)

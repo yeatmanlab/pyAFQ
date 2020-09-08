@@ -35,9 +35,10 @@ def _inline_interact(scene, inline, interact):
     return scene
 
 
-def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
-                      colors=None, color_by_volume=None, figure=None,
-                      background=(1, 1, 1), interact=False, inline=False):
+def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
+                      bundle=None, colors=None, color_by_volume=None,
+                      figure=None, background=(1, 1, 1), interact=False,
+                      inline=False):
     """
     Visualize bundles in 3D using VTK
 
@@ -50,6 +51,10 @@ def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
        visualization. Default: no transform.
+
+    n_points : int or None
+        n_points to resample streamlines to before plotting. If None, no
+        resampling is done.
 
     bundle_dict : dict, optional
         Keys are names of bundles and values are dicts that should include
@@ -92,8 +97,8 @@ def visualize_bundles(sft, affine=None, bundle_dict=None, bundle=None,
 
     figure.SetBackground(background[0], background[1], background[2])
 
-    for (sls, color, name) in \
-            vut.tract_generator(sft, affine, bundle, bundle_dict, colors):
+    for (sls, color, name) in vut.tract_generator(
+            sft, affine, bundle, bundle_dict, colors, n_points):
         sls = list(sls)
         if name == "all_bundles":
             color = line_colors(sls)
