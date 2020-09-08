@@ -105,7 +105,7 @@ class CombineMaskMixin(object):
     """
 
     def __init__(self, combine):
-        self.combine = combine
+        self.combine = combine.lower()
 
     def reset_mask_draft(self, shape):
         if self.combine == "or":
@@ -491,7 +491,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         api.AFQ(tracking_params={"seed_mask": seed_mask})
         """
         self.scalar = scalar
-        self.combine = combine
+        CombineMaskMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
 

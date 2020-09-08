@@ -257,8 +257,8 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.reg_subject = reg_subject
-        self.reg_template = reg_template
+        self.reg_subject = reg_subject.lower()
+        self.reg_template = reg_template.lower()
         if brain_mask is None:
             self.brain_mask_definition = FullMask()
             self.mask_template = False
@@ -288,7 +288,7 @@ class AFQ(object):
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
-        self.viz = Viz(backend=viz_backend)
+        self.viz = Viz(backend=viz_backend.lower())
 
         default_tracking_params = get_default_args(aft.track)
         default_tracking_params["seed_mask"] = ScalarMask("dti_fa")
