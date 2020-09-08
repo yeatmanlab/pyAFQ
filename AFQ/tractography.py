@@ -8,15 +8,20 @@ from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
+from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
+                                              CmcStoppingCriterion,
+                                              ActStoppingCriterion)
 
-from AFQ._fixes import VerboseLocalTracking, tensor_odf
+
+from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
+                        tensor_odf)
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=10, max_length=1000, odf_model="DTI"):
+          min_length=10, max_length=1000, odf_model="DTI",
+          tracker="local"):
     """
     Tractography
 
@@ -48,17 +53,26 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         to generate within the mask.
     random_seeds : bool
         Whether to generate a total of n_seeds random seeds in the mask.
-        Default: XXX.
+        Default: False.
     rng_seed : int
         random seed used to generate random seeds if random_seeds is
         set to True. Default: None
-    stop_mask : array, optional.
-        A float or binary mask that determines a stopping criterion (e.g. FA).
-        Default to no stopping (all ones).
-    stop_threshold : float, optional.
-        A value of the stop_mask below which tracking is terminated. Default to
+    stop_mask : array or str, optional.
+        If array: A float or binary mask that determines a stopping criterion
+        (e.g. FA).
+        If str: "CMC" for Continuous Map Criterion [Girard2014]_.
+                "ACT" for Anatomically-constrained tractography [Smith2012]_.
+        Defaults to no stopping (all ones). A string is required if
+        the tracker is set to "pft".
+    stop_threshold : float or tuple, optional.
+        If float, this a value of the stop_mask below which tracking is
+        terminated (and stop_mask has to be an array). Defaults to
         0 (this means that if no stop_mask is passed, we will stop only at
-        the edge of the image)
+        the edge of the image). If this is a tuple, it contains a sequence
+        that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
+        which is either a string (full path) or a nibabel img to be used
+        in particle filtering tractography. A tuple is required if tracker
+        is set to "pft".
     step_size : float, optional.
         The size (in mm) of a step of tractography. Default: 1.0
     min_length: int, optional
@@ -67,9 +81,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
         One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
+    tracker : str, optional
+        Which strategy to use in tracking. This can be the standard local
+        tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
+        One of {"local", "pft"}. Default: "local"
+
     Returns
     -------
     list of streamlines ()
+
+    References
+    ----------
+    .. [Girard2014] Girard, G., Whittingstall, K., Deriche, R., &
+        Descoteaux, M. Towards quantitative connectivity analysis: reducing
+        tractography biases. NeuroImage, 98, 266-278, 2014.
     """
     logger = logging.getLogger('AFQ.tractography')
 
@@ -117,38 +142,74 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     elif odf_model == "CSD":
         dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
-    if stop_mask is None:
-        stop_mask = np.ones(params_img.shape[:3])
+    if tracker == "local":
+        if stop_mask is None:
+            stop_mask = np.ones(params_img.shape[:3])
 
-    if stop_mask.dtype == 'bool':
-        stopping_criterion = ThresholdStoppingCriterion(stop_mask,
-                                                        0.5)
-    else:
-        stopping_criterion = ThresholdStoppingCriterion(stop_mask,
-                                                        stop_threshold)
+        if stop_mask.dtype == 'bool':
+            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+                                                            0.5)
+        else:
+            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+                                                            stop_threshold)
+
+        my_tracker = VerboseLocalTracking
+
+    elif tracker == "pft":
+        if not isinstance(stop_mask, str):
+            raise RuntimeError(
+            "You are using PFT tracking, but did not provide a string 'stop_mask' input. ",
+            "Possible inputs are: 'CMC' or 'ACT'")
+        if not isinstance(stop_threshold, tuple):
+            raise RuntimeError(
+            "You are using PFT tracking, but did not provide a tuple for `stop_threshold`",
+            "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
+        pves = []
+        vox_sizes = []
+        for ii, pve in enumerate(stop_threshold):
+            if isinstance(pve, str):
+                pve = nib.load(pve)
+            pves.append(pve.get_fdata())
+            vox_sizes.append(np.mean(pve.header.get_zooms()[:3]))
+        average_voxel_size = np.mean(vox_sizes)
+        pve_wm_data, pve_gm_data, pve_csf_data = pves
+        my_tracker = VerboseParticleFilteringTracking
+        if stop_mask == "CMC":
+            stopping_criterion = CmcStoppingCriterion.from_pve(
+                pve_wm_data,
+                pve_gm_data,
+                pve_csf_data,
+                step_size=step_size,
+                average_voxel_size=average_voxel_size)
+        elif stop_mask == "ACT":
+            stopping_criterion = ActStoppingCriterion.from_pve(
+                pve_wm_data,
+                pve_gm_data,
+                pve_csf_data)
 
     logger.info("Tracking...")
 
-    return _local_tracking(seeds, dg, stopping_criterion, params_img,
-                           step_size=step_size, min_length=min_length,
-                           max_length=max_length, random_seed=rng_seed)
+    return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
+                     step_size=step_size, min_length=min_length,
+                     max_length=max_length, random_seed=rng_seed)
 
-
-def _local_tracking(seeds, dg, stopping_criterion, params_img,
-                    step_size=0.5, min_length=10, max_length=1000,
-                    random_seed=None):
+def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
+              step_size=0.5, min_length=10, max_length=1000,
+              random_seed=None):
     """
     Helper function
     """
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
-    tracker = VerboseLocalTracking(dg,
-                                   stopping_criterion,
-                                   seeds,
-                                   params_img.affine,
-                                   step_size=step_size,
-                                   min_length=min_length,
-                                   max_length=max_length,
-                                   random_seed=random_seed)
+
+    tracker = tracker(
+        dg,
+        stopping_criterion,
+        seeds,
+        params_img.affine,
+        step_size=step_size,
+        min_length=min_length,
+        max_length=max_length,
+        random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)
