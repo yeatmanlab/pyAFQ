@@ -1319,6 +1319,7 @@ class AFQ(object):
                     figure.write_html(fname)
         row['timing']['Visualization'] =\
             row['timing']['Visualization'] + time() - start_time
+        return figure
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
@@ -1628,7 +1629,7 @@ class AFQ(object):
                  n_points=None,
                  inline=False,
                  interactive=False):
-        self.data_frame.apply(
+        return self.data_frame.apply(
             self._viz_ROIs,
             axis=1,
             bundle_names=bundle_names,

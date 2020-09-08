@@ -61,26 +61,29 @@ ax.axis("off")
 
 
 ##########################################################################
-# Getting tract profiles:
-# -------------------------
-# Running the code below triggers the full pipeline of operations leading
-# to the computation of the tract profiles. Therefore, it takes a little
-# while to run (about 40 minutes in a recent experiment run on a laptop).
-
-# df = pd.read_csv(myafq.tract_profiles[0])
-# for bundle in df['bundle'].unique():
-#     fig, ax = plt.subplots(1)
-#     ax.plot(df[(df['bundle'] == bundle)]['dti_fa'])
-#     ax.set_title(bundle)
-
-# plt.show()
-
-
-##########################################################################
-# Visualizations:
-# -------------------------
+# Visualizing bundles and tract profiles:
+# ---------------------------------------
+# The pyAFQ API provides several ways to visualize bundles and profiles.
+# First, we will run a function that exports an html file that contains
+# an interactive visualization of the bundles that are segmented. Once
+# it is done running, it should pop a browser window open and let you
+# interact with the bundles.
 #
+# .. note::
+#    Running the code below triggers the full pipeline of operations
+#    leading to the computation of the tract profiles. Therefore, it
+#    takes a little while to run (about 40 minutes, typically).
 
 bundle_html = myafq.viz_bundles(export=True)
 plotly.io.show(bundle_html[0])
 
+##########################################################################
+# We can also visualize the tract profiles in all of the bundles:
+#
+
+myafq.plot_tract_profiles()
+fig_files = myafq.data_frame['tract_profiles_viz'][0]
+
+##########################################################################
+# .. figure:: {{ fig_files[0] }}
+#
