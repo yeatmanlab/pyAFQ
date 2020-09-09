@@ -348,7 +348,8 @@ class Segmentation:
             if not isinstance(roi, np.ndarray):
                 roi = roi.get_fdata()
             warped_roi = auv.patch_up_roi(self.mapping.transform_inverse(
-                roi.astype(np.float32), interpolation='linear'))
+                roi.astype(np.float32), interpolation='linear'),
+                bundle_name=bundle)
 
             if rule:
                 # include ROI:
