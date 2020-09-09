@@ -174,14 +174,21 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
+from plotly.io._sg_scraper import plotly_sg_scraper
+image_scrapers = ('matplotlib', plotly_sg_scraper,)
+
+
 sphinx_gallery_conf = {
      # path to your examples scripts
      'examples_dirs': '../../examples',
      # path where to save gallery generated examples
      'gallery_dirs': 'auto_examples',
+     'image_scrapers': image_scrapers,
 }
 
 # Auto API
 autoapi_type = 'python'
 autoapi_dirs = ['../../AFQ']
 autoapi_ignore = ['*test*', '*_fixes*', '*version*', 'pyAFQ', 'License']
+
+

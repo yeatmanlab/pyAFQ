@@ -1319,11 +1319,12 @@ class AFQ(object):
                     figure.write_html(fname)
         row['timing']['Visualization'] =\
             row['timing']['Visualization'] + time() - start_time
+        return figure
 
     def _plot_tract_profiles(self, row):
         tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
-
         start_time = time()
+        fnames = []
         for scalar in self.scalars:
             fname = self._get_fname(
                 row,
@@ -1334,8 +1335,11 @@ class AFQ(object):
             visualize_tract_profiles(tract_profiles,
                                      scalar=scalar,
                                      file_name=fname)
+            fnames.append(fname)
         row['timing']['Visualization'] =\
             row['timing']['Visualization'] + time() - start_time
+
+        return fnames
 
     def _export_timing(self, row):
         df = pd.DataFrame.from_dict(
@@ -1625,7 +1629,7 @@ class AFQ(object):
                  n_points=None,
                  inline=False,
                  interactive=False):
-        self.data_frame.apply(
+        return self.data_frame.apply(
             self._viz_ROIs,
             axis=1,
             bundle_names=bundle_names,
@@ -1639,7 +1643,9 @@ class AFQ(object):
             n_points=n_points)
 
     def plot_tract_profiles(self):
-        self.data_frame.apply(self._plot_tract_profiles, axis=1)
+        if 'tract_profiles_viz' not in self.data_frame.columns:
+            self.data_frame['tract_profiles_viz'] =\
+                self.data_frame.apply(self._plot_tract_profiles, axis=1)
 
     def export_registered_b0(self):
         self.data_frame.apply(self._export_registered_b0, axis=1)

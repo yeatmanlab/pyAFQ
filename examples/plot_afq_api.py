@@ -12,6 +12,7 @@ import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
 import pandas as pd
+import plotly
 
 from AFQ import api
 import AFQ.data as afd
@@ -30,7 +31,8 @@ base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
-                dmriprep='vistasoft')
+                dmriprep='vistasoft',
+                viz_backend="plotly")
 
 ##########################################################################
 # Reading in DTI FA
@@ -59,24 +61,29 @@ ax.axis("off")
 
 
 ##########################################################################
-# Getting tract profiles:
-# -------------------------
-# The computation below is quite time-consuming. For this reason, we have
-# commented it out for now. If you want to run it through, uncomment then next
-# few lines and go get a cup of coffee:
+# Visualizing bundles and tract profiles:
+# ---------------------------------------
+# The pyAFQ API provides several ways to visualize bundles and profiles.
+# First, we will run a function that exports an html file that contains
+# an interactive visualization of the bundles that are segmented. Once
+# it is done running, it should pop a browser window open and let you
+# interact with the bundles.
 #
 # .. note::
-#     Note that because of a quirk in the way that brain segmentation was
-#     generated in this data, some bundles will not be detected using the
-#     detected using the default values. For example, the corticospinal tracts
-#     on both sides will not be properly detected because the waypoint ROIs for
-#     these tracts fall into parts of the white matter that were not segmented.
+#    Running the code below triggers the full pipeline of operations
+#    leading to the computation of the tract profiles. Therefore, it
+#    takes a little while to run (about 40 minutes, typically).
 
-# df = pd.read_csv(myafq.tract_profiles[0])
-# for bundle in df['bundle'].unique():
-#     fig, ax = plt.subplots(1)
-#     ax.plot(df[(df['scalar'] == "dti_fa")
-#             & (df['bundle'] == bundle)]['profiles'])
-#     ax.set_title(bundle)
+bundle_html = myafq.viz_bundles(export=True, n_points=50)
+plotly.io.show(bundle_html[0])
 
-plt.show()
+##########################################################################
+# We can also visualize the tract profiles in all of the bundles:
+#
+
+myafq.plot_tract_profiles()
+fig_files = myafq.data_frame['tract_profiles_viz'][0]
+
+##########################################################################
+# .. figure:: {{ fig_files[0] }}
+#
