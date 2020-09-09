@@ -109,7 +109,7 @@ def val_to_toml(v):
     elif callable(v):
         return f"'{v.__name__}'"
     elif isinstance(v, dict):
-        return f"'{v}'"
+        return f'"{v}"'
     else:
         return f"{v}"
 

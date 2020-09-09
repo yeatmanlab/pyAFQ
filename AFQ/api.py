@@ -182,10 +182,10 @@ class AFQ(object):
             preprocessed dwi/bvals/bvecs.
         bids_filters : dict
             [BIDS] Filter to pass to bids_layou.get when finding DWI files.
-            Default: {'suffix': 'dwi'}
+            Default: {"suffix": "dwi"}
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
-            Default: "dmriprep".
+            Default: "all".
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
@@ -224,7 +224,8 @@ class AFQ(object):
             [BUNDLES] List of bundle names to include in segmentation.
             Default: BUNDLES
         dask_it : bool, optional
-            [COMPUTE] Whether to use a dask DataFrame object
+            [COMPUTE] Whether to use a dask DataFrame object.
+            Default: False
         force_recompute : bool, optional
             [COMPUTE] Whether to recompute or ignore existing derivatives.
             This parameter can be turned on/off dynamically.
