@@ -808,7 +808,7 @@ class AFQ(object):
         return mapping_file
 
     def _streamlines(self, row):
-        odf_model = self.tracking_params["odf_model"]
+        odf_model = self.tracking_params["odf_model"].upper()
 
         streamlines_file = self._get_fname(
             row,
