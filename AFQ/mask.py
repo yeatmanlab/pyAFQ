@@ -238,12 +238,23 @@ class RoiMask(StrInstantiatesMixin):
         pass
 
     def get_mask(self, api, row):
+        if api.use_prealign:
+            reg_prealign = np.load(api._reg_prealign(row))
+            reg_prealign_inv = np.linalg.inv(reg_prealign)
+        else:
+            reg_prealign_inv = None
+        mapping = reg.read_mapping(
+            api._mapping(row),
+            row['dwi_file'],
+            api.reg_template,
+            prealign=reg_prealign_inv)
+
         mask_data = None
         for bundle_name, bundle_info in api.bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
                 if api.bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.patch_up_roi(
-                        api.mapping.transform_inverse(
+                        mapping.transform_inverse(
                             roi.get_fdata().astype(np.float32),
                             interpolation='linear'))
 
