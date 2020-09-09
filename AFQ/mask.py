@@ -246,7 +246,7 @@ class RoiMask(StrInstantiatesMixin):
                         api.mapping.transform_inverse(
                             roi.get_fdata().astype(np.float32),
                             interpolation='linear'),
-                            bundle_name=bundle_name)
+                        bundle_name=bundle_name)
 
                     if mask_data is None:
                         mask_data = np.zeros(warped_roi.shape)
