@@ -92,7 +92,7 @@ def test_download_from_s3(temp_data_dir):
         fname=op.join(test_dir, "test_file"),
         bucket=TEST_BUCKET,
         key=first_json_file,
-        anon=False
+        anon=False,
     )
 
     assert op.isfile(op.join(test_dir, "test_file"))
@@ -110,10 +110,10 @@ def test_S3BIDSStudy(temp_data_dir):
         s3_prefix=TEST_DATASET,
         anon=False,
         random_seed=42,
-        subjects=5
+        subjects=5,
     )
 
-    assert len(study.subjects)==5
+    assert len(study.subjects) == 5
 
     study = afd.S3BIDSStudy(
         study_id="test",
@@ -123,17 +123,17 @@ def test_S3BIDSStudy(temp_data_dir):
         random_seed=42,
     )
 
-    assert len(study.subjects)==1
+    assert len(study.subjects) == 1
 
     study = afd.S3BIDSStudy(
         study_id="test",
         bucket=TEST_BUCKET,
         s3_prefix=TEST_DATASET,
         anon=False,
-        subjects="all"
+        subjects="all",
     )
 
-    assert len(study.subjects)==len(study._all_subjects)
+    assert len(study.subjects) == len(study._all_subjects)
 
     study.download(test_dir)
     study._download_non_sub_keys(test_dir)
@@ -147,36 +147,49 @@ def test_S3BIDSStudy(temp_data_dir):
 
     assert not mismatch
     assert not errors
-    
+
+    try:
+        test_dir2 = str(uuid4())
+        os.mkdir(test_dir2)
+
+        study.download(test_dir2)
+        match, mismatch, errors = filecmp.cmpfiles(
+            ref_dir, test_dir2, download_files, shallow=False
+        )
+        assert not mismatch
+        assert not errors
+    finally:
+        shutil.rmtree(test_dir2)
 
 
 def test_aal_to_regions():
     atlas = np.zeros((20, 20, 20, 5))
     # Just one region:
     atlas[0, 0, 0, 0] = 1
-    regions = ['leftfrontal']
+    regions = ["leftfrontal"]
     idx = afd.aal_to_regions(regions, atlas=atlas)
     npt.assert_equal(idx, np.array(np.where(atlas[..., 0] == 1)).T)
 
     # More than one region:
     atlas[1, 1, 1, 0] = 2
-    regions = ['leftfrontal', 'rightfrontal']
+    regions = ["leftfrontal", "rightfrontal"]
     idx = afd.aal_to_regions(regions, atlas=atlas)
 
     npt.assert_equal(
-        idx,
-        np.array(np.where((atlas[..., 0] == 1) | (atlas[..., 0] == 2))).T)
+        idx, np.array(np.where((atlas[..., 0] == 1) | (atlas[..., 0] == 2))).T
+    )
 
     # Use one of the additional volumes
     atlas[1, 1, 1, 1] = 1
-    regions = ['leftfrontal', 'rightfrontal', 'cstsuperior']
+    regions = ["leftfrontal", "rightfrontal", "cstsuperior"]
     idx = afd.aal_to_regions(regions, atlas=atlas)
 
     npt.assert_equal(
         idx,
-        np.array(np.where((atlas[..., 0] == 1)
-                          | (atlas[..., 0] == 2)
-                          | (atlas[..., 1] == 1))).T)
+        np.array(
+            np.where((atlas[..., 0] == 1) | (atlas[..., 0] == 2) | (atlas[..., 1] == 1))
+        ).T,
+    )
 
 
 def test_bundles_to_aal():
@@ -185,13 +198,16 @@ def test_bundles_to_aal():
     atlas[0, 0, 0, 0] = 1
 
     targets = afd.bundles_to_aal(["ATR_L"], atlas)
-    npt.assert_equal(targets,
-                     [[np.array(np.where(atlas[..., 0] == 1)).T, None]])
-
+    npt.assert_equal(targets, [[np.array(np.where(atlas[..., 0] == 1)).T, None]])
 
     atlas[0, 0, 1, 0] = 2
 
     targets = afd.bundles_to_aal(["ATR_L", "ATR_R"], atlas)
-    npt.assert_equal(targets,
-                     [[np.array(np.where(atlas[..., 0] == 1)).T, None],
-                      [np.array(np.where(atlas[..., 0] == 2)).T, None]])
+    npt.assert_equal(
+        targets,
+        [
+            [np.array(np.where(atlas[..., 0] == 1)).T, None],
+            [np.array(np.where(atlas[..., 0] == 2)).T, None],
+        ],
+    )
+
