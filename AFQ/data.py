@@ -1156,7 +1156,7 @@ class S3BIDSStudy:
         AFQ.data.S3BIDSSubject.download
         """
         self._local_directories.append(directory)
-        self._local_directories = set(self._local_directories)
+        self._local_directories = list(set(self._local_directories))
 
         if include_modality_agnostic is True or include_modality_agnostic == "all":
             self._download_non_sub_keys(directory, select="all")
