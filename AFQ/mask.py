@@ -239,7 +239,7 @@ class RoiMask(StrInstantiatesMixin):
 
     def get_mask(self, api, row):
         mask_data = None
-        for bundle_name, bundle_info in api.bundle_dict.keys():
+        for bundle_name, bundle_info in api.bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
                 if api.bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.patch_up_roi(
