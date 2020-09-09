@@ -1083,7 +1083,7 @@ class AFQ(object):
                         row,
                         f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
 
-                fname = op.join(fname[0], rois_dir, fname[1])
+                fname = op.join(rois_dir, fname[1])
                 if not op.exists(fname):
 
                     warped_roi = auv.patch_up_roi(
@@ -1130,7 +1130,7 @@ class AFQ(object):
                             f'_tractography.trk',
                             include_track=True,
                             include_seg=True))
-                    fname = op.join(fname[0], bundles_dir, fname[1])
+                    fname = op.join(bundles_dir, fname[1])
                     self.log_and_save_trk(this_tgm, fname)
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
@@ -1302,7 +1302,7 @@ class AFQ(object):
                             include_track=True,
                             include_seg=True))
 
-                    fname = op.join(fname[0], roi_dir, fname[1])
+                    fname = op.join(roi_dir, fname[1])
                     self.viz.create_gif(figure, fname)
                 else:
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
@@ -1315,7 +1315,7 @@ class AFQ(object):
                             include_track=True,
                             include_seg=True))
 
-                    fname = op.join(fname[0], roi_dir, fname[1])
+                    fname = op.join(roi_dir, fname[1])
                     figure.write_html(fname)
         row['timing']['Visualization'] =\
             row['timing']['Visualization'] + time() - start_time
