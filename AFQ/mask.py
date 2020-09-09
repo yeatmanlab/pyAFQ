@@ -246,7 +246,7 @@ class RoiMask(StrInstantiatesMixin):
         mapping = reg.read_mapping(
             api._mapping(row),
             row['dwi_file'],
-            api.reg_template,
+            api.reg_template_img,
             prealign=reg_prealign_inv)
 
         mask_data = None

@@ -1170,7 +1170,7 @@ class AFQ(object):
 
             mapping = reg.read_mapping(self._mapping(row),
                                        row['dwi_file'],
-                                       self.reg_template,
+                                       self.reg_template_img,
                                        prealign=reg_prealign_inv)
 
         if xform_volume:
