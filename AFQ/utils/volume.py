@@ -34,7 +34,7 @@ def patch_up_roi(roi, bundle_name="ROI"):
     """
 
     hole_filled = ndim.binary_fill_holes(roi > 0)
-    if np.sum(hole_filled) < 1:
+    if not np.any(hole_filled):
         raise ValueError((
             f"{bundle_name} found to be empty after "
             "applying the mapping."))
