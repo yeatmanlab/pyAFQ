@@ -145,6 +145,7 @@ class AFQ(object):
 
     def __init__(self,
                  bids_path,
+                 bids_filters={'suffix': 'dwi'},
                  dmriprep='all',
                  b0_threshold=50,
                  min_bval=None,
@@ -179,6 +180,9 @@ class AFQ(object):
             [BIDS] The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
+        bids_filters : dict
+            [BIDS] Filter to pass to bids_layou.get when finding DWI files.
+            Default: {'suffix': 'dwi'}
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "dmriprep".
@@ -380,21 +384,22 @@ class AFQ(object):
                 os.makedirs(results_dir_list[-1], exist_ok=True)
                 dwi_file_list.append(
                     bids_layout.get(subject=subject, session=session,
-                                    extension='nii.gz', suffix='dwi',
+                                    extension='nii.gz',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
-                                    suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
                 bval_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bval', 'bvals'],
-                                    suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
