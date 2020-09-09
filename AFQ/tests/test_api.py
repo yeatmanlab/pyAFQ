@@ -303,7 +303,7 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
-    tracking_params = dict(odf_model="DTI",
+    tracking_params = dict(odf_model="dti",
                            seed_mask=RoiMask(),
                            n_seeds=100,
                            random_seeds=True)
@@ -316,7 +316,7 @@ def test_AFQ_data_waypoint():
     myafq = api.AFQ(bids_path=bids_path,
                     dmriprep='vistasoft',
                     bundle_names=bundle_names,
-                    scalars=["dti_fa", "dti_md"],
+                    scalars=["dti_FA", "dti_MD"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
