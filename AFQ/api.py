@@ -145,8 +145,8 @@ class AFQ(object):
 
     def __init__(self,
                  bids_path,
-                 bids_filters={'suffix': 'dwi'},
-                 dmriprep='all',
+                 bids_filters={"suffix": "dwi"},
+                 dmriprep="all",
                  b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
