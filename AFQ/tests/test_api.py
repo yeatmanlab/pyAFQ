@@ -349,7 +349,7 @@ def test_AFQ_data_waypoint():
     tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
 
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
-    npt.assert_(len(bundles['CST_R']) > 0)
+    npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
