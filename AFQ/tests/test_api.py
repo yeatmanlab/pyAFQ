@@ -349,6 +349,7 @@ def test_AFQ_data_waypoint():
     tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
 
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    print(bundles)
     npt.assert_(len(bundles['CST_R']) > 0)
 
     # Test ROI exporting:
@@ -363,12 +364,12 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
     # Test creation of file with bundle indices:
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (500, 5)
@@ -376,11 +377,11 @@ def test_AFQ_data_waypoint():
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
 
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
