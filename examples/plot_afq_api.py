@@ -74,7 +74,7 @@ ax.axis("off")
 #    leading to the computation of the tract profiles. Therefore, it
 #    takes a little while to run (about 40 minutes, typically).
 
-bundle_html = myafq.viz_bundles(export=True)
+bundle_html = myafq.viz_bundles(export=True, n_points=50)
 plotly.io.show(bundle_html[0])
 
 ##########################################################################
