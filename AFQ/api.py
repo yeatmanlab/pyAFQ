@@ -250,6 +250,8 @@ class AFQ(object):
         tracking_params: dict, optional
             The parameters for tracking.
             Default: use the default behavior of the aft.track function.
+            Seed mask and seed threshold, if not specified, are replaced
+            with scalar masks from scalar[0] thresholded to 0.2.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -287,7 +289,7 @@ class AFQ(object):
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
         self.b0_threshold = b0_threshold
 
-        self.scalars = scalars
+        self.scalars = [scalar.lower() for scalar in scalars]
 
         if virtual_frame_buffer:
             from xvfbwrapper import Xvfb
@@ -296,8 +298,8 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend.lower())
 
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = ScalarMask("dti_fa")
-        default_tracking_params["stop_mask"] = ScalarMask("dti_fa")
+        default_tracking_params["seed_mask"] = ScalarMask(self.scalars[0])
+        default_tracking_params["stop_mask"] = ScalarMask(self.scalars[0])
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value was
