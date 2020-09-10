@@ -138,7 +138,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
-@pytest.mark.nightly
+@pytest.mark.nightly2
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
@@ -152,7 +152,7 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 11))
 
 
-@pytest.mark.nightly
+@pytest.mark.nightly2
 def test_AFQ_data():
     """
     Test if API can run without prealign
@@ -173,7 +173,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-@pytest.mark.nightly
+@pytest.mark.nightly2
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -213,7 +213,7 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
 
 
-@pytest.mark.nightly
+@pytest.mark.nightly2
 def test_AFQ_slr():
     """
     Test if API can run using slr map
