@@ -1089,7 +1089,8 @@ class AFQ(object):
                     warped_roi = auv.patch_up_roi(
                         (mapping.transform_inverse(
                             roi.get_fdata(),
-                            interpolation='linear')) > 0).astype(int)
+                            interpolation='linear')) > 0,
+                        bundle_name=bundle).astype(int)
 
                     # Cast to float32, so that it can be read in by MI-Brain:
                     self.log_and_save_nii(
