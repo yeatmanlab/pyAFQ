@@ -411,9 +411,10 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
 
     use_fa_ticks : bool, optional
         Set min and max y limit to 0 and 1, and only use yticks at
-        0.2, 0.4, 0.6 . Useful for plotting FA. If None,
-        Set to "fa" in scalar.
-        Default: False
+        0.2, 0.4, 0.6 . Useful for plotting FA.
+        If None, set to evaluation of ("fa" in scalar).
+        If ultimately True, takes precedence over ylim.
+        Default: None
 
     positions : dictionary, optional
         Dictionary that maps bundle names to position in plot.
