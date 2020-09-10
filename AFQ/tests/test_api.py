@@ -413,7 +413,7 @@ def test_AFQ_data_waypoint():
         myafq._get_fname(myafq.data_frame.iloc[0], '_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (500, 7)
+    assert combined_profiles.shape == (700, 7)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
