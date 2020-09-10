@@ -181,7 +181,7 @@ class AFQ(object):
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
         bids_filters : dict
-            [BIDS] Filter to pass to bids_layou.get when finding DWI files.
+            [BIDS] Filter to pass to bids_layout.get when finding DWI files.
             Default: {"suffix": "dwi"}
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
