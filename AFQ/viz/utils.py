@@ -500,7 +500,7 @@ class LongitudinalCSVComparison():
             Whether or not the csv was generated from Matlab AFQ or pyAFQ.
             Default: False
 
-        subjects : list of str, optional
+        subjects : list of num, optional
             List of subjects to consider.
             If None, will use all subjects in first dataset.
             Default: None
