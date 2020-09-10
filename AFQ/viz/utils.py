@@ -386,8 +386,8 @@ class Viz:
                             % backend)
 
 
-def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_scalar=None,
-                             max_scalar=None, file_name=None,
+def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
+                             file_name=None,
                              use_fa_ticks=None,
                              positions=POSITIONS):
     """
@@ -402,16 +402,10 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_scalar=None,
     scalar : string, optional
        Scalar to use in plots. Default: "dti_fa".
 
-    min_scalar : float, optional
-        Minimum value used for y-axis bounds.
+    ylim : list of 2 floats, optional
+        Minimum and maximum value used for y-axis bounds.
         If None, ylim is not set.
         Default: None
-
-    max_scalar : float, optional
-        Maximum value used for y-axis bounds.
-        If None, ylim is not set.
-        Default: None
-
     file_name : string, optional
         File name to save figure to if not None. Default: None
 
@@ -444,8 +438,8 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", min_scalar=None,
         ][scalar].values
         ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
 
-        if (min_scalar is not None) and (max_scalar is not None):
-            ax.set_ylim([min_scalar, max_scalar])
+        if ylim is not None:
+            ax.set_ylim(ylim)
 
         if use_fa_ticks:
             ax.set_ylim([0.0, 1.0])
