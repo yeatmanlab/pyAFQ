@@ -306,7 +306,8 @@ def test_AFQ_data_waypoint():
     tracking_params = dict(odf_model="dti",
                            seed_mask=RoiMask(),
                            n_seeds=100,
-                           random_seeds=True)
+                           random_seeds=True,
+                           rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
                                seg_algo="AFQ",
                                return_idx=True)
@@ -391,7 +392,8 @@ def test_AFQ_data_waypoint():
     tracking_params = dict(odf_model="DTI",
                            seed_mask="RoiMask()",
                            n_seeds=100,
-                           random_seeds=True)
+                           random_seeds=True,
+                           rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
                   BUNDLES=dict(
