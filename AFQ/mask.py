@@ -169,7 +169,7 @@ class MaskFile(StrInstantiatesMixin):
             suffix=self.suffix,
             **self.filters)[0]
 
-    def get_path_data_affine(self, api, row):
+    def get_path_data_affine(self, afq_object, row):
         mask_file = self.fnames[row['ses']][row['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
@@ -178,11 +178,11 @@ class MaskFile(StrInstantiatesMixin):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask(self, api, row):
+    def get_mask(self, afq_object, row):
         # Load data
-        dwi_data, _, dwi_img = api._get_data_gtab(row)
+        dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(api, row)
+            self.get_path_data_affine(afq_object, row)
 
         # Apply any conditions on the data
         mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
@@ -212,9 +212,9 @@ class FullMask(StrInstantiatesMixin):
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, api, row):
+    def get_mask(self, afq_object, row):
         # Load data to get shape, affine
-        dwi_data, _, dwi_img = api._get_data_gtab(row)
+        dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
 
         return np.ones(dwi_data.shape),\
             dwi_img.affine,\
@@ -237,22 +237,22 @@ class RoiMask(StrInstantiatesMixin):
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, api, row):
-        if api.use_prealign:
-            reg_prealign = np.load(api._reg_prealign(row))
+    def get_mask(self, afq_object, row):
+        if afq_object.use_prealign:
+            reg_prealign = np.load(afq_object._reg_prealign(row))
             reg_prealign_inv = np.linalg.inv(reg_prealign)
         else:
             reg_prealign_inv = None
         mapping = reg.read_mapping(
-            api._mapping(row),
+            afq_object._mapping(row),
             row['dwi_file'],
-            api.reg_template_img,
+            afq_object.reg_template_img,
             prealign=reg_prealign_inv)
 
         mask_data = None
-        for bundle_name, bundle_info in api.bundle_dict.items():
+        for bundle_name, bundle_info in afq_object.bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
-                if api.bundle_dict[bundle_name]['rules'][idx]:
+                if afq_object.bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.patch_up_roi(
                         mapping.transform_inverse(
                             roi.get_fdata().astype(np.float32),
@@ -263,7 +263,7 @@ class RoiMask(StrInstantiatesMixin):
                     mask_data = np.logical_or(
                         mask_data,
                         warped_roi.astype(bool))
-        return mask_data, api["dwi_affine"], dict(source="ROIs")
+        return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
 
 
 class B0Mask(StrInstantiatesMixin):
@@ -288,8 +288,8 @@ class B0Mask(StrInstantiatesMixin):
     def find_path(self, bids_layout, subject, session):
         pass
 
-    def get_mask(self, api, row):
-        b0_file = api._b0(row)
+    def get_mask(self, afq_object, row):
+        b0_file = afq_object._b0(row)
         mean_b0_img = nib.load(b0_file)
         mean_b0 = mean_b0_img.get_fdata()
         _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
@@ -451,15 +451,15 @@ class ScalarMask(MaskFile):
         pass
 
     # overrides MaskFile
-    def get_path_data_affine(self, api, row):
-        valid_scalars = list(api._scalar_dict.keys())
+    def get_path_data_affine(self, afq_object, row):
+        valid_scalars = list(afq_object._scalar_dict.keys())
         if self.scalar not in valid_scalars:
             raise RuntimeError((
                 f"scalar should be one of"
                 f" {', '.join(valid_scalars)}"
                 f", you input {self.scalar}"))
 
-        scalar_fname = api._scalar_dict[self.scalar](api, row)
+        scalar_fname = afq_object._scalar_dict[self.scalar](afq_object, row)
         scalar_img = nib.load(scalar_fname)
         scalar_data = scalar_img.get_fdata()
 
@@ -542,11 +542,11 @@ class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
         for mask in self.mask_list:
             mask.find_path(bids_layout, subject, session)
 
-    def get_mask(self, api, row):
+    def get_mask(self, afq_object, row):
         self.mask_draft = None
         metas = []
         for mask in self.mask_list:
-            next_mask, next_affine, next_meta = mask.get_mask(api, row)
+            next_mask, next_affine, next_meta = mask.get_mask(afq_object, row)
             if self.mask_draft is None:
                 self.reset_mask_draft(next_mask.shape)
             else:
