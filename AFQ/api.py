@@ -298,8 +298,10 @@ class AFQ(object):
         self.viz = Viz(backend=viz_backend.lower())
 
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = ScalarMask(self.scalars[0])
-        default_tracking_params["stop_mask"] = ScalarMask(self.scalars[0])
+        default_tracking_params["seed_mask"] = ScalarMask(
+            self._get_best_scalar())
+        default_tracking_params["stop_mask"] = ScalarMask(
+            self._get_best_scalar())
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value was
@@ -667,6 +669,12 @@ class AFQ(object):
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
+
+    def _get_best_scalar(self):
+        for scalar in self.scalars:
+            if "fa" in scalar:
+                return scalar
+        return self.scalars[0]
 
     def _reg_img(self, img, row=None):
         if isinstance(img, str):
@@ -1152,13 +1160,13 @@ class AFQ(object):
                           color_by_volume=None,
                           xform_color_by_volume=False):
         if volume is None:
-            volume = self.scalars[0]
+            volume = self._get_best_scalar()
         if volume in self.scalars:
             volume = nib.load(
                 self._scalar_dict[volume](self, row)).get_fdata()
 
         if color_by_volume is None:
-            color_by_volume = self.scalars[0]
+            color_by_volume = self._get_best_scalar()
         if color_by_volume in self.scalars:
             color_by_volume = nib.load(
                 self._scalar_dict[color_by_volume](self, row)).get_fdata()
