@@ -309,6 +309,8 @@ class AFQ(object):
                 default_tracking_params[k] = tracking_params[k]
 
         self.tracking_params = default_tracking_params
+        self.tracking_params["odf_model"] =\
+            self.tracking_params["odf_model"].upper()
 
         default_seg_params = get_default_args(seg.Segmentation.__init__)
         if segmentation_params is not None:
@@ -808,7 +810,7 @@ class AFQ(object):
         return mapping_file
 
     def _streamlines(self, row):
-        odf_model = self.tracking_params["odf_model"].upper()
+        odf_model = self.tracking_params["odf_model"]
 
         streamlines_file = self._get_fname(
             row,

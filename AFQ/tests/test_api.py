@@ -330,13 +330,6 @@ def test_AFQ_data_waypoint():
             [s for s in streamlines if s.shape[0] > 100],
             np.linalg.inv(myafq.dwi_affine[0])))
 
-    sl_file = op.join(
-        myafq.data_frame.results_dir[0],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
-    sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
-                             Space.VOX)
-    save_tractogram(sft, sl_file, bbox_valid_check=False)
-
     mapping_file = op.join(
         myafq.data_frame.results_dir[0],
         'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
@@ -363,12 +356,12 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
     # Test creation of file with bundle indices:
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
     assert tract_profiles.shape == (500, 5)
@@ -376,11 +369,11 @@ def test_AFQ_data_waypoint():
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
 
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_space-RASMM_model-dti_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
