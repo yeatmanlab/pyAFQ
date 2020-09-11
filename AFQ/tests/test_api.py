@@ -229,6 +229,21 @@ def test_AFQ_slr():
     myafq.export_rois()
 
 
+def test_AFQ_reco():
+    """
+    Test if API can run registeration with FA
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation_params={'seg_algo': 'reco'})
+    bundles = myafq.get_clean_bundles()[0]
+    npt.assert_(len(bundles['CST_R']) > 0)
+
+
 # Requires large download
 @pytest.mark.nightly
 def test_AFQ_FA():
