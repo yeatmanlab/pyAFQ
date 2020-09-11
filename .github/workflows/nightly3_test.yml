@@ -1,6 +1,8 @@
-name: Test suite
+name: Nightly test suite
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: '0 9 * * *'  # every day at 2 AM, PST
 
 jobs:
   build:
@@ -28,4 +30,4 @@ jobs:
     - name: Test
       run: |
         export TEST_WITH_XVFB=true
-        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "not nightly and not nightly2 and not nightly3" --durations=0
+        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "nightly3" --durations=0
