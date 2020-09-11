@@ -243,7 +243,7 @@ def test_AFQ_reco():
 
     tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
-    npt.assert_(len(bundles['CST_L']) > 0)
+    npt.assert_(len(bundles['CST_R']) > 0)
 
 
 # Requires large download
