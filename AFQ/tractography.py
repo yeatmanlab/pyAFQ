@@ -32,7 +32,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         coefficients, or nibabel img with model params.
     directions : str
         How tracking directions are determined.
-        One of: {"deterministic" | "probablistic"}
+        One of: {"det" | "prob"}
     max_angle : float, optional.
         The maximum turning angle in each step. Default: 30
     sphere : Sphere object, optional.
@@ -106,6 +106,8 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     model_params = params_img.get_fdata()
     affine = params_img.affine
+    odf_model = odf_model.upper()
+    directions = directions.lower()
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):

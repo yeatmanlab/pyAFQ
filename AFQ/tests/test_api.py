@@ -303,10 +303,11 @@ def test_AFQ_data_waypoint():
     afd.organize_stanford_data(path=tmpdir.name)
     bids_path = op.join(tmpdir.name, 'stanford_hardi')
     bundle_names = ["SLF", "ARC", "CST", "FP"]
-    tracking_params = dict(odf_model="DTI",
+    tracking_params = dict(odf_model="dti",
                            seed_mask=RoiMask(),
                            n_seeds=100,
-                           random_seeds=True)
+                           random_seeds=True,
+                           rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
                                seg_algo="AFQ",
                                return_idx=True)
@@ -316,7 +317,7 @@ def test_AFQ_data_waypoint():
     myafq = api.AFQ(bids_path=bids_path,
                     dmriprep='vistasoft',
                     bundle_names=bundle_names,
-                    scalars=["dti_fa", "dti_md"],
+                    scalars=["dti_FA", "dti_MD"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
@@ -330,13 +331,6 @@ def test_AFQ_data_waypoint():
             [s for s in streamlines if s.shape[0] > 100],
             np.linalg.inv(myafq.dwi_affine[0])))
 
-    sl_file = op.join(
-        myafq.data_frame.results_dir[0],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det_tractography.trk')
-    sft = StatefulTractogram(streamlines, myafq.data_frame.dwi_file[0],
-                             Space.VOX)
-    save_tractogram(sft, sl_file, bbox_valid_check=False)
-
     mapping_file = op.join(
         myafq.data_frame.results_dir[0],
         'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
@@ -349,7 +343,7 @@ def test_AFQ_data_waypoint():
     tgram = load_tractogram(myafq.bundles[0], myafq.dwi_img[0])
 
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
-    npt.assert_(len(bundles['CST_R']) > 0)
+    npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
@@ -398,7 +392,8 @@ def test_AFQ_data_waypoint():
     tracking_params = dict(odf_model="DTI",
                            seed_mask="RoiMask()",
                            n_seeds=100,
-                           random_seeds=True)
+                           random_seeds=True,
+                           rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
                   BUNDLES=dict(

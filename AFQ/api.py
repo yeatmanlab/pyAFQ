@@ -145,7 +145,8 @@ class AFQ(object):
 
     def __init__(self,
                  bids_path,
-                 dmriprep='all',
+                 bids_filters={"suffix": "dwi"},
+                 dmriprep="all",
                  b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
@@ -179,9 +180,12 @@ class AFQ(object):
             [BIDS] The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
+        bids_filters : dict
+            [BIDS] Filter to pass to bids_layout.get when finding DWI files.
+            Default: {"suffix": "dwi"}
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
-            Default: "dmriprep".
+            Default: "all".
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
@@ -220,7 +224,8 @@ class AFQ(object):
             [BUNDLES] List of bundle names to include in segmentation.
             Default: BUNDLES
         dask_it : bool, optional
-            [COMPUTE] Whether to use a dask DataFrame object
+            [COMPUTE] Whether to use a dask DataFrame object.
+            Default: False
         force_recompute : bool, optional
             [COMPUTE] Whether to recompute or ignore existing derivatives.
             This parameter can be turned on/off dynamically.
@@ -245,6 +250,8 @@ class AFQ(object):
         tracking_params: dict, optional
             The parameters for tracking.
             Default: use the default behavior of the aft.track function.
+            Seed mask and seed threshold, if not specified, are replaced
+            with scalar masks from scalar[0] thresholded to 0.2.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -257,8 +264,8 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.reg_subject = reg_subject
-        self.reg_template = reg_template
+        self.reg_subject = reg_subject.lower()
+        self.reg_template = reg_template.lower()
         if brain_mask is None:
             self.brain_mask_definition = FullMask()
             self.mask_template = False
@@ -282,17 +289,19 @@ class AFQ(object):
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
         self.b0_threshold = b0_threshold
 
-        self.scalars = scalars
+        self.scalars = [scalar.lower() for scalar in scalars]
 
         if virtual_frame_buffer:
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=1280)
             self.vdisplay.start()
-        self.viz = Viz(backend=viz_backend)
+        self.viz = Viz(backend=viz_backend.lower())
 
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = ScalarMask("dti_fa")
-        default_tracking_params["stop_mask"] = ScalarMask("dti_fa")
+        default_tracking_params["seed_mask"] = ScalarMask(
+            self._get_best_scalar())
+        default_tracking_params["stop_mask"] = ScalarMask(
+            self._get_best_scalar())
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value was
@@ -302,6 +311,8 @@ class AFQ(object):
                 default_tracking_params[k] = tracking_params[k]
 
         self.tracking_params = default_tracking_params
+        self.tracking_params["odf_model"] =\
+            self.tracking_params["odf_model"].upper()
 
         default_seg_params = get_default_args(seg.Segmentation.__init__)
         if segmentation_params is not None:
@@ -380,21 +391,22 @@ class AFQ(object):
                 os.makedirs(results_dir_list[-1], exist_ok=True)
                 dwi_file_list.append(
                     bids_layout.get(subject=subject, session=session,
-                                    extension='nii.gz', suffix='dwi',
+                                    extension='nii.gz',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
-                                    suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
                 bval_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bval', 'bvals'],
-                                    suffix='dwi',
                                     return_type='filename',
-                                    scope=dmriprep)[0])
+                                    scope=dmriprep,
+                                    **bids_filters)[0])
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
@@ -658,6 +670,12 @@ class AFQ(object):
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md}
 
+    def _get_best_scalar(self):
+        for scalar in self.scalars:
+            if "fa" in scalar:
+                return scalar
+        return self.scalars[0]
+
     def _reg_img(self, img, row=None):
         if isinstance(img, str):
             img_l = img.lower()
@@ -743,7 +761,7 @@ class AFQ(object):
             warped_b0 = mapping.transform(mean_b0)
 
             self.log_and_save_nii(nib.Nifti1Image(
-                warped_b0, row['dwi_affine']), b0_warped_file)
+                warped_b0, self.reg_template_img.affine), b0_warped_file)
 
         return b0_warped_file
 
@@ -1143,13 +1161,13 @@ class AFQ(object):
                           color_by_volume=None,
                           xform_color_by_volume=False):
         if volume is None:
-            volume = self.scalars[0]
+            volume = self._get_best_scalar()
         if volume in self.scalars:
             volume = nib.load(
                 self._scalar_dict[volume](self, row)).get_fdata()
 
         if color_by_volume is None:
-            color_by_volume = self.scalars[0]
+            color_by_volume = self._get_best_scalar()
         if color_by_volume in self.scalars:
             color_by_volume = nib.load(
                 self._scalar_dict[color_by_volume](self, row)).get_fdata()
@@ -1163,7 +1181,7 @@ class AFQ(object):
 
             mapping = reg.read_mapping(self._mapping(row),
                                        row['dwi_file'],
-                                       self.reg_template,
+                                       self.reg_template_img,
                                        prealign=reg_prealign_inv)
 
         if xform_volume:
