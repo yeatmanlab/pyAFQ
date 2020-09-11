@@ -1588,6 +1588,7 @@ class AFQ(object):
     def set_clean_bundles(self):
         if 'clean_bundles_file' not in self.data_frame.columns:
             if self.seg_algo == "reco":
+                self.set_bundles()
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
             else:
