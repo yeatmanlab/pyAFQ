@@ -240,8 +240,10 @@ def test_AFQ_reco():
         bids_path=bids_path,
         dmriprep='vistasoft',
         segmentation_params={'seg_algo': 'reco'})
-    bundles = myafq.get_clean_bundles()[0]
-    npt.assert_(len(bundles['CST_R']) > 0)
+
+    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    npt.assert_(len(bundles['CST_L']) > 0)
 
 
 # Requires large download
