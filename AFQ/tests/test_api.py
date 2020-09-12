@@ -239,7 +239,7 @@ def test_AFQ_reco():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
-        segmentation_params={'seg_algo': 'reco'})
+        segmentation_params={'seg_algo': 'reco', 'rng': np.random.RandomState(42)})
 
     tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
