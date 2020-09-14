@@ -428,6 +428,8 @@ class AFQ(object):
                                         return_type='filename',
                                         scope=dmriprep,
                                         **custom_tractography_bids_filters)[0])
+                else:
+                    custom_tract_list.append(None)
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
