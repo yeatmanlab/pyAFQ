@@ -432,7 +432,11 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         fa = tract_profiles[
             (tract_profiles["bundle"] == bundle)
         ][scalar].values
-        sns.lineplot(y=fa, color=COLOR_DICT[bundle], ax=ax)
+        sns.lineplot(
+            y=fa,
+            fmt='o-',
+            color=COLOR_DICT[bundle],
+            ax=ax)
 
         if ylim is not None:
             ax.set_ylim(ylim)
