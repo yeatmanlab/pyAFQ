@@ -1,8 +1,40 @@
+0.4.1 (September 14, 2020)
+========================
+
+This micro release provides testing for Python 3.8 and multiple other fixes.
+This release requires the newly-released DIPY 1.2.0
+
+  * BF: Register the PVE to the parameters. (#423)
+  * Python 3.8 (#360)
+  * Further subdivide nightly tests (#419)
+  * Many minor bug fixes (#409)
+  * Divide nightly test into 2; have nightly tests only do nightly tests (#417)
+  * Raise error earlier for empty ROI (#415)
+  * Update example to serve as a CI target (#380)
+  * Convert local_directories set to list (#414)
+  * Update to Dipy 1.2.0 (#384)
+  * Adds ParticleFilteringTractography. (#335)
+  * A few visualization updates (#390)
+  * Timing dict name mismatch bug fix (#395)
+  * make decision to combine profile automatic in export_all (#387)
+  * Export timing information (#393)
+  * Remove unnecessary check (#389)
+  * Add ability to remove edges of profiles (#386)
+  * Add upload_to_s3, download_and_combine_afq_profiles (#376)
+  * Change nighty tests to happen at midnight, PST (#383)
+  * Use get_fdata instead of deprecated get_data in example (#377)
+  * Skip seg faulting test (#378)
+  * Overhaul Mask File UI; Other minor UI improvements (#370)
+  * Return a unique set of subjects in S3BIDSStudy._all_subjects (#373)
+  * Allow user to seed tractography with ROIs via api. Use this to reduce test times. Mark some tests as nightly. (#364)
+  * Added test that runs full cli pipeline on default config file. Tell CI to not run the tests marked slow. (#356)
+
+
 0.4 (August 17, 2020)
 =====================
-This release adds several new registration templates and techniques, providing 
-major improvements in bundle segmentation with waypoint ROIs. In addition, new 
-visualization methods using plotly were introduced, to generate HTML-based 
+This release adds several new registration templates and techniques, providing
+major improvements in bundle segmentation with waypoint ROIs. In addition, new
+visualization methods using plotly were introduced, to generate HTML-based
 visualizations of bundles, and to compare longitudinal measurements. This version
 relies on pybids for parsing of input datasets. Many other bug fixes and improvements.
 
