@@ -147,6 +147,7 @@ class AFQ(object):
                  bids_path,
                  bids_filters={"suffix": "dwi"},
                  dmriprep="all",
+                 custom_tractography_bids_filters=None,
                  b0_threshold=50,
                  min_bval=None,
                  max_bval=None,
@@ -186,6 +187,10 @@ class AFQ(object):
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "all".
+        custom_tractography_bids_filters : dict, optional
+            [BIDS] BIDS filters for inputing a user made tractography file.
+            If None, tractography will be performed automatically.
+            Default: None
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
@@ -288,6 +293,8 @@ class AFQ(object):
             self.reg_algo = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
         self.b0_threshold = b0_threshold
+        self.custom_tractography_bids_filters =\
+            custom_tractography_bids_filters
 
         self.scalars = [scalar.lower() for scalar in scalars]
 
@@ -377,6 +384,7 @@ class AFQ(object):
         dwi_file_list = []
         bvec_file_list = []
         bval_file_list = []
+        custom_tract_list = []
         timing_list = []
         results_dir_list = []
         for subject in self.subjects:
@@ -408,6 +416,14 @@ class AFQ(object):
                                     scope=dmriprep,
                                     **bids_filters)[0])
 
+                if custom_tractography_bids_filters is not None:
+                    custom_tract_list.append(
+                        bids_layout.get(subject=subject, session=session,
+                                        extension='.trk',
+                                        return_type='filename',
+                                        scope=dmriprep,
+                                        **custom_tractography_bids_filters)[0])
+
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
@@ -436,6 +452,7 @@ class AFQ(object):
                                             dwi_file=dwi_file_list,
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
+                                            custom_tract=custom_tract_list,
                                             ses=ses_list,
                                             timing=timing_list,
                                             results_dir=results_dir_list))
@@ -818,6 +835,9 @@ class AFQ(object):
         return mapping_file
 
     def _streamlines(self, row):
+        if self.custom_tractography_bids_filters is not None:
+            return row["custom_tract"]
+
         odf_model = self.tracking_params["odf_model"]
 
         streamlines_file = self._get_fname(
