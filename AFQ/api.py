@@ -419,7 +419,12 @@ class AFQ(object):
                 if custom_tractography_bids_filters is not None:
                     custom_tract_list.append(
                         bids_layout.get(subject=subject, session=session,
-                                        extension='.trk',
+                                        extension=[
+                                            '.trk',
+                                            '.tck',
+                                            '.vtk',
+                                            '.fib',
+                                            '.dpy'],
                                         return_type='filename',
                                         scope=dmriprep,
                                         **custom_tractography_bids_filters)[0])
