@@ -138,6 +138,45 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
+def test_AFQ_custom_tract():
+    """
+    Test whether AFQ can use tractography from
+    custom_tractography_bids_filters 
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    afd.fetch_stanford_hardi_tractography()
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
+
+    # move subsampled tractography into bids folder
+    os.rename(
+        op.join(
+            op.expanduser('~'),
+            'AFQ_data',
+            'stanford_hardi_tractography',
+            'tractography_subsampled.trk'),
+        op.join(
+            tmpdir.name,
+            'stanford_hardi',
+            'derivatives',
+            'vistasoft',
+            'sub-01',
+            'ses-01',
+            'subsampled_tractography.trk'
+            )
+    )
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep='vistasoft',
+        bundle_names=bundle_names,
+        custom_tractography_bids_filters={
+            "suffix": "tractography"
+        })
+    my_afq.export_rois()
+
+
 @pytest.mark.nightly2
 def test_AFQ_init():
     """
