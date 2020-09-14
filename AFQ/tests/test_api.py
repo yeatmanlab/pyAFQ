@@ -138,10 +138,11 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
+@pytest.mark.nightly3
 def test_AFQ_custom_tract():
     """
     Test whether AFQ can use tractography from
-    custom_tractography_bids_filters 
+    custom_tractography_bids_filters
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_stanford_data(path=tmpdir.name)
