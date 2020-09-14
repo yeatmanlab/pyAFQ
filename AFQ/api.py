@@ -426,7 +426,6 @@ class AFQ(object):
                                             '.fib',
                                             '.dpy'],
                                         return_type='filename',
-                                        scope=dmriprep,
                                         **custom_tractography_bids_filters)[0])
                 else:
                     custom_tract_list.append(None)

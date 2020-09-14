@@ -173,7 +173,8 @@ def test_AFQ_custom_tract():
         dmriprep='vistasoft',
         bundle_names=bundle_names,
         custom_tractography_bids_filters={
-            "suffix": "tractography"
+            "suffix": "tractography",
+            "scope": "vistasoft"
         })
     my_afq.export_rois()
 
