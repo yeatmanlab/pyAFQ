@@ -50,6 +50,9 @@ def do_preprocessing():
 
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
+RECO_BUNDLES = [
+    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid', 'AF',
+    'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
@@ -153,7 +156,7 @@ class AFQ(object):
                  reg_template="mni_T1",
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
-                 bundle_names=BUNDLES,
+                 bundle_names=None,
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
@@ -222,7 +225,9 @@ class AFQ(object):
             Default: B0Mask()
         bundle_names : list of strings, optional
             [BUNDLES] List of bundle names to include in segmentation.
-            Default: BUNDLES
+            If None, will get all appropriate bundles for the chosen
+            segmentation algorithm.
+            Default: None
         dask_it : bool, optional
             [COMPUTE] Whether to use a dask DataFrame object.
             Default: False
@@ -328,6 +333,12 @@ class AFQ(object):
                 default_clean_params[k] = clean_params[k]
 
         self.clean_params = default_clean_params
+
+        if bundle_names is None:
+            if self.seg_algo == "reco":
+                bundle_names = RECO_BUNDLES
+            else:
+                bundle_names = BUNDLES
 
         # Create the bundle dict after reg_template has been resolved:
         self.reg_template_img, _ = self._reg_img(self.reg_template)
@@ -1577,6 +1588,7 @@ class AFQ(object):
     def set_clean_bundles(self):
         if 'clean_bundles_file' not in self.data_frame.columns:
             if self.seg_algo == "reco":
+                self.set_bundles()
                 self.data_frame['clean_bundles_file'] =\
                     self.data_frame['bundles_file']
             else:
