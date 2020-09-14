@@ -11,6 +11,7 @@ from palettable.tableau import Tableau_20
 import imageio as io
 import IPython.display as display
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -27,6 +28,7 @@ __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
+sns.set_theme()
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_rgb[0], "C_L": tableau_20_rgb[0],
@@ -430,7 +432,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         fa = tract_profiles[
             (tract_profiles["bundle"] == bundle)
         ][scalar].values
-        ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
+        sns.lineplot(y=fa, color=COLOR_DICT[bundle], ax=ax)
 
         if ylim is not None:
             ax.set_ylim(ylim)
@@ -719,7 +721,7 @@ class LongitudinalCSVComparison():
                 for name in names:
                     profile = self._get_profile(name, bundle, subject, scalar)
                     if profile is not None:
-                        ax.plot(profile)
+                        sns.lineplot(y=profile, ax=ax)
                 ax.set_title(bundle)
                 ax.set_ylim([min_scalar, max_scalar])
                 y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
@@ -789,7 +791,7 @@ class LongitudinalCSVComparison():
                     this_contrast_index = \
                         calc_contrast_index(profiles[0], profiles[1])
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                    ax.plot(this_contrast_index, label=scalar)
+                    sns.lineplot(y=this_contrast_index, label=scalar, ax=ax)
                     ax.set_title(bundle)
                     ax.set_ylim([-1, 1])
                     ax.set_xticklabels([])
@@ -858,7 +860,8 @@ class LongitudinalCSVComparison():
                         lateral_contrast_index = \
                             calc_contrast_index(profile, other_profile)
                         ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                        ax.plot(lateral_contrast_index, label=name)
+                        sns.lineplot(y=lateral_contrast_index,
+                                     label=name, ax=ax)
                         ax.set_title(f"{bundle} vs {other_bundle}")
                         ax.set_ylim([-1, 1])
                         ax.set_xticklabels([])
@@ -956,7 +959,12 @@ class LongitudinalCSVComparison():
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
-                ax.hist(bundle_coefs, bins, alpha=0.5, label=scalar)
+                sns.histplot(
+                    y=bundle_coefs,
+                    bins=bins,
+                    alpha=0.5,
+                    label=scalar,
+                    ax=ax)
             ax.set_title(bundle)
 
         fig.legend(scalars, loc='center')
@@ -979,7 +987,7 @@ class LongitudinalCSVComparison():
         for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
-                ax.plot(all_node_coef[m, k], label=scalar)
+                sns.lineplot(y=all_node_coef[m, k], label=scalar)
             ax.set_title(bundle)
             ax.set_ylim([mini, maxi])
             ax.set_xticklabels([])
@@ -1000,8 +1008,10 @@ class LongitudinalCSVComparison():
                     f" {names[0]}_vs_{names[1]}_{scalar}"))
             for k, bundle in enumerate(self.bundles):
                 ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                ax.scatter(
-                    this_sub_means[k, 0], this_sub_means[k, 1])
+                sns.scatterplot(
+                    x=this_sub_means[k, 0],
+                    y=this_sub_means[k, 1],
+                    ax=ax)
                 ax.set_title(bundle)
                 ax.set_xlabel(names[0])
                 ax.set_ylabel(names[1])
@@ -1029,17 +1039,19 @@ class LongitudinalCSVComparison():
             maxi = ylims[1]
             mini = ylims[0]
         for m, scalar in enumerate(scalars):
-            axes[0].bar(
-                x + x_shift[m],
-                bundle_prof_means[m],
-                width,
+            sns.barplot(
+                x=x + x_shift[m],
+                y=bundle_prof_means[m],
+                width=width,
                 label=scalar,
-                yerr=bundle_prof_stds[m])
-            axes[1].bar(
-                x + x_shift[m],
-                all_sub_coef[m],
-                width,
-                label=scalar
+                yerr=bundle_prof_stds[m],
+                ax=axes[0])
+            sns.barplot(
+                x=x + x_shift[m],
+                y=all_sub_coef[m],
+                width=width,
+                label=scalar,
+                ax=axes[1]
             )
 
         axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
