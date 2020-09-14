@@ -46,15 +46,21 @@
                             <span class="n">ProbabilisticDirectionGetter</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
-<span class="kn">from</span> <span class="nn">dipy.tracking.stopping_criterion</span> <span class="kn">import</span> <span class="n">ThresholdStoppingCriterion</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.stopping_criterion</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ThresholdStoppingCriterion</span><span class="p">,</span>
+                                              <span class="n">CmcStoppingCriterion</span><span class="p">,</span>
+                                              <span class="n">ActStoppingCriterion</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="n">VerboseLocalTracking</span><span class="p">,</span> <span class="n">tensor_odf</span>
 
+<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="p">(</span><span class="n">VerboseLocalTracking</span><span class="p">,</span> <span class="n">VerboseParticleFilteringTracking</span><span class="p">,</span>
+                        <span class="n">tensor_odf</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 
 <div class="viewcode-block" id="track"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography.track">[docs]</a><span class="k">def</span> <span class="nf">track</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;det&quot;</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="mf">30.</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">seed_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_seeds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
           <span class="n">rng_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-          <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;DTI&quot;</span><span class="p">):</span>
+          <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;DTI&quot;</span><span class="p">,</span>
+          <span class="n">tracker</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tractography</span>
 
@@ -65,7 +71,7 @@
 <span class="sd">        coefficients, or nibabel img with model params.</span>
 <span class="sd">    directions : str</span>
 <span class="sd">        How tracking directions are determined.</span>
-<span class="sd">        One of: {&quot;deterministic&quot; | &quot;probablistic&quot;}</span>
+<span class="sd">        One of: {&quot;det&quot; | &quot;prob&quot;}</span>
 <span class="sd">    max_angle : float, optional.</span>
 <span class="sd">        The maximum turning angle in each step. Default: 30</span>
 <span class="sd">    sphere : Sphere object, optional.</span>
@@ -86,17 +92,26 @@
 <span class="sd">        to generate within the mask.</span>
 <span class="sd">    random_seeds : bool</span>
 <span class="sd">        Whether to generate a total of n_seeds random seeds in the mask.</span>
-<span class="sd">        Default: XXX.</span>
+<span class="sd">        Default: False.</span>
 <span class="sd">    rng_seed : int</span>
 <span class="sd">        random seed used to generate random seeds if random_seeds is</span>
 <span class="sd">        set to True. Default: None</span>
-<span class="sd">    stop_mask : array, optional.</span>
-<span class="sd">        A float or binary mask that determines a stopping criterion (e.g. FA).</span>
-<span class="sd">        Default to no stopping (all ones).</span>
-<span class="sd">    stop_threshold : float, optional.</span>
-<span class="sd">        A value of the stop_mask below which tracking is terminated. Default to</span>
+<span class="sd">    stop_mask : array or str, optional.</span>
+<span class="sd">        If array: A float or binary mask that determines a stopping criterion</span>
+<span class="sd">        (e.g. FA).</span>
+<span class="sd">        If str: &quot;CMC&quot; for Continuous Map Criterion [Girard2014]_.</span>
+<span class="sd">                &quot;ACT&quot; for Anatomically-constrained tractography [Smith2012]_.</span>
+<span class="sd">        Defaults to no stopping (all ones). A string is required if</span>
+<span class="sd">        the tracker is set to &quot;pft&quot;.</span>
+<span class="sd">    stop_threshold : float or tuple, optional.</span>
+<span class="sd">        If float, this a value of the stop_mask below which tracking is</span>
+<span class="sd">        terminated (and stop_mask has to be an array). Defaults to</span>
 <span class="sd">        0 (this means that if no stop_mask is passed, we will stop only at</span>
-<span class="sd">        the edge of the image)</span>
+<span class="sd">        the edge of the image). If this is a tuple, it contains a sequence</span>
+<span class="sd">        that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of</span>
+<span class="sd">        which is either a string (full path) or a nibabel img to be used</span>
+<span class="sd">        in particle filtering tractography. A tuple is required if tracker</span>
+<span class="sd">        is set to &quot;pft&quot;.</span>
 <span class="sd">    step_size : float, optional.</span>
 <span class="sd">        The size (in mm) of a step of tractography. Default: 1.0</span>
 <span class="sd">    min_length: int, optional</span>
@@ -104,10 +119,21 @@
 <span class="sd">    max_length: int, optional</span>
 <span class="sd">        The miminal length (mm) in a streamline. Default: 250</span>
 <span class="sd">    odf_model : str, optional</span>
-<span class="sd">        One of {&quot;DTI&quot;, &quot;CSD&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="sd">        One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="sd">    tracker : str, optional</span>
+<span class="sd">        Which strategy to use in tracking. This can be the standard local</span>
+<span class="sd">        tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
+<span class="sd">        One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list of streamlines ()</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [Girard2014] Girard, G., Whittingstall, K., Deriche, R., &amp;</span>
+<span class="sd">        Descoteaux, M. Towards quantitative connectivity analysis: reducing</span>
+<span class="sd">        tractography biases. NeuroImage, 98, 266-278, 2014.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.tractography&#39;</span><span class="p">)</span>
 
@@ -119,6 +145,8 @@
 
     <span class="n">model_params</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">affine</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span>
+    <span class="n">odf_model</span> <span class="o">=</span> <span class="n">odf_model</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">directions</span> <span class="o">=</span> <span class="n">directions</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating Seeds...&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_seeds</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -155,39 +183,93 @@
     <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;CSD&quot;</span><span class="p">:</span>
         <span class="n">dg</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">from_shcoeff</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="n">max_angle</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">stop_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">tracker</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stop_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">stop_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
-        <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
-                                                        <span class="mf">0.5</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
-                                                        <span class="n">stop_threshold</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                            <span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                            <span class="n">stop_threshold</span><span class="p">)</span>
+
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseLocalTracking</span>
+
+    <span class="k">elif</span> <span class="n">tracker</span> <span class="o">==</span> <span class="s2">&quot;pft&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;You are using PFT tracking, but did not provide a string &quot;</span><span class="p">,</span>
+                <span class="s2">&quot;&#39;stop_mask&#39; input. &quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Possible inputs are: &#39;CMC&#39; or &#39;ACT&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_threshold</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;You are using PFT tracking, but did not provide a tuple for&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;`stop_threshold`&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;input. Expected a (pve_wm, pve_gm, pve_csf) tuple.&quot;</span><span class="p">)</span>
+        <span class="n">pves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pve_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vox_sizes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">pve</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stop_threshold</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pve</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">pve</span>
+            <span class="n">pve_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+            <span class="n">pves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pve_imgs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
+        <span class="n">average_voxel_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vox_sizes</span><span class="p">)</span>
+        <span class="n">pve_wm_img</span><span class="p">,</span> <span class="n">pve_gm_img</span><span class="p">,</span> <span class="n">pve_csf_img</span> <span class="o">=</span> <span class="n">pve_imgs</span>
+        <span class="n">pve_wm_data</span><span class="p">,</span> <span class="n">pve_gm_data</span><span class="p">,</span> <span class="n">pve_csf_data</span> <span class="o">=</span> <span class="n">pves</span>
+        <span class="n">pve_wm_data</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">pve_wm_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">pve_wm_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                   <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+        <span class="n">pve_gm_data</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">pve_gm_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">pve_gm_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                   <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+        <span class="n">pve_csf_data</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">pve_csf_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">pve_csf_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                    <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+        <span class="n">vox_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get_zooms</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]))</span>
+
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseParticleFilteringTracking</span>
+        <span class="k">if</span> <span class="n">stop_mask</span> <span class="o">==</span> <span class="s2">&quot;CMC&quot;</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CmcStoppingCriterion</span><span class="o">.</span><span class="n">from_pve</span><span class="p">(</span>
+                <span class="n">pve_wm_data</span><span class="p">,</span>
+                <span class="n">pve_gm_data</span><span class="p">,</span>
+                <span class="n">pve_csf_data</span><span class="p">,</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
+                <span class="n">average_voxel_size</span><span class="o">=</span><span class="n">average_voxel_size</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stop_mask</span> <span class="o">==</span> <span class="s2">&quot;ACT&quot;</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ActStoppingCriterion</span><span class="o">.</span><span class="n">from_pve</span><span class="p">(</span>
+                <span class="n">pve_wm_data</span><span class="p">,</span>
+                <span class="n">pve_gm_data</span><span class="p">,</span>
+                <span class="n">pve_csf_data</span><span class="p">)</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
-                           <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-                           <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_tracking</span><span class="p">(</span><span class="n">my_tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+                     <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
+                     <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="_local_tracking"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography._local_tracking">[docs]</a><span class="k">def</span> <span class="nf">_local_tracking</span><span class="p">(</span><span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
-                    <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                    <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_tracking"><a class="viewcode-back" href="../../autoapi/AFQ/tractography/index.html#AFQ.tractography._tracking">[docs]</a><span class="k">def</span> <span class="nf">_tracking</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+              <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+              <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">seeds</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-    <span class="n">tracker</span> <span class="o">=</span> <span class="n">VerboseLocalTracking</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span>
-                                   <span class="n">stopping_criterion</span><span class="p">,</span>
-                                   <span class="n">seeds</span><span class="p">,</span>
-                                   <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                   <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
-                                   <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-                                   <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
-                                   <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
+
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">tracker</span><span class="p">(</span>
+        <span class="n">dg</span><span class="p">,</span>
+        <span class="n">stopping_criterion</span><span class="p">,</span>
+        <span class="n">seeds</span><span class="p">,</span>
+        <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span></div>
 </pre></div>

@@ -1,0 +1,367 @@
+:mod:`AFQ.mask`
+===============
+
+.. py:module:: AFQ.mask
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.mask.MaskFile
+   AFQ.mask.FullMask
+   AFQ.mask.RoiMask
+   AFQ.mask.B0Mask
+   AFQ.mask.LabelledMaskFile
+   AFQ.mask.ThresholdedMaskFile
+   AFQ.mask.ScalarMask
+   AFQ.mask.ThresholdedScalarMask
+   AFQ.mask.CombinedMask
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.mask.check_mask_methods
+
+
+.. function:: check_mask_methods(mask, mask_name=False)
+
+   Helper function
+   Checks if mask is a valid mask.
+   If mask_name is not False, will throw an error stating the method
+   not found and the mask name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: MaskFile(suffix, filters={})
+
+   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_path_data_affine(self, afq_object, row)
+
+
+   .. method:: apply_conditions(self, mask_data_orig, mask_file)
+
+
+   .. method:: get_mask(self, afq_object, row)
+
+
+
+.. py:class:: FullMask
+
+   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Define a mask which covers a full volume.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_mask = FullMask()
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_mask(self, afq_object, row)
+
+
+
+.. py:class:: RoiMask
+
+   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Define a mask which is all ROIs or'd together.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   seed_mask = RoiMask()
+   api.AFQ(tracking_params={"seed_mask": seed_mask})
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_mask(self, afq_object, row)
+
+
+
+.. py:class:: B0Mask(median_otsu_kwargs={})
+
+   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Define a mask using b0 and dipy's median_otsu.
+
+
+   :Parameters:
+
+       **median_otsu_kwargs: dict, optional**
+           Optional arguments to pass into dipy's median_otsu.
+           Default: {}
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_mask = B0Mask()
+   api.AFQ(brain_mask=brain_mask)
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_mask(self, afq_object, row)
+
+
+
+.. py:class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
+
+   Bases: :class:`AFQ.mask.MaskFile`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: apply_conditions(self, mask_data_orig, mask_file)
+
+
+
+.. py:class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
+
+   Bases: :class:`AFQ.mask.MaskFile`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: apply_conditions(self, mask_data_orig, mask_file)
+
+
+
+.. py:class:: ScalarMask(scalar)
+
+   Bases: :class:`AFQ.mask.MaskFile`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_path_data_affine(self, afq_object, row)
+
+
+
+.. py:class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
+
+   Bases: :class:`AFQ.mask.ThresholdedMaskFile`, :class:`AFQ.mask.ScalarMask`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: CombinedMask(mask_list, combine='and')
+
+   Bases: :class:`AFQ.mask.StrInstantiatesMixin`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Helper class
+   Uses __init__ in str_for_toml to make string that will instantiate itself.
+   Assumes object will have attributes of same name as __init__ args.
+   This is important for reading/writing masks as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, subject, session)
+
+
+   .. method:: get_mask(self, afq_object, row)
+
+
+

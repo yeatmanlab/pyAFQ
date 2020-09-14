@@ -49,7 +49,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.Axes" title="AFQ.viz.plotly_backend.Axes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.Axes" title="AFQ.viz.plotly_backend.Axes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></p></td>
 <td><p>Enum where members are also (and must be) ints</p></td>
 </tr>
 </tbody>
@@ -78,7 +78,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_streamlines" title="AFQ.viz.plotly_backend._draw_streamlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_streamlines</span></code></a>(figure, sls, color, name, cbv=None)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_bundles" title="AFQ.viz.plotly_backend.visualize_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_bundles</span></code></a>(sft, affine=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, figure=None, background=(1, 1, 1), interact=False, inline=False)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_bundles" title="AFQ.viz.plotly_backend.visualize_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_bundles</span></code></a>(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, figure=None, background=(1, 1, 1), interact=False, inline=False)</p></td>
 <td><p>Visualize bundles in 3D</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.create_gif" title="AFQ.viz.plotly_backend.create_gif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_gif</span></code></a>(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, size=(600, 600))</p></td>
@@ -137,7 +137,7 @@
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.visualize_bundles">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">visualize_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sft</span></em>, <em class="sig-param"><span class="n">affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">figure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">background</span><span class="o">=</span><span class="default_value">1, 1, 1</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">visualize_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sft</span></em>, <em class="sig-param"><span class="n">affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">figure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">background</span><span class="o">=</span><span class="default_value">1, 1, 1</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_bundles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize bundles in 3D</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -147,6 +147,9 @@ or a path to a trk file</p>
 </dd>
 <dt><strong>affine</strong><span class="classifier">ndarray, optional</span></dt><dd><p>An affine transformation to apply to the streamlines before
 visualization. Default: no transform.</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int or None</span></dt><dd><p>n_points to resample streamlines to before plotting. If None, no
+resampling is done.</p>
 </dd>
 <dt><strong>bundle_dict</strong><span class="classifier">dict, optional</span></dt><dd><p>Keys are names of bundles and values are dicts that should include
 a key <cite>‘uid’</cite> with values as integers for selection from the sft

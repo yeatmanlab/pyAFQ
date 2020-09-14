@@ -16,7 +16,7 @@ Functions
    AFQ.utils.volume.patch_up_roi
 
 
-.. function:: patch_up_roi(roi)
+.. function:: patch_up_roi(roi, bundle_name='ROI')
 
    After being non-linearly transformed, ROIs tend to have holes in them.
    We perform a couple of computational geometry operations on the ROI to
@@ -33,6 +33,10 @@ Functions
 
        **truncate** : float
            The truncation for the Gaussian
+
+       **bundle_name** : str, optional
+           Name of bundle, which may be useful for error messages.
+           Default: None
 
    :Returns:
 

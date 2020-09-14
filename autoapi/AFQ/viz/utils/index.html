@@ -49,7 +49,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.Viz" title="AFQ.viz.utils.Viz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Viz</span></code></a>(backend=’fury’)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.Viz" title="AFQ.viz.utils.Viz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Viz</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -63,7 +63,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_tract_profiles" title="AFQ.viz.utils.visualize_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_tract_profiles</span></code></a>(tract_profiles, scalar=’dti_fa’, min_fa=0.0, max_fa=1.0, file_name=None, positions=POSITIONS)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_tract_profiles" title="AFQ.viz.utils.visualize_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_tract_profiles</span></code></a>(tract_profiles, scalar=’dti_fa’, ylim=None, file_name=None, use_fa_ticks=None, positions=POSITIONS)</p></td>
 <td><p>Visualize all tract profiles for a scalar in one plot</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_gif_inline" title="AFQ.viz.utils.visualize_gif_inline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_gif_inline</span></code></a>(fname, use_s3fs=False)</p></td>
@@ -78,7 +78,7 @@
 
 <dl class="py function">
 <dt id="AFQ.viz.utils.visualize_tract_profiles">
-<code class="sig-prename descclassname">AFQ.viz.utils.</code><code class="sig-name descname">visualize_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tract_profiles</span></em>, <em class="sig-param"><span class="n">scalar</span><span class="o">=</span><span class="default_value">'dti_fa'</span></em>, <em class="sig-param"><span class="n">min_fa</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">max_fa</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">file_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">positions</span><span class="o">=</span><span class="default_value">POSITIONS</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.utils.</code><code class="sig-name descname">visualize_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tract_profiles</span></em>, <em class="sig-param"><span class="n">scalar</span><span class="o">=</span><span class="default_value">'dti_fa'</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_fa_ticks</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">positions</span><span class="o">=</span><span class="default_value">POSITIONS</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize all tract profiles for a scalar in one plot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -88,11 +88,17 @@ tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])</p>
 </dd>
 <dt><strong>scalar</strong><span class="classifier">string, optional</span></dt><dd><p>Scalar to use in plots. Default: “dti_fa”.</p>
 </dd>
-<dt><strong>min_fa</strong><span class="classifier">float, optional</span></dt><dd><p>Minimum FA used for y-axis bounds. Default: 0.0</p>
-</dd>
-<dt><strong>max_fa</strong><span class="classifier">float, optional</span></dt><dd><p>Maximum FA used for y-axis bounds. Default: 1.0</p>
+<dt><strong>ylim</strong><span class="classifier">list of 2 floats, optional</span></dt><dd><p>Minimum and maximum value used for y-axis bounds.
+If None, ylim is not set.
+Default: None</p>
 </dd>
 <dt><strong>file_name</strong><span class="classifier">string, optional</span></dt><dd><p>File name to save figure to if not None. Default: None</p>
+</dd>
+<dt><strong>use_fa_ticks</strong><span class="classifier">bool, optional</span></dt><dd><p>Set min and max y limit to 0 and 1, and only use yticks at
+0.2, 0.4, 0.6 . Useful for plotting FA.
+If None, set to evaluation of (“fa” in scalar).
+If ultimately True, takes precedence over ylim.
+Default: None</p>
 </dd>
 <dt><strong>positions</strong><span class="classifier">dictionary, optional</span></dt><dd><p>Dictionary that maps bundle names to position in plot.
 Default: POSITIONS</p>

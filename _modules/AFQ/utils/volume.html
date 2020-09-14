@@ -36,13 +36,16 @@
           <div class="body" role="main">
             
   <h1>Source code for AFQ.utils.volume</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">ndim</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">ndim</span>
 <span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">gaussian</span>
 <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">convex_hull_image</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.qhull</span> <span class="kn">import</span> <span class="n">QhullError</span>
 
 
-<div class="viewcode-block" id="patch_up_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">[docs]</a><span class="k">def</span> <span class="nf">patch_up_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">):</span>
+<div class="viewcode-block" id="patch_up_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">[docs]</a><span class="k">def</span> <span class="nf">patch_up_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="s2">&quot;ROI&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    After being non-linearly transformed, ROIs tend to have holes in them.</span>
 <span class="sd">    We perform a couple of computational geometry operations on the ROI to</span>
@@ -59,12 +62,20 @@
 <span class="sd">    truncate : float</span>
 <span class="sd">        The truncation for the Gaussian</span>
 
+<span class="sd">    bundle_name : str, optional</span>
+<span class="sd">        Name of bundle, which may be useful for error messages.</span>
+<span class="sd">        Default: None</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ROI after dilation and hole-filling</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">hole_filled</span> <span class="o">=</span> <span class="n">ndim</span><span class="o">.</span><span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">hole_filled</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2"> found to be empty after &quot;</span>
+            <span class="s2">&quot;applying the mapping.&quot;</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">convex_hull_image</span><span class="p">(</span><span class="n">hole_filled</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">QhullError</span><span class="p">:</span>

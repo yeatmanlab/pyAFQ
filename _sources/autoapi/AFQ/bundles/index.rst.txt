@@ -20,7 +20,6 @@ Classes
 
    .. method:: add_bundle(self, bundle_name, streamlines, idx=None)
 
-
       Add a bundle to bundles.
 
 
@@ -54,7 +53,6 @@ Classes
 
 
    .. method:: clean_bundles(self, **kwargs)
-
 
       Clean each segmented bundle based on the Mahalnobis distance of
       each streamline
@@ -98,9 +96,7 @@ Classes
    .. method:: _apply_affine_sft(self, sft, affine, reference, origin)
 
 
-
    .. method:: apply_affine(self, affine, reference, origin=Origin.NIFTI)
-
 
       Apply a linear transformation, given by affine, to all
       streamlines.
@@ -138,7 +134,6 @@ Classes
 
    .. method:: to_space(self, space)
 
-
       Transform streamlines to space.
 
 
@@ -165,7 +160,6 @@ Classes
 
 
    .. method:: save_bundles(self, file_path='./', file_suffix='.trk', space=None, bbox_valid_check=False)
-
 
       Save tractograms in bundles.
 
@@ -207,7 +201,6 @@ Classes
 
 
    .. method:: load_bundles(self, bundle_names, file_path='./', file_suffix='.trk', affine=np.eye(4), bbox_valid_check=False)
-
 
       load tractograms from file.
 
@@ -251,7 +244,6 @@ Classes
 
 
    .. method:: tract_profiles(self, data, subject_label, affine=np.eye(4), method='afq', metric='FA', n_points=100, weight=True)
-
 
       Calculate a summarized profile of data for each bundle along
       its length.

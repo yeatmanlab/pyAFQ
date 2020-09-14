@@ -28,7 +28,7 @@ Functions
 .. py:class:: Viz(backend='fury')
 
 
-.. function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', min_fa=0.0, max_fa=1.0, file_name=None, positions=POSITIONS)
+.. function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', ylim=None, file_name=None, use_fa_ticks=None, positions=POSITIONS)
 
    Visualize all tract profiles for a scalar in one plot
 
@@ -42,14 +42,20 @@ Functions
        **scalar** : string, optional
            Scalar to use in plots. Default: "dti_fa".
 
-       **min_fa** : float, optional
-           Minimum FA used for y-axis bounds. Default: 0.0
-
-       **max_fa** : float, optional
-           Maximum FA used for y-axis bounds. Default: 1.0
+       **ylim** : list of 2 floats, optional
+           Minimum and maximum value used for y-axis bounds.
+           If None, ylim is not set.
+           Default: None
 
        **file_name** : string, optional
            File name to save figure to if not None. Default: None
+
+       **use_fa_ticks** : bool, optional
+           Set min and max y limit to 0 and 1, and only use yticks at
+           0.2, 0.4, 0.6 . Useful for plotting FA.
+           If None, set to evaluation of ("fa" in scalar).
+           If ultimately True, takes precedence over ylim.
+           Default: None
 
        **positions** : dictionary, optional
            Dictionary that maps bundle names to position in plot.

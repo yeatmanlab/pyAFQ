@@ -55,7 +55,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(bids_path, dmriprep='dmriprep', segmentation='dmriprep', seg_suffix='seg', b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', mask_template=True, bundle_names=BUNDLES, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], wm_criterion={'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}, use_prealign=True, virtual_frame_buffer=False, viz_backend='fury', tracking_params=None, segmentation_params=None, clean_params=None)
+.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_names=BUNDLES, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='fury', tracking_params=None, segmentation_params=None, clean_params=None)
 
    Bases: :class:`object`
 
@@ -88,11 +88,6 @@ Functions
       
 
    .. attribute:: brain_mask
-      
-
-      
-
-   .. attribute:: wm_mask
       
 
       
@@ -170,347 +165,278 @@ Functions
    .. method:: log_and_save_nii(self, img, fname)
 
 
-
    .. method:: log_and_save_trk(self, sft, fname)
-
 
 
    .. method:: _get_data_gtab(self, row, filter_b=True)
 
 
-
    .. method:: _b0(self, row)
-
 
 
    .. method:: _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False, vol_idx=None, dilate=10)
 
 
-
    .. method:: _dti_fit(self, row)
-
 
 
    .. method:: _dti(self, row)
 
 
-
    .. method:: _dki_fit(self, row)
-
 
 
    .. method:: _dki(self, row)
 
 
-
    .. method:: _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1)
-
 
 
    .. method:: _anisotropic_power_map(self, row)
 
 
-
    .. method:: _dti_fa(self, row)
-
 
 
    .. method:: _dti_cfa(self, row)
 
 
-
    .. method:: _dti_pdd(self, row)
-
 
 
    .. method:: _dti_md(self, row)
 
 
-
    .. method:: _dki_fa(self, row)
-
 
 
    .. method:: _dki_md(self, row)
 
 
+   .. method:: _get_best_scalar(self)
+
 
    .. method:: _reg_img(self, img, row=None)
-
 
 
    .. method:: _reg_prealign(self, row)
 
 
-
    .. method:: _export_registered_b0(self, row)
-
 
 
    .. method:: _mapping(self, row)
 
 
-
-   .. method:: _mask_from_seg(self, row, image_labels, not_equal=False)
-
-
-
-   .. method:: _wm_mask(self, row)
-
-
-
-   .. method:: _get_mask(self, row, mask)
-
-
-
    .. method:: _streamlines(self, row)
-
 
 
    .. method:: _segment(self, row)
 
 
-
    .. method:: _clean_bundles(self, row)
-
 
 
    .. method:: _tract_profiles(self, row)
 
 
-
    .. method:: _template_xform(self, row)
-
 
 
    .. method:: _export_rois(self, row)
 
 
-
    .. method:: _export_bundles(self, row)
-
 
 
    .. method:: _viz_prepare_vols(self, row, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
 
 
-
-   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
-
+   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None)
 
 
-   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
-
+   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None)
 
 
    .. method:: _plot_tract_profiles(self, row)
 
 
+   .. method:: _export_timing(self, row)
+
 
    .. method:: _get_affine(self, fname)
-
 
 
    .. method:: _get_fname(self, row, suffix, include_track=False, include_seg=False)
 
 
-
    .. method:: set_gtab(self, b0_threshold)
-
 
 
    .. method:: get_gtab(self)
 
 
-
    .. method:: set_dwi_affine(self)
-
 
 
    .. method:: get_dwi_affine(self)
 
 
-
    .. method:: set_dwi_img(self)
-
 
 
    .. method:: get_dwi_img(self)
 
 
-
    .. method:: __getitem__(self, k)
-
 
 
    .. method:: set_b0(self)
 
 
-
    .. method:: get_b0(self)
-
 
 
    .. method:: set_brain_mask(self)
 
 
-
    .. method:: get_brain_mask(self)
-
-
-
-   .. method:: set_wm_mask(self)
-
-
-
-   .. method:: get_wm_mask(self)
-
 
 
    .. method:: set_dti(self)
 
 
-
    .. method:: get_dti(self)
-
 
 
    .. method:: set_dti_fa(self)
 
 
-
    .. method:: get_dti_fa(self)
-
 
 
    .. method:: set_dti_cfa(self)
 
 
-
    .. method:: get_dti_cfa(self)
-
 
 
    .. method:: set_dti_pdd(self)
 
 
-
    .. method:: get_dti_pdd(self)
-
 
 
    .. method:: set_dti_md(self)
 
 
-
    .. method:: get_dti_md(self)
-
 
 
    .. method:: set_dki(self)
 
 
-
    .. method:: get_dki(self)
-
 
 
    .. method:: set_dki_fa(self)
 
 
-
    .. method:: get_dki_fa(self)
-
 
 
    .. method:: set_dki_md(self)
 
 
-
    .. method:: get_dki_md(self)
-
 
 
    .. method:: set_mapping(self)
 
 
-
    .. method:: get_mapping(self)
-
 
 
    .. method:: set_streamlines(self)
 
 
-
    .. method:: get_streamlines(self)
-
 
 
    .. method:: set_bundles(self)
 
 
-
    .. method:: get_bundles(self)
-
 
 
    .. method:: set_clean_bundles(self)
 
 
-
    .. method:: get_clean_bundles(self)
-
 
 
    .. method:: set_tract_profiles(self)
 
 
-
    .. method:: get_tract_profiles(self)
-
 
 
    .. method:: set_template_xform(self)
 
 
-
    .. method:: get_template_xform(self)
-
 
 
    .. method:: export_rois(self)
 
 
-
    .. method:: export_bundles(self)
 
 
-
-   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, inline=False, interactive=False)
-
+   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None, inline=False, interactive=False)
 
 
-   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, inline=False, interactive=False)
-
+   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None, inline=False, interactive=False)
 
 
    .. method:: plot_tract_profiles(self)
 
 
-
    .. method:: export_registered_b0(self)
-
 
 
    .. method:: combine_profiles(self)
 
 
+   .. method:: export_timing(self)
+
 
    .. method:: export_all(self)
 
-
       Exports all the possible outputs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: upload_to_s3(self, s3fs, remote_path)
+
+      Upload entire AFQ derivatives folder to S3
 
 
 

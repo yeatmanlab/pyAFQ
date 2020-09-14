@@ -49,14 +49,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.volume.patch_up_roi" title="AFQ.utils.volume.patch_up_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_up_roi</span></code></a>(roi)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.volume.patch_up_roi" title="AFQ.utils.volume.patch_up_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_up_roi</span></code></a>(roi, bundle_name=’ROI’)</p></td>
 <td><p>After being non-linearly transformed, ROIs tend to have holes in them.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="AFQ.utils.volume.patch_up_roi">
-<code class="sig-prename descclassname">AFQ.utils.volume.</code><code class="sig-name descname">patch_up_roi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">roi</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/volume.html#patch_up_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.volume.patch_up_roi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.volume.</code><code class="sig-name descname">patch_up_roi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">roi</span></em>, <em class="sig-param"><span class="n">bundle_name</span><span class="o">=</span><span class="default_value">'ROI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/volume.html#patch_up_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.volume.patch_up_roi" title="Permalink to this definition">¶</a></dt>
 <dd><p>After being non-linearly transformed, ROIs tend to have holes in them.
 We perform a couple of computational geometry operations on the ROI to
 fix that up.</p>
@@ -68,6 +68,9 @@ fix that up.</p>
 <dt><strong>sigma</strong><span class="classifier">float</span></dt><dd><p>The sigma for initial Gaussian smoothing.</p>
 </dd>
 <dt><strong>truncate</strong><span class="classifier">float</span></dt><dd><p>The truncation for the Gaussian</p>
+</dd>
+<dt><strong>bundle_name</strong><span class="classifier">str, optional</span></dt><dd><p>Name of bundle, which may be useful for error messages.
+Default: None</p>
 </dd>
 </dl>
 </dd>

@@ -42,6 +42,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
@@ -72,6 +73,8 @@
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">Viz</span><span class="p">,</span> <span class="n">visualize_tract_profiles</span>
 <span class="kn">from</span> <span class="nn">AFQ.utils.bin</span> <span class="kn">import</span> <span class="n">get_default_args</span>
+<span class="kn">from</span> <span class="nn">AFQ.mask</span> <span class="kn">import</span> <span class="n">B0Mask</span><span class="p">,</span> <span class="n">CombinedMask</span><span class="p">,</span> \
+    <span class="n">ThresholdedScalarMask</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">,</span> <span class="n">FullMask</span><span class="p">,</span> <span class="n">check_mask_methods</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
@@ -180,21 +183,18 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">bids_path</span><span class="p">,</span>
-                 <span class="n">dmriprep</span><span class="o">=</span><span class="s1">&#39;dmriprep&#39;</span><span class="p">,</span>
-                 <span class="n">segmentation</span><span class="o">=</span><span class="s1">&#39;dmriprep&#39;</span><span class="p">,</span>
-                 <span class="n">seg_suffix</span><span class="o">=</span><span class="s1">&#39;seg&#39;</span><span class="p">,</span>
+                 <span class="n">bids_filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;dwi&quot;</span><span class="p">},</span>
+                 <span class="n">dmriprep</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                  <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">reg_template</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">,</span>
                  <span class="n">reg_subject</span><span class="o">=</span><span class="s2">&quot;power_map&quot;</span><span class="p">,</span>
-                 <span class="n">mask_template</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">brain_mask</span><span class="o">=</span><span class="n">B0Mask</span><span class="p">(),</span>
                  <span class="n">bundle_names</span><span class="o">=</span><span class="n">BUNDLES</span><span class="p">,</span>
                  <span class="n">dask_it</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">force_recompute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">scalars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">],</span>
-                 <span class="n">wm_criterion</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lb&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dti_fa&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">},</span>
-                               <span class="s1">&#39;ub&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dti_md&#39;</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">}},</span>
                  <span class="n">use_prealign</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">viz_backend</span><span class="o">=</span><span class="s2">&quot;fury&quot;</span><span class="p">,</span>
@@ -203,6 +203,14 @@
                  <span class="n">clean_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Initialize an AFQ object.</span>
+<span class="sd">        Some special notes on parameters:</span>
+<span class="sd">        In tracking_params, parameters with the suffix mask which are also</span>
+<span class="sd">        a mask from AFQ.mask will be handled automatically by the api.</span>
+<span class="sd">        You can set additional parameters for a given step of the process</span>
+<span class="sd">        by directly calling the relevant api function. For example,</span>
+<span class="sd">        to set the sh_order for csd to 4, call:</span>
+<span class="sd">        myafq._csd(sh_order=4)</span>
+<span class="sd">        before otherwise generating the csd file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -210,16 +218,12 @@
 <span class="sd">            [BIDS] The path to preprocessed diffusion data organized in a BIDS</span>
 <span class="sd">            dataset. This should contain a BIDS derivative dataset with</span>
 <span class="sd">            preprocessed dwi/bvals/bvecs.</span>
+<span class="sd">        bids_filters : dict</span>
+<span class="sd">            [BIDS] Filter to pass to bids_layout.get when finding DWI files.</span>
+<span class="sd">            Default: {&quot;suffix&quot;: &quot;dwi&quot;}</span>
 <span class="sd">        dmriprep : str, optional.</span>
 <span class="sd">            [BIDS] The name of the pipeline used to preprocess the DWI data.</span>
-<span class="sd">            Default: &quot;dmriprep&quot;.</span>
-<span class="sd">        segmentation : str</span>
-<span class="sd">            [BIDS] The name of the pipeline used to generate</span>
-<span class="sd">            a segmentation image.</span>
-<span class="sd">            Default: &quot;dmriprep&quot;</span>
-<span class="sd">        seg_suffix : str, optional.</span>
-<span class="sd">            [BIDS] The suffix that identifies the segmentation image.</span>
-<span class="sd">            Default: &quot;seg&quot;.</span>
+<span class="sd">            Default: &quot;all&quot;.</span>
 <span class="sd">        b0_threshold : int, optional</span>
 <span class="sd">            [REGISTRATION] The value of b under which</span>
 <span class="sd">            it is considered to be b0. Default: 50.</span>
@@ -247,15 +251,19 @@
 <span class="sd">            If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
 <span class="sd">            and reg_subject should be &quot;subject_sls&quot;.</span>
 <span class="sd">            Default: &quot;mni_T1&quot;</span>
-<span class="sd">        mask_template : bool, optional</span>
-<span class="sd">            [REGISTRATION] Whether to mask the chosen template(s)</span>
-<span class="sd">            with a brain-mask.</span>
-<span class="sd">            Default: True</span>
+<span class="sd">        brain_mask : instance of a class defined in `AFQ.mask`, optional</span>
+<span class="sd">            [REGISTRATION] This will be used to create</span>
+<span class="sd">            the brain mask, which gets applied before registration to a</span>
+<span class="sd">            template.</span>
+<span class="sd">            If None, no brain mask will not be applied,</span>
+<span class="sd">            and no brain mask will be applied to the template.</span>
+<span class="sd">            Default: B0Mask()</span>
 <span class="sd">        bundle_names : list of strings, optional</span>
 <span class="sd">            [BUNDLES] List of bundle names to include in segmentation.</span>
 <span class="sd">            Default: BUNDLES</span>
 <span class="sd">        dask_it : bool, optional</span>
-<span class="sd">            [COMPUTE] Whether to use a dask DataFrame object</span>
+<span class="sd">            [COMPUTE] Whether to use a dask DataFrame object.</span>
+<span class="sd">            Default: False</span>
 <span class="sd">        force_recompute : bool, optional</span>
 <span class="sd">            [COMPUTE] Whether to recompute or ignore existing derivatives.</span>
 <span class="sd">            This parameter can be turned on/off dynamically.</span>
@@ -264,20 +272,6 @@
 <span class="sd">            [BUNDLES] List of scalars to use.</span>
 <span class="sd">            Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;</span>
 <span class="sd">            Default: [&quot;dti_fa&quot;, &quot;dti_md&quot;]</span>
-<span class="sd">        wm_criterion : list or float, optional</span>
-<span class="sd">            [REGISTRATION] This is either a list of the labels of the white</span>
-<span class="sd">            matter in the segmentation file or (if a dictionary is provided)</span>
-<span class="sd">            a lower bound and upper bound containting a series of</span>
-<span class="sd">            scalar / threshold pairs used for creating the white-matter mask.</span>
-<span class="sd">            In the latter case, scalars can be &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;,</span>
-<span class="sd">            &quot;dki_md&quot;, thresholds are floats, and &#39;lb&#39; / &#39;ub&#39; mean lower and</span>
-<span class="sd">            upper bounds respectively (see the format in the default). Each</span>
-<span class="sd">            scalar mask will &#39;logical and&#39; to make the white-matter mask.</span>
-<span class="sd">            For an example of the former case,</span>
-<span class="sd">            the white matter values for the segmentation provided</span>
-<span class="sd">            with the HCP data including labels for midbrain are:</span>
-<span class="sd">            [250, 251, 252, 253, 254, 255, 41, 2, 16, 77].</span>
-<span class="sd">            Default: {&#39;lb&#39;: {&#39;dti_fa&#39;: 0.1}, &#39;ub&#39;: {&#39;dti_md&#39;: 0.003}}</span>
 <span class="sd">        use_prealign : bool, optional</span>
 <span class="sd">            [REGISTRATION] Whether to perform pre-alignment before perforiming</span>
 <span class="sd">            the diffeomorphic mapping in registration. Default: True</span>
@@ -293,12 +287,9 @@
 <span class="sd">            Default: use the default behavior of the seg.Segmentation object.</span>
 <span class="sd">        tracking_params: dict, optional</span>
 <span class="sd">            The parameters for tracking.</span>
-<span class="sd">            Parameters with suffix_mask are handled differently by this api.</span>
-<span class="sd">            Masks which are strings that are in scalars or are &quot;wm_mask&quot;</span>
-<span class="sd">            will be replaced by the corresponding mask. Masks which are paths</span>
-<span class="sd">            will be loaded. All masks set to None will default to &quot;dti_fa&quot;.</span>
-<span class="sd">            To track the entire volume, set mask to &quot;full&quot;.</span>
 <span class="sd">            Default: use the default behavior of the aft.track function.</span>
+<span class="sd">            Seed mask and seed threshold, if not specified, are replaced</span>
+<span class="sd">            with scalar masks from scalar[0] thresholded to 0.2.</span>
 <span class="sd">        clean_params: dict, optional</span>
 <span class="sd">            The parameters for cleaning.</span>
 <span class="sd">            Default: use the default behavior of the seg.clean_bundle</span>
@@ -311,10 +302,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_bval</span> <span class="o">=</span> <span class="n">max_bval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_bval</span> <span class="o">=</span> <span class="n">min_bval</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">wm_criterion</span> <span class="o">=</span> <span class="n">wm_criterion</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span> <span class="o">=</span> <span class="n">reg_subject</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask_template</span> <span class="o">=</span> <span class="n">mask_template</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span> <span class="o">=</span> <span class="n">reg_subject</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">brain_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">FullMask</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_template</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">brain_mask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_template</span> <span class="o">=</span> <span class="kc">True</span>
+
         <span class="k">if</span> <span class="n">reg_subject</span> <span class="o">==</span> <span class="s1">&#39;subject_sls&#39;</span> <span class="ow">or</span> <span class="n">reg_template</span> <span class="o">==</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">reg_template</span> <span class="o">!=</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
@@ -331,17 +327,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span> <span class="o">=</span> <span class="p">(</span><span class="n">use_prealign</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">!=</span> <span class="s1">&#39;slr&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span> <span class="o">=</span> <span class="n">scalars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">scalars</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">virtual_frame_buffer</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">xvfbwrapper</span> <span class="kn">import</span> <span class="n">Xvfb</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vdisplay</span> <span class="o">=</span> <span class="n">Xvfb</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1280</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vdisplay</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">viz</span> <span class="o">=</span> <span class="n">Viz</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">viz_backend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz</span> <span class="o">=</span> <span class="n">Viz</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">viz_backend</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
 
         <span class="n">default_tracking_params</span> <span class="o">=</span> <span class="n">get_default_args</span><span class="p">(</span><span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">)</span>
-        <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dti_fa&quot;</span>
-        <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dti_fa&quot;</span>
+        <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScalarMask</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">())</span>
+        <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScalarMask</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">())</span>
         <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
         <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
         <span class="c1"># Replace the defaults only for kwargs for which a non-default value was</span>
@@ -351,6 +349,8 @@
                 <span class="n">default_tracking_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span> <span class="o">=</span> <span class="n">default_tracking_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
         <span class="n">default_seg_params</span> <span class="o">=</span> <span class="n">get_default_args</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">segmentation_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -372,6 +372,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span>
                                             <span class="n">seg_algo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="p">,</span>
                                             <span class="n">resample_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">)</span>
+
+        <span class="c1"># Initialize dict to store relevant timing information</span>
+        <span class="n">timing_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Tractography&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Registration&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Segmentation&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Cleaning&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Visualization&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
 
         <span class="c1"># This is where all the outputs will go:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;afq&#39;</span><span class="p">)</span>
@@ -406,8 +415,7 @@
         <span class="n">dwi_file_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">bvec_file_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">bval_file_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">anat_file_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">seg_file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">timing_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">results_dir_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
@@ -421,54 +429,54 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">results_dir_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">dwi_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                                    <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;nii.gz&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;dwi&#39;</span><span class="p">,</span>
+                                    <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;nii.gz&#39;</span><span class="p">,</span>
                                     <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">bvec_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
                                     <span class="n">extension</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bvec&#39;</span><span class="p">,</span> <span class="s1">&#39;bvecs&#39;</span><span class="p">],</span>
-                                    <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;dwi&#39;</span><span class="p">,</span>
                                     <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">bval_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
                                     <span class="n">extension</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bval&#39;</span><span class="p">,</span> <span class="s1">&#39;bvals&#39;</span><span class="p">],</span>
-                                    <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;dwi&#39;</span><span class="p">,</span>
                                     <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">this_t1w</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                    <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.nii.gz&#39;</span><span class="p">,</span>
-                    <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;T1w&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                    <span class="n">scope</span><span class="o">=</span><span class="n">segmentation</span><span class="p">)</span>
+                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
-                <span class="n">this_seg</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                    <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.nii.gz&#39;</span><span class="p">,</span>
-                    <span class="n">suffix</span><span class="o">=</span><span class="n">seg_suffix</span><span class="p">,</span>
-                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                    <span class="n">scope</span><span class="o">=</span><span class="n">segmentation</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                        <span class="n">bids_layout</span><span class="p">,</span>
+                        <span class="n">subject</span><span class="p">,</span>
+                        <span class="n">session</span>
+                    <span class="p">)</span>
 
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">this_t1w</span><span class="p">):</span>
-                    <span class="n">anat_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_t1w</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                        <span class="n">bids_layout</span><span class="p">,</span>
+                        <span class="n">subject</span><span class="p">,</span>
+                        <span class="n">session</span>
+                    <span class="p">)</span>
 
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">this_seg</span><span class="p">):</span>
-                    <span class="n">seg_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_seg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                    <span class="n">bids_layout</span><span class="p">,</span>
+                    <span class="n">subject</span><span class="p">,</span>
+                    <span class="n">session</span>
+                <span class="p">)</span>
 
                 <span class="n">sub_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
                 <span class="n">ses_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+                <span class="n">timing_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timing_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">sub_list</span><span class="p">,</span>
                                             <span class="n">dwi_file</span><span class="o">=</span><span class="n">dwi_file_list</span><span class="p">,</span>
                                             <span class="n">bvec_file</span><span class="o">=</span><span class="n">bvec_file_list</span><span class="p">,</span>
                                             <span class="n">bval_file</span><span class="o">=</span><span class="n">bval_file_list</span><span class="p">,</span>
                                             <span class="n">ses</span><span class="o">=</span><span class="n">ses_list</span><span class="p">,</span>
+                                            <span class="n">timing</span><span class="o">=</span><span class="n">timing_list</span><span class="p">,</span>
                                             <span class="n">results_dir</span><span class="o">=</span><span class="n">results_dir_list</span><span class="p">))</span>
-        <span class="c1"># Add these if they exist:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg_file_list</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;seg_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seg_file_list</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">anat_file_list</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;anat_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">anat_file_list</span>
 
         <span class="k">if</span> <span class="n">dask_it</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span> <span class="o">=</span> <span class="n">ddf</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span>
@@ -523,27 +531,12 @@
                     <span class="n">vol_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dilate</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_brain_mask.nii.gz&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">):</span>
-            <span class="k">if</span> <span class="s1">&#39;seg_file&#39;</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-                <span class="n">brain_mask</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_mask_from_seg</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">not_equal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span>
-                    <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">brain_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                                    <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
-                    <span class="n">brain_mask_file</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">b0_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b0</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-                <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">b0_file</span><span class="p">)</span>
-                <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">mean_b0_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">median_otsu</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">median_radius</span><span class="p">,</span> <span class="n">numpass</span><span class="p">,</span>
-                                            <span class="n">autocrop</span><span class="p">,</span> <span class="n">dilate</span><span class="o">=</span><span class="n">dilate</span><span class="p">)</span>
-                <span class="n">be_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">brain_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
-                                         <span class="n">mean_b0_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">be_img</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">)</span>
-                <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">b0_file</span><span class="p">,</span>
-                            <span class="n">median_radius</span><span class="o">=</span><span class="n">median_radius</span><span class="p">,</span>
-                            <span class="n">numpass</span><span class="o">=</span><span class="n">numpass</span><span class="p">,</span>
-                            <span class="n">autocrop</span><span class="o">=</span><span class="n">autocrop</span><span class="p">,</span>
-                            <span class="n">vol_idx</span><span class="o">=</span><span class="n">vol_idx</span><span class="p">)</span>
+            <span class="n">brain_mask</span><span class="p">,</span> <span class="n">brain_affine</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">brain_mask_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+                <span class="n">brain_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
+                <span class="n">brain_affine</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">brain_mask_img</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">)</span>
             <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_brain_mask.json&#39;</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">brain_mask_file</span></div>
@@ -715,6 +708,12 @@
                     <span class="s2">&quot;dki_fa&quot;</span><span class="p">:</span> <span class="n">_dki_fa</span><span class="p">,</span>
                     <span class="s2">&quot;dki_md&quot;</span><span class="p">:</span> <span class="n">_dki_md</span><span class="p">}</span></div>
 
+<div class="viewcode-block" id="AFQ._get_best_scalar"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_best_scalar">[docs]</a>    <span class="k">def</span> <span class="nf">_get_best_scalar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;fa&quot;</span> <span class="ow">in</span> <span class="n">scalar</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">scalar</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="AFQ._reg_img"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._reg_img">[docs]</a>    <span class="k">def</span> <span class="nf">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">img_l</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -800,7 +799,7 @@
             <span class="n">warped_b0</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-                <span class="n">warped_b0</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span> <span class="n">b0_warped_file</span><span class="p">)</span>
+                <span class="n">warped_b0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="n">b0_warped_file</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">b0_warped_file</span></div>
 
@@ -829,6 +828,7 @@
             <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
 
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;slr&quot;</span><span class="p">:</span>
                 <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">slr_registration</span><span class="p">(</span>
                     <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
@@ -850,102 +850,10 @@
             <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">mapping_file</span><span class="p">)</span>
             <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;displacementfield&quot;</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
         <span class="k">return</span> <span class="n">mapping_file</span></div>
-
-<div class="viewcode-block" id="AFQ._mask_from_seg"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._mask_from_seg">[docs]</a>    <span class="k">def</span> <span class="nf">_mask_from_seg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">image_labels</span><span class="p">,</span> <span class="n">not_equal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">dwi_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dwi_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-
-        <span class="c1"># If we found a segmentation file in the</span>
-        <span class="c1"># expected location:</span>
-        <span class="n">seg_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;seg_file&#39;</span><span class="p">])</span>
-        <span class="n">seg_data_orig</span> <span class="o">=</span> <span class="n">seg_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-        <span class="c1"># For different sets of labels, extract all the voxels that</span>
-        <span class="c1"># have any of these values:</span>
-        <span class="n">seg_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">seg_data_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">image_labels</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">not_equal</span><span class="p">:</span>
-                <span class="n">seg_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seg_mask</span><span class="p">,</span> <span class="p">(</span><span class="n">seg_data_orig</span> <span class="o">!=</span> <span class="n">label</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">seg_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seg_mask</span><span class="p">,</span> <span class="p">(</span><span class="n">seg_data_orig</span> <span class="o">==</span> <span class="n">label</span><span class="p">))</span>
-
-        <span class="c1"># Resample to DWI data:</span>
-        <span class="n">seg_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">seg_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
-                                         <span class="n">dwi_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                         <span class="n">seg_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                         <span class="n">dwi_img</span><span class="o">.</span><span class="n">affine</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;seg_file&#39;</span><span class="p">],</span>
-                    <span class="n">wm_criterion</span><span class="o">=</span><span class="n">image_labels</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">seg_mask</span><span class="p">,</span> <span class="n">meta</span></div>
-
-<div class="viewcode-block" id="AFQ._wm_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._wm_mask">[docs]</a>    <span class="k">def</span> <span class="nf">_wm_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">wm_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_wm_mask.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">wm_mask_file</span><span class="p">):</span>
-            <span class="k">if</span> <span class="s1">&#39;seg_file&#39;</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wm_criterion</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">wm_mask</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_from_seg</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm_criterion</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Otherwise, we&#39;ll identify the white matter based on scalars:</span>
-                <span class="n">valid_scalars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                <span class="n">wm_mask</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">filenames</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">bound</span><span class="p">,</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm_criterion</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">for</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="n">constraint</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="n">scalar</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_scalars</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span>
-                                <span class="sa">f</span><span class="s2">&quot;wm_criterion scalars should be one of&quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
-
-                        <span class="n">scalar_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">scalar</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">bound</span> <span class="o">==</span> <span class="s2">&quot;lb&quot;</span><span class="p">:</span>
-                            <span class="n">new_wm_mask</span> <span class="o">=</span> \
-                                <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                                    <span class="n">scalar_fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">threshold</span>
-                        <span class="k">elif</span> <span class="n">bound</span> <span class="o">==</span> <span class="s2">&quot;ub&quot;</span><span class="p">:</span>
-                            <span class="n">new_wm_mask</span> <span class="o">=</span> \
-                                <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                                    <span class="n">scalar_fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">threshold</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;wm_criterion dictionary &quot;</span>
-                                               <span class="o">+</span> <span class="s2">&quot; formatted incorrectly. See&quot;</span>
-                                               <span class="o">+</span> <span class="s2">&quot; the default for reference&quot;</span><span class="p">)</span>
-
-                        <span class="k">if</span> <span class="n">wm_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="n">wm_mask</span> <span class="o">=</span> <span class="n">new_wm_mask</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">wm_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">wm_mask</span><span class="p">,</span> <span class="n">new_wm_mask</span><span class="p">)</span>
-                        <span class="n">filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scalar_fname</span><span class="p">)</span>
-
-                <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wm_criterion</span><span class="p">,</span>
-                    <span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">wm_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                                                  <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
-                                  <span class="n">wm_mask_file</span><span class="p">)</span>
-
-            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_wm_mask.json&#39;</span><span class="p">)</span>
-            <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">wm_mask_file</span></div>
-
-<div class="viewcode-block" id="AFQ._get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">_get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">mask</span> <span class="o">==</span> <span class="s2">&quot;wm_mask&quot;</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wm_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-                <span class="n">mask_data</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">mask</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
-                <span class="n">mask_data</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">mask</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;Entire Volume&quot;</span>
-                <span class="n">mask_data</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="n">mask</span>
-                <span class="n">mask_data</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">mask_data</span><span class="p">,</span> <span class="n">fname</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span></div>
 
 <div class="viewcode-block" id="AFQ._streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">odf_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span>
@@ -964,10 +872,19 @@
                 <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dki</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
             <span class="n">tracking_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">],</span> <span class="n">seed_mask_desc</span> <span class="o">=</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_mask</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">])</span>
-            <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">],</span> <span class="n">stop_mask_desc</span> <span class="o">=</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_mask</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]):</span>
+                <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">seed_mask_desc</span> <span class="o">=</span>\
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">seed_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]):</span>
+                <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">stop_mask_desc</span> <span class="o">=</span>\
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stop_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">])</span>
+
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="o">**</span><span class="n">tracking_params</span><span class="p">)</span>
             <span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
             <span class="n">meta_directions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;det&quot;</span><span class="p">:</span> <span class="s2">&quot;deterministic&quot;</span><span class="p">,</span>
@@ -982,7 +899,7 @@
                     <span class="n">ROI</span><span class="o">=</span><span class="n">seed_mask_desc</span><span class="p">,</span>
                     <span class="n">n_seeds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;n_seeds&quot;</span><span class="p">],</span>
                     <span class="n">random_seeds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;random_seeds&quot;</span><span class="p">]),</span>
-                <span class="n">Constraints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">AnatomicalImage</span><span class="o">=</span><span class="n">stop_mask_desc</span><span class="p">),</span>
+                <span class="n">Constraints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">ROI</span><span class="o">=</span><span class="n">stop_mask_desc</span><span class="p">),</span>
                 <span class="n">Parameters</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                     <span class="n">Units</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
                     <span class="n">StepSize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;step_size&quot;</span><span class="p">],</span>
@@ -996,6 +913,8 @@
                 <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_trk</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">streamlines_file</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Tractography&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Tractography&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
         <span class="k">return</span> <span class="n">streamlines_file</span></div>
 
@@ -1018,6 +937,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">reg_prealign</span> <span class="o">=</span> <span class="kc">None</span>
 
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="p">)</span>
             <span class="n">bundles</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">,</span>
                                            <span class="n">tg</span><span class="p">,</span>
@@ -1042,6 +962,8 @@
                         <span class="n">Parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="p">)</span>
             <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">bundles_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Segmentation&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Segmentation&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
         <span class="k">return</span> <span class="n">bundles_file</span></div>
 
@@ -1059,6 +981,7 @@
                                   <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_img&#39;</span><span class="p">],</span>
                                   <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
 
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">tgram</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">Tractogram</span><span class="p">([],</span> <span class="p">{</span><span class="s1">&#39;bundle&#39;</span><span class="p">:</span> <span class="p">[]})</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_params</span><span class="p">[</span><span class="s1">&#39;return_idx&#39;</span><span class="p">]:</span>
                 <span class="n">return_idx</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1107,6 +1030,8 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_params</span><span class="p">[</span><span class="s1">&#39;return_idx&#39;</span><span class="p">]:</span>
                 <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">clean_bundles_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_idx.json&#39;</span><span class="p">,</span>
                                <span class="n">return_idx</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Cleaning&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Cleaning&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
         <span class="k">return</span> <span class="n">clean_bundles_file</span></div>
 
@@ -1214,13 +1139,14 @@
                         <span class="n">row</span><span class="p">,</span>
                         <span class="sa">f</span><span class="s1">&#39;_desc-ROI-</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">inclusion</span><span class="si">}</span><span class="s1">.nii.gz&#39;</span><span class="p">))</span>
 
-                <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rois_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 
                     <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span>
                         <span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
                             <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
                     <span class="c1"># Cast to float32, so that it can be read in by MI-Brain:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span>
@@ -1261,7 +1187,7 @@
                             <span class="sa">f</span><span class="s1">&#39;_tractography.trk&#39;</span><span class="p">,</span>
                             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bundles_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bundles_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_trk</span><span class="p">(</span><span class="n">this_tgm</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
                     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">bundles_file</span><span class="p">)</span>
                     <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
@@ -1272,9 +1198,17 @@
                           <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">color_by_volume</span> <span class="o">==</span> <span class="s1">&#39;dti_fa&#39;</span><span class="p">:</span>
-            <span class="n">fa_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti_fa</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">fa_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fa_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">volume</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">volume</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">color_by_volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">color_by_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">color_by_volume</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
+            <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">color_by_volume</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">xform_volume</span> <span class="ow">or</span> <span class="n">xform_color_by_volume</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
@@ -1285,12 +1219,8 @@
 
             <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
                                        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
                                        <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign_inv</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">volume</span> <span class="o">=</span> <span class="n">fa_img</span>
-        <span class="k">if</span> <span class="n">color_by_volume</span> <span class="o">==</span> <span class="s1">&#39;dti_fa&#39;</span><span class="p">:</span>
-            <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">fa_img</span>
 
         <span class="k">if</span> <span class="n">xform_volume</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1309,8 +1239,11 @@
                      <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                     <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">volume</span><span class="p">,</span> <span class="n">color_by_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_prepare_vols</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span>
             <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
@@ -1326,6 +1259,7 @@
         <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">,</span>
                                             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
                                             <span class="n">bundle_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">,</span>
+                                            <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
                                             <span class="n">interact</span><span class="o">=</span><span class="n">interactive</span><span class="p">,</span>
                                             <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span>
                                             <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
@@ -1347,6 +1281,8 @@
                     <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="n">figure</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="k">return</span> <span class="n">figure</span></div>
 
 <div class="viewcode-block" id="AFQ._viz_ROIs"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_ROIs">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_ROIs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span>
@@ -1357,9 +1293,11 @@
                   <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                  <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">volume</span><span class="p">,</span> <span class="n">color_by_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_prepare_vols</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span>
             <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
@@ -1383,6 +1321,7 @@
                     <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
                     <span class="n">bundle_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">,</span>
                     <span class="n">bundle</span><span class="o">=</span><span class="n">uid</span><span class="p">,</span>
+                    <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
                     <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
@@ -1420,7 +1359,7 @@
                             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">roi_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
@@ -1433,12 +1372,16 @@
                             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">roi_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="n">figure</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">figure</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="k">return</span> <span class="n">figure</span></div>
 
 <div class="viewcode-block" id="AFQ._plot_tract_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._plot_tract_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">_plot_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">tract_profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tract_profiles</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">fnames</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                 <span class="n">row</span><span class="p">,</span>
@@ -1448,7 +1391,20 @@
 
             <span class="n">visualize_tract_profiles</span><span class="p">(</span><span class="n">tract_profiles</span><span class="p">,</span>
                                      <span class="n">scalar</span><span class="o">=</span><span class="n">scalar</span><span class="p">,</span>
-                                     <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span></div>
+                                     <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+
+        <span class="k">return</span> <span class="n">fnames</span></div>
+
+<div class="viewcode-block" id="AFQ._export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">_export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">],</span>
+            <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">])</span>
+        <span class="n">timing_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;_desc-timing&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ._get_affine"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_affine">[docs]</a>    <span class="k">def</span> <span class="nf">_get_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">affine</span></div>
@@ -1525,18 +1481,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;brain_mask_file&#39;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="AFQ.brain_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.brain_mask">[docs]</a>    <span class="n">brain_mask</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_brain_mask</span><span class="p">,</span> <span class="n">set_brain_mask</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AFQ.set_wm_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_wm_mask">[docs]</a>    <span class="k">def</span> <span class="nf">set_wm_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s1">&#39;wm_mask_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;wm_mask_file&#39;</span><span class="p">]</span> <span class="o">=</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wm_mask</span><span class="p">,</span>
-                                      <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AFQ.get_wm_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.get_wm_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_wm_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_wm_mask</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;wm_mask_file&#39;</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="AFQ.wm_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.wm_mask">[docs]</a>    <span class="n">wm_mask</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_wm_mask</span><span class="p">,</span> <span class="n">set_wm_mask</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.set_dti"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_dti">[docs]</a>    <span class="k">def</span> <span class="nf">set_dti</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;dti_params_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -1718,6 +1662,7 @@
                     <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
@@ -1727,6 +1672,7 @@
             <span class="n">xform_volume</span><span class="o">=</span><span class="n">xform_volume</span><span class="p">,</span>
             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
             <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="n">xform_color_by_volume</span><span class="p">,</span>
+            <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
             <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span>
             <span class="n">interactive</span><span class="o">=</span><span class="n">interactive</span><span class="p">)</span></div>
 
@@ -1737,9 +1683,10 @@
                  <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_viz_ROIs</span><span class="p">,</span>
             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span>
@@ -1749,25 +1696,24 @@
             <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
             <span class="n">xform_volume</span><span class="o">=</span><span class="n">xform_volume</span><span class="p">,</span>
             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
-            <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="n">xform_color_by_volume</span><span class="p">)</span></div>
+            <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="n">xform_color_by_volume</span><span class="p">,</span>
+            <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.plot_tract_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.plot_tract_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">plot_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plot_tract_profiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="s1">&#39;tract_profiles_viz&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;tract_profiles_viz&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plot_tract_profiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.export_registered_b0"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_registered_b0">[docs]</a>    <span class="k">def</span> <span class="nf">export_registered_b0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_export_registered_b0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.combine_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.combine_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">combine_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tract_profiles</span><span class="p">):</span>
-            <span class="n">profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="n">profiles</span><span class="p">[</span><span class="s1">&#39;sub&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
-            <span class="n">profiles</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ii</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profiles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">combine_list_of_profiles</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tract_profiles</span><span class="p">,</span>
+            <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span><span class="p">,</span> <span class="s1">&#39;tract_profiles.csv&#39;</span><span class="p">))</span></div>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span><span class="p">,</span> <span class="s1">&#39;tract_profiles.csv&#39;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">df</span></div>
+<div class="viewcode-block" id="AFQ.export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_export_timing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.export_all"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Exports all the possible outputs&quot;&quot;&quot;</span>
@@ -1779,7 +1725,93 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">viz_ROIs</span><span class="p">(</span><span class="n">export</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">export_rois</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">combine_profiles</span><span class="p">()</span></div></div>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tract_profiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combine_profiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_timing</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AFQ.upload_to_s3"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.upload_to_s3">[docs]</a>    <span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s3fs</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Upload entire AFQ derivatives folder to S3&quot;&quot;&quot;</span>
+        <span class="n">s3fs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">download_and_combine_afq_profiles</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">study_s3_prefix</span><span class="p">,</span>
+                                      <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download and combine tract profiles from different subjects / sessions</span>
+<span class="sd">    on an s3 bucket into one CSV.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outfile : filename</span>
+<span class="sd">        Filename for the combined output CSV.</span>
+<span class="sd">    bucket : str</span>
+<span class="sd">        The S3 bucket that contains the study data.</span>
+<span class="sd">    study_s3_prefix : str</span>
+<span class="sd">        The S3 prefix common to all of the study objects on S3.</span>
+<span class="sd">    session : str</span>
+<span class="sd">        Session to get CSVs from. If None, all sessions are used.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ouput CSV&#39;s pandas dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">nib</span><span class="o">.</span><span class="n">tmpdirs</span><span class="o">.</span><span class="n">InTemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">t_dir</span><span class="p">:</span>
+        <span class="n">remote_study</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">S3BIDSStudy</span><span class="p">(</span>
+            <span class="s2">&quot;get_profiles&quot;</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="p">,</span>
+            <span class="n">study_s3_prefix</span><span class="p">,</span>
+            <span class="n">subjects</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+            <span class="n">anon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">remote_study</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+            <span class="n">t_dir</span><span class="p">,</span>
+            <span class="n">include_modality_agnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_derivs</span><span class="o">=</span><span class="s2">&quot;afq&quot;</span><span class="p">,</span>
+            <span class="n">include_derivs_dataset_description</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;profiles.csv&quot;</span><span class="p">)</span>
+        <span class="n">temp_study</span> <span class="o">=</span> <span class="n">BIDSLayout</span><span class="p">(</span><span class="n">t_dir</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">profiles</span> <span class="o">=</span> <span class="n">temp_study</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;profiles&#39;</span><span class="p">,</span>
+                <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">profiles</span> <span class="o">=</span> <span class="n">temp_study</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+                <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;profiles&#39;</span><span class="p">,</span>
+                <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">combine_list_of_profiles</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">out_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">combine_list_of_profiles</span><span class="p">(</span><span class="n">profile_fnames</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combine tract profiles from different subjects / sessions</span>
+<span class="sd">    into one CSV.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    profile_fnames : list of str</span>
+<span class="sd">        List of csv filenames.</span>
+<span class="sd">    outfile : filename</span>
+<span class="sd">        Filename for the combined output CSV.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ouput CSV&#39;s pandas dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">profile_fnames</span><span class="p">:</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">profiles</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;sub-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;ses-&#39;</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
+            <span class="n">session_name</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;ses-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">session_name</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+        <span class="n">profiles</span><span class="p">[</span><span class="s1">&#39;sessionID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_name</span>
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profiles</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_file</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 
           </div>

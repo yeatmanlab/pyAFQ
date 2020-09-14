@@ -102,8 +102,19 @@ minimum, the file should contain information about the location of the
 See an example configuration file below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My AFQ analysis&quot;</span>
 
+<span class="c1"># Initialize an AFQ object.</span>
+<span class="c1"># Some special notes on parameters:</span>
+<span class="c1"># In tracking_params, parameters with the suffix mask which are also</span>
+<span class="c1"># a mask from AFQ.mask will be handled automatically by the api.</span>
+<span class="c1"># You can set additional parameters for a given step of the process</span>
+<span class="c1"># by directly calling the relevant api function. For example,</span>
+<span class="c1"># to set the sh_order for csd to 4, call:</span>
+<span class="c1"># myafq._csd(sh_order=4)</span>
+<span class="c1"># before otherwise generating the csd file.</span>
+
 <span class="c1"># Use &#39;&#39; to indicate None</span>
 <span class="c1"># Wrap dictionaries in quotes</span>
+<span class="c1"># Wrap mask object instantiations in quotes</span>
 
 <span class="p">[</span><span class="n">BIDS</span><span class="p">]</span>
 
@@ -112,18 +123,13 @@ See an example configuration file below:</p>
 <span class="c1"># preprocessed dwi/bvals/bvecs.</span>
 <span class="n">bids_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
+<span class="c1"># Filter to pass to bids_layout.get when finding DWI files.</span>
+<span class="c1"># Default: {&quot;suffix&quot;: &quot;dwi&quot;}</span>
+<span class="n">bids_filters</span> <span class="o">=</span> <span class="s2">&quot;{&#39;suffix&#39;: &#39;dwi&#39;}&quot;</span>
+
 <span class="c1"># The name of the pipeline used to preprocess the DWI data.</span>
-<span class="c1"># Default: &quot;dmriprep&quot;.</span>
-<span class="n">dmriprep</span> <span class="o">=</span> <span class="s1">&#39;dmriprep&#39;</span>
-
-<span class="c1"># The name of the pipeline used to generate</span>
-<span class="c1"># a segmentation image.</span>
-<span class="c1"># Default: &quot;dmriprep&quot;</span>
-<span class="n">segmentation</span> <span class="o">=</span> <span class="s1">&#39;dmriprep&#39;</span>
-
-<span class="c1"># The suffix that identifies the segmentation image.</span>
-<span class="c1"># Default: &quot;seg&quot;.</span>
-<span class="n">seg_suffix</span> <span class="o">=</span> <span class="s1">&#39;seg&#39;</span>
+<span class="c1"># Default: &quot;all&quot;.</span>
+<span class="n">dmriprep</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
 
 <span class="p">[</span><span class="n">REGISTRATION</span><span class="p">]</span>
 
@@ -159,23 +165,13 @@ See an example configuration file below:</p>
 <span class="c1"># Default: &quot;power_map&quot;</span>
 <span class="n">reg_subject</span> <span class="o">=</span> <span class="s1">&#39;power_map&#39;</span>
 
-<span class="c1"># Whether to mask the chosen template(s)</span>
-<span class="c1"># with a brain-mask.</span>
-<span class="c1"># Default: True</span>
-<span class="n">mask_template</span> <span class="o">=</span> <span class="n">true</span>
-
-<span class="c1"># This is either a list of the labels of the white</span>
-<span class="c1"># matter in the segmentation file or (if a dictionary is provided)</span>
-<span class="c1"># a lower bound and upper bound containting a series of</span>
-<span class="c1"># scalar / threshold pairs used for creating the white-matter mask.</span>
-<span class="c1"># In the latter case, scalars can be &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;,</span>
-<span class="c1"># &quot;dki_md&quot;, thresholds are floats, and &#39;lb&#39; / &#39;ub&#39; mean lower and</span>
-<span class="c1"># upper bounds respectively (see the format in the default). Each</span>
-<span class="c1"># scalar mask will &#39;logical and&#39; to make the white-matter mask.</span>
-<span class="c1"># For an example of the former case,</span>
-<span class="c1"># the white matter values for the segmentation provided</span>
-<span class="c1"># with the HCP data including labels for midbrain are:</span>
-<span class="n">wm_criterion</span> <span class="o">=</span> <span class="s2">&quot;{&#39;lb&#39;: {&#39;dti_fa&#39;: 0.2}, &#39;ub&#39;: {&#39;dti_md&#39;: 0.002}}&quot;</span>
+<span class="c1"># This will be used to create</span>
+<span class="c1"># the brain mask, which gets applied before registration to a</span>
+<span class="c1"># template.</span>
+<span class="c1"># If None, no brain mask will not be applied,</span>
+<span class="c1"># and no brain mask will be applied to the template.</span>
+<span class="c1"># Default: B0Mask()</span>
+<span class="n">brain_mask</span> <span class="o">=</span> <span class="s1">&#39;B0Mask(</span><span class="si">{}</span><span class="s1">)&#39;</span>
 
 <span class="c1"># Whether to perform pre-alignment before perforiming</span>
 <span class="c1"># the diffeomorphic mapping in registration. Default: True</span>
@@ -194,7 +190,8 @@ See an example configuration file below:</p>
 
 <span class="p">[</span><span class="n">COMPUTE</span><span class="p">]</span>
 
-<span class="c1"># Whether to use a dask DataFrame object</span>
+<span class="c1"># Whether to use a dask DataFrame object.</span>
+<span class="c1"># Default: False</span>
 <span class="n">dask_it</span> <span class="o">=</span> <span class="n">false</span>
 
 <span class="c1"># Whether to recompute or ignore existing derivatives.</span>
@@ -216,7 +213,7 @@ See an example configuration file below:</p>
 <span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
 
 <span class="c1"># How tracking directions are determined.</span>
-<span class="c1"># One of: {&quot;deterministic&quot; | &quot;probablistic&quot;}</span>
+<span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
 <span class="n">directions</span> <span class="o">=</span> <span class="s1">&#39;det&#39;</span>
 
 <span class="c1"># The maximum turning angle in each step. Default: 30</span>
@@ -243,20 +240,29 @@ See an example configuration file below:</p>
 <span class="n">n_seeds</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Whether to generate a total of n_seeds random seeds in the mask.</span>
-<span class="c1"># Default: XXX.</span>
+<span class="c1"># Default: False.</span>
 <span class="n">random_seeds</span> <span class="o">=</span> <span class="n">false</span>
 
 <span class="c1"># random seed used to generate random seeds if random_seeds is</span>
 <span class="c1"># set to True. Default: None</span>
 <span class="n">rng_seed</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-<span class="c1"># A float or binary mask that determines a stopping criterion (e.g. FA).</span>
-<span class="c1"># Default to no stopping (all ones).</span>
+<span class="c1"># If array: A float or binary mask that determines a stopping criterion</span>
+<span class="c1"># (e.g. FA).</span>
+<span class="c1"># If str: &quot;CMC&quot; for Continuous Map Criterion [Girard2014]_.</span>
+<span class="c1"># &quot;ACT&quot; for Anatomically-constrained tractography [Smith2012]_.</span>
+<span class="c1"># Defaults to no stopping (all ones). A string is required if</span>
+<span class="c1"># the tracker is set to &quot;pft&quot;.</span>
 <span class="n">stop_mask</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-<span class="c1"># A value of the stop_mask below which tracking is terminated. Default to</span>
+<span class="c1"># If float, this a value of the stop_mask below which tracking is</span>
+<span class="c1"># terminated (and stop_mask has to be an array). Defaults to</span>
 <span class="c1"># 0 (this means that if no stop_mask is passed, we will stop only at</span>
-<span class="c1"># the edge of the image)</span>
+<span class="c1"># the edge of the image). If this is a tuple, it contains a sequence</span>
+<span class="c1"># that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of</span>
+<span class="c1"># which is either a string (full path) or a nibabel img to be used</span>
+<span class="c1"># in particle filtering tractography. A tuple is required if tracker</span>
+<span class="c1"># is set to &quot;pft&quot;.</span>
 <span class="n">stop_threshold</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="c1"># The size (in mm) of a step of tractography. Default: 1.0</span>
@@ -268,8 +274,13 @@ See an example configuration file below:</p>
 <span class="c1"># The miminal length (mm) in a streamline. Default: 250</span>
 <span class="n">max_length</span> <span class="o">=</span> <span class="mi">1000</span>
 
-<span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
 <span class="n">odf_model</span> <span class="o">=</span> <span class="s1">&#39;DTI&#39;</span>
+
+<span class="c1"># Which strategy to use in tracking. This can be the standard local</span>
+<span class="c1"># tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
+<span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
 
 <span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
 

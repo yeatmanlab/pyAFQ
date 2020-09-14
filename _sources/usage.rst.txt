@@ -76,8 +76,19 @@ See an example configuration file below::
 
     title = "My AFQ analysis"
 
+    # Initialize an AFQ object.
+    # Some special notes on parameters:
+    # In tracking_params, parameters with the suffix mask which are also
+    # a mask from AFQ.mask will be handled automatically by the api.
+    # You can set additional parameters for a given step of the process
+    # by directly calling the relevant api function. For example,
+    # to set the sh_order for csd to 4, call:
+    # myafq._csd(sh_order=4)
+    # before otherwise generating the csd file.
+    
     # Use '' to indicate None
     # Wrap dictionaries in quotes
+    # Wrap mask object instantiations in quotes
     
     [BIDS]
     
@@ -86,18 +97,13 @@ See an example configuration file below::
     # preprocessed dwi/bvals/bvecs.
     bids_path = ''
     
+    # Filter to pass to bids_layout.get when finding DWI files.
+    # Default: {"suffix": "dwi"}
+    bids_filters = "{'suffix': 'dwi'}"
+    
     # The name of the pipeline used to preprocess the DWI data.
-    # Default: "dmriprep".
-    dmriprep = 'dmriprep'
-    
-    # The name of the pipeline used to generate
-    # a segmentation image.
-    # Default: "dmriprep"
-    segmentation = 'dmriprep'
-    
-    # The suffix that identifies the segmentation image.
-    # Default: "seg".
-    seg_suffix = 'seg'
+    # Default: "all".
+    dmriprep = 'all'
     
     [REGISTRATION]
     
@@ -133,23 +139,13 @@ See an example configuration file below::
     # Default: "power_map"
     reg_subject = 'power_map'
     
-    # Whether to mask the chosen template(s)
-    # with a brain-mask.
-    # Default: True
-    mask_template = true
-    
-    # This is either a list of the labels of the white
-    # matter in the segmentation file or (if a dictionary is provided)
-    # a lower bound and upper bound containting a series of
-    # scalar / threshold pairs used for creating the white-matter mask.
-    # In the latter case, scalars can be "dti_fa", "dti_md", "dki_fa",
-    # "dki_md", thresholds are floats, and 'lb' / 'ub' mean lower and
-    # upper bounds respectively (see the format in the default). Each
-    # scalar mask will 'logical and' to make the white-matter mask.
-    # For an example of the former case,
-    # the white matter values for the segmentation provided
-    # with the HCP data including labels for midbrain are:
-    wm_criterion = "{'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}"
+    # This will be used to create
+    # the brain mask, which gets applied before registration to a
+    # template.
+    # If None, no brain mask will not be applied,
+    # and no brain mask will be applied to the template.
+    # Default: B0Mask()
+    brain_mask = 'B0Mask({})'
     
     # Whether to perform pre-alignment before perforiming
     # the diffeomorphic mapping in registration. Default: True
@@ -168,7 +164,8 @@ See an example configuration file below::
     
     [COMPUTE]
     
-    # Whether to use a dask DataFrame object
+    # Whether to use a dask DataFrame object.
+    # Default: False
     dask_it = false
     
     # Whether to recompute or ignore existing derivatives.
@@ -190,7 +187,7 @@ See an example configuration file below::
     [TRACTOGRAPHY]
     
     # How tracking directions are determined.
-    # One of: {"deterministic" | "probablistic"}
+    # One of: {"det" | "prob"}
     directions = 'det'
     
     # The maximum turning angle in each step. Default: 30
@@ -217,20 +214,29 @@ See an example configuration file below::
     n_seeds = 1
     
     # Whether to generate a total of n_seeds random seeds in the mask.
-    # Default: XXX.
+    # Default: False.
     random_seeds = false
     
     # random seed used to generate random seeds if random_seeds is
     # set to True. Default: None
     rng_seed = ''
     
-    # A float or binary mask that determines a stopping criterion (e.g. FA).
-    # Default to no stopping (all ones).
+    # If array: A float or binary mask that determines a stopping criterion
+    # (e.g. FA).
+    # If str: "CMC" for Continuous Map Criterion [Girard2014]_.
+    # "ACT" for Anatomically-constrained tractography [Smith2012]_.
+    # Defaults to no stopping (all ones). A string is required if
+    # the tracker is set to "pft".
     stop_mask = ''
     
-    # A value of the stop_mask below which tracking is terminated. Default to
+    # If float, this a value of the stop_mask below which tracking is
+    # terminated (and stop_mask has to be an array). Defaults to
     # 0 (this means that if no stop_mask is passed, we will stop only at
-    # the edge of the image)
+    # the edge of the image). If this is a tuple, it contains a sequence
+    # that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
+    # which is either a string (full path) or a nibabel img to be used
+    # in particle filtering tractography. A tuple is required if tracker
+    # is set to "pft".
     stop_threshold = 0
     
     # The size (in mm) of a step of tractography. Default: 1.0
@@ -242,8 +248,13 @@ See an example configuration file below::
     # The miminal length (mm) in a streamline. Default: 250
     max_length = 1000
     
-    # One of {"DTI", "CSD"}. Defaults to use "DTI"
+    # One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
     odf_model = 'DTI'
+    
+    # Which strategy to use in tracking. This can be the standard local
+    # tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
+    # One of {"local", "pft"}. Default: "local"
+    tracker = 'local'
     
     [SEGMENTATION]
     

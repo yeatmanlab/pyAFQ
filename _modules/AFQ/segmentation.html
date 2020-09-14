@@ -386,7 +386,8 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
                 <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
             <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
-                <span class="n">roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span>
+                <span class="n">roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">),</span>
+                <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">rule</span><span class="p">:</span>
                 <span class="c1"># include ROI:</span>

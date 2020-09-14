@@ -111,8 +111,9 @@ if not op.exists('dti_streamlines.trk'):
             if bundles[bundle]['rules'][idx]:
                 warped_roi = patch_up_roi(
                     mapping.transform_inverse(
-                        roi.get_data().astype(np.float32),
-                        interpolation='linear'))
+                        roi.get_fdata().astype(np.float32),
+                        interpolation='linear'),
+                        bundle_name=bundle)
 
                 nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
                          f"{bundle}_{idx+1}.nii.gz")

@@ -48,26 +48,26 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tractography.track" title="AFQ.tractography.track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track</span></code></a>(params_file, directions=’det’, max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model=’DTI’)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tractography.track" title="AFQ.tractography.track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track</span></code></a>(params_file, directions=’det’, max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model=’DTI’, tracker=’local’)</p></td>
 <td><p>Tractography</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tractography._local_tracking" title="AFQ.tractography._local_tracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_local_tracking</span></code></a>(seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tractography._tracking" title="AFQ.tractography._tracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_tracking</span></code></a>(tracker, seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)</p></td>
 <td><p>Helper function</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="AFQ.tractography.track">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">directions</span><span class="o">=</span><span class="default_value">'det'</span></em>, <em class="sig-param"><span class="n">max_angle</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">n_seeds</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">random_seeds</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng_seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">odf_model</span><span class="o">=</span><span class="default_value">'DTI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">track</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params_file</span></em>, <em class="sig-param"><span class="n">directions</span><span class="o">=</span><span class="default_value">'det'</span></em>, <em class="sig-param"><span class="n">max_angle</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">n_seeds</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">random_seeds</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng_seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">odf_model</span><span class="o">=</span><span class="default_value">'DTI'</span></em>, <em class="sig-param"><span class="n">tracker</span><span class="o">=</span><span class="default_value">'local'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography.track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tractography</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>params_file</strong><span class="classifier">str, nibabel img.</span></dt><dd><p>Full path to a nifti file containing CSD spherical harmonic
 coefficients, or nibabel img with model params.</p>
 </dd>
 <dt><strong>directions</strong><span class="classifier">str</span></dt><dd><p>How tracking directions are determined.
-One of: {“deterministic” | “probablistic”}</p>
+One of: {“det” | “prob”}</p>
 </dd>
 <dt><strong>max_angle</strong><span class="classifier">float, optional.</span></dt><dd><p>The maximum turning angle in each step. Default: 30</p>
 </dd>
@@ -88,17 +88,28 @@ set to True, in which case this is the total number of random seeds
 to generate within the mask.</p>
 </dd>
 <dt><strong>random_seeds</strong><span class="classifier">bool</span></dt><dd><p>Whether to generate a total of n_seeds random seeds in the mask.
-Default: XXX.</p>
+Default: False.</p>
 </dd>
 <dt><strong>rng_seed</strong><span class="classifier">int</span></dt><dd><p>random seed used to generate random seeds if random_seeds is
 set to True. Default: None</p>
 </dd>
-<dt><strong>stop_mask</strong><span class="classifier">array, optional.</span></dt><dd><p>A float or binary mask that determines a stopping criterion (e.g. FA).
-Default to no stopping (all ones).</p>
+<dt><strong>stop_mask</strong><span class="classifier">array or str, optional.</span></dt><dd><p>If array: A float or binary mask that determines a stopping criterion
+(e.g. FA).
+If str: “CMC” for Continuous Map Criterion <a class="reference internal" href="#r2bb8bf7259c4-girard2014" id="id1">[Girard2014]</a>.</p>
+<blockquote>
+<div><p>“ACT” for Anatomically-constrained tractography <span id="id2">[Smith2012]</span>.</p>
+</div></blockquote>
+<p>Defaults to no stopping (all ones). A string is required if
+the tracker is set to “pft”.</p>
 </dd>
-<dt><strong>stop_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>A value of the stop_mask below which tracking is terminated. Default to
+<dt><strong>stop_threshold</strong><span class="classifier">float or tuple, optional.</span></dt><dd><p>If float, this a value of the stop_mask below which tracking is
+terminated (and stop_mask has to be an array). Defaults to
 0 (this means that if no stop_mask is passed, we will stop only at
-the edge of the image)</p>
+the edge of the image). If this is a tuple, it contains a sequence
+that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
+which is either a string (full path) or a nibabel img to be used
+in particle filtering tractography. A tuple is required if tracker
+is set to “pft”.</p>
 </dd>
 <dt><strong>step_size</strong><span class="classifier">float, optional.</span></dt><dd><p>The size (in mm) of a step of tractography. Default: 1.0</p>
 </dd>
@@ -106,19 +117,33 @@ the edge of the image)</p>
 </dd>
 <dt><strong>max_length: int, optional</strong></dt><dd><p>The miminal length (mm) in a streamline. Default: 250</p>
 </dd>
-<dt><strong>odf_model</strong><span class="classifier">str, optional</span></dt><dd><p>One of {“DTI”, “CSD”}. Defaults to use “DTI”</p>
+<dt><strong>odf_model</strong><span class="classifier">str, optional</span></dt><dd><p>One of {“DTI”, “CSD”, “DKI”}. Defaults to use “DTI”</p>
 </dd>
-<dt><strong>Returns</strong></dt><dd></dd>
-<dt><strong>——-</strong></dt><dd></dd>
-<dt><strong>list of streamlines ()</strong></dt><dd></dd>
+<dt><strong>tracker</strong><span class="classifier">str, optional</span></dt><dd><p>Which strategy to use in tracking. This can be the standard local
+tracking (“local”) or Particle Filtering Tracking (<a class="reference internal" href="#r2bb8bf7259c4-girard2014" id="id3">[Girard2014]</a>).
+One of {“local”, “pft”}. Default: “local”</p>
+</dd>
 </dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>list of streamlines ()</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r2bb8bf7259c4-girard2014"><span class="brackets">Girard2014</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>)</span></dt>
+<dd><p>Girard, G., Whittingstall, K., Deriche, R., &amp;
+Descoteaux, M. Towards quantitative connectivity analysis: reducing
+tractography biases. NeuroImage, 98, 266-278, 2014.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="AFQ.tractography._local_tracking">
-<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_local_tracking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seeds</span></em>, <em class="sig-param"><span class="n">dg</span></em>, <em class="sig-param"><span class="n">stopping_criterion</span></em>, <em class="sig-param"><span class="n">params_img</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_local_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._local_tracking" title="Permalink to this definition">¶</a></dt>
+<dt id="AFQ.tractography._tracking">
+<code class="sig-prename descclassname">AFQ.tractography.</code><code class="sig-name descname">_tracking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tracker</span></em>, <em class="sig-param"><span class="n">seeds</span></em>, <em class="sig-param"><span class="n">dg</span></em>, <em class="sig-param"><span class="n">stopping_criterion</span></em>, <em class="sig-param"><span class="n">params_img</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">min_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/tractography.html#_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.tractography._tracking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function</p>
 </dd></dl>
 

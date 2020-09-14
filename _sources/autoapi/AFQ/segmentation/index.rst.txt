@@ -20,7 +20,6 @@ Classes
 
    .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=0, img_affine=None)
 
-
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
       Parameters
@@ -78,7 +77,6 @@ Classes
 
    .. method:: prepare_img(self, fdata, fbval, fbvec)
 
-
       Prepare image data from DWI data.
       Parameters
       ----------
@@ -105,7 +103,6 @@ Classes
 
 
    .. method:: prepare_map(self, mapping=None, reg_prealign=None, reg_template=None)
-
 
       Set mapping between DWI space and a template.
       Parameters
@@ -143,7 +140,6 @@ Classes
 
    .. method:: cross_streamlines(self, tg=None, template=None, low_coord=10)
 
-
       Classify the streamlines by whether they cross the midline.
       Creates a crosses attribute which is an array of booleans. Each boolean
       corresponds to a streamline, and is whether or not that streamline
@@ -175,7 +171,6 @@ Classes
 
    .. method:: _get_bundle_info(self, bundle_idx, bundle)
 
-
       Get fiber probabilites and ROIs for a given bundle.
 
 
@@ -198,7 +193,6 @@ Classes
 
 
    .. method:: _check_sl_with_inclusion(self, sl, include_rois, tol)
-
 
       Helper function to check that a streamline is close to a list of
       inclusion ROIS.
@@ -224,7 +218,6 @@ Classes
 
    .. method:: _check_sl_with_exclusion(self, sl, exclude_rois, tol)
 
-
       Helper function to check that a streamline is not too close to a
       list of exclusion ROIs.
 
@@ -249,7 +242,6 @@ Classes
 
    .. method:: _return_empty(self, bundle)
 
-
       Helper function for segment_afq, to return an empty dict under
       some conditions.
 
@@ -273,7 +265,6 @@ Classes
 
 
    .. method:: segment_afq(self, tg=None)
-
 
       Assign streamlines to bundles using the waypoint ROI approach
       Parameters
@@ -300,7 +291,6 @@ Classes
 
 
    .. method:: segment_reco(self, tg=None)
-
 
       Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
       Parameters

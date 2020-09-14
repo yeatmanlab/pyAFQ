@@ -14,10 +14,10 @@ Functions
 .. autoapisummary::
 
    AFQ.tractography.track
-   AFQ.tractography._local_tracking
+   AFQ.tractography._tracking
 
 
-.. function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI')
+.. function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI', tracker='local')
 
    Tractography
 
@@ -30,7 +30,7 @@ Functions
 
        **directions** : str
            How tracking directions are determined.
-           One of: {"deterministic" | "probablistic"}
+           One of: {"det" | "prob"}
 
        **max_angle** : float, optional.
            The maximum turning angle in each step. Default: 30
@@ -57,20 +57,29 @@ Functions
 
        **random_seeds** : bool
            Whether to generate a total of n_seeds random seeds in the mask.
-           Default: XXX.
+           Default: False.
 
        **rng_seed** : int
            random seed used to generate random seeds if random_seeds is
            set to True. Default: None
 
-       **stop_mask** : array, optional.
-           A float or binary mask that determines a stopping criterion (e.g. FA).
-           Default to no stopping (all ones).
+       **stop_mask** : array or str, optional.
+           If array: A float or binary mask that determines a stopping criterion
+           (e.g. FA).
+           If str: "CMC" for Continuous Map Criterion [R2bb8bf7259c4-Girard2014]_.
+                   "ACT" for Anatomically-constrained tractography [Smith2012]_.
+           Defaults to no stopping (all ones). A string is required if
+           the tracker is set to "pft".
 
-       **stop_threshold** : float, optional.
-           A value of the stop_mask below which tracking is terminated. Default to
+       **stop_threshold** : float or tuple, optional.
+           If float, this a value of the stop_mask below which tracking is
+           terminated (and stop_mask has to be an array). Defaults to
            0 (this means that if no stop_mask is passed, we will stop only at
-           the edge of the image)
+           the edge of the image). If this is a tuple, it contains a sequence
+           that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
+           which is either a string (full path) or a nibabel img to be used
+           in particle filtering tractography. A tuple is required if tracker
+           is set to "pft".
 
        **step_size** : float, optional.
            The size (in mm) of a step of tractography. Default: 1.0
@@ -82,16 +91,18 @@ Functions
            The miminal length (mm) in a streamline. Default: 250
 
        **odf_model** : str, optional
-           One of {"DTI", "CSD"}. Defaults to use "DTI"
+           One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
 
-       **Returns**
+       **tracker** : str, optional
+           Which strategy to use in tracking. This can be the standard local
+           tracking ("local") or Particle Filtering Tracking ([R2bb8bf7259c4-Girard2014]_).
+           One of {"local", "pft"}. Default: "local"
+
+   :Returns:
+
+       list of streamlines ()
            ..
 
-       **-------**
-           ..
-
-       **list of streamlines ()**
-           ..
 
 
 
@@ -100,8 +111,15 @@ Functions
 
 
 
+   .. rubric:: References
 
+   .. [R2bb8bf7259c4-Girard2014] Girard, G., Whittingstall, K., Deriche, R., &
+       Descoteaux, M. Towards quantitative connectivity analysis: reducing
+       tractography biases. NeuroImage, 98, 266-278, 2014.
 
+   .. only:: latex
+
+      [R2bb8bf7259c4-Girard2014]_
 
 
 
@@ -110,7 +128,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: _local_tracking(seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)
+.. function:: _tracking(tracker, seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)
 
    Helper function
 

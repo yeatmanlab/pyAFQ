@@ -109,34 +109,35 @@
 
 <div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
-    <span class="n">n_points</span> <span class="o">=</span> <span class="mi">100</span>
 
-    <span class="n">bundle_shape</span> <span class="o">=</span> <span class="p">((</span><span class="n">n_points</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">plotting_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="c1"># dtype object so None can be stored</span>
-    <span class="n">x_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">bundle_shape</span><span class="p">)</span>
-    <span class="n">y_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">bundle_shape</span><span class="p">)</span>
-    <span class="n">z_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">bundle_shape</span><span class="p">)</span>
+    <span class="n">x_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
+    <span class="n">y_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
+    <span class="n">z_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">bundle_shape</span><span class="p">)</span>
-        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">bundle_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">color_constant</span> <span class="o">=</span> <span class="p">(</span><span class="n">color</span> <span class="o">/</span> <span class="n">color</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.4</span> <span class="o">/</span> <span class="n">cbv</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">customdata</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">line_color</span> <span class="o">=</span> <span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">color_constant</span> <span class="o">=</span> <span class="n">color</span>
 
-    <span class="k">for</span> <span class="n">cumul_offset</span><span class="p">,</span> <span class="n">curr_offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">):</span>
-        <span class="n">sl</span> <span class="o">=</span> <span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">curr_offset</span><span class="p">:</span><span class="n">curr_offset</span><span class="o">+</span><span class="n">sls</span><span class="o">.</span><span class="n">_lengths</span><span class="p">[</span><span class="n">cumul_offset</span><span class="p">]]</span>
-        <span class="n">sl</span> <span class="o">=</span> <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sl_index</span><span class="p">,</span> <span class="n">plotting_offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">):</span>
+        <span class="n">sl_length</span> <span class="o">=</span> <span class="n">sls</span><span class="o">.</span><span class="n">_lengths</span><span class="p">[</span><span class="n">sl_index</span><span class="p">]</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">plotting_offset</span><span class="p">:</span><span class="n">plotting_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span>
 
         <span class="c1"># add sl to lines</span>
-        <span class="n">total_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cumul_offset</span>
-        <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># don&#39;t draw between streamlines</span>
-        <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">total_offset</span> <span class="o">=</span> <span class="n">plotting_offset</span> <span class="o">+</span> <span class="n">sl_index</span>
+        <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># don&#39;t draw between streamlines</span>
+        <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">brightness</span> <span class="o">=</span> <span class="n">cbv</span><span class="p">[</span>
@@ -145,12 +146,16 @@
                 <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
             <span class="p">]</span>
 
-            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
+            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">brightness</span><span class="p">,</span> <span class="n">color_constant</span><span class="p">)</span>
-            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
+            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
+                <span class="n">color_constant</span>
+            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="o">+</span><span class="n">n_points</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
@@ -169,9 +174,10 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize bundles in 3D</span>
 
@@ -184,6 +190,10 @@
 <span class="sd">    affine : ndarray, optional</span>
 <span class="sd">       An affine transformation to apply to the streamlines before</span>
 <span class="sd">       visualization. Default: no transform.</span>
+
+<span class="sd">    n_points : int or None</span>
+<span class="sd">        n_points to resample streamlines to before plotting. If None, no</span>
+<span class="sd">        resampling is done.</span>
 
 <span class="sd">    bundle_dict : dict, optional</span>
 <span class="sd">        Keys are names of bundles and values are dicts that should include</span>
@@ -229,8 +239,8 @@
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">background</span><span class="p">))</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> \
-            <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
+            <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
         <span class="n">_draw_streamlines</span><span class="p">(</span>
             <span class="n">figure</span><span class="p">,</span>
             <span class="n">sls</span><span class="p">,</span>

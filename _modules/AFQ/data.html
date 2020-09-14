@@ -596,7 +596,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_s3_keys</span> <span class="o">=</span> <span class="n">s3_keys</span>
 
     <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">include_derivs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pbar_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                 <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pbar_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Download files from S3</span>
 
 <span class="sd">        Parameters</span>
@@ -612,6 +612,10 @@
 
 <span class="sd">        overwrite : bool</span>
 <span class="sd">            If True, overwrite files for each subject. Default: False</span>
+
+<span class="sd">        suffix : str</span>
+<span class="sd">            Suffix, including extension, of file(s) to download.</span>
+<span class="sd">            Default: None</span>
 
 <span class="sd">        pbar : bool</span>
 <span class="sd">            If True, include download progress bar. Default: True</span>
@@ -631,6 +635,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;overwrite must be a boolean.&#39;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="p">(</span><span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;suffix must be a string.&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pbar</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;pbar must be a boolean.&#39;</span><span class="p">)</span>
 
@@ -643,12 +650,27 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">key</span>
 
+        <span class="c1"># Filter out keys that do not end with suffix</span>
+        <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s3_keys_raw</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">s3key</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">s3key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">s3_keys_deriv</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">dt</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">s3key</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="n">s3keys</span> <span class="k">if</span> <span class="n">s3key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+                <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s3_keys_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+            <span class="n">s3_keys_deriv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span>
+
         <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="p">[</span>
                 <span class="n">op</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="n">directory</span><span class="p">,</span>
                     <span class="n">split_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-                <span class="p">))</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+                <span class="p">))</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">s3_keys_raw</span>
             <span class="p">],</span>
             <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="n">dt</span><span class="p">:</span> <span class="p">[</span>
@@ -656,11 +678,11 @@
                         <span class="n">directory</span><span class="p">,</span>
                         <span class="n">split_key</span><span class="p">(</span><span class="n">s3key</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
                     <span class="p">))</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="n">s3keys</span>
-                <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="n">s3_keys_deriv</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
         <span class="p">}</span>
 
-        <span class="n">raw_zip</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">],</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]))</span>
+        <span class="n">raw_zip</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">s3_keys_raw</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]))</span>
 
         <span class="c1"># Populate files parameter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">raw_zip</span><span class="p">})</span>
@@ -671,7 +693,7 @@
         <span class="n">deriv_zips</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">dt</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
                 <span class="n">s3keys</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">]</span>
-            <span class="p">))</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">))</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="n">s3_keys_deriv</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
 
         <span class="n">deriv_pairs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1011,7 +1033,7 @@
 <span class="sd">        list</span>
 <span class="sd">            list of available derivatives pipelines</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
         <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
                                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
         <span class="n">derivatives_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">])</span>
@@ -1037,7 +1059,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
         <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
                                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
@@ -1067,7 +1089,8 @@
 <span class="sd">            list of participant_ids</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_participants_tsv</span><span class="p">:</span>
-            <span class="n">tsv_key</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="s1">&#39;participants.tsv&#39;</span><span class="p">])</span>
+            <span class="n">tsv_key</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                                <span class="s2">&quot;participants.tsv&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
             <span class="n">s3</span> <span class="o">=</span> <span class="n">get_s3_client</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)</span>
 
             <span class="k">def</span> <span class="nf">get_subs_from_tsv_key</span><span class="p">(</span><span class="n">s3_key</span><span class="p">):</span>
@@ -1083,7 +1106,7 @@
             <span class="n">subject_set</span> <span class="o">=</span> <span class="n">get_subs_from_tsv_key</span><span class="p">(</span><span class="n">tsv_key</span><span class="p">)</span>
             <span class="n">subjects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subject_set</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span>
+            <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
             <span class="n">sub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
                                 <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;subjects&#39;</span><span class="p">]</span>
 
@@ -1095,7 +1118,7 @@
                 <span class="n">entities</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">parse_file_entities</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
                 <span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sub-&#39;</span> <span class="o">+</span> <span class="n">entities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">subjects</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">subjects</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_download_non_sub_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span>
                                <span class="n">select</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,),</span>
@@ -1130,6 +1153,7 @@
                  <span class="n">include_modality_agnostic</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,),</span>
                  <span class="n">include_derivs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">include_derivs_dataset_description</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Download files for each subject in the study</span>
 
@@ -1155,6 +1179,10 @@
 <span class="sd">            Used only if include_derivs is not False. If True,</span>
 <span class="sd">            dataset_description.json downloaded for each derivative.</span>
 
+<span class="sd">        suffix : str</span>
+<span class="sd">            Suffix, including extension, of file(s) to download.</span>
+<span class="sd">            Default: None</span>
+
 <span class="sd">        overwrite : bool</span>
 <span class="sd">            If True, overwrite files for each subject. Default: False</span>
 
@@ -1166,7 +1194,7 @@
 <span class="sd">        AFQ.data.S3BIDSSubject.download</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">include_modality_agnostic</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">include_modality_agnostic</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_download_non_sub_keys</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
@@ -1194,6 +1222,7 @@
         <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">delayed</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">download</span><span class="p">)(</span>
             <span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span>
             <span class="n">include_derivs</span><span class="o">=</span><span class="n">include_derivs</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
             <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
             <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span><span class="p">,</span>
             <span class="n">pbar_idx</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span>
@@ -1287,7 +1316,7 @@
 <span class="sd">        list</span>
 <span class="sd">            list of available derivatives pipelines</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
         <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
                                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
         <span class="n">derivatives_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">])</span>
@@ -1332,7 +1361,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
         <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
                                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
@@ -1541,8 +1570,8 @@
     <span class="n">stanford_hardi_tractography_remote_fnames</span><span class="p">,</span>
     <span class="n">stanford_hardi_tractography_fnames</span><span class="p">,</span>
     <span class="n">md5_list</span><span class="o">=</span><span class="n">stanford_hardi_tractography_hashes</span><span class="p">,</span>
-    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Download Stanford HARDI tractography and mapping. For testing</span>
-<span class="s2">           purposes&quot;&quot;&quot;</span><span class="p">)</span></div>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Download Stanford HARDI tractography and mapping. For testing</span></div>
+<span class="s2">           purposes&quot;&quot;&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="read_stanford_hardi_tractography"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_stanford_hardi_tractography">[docs]</a><span class="k">def</span> <span class="nf">read_stanford_hardi_tractography</span><span class="p">():</span>
