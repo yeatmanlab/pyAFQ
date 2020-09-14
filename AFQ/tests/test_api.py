@@ -213,7 +213,7 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
 
 
-@pytest.mark.nightly3
+@pytest.mark.skip(reason="may cause OOM")
 def test_AFQ_slr():
     """
     Test if API can run using slr map
