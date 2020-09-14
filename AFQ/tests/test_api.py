@@ -229,6 +229,7 @@ def test_AFQ_slr():
     myafq.export_rois()
 
 
+@pytest.mark.nightly2
 def test_AFQ_reco():
     """
     Test if API can run registeration with FA
