@@ -16,6 +16,7 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
 
+import AFQ.registration as reg
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
@@ -160,21 +161,39 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     elif tracker == "pft":
         if not isinstance(stop_mask, str):
             raise RuntimeError(
-            "You are using PFT tracking, but did not provide a string 'stop_mask' input. ",
-            "Possible inputs are: 'CMC' or 'ACT'")
+                "You are using PFT tracking, but did not provide a string ",
+                "'stop_mask' input. ",
+                "Possible inputs are: 'CMC' or 'ACT'")
         if not isinstance(stop_threshold, tuple):
             raise RuntimeError(
-            "You are using PFT tracking, but did not provide a tuple for `stop_threshold`",
-            "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
+                "You are using PFT tracking, but did not provide a tuple for",
+                "`stop_threshold`",
+                "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
         pves = []
+        pve_imgs = []
         vox_sizes = []
         for ii, pve in enumerate(stop_threshold):
             if isinstance(pve, str):
-                pve = nib.load(pve)
-            pves.append(pve.get_fdata())
-            vox_sizes.append(np.mean(pve.header.get_zooms()[:3]))
+                img = nib.load(pve)
+            else:
+                img = pve
+            pve_imgs.append(img)
+            pves.append(pve_imgs[-1].get_fdata())
         average_voxel_size = np.mean(vox_sizes)
+        pve_wm_img, pve_gm_img, pve_csf_img = pve_imgs
         pve_wm_data, pve_gm_data, pve_csf_data = pves
+        pve_wm_data = reg.resample(pve_wm_data, model_params[..., 0],
+                                   pve_wm_img.affine,
+                                   params_img.affine)
+        pve_gm_data = reg.resample(pve_gm_data, model_params[..., 0],
+                                   pve_gm_img.affine,
+                                   params_img.affine)
+        pve_csf_data = reg.resample(pve_csf_data, model_params[..., 0],
+                                    pve_csf_img.affine,
+                                    params_img.affine)
+
+        vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
+
         my_tracker = VerboseParticleFilteringTracking
         if stop_mask == "CMC":
             stopping_criterion = CmcStoppingCriterion.from_pve(
