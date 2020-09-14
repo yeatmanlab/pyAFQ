@@ -120,8 +120,10 @@ class Segmentation:
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
-        rng : RandomState
-            If None, creates RandomState. Used in RecoBundles Algorithm.
+        rng : RandomState or int
+            If None, creates RandomState.
+            If int, creates RandomState with seed rng.
+            Used in RecoBundles Algorithm.
             Default: None.
         return_idx : bool
             Whether to return the indices in the original streamlines as part
@@ -149,6 +151,8 @@ class Segmentation:
 
         if rng is None:
             self.rng = np.random.RandomState()
+        elif isinstance(rng, int):
+            self.rng = np.random.RandomState(rng)
         else:
             self.rng = rng
 
