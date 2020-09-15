@@ -7,11 +7,10 @@ import tempfile
 import numpy as np
 from scipy.stats import sem
 import pandas as pd
-from palettable.tableau import Tableau_20
 import imageio as io
 import IPython.display as display
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -27,30 +26,30 @@ from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
-tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
 sns.set_theme()
+tableau_20_sns = sns.color_palette("tab20")
 
 COLOR_DICT = OrderedDict({
-    "ATR_L": tableau_20_rgb[0], "C_L": tableau_20_rgb[0],
-    "ATR_R": tableau_20_rgb[1], "C_R": tableau_20_rgb[1],
-    "CST_L": tableau_20_rgb[2],
-    "CST_R": tableau_20_rgb[3],
-    "CGC_L": tableau_20_rgb[4], "MCP": tableau_20_rgb[4],
-    "CGC_R": tableau_20_rgb[5], "CCMid": tableau_20_rgb[5],
-    "HCC_L": tableau_20_rgb[6],
-    "HCC_R": tableau_20_rgb[7],
-    "FP": tableau_20_rgb[8], "CC_ForcepsMinor": tableau_20_rgb[8],
-    "FA": tableau_20_rgb[9], "CC_ForcepsMajor": tableau_20_rgb[9],
-    "IFO_L": tableau_20_rgb[10], "IFOF_L": tableau_20_rgb[10],
-    "IFO_R": tableau_20_rgb[11], "IFOF_R": tableau_20_rgb[11],
-    "ILF_L": tableau_20_rgb[12], "F_L": tableau_20_rgb[12],
-    "ILF_R": tableau_20_rgb[13], "F_R": tableau_20_rgb[13],
-    "SLF_L": tableau_20_rgb[14],
-    "SLF_R": tableau_20_rgb[15],
-    "UNC_L": tableau_20_rgb[16], "UF_L": tableau_20_rgb[16],
-    "UNC_R": tableau_20_rgb[17], "UF_R": tableau_20_rgb[17],
-    "ARC_L": tableau_20_rgb[18], "AF_L": tableau_20_rgb[18],
-    "ARC_R": tableau_20_rgb[19], "AF_R": tableau_20_rgb[19]})
+    "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
+    "ATR_R": tableau_20_sns[1], "C_R": tableau_20_sns[1],
+    "CST_L": tableau_20_sns[2],
+    "CST_R": tableau_20_sns[3],
+    "CGC_L": tableau_20_sns[4], "MCP": tableau_20_sns[4],
+    "CGC_R": tableau_20_sns[5], "CCMid": tableau_20_sns[5],
+    "HCC_L": tableau_20_sns[6],
+    "HCC_R": tableau_20_sns[7],
+    "FP": tableau_20_sns[8], "CC_ForcepsMinor": tableau_20_sns[8],
+    "FA": tableau_20_sns[9], "CC_ForcepsMajor": tableau_20_sns[9],
+    "IFO_L": tableau_20_sns[10], "IFOF_L": tableau_20_sns[10],
+    "IFO_R": tableau_20_sns[11], "IFOF_R": tableau_20_sns[11],
+    "ILF_L": tableau_20_sns[12], "F_L": tableau_20_sns[12],
+    "ILF_R": tableau_20_sns[13], "F_R": tableau_20_sns[13],
+    "SLF_L": tableau_20_sns[14],
+    "SLF_R": tableau_20_sns[15],
+    "UNC_L": tableau_20_sns[16], "UF_L": tableau_20_sns[16],
+    "UNC_R": tableau_20_sns[17], "UF_R": tableau_20_sns[17],
+    "ARC_L": tableau_20_sns[18], "AF_L": tableau_20_sns[18],
+    "ARC_R": tableau_20_sns[19], "AF_R": tableau_20_sns[19]})
 
 POSITIONS = OrderedDict({
     "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
@@ -658,9 +657,16 @@ class LongitudinalCSVComparison():
         return single_profile
 
     def _get_brain_axes(self, suptitle):
-        fig, axes = plt.subplots(5, 5)
-        plt.tight_layout()
-        fig.set_size_inches((12, 12))
+        fig, axes = plt.subplots(5, 5, frameon=False)
+        plt.subplots_adjust(
+            left=None,
+            bottom=None,
+            right=None,
+            top=None,
+            wspace=0.4,
+            hspace=0.6)
+        sns.despine()
+        fig.set_size_inches((18, 18))
         fig.suptitle(suptitle)
         axes[0, 0].axis("off")
         axes[0, -1].axis("off")
@@ -683,7 +689,8 @@ class LongitudinalCSVComparison():
     def tract_profiles(self, names=None, scalar="dti_fa",
                        min_scalar=0.0, max_scalar=1.0,
                        show_plots=False,
-                       positions=POSITIONS):
+                       positions=POSITIONS,
+                       n_boot=1000):
         """
         Compare all tract profiles for a scalar from different CSVs.
         Plots tract profiles for all in one plot.
@@ -702,6 +709,11 @@ class LongitudinalCSVComparison():
         min_scalar : float, optional
             Minimum value used for y-axis bounds. Default: 0.0
 
+        n_boot : int, optional
+            Number of bootstrap resamples for seaborn to use
+            to estimate the ci.
+            Default: 1000
+
         max_scalar : float, optional
             Maximum value used for y-axis bounds. Default: 1.0
 
@@ -718,26 +730,39 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
 
-        for subject in self.subjects:
-            fig, axes = self._get_brain_axes('Subject ' + str(subject))
-            for bundle in self.bundles:
-                ax = axes[positions[bundle][0], positions[bundle][1]]
-                for name in names:
-                    profile = self._get_profile(name, bundle, subject, scalar)
-                    if profile is not None:
-                        sns.lineplot(y=profile, ax=ax)
-                ax.set_title(bundle)
-                ax.set_ylim([min_scalar, max_scalar])
-                y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
-                ax.set_yticks(y_ticks)
-                ax.set_yticklabels(y_ticks)
-                ax.set_xticklabels([])
+        fig, axes = self._get_brain_axes("A")
+        for bundle in self.bundles:
+            ax = axes[positions[bundle][0], positions[bundle][1]]
+            for name in names:
+                profile = self.profile_dict[name]
+                profile = profile[profile['bundle'] == bundle]
+                sns.set(style="ticks", rc={"lines.linewidth": 6})
+                sns.lineplot(
+                    x="node", y=scalar,
+                    data=profile, hue="bundle",
+                    estimator='mean', ci=95, n_boot=n_boot,
+                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax)
+                sns.set(style="ticks", rc={"lines.linewidth": 0.5})
+                sns.lineplot(
+                    x="node", y=scalar,
+                    data=profile, hue="bundle",
+                    estimator=None, units='subjectID',
+                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax)
 
-            fig.legend(names, loc='center')
-            fig.savefig(
-                self._get_fname(
-                    f"tract_profiles/{scalar}",
-                    f"{'_'.join(names)}_sub-{subject}"))
+            ax.set_title(bundle, fontsize=15)
+            ax.set_xlabel('Node', fontsize=10)
+            ax.set_ylabel(scalar, fontsize=10)
+            ax.set_ylim([min_scalar, max_scalar])
+            y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
+            ax.set_yticks(y_ticks)
+            ax.set_yticklabels(y_ticks)
+            ax.set_xticklabels([])
+
+        fig.legend(names, loc='center')
+        fig.savefig(
+            self._get_fname(
+                f"tract_profiles/{scalar}",
+                f"{'_'.join(names)}"))
 
         if not show_plots:
             plt.ion()
