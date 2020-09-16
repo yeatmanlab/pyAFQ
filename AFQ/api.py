@@ -51,7 +51,7 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 RECO_BUNDLES = [
-    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid', 'AF',
+    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"

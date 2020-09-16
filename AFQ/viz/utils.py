@@ -27,36 +27,46 @@ __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
 
-COLOR_DICT = OrderedDict({"ATR_L": tableau_20_rgb[0],
-                          "ATR_R": tableau_20_rgb[1],
-                          "CST_L": tableau_20_rgb[2],
-                          "CST_R": tableau_20_rgb[3],
-                          "CGC_L": tableau_20_rgb[4],
-                          "CGC_R": tableau_20_rgb[5],
-                          "HCC_L": tableau_20_rgb[6],
-                          "HCC_R": tableau_20_rgb[7],
-                          "FP": tableau_20_rgb[8],
-                          "FA": tableau_20_rgb[9],
-                          "IFO_L": tableau_20_rgb[10],
-                          "IFO_R": tableau_20_rgb[11],
-                          "ILF_L": tableau_20_rgb[12],
-                          "ILF_R": tableau_20_rgb[13],
-                          "SLF_L": tableau_20_rgb[14],
-                          "SLF_R": tableau_20_rgb[15],
-                          "UNC_L": tableau_20_rgb[16],
-                          "UNC_R": tableau_20_rgb[17],
-                          "ARC_L": tableau_20_rgb[18],
-                          "ARC_R": tableau_20_rgb[19]})
+COLOR_DICT = OrderedDict({
+    "ATR_L": tableau_20_rgb[0],
+    "ATR_R": tableau_20_rgb[1],
+    "CST_L": tableau_20_rgb[2],
+    "CST_R": tableau_20_rgb[3],
+    "CGC_L": tableau_20_rgb[4],
+    "CGC_R": tableau_20_rgb[5],
+    "HCC_L": tableau_20_rgb[6],
+    "HCC_R": tableau_20_rgb[7],
+    "FP": tableau_20_rgb[8],
+    "FA": tableau_20_rgb[9],
+    "IFO_L": tableau_20_rgb[10], "IFOF_L": tableau_20_rgb[10],
+    "IFO_R": tableau_20_rgb[11], "IFOF_R": tableau_20_rgb[11],
+    "ILF_L": tableau_20_rgb[12],
+    "ILF_R": tableau_20_rgb[13],
+    "SLF_L": tableau_20_rgb[14],
+    "SLF_R": tableau_20_rgb[15],
+    "UNC_L": tableau_20_rgb[16], "UF_L": tableau_20_rgb[16],
+    "UNC_R": tableau_20_rgb[17], "UF_R": tableau_20_rgb[17],
+    "ARC_L": tableau_20_rgb[18], "AF_L": tableau_20_rgb[18],
+    "ARC_R": tableau_20_rgb[19], "AF_R": tableau_20_rgb[19]})
 
-POSITIONS = OrderedDict({"ATR_L": (1, 0), "ATR_R": (1, 4),
-                         "CST_L": (1, 1), "CST_R": (1, 3),
-                         "CGC_L": (3, 1), "CGC_R": (3, 3),
-                         "FP": (4, 2), "FA": (0, 2),
-                         "IFO_L": (4, 1), "IFO_R": (4, 3),
-                         "ILF_L": (3, 0), "ILF_R": (3, 4),
-                         "SLF_L": (2, 1), "SLF_R": (2, 3),
-                         "ARC_L": (2, 0), "ARC_R": (2, 4),
-                         "UNC_L": (0, 1), "UNC_R": (0, 3)})
+POSITIONS = OrderedDict({
+    "ATR_L": (1, 0), "ATR_R": (1, 4),
+    "CST_L": (1, 1), "CST_R": (1, 3),
+    "CGC_L": (3, 1), "CGC_R": (3, 3),
+    "FP": (4, 2), "FA": (0, 2),
+    "IFO_L": (4, 1), "IFO_R": (4, 3), "IFOF_L": (4, 1), "IFOF_R": (4, 3),
+    "HCC_L": (4, 0), "HCC_R": (4, 5),
+    "ILF_L": (3, 0), "ILF_R": (3, 4),
+    "SLF_L": (2, 1), "SLF_R": (2, 3),
+    "ARC_L": (2, 0), "ARC_R": (2, 4), "AF_L": (2, 0), "AF_R": (2, 4),
+    "UNC_L": (0, 1), "UNC_R": (0, 3), "UF_L": (0, 1), "UF_R": (0, 3)})
+
+BUNDLE_RECO_2_AFQ = \
+    {
+        "AF_L": "ARC_L", "AF_R": "ARC_R",
+        "UF_L": "UNC_L", "UF_R": "UNC_R",
+        "IFOF_L": "IFO_L", "IFOF_R": "IFO_R",
+    }
 
 BUNDLE_MAT_2_PYTHON = \
     {'Right Corticospinal': 'CST_R', 'Left Corticospinal': 'CST_L',
@@ -477,6 +487,7 @@ class LongitudinalCSVComparison():
                  subjects=None,
                  scalar_bounds={'lb': {'dti_fa': 0.2},
                                 'ub': {'dti_md': 0.002}},
+                 bundles=None,
                  percent_nan_tol=10,
                  percent_edges_removed=10,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
@@ -512,6 +523,11 @@ class LongitudinalCSVComparison():
             on the profiles (any values outside of the threshold will be
             marked NaN and not used or set to 0, depending on the case).
             Default: {'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}
+
+        bundles : list of strings, optional
+            Bundles to compare.
+            If None, use all bundles in the first profile group.
+            Default: None
 
         percent_nan_tol : int, optional
             Percentage of NaNs tolerable. If a profile has less than this
@@ -590,6 +606,10 @@ class LongitudinalCSVComparison():
         else:
             self.subjects = subjects
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
+        if bundles is None:
+            self.bundles = self.profile_dict[0]['bundle'].unique()
+        else:
+            self.bundles = bundles
 
     def _threshold_scalar(self, bound, threshold, val):
         if bound == "lb":
@@ -710,11 +730,9 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
 
-        bundles = positions.keys()
-
         for subject in self.subjects:
             fig, axes = self._get_brain_axes('Subject ' + str(subject))
-            for bundle in bundles:
+            for bundle in self.bundles:
                 ax = axes[positions[bundle][0], positions[bundle][1]]
                 for name in names:
                     profile = self._get_profile(name, bundle, subject, scalar)
@@ -737,7 +755,7 @@ class LongitudinalCSVComparison():
             plt.ion()
 
     def contrast_index(self, names=None, scalar="dti_fa",
-                       bundles=list(POSITIONS.keys()), show_plots=False):
+                       show_plots=False):
         """
         Calculate the contrast index for each bundle in two datasets.
 
@@ -751,9 +769,6 @@ class LongitudinalCSVComparison():
 
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
-
-        bundles : list of strings, optional
-            Bundles to correlate. Default: list(POSITIONS.keys())
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -774,12 +789,13 @@ class LongitudinalCSVComparison():
                               + "only two dataset names should be given")
             return None
 
-        contrast_index = pd.DataFrame(index=bundles, columns=self.subjects)
+        contrast_index = pd.DataFrame(
+            index=self.bundles, columns=self.subjects)
         for subject in self.subjects:
             fig, axes = self._get_brain_axes(
                 (f"Contrast Indices by Bundle, "
                     f" {names[0]} vs {names[1]}"))
-            for bundle in bundles:
+            for bundle in self.bundles:
                 profiles = [None] * 2
                 both_found = True
                 for i, name in enumerate(names):
@@ -811,7 +827,6 @@ class LongitudinalCSVComparison():
         return contrast_index
 
     def lateral_contrast_index(self, names=None, scalar="dti_fa",
-                               bundles=list(POSITIONS.keys()),
                                show_plots=False):
         """
         Calculate the lateral contrast index for each bundle in a given
@@ -827,12 +842,6 @@ class LongitudinalCSVComparison():
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
 
-        bundles : list of strings, optional
-            Bundles to correlate.
-            Every other bundle will be laterally correlated.
-            There must be an even number of bundles.
-            Default: list(POSITIONS.keys())
-
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
@@ -846,9 +855,17 @@ class LongitudinalCSVComparison():
         for subject in self.subjects:
             fig, axes = self._get_brain_axes(
                 f"Lateral Contrast Indices by Bundle")
-            for j in range(0, len(bundles), 2):
-                bundle = bundles[j]
-                other_bundle = bundles[j + 1]
+            for j, bundle in enumerate(self.bundles):
+                other_bundle = list(bundle)
+                if other_bundle[-1] == 'L':
+                    other_bundle[-1] = 'R'
+                elif other_bundle[-1] == 'R':
+                    other_bundle[-1] = 'L'
+                else:
+                    continue
+                if other_bundle not in self.bundles:
+                    continue
+
                 for name in names:
                     profile = self._get_profile(
                         name, bundle, subject, scalar)
@@ -875,7 +892,6 @@ class LongitudinalCSVComparison():
     def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           ylims=[0.0, 1.0],
-                          bundles=POSITIONS.keys(),
                           show_plots=False):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
@@ -895,9 +911,6 @@ class LongitudinalCSVComparison():
             Limits of the y-axis. Useful to synchronize axes across graphs.
             Default: [0.0, 1.0].
 
-        bundles : list of strings, optional
-            Bundles to correlate. Default: POSITIONS.keys()
-
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
@@ -916,14 +929,15 @@ class LongitudinalCSVComparison():
             return None
 
         # extract relevant statistics / data from profiles
-        all_sub_coef = np.zeros((len(scalars), len(bundles)))
+        all_sub_coef = np.zeros((len(scalars), len(self.bundles)))
         all_sub_means = np.zeros(
-            (len(scalars), len(bundles), 2, len(self.subjects)))
+            (len(scalars), len(self.bundles), 2, len(self.subjects)))
         all_profile_coef = \
-            np.zeros((len(scalars), len(bundles), len(self.subjects)))
-        all_node_coef = np.zeros((len(scalars), len(bundles), self.prof_len))
+            np.zeros((len(scalars), len(self.bundles), len(self.subjects)))
+        all_node_coef = np.zeros(
+            (len(scalars), len(self.bundles), self.prof_len))
         for m, scalar in enumerate(scalars):
-            for k, bundle in enumerate(bundles):
+            for k, bundle in enumerate(self.bundles):
                 bundle_profiles =\
                     np.zeros((2, len(self.subjects), self.prof_len))
                 for j, name in enumerate(names):
@@ -956,7 +970,7 @@ class LongitudinalCSVComparison():
         fig, axes = self._get_brain_axes(
             (f"Distribution of Pearson's r between profiles,"
                 f" {names[0]}_vs_{names[1]}"))
-        for k, bundle in enumerate(bundles):
+        for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
@@ -980,7 +994,7 @@ class LongitudinalCSVComparison():
         fig, axes = self._get_brain_axes(
             (f"node reliability profiles,"
                 f" {names[0]}_vs_{names[1]}"))
-        for k, bundle in enumerate(bundles):
+        for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
                 ax.plot(all_node_coef[m, k], label=scalar)
@@ -1002,7 +1016,7 @@ class LongitudinalCSVComparison():
             fig, axes = self._get_brain_axes(
                 (f"Distribution of mean profiles,"
                     f" {names[0]}_vs_{names[1]}_{scalar}"))
-            for k, bundle in enumerate(bundles):
+            for k, bundle in enumerate(self.bundles):
                 ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                 ax.scatter(
                     this_sub_means[k, 0], this_sub_means[k, 1])
@@ -1020,7 +1034,7 @@ class LongitudinalCSVComparison():
         # plot bar plots of pearson's r
         width = 0.6
         spacing = 2
-        x = np.arange(len(bundles)) * spacing
+        x = np.arange(len(self.bundles)) * spacing
         x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
         fig, axes = plt.subplots(2, 1)
@@ -1049,12 +1063,12 @@ class LongitudinalCSVComparison():
         axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xticks(x)
-        axes[0].set_xticklabels(bundles)
+        axes[0].set_xticklabels(self.bundles)
         axes[0].set_title("profile_reliability")
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xticks(x)
-        axes[1].set_xticklabels(bundles)
+        axes[1].set_xticklabels(self.bundles)
         axes[1].set_title(f"intersubejct_reliability")
 
         plt.setp(axes[0].get_xticklabels(),
