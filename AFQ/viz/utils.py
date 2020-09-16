@@ -397,17 +397,16 @@ class Viz:
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
+                             n_boot=1000,
                              file_name=None,
-                             use_fa_ticks=None,
                              positions=POSITIONS):
     """
     Visualize all tract profiles for a scalar in one plot
 
     Parameters
     ----------
-    tract_profiles : pandas dataframe
-        Pandas dataframe of tract_profiles. For example,
-        tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])
+    tract_profiles : string
+        Path to CSV containing tract_profiles.
 
     scalar : string, optional
        Scalar to use in plots. Default: "dti_fa".
@@ -416,15 +415,14 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         Minimum and maximum value used for y-axis bounds.
         If None, ylim is not set.
         Default: None
+
+    n_boot : int, optional
+        Number of bootstrap resamples for seaborn to use
+        to estimate the ci.
+        Default: 1000
+
     file_name : string, optional
         File name to save figure to if not None. Default: None
-
-    use_fa_ticks : bool, optional
-        Set min and max y limit to 0 and 1, and only use yticks at
-        0.2, 0.4, 0.6 . Useful for plotting FA.
-        If None, set to evaluation of ("fa" in scalar).
-        If ultimately True, takes precedence over ylim.
-        Default: None
 
     positions : dictionary, optional
         Dictionary that maps bundle names to position in plot.
@@ -434,52 +432,24 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
     -------
         Matplotlib figure and axes.
     """
-    if use_fa_ticks is None:
-        use_fa_ticks = ("fa" in scalar)
+    csv_comparison = GroupCSVComparison(
+        None,
+        [tract_profiles],
+        ["my_tract_profiles"],
+        scalar_bounds={'lb': {}, 'ub': {}})
 
-    if (file_name is not None):
-        plt.ioff()
+    df = csv_comparison.tract_profiles(
+        scalar=scalar,
+        min_scalar=ylim[0],
+        max_scalar=ylim[1],
+        positions=positions,
+        out_file=file_name,
+        n_boot=n_boot)
 
-    fig, axes = plt.subplots(5, 5)
-
-    for bundle in positions.keys():
-        ax = axes[positions[bundle][0], positions[bundle][1]]
-        fa = tract_profiles[
-            (tract_profiles["bundle"] == bundle)
-        ][scalar].values
-        sns.lineplot(
-            y=fa,
-            fmt='o-',
-            color=COLOR_DICT[bundle],
-            ax=ax)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
-
-        if use_fa_ticks:
-            ax.set_ylim([0.0, 1.0])
-            ax.set_yticks([0.2, 0.4, 0.6])
-            ax.set_yticklabels([0.2, 0.4, 0.6])
-            ax.set_xticklabels([])
-
-    fig.set_size_inches((12, 12))
-
-    axes[0, 0].axis("off")
-    axes[0, -1].axis("off")
-    axes[1, 2].axis("off")
-    axes[2, 2].axis("off")
-    axes[3, 2].axis("off")
-    axes[4, 0].axis("off")
-    axes[4, 4].axis("off")
-
-    if (file_name is not None):
-        fig.savefig(file_name)
-        plt.ion()
-
-    return fig, axes
+    return df
 
 
-class LongitudinalCSVComparison():
+class GroupCSVComparison():
     """
     Compare different CSVs, using:
     tract profiles, contrast indices,
@@ -705,6 +675,7 @@ class LongitudinalCSVComparison():
                        min_scalar=0.0, max_scalar=1.0,
                        show_plots=False,
                        positions=POSITIONS,
+                       out_file=None,
                        n_boot=1000):
         """
         Compare all tract profiles for a scalar from different CSVs.
@@ -723,6 +694,11 @@ class LongitudinalCSVComparison():
 
         min_scalar : float, optional
             Minimum value used for y-axis bounds. Default: 0.0
+
+        out_file : str, optional
+            Path to save the figure to.
+            If None, use the default naming convention in self.out_folder
+            Default: None
 
         n_boot : int, optional
             Number of bootstrap resamples for seaborn to use
@@ -782,10 +758,14 @@ class LongitudinalCSVComparison():
             ax.set_yticklabels(y_ticks)
             ax.set_xticklabels([])
         fig.legend(names, loc='center')
-        fig.savefig(
-            self._get_fname(
-                f"tract_profiles/{scalar}",
-                f"{'_'.join(names)}"))
+
+        if out_file is None:
+            fig.savefig(
+                self._get_fname(
+                    f"tract_profiles/{scalar}",
+                    f"{'_'.join(names)}"))
+        else:
+            fig.savefig(out_file)
 
         if not show_plots:
             plt.ion()
