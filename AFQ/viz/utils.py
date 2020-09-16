@@ -762,9 +762,9 @@ class GroupCSVComparison():
             ax.set_ylabel(scalar, fontsize=14)
             if ylim is not None:
                 ax.set_ylim(ylim)
-            y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
-            ax.set_yticks(y_ticks)
-            ax.set_yticklabels(y_ticks)
+                y_ticks = np.asarray([0.2, 0.4, 0.6]) * ylim[1]
+                ax.set_yticks(y_ticks)
+                ax.set_yticklabels(y_ticks)
 
         fig.legend(labels, names, loc='center')
 
