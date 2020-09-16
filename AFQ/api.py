@@ -183,7 +183,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  use_prealign=True,
                  virtual_frame_buffer=False,
-                 viz_backend="fury",
+                 viz_backend="plotly",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -273,7 +273,7 @@ class AFQ(object):
         viz_backend : str, optional
             [VIZ] Which visualization backend to us.
             One of {"fury", "plotly"}.
-            Default: "fury"
+            Default: "plotly"
         segmentation_params : dict, optional
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
