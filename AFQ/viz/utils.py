@@ -441,8 +441,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
 
     df = csv_comparison.tract_profiles(
         scalar=scalar,
-        min_scalar=ylim[0],
-        max_scalar=ylim[1],
+        ylim=ylim,
         positions=positions,
         out_file=file_name,
         n_boot=n_boot)
@@ -676,7 +675,7 @@ class GroupCSVComparison():
         return np.corrcoef(arr[:, mask])[0][1]
 
     def tract_profiles(self, names=None, scalar="dti_fa",
-                       min_scalar=0.0, max_scalar=1.0,
+                       ylim=None,
                        show_plots=False,
                        positions=POSITIONS,
                        out_file=None,
@@ -696,8 +695,10 @@ class GroupCSVComparison():
         scalar : string, optional
             Scalar to use in plots. Default: "dti_fa".
 
-        min_scalar : float, optional
-            Minimum value used for y-axis bounds. Default: 0.0
+        ylim : list of 2 floats, optional
+            Minimum and maximum value used for y-axis bounds.
+            If None, ylim is not set.
+            Default: None
 
         out_file : str, optional
             Path to save the figure to.
@@ -708,9 +709,6 @@ class GroupCSVComparison():
             Number of bootstrap resamples for seaborn to use
             to estimate the ci.
             Default: 1000
-
-        max_scalar : float, optional
-            Maximum value used for y-axis bounds. Default: 1.0
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -762,7 +760,8 @@ class GroupCSVComparison():
             ax.set_title(bundle, fontsize=20)
             ax.set_xlabel(X_LABELS[j], fontsize=14)
             ax.set_ylabel(scalar, fontsize=14)
-            ax.set_ylim([min_scalar, max_scalar])
+            if ylim is not None:
+                ax.set_ylim(ylim)
             y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
             ax.set_yticks(y_ticks)
             ax.set_yticklabels(y_ticks)
