@@ -768,6 +768,7 @@ class GroupCSVComparison():
             fig.savefig(out_file)
 
         if not show_plots:
+            plt.close(fig)
             plt.ion()
 
     def contrast_index(self, names=None, scalar="dti_fa",
@@ -837,6 +838,7 @@ class GroupCSVComparison():
             f"contrast_index/{scalar}",
             f"{names[0]}_vs_{names[1]}"))
         if not show_plots:
+            plt.close(fig)
             plt.ion()
         return contrast_index
 
@@ -901,6 +903,7 @@ class GroupCSVComparison():
                     f"{'_'.join(names)}_lateral_contrast_index"))
 
         if not show_plots:
+            plt.close(fig)
             plt.ion()
 
     def reliability_plots(self, names=None,
@@ -1118,6 +1121,7 @@ class GroupCSVComparison():
         axes[1].set_title(f"intersubejct_reliability")
 
         if not show_plots:
+            plt.close(fig)
             plt.ion()
         return fig, axes
 
