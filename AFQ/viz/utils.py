@@ -808,7 +808,9 @@ class GroupCSVComparison():
 
         contrast_index = pd.DataFrame(
             index=self.bundles, columns=self.subjects)
-        for subject in self.subjects:
+        self.logger.info(
+            "Calculating contrast index by bundle per subject...")
+        for subject in tqdm(self.subjects):
             fig, axes = self._get_brain_axes()
             for bundle in self.bundles:
                 profiles = [None] * 2
@@ -822,7 +824,7 @@ class GroupCSVComparison():
                     this_contrast_index = \
                         calc_contrast_index(profiles[0], profiles[1])
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                    sns.lineplot(y=this_contrast_index, label=scalar, ax=ax)
+                    sns.lineplot(data=this_contrast_index, label=scalar, ax=ax)
                     ax.set_title(bundle)
                     ax.set_ylim([-1, 1])
                     ax.set_xticklabels([])
@@ -833,12 +835,13 @@ class GroupCSVComparison():
                 self._get_fname(
                     f"contrast_plots/{scalar}/",
                     f"{names[0]}_vs_{names[1]}_contrast_index"))
+            if not show_plots:
+                plt.close(fig)
 
         contrast_index.to_csv(self._get_fname(
             f"contrast_index/{scalar}",
             f"{names[0]}_vs_{names[1]}"))
         if not show_plots:
-            plt.close(fig)
             plt.ion()
         return contrast_index
 
@@ -891,7 +894,7 @@ class GroupCSVComparison():
                         lateral_contrast_index = \
                             calc_contrast_index(profile, other_profile)
                         ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                        sns.lineplot(y=lateral_contrast_index,
+                        sns.lineplot(data=lateral_contrast_index,
                                      label=name, ax=ax)
                         ax.set_title(f"{bundle} vs {other_bundle}")
                         ax.set_ylim([-1, 1])
@@ -901,9 +904,10 @@ class GroupCSVComparison():
                 self._get_fname(
                     f"contrast_plots/{scalar}/",
                     f"{'_'.join(names)}_lateral_contrast_index"))
+            if not show_plots:
+                plt.close(fig)
 
         if not show_plots:
-            plt.close(fig)
             plt.ion()
 
     def reliability_plots(self, names=None,
@@ -990,7 +994,7 @@ class GroupCSVComparison():
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
                 sns.histplot(
-                    y=bundle_coefs,
+                    data=bundle_coefs,
                     bins=bins,
                     alpha=0.5,
                     label=scalar,
@@ -1002,6 +1006,9 @@ class GroupCSVComparison():
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
+
+        if not show_plots:
+            plt.close(fig)
 
         # plot node reliability profile
         all_node_coef[np.isnan(all_node_coef)] = 0
@@ -1015,7 +1022,7 @@ class GroupCSVComparison():
         for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
-                sns.lineplot(y=all_node_coef[m, k], label=scalar)
+                sns.lineplot(data=all_node_coef[m, k], label=scalar)
             ax.set_title(bundle)
             ax.set_ylim([mini, maxi])
             ax.set_xticklabels([])
@@ -1025,6 +1032,9 @@ class GroupCSVComparison():
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_node_profiles"))
+
+        if not show_plots:
+            plt.close(fig)
 
         # plot mean profile scatter plots
         for m, scalar in enumerate(scalars):
@@ -1048,6 +1058,8 @@ class GroupCSVComparison():
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
+            if not show_plots:
+                plt.close(fig)
 
         # plot bar plots of pearson's r
         width = 0.6
