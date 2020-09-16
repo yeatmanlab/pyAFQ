@@ -71,18 +71,18 @@ CSV_MAT_2_PYTHON = \
      'nodeID': 'node'}
 
 X_LABELS = ['Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (inf -> sup)', 'Node (inf -> sup)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (lh -> rh)', 'Node (lh -> rh)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (pos -> ant)', 'Node (pos -> ant)',
-          'Node (inf -> sup)', 'Node (inf -> sup)',
-          'Node (inf -> sup)', 'Node (inf -> sup)']
+            'Node (inf -> sup)', 'Node (inf -> sup)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (lh -> rh)', 'Node (lh -> rh)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (pos -> ant)', 'Node (pos -> ant)',
+            'Node (inf -> sup)', 'Node (inf -> sup)',
+            'Node (inf -> sup)', 'Node (inf -> sup)']
 
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
