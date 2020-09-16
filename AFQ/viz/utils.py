@@ -756,7 +756,6 @@ class GroupCSVComparison():
             y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
             ax.set_yticks(y_ticks)
             ax.set_yticklabels(y_ticks)
-            ax.set_xticklabels([])
         fig.legend(names, loc='center')
 
         if out_file is None:
@@ -812,7 +811,7 @@ class GroupCSVComparison():
             "Calculating contrast index by bundle per subject...")
         for subject in tqdm(self.subjects):
             fig, axes = self._get_brain_axes()
-            for bundle in self.bundles:
+            for j, bundle in enumerate(self.bundles):
                 profiles = [None] * 2
                 both_found = True
                 for i, name in enumerate(names):
@@ -825,9 +824,10 @@ class GroupCSVComparison():
                         calc_contrast_index(profiles[0], profiles[1])
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                     sns.lineplot(data=this_contrast_index, label=scalar, ax=ax)
-                    ax.set_title(bundle)
+                    ax.set_title(bundle, fontsize=20)
+                    ax.set_xlabel(X_LABELS[j], fontsize=14)
+                    ax.set_ylabel(scalar, fontsize=14)
                     ax.set_ylim([-1, 1])
-                    ax.set_xticklabels([])
                     contrast_index.at[bundle, subject] = \
                         np.nanmean(this_contrast_index)
             fig.legend([scalar], loc='center')
@@ -896,9 +896,11 @@ class GroupCSVComparison():
                         ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                         sns.lineplot(data=lateral_contrast_index,
                                      label=name, ax=ax)
-                        ax.set_title(f"{bundle} vs {other_bundle}")
+                        ax.set_title(
+                            f"{bundle} vs {other_bundle}", fontsize=20)
+                        ax.set_xlabel(X_LABELS[j], fontsize=14)
+                        ax.set_ylabel(scalar, fontsize=14)
                         ax.set_ylim([-1, 1])
-                        ax.set_xticklabels([])
             fig.legend(names, loc='center')
             fig.savefig(
                 self._get_fname(
