@@ -1239,7 +1239,7 @@ class AFQ(object):
                      xform_volume=False,
                      color_by_volume=None,
                      xform_color_by_volume=False,
-                     n_points=None):
+                     n_points=100):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1293,7 +1293,7 @@ class AFQ(object):
                   xform_volume=False,
                   color_by_volume=None,
                   xform_color_by_volume=False,
-                  n_points=None):
+                  n_points=100):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1662,7 +1662,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
-                    n_points=None,
+                    n_points=100,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1683,7 +1683,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
-                 n_points=None,
+                 n_points=100,
                  inline=False,
                  interactive=False):
         return self.data_frame.apply(
