@@ -21,6 +21,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
 from AFQ.utils.stats import contrast_index as calc_contrast_index
+from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 
 __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
@@ -61,27 +62,6 @@ POSITIONS = OrderedDict({
     "SLF_L": (2, 1), "SLF_R": (2, 3),
     "ARC_L": (2, 0), "ARC_R": (2, 4), "AF_L": (2, 0), "AF_R": (2, 4),
     "UNC_L": (0, 1), "UNC_R": (0, 3), "UF_L": (0, 1), "UF_R": (0, 3)})
-
-BUNDLE_RECO_2_AFQ = \
-    {
-        "AF_L": "ARC_L", "AF_R": "ARC_R",
-        "UF_L": "UNC_L", "UF_R": "UNC_R",
-        "IFOF_L": "IFO_L", "IFOF_R": "IFO_R",
-        "CST_L": "CST_L", "CST_R": "CST_R",
-    }
-
-BUNDLE_MAT_2_PYTHON = \
-    {'Right Corticospinal': 'CST_R', 'Left Corticospinal': 'CST_L',
-     'Right Uncinate': 'UNC_R', 'Left Uncinate': 'UNC_L',
-     'Left IFOF': 'IFO_L', 'Right IFOF': 'IFO_R',
-     'Right Arcuate': 'ARC_R', 'Left Arcuate': 'ARC_L',
-     'Right Thalamic Radiation': 'ATR_R', 'Left Thalamic Radiation': 'ATR_L',
-     'Right Cingulum Cingulate': 'CGC_R', 'Left Cingulum Cingulate': 'CGC_L',
-     'Right Cingulum Hippocampus': 'HCC_R',
-     'Left Cingulum Hippocampus': 'HCC_L',
-     'Callosum Forceps Major': 'FP', 'Callosum Forceps Minor': 'FA',
-     'Right ILF': 'ILF_R', 'Left ILF': 'ILF_L',
-     'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L'}
 
 CSV_MAT_2_PYTHON = \
     {'fa': 'dti_fa', 'md': 'dti_md',
