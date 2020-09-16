@@ -1735,7 +1735,7 @@ class AFQ(object):
 
 
 def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
-                                      session=None):
+                                      upload=None, session=None):
     """
     Download and combine tract profiles from different subjects / sessions
     on an s3 bucket into one CSV.
@@ -1747,7 +1747,12 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
         The S3 bucket that contains the study data.
     study_s3_prefix : str
         The S3 prefix common to all of the study objects on S3.
-    session : str
+    upload : s3fs, optional
+        If not None,
+        Upload the combined CSV after combining using the s3fs object.
+        Uploads to bucket/study_s3_prefix/derivatives/afq
+        Defaut: None
+    session : str, optional
         Session to get CSVs from. If None, all sessions are used.
         Default: None
     Returns
@@ -1780,6 +1785,15 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
                 suffix='profiles',
                 return_type='filename')
         df = combine_list_of_profiles(profiles, out_file)
+    if upload is not None:
+        upload.put(
+            out_file,
+            os.join(
+                bucket,
+                study_s3_prefix,
+                "derivatives/afq",
+                "combined_tract_profiles.csv"
+            ))
     return df
 
 
