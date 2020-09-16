@@ -11,6 +11,7 @@ import imageio as io
 import IPython.display as display
 import seaborn as sns
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -66,7 +67,22 @@ POSITIONS = OrderedDict({
 
 CSV_MAT_2_PYTHON = \
     {'fa': 'dti_fa', 'md': 'dti_md',
-     'tractID': 'bundle'}
+     'tractID': 'bundle',
+     'nodeID': 'node'}
+
+X_LABELS = ['Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (inf -> sup)', 'Node (inf -> sup)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (lh -> rh)', 'Node (lh -> rh)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (pos -> ant)', 'Node (pos -> ant)',
+          'Node (inf -> sup)', 'Node (inf -> sup)',
+          'Node (inf -> sup)', 'Node (inf -> sup)']
 
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
@@ -656,7 +672,7 @@ class LongitudinalCSVComparison():
 
         return single_profile
 
-    def _get_brain_axes(self, suptitle):
+    def _get_brain_axes(self):
         fig, axes = plt.subplots(5, 5, frameon=False)
         plt.subplots_adjust(
             left=None,
@@ -667,7 +683,6 @@ class LongitudinalCSVComparison():
             hspace=0.6)
         sns.despine()
         fig.set_size_inches((18, 18))
-        fig.suptitle(suptitle)
         axes[0, 0].axis("off")
         axes[0, -1].axis("off")
         axes[1, 2].axis("off")
@@ -730,34 +745,42 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
 
-        fig, axes = self._get_brain_axes("A")
-        for bundle in self.bundles:
+        fig, axes = self._get_brain_axes()
+        self.logger.info("Calculating means and CIs...")
+        for j, bundle in enumerate(tqdm(self.bundles)):
             ax = axes[positions[bundle][0], positions[bundle][1]]
-            for name in names:
+            for i, name in enumerate(names):
                 profile = self.profile_dict[name]
                 profile = profile[profile['bundle'] == bundle]
                 sns.set(style="ticks", rc={"lines.linewidth": 6})
+                if i == 0:
+                    dashes = None
+                else:
+                    dashes = [(2**i, 2**i)]
                 sns.lineplot(
                     x="node", y=scalar,
                     data=profile, hue="bundle",
                     estimator='mean', ci=95, n_boot=n_boot,
-                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax)
+                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
+                    style=[True] * len(profile.index), dashes=dashes,
+                    alpha=0.4 + 0.2 * i)
                 sns.set(style="ticks", rc={"lines.linewidth": 0.5})
                 sns.lineplot(
                     x="node", y=scalar,
                     data=profile, hue="bundle",
                     estimator=None, units='subjectID',
-                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax)
+                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
+                    style=[True] * len(profile.index), dashes=dashes,
+                    alpha=0.3 + 0.2 * i)
 
-            ax.set_title(bundle, fontsize=15)
-            ax.set_xlabel('Node', fontsize=10)
-            ax.set_ylabel(scalar, fontsize=10)
+            ax.set_title(bundle, fontsize=20)
+            ax.set_xlabel(X_LABELS[j], fontsize=14)
+            ax.set_ylabel(scalar, fontsize=14)
             ax.set_ylim([min_scalar, max_scalar])
             y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
             ax.set_yticks(y_ticks)
             ax.set_yticklabels(y_ticks)
             ax.set_xticklabels([])
-
         fig.legend(names, loc='center')
         fig.savefig(
             self._get_fname(
@@ -805,9 +828,7 @@ class LongitudinalCSVComparison():
         contrast_index = pd.DataFrame(
             index=self.bundles, columns=self.subjects)
         for subject in self.subjects:
-            fig, axes = self._get_brain_axes(
-                (f"Contrast Indices by Bundle, "
-                    f" {names[0]} vs {names[1]}"))
+            fig, axes = self._get_brain_axes()
             for bundle in self.bundles:
                 profiles = [None] * 2
                 both_found = True
@@ -866,8 +887,7 @@ class LongitudinalCSVComparison():
             names = list(self.profile_dict.keys())
 
         for subject in self.subjects:
-            fig, axes = self._get_brain_axes(
-                f"Lateral Contrast Indices by Bundle")
+            fig, axes = self._get_brain_axes()
             for j, bundle in enumerate(self.bundles):
                 other_bundle = list(bundle)
                 if other_bundle[-1] == 'L':
@@ -981,9 +1001,7 @@ class LongitudinalCSVComparison():
         maxi = all_profile_coef.max()
         mini = all_profile_coef.min()
         bins = np.linspace(mini, maxi, 10)
-        fig, axes = self._get_brain_axes(
-            (f"Distribution of Pearson's r between profiles,"
-                f" {names[0]}_vs_{names[1]}"))
+        fig, axes = self._get_brain_axes()
         for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
@@ -1010,9 +1028,7 @@ class LongitudinalCSVComparison():
         else:
             maxi = ylims[1]
             mini = ylims[0]
-        fig, axes = self._get_brain_axes(
-            (f"node reliability profiles,"
-                f" {names[0]}_vs_{names[1]}"))
+        fig, axes = self._get_brain_axes()
         for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
@@ -1032,9 +1048,7 @@ class LongitudinalCSVComparison():
             this_sub_means = all_sub_means[m]
             maxi = np.nanmax(this_sub_means)
             mini = np.nanmin(this_sub_means)
-            fig, axes = self._get_brain_axes(
-                (f"Distribution of mean profiles,"
-                    f" {names[0]}_vs_{names[1]}_{scalar}"))
+            fig, axes = self._get_brain_axes()
             for k, bundle in enumerate(self.bundles):
                 ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                 sns.scatterplot(
