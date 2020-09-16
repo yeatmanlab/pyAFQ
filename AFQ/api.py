@@ -1387,7 +1387,7 @@ class AFQ(object):
                 include_track=True,
                 include_seg=True)
 
-            visualize_tract_profiles(row['tract_profiles_file'],
+            visualize_tract_profiles(self._tract_profiles(row),
                                      scalar=scalar,
                                      file_name=fname,
                                      n_boot=100)
