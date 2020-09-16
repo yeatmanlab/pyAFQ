@@ -11,6 +11,7 @@ import imageio as io
 import IPython.display as display
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from tqdm import tqdm
 
 import nibabel as nib
@@ -722,6 +723,7 @@ class GroupCSVComparison():
             names = list(self.profile_dict.keys())
 
         fig, axes = self._get_brain_axes()
+        labels = []
         self.logger.info("Calculating means and CIs...")
         for j, bundle in enumerate(tqdm(self.bundles)):
             ax = axes[positions[bundle][0], positions[bundle][1]]
@@ -729,10 +731,7 @@ class GroupCSVComparison():
                 profile = self.profile_dict[name]
                 profile = profile[profile['bundle'] == bundle]
                 sns.set(style="ticks", rc={"lines.linewidth": 6})
-                if i == 0:
-                    dashes = None
-                else:
-                    dashes = [(2**i, 2**i)]
+                dashes = [(2**i, 2**i)]
                 sns.lineplot(
                     x="node", y=scalar,
                     data=profile, hue="bundle",
@@ -748,6 +747,14 @@ class GroupCSVComparison():
                     palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
                     style=[True] * len(profile.index), dashes=dashes,
                     alpha=0.3 + 0.2 * i)
+                if j == 0:
+                    labels.append(
+                        Line2D(
+                            [], [],
+                            color=[0, 0, 0],
+                            linestyle='-' * (i + 1)
+                        )
+                    )
 
             ax.set_title(bundle, fontsize=20)
             ax.set_xlabel(X_LABELS[j], fontsize=14)
@@ -756,7 +763,8 @@ class GroupCSVComparison():
             y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
             ax.set_yticks(y_ticks)
             ax.set_yticklabels(y_ticks)
-        fig.legend(names, loc='center')
+
+        fig.legend(labels, names, loc='center')
 
         if out_file is None:
             fig.savefig(
