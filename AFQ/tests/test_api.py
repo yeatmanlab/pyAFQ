@@ -281,7 +281,7 @@ def test_AFQ_reco():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
-        viz_library="plotly",
+        viz_backend="plotly",
         segmentation_params={
             'seg_algo': 'reco',
             'rng': 42})

@@ -56,7 +56,7 @@ POSITIONS = OrderedDict({
     "FP": (4, 2), "FA": (0, 2),
     "CC_ForcepsMinor": (4, 2), "CC_ForcepsMajor": (0, 2),
     "IFO_L": (4, 1), "IFO_R": (4, 3), "IFOF_L": (4, 1), "IFOF_R": (4, 3),
-    "HCC_L": (4, 0), "HCC_R": (4, 5),
+    "HCC_L": (4, 0), "HCC_R": (4, 4),
     "ILF_L": (3, 0), "ILF_R": (3, 4), "F_L": (3, 0), "F_R": (3, 4),
     "SLF_L": (2, 1), "SLF_R": (2, 3),
     "ARC_L": (2, 0), "ARC_R": (2, 4), "AF_L": (2, 0), "AF_R": (2, 4),
