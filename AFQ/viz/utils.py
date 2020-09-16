@@ -543,11 +543,14 @@ class GroupCSVComparison():
         self.profile_dict = {}
         for i, fname in enumerate(csv_fnames):
             profile = pd.read_csv(fname)
-            profile['subjectID'] = \
-                profile['subjectID'].apply(
-                    lambda x: int(
-                        ''.join(c for c in x if c.isdigit())
-                    ) if isinstance(x, str) else x)
+            if 'subjectID' in profile.columns:
+                profile['subjectID'] = \
+                    profile['subjectID'].apply(
+                        lambda x: int(
+                            ''.join(c for c in x if c.isdigit())
+                        ) if isinstance(x, str) else x)
+            else:
+                profile['subjectID'] = 0
 
             if is_mats[i]:
                 profile.rename(
