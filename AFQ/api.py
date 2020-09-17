@@ -51,7 +51,7 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 RECO_BUNDLES = [
-    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid', 'AF',
+    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -1239,7 +1239,7 @@ class AFQ(object):
                      xform_volume=False,
                      color_by_volume=None,
                      xform_color_by_volume=False,
-                     n_points=None):
+                     n_points=100):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1293,7 +1293,7 @@ class AFQ(object):
                   xform_volume=False,
                   color_by_volume=None,
                   xform_color_by_volume=False,
-                  n_points=None):
+                  n_points=100):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1662,7 +1662,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
-                    n_points=None,
+                    n_points=100,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1683,7 +1683,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
-                 n_points=None,
+                 n_points=100,
                  inline=False,
                  interactive=False):
         return self.data_frame.apply(

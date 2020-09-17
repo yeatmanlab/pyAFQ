@@ -281,6 +281,7 @@ def test_AFQ_reco():
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
+        viz_backend="plotly",
         segmentation_params={
             'seg_algo': 'reco',
             'rng': 42})
@@ -288,6 +289,7 @@ def test_AFQ_reco():
     tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
     npt.assert_(len(bundles['CCMid']) > 0)
+    myafq.export_all()
 
 
 # Requires large download
