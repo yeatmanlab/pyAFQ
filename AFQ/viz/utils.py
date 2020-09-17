@@ -464,6 +464,83 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
     return df
 
 
+# TODO: get rid of grey background
+class BrainAxes():
+    '''
+    Creates and handles a grid of axes.
+    Each axis corresponds to a bundle.
+    Axis placement should roughly correspond
+    to the actual bundle placement in the brain.
+    '''
+
+    def __init__(self, size=(5, 5), positions=POSITIONS):
+        self.size = size
+        self.positions = positions
+        self.on_grid = np.zeros((5, 5), dtype=bool)
+        self.fig, self.axes = plt.subplots(
+            self.size[0],
+            self.size[1],
+            frameon=False)
+        plt.subplots_adjust(
+            left=None,
+            bottom=None,
+            right=None,
+            top=None,
+            wspace=0.4,
+            hspace=0.6)
+        self.fig.set_size_inches((18, 18))
+
+    def get_axis(bundle):
+        '''
+        Given a bundle, turn on and get an axis.
+        '''
+        self.on_grid[self.positions[bundle]] = True
+        return self.axes[self.positions[bundle]]
+
+    def plot(bundle, x, y, data, ylabel, ylim, n_boot, alpha, dashes=None):
+        '''
+        Given a dataframe data with at least columns x, y,
+        and subjectID, plot the mean of subjects with ci of 95
+        in alpha and the individual subjects in alpha-0.2
+        using sns.lineplot()
+        '''
+        ax = self.get_axis(bundle)
+        sns.set(style="whitegrid", rc={"lines.linewidth": 6})
+        sns.lineplot(
+            x=x, y=y,
+            data=data, hue="bundle",
+            estimator='mean', ci=95, n_boot=n_boot,
+            palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
+            style=[True] * len(data.index), dashes=dashes,
+            alpha=alpha)
+        sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
+        sns.lineplot(
+            x=x, y=y,
+            data=data, hue="bundle",
+            ci=None, estimator=None, units='subjectID',
+            palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
+            style=[True] * len(data.index), dashes=dashes,
+            alpha=alpha - 0.2)
+
+        ax.set_title(bundle, fontsize=20)
+        ax.set_ylabel(ylabel, fontsize=14)
+        ax.set_ylim(ylim)
+
+    def format():
+        '''
+        Call this functions once after all axes that you intend to use
+        have been plotted on. Automatically formats brain axes.
+        '''
+        for i in range(self.size[0]):
+            for j in range(self.size[1]):
+                if not self.on_grid[i, j]:
+                    self.axes[i, j].axis("off")
+                if i != 0 and self.on_grid[i - 1] == True:
+                    self.axes[i, j].set_yticklabels([])
+                self.axes[i, j].set_xticklabels([])
+        self.fig.tight_layout()
+
+
 class GroupCSVComparison():
     """
     Compare different CSVs, using:
@@ -603,6 +680,9 @@ class GroupCSVComparison():
             self.bundles = bundles
 
     def _threshold_scalar(self, bound, threshold, val):
+        """
+        Threshold scalars by a lower and upper bound.
+        """
         if bound == "lb":
             if val > threshold:
                 return val
@@ -619,6 +699,9 @@ class GroupCSVComparison():
                                + " the default for reference")
 
     def _get_fname(self, folder, f_name):
+        """
+        Get file to save to, and generate the folder if it does not exist.
+        """
         f_folder = op.join(
             self.out_folder,
             folder)
@@ -626,6 +709,9 @@ class GroupCSVComparison():
         return op.join(f_folder, f_name)
 
     def _get_profile(self, name, bundle, subject, scalar, repl_nan=True):
+        """
+        Get a single profile, then handle not found / NaNs
+        """
         profile = self.profile_dict[name]
         single_profile = profile[
             (profile['subjectID'] == subject)
@@ -660,34 +746,21 @@ class GroupCSVComparison():
 
         return single_profile
 
-    # TODO: get rid of x axis; get rid of y axis not on right
-    def _get_brain_axes(self):
-        fig, axes = plt.subplots(5, 5, frameon=False)
-        plt.subplots_adjust(
-            left=None,
-            bottom=None,
-            right=None,
-            top=None,
-            wspace=0.4,
-            hspace=0.6)
-        fig.set_size_inches((18, 18))
-        axes[0, 0].axis("off")
-        axes[0, -1].axis("off")
-        axes[1, 2].axis("off")
-        axes[2, 2].axis("off")
-        axes[3, 2].axis("off")
-        axes[4, 0].axis("off")
-        axes[4, 4].axis("off")
-        return fig, axes
-
     def _alpha(self, alpha):
-        if alpha < 0:
-            return 0
+        '''
+        Keep alpha in a reasonable range
+        Useful when calculating alpha automatically
+        '''
+        if alpha < 0.3:
+            return 0.3
         if alpha > 1:
             return 1
         return alpha
 
     def masked_corr(self, arr):
+        '''
+        Mask arr for NaNs before calling np.corrcoef
+        '''
         mask = np.logical_not(
             np.logical_or(
                 np.isnan(arr[0, ...]),
@@ -745,31 +818,17 @@ class GroupCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
 
-        fig, axes = self._get_brain_axes()
+        ba = BrainAxes(positions=positions)
         labels = []
         self.logger.info("Calculating means and CIs...")
         for j, bundle in enumerate(tqdm(self.bundles)):
-            ax = axes[positions[bundle][0], positions[bundle][1]]
             for i, name in enumerate(names):
                 profile = self.profile_dict[name]
                 profile = profile[profile['bundle'] == bundle]
-                sns.set(style="whitegrid", rc={"lines.linewidth": 6})
-                dashes = [(2**i, 2**i)]
-                sns.lineplot(
-                    x="node", y=scalar,
-                    data=profile, hue="bundle",
-                    estimator='mean', ci=95, n_boot=n_boot,
-                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
-                    style=[True] * len(profile.index), dashes=dashes,
-                    alpha=self._alpha(0.4 + 0.2 * i))
-                sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
-                sns.lineplot(
-                    x="node", y=scalar,
-                    data=profile, hue="bundle",
-                    ci=None, estimator=None, units='subjectID',
-                    palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
-                    style=[True] * len(profile.index), dashes=dashes,
-                    alpha=self._alpha(0.3 + 0.2 * i))
+                ba.plot(
+                    bundle, "node", scalar, profile,
+                    scalar, ylim, n_boot, self._alpha(0.4 + 0.2 * i),
+                    dashes=[(2**i, 2**i)])
                 if j == 0:
                     line = Line2D(
                         [], [],
@@ -777,54 +836,20 @@ class GroupCSVComparison():
                     )
                     line.set_dashes((2**(i + 1), 2**(i + 1)))
                     labels.append(line)
-
-            ax.set_title(bundle, fontsize=20)
-            ax.set_xlabel(X_LABELS[j], fontsize=14)
-            ax.set_ylabel(scalar, fontsize=14)
-            if ylim is not None:
-                ax.set_ylim(ylim)
-                y_ticks = np.asarray([0.2, 0.4, 0.6]) * ylim[1]
-                ax.set_yticks(y_ticks)
-                ax.set_yticklabels(y_ticks)
-
-        fig.legend(labels, names, loc='center', fontsize=14)
+        ba.fig.legend(labels, names, loc='center', fontsize=14)
+        ba.format()
 
         if out_file is None:
-            fig.savefig(
+            ba.fig.savefig(
                 self._get_fname(
                     f"tract_profiles/{scalar}",
                     f"{'_'.join(names)}"))
         else:
-            fig.savefig(out_file)
+            ba.fig.savefig(out_file)
 
         if not show_plots:
-            plt.close(fig)
+            plt.close(ba.fig)
             plt.ion()
-
-    def _contrast_index_plotter(self, j, axes, positions,
-                                bundle, ci_df, n_boot, scalar):
-        ax = axes[positions[bundle][0], positions[bundle][1]]
-        sns.set(style="whitegrid", rc={"lines.linewidth": 6})
-        sns.lineplot(
-            x="node", y="diff",
-            data=ci_df,
-            estimator='mean', ci=95, n_boot=n_boot,
-            color=COLOR_DICT[bundle], legend=False, ax=ax,
-            style=[True] * len(ci_df.index),
-            alpha=self._alpha(1.0))
-        sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
-        sns.lineplot(
-            x="node", y="diff",
-            data=ci_df,
-            ci=None, estimator=None, units='subject',
-            color=COLOR_DICT[bundle], legend=False, ax=ax,
-            style=[True] * len(ci_df.index),
-            alpha=self._alpha(0.6))
-
-        ax.set_title(bundle, fontsize=20)
-        ax.set_xlabel(X_LABELS[j], fontsize=14)
-        ax.set_ylabel("C.I. * 2", fontsize=14)
-        ax.set_ylim([-1, 1])
 
     def _contrast_index_df_maker(self, bundles, names, scalar):
         ci_df = pd.DataFrame(columns=["subject", "node", "diff"])
@@ -888,19 +913,21 @@ class GroupCSVComparison():
                               + "only two dataset names should be given")
             return None
 
-        fig, axes = self._get_brain_axes()
+        ba = BrainAxes(positions=positions)
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
-            self._contrast_index_plotter(
-                j, axes, positions, bundle, ci_df, n_boot, scalar)
-        fig.legend([scalar], loc='center', fontsize=14)
-        fig.savefig(
+            ba.plot(
+                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                n_boot, 1.0)
+        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
             self._get_fname(
                 f"contrast_plots/{scalar}/",
                 f"{names[0]}_vs_{names[1]}_contrast_index"))
         if not show_plots:
-            plt.close(fig)
+            plt.close(ba.fig)
             plt.ion()
 
     def lateral_contrast_index(self, name, scalar="dti_fa",
@@ -934,7 +961,7 @@ class GroupCSVComparison():
         if not show_plots:
             plt.ioff()
 
-        fig, axes = self._get_brain_axes()
+        ba = BrainAxes(positions=positions)
         for j, bundle in enumerate(tqdm(self.bundles)):
             other_bundle = list(bundle)
             if other_bundle[-1] == 'L':
@@ -949,16 +976,18 @@ class GroupCSVComparison():
 
             ci_df = self._contrast_index_df_maker(
                 [bundle, other_bundle], [name], scalar)
-            self._contrast_index_plotter(
-                j, axes, positions, bundle, ci_df, n_boot, scalar)
+            ba.plot(
+                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                n_boot, 1.0)
 
-            fig.legend([scalar], loc='center', fontsize=14)
-            fig.savefig(
-                self._get_fname(
-                    f"contrast_plots/{scalar}/",
-                    f"{name}_lateral_contrast_index"))
-            if not show_plots:
-                plt.close(fig)
+        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
+            self._get_fname(
+                f"contrast_plots/{scalar}/",
+                f"{name}_lateral_contrast_index"))
+        if not show_plots:
+            plt.close(ba.fig)
 
         if not show_plots:
             plt.ion()
