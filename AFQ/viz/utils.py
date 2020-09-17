@@ -583,7 +583,7 @@ class GroupCSVComparison():
             self.subjects = subjects
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
         if bundles is None:
-            self.bundles = self.profile_dict[0]['bundle'].unique()
+            self.bundles = self.profile_dict[names[0]]['bundle'].unique()
         else:
             self.bundles = bundles
 
@@ -766,7 +766,7 @@ class GroupCSVComparison():
                 ax.set_yticks(y_ticks)
                 ax.set_yticklabels(y_ticks)
 
-        fig.legend(labels, names, loc='center')
+        fig.legend(labels, names, loc='center', fontsize=12)
 
         if out_file is None:
             fig.savefig(
