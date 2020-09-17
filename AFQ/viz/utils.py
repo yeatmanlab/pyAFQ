@@ -466,7 +466,7 @@ class BrainAxes():
         self.on_grid[self.positions[bundle]] = True
         return self.axes[self.positions[bundle]]
 
-    def plot(self, bundle, x, y, data, ylabel, ylim, alpha
+    def plot(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
              lineplot_kwargs):
         '''
         Given a dataframe data with at least columns x, y,
@@ -688,7 +688,7 @@ class GroupCSVComparison():
             & (profile['bundle'] == bundle)
         ][scalar].to_numpy()
         nans = np.isnan(single_profile)
-        percent_nan = np.sum(nans)
+        percent_nan = (np.sum(nans) * 100) // self.prof_len
         if len(single_profile) < 1:
             self.logger.warning(
                 'No scalars found for scalar ' + scalar
@@ -799,7 +799,7 @@ class GroupCSVComparison():
                     bundle, "node", scalar, profile,
                     scalar, ylim, n_boot, self._alpha(0.4 + 0.2 * i),
                     {
-                        "dashes": dashes=[(2**i, 2**i)],
+                        "dashes": [(2**i, 2**i)],
                         "hue": "bundle",
                         "palette": [COLOR_DICT[bundle]]})
                 if j == 0:
