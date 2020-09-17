@@ -503,7 +503,7 @@ class BrainAxes():
             for j in range(self.size[1]):
                 if not self.on_grid[i, j]:
                     self.axes[i, j].axis("off")
-                if i != 0 and self.on_grid[i - 1] is True:
+                if j != 0 and self.on_grid[i][j - 1]:
                     self.axes[i, j].set_yticklabels([])
                     self.axes[i, j].set_ylabel("")
                 self.axes[i, j].set_xticklabels([])
@@ -797,7 +797,7 @@ class GroupCSVComparison():
                 profile = profile[profile['bundle'] == bundle]
                 ba.plot(
                     bundle, "node", scalar, profile,
-                    scalar, ylim, n_boot, self._alpha(0.4 + 0.2 * i),
+                    scalar, ylim, n_boot, self._alpha(0.6 + 0.2 * i),
                     {
                         "dashes": [(2**i, 2**i)],
                         "hue": "bundle",
