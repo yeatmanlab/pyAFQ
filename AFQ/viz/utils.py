@@ -70,36 +70,6 @@ CSV_MAT_2_PYTHON = \
      'tractID': 'bundle',
      'nodeID': 'node'}
 
-
-# these are wrong
-# X_LABELS = ['Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (inf -> sup)', 'Node (inf -> sup)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (lh -> rh)', 'Node (lh -> rh)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (pos -> ant)', 'Node (pos -> ant)',
-#             'Node (inf -> sup)', 'Node (inf -> sup)',
-#             'Node (inf -> sup)', 'Node (inf -> sup)']
-
-X_LABELS = ['Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node',
-            'Node', 'Node']
-
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
 
@@ -490,14 +460,15 @@ class BrainAxes():
             hspace=0.6)
         self.fig.set_size_inches((18, 18))
 
-    def get_axis(bundle):
+    def get_axis(self, bundle):
         '''
         Given a bundle, turn on and get an axis.
         '''
         self.on_grid[self.positions[bundle]] = True
         return self.axes[self.positions[bundle]]
 
-    def plot(bundle, x, y, data, ylabel, ylim, n_boot, alpha, dashes=None):
+    def plot(self, bundle, x, y, data, ylabel, ylim,
+             n_boot, alpha, dashes=None):
         '''
         Given a dataframe data with at least columns x, y,
         and subjectID, plot the mean of subjects with ci of 95
@@ -526,7 +497,7 @@ class BrainAxes():
         ax.set_ylabel(ylabel, fontsize=14)
         ax.set_ylim(ylim)
 
-    def format():
+    def format(self):
         '''
         Call this functions once after all axes that you intend to use
         have been plotted on. Automatically formats brain axes.
@@ -535,9 +506,11 @@ class BrainAxes():
             for j in range(self.size[1]):
                 if not self.on_grid[i, j]:
                     self.axes[i, j].axis("off")
-                if i != 0 and self.on_grid[i - 1] == True:
+                if i != 0 and self.on_grid[i - 1] is True:
                     self.axes[i, j].set_yticklabels([])
+                    self.axes[i, j].set_ylabel("")
                 self.axes[i, j].set_xticklabels([])
+                self.axes[i, j].set_xlabel("")
         self.fig.tight_layout()
 
 
@@ -770,7 +743,7 @@ class GroupCSVComparison():
         return np.corrcoef(arr[:, mask])[0][1]
 
     def tract_profiles(self, names=None, scalar="dti_fa",
-                       ylim=None,
+                       ylim=[0.0, 1.0],
                        show_plots=False,
                        positions=POSITIONS,
                        out_file=None,
@@ -793,7 +766,7 @@ class GroupCSVComparison():
         ylim : list of 2 floats, optional
             Minimum and maximum value used for y-axis bounds.
             If None, ylim is not set.
-            Default: None
+            Default: [0.0, 1.0]
 
         out_file : str, optional
             Path to save the figure to.
@@ -852,7 +825,7 @@ class GroupCSVComparison():
             plt.ion()
 
     def _contrast_index_df_maker(self, bundles, names, scalar):
-        ci_df = pd.DataFrame(columns=["subject", "node", "diff"])
+        ci_df = pd.DataFrame(columns=["subjectID", "node", "diff"])
         for subject in self.subjects:
             profiles = [None] * 2
             both_found = True
@@ -867,7 +840,7 @@ class GroupCSVComparison():
                     calc_contrast_index(profiles[0], profiles[1])
                 for i, diff in enumerate(this_contrast_index):
                     ci_df = ci_df.append({
-                        "subject": subject,
+                        "subjectID": subject,
                         "node": i,
                         "diff": diff},
                         ignore_index=True)
