@@ -12,7 +12,7 @@ import IPython.display as display
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -28,7 +28,6 @@ from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
-sns.set_theme()
 tableau_20_sns = sns.color_palette("tab20")
 
 COLOR_DICT = OrderedDict({
@@ -71,19 +70,35 @@ CSV_MAT_2_PYTHON = \
      'tractID': 'bundle',
      'nodeID': 'node'}
 
-X_LABELS = ['Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (inf -> sup)', 'Node (inf -> sup)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (lh -> rh)', 'Node (lh -> rh)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (pos -> ant)', 'Node (pos -> ant)',
-            'Node (inf -> sup)', 'Node (inf -> sup)',
-            'Node (inf -> sup)', 'Node (inf -> sup)']
+
+# these are wrong
+# X_LABELS = ['Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (inf -> sup)', 'Node (inf -> sup)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (lh -> rh)', 'Node (lh -> rh)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (pos -> ant)', 'Node (pos -> ant)',
+#             'Node (inf -> sup)', 'Node (inf -> sup)',
+#             'Node (inf -> sup)', 'Node (inf -> sup)']
+
+X_LABELS = ['Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node',
+            'Node', 'Node']
 
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
@@ -645,6 +660,7 @@ class GroupCSVComparison():
 
         return single_profile
 
+    # TODO: get rid of x axis; get rid of y axis not on right
     def _get_brain_axes(self):
         fig, axes = plt.subplots(5, 5, frameon=False)
         plt.subplots_adjust(
@@ -654,7 +670,6 @@ class GroupCSVComparison():
             top=None,
             wspace=0.4,
             hspace=0.6)
-        sns.despine()
         fig.set_size_inches((18, 18))
         axes[0, 0].axis("off")
         axes[0, -1].axis("off")
@@ -738,7 +753,7 @@ class GroupCSVComparison():
             for i, name in enumerate(names):
                 profile = self.profile_dict[name]
                 profile = profile[profile['bundle'] == bundle]
-                sns.set(style="ticks", rc={"lines.linewidth": 6})
+                sns.set(style="whitegrid", rc={"lines.linewidth": 6})
                 dashes = [(2**i, 2**i)]
                 sns.lineplot(
                     x="node", y=scalar,
@@ -747,7 +762,7 @@ class GroupCSVComparison():
                     palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
                     style=[True] * len(profile.index), dashes=dashes,
                     alpha=self._alpha(0.4 + 0.2 * i))
-                sns.set(style="ticks", rc={"lines.linewidth": 0.5})
+                sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
                 sns.lineplot(
                     x="node", y=scalar,
                     data=profile, hue="bundle",
@@ -786,6 +801,53 @@ class GroupCSVComparison():
             plt.close(fig)
             plt.ion()
 
+    def _contrast_index_plotter(self, j, axes, positions,
+                                bundle, ci_df, n_boot, scalar):
+        ax = axes[positions[bundle][0], positions[bundle][1]]
+        sns.set(style="whitegrid", rc={"lines.linewidth": 6})
+        sns.lineplot(
+            x="node", y="diff",
+            data=ci_df,
+            estimator='mean', ci=95, n_boot=n_boot,
+            color=COLOR_DICT[bundle], legend=False, ax=ax,
+            style=[True] * len(ci_df.index),
+            alpha=self._alpha(1.0))
+        sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
+        sns.lineplot(
+            x="node", y="diff",
+            data=ci_df,
+            ci=None, estimator=None, units='subject',
+            color=COLOR_DICT[bundle], legend=False, ax=ax,
+            style=[True] * len(ci_df.index),
+            alpha=self._alpha(0.6))
+
+        ax.set_title(bundle, fontsize=20)
+        ax.set_xlabel(X_LABELS[j], fontsize=14)
+        ax.set_ylabel("C.I. * 2", fontsize=14)
+        ax.set_ylim([-1, 1])
+
+    def _contrast_index_df_maker(self, bundles, names, scalar):
+        ci_df = pd.DataFrame(columns=["subject", "node", "diff"])
+        for subject in self.subjects:
+            profiles = [None] * 2
+            both_found = True
+            for i, name in enumerate(names):
+                for j, bundle in enumerate(bundles):
+                    profiles[i + j] = self._get_profile(
+                        name, bundle, subject, scalar)
+                    if profiles[i + j] is None:
+                        both_found = False
+            if both_found:
+                this_contrast_index = \
+                    calc_contrast_index(profiles[0], profiles[1])
+                for i, diff in enumerate(this_contrast_index):
+                    ci_df = ci_df.append({
+                        "subject": subject,
+                        "node": i,
+                        "diff": diff},
+                        ignore_index=True)
+        return ci_df
+
     def contrast_index(self, names=None, scalar="dti_fa",
                        show_plots=False, n_boot=1000,
                        positions=POSITIONS):
@@ -815,11 +877,6 @@ class GroupCSVComparison():
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
-
-        Returns
-        -------
-        Pandas dataframe of contrast indices
-        with subjects as columns and bundles as rows.
         """
         if not show_plots:
             plt.ioff()
@@ -833,47 +890,11 @@ class GroupCSVComparison():
 
         fig, axes = self._get_brain_axes()
         for j, bundle in enumerate(tqdm(self.bundles)):
-            ci_df = pd.DataFrame(columns=["subject", "node", "diff"])
-            for subject in self.subjects:
-                profiles = [None] * 2
-                both_found = True
-                for i, name in enumerate(names):
-                    profiles[i] = self._get_profile(
-                        name, bundle, subject, scalar)
-                    if profiles[i] is None:
-                        both_found = False
-                if both_found:
-                    this_contrast_index = \
-                        calc_contrast_index(profiles[0], profiles[1])
-                    for i, diff in enumerate(this_contrast_index):
-                        ci_df = ci_df.append({
-                            "subject": subject,
-                            "node": i,
-                            "diff": diff},
-                            ignore_index=True)
-            ax = axes[positions[bundle][0], positions[bundle][1]]
-            sns.set(style="ticks", rc={"lines.linewidth": 6})
-            sns.lineplot(
-                x="node", y="diff",
-                data=ci_df,
-                estimator='mean', ci=95, n_boot=n_boot,
-                color=COLOR_DICT[bundle], legend=False, ax=ax,
-                style=[True] * len(ci_df.index),
-                alpha=self._alpha(0.5))
-            sns.set(style="ticks", rc={"lines.linewidth": 0.5})
-            sns.lineplot(
-                x="node", y="diff",
-                data=ci_df,
-                ci=None, estimator=None, units='subject',
-                color=COLOR_DICT[bundle], legend=False, ax=ax,
-                style=[True] * len(ci_df.index),
-                alpha=self._alpha(0.3))
-
-            ax.set_title(bundle, fontsize=20)
-            ax.set_xlabel(X_LABELS[j], fontsize=14)
-            ax.set_ylabel(scalar, fontsize=14)
-            ax.set_ylim([-1, 1])
-        fig.legend([scalar], loc='center')
+            ci_df = self._contrast_index_df_maker(
+                [bundle], names, scalar)
+            self._contrast_index_plotter(
+                j, axes, positions, bundle, ci_df, n_boot, scalar)
+        fig.legend([scalar], loc='center', fontsize=14)
         fig.savefig(
             self._get_fname(
                 f"contrast_plots/{scalar}/",
@@ -882,18 +903,17 @@ class GroupCSVComparison():
             plt.close(fig)
             plt.ion()
 
-    def lateral_contrast_index(self, names=None, scalar="dti_fa",
-                               show_plots=False):
+    def lateral_contrast_index(self, name, scalar="dti_fa",
+                               show_plots=False, n_boot=1000,
+                               positions=POSITIONS):
         """
         Calculate the lateral contrast index for each bundle in a given
         dataset, for each dataset in names.
 
         Parameters
         ----------
-        names : list of strings, optional
-            Names of datasets to plot profiles of.
-            If None, all datasets are used.
-            Default: None
+        name : string
+            Names of dataset to plot profiles of.
 
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
@@ -901,49 +921,42 @@ class GroupCSVComparison():
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
+
+        n_boot : int, optional
+            Number of bootstrap resamples for seaborn to use
+            to estimate the ci.
+            Default: 1000
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
         """
         if not show_plots:
             plt.ioff()
 
-        if names is None:
-            names = list(self.profile_dict.keys())
+        fig, axes = self._get_brain_axes()
+        for j, bundle in enumerate(tqdm(self.bundles)):
+            other_bundle = list(bundle)
+            if other_bundle[-1] == 'L':
+                other_bundle[-1] = 'R'
+            elif other_bundle[-1] == 'R':
+                other_bundle[-1] = 'L'
+            else:
+                continue
+            other_bundle = "".join(other_bundle)
+            if other_bundle not in self.bundles:
+                continue
 
-        for subject in self.subjects:
-            fig, axes = self._get_brain_axes()
-            for j, bundle in enumerate(self.bundles):
-                other_bundle = list(bundle)
-                if other_bundle[-1] == 'L':
-                    other_bundle[-1] = 'R'
-                elif other_bundle[-1] == 'R':
-                    other_bundle[-1] = 'L'
-                else:
-                    continue
-                if other_bundle not in self.bundles:
-                    continue
+            ci_df = self._contrast_index_df_maker(
+                [bundle, other_bundle], [name], scalar)
+            self._contrast_index_plotter(
+                j, axes, positions, bundle, ci_df, n_boot, scalar)
 
-                for name in names:
-                    profile = self._get_profile(
-                        name, bundle, subject, scalar)
-                    other_profile = self._get_profile(
-                        name, other_bundle, subject, scalar)
-
-                    if (profile is not None) and (other_profile is not None):
-                        lateral_contrast_index = \
-                            calc_contrast_index(profile, other_profile)
-                        ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                        sns.lineplot(data=lateral_contrast_index,
-                                     label=name, ax=ax, ci=None,
-                                     estimator=None)
-                        ax.set_title(
-                            f"{bundle} vs {other_bundle}", fontsize=20)
-                        ax.set_xlabel(X_LABELS[j], fontsize=14)
-                        ax.set_ylabel(scalar, fontsize=14)
-                        ax.set_ylim([-1, 1])
-            fig.legend(names, loc='center')
+            fig.legend([scalar], loc='center', fontsize=14)
             fig.savefig(
                 self._get_fname(
                     f"contrast_plots/{scalar}/",
-                    f"{'_'.join(names)}_lateral_contrast_index"))
+                    f"{name}_lateral_contrast_index"))
             if not show_plots:
                 plt.close(fig)
 
