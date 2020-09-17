@@ -749,13 +749,12 @@ class GroupCSVComparison():
                     style=[True] * len(profile.index), dashes=dashes,
                     alpha=0.3 + 0.2 * i)
                 if j == 0:
-                    labels.append(
-                        Line2D(
-                            [], [],
-                            color=[0, 0, 0],
-                            linestyle='-' * (i + 1)
-                        )
+                    line = Line2D(
+                        [], [],
+                        color=[0, 0, 0]
                     )
+                    line.set_dashes((2**(i + 1), 2**(i + 1)))
+                    labels.append(line)
 
             ax.set_title(bundle, fontsize=20)
             ax.set_xlabel(X_LABELS[j], fontsize=14)
@@ -766,7 +765,7 @@ class GroupCSVComparison():
                 ax.set_yticks(y_ticks)
                 ax.set_yticklabels(y_ticks)
 
-        fig.legend(labels, names, loc='center', fontsize=12)
+        fig.legend(labels, names, loc='center', fontsize=14)
 
         if out_file is None:
             fig.savefig(
