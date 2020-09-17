@@ -744,7 +744,7 @@ class GroupCSVComparison():
                 sns.lineplot(
                     x="node", y=scalar,
                     data=profile, hue="bundle",
-                    estimator=None, units='subjectID',
+                    ci=None, units='subjectID',
                     palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
                     style=[True] * len(profile.index), dashes=dashes,
                     alpha=0.3 + 0.2 * i)
@@ -832,7 +832,11 @@ class GroupCSVComparison():
                     this_contrast_index = \
                         calc_contrast_index(profiles[0], profiles[1])
                     ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                    sns.lineplot(data=this_contrast_index, label=scalar, ax=ax)
+                    sns.lineplot(
+                        data=this_contrast_index,
+                        label=scalar,
+                        ax=ax,
+                        ci=None)
                     ax.set_title(bundle, fontsize=20)
                     ax.set_xlabel(X_LABELS[j], fontsize=14)
                     ax.set_ylabel(scalar, fontsize=14)
@@ -904,7 +908,7 @@ class GroupCSVComparison():
                             calc_contrast_index(profile, other_profile)
                         ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
                         sns.lineplot(data=lateral_contrast_index,
-                                     label=name, ax=ax)
+                                     label=name, ax=ax, ci=None)
                         ax.set_title(
                             f"{bundle} vs {other_bundle}", fontsize=20)
                         ax.set_xlabel(X_LABELS[j], fontsize=14)
@@ -1033,7 +1037,7 @@ class GroupCSVComparison():
         for k, bundle in enumerate(self.bundles):
             ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
             for m, scalar in enumerate(scalars):
-                sns.lineplot(data=all_node_coef[m, k], label=scalar)
+                sns.lineplot(data=all_node_coef[m, k], label=scalar, ci=None)
             ax.set_title(bundle)
             ax.set_ylim([mini, maxi])
             ax.set_xticklabels([])
