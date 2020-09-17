@@ -434,7 +434,6 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
     return df
 
 
-# TODO: get rid of grey background
 class BrainAxes():
     '''
     Creates and handles a grid of axes.
@@ -467,8 +466,8 @@ class BrainAxes():
         self.on_grid[self.positions[bundle]] = True
         return self.axes[self.positions[bundle]]
 
-    def plot(self, bundle, x, y, data, ylabel, ylim,
-             n_boot, alpha, dashes=None):
+    def plot(self, bundle, x, y, data, ylabel, ylim, alpha
+             lineplot_kwargs):
         '''
         Given a dataframe data with at least columns x, y,
         and subjectID, plot the mean of subjects with ci of 95
@@ -479,19 +478,17 @@ class BrainAxes():
         sns.set(style="whitegrid", rc={"lines.linewidth": 6})
         sns.lineplot(
             x=x, y=y,
-            data=data, hue="bundle",
+            data=data,
             estimator='mean', ci=95, n_boot=n_boot,
-            palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
-            style=[True] * len(data.index), dashes=dashes,
-            alpha=alpha)
+            legend=False, ax=ax, alpha=alpha,
+            style=[True] * len(data.index), **lineplot_kwargs)
         sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
         sns.lineplot(
             x=x, y=y,
-            data=data, hue="bundle",
+            data=data,
             ci=None, estimator=None, units='subjectID',
-            palette=[COLOR_DICT[bundle]], legend=False, ax=ax,
-            style=[True] * len(data.index), dashes=dashes,
-            alpha=alpha - 0.2)
+            legend=False, ax=ax, alpha=alpha - 0.2,
+            style=[True] * len(data.index), **lineplot_kwargs)
 
         ax.set_title(bundle, fontsize=20)
         ax.set_ylabel(ylabel, fontsize=14)
@@ -801,12 +798,14 @@ class GroupCSVComparison():
                 ba.plot(
                     bundle, "node", scalar, profile,
                     scalar, ylim, n_boot, self._alpha(0.4 + 0.2 * i),
-                    dashes=[(2**i, 2**i)])
+                    {
+                        "dashes": dashes=[(2**i, 2**i)],
+                        "hue": "bundle",
+                        "palette": [COLOR_DICT[bundle]]})
                 if j == 0:
                     line = Line2D(
                         [], [],
-                        color=[0, 0, 0]
-                    )
+                        color=[0, 0, 0])
                     line.set_dashes((2**(i + 1), 2**(i + 1)))
                     labels.append(line)
         ba.fig.legend(labels, names, loc='center', fontsize=14)
@@ -892,7 +891,7 @@ class GroupCSVComparison():
                 [bundle], names, scalar)
             ba.plot(
                 bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0)
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
         ba.fig.legend([scalar], loc='center', fontsize=14)
         ba.format()
         ba.fig.savefig(
@@ -951,7 +950,7 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot(
                 bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0)
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
 
         ba.fig.legend([scalar], loc='center', fontsize=14)
         ba.format()
