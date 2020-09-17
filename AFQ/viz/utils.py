@@ -466,8 +466,8 @@ class BrainAxes():
         self.on_grid[self.positions[bundle]] = True
         return self.axes[self.positions[bundle]]
 
-    def plot(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
-             lineplot_kwargs):
+    def plot_line(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
+                  lineplot_kwargs):
         '''
         Given a dataframe data with at least columns x, y,
         and subjectID, plot the mean of subjects with ci of 95
@@ -494,7 +494,7 @@ class BrainAxes():
         ax.set_ylabel(ylabel, fontsize=14)
         ax.set_ylim(ylim)
 
-    def format(self):
+    def format(self, disable_x=True):
         '''
         Call this functions once after all axes that you intend to use
         have been plotted on. Automatically formats brain axes.
@@ -506,8 +506,9 @@ class BrainAxes():
                 if j != 0 and self.on_grid[i][j - 1]:
                     self.axes[i, j].set_yticklabels([])
                     self.axes[i, j].set_ylabel("")
-                self.axes[i, j].set_xticklabels([])
-                self.axes[i, j].set_xlabel("")
+                if disable_x or (i != 4 and self.on_grid[i + 1][j]):
+                    self.axes[i, j].set_xticklabels([])
+                    self.axes[i, j].set_xlabel("")
         self.fig.tight_layout()
 
 
@@ -727,6 +728,16 @@ class GroupCSVComparison():
             return 1
         return alpha
 
+    def _array_to_df(self, arr):
+        '''
+        Converts a 2xn array to a pandas dataframe with columns x, y
+        Useful for plotting with seaborn.
+        '''
+        df = pd.DataFrame()
+        df['x'] = arr[0]
+        df['y'] = arr[1]
+        return df
+
     def masked_corr(self, arr):
         '''
         Mask arr for NaNs before calling np.corrcoef
@@ -795,7 +806,7 @@ class GroupCSVComparison():
             for i, name in enumerate(names):
                 profile = self.profile_dict[name]
                 profile = profile[profile['bundle'] == bundle]
-                ba.plot(
+                ba.plot_line(
                     bundle, "node", scalar, profile,
                     scalar, ylim, n_boot, self._alpha(0.6 + 0.2 * i),
                     {
@@ -889,7 +900,7 @@ class GroupCSVComparison():
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
-            ba.plot(
+            ba.plot_line(
                 bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]})
         ba.fig.legend([scalar], loc='center', fontsize=14)
@@ -948,7 +959,7 @@ class GroupCSVComparison():
 
             ci_df = self._contrast_index_df_maker(
                 [bundle, other_bundle], [name], scalar)
-            ba.plot(
+            ba.plot_line(
                 bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]})
 
@@ -967,7 +978,8 @@ class GroupCSVComparison():
     def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           ylims=[0.0, 1.0],
-                          show_plots=False):
+                          show_plots=False,
+                          positions=POSITIONS):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
 
@@ -989,6 +1001,10 @@ class GroupCSVComparison():
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
 
         Returns
         -------
@@ -1042,27 +1058,32 @@ class GroupCSVComparison():
         maxi = all_profile_coef.max()
         mini = all_profile_coef.min()
         bins = np.linspace(mini, maxi, 10)
-        fig, axes = self._get_brain_axes()
+        ba = BrainAxes(positions=positions)
         for k, bundle in enumerate(self.bundles):
-            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            ax = ba.get_axis(bundle)
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
+                sns.set(style="whitegrid")
                 sns.histplot(
                     data=bundle_coefs,
                     bins=bins,
                     alpha=0.5,
                     label=scalar,
+                    color=tableau_20_sns[m * 2],
                     ax=ax)
-            ax.set_title(bundle)
+            ax.set_title(bundle, fontsize=20)
+            ax.set_xlabel("Pearson's r", fontsize=14)
+            ax.set_ylabel("Count", fontsize=14)
 
-        fig.legend(scalars, loc='center')
-        fig.savefig(
+        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.format(disable_x=False)
+        ba.fig.savefig(
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
 
         if not show_plots:
-            plt.close(fig)
+            plt.close(ba.fig)
 
         # plot node reliability profile
         all_node_coef[np.isnan(all_node_coef)] = 0
@@ -1072,57 +1093,65 @@ class GroupCSVComparison():
         else:
             maxi = ylims[1]
             mini = ylims[0]
-        fig, axes = self._get_brain_axes()
+        ba = BrainAxes(positions=positions)
         for k, bundle in enumerate(self.bundles):
-            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            ax = ba.get_axis(bundle)
             for m, scalar in enumerate(scalars):
-                sns.lineplot(data=all_node_coef[m, k], label=scalar,
-                             ci=None, estimator=None)
-            ax.set_title(bundle)
+                sns.set(style="whitegrid")
+                sns.lineplot(
+                    data=all_node_coef[m, k],
+                    label=scalar,
+                    color=tableau_20_sns[m * 2],
+                    ax=ax,
+                    legend=False,
+                    ci=None, estimator=None)
             ax.set_ylim([mini, maxi])
-            ax.set_xticklabels([])
+            ax.set_title(bundle, fontsize=20)
+            ax.set_ylabel("Pearson's r", fontsize=14)
 
-        fig.legend(scalars, loc='center')
-        fig.savefig(
+        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_node_profiles"))
 
         if not show_plots:
-            plt.close(fig)
+            plt.close(ba.fig)
 
         # plot mean profile scatter plots
         for m, scalar in enumerate(scalars):
-            this_sub_means = all_sub_means[m]
-            maxi = np.nanmax(this_sub_means)
-            mini = np.nanmin(this_sub_means)
-            fig, axes = self._get_brain_axes()
+            maxi = np.nanmax(all_sub_means[m])
+            mini = np.nanmin(all_sub_means[m])
+            ba = BrainAxes(positions=positions)
             for k, bundle in enumerate(self.bundles):
-                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+                this_sub_means = self._array_to_df(all_sub_means[m, k])
+                ax = ba.get_axis(bundle)
+                sns.set(style="whitegrid")
                 sns.scatterplot(
-                    x=this_sub_means[k, 0],
-                    y=this_sub_means[k, 1],
+                    data=this_sub_means, x='x', y='y',
+                    label=scalar,
+                    color=tableau_20_sns[m * 2],
+                    legend=False,
                     ax=ax)
-                ax.set_title(bundle)
-                ax.set_xlabel(names[0])
-                ax.set_ylabel(names[1])
+                ax.set_title(bundle, fontsize=20)
+                ax.set_xlabel(names[0], fontsize=14)
+                ax.set_ylabel(names[1], fontsize=14)
                 ax.set_ylim([mini, maxi])
                 ax.set_xlim([mini, maxi])
 
-            fig.savefig(
+            ba.fig.legend([scalar], loc='center', fontsize=14)
+            ba.format(disable_x=False)
+            ba.fig.savefig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
             if not show_plots:
-                plt.close(fig)
+                plt.close(ba.fig)
 
         # plot bar plots of pearson's r
-        width = 0.6
-        spacing = 2
-        x = np.arange(len(self.bundles)) * spacing
-        x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
-
         fig, axes = plt.subplots(2, 1)
+        fig.set_size_inches((8, 8))
         bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
         bundle_prof_stds = sem(all_profile_coef, axis=2, nan_policy='omit')
         if ylims is None:
@@ -1131,32 +1160,46 @@ class GroupCSVComparison():
         else:
             maxi = ylims[1]
             mini = ylims[0]
-        for m, scalar in enumerate(scalars):
-            sns.barplot(
-                x=x + x_shift[m],
-                y=bundle_prof_means[m],
-                width=width,
-                label=scalar,
-                yerr=bundle_prof_stds[m],
-                ax=axes[0])
-            sns.barplot(
-                x=x + x_shift[m],
-                y=all_sub_coef[m],
-                width=width,
-                label=scalar,
-                ax=axes[1]
-            )
 
-        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
+        df_bundle_prof_means = pd.DataFrame(
+            columns=['scalar', 'bundle', 'value'])
+        for m, scalar in enumerate(scalars):
+            for k, bundle in enumerate(self.bundles):
+                df_bundle_prof_means = df_bundle_prof_means.append({
+                    'scalar': scalar,
+                    'bundle': bundle,
+                    'value': bundle_prof_means[m, k]}, ignore_index=True)
+        df_all_sub_coef = pd.DataFrame(columns=['scalar', 'bundle', 'value'])
+        for m, scalar in enumerate(scalars):
+            for k, bundle in enumerate(self.bundles):
+                df_all_sub_coef = df_all_sub_coef.append({
+                    'scalar': scalar,
+                    'bundle': bundle,
+                    'value': all_sub_coef[m, k]}, ignore_index=True)
+
+        sns.set(style="whitegrid")
+        sns.barplot(
+            data=df_bundle_prof_means, x='bundle', y='value', hue='scalar',
+            palette=tableau_20_sns[:len(scalars) * 2:2],
+            yerr=bundle_prof_stds[m],
+            ax=axes[0])
+        axes[0].legend_.remove()
+        sns.barplot(
+            data=df_all_sub_coef, x='bundle', y='value', hue='scalar',
+            palette=tableau_20_sns[:len(scalars) * 2:2],
+            ax=axes[1])
+        axes[1].legend_.remove()
+
+        axes[0].set_title("A", fontsize=20)
+        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles', fontsize=14)
         axes[0].set_ylim([mini, maxi])
-        axes[0].set_xticks(x)
-        axes[0].set_xticklabels(self.bundles)
-        axes[0].set_title("profile_reliability")
-        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
+        axes[0].set_xlabel("")
+        axes[0].set_xticklabels(self.bundles, fontsize=14)
+        axes[1].set_title("B", fontsize=20)
+        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles', fontsize=14)
         axes[1].set_ylim([mini, maxi])
-        axes[1].set_xticks(x)
-        axes[1].set_xticklabels(self.bundles)
-        axes[1].set_title(f"intersubejct_reliability")
+        axes[1].set_xlabel("")
+        axes[1].set_xticklabels(self.bundles, fontsize=14)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -1165,27 +1208,20 @@ class GroupCSVComparison():
                  rotation=45,
                  horizontalalignment='right')
 
-        fig.suptitle(f"{names[0]}_vs_{names[1]}")
+        fig.tight_layout()
+        legend_labels = []
+        for m, _ in enumerate(scalars):
+            legend_labels.append(Line2D(
+                [], [],
+                color=tableau_20_sns[m * 2]))
         fig.legend(
+            legend_labels,
             scalars,
-            loc='lower right',
-            bbox_to_anchor=(0.5, 0.15, 0.5, 0.5),
-            fontsize='small')
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+            fontsize=14,
+            bbox_to_anchor=(1.25, 0.5))
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
-
-        extent = axes[1].get_window_extent().transformed(
-            fig.dpi_scale_trans.inverted())
-        axes[1].set_title(
-            f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
-        fig.savefig(
-            self._get_fname(
-                f"rel_plots/{'_'.join(scalars)}",
-                f"{names[0]}_vs_{names[1]}_intersubject"),
-            bbox_inches=extent.translated(0, -0.2).expanded(1.4, 2.0))
-        axes[1].set_title(f"intersubejct_reliability")
 
         if not show_plots:
             plt.close(fig)
