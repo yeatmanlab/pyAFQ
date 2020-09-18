@@ -20,7 +20,7 @@ import nibabel.tmpdirs as nbtmp
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.data as dpd
-from dipy.data import fetcher
+from dipy.data import fetcher, get_fnames
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.testing.decorators import xvfb_it
@@ -31,7 +31,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.mask import RoiMask, ThresholdedScalarMask
+from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
 
 
 def touch(fname, times=None):
@@ -290,6 +290,48 @@ def test_AFQ_reco():
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
     npt.assert_(len(bundles['CCMid']) > 0)
     myafq.export_all()
+
+
+@pytest.mark.nightly2
+def test_AFQ_pft():
+    """
+    Test pft interface for AFQ
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    afd.fetch_stanford_hardi_tractography()
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
+
+    sub_path = op.join(
+        tmpdir.name,
+        'stanford_hardi',
+        'derivatives',
+        'vistasoft',
+        'sub-01',
+        'ses-01',
+        'dwi')
+    f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
+    os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
+    os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
+    os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
+
+    stop_mask = PFTMask(
+        MaskFile("WMprobseg"),
+        MaskFile("GMprobseg"),
+        MaskFile("CSFprobseg"))
+
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep='vistasoft',
+        bundle_names=bundle_names,
+        tracking_params={
+            "stop_mask": stop_mask,
+            "stop_threshold": "CMC",
+            "tracker": "pft"
+        })
+    my_afq.export_rois()
 
 
 # Requires large download
