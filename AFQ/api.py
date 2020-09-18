@@ -1072,8 +1072,8 @@ class AFQ(object):
                 node_numbers.extend(nodes)
 
             profile_dict = dict()
-            profile_dict['bundle'] = bundle_names
-            profile_dict['node'] = node_numbers
+            profile_dict["tractID"] = bundle_names
+            profile_dict["nodeID"] = node_numbers
             for ii, scalar in enumerate(self.scalars):
                 profile_dict[scalar] = profiles[ii]
 
