@@ -1378,7 +1378,6 @@ class AFQ(object):
         return figure
 
     def _plot_tract_profiles(self, row):
-        tract_profiles = pd.read_csv(self.get_tract_profiles()[0])
         start_time = time()
         fnames = []
         for scalar in self.scalars:
@@ -1388,9 +1387,10 @@ class AFQ(object):
                 include_track=True,
                 include_seg=True)
 
-            visualize_tract_profiles(tract_profiles,
+            visualize_tract_profiles(self._tract_profiles(row),
                                      scalar=scalar,
-                                     file_name=fname)
+                                     file_name=fname,
+                                     n_boot=100)
             fnames.append(fname)
         row['timing']['Visualization'] =\
             row['timing']['Visualization'] + time() - start_time

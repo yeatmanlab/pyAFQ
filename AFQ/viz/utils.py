@@ -7,10 +7,12 @@ import tempfile
 import numpy as np
 from scipy.stats import sem
 import pandas as pd
-from palettable.tableau import Tableau_20
 import imageio as io
 import IPython.display as display
+import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from tqdm.auto import tqdm
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -26,29 +28,29 @@ from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
-tableau_20_rgb = np.array(Tableau_20.colors) / 255 - 0.0001
+tableau_20_sns = sns.color_palette("tab20")
 
 COLOR_DICT = OrderedDict({
-    "ATR_L": tableau_20_rgb[0], "C_L": tableau_20_rgb[0],
-    "ATR_R": tableau_20_rgb[1], "C_R": tableau_20_rgb[1],
-    "CST_L": tableau_20_rgb[2],
-    "CST_R": tableau_20_rgb[3],
-    "CGC_L": tableau_20_rgb[4], "MCP": tableau_20_rgb[4],
-    "CGC_R": tableau_20_rgb[5], "CCMid": tableau_20_rgb[5],
-    "HCC_L": tableau_20_rgb[6],
-    "HCC_R": tableau_20_rgb[7],
-    "FP": tableau_20_rgb[8], "CC_ForcepsMinor": tableau_20_rgb[8],
-    "FA": tableau_20_rgb[9], "CC_ForcepsMajor": tableau_20_rgb[9],
-    "IFO_L": tableau_20_rgb[10], "IFOF_L": tableau_20_rgb[10],
-    "IFO_R": tableau_20_rgb[11], "IFOF_R": tableau_20_rgb[11],
-    "ILF_L": tableau_20_rgb[12], "F_L": tableau_20_rgb[12],
-    "ILF_R": tableau_20_rgb[13], "F_R": tableau_20_rgb[13],
-    "SLF_L": tableau_20_rgb[14],
-    "SLF_R": tableau_20_rgb[15],
-    "UNC_L": tableau_20_rgb[16], "UF_L": tableau_20_rgb[16],
-    "UNC_R": tableau_20_rgb[17], "UF_R": tableau_20_rgb[17],
-    "ARC_L": tableau_20_rgb[18], "AF_L": tableau_20_rgb[18],
-    "ARC_R": tableau_20_rgb[19], "AF_R": tableau_20_rgb[19]})
+    "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
+    "ATR_R": tableau_20_sns[1], "C_R": tableau_20_sns[1],
+    "CST_L": tableau_20_sns[2],
+    "CST_R": tableau_20_sns[3],
+    "CGC_L": tableau_20_sns[4], "MCP": tableau_20_sns[4],
+    "CGC_R": tableau_20_sns[5], "CCMid": tableau_20_sns[5],
+    "HCC_L": tableau_20_sns[6],
+    "HCC_R": tableau_20_sns[7],
+    "FP": tableau_20_sns[8], "CC_ForcepsMinor": tableau_20_sns[8],
+    "FA": tableau_20_sns[9], "CC_ForcepsMajor": tableau_20_sns[9],
+    "IFO_L": tableau_20_sns[10], "IFOF_L": tableau_20_sns[10],
+    "IFO_R": tableau_20_sns[11], "IFOF_R": tableau_20_sns[11],
+    "ILF_L": tableau_20_sns[12], "F_L": tableau_20_sns[12],
+    "ILF_R": tableau_20_sns[13], "F_R": tableau_20_sns[13],
+    "SLF_L": tableau_20_sns[14],
+    "SLF_R": tableau_20_sns[15],
+    "UNC_L": tableau_20_sns[16], "UF_L": tableau_20_sns[16],
+    "UNC_R": tableau_20_sns[17], "UF_R": tableau_20_sns[17],
+    "ARC_L": tableau_20_sns[18], "AF_L": tableau_20_sns[18],
+    "ARC_R": tableau_20_sns[19], "AF_R": tableau_20_sns[19]})
 
 POSITIONS = OrderedDict({
     "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
@@ -65,7 +67,8 @@ POSITIONS = OrderedDict({
 
 CSV_MAT_2_PYTHON = \
     {'fa': 'dti_fa', 'md': 'dti_md',
-     'tractID': 'bundle'}
+     'tractID': 'bundle',
+     'nodeID': 'node'}
 
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
@@ -380,17 +383,16 @@ class Viz:
 
 
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
+                             n_boot=1000,
                              file_name=None,
-                             use_fa_ticks=None,
                              positions=POSITIONS):
     """
     Visualize all tract profiles for a scalar in one plot
 
     Parameters
     ----------
-    tract_profiles : pandas dataframe
-        Pandas dataframe of tract_profiles. For example,
-        tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])
+    tract_profiles : string
+        Path to CSV containing tract_profiles.
 
     scalar : string, optional
        Scalar to use in plots. Default: "dti_fa".
@@ -399,15 +401,14 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         Minimum and maximum value used for y-axis bounds.
         If None, ylim is not set.
         Default: None
+
+    n_boot : int, optional
+        Number of bootstrap resamples for seaborn to use
+        to estimate the ci.
+        Default: 1000
+
     file_name : string, optional
         File name to save figure to if not None. Default: None
-
-    use_fa_ticks : bool, optional
-        Set min and max y limit to 0 and 1, and only use yticks at
-        0.2, 0.4, 0.6 . Useful for plotting FA.
-        If None, set to evaluation of ("fa" in scalar).
-        If ultimately True, takes precedence over ylim.
-        Default: None
 
     positions : dictionary, optional
         Dictionary that maps bundle names to position in plot.
@@ -417,48 +418,101 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
     -------
         Matplotlib figure and axes.
     """
-    if use_fa_ticks is None:
-        use_fa_ticks = ("fa" in scalar)
+    csv_comparison = GroupCSVComparison(
+        None,
+        [tract_profiles],
+        ["my_tract_profiles"],
+        scalar_bounds={'lb': {}, 'ub': {}})
 
-    if (file_name is not None):
-        plt.ioff()
+    df = csv_comparison.tract_profiles(
+        scalar=scalar,
+        ylim=ylim,
+        positions=positions,
+        out_file=file_name,
+        n_boot=n_boot)
 
-    fig, axes = plt.subplots(5, 5)
-
-    for bundle in positions.keys():
-        ax = axes[positions[bundle][0], positions[bundle][1]]
-        fa = tract_profiles[
-            (tract_profiles["bundle"] == bundle)
-        ][scalar].values
-        ax.plot(fa, 'o-', color=COLOR_DICT[bundle])
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
-
-        if use_fa_ticks:
-            ax.set_ylim([0.0, 1.0])
-            ax.set_yticks([0.2, 0.4, 0.6])
-            ax.set_yticklabels([0.2, 0.4, 0.6])
-            ax.set_xticklabels([])
-
-    fig.set_size_inches((12, 12))
-
-    axes[0, 0].axis("off")
-    axes[0, -1].axis("off")
-    axes[1, 2].axis("off")
-    axes[2, 2].axis("off")
-    axes[3, 2].axis("off")
-    axes[4, 0].axis("off")
-    axes[4, 4].axis("off")
-
-    if (file_name is not None):
-        fig.savefig(file_name)
-        plt.ion()
-
-    return fig, axes
+    return df
 
 
-class LongitudinalCSVComparison():
+class BrainAxes():
+    '''
+    Creates and handles a grid of axes.
+    Each axis corresponds to a bundle.
+    Axis placement should roughly correspond
+    to the actual bundle placement in the brain.
+    '''
+
+    def __init__(self, size=(5, 5), positions=POSITIONS):
+        self.size = size
+        self.positions = positions
+        self.on_grid = np.zeros((5, 5), dtype=bool)
+        self.fig, self.axes = plt.subplots(
+            self.size[0],
+            self.size[1],
+            frameon=False)
+        plt.subplots_adjust(
+            left=None,
+            bottom=None,
+            right=None,
+            top=None,
+            wspace=0.4,
+            hspace=0.6)
+        self.fig.set_size_inches((18, 18))
+
+    def get_axis(self, bundle):
+        '''
+        Given a bundle, turn on and get an axis.
+        '''
+        self.on_grid[self.positions[bundle]] = True
+        return self.axes[self.positions[bundle]]
+
+    def plot_line(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
+                  lineplot_kwargs):
+        '''
+        Given a dataframe data with at least columns x, y,
+        and subjectID, plot the mean of subjects with ci of 95
+        in alpha and the individual subjects in alpha-0.2
+        using sns.lineplot()
+        '''
+        ax = self.get_axis(bundle)
+        sns.set(style="whitegrid", rc={"lines.linewidth": 6})
+        sns.lineplot(
+            x=x, y=y,
+            data=data,
+            estimator='mean', ci=95, n_boot=n_boot,
+            legend=False, ax=ax, alpha=alpha,
+            style=[True] * len(data.index), **lineplot_kwargs)
+        sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
+        sns.lineplot(
+            x=x, y=y,
+            data=data,
+            ci=None, estimator=None, units='subjectID',
+            legend=False, ax=ax, alpha=alpha - 0.2,
+            style=[True] * len(data.index), **lineplot_kwargs)
+
+        ax.set_title(bundle, fontsize=20)
+        ax.set_ylabel(ylabel, fontsize=14)
+        ax.set_ylim(ylim)
+
+    def format(self, disable_x=True):
+        '''
+        Call this functions once after all axes that you intend to use
+        have been plotted on. Automatically formats brain axes.
+        '''
+        for i in range(self.size[0]):
+            for j in range(self.size[1]):
+                if not self.on_grid[i, j]:
+                    self.axes[i, j].axis("off")
+                if j != 0 and self.on_grid[i][j - 1]:
+                    self.axes[i, j].set_yticklabels([])
+                    self.axes[i, j].set_ylabel("")
+                if disable_x or (i != 4 and self.on_grid[i + 1][j]):
+                    self.axes[i, j].set_xticklabels([])
+                    self.axes[i, j].set_xlabel("")
+        self.fig.tight_layout()
+
+
+class GroupCSVComparison():
     """
     Compare different CSVs, using:
     tract profiles, contrast indices,
@@ -551,11 +605,14 @@ class LongitudinalCSVComparison():
         self.profile_dict = {}
         for i, fname in enumerate(csv_fnames):
             profile = pd.read_csv(fname)
-            profile['subjectID'] = \
-                profile['subjectID'].apply(
-                    lambda x: int(
-                        ''.join(c for c in x if c.isdigit())
-                    ) if isinstance(x, str) else x)
+            if 'subjectID' in profile.columns:
+                profile['subjectID'] = \
+                    profile['subjectID'].apply(
+                        lambda x: int(
+                            ''.join(c for c in x if c.isdigit())
+                        ) if isinstance(x, str) else x)
+            else:
+                profile['subjectID'] = 0
 
             if is_mats[i]:
                 profile.rename(
@@ -589,11 +646,14 @@ class LongitudinalCSVComparison():
             self.subjects = subjects
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
         if bundles is None:
-            self.bundles = self.profile_dict[0]['bundle'].unique()
+            self.bundles = self.profile_dict[names[0]]['bundle'].unique()
         else:
             self.bundles = bundles
 
     def _threshold_scalar(self, bound, threshold, val):
+        """
+        Threshold scalars by a lower and upper bound.
+        """
         if bound == "lb":
             if val > threshold:
                 return val
@@ -610,6 +670,9 @@ class LongitudinalCSVComparison():
                                + " the default for reference")
 
     def _get_fname(self, folder, f_name):
+        """
+        Get file to save to, and generate the folder if it does not exist.
+        """
         f_folder = op.join(
             self.out_folder,
             folder)
@@ -617,13 +680,16 @@ class LongitudinalCSVComparison():
         return op.join(f_folder, f_name)
 
     def _get_profile(self, name, bundle, subject, scalar, repl_nan=True):
+        """
+        Get a single profile, then handle not found / NaNs
+        """
         profile = self.profile_dict[name]
         single_profile = profile[
             (profile['subjectID'] == subject)
             & (profile['bundle'] == bundle)
         ][scalar].to_numpy()
         nans = np.isnan(single_profile)
-        percent_nan = np.sum(nans)
+        percent_nan = (np.sum(nans) * 100) // self.prof_len
         if len(single_profile) < 1:
             self.logger.warning(
                 'No scalars found for scalar ' + scalar
@@ -651,21 +717,31 @@ class LongitudinalCSVComparison():
 
         return single_profile
 
-    def _get_brain_axes(self, suptitle):
-        fig, axes = plt.subplots(5, 5)
-        plt.tight_layout()
-        fig.set_size_inches((12, 12))
-        fig.suptitle(suptitle)
-        axes[0, 0].axis("off")
-        axes[0, -1].axis("off")
-        axes[1, 2].axis("off")
-        axes[2, 2].axis("off")
-        axes[3, 2].axis("off")
-        axes[4, 0].axis("off")
-        axes[4, 4].axis("off")
-        return fig, axes
+    def _alpha(self, alpha):
+        '''
+        Keep alpha in a reasonable range
+        Useful when calculating alpha automatically
+        '''
+        if alpha < 0.3:
+            return 0.3
+        if alpha > 1:
+            return 1
+        return alpha
+
+    def _array_to_df(self, arr):
+        '''
+        Converts a 2xn array to a pandas dataframe with columns x, y
+        Useful for plotting with seaborn.
+        '''
+        df = pd.DataFrame()
+        df['x'] = arr[0]
+        df['y'] = arr[1]
+        return df
 
     def masked_corr(self, arr):
+        '''
+        Mask arr for NaNs before calling np.corrcoef
+        '''
         mask = np.logical_not(
             np.logical_or(
                 np.isnan(arr[0, ...]),
@@ -675,9 +751,11 @@ class LongitudinalCSVComparison():
         return np.corrcoef(arr[:, mask])[0][1]
 
     def tract_profiles(self, names=None, scalar="dti_fa",
-                       min_scalar=0.0, max_scalar=1.0,
+                       ylim=[0.0, 1.0],
                        show_plots=False,
-                       positions=POSITIONS):
+                       positions=POSITIONS,
+                       out_file=None,
+                       n_boot=1000):
         """
         Compare all tract profiles for a scalar from different CSVs.
         Plots tract profiles for all in one plot.
@@ -693,11 +771,20 @@ class LongitudinalCSVComparison():
         scalar : string, optional
             Scalar to use in plots. Default: "dti_fa".
 
-        min_scalar : float, optional
-            Minimum value used for y-axis bounds. Default: 0.0
+        ylim : list of 2 floats, optional
+            Minimum and maximum value used for y-axis bounds.
+            If None, ylim is not set.
+            Default: [0.0, 1.0]
 
-        max_scalar : float, optional
-            Maximum value used for y-axis bounds. Default: 1.0
+        out_file : str, optional
+            Path to save the figure to.
+            If None, use the default naming convention in self.out_folder
+            Default: None
+
+        n_boot : int, optional
+            Number of bootstrap resamples for seaborn to use
+            to estimate the ci.
+            Default: 1000
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -712,32 +799,66 @@ class LongitudinalCSVComparison():
         if names is None:
             names = list(self.profile_dict.keys())
 
-        for subject in self.subjects:
-            fig, axes = self._get_brain_axes('Subject ' + str(subject))
-            for bundle in self.bundles:
-                ax = axes[positions[bundle][0], positions[bundle][1]]
-                for name in names:
-                    profile = self._get_profile(name, bundle, subject, scalar)
-                    if profile is not None:
-                        ax.plot(profile)
-                ax.set_title(bundle)
-                ax.set_ylim([min_scalar, max_scalar])
-                y_ticks = np.asarray([0.2, 0.4, 0.6]) * max_scalar
-                ax.set_yticks(y_ticks)
-                ax.set_yticklabels(y_ticks)
-                ax.set_xticklabels([])
+        ba = BrainAxes(positions=positions)
+        labels = []
+        self.logger.info("Calculating means and CIs...")
+        for j, bundle in enumerate(tqdm(self.bundles)):
+            for i, name in enumerate(names):
+                profile = self.profile_dict[name]
+                profile = profile[profile['bundle'] == bundle]
+                ba.plot_line(
+                    bundle, "node", scalar, profile,
+                    scalar, ylim, n_boot, self._alpha(0.6 + 0.2 * i),
+                    {
+                        "dashes": [(2**i, 2**i)],
+                        "hue": "bundle",
+                        "palette": [COLOR_DICT[bundle]]})
+                if j == 0:
+                    line = Line2D(
+                        [], [],
+                        color=[0, 0, 0])
+                    line.set_dashes((2**(i + 1), 2**(i + 1)))
+                    labels.append(line)
+        ba.fig.legend(labels, names, loc='center', fontsize=14)
+        ba.format()
 
-            fig.legend(names, loc='center')
-            fig.savefig(
+        if out_file is None:
+            ba.fig.savefig(
                 self._get_fname(
                     f"tract_profiles/{scalar}",
-                    f"{'_'.join(names)}_sub-{subject}"))
+                    f"{'_'.join(names)}"))
+        else:
+            ba.fig.savefig(out_file)
 
         if not show_plots:
+            plt.close(ba.fig)
             plt.ion()
 
+    def _contrast_index_df_maker(self, bundles, names, scalar):
+        ci_df = pd.DataFrame(columns=["subjectID", "node", "diff"])
+        for subject in self.subjects:
+            profiles = [None] * 2
+            both_found = True
+            for i, name in enumerate(names):
+                for j, bundle in enumerate(bundles):
+                    profiles[i + j] = self._get_profile(
+                        name, bundle, subject, scalar)
+                    if profiles[i + j] is None:
+                        both_found = False
+            if both_found:
+                this_contrast_index = \
+                    calc_contrast_index(profiles[0], profiles[1])
+                for i, diff in enumerate(this_contrast_index):
+                    ci_df = ci_df.append({
+                        "subjectID": subject,
+                        "node": i,
+                        "diff": diff},
+                        ignore_index=True)
+        return ci_df
+
     def contrast_index(self, names=None, scalar="dti_fa",
-                       show_plots=False):
+                       show_plots=False, n_boot=1000,
+                       positions=POSITIONS):
         """
         Calculate the contrast index for each bundle in two datasets.
 
@@ -756,10 +877,14 @@ class LongitudinalCSVComparison():
             Whether to show plots if in an interactive environment.
             Default: False
 
-        Returns
-        -------
-        Pandas dataframe of contrast indices
-        with subjects as columns and bundles as rows.
+        n_boot : int, optional
+            Number of bootstrap resamples for seaborn to use
+            to estimate the ci.
+            Default: 1000
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
         """
         if not show_plots:
             plt.ioff()
@@ -771,55 +896,34 @@ class LongitudinalCSVComparison():
                               + "only two dataset names should be given")
             return None
 
-        contrast_index = pd.DataFrame(
-            index=self.bundles, columns=self.subjects)
-        for subject in self.subjects:
-            fig, axes = self._get_brain_axes(
-                (f"Contrast Indices by Bundle, "
-                    f" {names[0]} vs {names[1]}"))
-            for bundle in self.bundles:
-                profiles = [None] * 2
-                both_found = True
-                for i, name in enumerate(names):
-                    profiles[i] = self._get_profile(
-                        name, bundle, subject, scalar)
-                    if profiles[i] is None:
-                        both_found = False
-                if both_found:
-                    this_contrast_index = \
-                        calc_contrast_index(profiles[0], profiles[1])
-                    ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                    ax.plot(this_contrast_index, label=scalar)
-                    ax.set_title(bundle)
-                    ax.set_ylim([-1, 1])
-                    ax.set_xticklabels([])
-                    contrast_index.at[bundle, subject] = \
-                        np.nanmean(this_contrast_index)
-            fig.legend([scalar], loc='center')
-            fig.savefig(
-                self._get_fname(
-                    f"contrast_plots/{scalar}/",
-                    f"{names[0]}_vs_{names[1]}_contrast_index"))
-
-        contrast_index.to_csv(self._get_fname(
-            f"contrast_index/{scalar}",
-            f"{names[0]}_vs_{names[1]}"))
+        ba = BrainAxes(positions=positions)
+        for j, bundle in enumerate(tqdm(self.bundles)):
+            ci_df = self._contrast_index_df_maker(
+                [bundle], names, scalar)
+            ba.plot_line(
+                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
+        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
+            self._get_fname(
+                f"contrast_plots/{scalar}/",
+                f"{names[0]}_vs_{names[1]}_contrast_index"))
         if not show_plots:
+            plt.close(ba.fig)
             plt.ion()
-        return contrast_index
 
-    def lateral_contrast_index(self, names=None, scalar="dti_fa",
-                               show_plots=False):
+    def lateral_contrast_index(self, name, scalar="dti_fa",
+                               show_plots=False, n_boot=1000,
+                               positions=POSITIONS):
         """
         Calculate the lateral contrast index for each bundle in a given
         dataset, for each dataset in names.
 
         Parameters
         ----------
-        names : list of strings, optional
-            Names of datasets to plot profiles of.
-            If None, all datasets are used.
-            Default: None
+        name : string
+            Names of dataset to plot profiles of.
 
         scalar : string, optional
             Scalar to use for the contrast index. Default: "dti_fa".
@@ -827,46 +931,46 @@ class LongitudinalCSVComparison():
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
+
+        n_boot : int, optional
+            Number of bootstrap resamples for seaborn to use
+            to estimate the ci.
+            Default: 1000
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
         """
         if not show_plots:
             plt.ioff()
 
-        if names is None:
-            names = list(self.profile_dict.keys())
+        ba = BrainAxes(positions=positions)
+        for j, bundle in enumerate(tqdm(self.bundles)):
+            other_bundle = list(bundle)
+            if other_bundle[-1] == 'L':
+                other_bundle[-1] = 'R'
+            elif other_bundle[-1] == 'R':
+                other_bundle[-1] = 'L'
+            else:
+                continue
+            other_bundle = "".join(other_bundle)
+            if other_bundle not in self.bundles:
+                continue
 
-        for subject in self.subjects:
-            fig, axes = self._get_brain_axes(
-                f"Lateral Contrast Indices by Bundle")
-            for j, bundle in enumerate(self.bundles):
-                other_bundle = list(bundle)
-                if other_bundle[-1] == 'L':
-                    other_bundle[-1] = 'R'
-                elif other_bundle[-1] == 'R':
-                    other_bundle[-1] = 'L'
-                else:
-                    continue
-                if other_bundle not in self.bundles:
-                    continue
+            ci_df = self._contrast_index_df_maker(
+                [bundle, other_bundle], [name], scalar)
+            ba.plot_line(
+                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
 
-                for name in names:
-                    profile = self._get_profile(
-                        name, bundle, subject, scalar)
-                    other_profile = self._get_profile(
-                        name, other_bundle, subject, scalar)
-
-                    if (profile is not None) and (other_profile is not None):
-                        lateral_contrast_index = \
-                            calc_contrast_index(profile, other_profile)
-                        ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                        ax.plot(lateral_contrast_index, label=name)
-                        ax.set_title(f"{bundle} vs {other_bundle}")
-                        ax.set_ylim([-1, 1])
-                        ax.set_xticklabels([])
-            fig.legend(names, loc='center')
-            fig.savefig(
-                self._get_fname(
-                    f"contrast_plots/{scalar}/",
-                    f"{'_'.join(names)}_lateral_contrast_index"))
+        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
+            self._get_fname(
+                f"contrast_plots/{scalar}/",
+                f"{name}_lateral_contrast_index"))
+        if not show_plots:
+            plt.close(ba.fig)
 
         if not show_plots:
             plt.ion()
@@ -874,7 +978,8 @@ class LongitudinalCSVComparison():
     def reliability_plots(self, names=None,
                           scalars=["dti_fa", "dti_md"],
                           ylims=[0.0, 1.0],
-                          show_plots=False):
+                          show_plots=False,
+                          positions=POSITIONS):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
 
@@ -896,6 +1001,10 @@ class LongitudinalCSVComparison():
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
+
+        positions : dictionary, optional
+            Dictionary that maps bundle names to position in plot.
+            Default: POSITIONS
 
         Returns
         -------
@@ -949,21 +1058,32 @@ class LongitudinalCSVComparison():
         maxi = all_profile_coef.max()
         mini = all_profile_coef.min()
         bins = np.linspace(mini, maxi, 10)
-        fig, axes = self._get_brain_axes(
-            (f"Distribution of Pearson's r between profiles,"
-                f" {names[0]}_vs_{names[1]}"))
+        ba = BrainAxes(positions=positions)
         for k, bundle in enumerate(self.bundles):
-            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            ax = ba.get_axis(bundle)
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
-                ax.hist(bundle_coefs, bins, alpha=0.5, label=scalar)
-            ax.set_title(bundle)
+                sns.set(style="whitegrid")
+                sns.histplot(
+                    data=bundle_coefs,
+                    bins=bins,
+                    alpha=0.5,
+                    label=scalar,
+                    color=tableau_20_sns[m * 2],
+                    ax=ax)
+            ax.set_title(bundle, fontsize=20)
+            ax.set_xlabel("Pearson's r", fontsize=14)
+            ax.set_ylabel("Count", fontsize=14)
 
-        fig.legend(scalars, loc='center')
-        fig.savefig(
+        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.format(disable_x=False)
+        ba.fig.savefig(
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
+
+        if not show_plots:
+            plt.close(ba.fig)
 
         # plot node reliability profile
         all_node_coef[np.isnan(all_node_coef)] = 0
@@ -973,53 +1093,65 @@ class LongitudinalCSVComparison():
         else:
             maxi = ylims[1]
             mini = ylims[0]
-        fig, axes = self._get_brain_axes(
-            (f"node reliability profiles,"
-                f" {names[0]}_vs_{names[1]}"))
+        ba = BrainAxes(positions=positions)
         for k, bundle in enumerate(self.bundles):
-            ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
+            ax = ba.get_axis(bundle)
             for m, scalar in enumerate(scalars):
-                ax.plot(all_node_coef[m, k], label=scalar)
-            ax.set_title(bundle)
+                sns.set(style="whitegrid")
+                sns.lineplot(
+                    data=all_node_coef[m, k],
+                    label=scalar,
+                    color=tableau_20_sns[m * 2],
+                    ax=ax,
+                    legend=False,
+                    ci=None, estimator=None)
             ax.set_ylim([mini, maxi])
-            ax.set_xticklabels([])
+            ax.set_title(bundle, fontsize=20)
+            ax.set_ylabel("Pearson's r", fontsize=14)
 
-        fig.legend(scalars, loc='center')
-        fig.savefig(
+        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.format()
+        ba.fig.savefig(
             self._get_fname(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
                 f"{names[0]}_vs_{names[1]}_node_profiles"))
 
+        if not show_plots:
+            plt.close(ba.fig)
+
         # plot mean profile scatter plots
         for m, scalar in enumerate(scalars):
-            this_sub_means = all_sub_means[m]
-            maxi = np.nanmax(this_sub_means)
-            mini = np.nanmin(this_sub_means)
-            fig, axes = self._get_brain_axes(
-                (f"Distribution of mean profiles,"
-                    f" {names[0]}_vs_{names[1]}_{scalar}"))
+            maxi = np.nanmax(all_sub_means[m])
+            mini = np.nanmin(all_sub_means[m])
+            ba = BrainAxes(positions=positions)
             for k, bundle in enumerate(self.bundles):
-                ax = axes[POSITIONS[bundle][0], POSITIONS[bundle][1]]
-                ax.scatter(
-                    this_sub_means[k, 0], this_sub_means[k, 1])
-                ax.set_title(bundle)
-                ax.set_xlabel(names[0])
-                ax.set_ylabel(names[1])
+                this_sub_means = self._array_to_df(all_sub_means[m, k])
+                ax = ba.get_axis(bundle)
+                sns.set(style="whitegrid")
+                sns.scatterplot(
+                    data=this_sub_means, x='x', y='y',
+                    label=scalar,
+                    color=tableau_20_sns[m * 2],
+                    legend=False,
+                    ax=ax)
+                ax.set_title(bundle, fontsize=20)
+                ax.set_xlabel(names[0], fontsize=14)
+                ax.set_ylabel(names[1], fontsize=14)
                 ax.set_ylim([mini, maxi])
                 ax.set_xlim([mini, maxi])
 
-            fig.savefig(
+            ba.fig.legend([scalar], loc='center', fontsize=14)
+            ba.format(disable_x=False)
+            ba.fig.savefig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
+            if not show_plots:
+                plt.close(ba.fig)
 
         # plot bar plots of pearson's r
-        width = 0.6
-        spacing = 2
-        x = np.arange(len(self.bundles)) * spacing
-        x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
-
         fig, axes = plt.subplots(2, 1)
+        fig.set_size_inches((8, 8))
         bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
         bundle_prof_stds = sem(all_profile_coef, axis=2, nan_policy='omit')
         if ylims is None:
@@ -1028,30 +1160,46 @@ class LongitudinalCSVComparison():
         else:
             maxi = ylims[1]
             mini = ylims[0]
-        for m, scalar in enumerate(scalars):
-            axes[0].bar(
-                x + x_shift[m],
-                bundle_prof_means[m],
-                width,
-                label=scalar,
-                yerr=bundle_prof_stds[m])
-            axes[1].bar(
-                x + x_shift[m],
-                all_sub_coef[m],
-                width,
-                label=scalar
-            )
 
-        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles')
+        df_bundle_prof_means = pd.DataFrame(
+            columns=['scalar', 'bundle', 'value'])
+        for m, scalar in enumerate(scalars):
+            for k, bundle in enumerate(self.bundles):
+                df_bundle_prof_means = df_bundle_prof_means.append({
+                    'scalar': scalar,
+                    'bundle': bundle,
+                    'value': bundle_prof_means[m, k]}, ignore_index=True)
+        df_all_sub_coef = pd.DataFrame(columns=['scalar', 'bundle', 'value'])
+        for m, scalar in enumerate(scalars):
+            for k, bundle in enumerate(self.bundles):
+                df_all_sub_coef = df_all_sub_coef.append({
+                    'scalar': scalar,
+                    'bundle': bundle,
+                    'value': all_sub_coef[m, k]}, ignore_index=True)
+
+        sns.set(style="whitegrid")
+        sns.barplot(
+            data=df_bundle_prof_means, x='bundle', y='value', hue='scalar',
+            palette=tableau_20_sns[:len(scalars) * 2:2],
+            yerr=bundle_prof_stds[m],
+            ax=axes[0])
+        axes[0].legend_.remove()
+        sns.barplot(
+            data=df_all_sub_coef, x='bundle', y='value', hue='scalar',
+            palette=tableau_20_sns[:len(scalars) * 2:2],
+            ax=axes[1])
+        axes[1].legend_.remove()
+
+        axes[0].set_title("A", fontsize=20)
+        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles', fontsize=14)
         axes[0].set_ylim([mini, maxi])
-        axes[0].set_xticks(x)
-        axes[0].set_xticklabels(self.bundles)
-        axes[0].set_title("profile_reliability")
-        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles')
+        axes[0].set_xlabel("")
+        axes[0].set_xticklabels(self.bundles, fontsize=14)
+        axes[1].set_title("B", fontsize=20)
+        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles', fontsize=14)
         axes[1].set_ylim([mini, maxi])
-        axes[1].set_xticks(x)
-        axes[1].set_xticklabels(self.bundles)
-        axes[1].set_title(f"intersubejct_reliability")
+        axes[1].set_xlabel("")
+        axes[1].set_xticklabels(self.bundles, fontsize=14)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -1060,29 +1208,23 @@ class LongitudinalCSVComparison():
                  rotation=45,
                  horizontalalignment='right')
 
-        fig.suptitle(f"{names[0]}_vs_{names[1]}")
+        fig.tight_layout()
+        legend_labels = []
+        for m, _ in enumerate(scalars):
+            legend_labels.append(Line2D(
+                [], [],
+                color=tableau_20_sns[m * 2]))
         fig.legend(
+            legend_labels,
             scalars,
-            loc='lower right',
-            bbox_to_anchor=(0.5, 0.15, 0.5, 0.5),
-            fontsize='small')
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+            fontsize=14,
+            bbox_to_anchor=(1.25, 0.5))
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
             f"{names[0]}_vs_{names[1]}"))
 
-        extent = axes[1].get_window_extent().transformed(
-            fig.dpi_scale_trans.inverted())
-        axes[1].set_title(
-            f"{names[0]}_vs_{names[1]}_intersubejct_reliability")
-        fig.savefig(
-            self._get_fname(
-                f"rel_plots/{'_'.join(scalars)}",
-                f"{names[0]}_vs_{names[1]}_intersubject"),
-            bbox_inches=extent.translated(0, -0.2).expanded(1.4, 2.0))
-        axes[1].set_title(f"intersubejct_reliability")
-
         if not show_plots:
+            plt.close(fig)
             plt.ion()
         return fig, axes
 
