@@ -309,7 +309,8 @@ def test_AFQ_pft():
         'derivatives',
         'vistasoft',
         'sub-01',
-        'ses-01')
+        'ses-01',
+        'dwi')
     img = nib.load(op.join(sub_path, 'sub-01_ses-01_dwi.nii.gz'))
     pve_wm_data = nib.Nifti1Image(np.ones(img.shape[:3]), img.affine)
     pve_gm_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
