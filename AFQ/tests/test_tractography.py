@@ -78,10 +78,10 @@ def test_pft_tracking():
         pve_wm_data = nib.Nifti1Image(np.ones(data_shape[:3]), img.affine)
         pve_gm_data = nib.Nifti1Image(np.zeros(data_shape[:3]), img.affine)
         pve_csf_data = nib.Nifti1Image(np.zeros(data_shape[:3]), img.affine)
-        stop_threshold = (pve_wm_data, pve_gm_data, pve_csf_data)
+        stop_mask = (pve_wm_data, pve_gm_data, pve_csf_data)
 
         for directions in ["det", "prob"]:
-            for stop_mask in ["ACT", "CMC"]:
+            for stop_threshold in ["ACT", "CMC"]:
                 sl = track(
                     fname,
                     directions,
@@ -104,7 +104,7 @@ def test_pft_tracking():
             max_angle=30.,
             sphere=None,
             seed_mask=None,
-            stop_mask=None,  # Stop mask needs to be a string!
+            stop_mask=0,  # Stop mask needs to be a tuple!
             stop_threshold=stop_threshold,
             n_seeds=1,
             step_size=step_size,
@@ -119,7 +119,7 @@ def test_pft_tracking():
             sphere=None,
             seed_mask=None,
             stop_mask=stop_mask,
-            stop_threshold=0,  # Stop threshold needs to be a tuple!
+            stop_threshold=None,  # Stop threshold needs to be a string!
             n_seeds=1,
             step_size=step_size,
             min_length=min_length,

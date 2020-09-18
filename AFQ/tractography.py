@@ -18,6 +18,7 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
 
 import AFQ.registration as reg
 
+
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
@@ -61,19 +62,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     stop_mask : array or str, optional.
         If array: A float or binary mask that determines a stopping criterion
         (e.g. FA).
-        If str: "CMC" for Continuous Map Criterion [Girard2014]_.
-                "ACT" for Anatomically-constrained tractography [Smith2012]_.
-        Defaults to no stopping (all ones). A string is required if
-        the tracker is set to "pft".
+        If tuple: it contains a sequence that is interpreted as:
+        (pve_wm, pve_gm, pve_csf), each item of which is either a string
+        (full path) or a nibabel img to be used in particle filtering
+        tractography.
+        A tuple is required if tracker is set to "pft".
+        Defaults to no stopping (all ones).
     stop_threshold : float or tuple, optional.
         If float, this a value of the stop_mask below which tracking is
-        terminated (and stop_mask has to be an array). Defaults to
-        0 (this means that if no stop_mask is passed, we will stop only at
-        the edge of the image). If this is a tuple, it contains a sequence
-        that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
-        which is either a string (full path) or a nibabel img to be used
-        in particle filtering tractography. A tuple is required if tracker
-        is set to "pft".
+        terminated (and stop_mask has to be an array).
+        If str, "CMC" for Continuous Map Criterion [Girard2014]_.
+                "ACT" for Anatomically-constrained tractography [Smith2012]_.
+        A string is required if the tracker is set to "pft".
+        Defaults to 0 (this means that if no stop_mask is passed,
+        we will stop only at the edge of the image). 
     step_size : float, optional.
         The size (in mm) of a step of tractography. Default: 1.0
     min_length: int, optional
@@ -159,20 +161,20 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         my_tracker = VerboseLocalTracking
 
     elif tracker == "pft":
-        if not isinstance(stop_mask, str):
+        if not isinstance(stop_threshold, str):
             raise RuntimeError(
                 "You are using PFT tracking, but did not provide a string ",
-                "'stop_mask' input. ",
+                "'stop_threshold' input. ",
                 "Possible inputs are: 'CMC' or 'ACT'")
-        if not isinstance(stop_threshold, tuple):
+        if not isinstance(stop_mask, tuple):
             raise RuntimeError(
                 "You are using PFT tracking, but did not provide a tuple for",
-                "`stop_threshold`",
+                "`stop_mask`",
                 "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
         pves = []
         pve_imgs = []
         vox_sizes = []
-        for ii, pve in enumerate(stop_threshold):
+        for ii, pve in enumerate(stop_mask):
             if isinstance(pve, str):
                 img = nib.load(pve)
             else:
@@ -195,14 +197,14 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
 
         my_tracker = VerboseParticleFilteringTracking
-        if stop_mask == "CMC":
+        if stop_threshold == "CMC":
             stopping_criterion = CmcStoppingCriterion.from_pve(
                 pve_wm_data,
                 pve_gm_data,
                 pve_csf_data,
                 step_size=step_size,
                 average_voxel_size=average_voxel_size)
-        elif stop_mask == "ACT":
+        elif stop_threshold == "ACT":
             stopping_criterion = ActStoppingCriterion.from_pve(
                 pve_wm_data,
                 pve_gm_data,
@@ -213,6 +215,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size, min_length=min_length,
                      max_length=max_length, random_seed=rng_seed)
+
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
               step_size=0.5, min_length=10, max_length=1000,
