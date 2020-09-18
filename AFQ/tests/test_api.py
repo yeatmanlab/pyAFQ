@@ -31,7 +31,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask
+from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
 
 
 def touch(fname, times=None):
@@ -324,9 +324,9 @@ def test_AFQ_pft():
              op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
     stop_mask = PFTMask(
-        afm.MaskFile("WMprobseg"),
-        afm.MaskFile("GMprobseg"),
-        afm.MaskFile("CSFprobseg"))
+        MaskFile("WMprobseg"),
+        MaskFile("GMprobseg"),
+        MaskFile("CSFprobseg"))
 
     my_afq = api.AFQ(
         bids_path,
