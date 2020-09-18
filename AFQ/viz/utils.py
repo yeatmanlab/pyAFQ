@@ -633,8 +633,8 @@ class GroupCSVComparison():
 
             if percent_edges_removed > 0:
                 profile = profile.drop(profile[np.logical_or(
-                    (profile.node < percent_nan_tol // 2),
-                    (profile.node >= 100 - (percent_nan_tol // 2))
+                    (profile["nodeID"] < percent_nan_tol // 2),
+                    (profile["nodeID"] >= 100 - (percent_nan_tol // 2))
                 )].index)
 
             self.profile_dict[names[i]] = profile
