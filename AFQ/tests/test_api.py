@@ -20,7 +20,7 @@ import nibabel.tmpdirs as nbtmp
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 import dipy.data as dpd
-from dipy.data import fetcher
+from dipy.data import fetcher, get_fnames
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.testing.decorators import xvfb_it
@@ -292,7 +292,6 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
-@pytest.mark.nightly2
 def test_AFQ_pft():
     """
     Test pft interface for AFQ
@@ -312,17 +311,10 @@ def test_AFQ_pft():
         'sub-01',
         'ses-01',
         'dwi')
-    img = nib.load(op.join(sub_path, 'sub-01_ses-01_dwi.nii.gz'))
-    pve_wm_data = nib.Nifti1Image(np.ones(img.shape[:3]), img.affine)
-    pve_gm_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
-    pve_csf_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
-
-    nib.save(pve_wm_data,
-             op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
-    nib.save(pve_gm_data,
-             op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
-    nib.save(pve_csf_data,
-             op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
+    f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
+    os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
+    os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
+    os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
     stop_mask = PFTMask(
         MaskFile("WMprobseg"),
