@@ -292,6 +292,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
+@pytest.mark.nightly2
 def test_AFQ_pft():
     """
     Test pft interface for AFQ
