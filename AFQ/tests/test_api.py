@@ -31,7 +31,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.mask import RoiMask, ThresholdedScalarMask
+from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask
 
 
 def touch(fname, times=None):
