@@ -75,7 +75,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                 "ACT" for Anatomically-constrained tractography [Smith2012]_.
         A string is required if the tracker is set to "pft".
         Defaults to 0 (this means that if no stop_mask is passed,
-        we will stop only at the edge of the image). 
+        we will stop only at the edge of the image).
     step_size : float, optional.
         The size (in mm) of a step of tractography. Default: 1.0
     min_length: int, optional

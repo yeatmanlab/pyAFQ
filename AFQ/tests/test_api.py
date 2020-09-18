@@ -316,11 +316,11 @@ def test_AFQ_pft():
     pve_csf_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
 
     nib.save(pve_wm_data,
-        op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
+             op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
     nib.save(pve_gm_data,
-        op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
+             op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
     nib.save(pve_csf_data,
-        op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
+             op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
     stop_mask = PFTMask(
         afm.MaskFile("WMprobseg"),
