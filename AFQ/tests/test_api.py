@@ -292,6 +292,53 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
+def test_AFQ_pft():
+    """
+    Test pft interface for AFQ
+    """
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    afd.fetch_stanford_hardi_tractography()
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
+
+    sub_path = op.join(
+        tmpdir.name,
+        'stanford_hardi',
+        'derivatives',
+        'vistasoft',
+        'sub-01',
+        'ses-01')
+    img = nib.load(op.join(sub_path, 'sub-01_ses-01_dwi.nii.gz'))
+    pve_wm_data = nib.Nifti1Image(np.ones(img.shape[:3]), img.affine)
+    pve_gm_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
+    pve_csf_data = nib.Nifti1Image(np.zeros(img.shape[:3]), img.affine)
+
+    nib.save(pve_wm_data,
+        op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
+    nib.save(pve_gm_data,
+        op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
+    nib.save(pve_csf_data,
+        op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
+
+    stop_mask = PFTMask(
+        afm.MaskFile("WMprobseg"),
+        afm.MaskFile("GMprobseg"),
+        afm.MaskFile("CSFprobseg"))
+
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep='vistasoft',
+        bundle_names=bundle_names,
+        tracking_params={
+            "stop_mask": stop_mask,
+            "stop_threshold": "CMC",
+            "tracker": "pft"
+        })
+    my_afq.export_rois()
+
+
 # Requires large download
 @pytest.mark.nightly
 def test_AFQ_FA():
