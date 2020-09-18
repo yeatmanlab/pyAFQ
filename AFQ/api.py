@@ -1430,15 +1430,14 @@ class AFQ(object):
                                             figure=figure)
 
         if export:
-            if self.viz.backend == 'fury':
-                fname = self._get_fname(
-                    row,
-                    '_viz.gif',
-                    include_track=True,
-                    include_seg=True)
+            fname = self._get_fname(
+                row,
+                '_viz.gif',
+                include_track=True,
+                include_seg=True)
 
-                self.viz.create_gif(figure, fname)
-            else:
+            self.viz.create_gif(figure, fname)
+            if self.viz.backend == 'plotly':
                 fname = self._get_fname(
                     row,
                     '_viz.html',
@@ -1513,20 +1512,19 @@ class AFQ(object):
                         figure=figure)
 
             if export:
-                if self.viz.backend == 'fury':
-                    roi_dir = op.join(row['results_dir'], 'viz_bundles')
-                    os.makedirs(roi_dir, exist_ok=True)
-                    fname = op.split(
-                        self._get_fname(
-                            row,
-                            f'_{bundle_name}'
-                            f'_viz.gif',
-                            include_track=True,
-                            include_seg=True))
+                roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                os.makedirs(roi_dir, exist_ok=True)
+                fname = op.split(
+                    self._get_fname(
+                        row,
+                        f'_{bundle_name}'
+                        f'_viz.gif',
+                        include_track=True,
+                        include_seg=True))
 
-                    fname = op.join(roi_dir, fname[1])
-                    self.viz.create_gif(figure, fname)
-                else:
+                fname = op.join(roi_dir, fname[1])
+                self.viz.create_gif(figure, fname)
+                if self.viz.backend == 'plotly':
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
                     os.makedirs(roi_dir, exist_ok=True)
                     fname = op.split(
