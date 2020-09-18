@@ -66,9 +66,7 @@ POSITIONS = OrderedDict({
     "UNC_L": (0, 1), "UNC_R": (0, 3), "UF_L": (0, 1), "UF_R": (0, 3)})
 
 CSV_MAT_2_PYTHON = \
-    {'fa': 'dti_fa', 'md': 'dti_md',
-     'tractID': 'bundle',
-     'nodeID': 'node'}
+    {'fa': 'dti_fa', 'md': 'dti_md'}
 
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
@@ -617,8 +615,8 @@ class GroupCSVComparison():
             if is_mats[i]:
                 profile.rename(
                     columns=mat_column_converter, inplace=True)
-                profile['bundle'] = \
-                    profile['bundle'].apply(
+                profile['tractID'] = \
+                    profile['tractID'].apply(
                         lambda x: mat_bundle_converter[x])
                 for scalar, scale in mat_scale_converter.items():
                     profile[scalar] = \
@@ -635,8 +633,8 @@ class GroupCSVComparison():
 
             if percent_edges_removed > 0:
                 profile = profile.drop(profile[np.logical_or(
-                    (profile.node < percent_nan_tol // 2),
-                    (profile.node >= 100 - (percent_nan_tol // 2))
+                    (profile["nodeID"] < percent_nan_tol // 2),
+                    (profile["nodeID"] >= 100 - (percent_nan_tol // 2))
                 )].index)
 
             self.profile_dict[names[i]] = profile
@@ -646,7 +644,7 @@ class GroupCSVComparison():
             self.subjects = subjects
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
         if bundles is None:
-            self.bundles = self.profile_dict[names[0]]['bundle'].unique()
+            self.bundles = self.profile_dict[names[0]]['tractID'].unique()
         else:
             self.bundles = bundles
 
@@ -686,7 +684,7 @@ class GroupCSVComparison():
         profile = self.profile_dict[name]
         single_profile = profile[
             (profile['subjectID'] == subject)
-            & (profile['bundle'] == bundle)
+            & (profile['tractID'] == bundle)
         ][scalar].to_numpy()
         nans = np.isnan(single_profile)
         percent_nan = (np.sum(nans) * 100) // self.prof_len
@@ -805,13 +803,13 @@ class GroupCSVComparison():
         for j, bundle in enumerate(tqdm(self.bundles)):
             for i, name in enumerate(names):
                 profile = self.profile_dict[name]
-                profile = profile[profile['bundle'] == bundle]
+                profile = profile[profile['tractID'] == bundle]
                 ba.plot_line(
-                    bundle, "node", scalar, profile,
+                    bundle, "nodeID", scalar, profile,
                     scalar, ylim, n_boot, self._alpha(0.6 + 0.2 * i),
                     {
                         "dashes": [(2**i, 2**i)],
-                        "hue": "bundle",
+                        "hue": "tractID",
                         "palette": [COLOR_DICT[bundle]]})
                 if j == 0:
                     line = Line2D(
@@ -835,7 +833,7 @@ class GroupCSVComparison():
             plt.ion()
 
     def _contrast_index_df_maker(self, bundles, names, scalar):
-        ci_df = pd.DataFrame(columns=["subjectID", "node", "diff"])
+        ci_df = pd.DataFrame(columns=["subjectID", "nodeID", "diff"])
         for subject in self.subjects:
             profiles = [None] * 2
             both_found = True
@@ -851,7 +849,7 @@ class GroupCSVComparison():
                 for i, diff in enumerate(this_contrast_index):
                     ci_df = ci_df.append({
                         "subjectID": subject,
-                        "node": i,
+                        "nodeID": i,
                         "diff": diff},
                         ignore_index=True)
         return ci_df
@@ -901,7 +899,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
             ba.plot_line(
-                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]})
         ba.fig.legend([scalar], loc='center', fontsize=14)
         ba.format()
@@ -960,7 +958,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
-                bundle, "node", "diff", ci_df, "C.I. * 2", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]})
 
         ba.fig.legend([scalar], loc='center', fontsize=14)
@@ -1162,30 +1160,30 @@ class GroupCSVComparison():
             mini = ylims[0]
 
         df_bundle_prof_means = pd.DataFrame(
-            columns=['scalar', 'bundle', 'value'])
+            columns=['scalar', 'tractID', 'value'])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
                 df_bundle_prof_means = df_bundle_prof_means.append({
                     'scalar': scalar,
-                    'bundle': bundle,
+                    'tractID': bundle,
                     'value': bundle_prof_means[m, k]}, ignore_index=True)
-        df_all_sub_coef = pd.DataFrame(columns=['scalar', 'bundle', 'value'])
+        df_all_sub_coef = pd.DataFrame(columns=['scalar', 'tractID', 'value'])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
                 df_all_sub_coef = df_all_sub_coef.append({
                     'scalar': scalar,
-                    'bundle': bundle,
+                    'tractID': bundle,
                     'value': all_sub_coef[m, k]}, ignore_index=True)
 
         sns.set(style="whitegrid")
         sns.barplot(
-            data=df_bundle_prof_means, x='bundle', y='value', hue='scalar',
+            data=df_bundle_prof_means, x='tractID', y='value', hue='scalar',
             palette=tableau_20_sns[:len(scalars) * 2:2],
             yerr=bundle_prof_stds[m],
             ax=axes[0])
         axes[0].legend_.remove()
         sns.barplot(
-            data=df_all_sub_coef, x='bundle', y='value', hue='scalar',
+            data=df_all_sub_coef, x='tractID', y='value', hue='scalar',
             palette=tableau_20_sns[:len(scalars) * 2:2],
             ax=axes[1])
         axes[1].legend_.remove()
