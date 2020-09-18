@@ -508,6 +508,48 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         self.upper_bound = upper_bound
 
 
+class PFTMask(StrInstantiatesMixin):
+    def __init__(self, WM_probseg, GM_probseg, CSF_probseg):
+        """
+        Define a mask for use in PFT tractography. Only use
+        if tracker set to 'pft' in tractography.
+
+        Parameters
+        ----------
+        WM_probseg : MaskFile
+            White matter segmentation file.
+        GM_probseg : MaskFile
+            Gray matter segmentation file.
+        CSF_probseg : MaskFile
+            Corticospinal fluid segmentation file.
+
+        Examples
+        --------
+        stop_mask = PFTMask(
+            afm.MaskFile("WMprobseg"),
+            afm.MaskFile("GMprobseg"),
+            afm.MaskFile("CSFprobseg"))
+        api.AFQ(tracking_params={
+            "stop_mask": stop_mask,
+            "stop_threshold": "CMC",
+            "tracker": "pft"})
+        """
+        self.probsegs = (WM_probseg, GM_probseg, CSF_probseg)
+
+    def find_path(self, bids_layout, subject, session):
+        for probseg in self.probsegs:
+            probseg.find_path(bids_layout, subject, session)
+
+    def get_mask(self, afq_object, row):
+        probseg_imgs = []
+        probseg_metas = []
+        for probseg in self.probsegs:
+            data, affine, meta = probseg.get_mask(afq_object, row)
+            probseg_imgs.append(nib.Nifti1Image(data, affine))
+            probseg_metas.append(meta)
+        return probseg_imgs, _, dict(sources=probseg_metas)
+
+
 class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
     def __init__(self, mask_list, combine="and"):
         """
