@@ -12,6 +12,7 @@ import s3fs
 import numpy as np
 import pandas as pd
 import logging
+import time
 
 from bids import BIDSLayout
 from botocore import UNSIGNED
@@ -124,7 +125,13 @@ def read_callosum_templates(resample_to=False):
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
+    logger = logging.getLogger('AFQ.data')
+
     files, folder = fetch_callosum_templates()
+
+    logger.debug('loading callosum templates')
+    tic = time.perf_counter()
+
     template_dict = {}
     for f in files:
         img = nib.load(op.join(folder, f))
@@ -137,6 +144,10 @@ def read_callosum_templates(resample_to=False):
                                                resample_to.affine),
                                   resample_to.affine)
         template_dict[f.split('.')[0]] = img
+
+    toc = time.perf_counter()
+    logger.debug(f'callosum templates loaded in {toc - tic:0.4f} seconds')
+
     return template_dict
 
 
@@ -299,7 +310,13 @@ def read_templates(resample_to=False):
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
+    logger = logging.getLogger('AFQ.data')
+
     files, folder = fetch_templates()
+
+    logger.debug('loading AFQ templates')
+    tic = time.perf_counter()
+
     template_dict = {}
     for f in files:
         img = nib.load(op.join(folder, f))
@@ -312,6 +329,9 @@ def read_templates(resample_to=False):
                                                resample_to.affine),
                                   resample_to.affine)
         template_dict[f.split('.')[0]] = img
+
+    toc = time.perf_counter()
+    logger.debug(f'AFQ templates loaded in {toc - tic:0.4f} seconds')
 
     return template_dict
 
