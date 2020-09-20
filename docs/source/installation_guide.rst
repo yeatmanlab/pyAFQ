@@ -43,7 +43,7 @@ which will install pyAFQ locally in editible mode and include extensions.
   you plan on contributing to pyAFQ it is recommended that you fork the
   repository and issue pull requests.
 
-See :ref:_contributing
+See :ref:`contributing`
 
 .. note::
 
