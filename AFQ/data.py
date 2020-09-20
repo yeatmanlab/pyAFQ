@@ -1649,10 +1649,40 @@ def organize_cfin_data(path=None):
 
 def organize_stanford_data(path=None):
     """
-    Create the expected file-system structure for the Stanford HARDI data-set.
+    If necessary, downloads the Stanford HARDI dataset into DIPY directory and 
+    creates a BIDS compliant file-system structure in AFQ data directory:
+
+
+    ~/AFQ_data/
+    └── stanford_hardi
+    ├── dataset_description.json
+    └── derivatives
+        ├── freesurfer
+        │   ├── dataset_description.json
+        │   └── sub-01
+        │       └── ses-01
+        │           └── anat
+        │               ├── sub-01_ses-01_T1w.nii.gz
+        │               └── sub-01_ses-01_seg.nii.gz
+        └── vistasoft
+            ├── dataset_description.json
+            └── sub-01
+                └── ses-01
+                    └── dwi
+                        ├── sub-01_ses-01_dwi.bvals
+                        ├── sub-01_ses-01_dwi.bvecs
+                        └── sub-01_ses-01_dwi.nii.gz
+
     """
+    logger = logging.getLogger('AFQ.data')
+
+    # fetches data for first subject and session
+    logger.info('fetching Stanford HARDI data')
     dpd.fetch_stanford_hardi()
+
     if path is None:
+        if not op.exists(afq_home):
+            logger.info(f'creating AFQ home directory: {afq_home}')
         os.makedirs(afq_home, exist_ok=True)
         path = afq_home
 
@@ -1662,19 +1692,31 @@ def organize_stanford_data(path=None):
     freesurfer_folder = op.join(derivatives_path, 'freesurfer')
 
     if not op.exists(derivatives_path):
+        logger.info(f'creating derivatives directory: {derivatives_path}')
+
+        # anatomical data
         anat_folder = op.join(freesurfer_folder, 'sub-01', 'ses-01', 'anat')
         os.makedirs(anat_folder, exist_ok=True)
+
         t1_img = dpd.read_stanford_t1()
         nib.save(t1_img, op.join(anat_folder, 'sub-01_ses-01_T1w.nii.gz'))
+
         seg_img = dpd.read_stanford_labels()[-1]
         nib.save(seg_img, op.join(anat_folder,
                                   'sub-01_ses-01_seg.nii.gz'))
+
+        # diffusion-weighted imaging data
         dwi_folder = op.join(dmriprep_folder, 'sub-01', 'ses-01', 'dwi')
         os.makedirs(dwi_folder, exist_ok=True)
+
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
         np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
         np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
+    else:
+        logger.info('Dataset is already in place. If you want to fetch it '
+                    + 'again please first remove the folder '
+                    + derivatives_path)
 
     # Dump out the description of the dataset
     to_bids_description(bids_path,
