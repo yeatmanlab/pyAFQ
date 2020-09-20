@@ -11,54 +11,123 @@ import os.path as op
 
 import matplotlib.pyplot as plt
 import nibabel as nib
-import pandas as pd
 import plotly
 
 from AFQ import api
 import AFQ.data as afd
 
-
 ##########################################################################
 # Get some example data
 # ---------------------
+#
+# Retrieves High angular resolution diffusion imaging (HARDI) dataset from
+# Stanford's Vista Lab
+#
+#   see https://purl.stanford.edu/ng782rw8378 for details on dataset.
+#
+# The data for the first subject and first session are downloaded locally
+# (by default into the users home directory) under:
+#
+#   ``.dipy/stanford_hardi/``
+#
+# Anatomical data (``anat``) and Diffusion-weighted imaging data (``dwi``) are
+# then extracted, formatted to be BIDS compliant, and placed in the AFQ
+# data directory (by default in the users home directory) under:
+#
+#   ``AFQ_data/stanford_hardi/``
+#
+# This data represents the required preprocessed diffusion data necessary for
+# intializing the AFQ object (which we will do next)
 
 afd.organize_stanford_data()
-base_dir = op.join(op.expanduser('~'), 'AFQ_data', 'stanford_hardi')
 
 ##########################################################################
 # Initialize an AFQ object:
 # ------------------------
+#
+# Creates an AFQ object, that encapsulates tractometry. This object can be
+# used to manage the entire AFQ pipeline, including:
+#
+# - Tractography
+# - Registration
+# - Segmentation
+# - Cleaning
+# - Profiling
+# - Visualization
+#
+# In this example we will load the subjects session data from the previous step
+# using the default AFQ parameters.
+#
+# .. note::
+#
+#    The first time intializing the AFQ object will download necessary
+#    waypoint regions of interest (ROIs) templates into AFQ data directory:
+#
+# - Human corpus callosum templates: ``AFQ_data/callosum_templates/``
+#
+#   see https://digital.lib.washington.edu/researchworks/handle/1773/34926
+#
+# - Tract probability maps: ``AFQ_data/templates/``
+#
+#   see https://figshare.com/articles/Tract_probability_maps_for_automated_fiber_quantification/6270434
+#
+# These waypoints ROIs will used to identify the desired white matter tracts.
+#
+# This will also create an output folder for the corresponding AFQ derivatives
+# in the AFQ data directory: ``AFQ_data/stanford_hardi/derivatives/afq/``
+#
+# To initialize this object we will pass in the path location to our BIDS
+# compliant data.
+#
+# .. note::
+#
+#    As noted above, the Stanford HARDI data contains anatomical and
+#    diffusion weighted imaging (dwi) data. In this example, we are intrested
+#    in the vistasoft dwi. For our dataset the `dmriprep` is optional, but
+#    we have included it to make the initialization more explicit.
+#
+# .. note::
+#
+#    We will also be using plotly to geneate an interactive visualization.
+#    So we will specify plotly as the visualization backend.
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                viz_backend="plotly")
+                viz_backend='plotly')
 
 ##########################################################################
-# Reading in DTI FA
+# Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
 # -----------------
-# The AFQ object holds a table with file-names to various data derivatives.
-# For example, this is where the FA computed from DTI is stored.
+# The AFQ object holds a table with file names to various data derivatives.
+#
+# For example, the file where the FA computed from DTI is stored can be
+# retrieved by inspecting the ``dti_fa`` property. The measures are stored
+# in a series, and since we only have one subject and one session we will
+# access the first (and only) file name from the example data.
 #
 # .. note::
 #
 #    The AFQ API computes quantities lazily. This means that DTI parameters
-#    are  not computed until they are required. This means that the first
+#    are not computed until they are required. This means that the first
 #    line below is the one that requires time.
+#
+# We will then use `nibabel` to load the deriviative file and retrieve the
+# data array.
 
 FA_fname = myafq.dti_fa[0]
-FA = nib.load(FA_fname).get_fdata()
-
+FA_img = nib.load(FA_fname)
+FA = FA_img.get_fdata()
 
 ##########################################################################
 # Visualize the result with Matplotlib
 # -------------------------------------
 # At this point `FA` is an array, and we can use standard Python tools to
 # visualize it or perform additional computations with it:
+
 fig, ax = plt.subplots(1)
 ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
 ax.axis("off")
-
 
 ##########################################################################
 # Visualizing bundles and tract profiles:
