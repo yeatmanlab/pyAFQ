@@ -512,7 +512,7 @@ class AFQ(object):
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             custom_tract=custom_tract_list,
-                                            reg_subject_list=reg_subject_list,
+                                            reg_subject=reg_subject_list,
                                             ses=ses_list,
                                             timing=timing_list,
                                             results_dir=results_dir_list))
