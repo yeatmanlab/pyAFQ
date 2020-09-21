@@ -1681,40 +1681,6 @@ fetch_hcp_atlas_16_bundles = _make_fetcher(
     unzip=True)
 
 
-def read_hcp_atlas_16_bundles():
-    """
-    Reads 16-bundle atlas for Recobundles.
-    """
-    bundle_dict = {}
-    _, folder = fetch_hcp_atlas_16_bundles()
-    whole_brain = load_tractogram(op.join(folder,
-                                          'Atlas_in_MNI_Space_16_bundles',
-                                          'whole_brain',
-                                          'whole_brain_MNI.trk'),
-                                  'same', bbox_valid_check=False).streamlines
-    bundle_dict['whole_brain'] = whole_brain
-    bundle_files = glob(
-        op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
-    for bundle_file in bundle_files:
-        bundle = op.splitext(op.split(bundle_file)[-1])[0]
-        bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file,
-                                                    'same',
-                                                    bbox_valid_check=False)\
-            .streamlines
-
-        feature = ResampleFeature(nb_points=100)
-        metric = AveragePointwiseEuclideanMetric(feature)
-        qb = QuickBundles(np.inf, metric=metric)
-        cluster = qb.cluster(bundle_dict[bundle]['sl'])
-        bundle_dict[bundle]['centroid'] = cluster.centroids[0]
-
-    # For some reason, this file-name has a 0 in it, instead of an O:
-    bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
-    del bundle_dict["IF0F_R"]
-    return bundle_dict
-
-
 fetch_hcp_atlas_80_bundles = _make_fetcher(
     "fetch_hcp_atlas_80_bundles",
     op.join(afq_home,
@@ -1727,27 +1693,45 @@ fetch_hcp_atlas_80_bundles = _make_fetcher(
     unzip=True)
 
 
-def read_hcp_atlas_80_bundles():
+def read_hcp_atlas(n_bundles=16):
     """
-    Reads 80-bundle atlas for Recobundles
+    n_bundles : int
+        16 or 80, which selects among the two different
+        atlases:
+
+        https://figshare.com/articles/Simple_model_bundle_atlas_for_RecoBundles/6483614  #noqa
+
+        https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883  #noqa
     """
     bundle_dict = {}
-    _, folder = fetch_hcp_atlas_80_bundles()
-    whole_brain = load_tractogram(op.join(folder,
-                                          'Atlas_80_Bundles',
-                                          'whole_brain',
-                                          'whole_brain_MNI.trk'),
-                                  'same', bbox_valid_check=False).streamlines
+    if n_bundles == 16:
+        _, folder = fetch_hcp_atlas_16_bundles()
+        atlas_folder = "Atlas_in_MNI_Space_16_bundles"
+    elif n_bundles == 80:
+        _, folder = fetch_hcp_atlas_80_bundles()
+        atlas_folder = "Atlas_80_Bundles"
+
+    whole_brain = load_tractogram(
+        op.join(
+            folder,
+            atlas_folder,
+            'whole_brain',
+            'whole_brain_MNI.trk'),
+            'same', bbox_valid_check=False).streamlines
+
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
-        op.join(folder, 'Atlas_80_Bundles', 'bundles', '*.trk'))
+        op.join(
+            folder,
+            atlas_folder,
+            "bundles", "*.trk"))
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
         bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file,
-                                                    'same',
-                                                    bbox_valid_check=False)\
-            .streamlines
+        bundle_dict[bundle]['sl'] = load_tractogram(
+            bundle_file,
+            'same',
+            bbox_valid_check=False).streamlines
 
         feature = ResampleFeature(nb_points=100)
         metric = AveragePointwiseEuclideanMetric(feature)
@@ -1755,7 +1739,13 @@ def read_hcp_atlas_80_bundles():
         cluster = qb.cluster(bundle_dict[bundle]['sl'])
         bundle_dict[bundle]['centroid'] = cluster.centroids[0]
 
+    # For some reason, this file-name has a 0 in it, instead of an O:
+    bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
+    # In the 80-bundle case, there are two files, and both have identical
+    # content, so this is fine:
+    del bundle_dict["IF0F_R"]
     return bundle_dict
+
 
 
 fetch_aal_atlas = _make_fetcher(

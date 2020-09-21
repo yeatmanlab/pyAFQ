@@ -8,10 +8,8 @@ from time import time
 
 import numpy as np
 import nibabel as nib
-from scipy.ndimage.morphology import binary_dilation
 
 import dipy.core.gradients as dpg
-from dipy.segment.mask import median_otsu
 import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -35,8 +33,7 @@ import AFQ.registration as reg
 import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
-from AFQ.mask import B0Mask, CombinedMask, \
-    ThresholdedScalarMask, ScalarMask, FullMask, check_mask_methods
+from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -50,9 +47,20 @@ def do_preprocessing():
 
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
-RECO_BUNDLES = [
-    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
+
+# See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
+
+RECO_BUNDLES_16 = [
+    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid', 'AF',
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
+
+RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor.trk"
+                   "CC_ForcepsMinor" "CC", "CCMid", "CNII", "CNII", "CNIII",
+                   "CNIV", "CNV", "CNVII", "CNVIII", "CS", "CST", "CT",
+                   "CTT", "DLF", "EMC", "F_L_R", "FPT", "ICP", "IFOF", "ILF",
+                   "LL", "MCP", "MdLF", "ML", "MLF", "OPT", "OR", "PC", "PPT",
+                   "RST", "SCP", "SLF", "STT", "TPT", "UF", "V", "VOF"]
+
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
@@ -65,6 +73,14 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
     ----------
     bundle_names : list, optional
         A list of the bundles to be used in this case. Default: all of them
+
+    seg_algo: One of {"afq", "reco", "reco16", "reco80"}
+        The bundle segmentation algorithm to use.
+            "afq" : Use waypoint ROIs + probability maps, as described
+            in [Yeatman2012]_
+            "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
+            with a 16-bundle set.
+            "reco80": Use Recobundles with an 80-bundle set.
 
     resample_to : Nifti1Image, optional
         If set, templates will be resampled to the affine and shape of this
@@ -121,10 +137,14 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
 
                     uid += 1
 
-    elif seg_algo == "reco":
+    elif seg_algo.startswith("reco"):
+        if seg_algo.endswith("80"):
+            bundle_dict = afd.read_hcp_atlas(80)
+        else:
+            bundle_dict = afd.read_hcp_atlas(16)
+
         afq_bundles = {}
         uid = 1
-        bundle_dict = afd.read_hcp_atlas_16_bundles()
         afq_bundles["whole_brain"] = bundle_dict["whole_brain"]
         for name in bundle_names:
             if name in ['CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP']:
@@ -316,8 +336,8 @@ class AFQ(object):
             self._get_best_scalar())
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
-        # Replace the defaults only for kwargs for which a non-default value was
-        # given:
+        # Replace the defaults only for kwargs for which a non-default value
+        # was given:
         if tracking_params is not None:
             for k in tracking_params:
                 default_tracking_params[k] = tracking_params[k]
@@ -342,8 +362,10 @@ class AFQ(object):
         self.clean_params = default_clean_params
 
         if bundle_names is None:
-            if self.seg_algo == "reco":
-                bundle_names = RECO_BUNDLES
+            if self.seg_algo == "reco" or self.seg_algo == "reco16":
+                bundle_names = RECO_BUNDLES_16
+            elif self.seg_algo == "reco80":
+                bundle_names = RECO_BUNDLES_80
             else:
                 bundle_names = BUNDLES
 
@@ -1267,7 +1289,7 @@ class AFQ(object):
             if self.viz.backend == 'fury':
                 fname = self._get_fname(
                     row,
-                    f'_viz.gif',
+                    '_viz.gif',
                     include_track=True,
                     include_seg=True)
 
@@ -1275,7 +1297,7 @@ class AFQ(object):
             else:
                 fname = self._get_fname(
                     row,
-                    f'_viz.html',
+                    '_viz.html',
                     include_track=True,
                     include_seg=True)
 
