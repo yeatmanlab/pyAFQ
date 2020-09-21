@@ -42,7 +42,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
-                 reg_algo="linear",
+                 reg_algo="slr",
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
@@ -75,7 +75,7 @@ class Segmentation:
             Default: 'AFQ'
         reg_algo : string
             Algorithm for streamline registration (case-insensitive):
-            'linear' : Use Streamlinear Registration [Garyfallidis2015]_
+            'slr' : Use Streamlinear Registration [Garyfallidis2015]_
             'syn' : Use image-based nonlinear registration
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
@@ -648,20 +648,20 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def move_streamlines(self, tg=None, reg_algo='linear'):
+    def move_streamlines(self, tg=None, reg_algo='slr'):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
         registration_algo : str
-            "linear" or "syn"
+            "slr" or "syn"
         """
         if tg is None:
             tg = self.tg
         else:
             self.tg = tg
 
-        if reg_algo == "linear":
-            self.logger.info("Registering tractogram with linear SLR")
+        if reg_algo == "slr":
+            self.logger.info("Registering tractogram with SLR")
             atlas = self.bundle_dict['whole_brain']
             self.moved_sl, _, _, _ = whole_brain_slr(
                 atlas, self.tg.streamlines, x0='affine', verbose=False,
