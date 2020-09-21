@@ -269,6 +269,10 @@ class AFQ(object):
         '''
         self.logger = logging.getLogger('AFQ.api')
 
+        # validate input and fail early
+        if not op.exists(bids_path):
+            raise ValueError(f'Unable to locate BIDS dataset in: {bids_path}')
+
         self.force_recompute = force_recompute
 
         self.max_bval = max_bval
