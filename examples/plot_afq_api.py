@@ -123,7 +123,14 @@ FA = FA_img.get_fdata()
 # Visualize the result with Matplotlib
 # -------------------------------------
 # At this point `FA` is an array, and we can use standard Python tools to
-# visualize it or perform additional computations with it:
+# visualize it or perform additional computations with it.
+#
+# In this case we are going to take an axial slice halfway through the
+# FA data array and plot using a sequential color map.
+#
+# .. note::
+#
+#    The data array is structured as a xyz coordinate system.
 
 fig, ax = plt.subplots(1)
 ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
@@ -133,21 +140,33 @@ ax.axis("off")
 # Visualizing bundles and tract profiles:
 # ---------------------------------------
 # The pyAFQ API provides several ways to visualize bundles and profiles.
+#
 # First, we will run a function that exports an html file that contains
-# an interactive visualization of the bundles that are segmented. Once
-# it is done running, it should pop a browser window open and let you
+# an interactive visualization of the bundles that are segmented.
+#
+# .. note::
+#    By default we resample a 100 points within a bundle, however to reduce
+#    processing time we will only resample 50 points.
+#
+# Once it is done running, it should pop a browser window open and let you
 # interact with the bundles.
 #
 # .. note::
 #    Running the code below triggers the full pipeline of operations
 #    leading to the computation of the tract profiles. Therefore, it
 #    takes a little while to run (about 40 minutes, typically).
+#
+# .. note::
+#    You can hide or show a bundle by clicking the legend, or select a
+#    single bundle by double clicking the legend. The interactive
+#    visualization will also all you to pan, zoom, and rotate.
 
 bundle_html = myafq.viz_bundles(export=True, n_points=50)
 plotly.io.show(bundle_html[0])
 
 ##########################################################################
-# We can also visualize the tract profiles in all of the bundles:
+# We can also visualize the tract profiles in all of the bundles. These
+# plots show both FA (left) and MD (right) layed out anatomically.
 #
 
 myafq.plot_tract_profiles()
