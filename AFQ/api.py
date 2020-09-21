@@ -1358,22 +1358,25 @@ class AFQ(object):
 
         sl_counts.to_csv(sl_count_file)
 
-    def _viz_prepare_vols(self, row,
-                          volume=None,
-                          xform_volume=False,
-                          color_by_volume=None,
-                          xform_color_by_volume=False):
-        if volume is None:
-            volume = self._get_best_scalar()
-        if volume in self.scalars:
-            volume = nib.load(
-                self._scalar_dict[volume](self, row)).get_fdata()
+    def _viz_prepare_vol(self, row, vol, xform, mapping):
+        if vol is self.scalars:
+            vol = nib.load(
+                self._scalar_dict[vol](self, row)).get_fdata()
+        if isinstance(vol, str):
+            vol = nib.load(vol).get_fdata()
+        if xform:
+            vol = mapping.transform_inverse(vol)
+        return vol
 
+    def _viz_prepare_vols(self, row,
+                          volume,
+                          xform_volume,
+                          color_by_volume,
+                          xform_color_by_volume):
+        if volume is None:
+            volume = self._b0(row)
         if color_by_volume is None:
             color_by_volume = self._get_best_scalar()
-        if color_by_volume in self.scalars:
-            color_by_volume = nib.load(
-                self._scalar_dict[color_by_volume](self, row)).get_fdata()
 
         if xform_volume or xform_color_by_volume:
             if self.use_prealign:
@@ -1386,16 +1389,20 @@ class AFQ(object):
                                        row['dwi_file'],
                                        self.reg_template_img,
                                        prealign=reg_prealign_inv)
+        else:
+            mapping = None
 
-        if xform_volume:
-            if isinstance(volume, str):
-                volume = nib.load(volume).get_fdata()
-            volume = mapping.transform_inverse(volume)
-        if xform_color_by_volume:
-            if isinstance(color_by_volume, str):
-                color_by_volume = nib.load(color_by_volume).get_fdata()
-            color_by_volume = mapping.transform_inverse(color_by_volume)
-        return volume, color_by_volume
+        return\
+            self._viz_prepare_vol(
+                row,
+                volume,
+                xform_volume,
+                mapping),
+        self._viz_prepare_vol(
+                row,
+                color_by_volume,
+                xform_color_by_volume,
+                mapping)
 
     def _viz_bundles(self, row,
                      export=False,
