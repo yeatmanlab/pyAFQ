@@ -42,7 +42,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
-                 slr_algo="linear",
+                 reg_algo="linear",
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
@@ -73,7 +73,7 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-        slr_algo : string
+        reg_algo : string
             Algorithm for streamline registration (case-insensitive):
             'linear' : Use Streamlinear Registration [Garyfallidis2015]_
             'syn' : Use image-based nonlinear registration
@@ -159,7 +159,7 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
-        self.slr_algo = slr_algo.lower()
+        self.reg_algo = reg_algo.lower()
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -648,7 +648,7 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def move_streamlines(self, tg=None, slr_algo='linear'):
+    def move_streamlines(self, tg=None, reg_algo='linear'):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
@@ -660,7 +660,7 @@ class Segmentation:
         else:
             self.tg = tg
 
-        if slr_algo == "linear":
+        if reg_algo == "linear":
             self.logger.info("Registering tractogram with linear SLR")
             atlas = self.bundle_dict['whole_brain']
             self.moved_sl, _, _, _ = whole_brain_slr(
@@ -669,7 +669,7 @@ class Segmentation:
                 greater_than=self.greater_than,
                 rm_small_clusters=self.rm_small_clusters,
                 rng=self.rng)
-        elif slr_algo == "syn":
+        elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
             delta = dts.values_from_volume(self.mapping.forward,
                                            self.tg.streamlines, np.eye(4))
@@ -697,7 +697,7 @@ class Segmentation:
 
         fiber_groups = {}
 
-        self.move_streamlines(tg, self.slr_algo)
+        self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
         rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
