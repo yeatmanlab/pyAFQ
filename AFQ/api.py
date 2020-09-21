@@ -287,6 +287,71 @@ class AFQ(object):
             Default: use the default behavior of the seg.clean_bundle
             function.
         '''
+        if not isinstance(bids_path, str):
+            raise TypeError("bids_path must be a string")
+        if not op.exists(bids_path):
+            raise ValueError("bids_path not found")
+        if not op.exists(op.join(bids_path, "dataset_description.json")):
+            raise ValueError("There must be a dataset_description.json"
+                             + " in bids_path")
+        if not isinstance(bids_filters, dict):
+            raise TypeError("bids_filters must be a dict")
+        # dmriprep typechecking handled by pyBIDS
+        if custom_tractography_bids_filters is not None\
+                and not isinstance(custom_tractography_bids_filters, dict):
+            raise TypeError(
+                "custom_tractography_bids_filters must be"
+                + " either a dict or None")
+        if not isinstance(b0_threshold, int):
+            raise TypeError("b0_threshold must be an int")
+        if min_bval is not None and not isinstance(min_bval, int):
+            raise TypeError("min_bval must be an int")
+        if max_bval is not None and not isinstance(max_bval, int):
+            raise TypeError("max_bval must be an int")
+        if not isinstance(reg_template, str)\
+                and not isinstance(reg_template, nib.Nifti1Image):
+            raise TypeError(
+                "reg_template must be a str or Nifti1Image")
+        if not isinstance(reg_subject, str)\
+                and not isinstance(reg_subject, nib.Nifti1Image):
+            raise TypeError(
+                "reg_subject must be a str or Nifti1Image")
+        if brain_mask is not None and not check_mask_methods(brain_mask):
+            raise TypeError(
+                "brain_mask must be None or a mask defined in `AFQ.mask`")
+        if bundle_names is not None and not (
+                isinstance(bundle_names, list)
+                and isinstance(bundle_names[0], str)):
+            raise TypeError(
+                "bundle_names must be None or a list of strings")
+        if not isinstance(dask_it, bool):
+            raise TypeError("dask_it must be a bool")
+        if not isinstance(force_recompute, bool):
+            raise TypeError("force_recompute must be a bool")
+        if scalars is not None and not (
+                isinstance(scalars, list)
+                and isinstance(scalars[0], str)):
+            raise TypeError(
+                "scalars must be None or a list of strings")
+        if not isinstance(use_prealign, bool):
+            raise TypeError("use_prealign must be a bool")
+        if not isinstance(virtual_frame_buffer, bool):
+            raise TypeError("virtual_frame_buffer must be a bool")
+        if not viz_backend == "fury" and not viz_backend == "plotly":
+            raise TypeError("viz_backend must be either 'fury' or 'plotly'")
+        if tracking_params is not None\
+                and not isinstance(tracking_params, dict):
+            raise TypeError(
+                "tracking_params must be None or a dict")
+        if segmentation_params is not None\
+                and not isinstance(tracking_params, dict):
+            raise TypeError(
+                "tracking_params must be None or a dict")
+        if clean_params is not None\
+                and not isinstance(tracking_params, dict):
+            raise TypeError(
+                "tracking_params must be None or a dict")
+
         self.logger = logging.getLogger('AFQ.api')
 
         # validate input and fail early
