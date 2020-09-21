@@ -250,8 +250,11 @@ class Segmentation:
 
         if self.seg_algo == "afq":
             return self.segment_afq()
-        elif self.seg_algo == "reco":
+        elif self.seg_algo.startswith("reco"):
             return self.segment_reco()
+        else:
+            raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
+                             "is not recognized")
 
     def prepare_img(self, fdata, fbval, fbvec):
         """
@@ -696,7 +699,7 @@ class Segmentation:
 
         fiber_groups = {}
 
-        self.slr(tg, self.slr_algo)
+        self.move_streamlines(tg, self.slr_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
         rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)

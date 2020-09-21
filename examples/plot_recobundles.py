@@ -65,8 +65,8 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
-bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "OPT"]
-bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco")
+bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
+bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco80")
 
 print("Tracking...")
 if not op.exists('dti_streamlines_reco.trk'):
