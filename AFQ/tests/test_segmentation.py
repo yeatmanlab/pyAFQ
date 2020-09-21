@@ -132,7 +132,7 @@ def test_segment_clip_edges():
 
 def test_segment_reco():
     # get bundles for reco method
-    bundles_reco = afd.read_hcp_atlas_16_bundles()
+    bundles_reco = afd.read_hcp_atlas(16)
     bundle_names = ['whole_brain', 'CST_R', 'CST_L']
     for key in list(bundles_reco):
         if key not in bundle_names:
