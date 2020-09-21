@@ -13,9 +13,11 @@ import AFQ.viz.utils as vut
 try:
     import plotly
     import plotly.graph_objs as go
+    import plotly.io as pio
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
+scope = pio.kaleido.scope
 viz_logger = logging.getLogger("AFQ.viz")
 
 
@@ -257,6 +259,7 @@ def create_gif(figure,
         )
         figure.update_layout(scene_camera=camera)
         figure.write_image(tdir + f"/tgif{i}.png")
+        scope._shutdown_kaleido()  # temporary fix for memory leak
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
                       png_fname="tgif", add_zeros=False)
