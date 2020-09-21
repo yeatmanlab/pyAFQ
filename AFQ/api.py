@@ -1392,17 +1392,19 @@ class AFQ(object):
         else:
             mapping = None
 
-        return\
-            self._viz_prepare_vol(
-                row,
-                volume,
-                xform_volume,
-                mapping),
-        self._viz_prepare_vol(
-                row,
-                color_by_volume,
-                xform_color_by_volume,
-                mapping)
+        volume = self._viz_prepare_vol(
+            row,
+            volume,
+            xform_volume,
+            mapping)
+
+        color_by_volume = self._viz_prepare_vol(
+            row,
+            color_by_volume,
+            xform_color_by_volume,
+            mapping)
+
+        return volume, color_by_volume
 
     def _viz_bundles(self, row,
                      export=False,
