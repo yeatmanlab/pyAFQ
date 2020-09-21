@@ -225,9 +225,9 @@ class AFQ(object):
             [REGISTRATION] Maximum b value you want to use
             from the dataset (other than b0).
             If None, there is no maximum limit. Default: None
-        reg_subject : str or Nifti1Image, optional
+        reg_subject : str, Nifti1Image, dict, optional
             [REGISTRATION] The source image data to be registered.
-            Can either be a Nifti1Image, a path to a Nifti1Image, or
+            Can either be a Nifti1Image, bids filters for a Nifti1Image, or
             If "b0", "dti_fa_subject", "subject_sls", or "power_map,"
             image data will be loaded automatically.
             If "subject_sls" is used, slr registration will be used
@@ -298,8 +298,8 @@ class AFQ(object):
         self.max_bval = max_bval
         self.min_bval = min_bval
 
-        self.reg_subject = reg_subject.lower()
-        self.reg_template = reg_template.lower()
+        self.reg_subject = reg_subject
+        self.reg_template = reg_template
         if brain_mask is None:
             self.brain_mask_definition = FullMask()
             self.mask_template = False
@@ -307,12 +307,13 @@ class AFQ(object):
             self.brain_mask_definition = brain_mask
             self.mask_template = True
 
-        if reg_subject == 'subject_sls' or reg_template == 'hcp_atlas':
-            if reg_template != 'hcp_atlas':
+        if reg_subject.lower() == 'subject_sls'\
+                or reg_template.lower() == 'hcp_atlas':
+            if reg_template.lower() != 'hcp_atlas':
                 self.logger.error(
                     "If reg_subject is 'subject_sls',"
                     + " reg_template must be 'hcp_atlas'")
-            if reg_subject != 'subject_sls':
+            if reg_subject.lower() != 'subject_sls':
                 self.logger.error(
                     "If reg_template is 'hcp_atlas',"
                     + " reg_subject must be 'subject_sls'")
@@ -428,6 +429,7 @@ class AFQ(object):
         bvec_file_list = []
         bval_file_list = []
         custom_tract_list = []
+        reg_subject_list = []
         timing_list = []
         results_dir_list = []
         for subject in self.subjects:
@@ -473,6 +475,14 @@ class AFQ(object):
                 else:
                     custom_tract_list.append(None)
 
+                if isinstance(self.reg_subject, dict):
+                    reg_subject_list.append(
+                        bids_layout.get(subject=subject, session=session,
+                                        return_type='filename',
+                                        **self.reg_subject)[0])
+                else:
+                    reg_subject_list.append(None)
+
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
@@ -502,6 +512,7 @@ class AFQ(object):
                                             bvec_file=bvec_file_list,
                                             bval_file=bval_file_list,
                                             custom_tract=custom_tract_list,
+                                            reg_subject_list=reg_subject_list,
                                             ses=ses_list,
                                             timing=timing_list,
                                             results_dir=results_dir_list))
@@ -746,6 +757,9 @@ class AFQ(object):
         return self.scalars[0]
 
     def _reg_img(self, img, row=None):
+        if row is not None and row["reg_subject"] is not None:
+            return row["reg_subject"]
+
         if isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni_t2":
