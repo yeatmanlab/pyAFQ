@@ -1649,7 +1649,7 @@ def organize_cfin_data(path=None):
 
 def organize_stanford_data(path=None):
     """
-    If necessary, downloads the Stanford HARDI dataset into DIPY directory and 
+    If necessary, downloads the Stanford HARDI dataset into DIPY directory and
     creates a BIDS compliant file-system structure in AFQ data directory:
 
 
