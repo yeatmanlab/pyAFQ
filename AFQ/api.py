@@ -1359,7 +1359,7 @@ class AFQ(object):
         sl_counts.to_csv(sl_count_file)
 
     def _viz_prepare_vol(self, row, vol, xform, mapping):
-        if vol is self.scalars:
+        if vol in self.scalars:
             vol = nib.load(
                 self._scalar_dict[vol](self, row)).get_fdata()
         if isinstance(vol, str):
