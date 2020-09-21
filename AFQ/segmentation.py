@@ -7,12 +7,9 @@ from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
 import nibabel as nib
-from templateflow import api as tflow
-
 from tqdm.auto import tqdm
 
 
-import dipy.data as dpd
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
@@ -676,7 +673,8 @@ class Segmentation:
             self.logger.info("Registering tractogram based on syn")
             delta = dts.values_from_volume(self.mapping.forward,
                                            self.tg.streamlines, np.eye(4))
-            self.moved_sl = [sum(d, s) for d, s in zip(delta, selg.tg.streamlines)]
+            self.moved_sl = dts.Streamlines(
+                [sum(d, s) for d, s in zip(delta, self.tg.streamlines)])
 
     def segment_reco(self, tg=None):
         """

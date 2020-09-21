@@ -110,6 +110,7 @@ else:
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(seg_algo='reco80',
+                                slr_algo="syn",
                                 rng=np.random.RandomState(2),
                                 greater_than=50,
                                 rm_small_clusters=10,
