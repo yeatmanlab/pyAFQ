@@ -465,7 +465,7 @@ class BrainAxes():
         return self.axes[self.positions[bundle]]
 
     def plot_line(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
-                  lineplot_kwargs):
+                  lineplot_kwargs, plot_subject_lines=True):
         '''
         Given a dataframe data with at least columns x, y,
         and subjectID, plot the mean of subjects with ci of 95
@@ -473,20 +473,24 @@ class BrainAxes():
         using sns.lineplot()
         '''
         ax = self.get_axis(bundle)
-        sns.set(style="whitegrid", rc={"lines.linewidth": 6})
+        if plot_subject_lines:
+            sns.set(style="whitegrid", rc={"lines.linewidth": 1})
+        else:
+            sns.set(style="whitegrid", rc={"lines.linewidth": 6})
         sns.lineplot(
             x=x, y=y,
             data=data,
             estimator='mean', ci=95, n_boot=n_boot,
             legend=False, ax=ax, alpha=alpha,
             style=[True] * len(data.index), **lineplot_kwargs)
-        sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
-        sns.lineplot(
-            x=x, y=y,
-            data=data,
-            ci=None, estimator=None, units='subjectID',
-            legend=False, ax=ax, alpha=alpha - 0.2,
-            style=[True] * len(data.index), **lineplot_kwargs)
+        if plot_subject_lines:
+            sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
+            sns.lineplot(
+                x=x, y=y,
+                data=data,
+                ci=None, estimator=None, units='subjectID',
+                legend=False, ax=ax, alpha=alpha - 0.2,
+                style=[True] * len(data.index), **lineplot_kwargs)
 
         ax.set_title(bundle, fontsize=20)
         ax.set_ylabel(ylabel, fontsize=14)
@@ -753,7 +757,8 @@ class GroupCSVComparison():
                        show_plots=False,
                        positions=POSITIONS,
                        out_file=None,
-                       n_boot=1000):
+                       n_boot=1000,
+                       plot_subject_lines=True):
         """
         Compare all tract profiles for a scalar from different CSVs.
         Plots tract profiles for all in one plot.
@@ -791,6 +796,10 @@ class GroupCSVComparison():
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
+
+        plot_subject_lines : bool, optional
+            Whether to plot individual subject lines with a smaller width.
+            Default: True
         """
         if not show_plots:
             plt.ioff()
@@ -810,7 +819,8 @@ class GroupCSVComparison():
                     {
                         "dashes": [(2**i, 2**i)],
                         "hue": "tractID",
-                        "palette": [COLOR_DICT[bundle]]})
+                        "palette": [COLOR_DICT[bundle]]},
+                    plot_subject_lines=plot_subject_lines)
                 if j == 0:
                     line = Line2D(
                         [], [],
@@ -856,7 +866,7 @@ class GroupCSVComparison():
 
     def contrast_index(self, names=None, scalar="dti_fa",
                        show_plots=False, n_boot=1000,
-                       positions=POSITIONS):
+                       positions=POSITIONS, plot_subject_lines=True):
         """
         Calculate the contrast index for each bundle in two datasets.
 
@@ -883,6 +893,10 @@ class GroupCSVComparison():
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
+
+        plot_subject_lines : bool, optional
+            Whether to plot individual subject lines with a smaller width.
+            Default: True
         """
         if not show_plots:
             plt.ioff()
@@ -900,7 +914,8 @@ class GroupCSVComparison():
                 [bundle], names, scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                plot_subject_lines=plot_subject_lines)
         ba.fig.legend([scalar], loc='center', fontsize=14)
         ba.format()
         ba.fig.savefig(
@@ -913,7 +928,7 @@ class GroupCSVComparison():
 
     def lateral_contrast_index(self, name, scalar="dti_fa",
                                show_plots=False, n_boot=1000,
-                               positions=POSITIONS):
+                               positions=POSITIONS, plot_subject_lines=True):
         """
         Calculate the lateral contrast index for each bundle in a given
         dataset, for each dataset in names.
@@ -938,6 +953,10 @@ class GroupCSVComparison():
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
+
+        plot_subject_lines : bool, optional
+            Whether to plot individual subject lines with a smaller width.
+            Default: True
         """
         if not show_plots:
             plt.ioff()
@@ -959,7 +978,8 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]})
+                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                plot_subject_lines=plot_subject_lines)
 
         ba.fig.legend([scalar], loc='center', fontsize=14)
         ba.format()
