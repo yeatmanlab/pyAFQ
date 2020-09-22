@@ -88,7 +88,7 @@ afd.organize_stanford_data()
 #
 # .. note::
 #
-#    We will also be using plotly to geneate an interactive visualization.
+#    We will also be using plotly to generate an interactive visualization.
 #    So we will specify plotly as the visualization backend.
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
