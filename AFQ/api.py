@@ -388,6 +388,9 @@ class AFQ(object):
             json.dump(pipeline_description, outfile)
 
         self.subjects = bids_layout.get(return_type='id', target='subject')
+        if not len(self.subjects):
+            raise ValueError("`bids_path` contains no subjects")
+
         sessions = bids_layout.get(return_type='id', target='session')
         if len(sessions):
             self.sessions = sessions
