@@ -42,7 +42,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
-                 reg_algo="syn",
+                 reg_algo='slr',
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
@@ -649,7 +649,7 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def move_streamlines(self, tg=None, reg_algo='syn'):
+    def move_streamlines(self, tg=None, reg_algo='slr'):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
