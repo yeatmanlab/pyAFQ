@@ -616,7 +616,7 @@ class AFQ(object):
 
     def _anisotropic_power_map(self, row):
         pmap_file = self._get_fname(
-            row, '_anisotropic_power_map.nii.gz')
+            row, '_model-CSD_APM.nii.gz')
         if self.force_recompute or not op.exists(pmap_file):
             dwi_data, gtab, img = self._get_data_gtab(row)
             mask = self._brain_mask(row)
@@ -624,6 +624,9 @@ class AFQ(object):
                 dwi_data, gtab, mask)
             pmap = nib.Nifti1Image(pmap, img.affine)
             self.log_and_save_nii(pmap, pmap_file)
+            meta_fname = self._get_fname(row, '_model-CSD_APM.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
 
         return pmap_file
 
