@@ -82,7 +82,7 @@ afd.organize_stanford_data()
 # .. note::
 #
 #    As noted above, the Stanford HARDI data contains anatomical and
-#    diffusion weighted imaging (dwi) data. In this example, we are intrested
+#    diffusion weighted imaging (dwi) data. In this example, we are interested
 #    in the vistasoft dwi. For our dataset the `dmriprep` is optional, but
 #    we have included it to make the initialization more explicit.
 #
