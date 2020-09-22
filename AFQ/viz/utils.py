@@ -31,6 +31,7 @@ viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_sns = sns.color_palette("tab20")
 large_font = 24
 medium_font = 20
+small_font = 18
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
@@ -1189,6 +1190,10 @@ class GroupCSVComparison():
                     'scalar': scalar,
                     'tractID': bundle,
                     'value': bundle_prof_means[m, k]}, ignore_index=True)
+            df_bundle_prof_means = df_bundle_prof_means.append({
+                'scalar': scalar,
+                'tractID': "median",
+                'value': np.median(bundle_prof_means[m])}, ignore_index=True)
         df_all_sub_coef = pd.DataFrame(columns=['scalar', 'tractID', 'value'])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
@@ -1196,17 +1201,21 @@ class GroupCSVComparison():
                     'scalar': scalar,
                     'tractID': bundle,
                     'value': all_sub_coef[m, k]}, ignore_index=True)
+            df_all_sub_coef = df_all_sub_coef.append({
+                'scalar': scalar,
+                'tractID': "median",
+                'value': np.median(all_sub_coef[m])}, ignore_index=True)
 
         sns.set(style="whitegrid")
         sns.barplot(
             data=df_bundle_prof_means, x='tractID', y='value', hue='scalar',
-            palette=tableau_20_sns[:len(scalars) * 2:2],
-            yerr=bundle_prof_stds[m],
+            palette=tableau_20_sns[:len(scalars) * 2 + 2:2],
+            yerr=[*bundle_prof_stds[m], 0],
             ax=axes[0])
         axes[0].legend_.remove()
         sns.barplot(
             data=df_all_sub_coef, x='tractID', y='value', hue='scalar',
-            palette=tableau_20_sns[:len(scalars) * 2:2],
+            palette=tableau_20_sns[:len(scalars) * 2 + 2:2],
             ax=axes[1])
         axes[1].legend_.remove()
 
@@ -1215,13 +1224,15 @@ class GroupCSVComparison():
                            fontsize=medium_font)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
-        axes[0].set_xticklabels(self.bundles, fontsize=medium_font)
+        axes[0].set_xticklabels(
+            [*self.bundles, "median"], fontsize=small_font)
         axes[1].set_title("B", fontsize=large_font)
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles',
-                           fontsize=medium_font)
+                           fontsize=small_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
-        axes[1].set_xticklabels(self.bundles, fontsize=medium_font)
+        axes[1].set_xticklabels(
+            [*self.bundles, "median"], fontsize=small_font)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -1239,7 +1250,7 @@ class GroupCSVComparison():
         fig.legend(
             legend_labels,
             scalars,
-            fontsize=medium_font,
+            fontsize=small_font,
             bbox_to_anchor=(1.25, 0.5))
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
