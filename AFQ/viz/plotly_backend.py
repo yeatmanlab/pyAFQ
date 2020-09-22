@@ -124,8 +124,11 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
             x=x_pts,
             y=y_pts,
             z=z_pts,
-            mode='lines',
             name=name,
+            marker=dict(
+                size=0.0001,
+                color=_color_arr2str(color)
+            ),  # this is necessary to add color to legend
             line=dict(
                 width=8,
                 color=line_color,
@@ -210,6 +213,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             name,
             cbv=color_by_volume)
 
+    figure.update_layout(legend=dict(itemsizing="constant"))
     return _inline_interact(figure, interact, inline)
 
 
