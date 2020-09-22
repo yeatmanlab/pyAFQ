@@ -221,7 +221,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
 def create_gif(figure,
                file_name,
-               n_frames=60,
+               n_frames=30,
                zoom=2.5,
                z_offset=0.5,
                size=(600, 600)):
@@ -259,7 +259,8 @@ def create_gif(figure,
         )
         figure.update_layout(scene_camera=camera)
         figure.write_image(tdir + f"/tgif{i}.png")
-        scope._shutdown_kaleido()  # temporary fix for memory leak
+        if i % 5 == 4:
+            scope._shutdown_kaleido()  # temporary fix for memory leak
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
                       png_fname="tgif", add_zeros=False)
