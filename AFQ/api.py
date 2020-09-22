@@ -307,8 +307,9 @@ class AFQ(object):
             self.brain_mask_definition = brain_mask
             self.mask_template = True
 
-        if reg_subject.lower() == 'subject_sls'\
-                or reg_template.lower() == 'hcp_atlas':
+        if isinstance(reg_subject, str) and isinstance(reg_template, str)\
+                and (reg_subject.lower() == 'subject_sls'
+                     or reg_template.lower() == 'hcp_atlas'):
             if reg_template.lower() != 'hcp_atlas':
                 self.logger.error(
                     "If reg_subject is 'subject_sls',"

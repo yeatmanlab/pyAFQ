@@ -52,7 +52,7 @@ def get_temp_hardi():
         'sub-01',
         'ses-01',
         'dwi')
-    
+
     return tmpdir, bids_path, sub_path
 
 
