@@ -98,7 +98,7 @@ myafq = api.AFQ(bids_path=op.join(afd.afq_home,
 
 ##########################################################################
 # Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
-# -----------------
+# ------------------------------------------------------------------
 # The AFQ object holds a table with file names to various data derivatives.
 #
 # For example, the file where the FA computed from DTI is stored can be
