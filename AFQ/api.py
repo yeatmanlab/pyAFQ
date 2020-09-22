@@ -1201,7 +1201,7 @@ class AFQ(object):
                     sl_counts.append(len(this_tgm.streamlines))
 
             sl_counts = pd.DataFrame(
-                data=dict(bundle=self.bundle_dict.keys(),
+                data=dict(bundle=list(self.bundle_dict.keys()),
                           n_streamlines=sl_counts))
 
             sl_count_file = self._get_fname(
