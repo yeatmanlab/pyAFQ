@@ -1198,16 +1198,18 @@ class AFQ(object):
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
-                    sl_counts.append(len(this_tgm.streamlines)
+                    sl_counts.append(len(this_tgm.streamlines))
 
             sl_counts = pd.DataFrame(
                 data=dict(bundle=self.bundle_dict.keys(),
                           n_streamlines=sl_counts))
+
             sl_count_file = self._get_fname(
                 row,
                 '_sl_count.csv',
                 include_track=True,
                 include_seg=True)
+
             sl_counts.to_csv(sl_count_file)
 
     def _viz_prepare_vols(self, row,
