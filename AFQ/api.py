@@ -388,6 +388,12 @@ class AFQ(object):
             json.dump(pipeline_description, outfile)
 
         self.subjects = bids_layout.get(return_type='id', target='subject')
+        if not len(self.subjects):
+            raise ValueError(
+                "`bids_path` contains no subjects in derivatives folders."
+                + " This could be caused by derivatives folders not following"
+                + " the BIDS format.")
+
         sessions = bids_layout.get(return_type='id', target='session')
         if len(sessions):
             self.sessions = sessions
