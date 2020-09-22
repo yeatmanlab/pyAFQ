@@ -43,7 +43,7 @@ afd.organize_stanford_data()
 
 ##########################################################################
 # Initialize an AFQ object:
-# ------------------------
+# -------------------------
 #
 # Creates an AFQ object, that encapsulates tractometry. This object can be
 # used to manage the entire AFQ pipeline, including:
