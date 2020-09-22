@@ -1292,7 +1292,7 @@ class HBNSite(S3BIDSStudy):
 
         The HBN dataset is not BIDS compliant so to go a list
         of available derivatives, we must peak inside every
-        directory in `derivatives/sub-XXXX/` 
+        directory in `derivatives/sub-XXXX/`
 
         Returns
         -------
@@ -1681,27 +1681,57 @@ fetch_hcp_atlas_16_bundles = _make_fetcher(
     unzip=True)
 
 
-def read_hcp_atlas_16_bundles():
+fetch_hcp_atlas_80_bundles = _make_fetcher(
+    "fetch_hcp_atlas_80_bundles",
+    op.join(afq_home,
+            'hcp_atlas_80_bundles'),
+    'https://ndownloader.figshare.com/files/',
+    ["13638644"],
+    ["Atlas_80_Bundles.zip"],
+    md5_list=["78331d527a10ec000d4f33bac472e099"],
+    doc="Download 80-bundle Recobundles atlas",
+    unzip=True)
+
+
+def read_hcp_atlas(n_bundles=16):
     """
-    XXX
+    n_bundles : int
+        16 or 80, which selects among the two different
+        atlases:
+
+        https://figshare.com/articles/Simple_model_bundle_atlas_for_RecoBundles/6483614  #noqa
+
+        https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883  #noqa
     """
     bundle_dict = {}
-    _, folder = fetch_hcp_atlas_16_bundles()
-    whole_brain = load_tractogram(op.join(folder,
-                                          'Atlas_in_MNI_Space_16_bundles',
-                                          'whole_brain',
-                                          'whole_brain_MNI.trk'),
-                                  'same', bbox_valid_check=False).streamlines
+    if n_bundles == 16:
+        _, folder = fetch_hcp_atlas_16_bundles()
+        atlas_folder = "Atlas_in_MNI_Space_16_bundles"
+    elif n_bundles == 80:
+        _, folder = fetch_hcp_atlas_80_bundles()
+        atlas_folder = "Atlas_80_Bundles"
+
+    whole_brain = load_tractogram(
+        op.join(
+            folder,
+            atlas_folder,
+            'whole_brain',
+            'whole_brain_MNI.trk'),
+            'same', bbox_valid_check=False).streamlines
+
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
-        op.join(folder, "Atlas_in_MNI_Space_16_bundles", "bundles", "*.trk"))
+        op.join(
+            folder,
+            atlas_folder,
+            "bundles", "*.trk"))
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
         bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_tractogram(bundle_file,
-                                                    'same',
-                                                    bbox_valid_check=False)\
-            .streamlines
+        bundle_dict[bundle]['sl'] = load_tractogram(
+            bundle_file,
+            'same',
+            bbox_valid_check=False).streamlines
 
         feature = ResampleFeature(nb_points=100)
         metric = AveragePointwiseEuclideanMetric(feature)
@@ -1711,8 +1741,11 @@ def read_hcp_atlas_16_bundles():
 
     # For some reason, this file-name has a 0 in it, instead of an O:
     bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]
+    # In the 80-bundle case, there are two files, and both have identical
+    # content, so this is fine:
     del bundle_dict["IF0F_R"]
     return bundle_dict
+
 
 
 fetch_aal_atlas = _make_fetcher(

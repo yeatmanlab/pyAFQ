@@ -7,12 +7,9 @@ from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
 import nibabel as nib
-from templateflow import api as tflow
-
 from tqdm.auto import tqdm
 
 
-import dipy.data as dpd
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
@@ -45,6 +42,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
+                 reg_algo='slr',
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
@@ -75,6 +73,11 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
+        reg_algo : string, optional
+            Algorithm for streamline registration (case-insensitive):
+            'slr' : Use Streamlinear Registration [Garyfallidis2015]_
+            'syn' : Use image-based nonlinear registration
+            Default: 'syn'
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
@@ -157,6 +160,7 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
+        self.reg_algo = reg_algo.lower()
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -244,8 +248,11 @@ class Segmentation:
 
         if self.seg_algo == "afq":
             return self.segment_afq()
-        elif self.seg_algo == "reco":
+        elif self.seg_algo.startswith("reco"):
             return self.segment_reco()
+        else:
+            raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
+                             "is not recognized")
 
     def prepare_img(self, fdata, fbval, fbvec):
         """
@@ -642,6 +649,34 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
+    def move_streamlines(self, tg=None, reg_algo='slr'):
+        """Streamline-based registration of a whole-brain tractogram to
+        the MNI whole-brain atlas.
+
+        registration_algo : str
+            "slr" or "syn"
+        """
+        if tg is None:
+            tg = self.tg
+        else:
+            self.tg = tg
+
+        if reg_algo == "slr":
+            self.logger.info("Registering tractogram with SLR")
+            atlas = self.bundle_dict['whole_brain']
+            self.moved_sl, _, _, _ = whole_brain_slr(
+                atlas, self.tg.streamlines, x0='affine', verbose=False,
+                progressive=self.progressive,
+                greater_than=self.greater_than,
+                rm_small_clusters=self.rm_small_clusters,
+                rng=self.rng)
+        elif reg_algo == "syn":
+            self.logger.info("Registering tractogram based on syn")
+            delta = dts.values_from_volume(self.mapping.forward,
+                                           self.tg.streamlines, np.eye(4))
+            self.moved_sl = dts.Streamlines(
+                [sum(d, s) for d, s in zip(delta, self.tg.streamlines)])
+
     def segment_reco(self, tg=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
@@ -662,20 +697,11 @@ class Segmentation:
             self.tg = tg
 
         fiber_groups = {}
-        self.logger.info("Registering Whole-brain with SLR")
-        # We start with whole-brain SLR:
-        atlas = self.bundle_dict['whole_brain']
-        moved, transform, qb_centroids1, qb_centroids2 = whole_brain_slr(
-            atlas, self.tg.streamlines, x0='affine', verbose=False,
-            progressive=self.progressive,
-            greater_than=self.greater_than,
-            rm_small_clusters=self.rm_small_clusters,
-            rng=self.rng)
 
+        self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
-        rb = RecoBundles(moved, verbose=False, rng=self.rng)
-
+        rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         bundle_list.remove('whole_brain')
@@ -693,7 +719,7 @@ class Segmentation:
 
             # Use the streamlines in the original space:
             recognized_sl = tg.streamlines[rec_labels]
-            if self.refine:
+            if self.refine and len(recognized_sl) > 0:
                 _, rec_labels = rb.refine(model_sl, recognized_sl,
                                           self.model_clust_thr,
                                           reduction_thr=self.reduction_thr,

@@ -65,8 +65,8 @@ if not op.exists('mapping.nii.gz'):
 else:
     mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
 
-bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor"]
-bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco")
+bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
+bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco80")
 
 print("Tracking...")
 if not op.exists('dti_streamlines_reco.trk'):
@@ -109,7 +109,7 @@ else:
     sft = load_tractogram('./dti_streamlines_reco.trk', img)
 
 print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(seg_algo='reco',
+segmentation = seg.Segmentation(seg_algo='reco80',
                                 rng=np.random.RandomState(2),
                                 greater_than=50,
                                 rm_small_clusters=10,
