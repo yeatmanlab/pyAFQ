@@ -5,9 +5,9 @@ Using pyAFQ
 Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
-The pyAFQ software assumes that your data is organized according to a format
-that emulates the `BIDS <http://bids.neuroimaging.io/>`_ format. Anatomical data
-and segmentation are optional. If a T1-weighted anatomical image and its
+pyAFQ works with `BIDS compliant<http://bids.neuroimaging.io/>`_ diffusion data. 
+While not required it is the prefered data format for neuroimaging interoperability.
+Anatomical data and segmentation are optional. If a T1-weighted anatomical image and its
 segmentation are not provided, the software will use the diffusion data to
 estimate the parts of the image that comprise the white matter.
 
@@ -27,11 +27,11 @@ the software.
     software to support a fully BIDS-compliant set of derivatives. Both as
     inputs, as well as outputs.
 
-
 Example data
 ------------
 
-To get some example data formatted for input into `pyAFQ`, you can run::
+To get some example diffusion data formatted for input into `pyAFQ`, you can 
+run::
 
     import AFQ.data as afd
     afd.organize_stanford_data()
@@ -39,18 +39,27 @@ To get some example data formatted for input into `pyAFQ`, you can run::
 This should create a folder in your home directory with a properly-formatted
 data set in a directory called `stanford_hardi`.
 
+    ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
+    ├── dataset_description.json
+    └── sub-01
+        └── ses-01
+            └── dwi
+                ├── sub-01_ses-01_dwi.bvals
+                ├── sub-01_ses-01_dwi.bvecs
+                └── sub-01_ses-01_dwi.nii.gz
+
 
 Running the pyAFQ pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`pyAFQ` provides a programmatic application programming interface that can
-be used to integrate pyAFQ functionality into Python programs or into
+`pyAFQ` provides a programmatic application programming interface (API) that
+can be used to integrate pyAFQ functionality into Python programs or into
 interactive analysis sessions (e.g., using
 `Jupyter <https://jupyter.org>`_ notebooks). Examples of using the API are
 provided in the :ref:`examples` documentation section.
 
-In addition, pyAFQ provides a command-line interface. After installing the
-software, and organizing the data, run::
+In addition, pyAFQ provides a command-line interface (CLI). After installing
+the software, and organizing the data, run::
 
     pyAFQ /path/to/config.toml
 

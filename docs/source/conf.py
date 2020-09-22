@@ -40,6 +40,7 @@ release = '0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.todo',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
@@ -109,6 +110,9 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+html_css_files = [
+    'css/custom.css',
+]
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
