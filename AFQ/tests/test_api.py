@@ -180,6 +180,23 @@ def test_AFQ_custom_tract():
 
 
 @pytest.mark.nightly2
+def test_AFQ_no_derivs():
+    """
+    Test the initialization of the AFQ object
+    """
+    bids_path = create_dummy_bids_path(1, 1)
+    os.remove(op.join(
+        bids_path, "derivatives", "dmriprep", "dataset_description.json"))
+    with pytest.raises(
+            ValueError,
+            match = "`bids_path` contains no subjects in derivatives folders."
+                + " This could be caused by derivatives folders not following"
+                + " the BIDS format."):
+        my_afq = api.AFQ(bids_path,
+                         dmriprep="synthetic")
+
+
+@pytest.mark.nightly3
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
