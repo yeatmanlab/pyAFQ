@@ -29,6 +29,8 @@ __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_sns = sns.color_palette("tab20")
+large_font = 24
+medium_font = 20
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
@@ -492,8 +494,8 @@ class BrainAxes():
                 legend=False, ax=ax, alpha=alpha - 0.2,
                 style=[True] * len(data.index), **lineplot_kwargs)
 
-        ax.set_title(bundle, fontsize=20)
-        ax.set_ylabel(ylabel, fontsize=14)
+        ax.set_title(bundle, fontsize=large_font)
+        ax.set_ylabel(ylabel, fontsize=medium_font)
         ax.set_ylim(ylim)
 
     def format(self, disable_x=True):
@@ -827,7 +829,7 @@ class GroupCSVComparison():
                         color=[0, 0, 0])
                     line.set_dashes((2**(i + 1), 2**(i + 1)))
                     labels.append(line)
-        ba.fig.legend(labels, names, loc='center', fontsize=14)
+        ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
         ba.format()
 
         if out_file is None:
@@ -916,7 +918,7 @@ class GroupCSVComparison():
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]},
                 plot_subject_lines=plot_subject_lines)
-        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
@@ -981,7 +983,7 @@ class GroupCSVComparison():
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]},
                 plot_subject_lines=plot_subject_lines)
 
-        ba.fig.legend([scalar], loc='center', fontsize=14)
+        ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
@@ -1089,11 +1091,11 @@ class GroupCSVComparison():
                     label=scalar,
                     color=tableau_20_sns[m * 2],
                     ax=ax)
-            ax.set_title(bundle, fontsize=20)
-            ax.set_xlabel("Pearson's r", fontsize=14)
-            ax.set_ylabel("Count", fontsize=14)
+            ax.set_title(bundle, fontsize=large_font)
+            ax.set_xlabel("Pearson's r", fontsize=medium_font)
+            ax.set_ylabel("Count", fontsize=medium_font)
 
-        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format(disable_x=False)
         ba.fig.savefig(
             self._get_fname(
@@ -1124,10 +1126,10 @@ class GroupCSVComparison():
                     legend=False,
                     ci=None, estimator=None)
             ax.set_ylim([mini, maxi])
-            ax.set_title(bundle, fontsize=20)
-            ax.set_ylabel("Pearson's r", fontsize=14)
+            ax.set_title(bundle, fontsize=large_font)
+            ax.set_ylabel("Pearson's r", fontsize=medium_font)
 
-        ba.fig.legend(scalars, loc='center', fontsize=14)
+        ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
@@ -1152,13 +1154,13 @@ class GroupCSVComparison():
                     color=tableau_20_sns[m * 2],
                     legend=False,
                     ax=ax)
-                ax.set_title(bundle, fontsize=20)
-                ax.set_xlabel(names[0], fontsize=14)
-                ax.set_ylabel(names[1], fontsize=14)
+                ax.set_title(bundle, fontsize=large_font)
+                ax.set_xlabel(names[0], fontsize=medium_font)
+                ax.set_ylabel(names[1], fontsize=medium_font)
                 ax.set_ylim([mini, maxi])
                 ax.set_xlim([mini, maxi])
 
-            ba.fig.legend([scalar], loc='center', fontsize=14)
+            ba.fig.legend([scalar], loc='center', fontsize=medium_font)
             ba.format(disable_x=False)
             ba.fig.savefig(
                 self._get_fname(
@@ -1208,16 +1210,18 @@ class GroupCSVComparison():
             ax=axes[1])
         axes[1].legend_.remove()
 
-        axes[0].set_title("A", fontsize=20)
-        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles', fontsize=14)
+        axes[0].set_title("A", fontsize=large_font)
+        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles',
+                           fontsize=medium_font)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
-        axes[0].set_xticklabels(self.bundles, fontsize=14)
-        axes[1].set_title("B", fontsize=20)
-        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles', fontsize=14)
+        axes[0].set_xticklabels(self.bundles, fontsize=medium_font)
+        axes[1].set_title("B", fontsize=large_font)
+        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles',
+                           fontsize=medium_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
-        axes[1].set_xticklabels(self.bundles, fontsize=14)
+        axes[1].set_xticklabels(self.bundles, fontsize=medium_font)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
@@ -1235,7 +1239,7 @@ class GroupCSVComparison():
         fig.legend(
             legend_labels,
             scalars,
-            fontsize=14,
+            fontsize=medium_font,
             bbox_to_anchor=(1.25, 0.5))
         fig.savefig(self._get_fname(
             f"rel_plots/{'_'.join(scalars)}",
