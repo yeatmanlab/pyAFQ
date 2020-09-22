@@ -39,6 +39,23 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 
+def get_temp_hardi():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_stanford_data(path=tmpdir.name)
+    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+
+    sub_path = op.join(
+        tmpdir.name,
+        'stanford_hardi',
+        'derivatives',
+        'vistasoft',
+        'sub-01',
+        'ses-01',
+        'dwi')
+    
+    return tmpdir, bids_path, sub_path
+
+
 def create_dummy_bids_path(n_subjects, n_sessions):
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
 
@@ -144,10 +161,8 @@ def test_AFQ_custom_tract():
     Test whether AFQ can use tractography from
     custom_tractography_bids_filters
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
+    _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
 
     bundle_names = ["SLF", "ARC", "CST", "FP"]
 
@@ -159,12 +174,7 @@ def test_AFQ_custom_tract():
             'stanford_hardi_tractography',
             'tractography_subsampled.trk'),
         op.join(
-            tmpdir.name,
-            'stanford_hardi',
-            'derivatives',
-            'vistasoft',
-            'sub-01',
-            'ses-01',
+            sub_path,
             'subsampled_tractography.trk'
             )
     )
@@ -215,11 +225,9 @@ def test_AFQ_data():
     """
     Test if API can run without prealign
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
-    for use_prealign in [True, False]:
+    _, bids_path, _ = get_temp_hardi()
 
+    for use_prealign in [True, False]:
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
@@ -237,9 +245,7 @@ def test_AFQ_anisotropic():
     Test if API can run using anisotropic registration
     with a specific selection of b vals
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
@@ -276,9 +282,7 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
@@ -292,9 +296,7 @@ def test_AFQ_reco():
     """
     Test if API can run registeration with FA
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
@@ -314,21 +316,10 @@ def test_AFQ_pft():
     """
     Test pft interface for AFQ
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    afd.fetch_stanford_hardi_tractography()
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    _, bids_path, sub_path = get_temp_hardi()
 
     bundle_names = ["SLF", "ARC", "CST", "FP"]
 
-    sub_path = op.join(
-        tmpdir.name,
-        'stanford_hardi',
-        'derivatives',
-        'vistasoft',
-        'sub-01',
-        'ses-01',
-        'dwi')
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
     os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
     os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
@@ -351,15 +342,44 @@ def test_AFQ_pft():
     my_afq.export_rois()
 
 
+#@pytest.mark.nightly3
+def test_AFQ_custom_subject_reg():
+    """
+    Test pft interface for AFQ
+    """
+    # make first temproary directory to generate b0
+    _, bids_path, sub_path = get_temp_hardi()
+
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
+
+    b0_file = api.AFQ(
+        bids_path,
+        dmriprep='vistasoft',
+        bundle_names=bundle_names).get_b0()[0]
+
+    # make a different temporary directly to test this custom file in
+    _, bids_path, sub_path = get_temp_hardi()
+
+    os.rename(b0_file, op.join(sub_path, "sub-01_ses-01_customb0.nii.gz"))
+
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep='vistasoft',
+        bundle_names=bundle_names,
+        reg_template="mni_T2",
+        reg_subject={
+            "suffix": "customb0",
+            "scope": "vistasoft"})
+    my_afq.export_rois()
+
+
 # Requires large download
 @pytest.mark.nightly
 def test_AFQ_FA():
     """
     Test if API can run registeration with FA
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
         dmriprep='vistasoft',
@@ -396,9 +416,7 @@ def test_auto_cli():
 
 @pytest.mark.skip(reason="causes segmentation fault")
 def test_run_using_auto_cli():
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    tmpdir, bids_path, _ = get_temp_hardi()
     config_file = op.join(tmpdir.name, 'test.toml')
 
     arg_dict = afb.func_dict_to_arg_dict()
@@ -421,9 +439,7 @@ def test_AFQ_data_waypoint():
     """
     Test with some actual data again, this time for track segmentation
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    tmpdir, bids_path, _ = get_temp_hardi()
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="dti",
                            seed_mask=RoiMask(),
