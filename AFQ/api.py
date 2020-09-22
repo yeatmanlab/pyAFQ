@@ -1183,7 +1183,6 @@ class AFQ(object):
                     this_sl = dtu.transform_tracking_output(
                         streamlines[idx],
                         np.linalg.inv(row['dwi_affine']))
-                    sl_counts.append(len(this_sl))
 
                     this_tgm = StatefulTractogram(this_sl, row['dwi_img'],
                                                   Space.VOX)
@@ -1199,6 +1198,8 @@ class AFQ(object):
                     meta = dict(source=bundles_file)
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
+                    sl_counts.append(len(this_tgm.streamlines)
+
             sl_counts = pd.DataFrame(
                 data=dict(bundle=self.bundle_dict.keys(),
                           n_streamlines=sl_counts))
