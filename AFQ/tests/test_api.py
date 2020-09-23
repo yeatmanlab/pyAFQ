@@ -342,7 +342,7 @@ def test_AFQ_pft():
     my_afq.export_rois()
 
 
-#@pytest.mark.nightly3
+@pytest.mark.nightly3
 def test_AFQ_custom_subject_reg():
     """
     Test pft interface for AFQ
