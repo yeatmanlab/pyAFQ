@@ -298,9 +298,12 @@ class Segmentation:
         self.reg_template = reg_template
 
         if mapping is None:
-            gtab = dpg.gradient_table(self.fbval, self.fbvec)
-            self.mapping = reg.syn_register_dwi(self.fdata, gtab,
-                                                template=reg_template)[1]
+            if self.seg_algo == "afq" or self.reg_algo == "syn":
+                gtab = dpg.gradient_table(self.fbval, self.fbvec)
+                self.mapping = reg.syn_register_dwi(self.fdata, gtab,
+                                                    template=reg_template)[1]
+            else:
+                self.mapping = None
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
@@ -665,10 +668,10 @@ class Segmentation:
             self.tg = tg
 
         if reg_algo is None:
-            if hasattr(self, 'mapping'):
-                reg_algo = 'syn'
-            else:
+            if self.mapping is None:
                 reg_algo = 'slr'
+            else:
+                reg_algo = 'syn'
 
         if reg_algo == "slr":
             self.logger.info("Registering tractogram with SLR")
