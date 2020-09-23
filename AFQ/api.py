@@ -1228,8 +1228,11 @@ class AFQ(object):
                     afd.write_json(meta_fname, meta)
                     sl_counts.append(len(this_tgm.streamlines))
 
+            bundle_list = list(self.bundle_dict.keys())
+            if 'whole_brain' in bundle_list:
+                bundle_list.remove('whole_brain')
             sl_counts = pd.DataFrame(
-                data=dict(bundle=list(self.bundle_dict.keys()),
+                data=dict(bundle=bundle_list,
                           n_streamlines=sl_counts))
 
             sl_count_file = self._get_fname(
