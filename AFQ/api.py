@@ -1237,7 +1237,7 @@ class AFQ(object):
 
             sl_count_file = self._get_fname(
                 row,
-                '_sl_count.csv',
+                f'{func}_sl_count.csv',
                 include_track=True,
                 include_seg=True)
 
