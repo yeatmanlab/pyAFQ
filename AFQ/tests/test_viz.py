@@ -10,5 +10,5 @@ def test_viz_name_errors():
         TypeError,
         match="Visualization backend contain"
         + " either 'plotly' or 'fury'. "
-            + "It is currently set to plotlyy"):
-        Viz("plotlyy")
+            + "It is currently set to plotli"):
+        Viz("plotli")
