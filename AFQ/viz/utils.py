@@ -377,7 +377,7 @@ class Viz:
                 Default: "fury"
         """
         self.backend = backend
-        if backend == "fury":
+        if "fury" in backend:
             try:
                 import AFQ.viz.fury_backend
             except ImportError:
@@ -386,7 +386,7 @@ class Viz:
             self.visualize_roi = AFQ.viz.fury_backend.visualize_roi
             self.visualize_volume = AFQ.viz.fury_backend.visualize_volume
             self.create_gif = AFQ.viz.fury_backend.create_gif
-        elif backend == "plotly":
+        elif "plotly" in backend:
             try:
                 import AFQ.viz.plotly_backend
             except ImportError:
@@ -396,7 +396,7 @@ class Viz:
             self.visualize_volume = AFQ.viz.plotly_backend.visualize_volume
             self.create_gif = AFQ.viz.plotly_backend.create_gif
         else:
-            raise TypeError("Visualization backend should be"
+            raise TypeError("Visualization backend contain"
                             + " either 'plotly' or 'fury'. "
                             + "It is currently set to %s"
                             % backend)

@@ -272,7 +272,7 @@ class AFQ(object):
             generating GIFs in a headless environment. Default: False
         viz_backend : str, optional
             [VIZ] Which visualization backend to us.
-            One of {"fury", "plotly"}.
+            One of {"fury", "plotly", "plotly_no_gif"}.
             Default: "plotly"
         segmentation_params : dict, optional
             The parameters for segmentation.
@@ -1439,14 +1439,15 @@ class AFQ(object):
                                             figure=figure)
 
         if export:
-            fname = self._get_fname(
-                row,
-                '_viz.gif',
-                include_track=True,
-                include_seg=True)
+            if "no_gif" not in self.viz.backend:
+                fname = self._get_fname(
+                    row,
+                    '_viz.gif',
+                    include_track=True,
+                    include_seg=True)
 
-            #self.viz.create_gif(figure, fname)
-            if self.viz.backend == 'plotly':
+                self.viz.create_gif(figure, fname)
+            if "plotly" in self.viz.backend:
                 fname = self._get_fname(
                     row,
                     '_viz.html',
@@ -1523,17 +1524,17 @@ class AFQ(object):
             if export:
                 roi_dir = op.join(row['results_dir'], 'viz_bundles')
                 os.makedirs(roi_dir, exist_ok=True)
-                fname = op.split(
-                    self._get_fname(
-                        row,
-                        f'_{bundle_name}'
-                        f'_viz.gif',
-                        include_track=True,
-                        include_seg=True))
+                if "no_gif" not in self.viz.backend:
+                    fname = op.split(
+                        self._get_fname(
+                            row,
+                            f'_{bundle_name}'
+                            f'_viz.gif',
+                            include_track=True,
+                            include_seg=True))
 
-                fname = op.join(roi_dir, fname[1])
-                #self.viz.create_gif(figure, fname)
-                if self.viz.backend == 'plotly':
+                    fname = op.join(roi_dir, fname[1])
+                if "plotly" in self.viz.backend:
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
                     os.makedirs(roi_dir, exist_ok=True)
                     fname = op.split(

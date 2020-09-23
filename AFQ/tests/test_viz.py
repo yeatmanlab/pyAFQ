@@ -8,7 +8,7 @@ def test_viz_name_errors():
 
     with pytest.raises(
         TypeError,
-        match="Visualization backend should be"
+        match="Visualization backend contain"
         + " either 'plotly' or 'fury'. "
             + "It is currently set to plotlyy"):
         Viz("plotlyy")
