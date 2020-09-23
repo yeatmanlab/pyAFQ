@@ -759,7 +759,7 @@ class AFQ(object):
 
     def _reg_img(self, img, row=None):
         if row is not None and row["reg_subject"] is not None:
-            return row["reg_subject"], None
+            return nib.load(row["reg_subject"]), None
 
         if isinstance(img, str):
             img_l = img.lower()
