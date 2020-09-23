@@ -259,6 +259,7 @@ def gif_from_pngs(tdir, gif_fname, n_frames,
         fname_suffix100 = ""
         fname_suffix1000 = ""
     angles = []
+    n_frame_copies = 60 // n_frames
     for i in range(n_frames):
         if i < 10:
             angle_fname = f"{png_fname}{fname_suffix10}{i}.png"
@@ -266,7 +267,9 @@ def gif_from_pngs(tdir, gif_fname, n_frames,
             angle_fname = f"{png_fname}{fname_suffix100}{i}.png"
         else:
             angle_fname = f"{png_fname}{fname_suffix1000}{i}.png"
-        angles.append(io.imread(op.join(tdir, angle_fname)))
+        frame = io.imread(op.join(tdir, angle_fname))
+        for j in range(n_frame_copies):
+            angles.append(frame)
 
     io.mimsave(gif_fname, angles)
 

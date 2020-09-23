@@ -249,6 +249,8 @@ def create_gif(figure,
         Size of the gif.
         Default: (600, 600)
     """
+    pio.kaleido.scope.default_width = size[0]
+    pio.kaleido.scope.default_height = size[1]
     tdir = tempfile.gettempdir()
 
     for i in range(n_frames):
