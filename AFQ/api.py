@@ -1450,8 +1450,8 @@ class AFQ(object):
             row["timing"],
             'index',
             columns=['Time (s)'])
-        timing_fname = self._get_fname(row, "_desc-timing", True, True)
-        df.to_csv(timing_fname, index=False)
+        timing_fname = self._get_fname(row, "_desc-timing.csv", True, True)
+        df.to_csv(timing_fname, index=True, index_label='step')
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
