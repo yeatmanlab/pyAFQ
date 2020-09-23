@@ -42,7 +42,7 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
-                 reg_algo='slr',
+                 reg_algo=None,
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
@@ -73,11 +73,12 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-        reg_algo : string, optional
+        reg_algo : string or None, optional
             Algorithm for streamline registration (case-insensitive):
             'slr' : Use Streamlinear Registration [Garyfallidis2015]_
             'syn' : Use image-based nonlinear registration
-            Default: 'syn'
+            If None, will use syn if a mapping is provided, slr otherwise.
+            Default: None
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
@@ -160,7 +161,9 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
-        self.reg_algo = reg_algo.lower()
+        if reg_algo is not None:
+            reg_algo = reg_algo.lower()
+        self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -661,6 +664,12 @@ class Segmentation:
         else:
             self.tg = tg
 
+        if reg_algo is None:
+            if hasattr(self, 'mapping'):
+                reg_algo = 'syn'
+            else:
+                reg_algo = 'slr'
+
         if reg_algo == "slr":
             self.logger.info("Registering tractogram with SLR")
             atlas = self.bundle_dict['whole_brain']
@@ -866,7 +875,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
 
     # Check whether it's already in the right format:
     sp_is_idx = (targets0 is None
-                 or(isinstance(targets0, np.ndarray)
+                 or (isinstance(targets0, np.ndarray)
                     and targets0.shape[1] == 3))
 
     ep_is_idx = (targets1 is None
