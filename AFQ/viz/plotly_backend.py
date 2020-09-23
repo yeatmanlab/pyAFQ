@@ -249,8 +249,6 @@ def create_gif(figure,
         Size of the gif.
         Default: (600, 600)
     """
-    pio.kaleido.scope.default_width = size[0]
-    pio.kaleido.scope.default_height = size[1]
     tdir = tempfile.gettempdir()
 
     for i in range(n_frames):
@@ -261,8 +259,7 @@ def create_gif(figure,
         )
         figure.update_layout(scene_camera=camera)
         figure.write_image(tdir + f"/tgif{i}.png")
-        if i % 5 == 4:
-            scope._shutdown_kaleido()  # temporary fix for memory leak
+        scope._shutdown_kaleido()  # temporary fix for memory leak
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
                       png_fname="tgif", add_zeros=False)
