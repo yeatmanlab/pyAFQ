@@ -684,10 +684,23 @@ class Segmentation:
                 rng=self.rng)
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
+            self.tg.to_rasmm()
             delta = dts.values_from_volume(self.mapping.forward,
                                            self.tg.streamlines, np.eye(4))
             self.moved_sl = dts.Streamlines(
-                [sum(d, s) for d, s in zip(delta, self.tg.streamlines)])
+                [d + s for d, s in zip(delta, self.tg.streamlines)])
+            self.tg.to_vox()
+
+        if self.save_intermediates is not None:
+            moved_sft = StatefulTractogram(
+                self.moved_sl,
+                self.reg_template,
+                Space.RASMM)
+            save_tractogram(
+                moved_sft,
+                op.join(self.save_intermediates,
+                        'sls_in_mni.trk'),
+                bbox_valid_check=False)
 
     def segment_reco(self, tg=None):
         """
