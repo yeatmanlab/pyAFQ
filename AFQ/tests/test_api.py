@@ -231,7 +231,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-# @pytest.mark.nightly3
+@pytest.mark.nightly3
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
