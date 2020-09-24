@@ -5,6 +5,7 @@ import numpy as np
 import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
+from dipy.reconst import mcsd as msmt
 from dipy.reconst import shm
 import dipy.data as dpd
 import AFQ.utils.models as ut
@@ -16,7 +17,7 @@ shm.spherical_harmonics = spherical_harmonics
 __all__ = ["fit_csd"]
 
 
-def _model(gtab, data, response=None, sh_order=None):
+def _model(gtab, data, response=None, sh_order=None, msmt=False):
     """
     Helper function that defines a CSD model.
     """
@@ -30,24 +31,39 @@ def _model(gtab, data, response=None, sh_order=None):
         if sh_order > 8:
             sh_order = 8
 
-    if response is None:
-        response, _ = csd.auto_response(gtab, data, roi_radius=10,
-                                        fa_thr=0.7)
+    if msmt:
+        my_model = msmt.MultiShellDeconvModel
+        if response is None:
+            response_wm, response_gm, response_csf =\
+                msmt.auto_response_msmt(gtab, data, roi_radii=10)
 
-    csdmodel = csd.ConstrainedSphericalDeconvModel(gtab, response,
-                                                   sh_order=sh_order)
+            response = msmt.msulti_shell_fiber_response(
+                sh_order=8,
+                bvals=gtab.bvals,
+                wm_rf=response_wm,
+                gm_rf=response_gm,
+                csf_rf=response_csf)
+    else:
+        my_model = csd.ConstrainedSphericalDeconvModel
+        if response is None:
+            response, _ = csd.auto_response_ssst(gtab, data, roi_radii=10,
+                                                 fa_thr=0.7)
+
+    csdmodel = my_model(gtab, response, sh_order=sh_order)
     return csdmodel
 
 
-def _fit(gtab, data, mask, response=None, sh_order=None, lambda_=1, tau=0.1):
+def _fit(gtab, data, mask, response=None, sh_order=None, lambda_=1, tau=0.1,
+         msmt=False):
     """
     Helper function that does the core of fitting a model to data.
     """
-    return _model(gtab, data, response, sh_order).fit(data, mask=mask)
+    return _model(gtab, data, response, sh_order, msmt).fit(data, mask=mask)
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
-            b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None):
+            b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None,
+            msmt=False):
     """
     Fit the CSD model and save file with SH coefficients.
 
@@ -88,6 +104,9 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
         A full path to a directory to store the maps that get computed.
         Default: file with coefficients gets stored in the same directory as
         the first DWI file in `data_files`.
+    msmt : bool, optional
+        If False, standard single-shell CSD will be used. Otherwise,
+
 
     Returns
     -------
@@ -97,7 +116,7 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
                                             b0_threshold=b0_threshold)
 
     csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
-                  lambda_=lambda_, tau=tau)
+                  lambda_=lambda_, tau=tau, msmt=msmt)
 
     if out_dir is None:
         out_dir = op.join(op.split(data_files)[0], 'dki')
