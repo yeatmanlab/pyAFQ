@@ -268,7 +268,7 @@ def test_AFQ_anisotropic():
     myafq.export_rois()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi_anisotropic_power_map.nii.gz'))
+        'sub-01_ses-01_dwi__model-CSD_APM.nii.gz'))
 
 
 @pytest.mark.skip(reason="may cause OOM")
