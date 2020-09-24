@@ -231,7 +231,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-@pytest.mark.nightly3
+# @pytest.mark.nightly3
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -268,7 +268,7 @@ def test_AFQ_anisotropic():
     myafq.export_rois()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
-        'sub-01_ses-01_dwi__model-CSD_APM.nii.gz'))
+        'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
 
 
 @pytest.mark.skip(reason="may cause OOM")
