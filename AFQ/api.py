@@ -337,8 +337,9 @@ class AFQ(object):
             raise TypeError("use_prealign must be a bool")
         if not isinstance(virtual_frame_buffer, bool):
             raise TypeError("virtual_frame_buffer must be a bool")
-        if not viz_backend == "fury" and not viz_backend == "plotly":
-            raise TypeError("viz_backend must be either 'fury' or 'plotly'")
+        if not "fury" in viz_backend and not "plotly" in viz_backend:
+            raise TypeError(
+                "viz_backend must contain either 'fury' or 'plotly'")
         if tracking_params is not None\
                 and not isinstance(tracking_params, dict):
             raise TypeError(
