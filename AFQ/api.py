@@ -228,7 +228,7 @@ class AFQ(object):
         reg_subject : str, Nifti1Image, dict, optional
             [REGISTRATION] The source image data to be registered.
             Can either be a Nifti1Image, bids filters for a Nifti1Image, or
-            If "b0", "dti_fa_subject", "subject_sls", or "power_map,"
+            if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
             image data will be loaded automatically.
             If "subject_sls" is used, slr registration will be used
             and reg_template should be "hcp_atlas".
@@ -236,7 +236,7 @@ class AFQ(object):
         reg_template : str or Nifti1Image, optional
             [REGISTRATION] The target image data for registration.
             Can either be a Nifti1Image, a path to a Nifti1Image, or
-            If "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+            if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
             image data will be loaded automatically.
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".

@@ -345,7 +345,7 @@ def test_AFQ_pft():
 @pytest.mark.nightly3
 def test_AFQ_custom_subject_reg():
     """
-    Test pft interface for AFQ
+    Test custom subject registration using AFQ object
     """
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
