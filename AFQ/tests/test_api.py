@@ -280,33 +280,33 @@ def test_AFQ_anisotropic():
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
     with pytest.raises(
-        TypeError,
-        match="bids_path must be a string"):
+            TypeError,
+            match="bids_path must be a string"):
         api.AFQ(2)
 
     with pytest.raises(
-        TypeError,
-        match="custom_tractography_bids_filters must be"
-              + " either a dict or None"):
+            TypeError,
+            match="custom_tractography_bids_filters must be"
+            + " either a dict or None"):
         api.AFQ(
             bids_path,
             custom_tractography_bids_filters=["dwi"])
 
     with pytest.raises(
-        TypeError,
-        match="brain_mask must be None or a mask defined in `AFQ.mask`"):
+            TypeError,
+            match="brain_mask must be None or a mask defined in `AFQ.mask`"):
         api.AFQ(
             bids_path,
             brain_mask="not a brain mask")
 
     with pytest.raises(
-        TypeError,
-        match="viz_backend must contain either 'fury' or 'plotly'"):
+            TypeError,
+            match="viz_backend must contain either 'fury' or 'plotly'"):
         api.AFQ(bids_path, viz_backend="matplotlib")
 
     with pytest.raises(
-        TypeError,
-        match="bundle_names must be None or a list of strings"):
+            TypeError,
+            match="bundle_names must be None or a list of strings"):
         api.AFQ(bids_path, bundle_names=[2, 3])
 
 
