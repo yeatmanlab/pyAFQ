@@ -441,10 +441,10 @@ def test_auto_cli():
     arg_dict = afb.func_dict_to_arg_dict()
     arg_dict['BIDS']['bids_path']['default'] = tmpdir.name
     afb.generate_config(config_file, arg_dict, False)
-    try:
+    with pytest.raises(
+            ValueError,
+            match="There must be a dataset_description.json in bids_path"):
         afb.parse_config_run_afq(config_file, arg_dict, False)
-    except BIDSValidationError:
-        pass  # made it into the api
 
 
 @pytest.mark.skip(reason="causes segmentation fault")
