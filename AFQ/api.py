@@ -701,8 +701,17 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dki_params_file
 
-    def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,):
-        csd_params_file = self._get_fname(row, '_model-CSD_diffmodel.nii.gz')
+    def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,
+             msmt=False):
+        if msmt:
+            model_str = "MSMT"
+            model_file = "mcsd.py"
+        else:
+            model_str = "CSD"
+            model_file = "csdeconv.py"
+        csd_params_file = self._get_fname(
+            row,
+            f'_model-{model_str}_diffmodel.nii.gz')
         if self.force_recompute or not op.exists(csd_params_file):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
@@ -713,11 +722,13 @@ class AFQ(object):
             self.log_and_save_nii(nib.Nifti1Image(csdf.shm_coeff,
                                                   row['dwi_affine']),
                                   csd_params_file)
-            meta_fname = self._get_fname(row, '_model-CSD_diffmodel.json')
+            meta_fname = self._get_fname(
+                row,
+                f'_model-{model_str}_diffmodel.json')
             meta = dict(SphericalHarmonicDegree=sh_order,
                         ResponseFunctionTensor=response,
                         SphericalHarmonicBasis="DESCOTEAUX",
-                        ModelURL=f"{DIPY_GH}reconst/csdeconv.py",
+                        ModelURL=f"{DIPY_GH}reconst/{model_file}",
                         lambda_=lambda_,
                         tau=tau)
             afd.write_json(meta_fname, meta)
@@ -995,6 +1006,8 @@ class AFQ(object):
                 params_file = self._dti(row)
             elif odf_model == "CSD":
                 params_file = self._csd(row)
+            elif odf_model == "MSMT":
+                params_file = self._csd(row, msmt=True)
             elif odf_model == "DKI":
                 params_file = self._dki(row)
 

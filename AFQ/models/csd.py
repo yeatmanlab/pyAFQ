@@ -5,7 +5,7 @@ import numpy as np
 import nibabel as nib
 
 from dipy.reconst import csdeconv as csd
-from dipy.reconst import mcsd as msmt
+from dipy.reconst import mcsd
 from dipy.reconst import shm
 import dipy.data as dpd
 import AFQ.utils.models as ut
@@ -32,17 +32,14 @@ def _model(gtab, data, response=None, sh_order=None, msmt=False):
             sh_order = 8
 
     if msmt:
-        my_model = msmt.MultiShellDeconvModel
+        my_model = mcsd.MultiShellDeconvModel
         if response is None:
+            mask_wm, mask_gm, mask_csf =\
+                mcsd.mask_for_response_msmt(gtab, data)
             response_wm, response_gm, response_csf =\
-                msmt.auto_response_msmt(gtab, data, roi_radii=10)
-
-            response = msmt.msulti_shell_fiber_response(
-                sh_order=8,
-                bvals=gtab.bvals,
-                wm_rf=response_wm,
-                gm_rf=response_gm,
-                csf_rf=response_csf)
+                mcsd.response_from_mask_msmt(gtab, data,
+                                             mask_wm, mask_gm, mask_csf)
+            response = np.array([response_wm, response_gm, response_csf])
     else:
         my_model = csd.ConstrainedSphericalDeconvModel
         if response is None:

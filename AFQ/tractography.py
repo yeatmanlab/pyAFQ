@@ -83,7 +83,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 1000
     odf_model : str, optional
-        One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
+        One of {"DTI", "CSD", "DKI", "MSMT"}. Defaults to use "DTI"
     tracker : str, optional
         Which strategy to use in tracking. This can be the standard local
         tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
@@ -144,7 +144,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
         dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
-    elif odf_model == "CSD":
+    elif odf_model == "CSD" or "MSMT":
         dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if tracker == "local":
