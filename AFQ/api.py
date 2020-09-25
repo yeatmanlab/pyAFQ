@@ -1534,6 +1534,7 @@ class AFQ(object):
                             include_seg=True))
 
                     fname = op.join(roi_dir, fname[1])
+                    self.viz.create_gif(figure, fname)
                 if "plotly" in self.viz.backend:
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
                     os.makedirs(roi_dir, exist_ok=True)
