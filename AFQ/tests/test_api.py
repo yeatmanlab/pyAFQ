@@ -577,6 +577,5 @@ def test_afq_msmt():
     myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     dmriprep='dipy', tracking_params={"odf_model": "MSMT"})
     npt.assert_equal(
-        myafq.streamlines[0],
+        op.split(myafq.streamlines[0])[-1],
         "sub-01_ses-01_dwi_space-RASMM_model-MSMT_desc-det_tractography.trk")
-
