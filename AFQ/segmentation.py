@@ -49,7 +49,7 @@ class Segmentation:
                  greater_than=50,
                  rm_small_clusters=50,
                  model_clust_thr=5,
-                 reduction_thr=10,
+                 reduction_thr=20,
                  refine=False,
                  pruning_thr=5,
                  b0_threshold=50,
@@ -95,7 +95,7 @@ class Segmentation:
         reduction_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 10
+            Default: 20
         refine : bool
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
