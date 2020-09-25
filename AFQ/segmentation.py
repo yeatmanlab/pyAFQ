@@ -17,6 +17,7 @@ from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.streamline import save_tractogram
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -47,10 +48,10 @@ class Segmentation:
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
-                 model_clust_thr=40,
-                 reduction_thr=40,
+                 model_clust_thr=5,
+                 reduction_thr=10,
                  refine=False,
-                 pruning_thr=6,
+                 pruning_thr=5,
                  b0_threshold=50,
                  prob_threshold=0,
                  rng=None,
@@ -90,11 +91,11 @@ class Segmentation:
         model_clust_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 40
+            Default: 5
         reduction_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 40
+            Default: 10
         refine : bool
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
@@ -102,7 +103,7 @@ class Segmentation:
         pruning_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 6
+            Default: 5
         progressive : boolean, optional
             Using RecoBundles Algorithm.
             Whether or not to use progressive technique
