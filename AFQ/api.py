@@ -900,13 +900,14 @@ class AFQ(object):
 
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
+                reg_prealign_inv = np.linalg.inv(reg_prealign)
             else:
-                reg_prealign = None
+                reg_prealign_inv = None
 
             mapping_file = self._mapping(row)
             mapping = reg.read_mapping(mapping_file, b0_file,
                                        self.reg_template_img,
-                                       prealign=reg_prealign)
+                                       prealign=reg_prealign_inv)
 
             warped_b0 = mapping.transform(mean_b0)
 
