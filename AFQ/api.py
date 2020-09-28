@@ -345,13 +345,13 @@ class AFQ(object):
             raise TypeError(
                 "tracking_params must be None or a dict")
         if segmentation_params is not None\
-                and not isinstance(tracking_params, dict):
+                and not isinstance(segmentation_params, dict):
             raise TypeError(
-                "tracking_params must be None or a dict")
+                "segmentation_params must be None or a dict")
         if clean_params is not None\
-                and not isinstance(tracking_params, dict):
+                and not isinstance(clean_params, dict):
             raise TypeError(
-                "tracking_params must be None or a dict")
+                "clean_params must be None or a dict")
 
         self.logger = logging.getLogger('AFQ.api')
 
