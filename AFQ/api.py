@@ -869,7 +869,7 @@ class AFQ(object):
 
         if mask:
             brain_mask_file = self._brain_mask(row)
-            brain_mask = nib.load(brain_mask_file).get_fdata()
+            brain_mask = nib.load(brain_mask_file).get_fdata().astype(bool)
 
             masked_data = img.get_fdata()
             masked_data[~brain_mask] = 0
