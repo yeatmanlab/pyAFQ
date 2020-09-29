@@ -17,6 +17,7 @@ from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.streamline import save_tractogram
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -42,15 +43,15 @@ class Segmentation:
     def __init__(self,
                  nb_points=False,
                  seg_algo='AFQ',
-                 reg_algo='slr',
+                 reg_algo=None,
                  clip_edges=False,
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
-                 model_clust_thr=40,
-                 reduction_thr=40,
+                 model_clust_thr=5,
+                 reduction_thr=20,
                  refine=False,
-                 pruning_thr=6,
+                 pruning_thr=5,
                  b0_threshold=50,
                  prob_threshold=0,
                  rng=None,
@@ -73,11 +74,13 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-        reg_algo : string, optional
+        reg_algo : string or None, optional
             Algorithm for streamline registration (case-insensitive):
             'slr' : Use Streamlinear Registration [Garyfallidis2015]_
             'syn' : Use image-based nonlinear registration
-            Default: 'syn'
+            If None, will use SyN if a mapping is provided, slr otherwise.
+            If  seg_algo="AFQ", SyN is always used.
+            Default: None
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
@@ -89,11 +92,11 @@ class Segmentation:
         model_clust_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 40
+            Default: 5
         reduction_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 40
+            Default: 20
         refine : bool
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
@@ -101,7 +104,7 @@ class Segmentation:
         pruning_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 6
+            Default: 5
         progressive : boolean, optional
             Using RecoBundles Algorithm.
             Whether or not to use progressive technique
@@ -160,7 +163,9 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
-        self.reg_algo = reg_algo.lower()
+        if reg_algo is not None:
+            reg_algo = reg_algo.lower()
+        self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -295,9 +300,12 @@ class Segmentation:
         self.reg_template = reg_template
 
         if mapping is None:
-            gtab = dpg.gradient_table(self.fbval, self.fbvec)
-            self.mapping = reg.syn_register_dwi(self.fdata, gtab,
-                                                template=reg_template)[1]
+            if self.seg_algo == "afq" or self.reg_algo == "syn":
+                gtab = dpg.gradient_table(self.fbval, self.fbvec)
+                self.mapping = reg.syn_register_dwi(self.fdata, gtab,
+                                                    template=reg_template)[1]
+            else:
+                self.mapping = None
         elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
             if reg_prealign is None:
                 reg_prealign = np.eye(4)
@@ -661,6 +669,12 @@ class Segmentation:
         else:
             self.tg = tg
 
+        if reg_algo is None:
+            if self.mapping is None:
+                reg_algo = 'slr'
+            else:
+                reg_algo = 'syn'
+
         if reg_algo == "slr":
             self.logger.info("Registering tractogram with SLR")
             atlas = self.bundle_dict['whole_brain']
@@ -672,10 +686,24 @@ class Segmentation:
                 rng=self.rng)
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
-            delta = dts.values_from_volume(self.mapping.forward,
-                                           self.tg.streamlines, np.eye(4))
+            self.tg.to_rasmm()
+            delta = dts.values_from_volume(
+                self.mapping.forward,
+                self.tg.streamlines, np.eye(4))
             self.moved_sl = dts.Streamlines(
-                [sum(d, s) for d, s in zip(delta, self.tg.streamlines)])
+                [d + s for d, s in zip(delta, self.tg.streamlines)])
+            self.tg.to_vox()
+
+        if self.save_intermediates is not None:
+            moved_sft = StatefulTractogram(
+                self.moved_sl,
+                self.reg_template,
+                Space.RASMM)
+            save_tractogram(
+                moved_sft,
+                op.join(self.save_intermediates,
+                        'sls_in_mni.trk'),
+                bbox_valid_check=False)
 
     def segment_reco(self, tg=None):
         """
@@ -866,7 +894,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
 
     # Check whether it's already in the right format:
     sp_is_idx = (targets0 is None
-                 or(isinstance(targets0, np.ndarray)
+                 or (isinstance(targets0, np.ndarray)
                     and targets0.shape[1] == 3))
 
     ep_is_idx = (targets1 is None

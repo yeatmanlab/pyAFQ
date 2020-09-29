@@ -110,12 +110,7 @@ else:
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(seg_algo='reco80',
-                                rng=np.random.RandomState(2),
-                                greater_than=50,
-                                rm_small_clusters=10,
-                                model_clust_thr=5,
-                                reduction_thr=20,
-                                refine=True)
+                                rng=np.random.RandomState(2))
 
 segmentation.segment(bundles,
                      sft,
@@ -132,7 +127,7 @@ for kk in fiber_groups:
     sft = StatefulTractogram(fiber_groups[kk].streamlines,
                              img,
                              Space.RASMM)
-    save_tractogram(sft, './%s_reco.trk'%kk,
+    save_tractogram(sft, './%s_reco.trk' % kk,
                     bbox_valid_check=False)
 
 
@@ -141,7 +136,11 @@ for bundle in bundles:
     if bundle != 'whole_brain':
 
         fig, ax = plt.subplots(1)
-        sft = load_tractogram(f'./{bundle}_reco.trk', img, to_space=Space.VOX)
+        sft = load_tractogram(
+            f'./{bundle}_reco.trk',
+            img,
+            to_space=Space.VOX,
+            bbox_valid_check=False)
         weights = gaussian_weights(sft.streamlines)
         profile = afq_profile(FA_data, sft.streamlines,
                               np.eye(4), weights=weights)
