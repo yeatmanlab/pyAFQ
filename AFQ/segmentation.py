@@ -78,7 +78,8 @@ class Segmentation:
             Algorithm for streamline registration (case-insensitive):
             'slr' : Use Streamlinear Registration [Garyfallidis2015]_
             'syn' : Use image-based nonlinear registration
-            If None, will use syn if a mapping is provided, slr otherwise.
+            If None, will use SyN if a mapping is provided, slr otherwise.
+            If  seg_algo="AFQ", SyN is always used.
             Default: None
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
