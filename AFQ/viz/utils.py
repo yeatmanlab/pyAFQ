@@ -131,7 +131,8 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
+def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
+                    n_sls=200):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -167,6 +168,12 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
     n_points : int or None
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
+
+    n_sls : int or None:
+        Number of streamlines to randomly select per bundle if plotting
+        all bundles.
+        If None, do use all streamlines.
+        Default: 200
 
     Returns
     -------
@@ -205,6 +212,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
 
             for b in np.unique(sft.data_per_streamline['bundle']):
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
+                if n_sls is not None and len(idx) > n_sls:
+                    idx = np.random.choice(idx, size=n_sls, replace=False)
                 these_sls = streamlines[idx]
                 if n_points is not None:
                     these_sls = dps.set_number_of_points(these_sls, n_points)
