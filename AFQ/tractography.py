@@ -275,7 +275,7 @@ def create_density_map(tractogram, n_sls=None, to_vox=False):
         sls = select_random_set_of_streamlines(sls, n_sls)
 
     affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
-    tractogram_density = density_map(streamlines, np.eye(4), vol_dims)
+    tractogram_density = density_map(sls, np.eye(4), vol_dims)
     nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
     density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
 
