@@ -5,6 +5,11 @@ import scipy.ndimage as ndim
 from skimage.filters import gaussian
 from skimage.morphology import convex_hull_image
 from scipy.spatial.qhull import QhullError
+from scipy.spatial.distance import dice
+
+from dipy.io.utils import (create_nifti_header, get_reference_info)
+from dipy.tracking.streamline import select_random_set_of_streamlines
+from dipy.tracking.utils import density_map
 
 
 def patch_up_roi(roi, bundle_name="ROI"):
@@ -42,3 +47,61 @@ def patch_up_roi(roi, bundle_name="ROI"):
         return convex_hull_image(hole_filled)
     except QhullError:
         return hole_filled
+
+
+def create_density_map(tractogram, n_sls=None, to_vox=False):
+    """
+    Write streamline density maps.
+    based on:
+    https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
+
+    Parameters
+    ----------
+    tractogram : StatefulTractogram
+        Stateful tractogram whose streamlines are used to make
+        the density map.
+    n_sls : int or None
+        n_sls to randomly select to make the density map.
+        If None, all streamlines are used.
+        Default: None
+    to_vox : bool
+        Whether to put the stateful tractogram in VOX space before making
+        the density map.
+
+    Returns
+    -------
+    Nifti1Image containing the density map.
+    """
+    if to_vox:
+        tractogram.to_vox()
+
+    sls = tractogram.streamlines
+    if n_sls is not None:
+        sls = select_random_set_of_streamlines(sls, n_sls)
+
+    affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
+    tractogram_density = density_map(sls, np.eye(4), vol_dims)
+    nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
+    density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
+
+    return density_map_img
+
+
+def compute_dice_similarity_coefficient(density_map_img1, density_map_img2):
+    """
+    Compute Dice's coefficient between two density maps.
+
+    Parameters
+    ----------
+    density_map_img1 : Nifti1Image
+        One density map to compare.
+    density_map_img2 : Nifti1Image
+        The other density map to compare.
+
+    Returns
+    -------
+    The dice similarity between the density maps.
+    """
+    return 1 - dice(
+        density_map_img1.get_fdata().flatten().astype(bool),
+        density_map_img2.get_fdata().flatten().astype(bool))
