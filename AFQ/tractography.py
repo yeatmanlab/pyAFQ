@@ -3,6 +3,8 @@ import nibabel as nib
 import dipy.reconst.shm as shm
 import logging
 
+from scipy.spatial.distance import dice
+
 import dipy.data as dpd
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
@@ -278,3 +280,24 @@ def create_density_map(tractogram, n_sls=None, to_vox=False):
     density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
 
     return density_map_img
+
+
+def compute_dice_similarity_coefficient(density_map_img1, density_map_img2):
+    """
+    Compute the Dice dissimilarity between two density maps
+    using scipy's dice. 
+
+    Parameters
+    ----------
+    density_map_img1 : Nifti1Image
+        One density map to compare.
+    density_map_img2 : Nifti1Image
+        The other density map to compare.
+
+    Returns
+    -------
+    The dice similarity between the density maps.
+    """
+    return 1 - dice(
+        density_map_img1.get_fdata().flatten().astype(bool),
+        density_map_img2.get_fdata().flatten().astype(bool))
