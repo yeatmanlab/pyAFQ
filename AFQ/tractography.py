@@ -11,6 +11,9 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
                                               ActStoppingCriterion)
+from dipy.io.utils import (create_nifti_header, get_reference_info)
+from dipy.tracking.streamline import select_random_set_of_streamlines
+from dipy.tracking.utils import density_map
 
 
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
@@ -237,3 +240,41 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         random_seed=random_seed)
 
     return StatefulTractogram(tracker, params_img, Space.RASMM)
+
+
+def create_density_map(tractogram, n_sls=None, to_vox=False):
+    """
+    Write streamline density maps.
+    based on:
+    https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
+
+    Parameters
+    ----------
+    tractogram : StatefulTractogram
+        Stateful tractogram whose streamlines are used to make
+        the density map.
+    n_sls : int or None
+        n_sls to randomly select to make the density map.
+        If None, all streamlines are used.
+        Default: None
+    to_vox : bool
+        Whether to put the stateful tractogram in VOX space before making
+        the density map.
+
+    Returns
+    -------
+    Nifti1Image containing the density map.
+    """
+    if to_vox:
+        tractogram.to_vox()
+
+    sls = tractogram.streamlines
+    if n_sls is not None:
+        sls = select_random_set_of_streamlines(sls, n_sls)
+
+    affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
+    tractogram_density = density_map(streamlines, np.eye(4), vol_dims)
+    nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
+    density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
+
+    return density_map_img
