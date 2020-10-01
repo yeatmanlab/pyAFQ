@@ -179,6 +179,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
+    bundle_dict = bundle_dict.copy()
     bundle_dict.pop('whole_brain', None)
 
     if isinstance(sft, str):
