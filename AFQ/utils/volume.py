@@ -102,6 +102,7 @@ def compute_dice_similarity_coefficient(density_map_img1, density_map_img2):
     -------
     The dice similarity between the density maps.
     """
+    # scipy's dice function returns the dice *dissimilarity*
     return 1 - dice(
         density_map_img1.get_fdata().flatten().astype(bool),
         density_map_img2.get_fdata().flatten().astype(bool))
