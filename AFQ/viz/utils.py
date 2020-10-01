@@ -214,7 +214,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
 
             bundles = np.unique(sft.data_per_streamline['bundle'])
             n_sls = len(sft.streamlines)
-            mean_n_sl_per_bundle_viz = n_sls_viz / len(bundles)
+            mean_n_sl_per_bundle_viz = n_sls_viz // len(bundles)
             for b in bundles:
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
                 n_sl_viz = (len(idx) * mean_n_sl_per_bundle_viz) // n_sls\
