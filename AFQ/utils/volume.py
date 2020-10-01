@@ -87,22 +87,22 @@ def create_density_map(tractogram, n_sls=None, to_vox=False):
     return density_map_img
 
 
-def compute_dice_similarity_coefficient(density_map_img1, density_map_img2):
+def compute_dice_similarity_coefficient(img1, img2):
     """
-    Compute Dice's coefficient between two density maps.
+    Compute Dice's coefficient between two imagess.
 
     Parameters
     ----------
-    density_map_img1 : Nifti1Image
-        One density map to compare.
-    density_map_img2 : Nifti1Image
-        The other density map to compare.
+    img1 : Nifti1Image
+        One image to compare.
+    img2 : Nifti1Image
+        The other image to compare.
 
     Returns
     -------
-    The dice similarity between the density maps.
+    The dice similarity between the images.
     """
     # scipy's dice function returns the dice *dissimilarity*
     return 1 - dice(
-        density_map_img1.get_fdata().flatten().astype(bool),
-        density_map_img2.get_fdata().flatten().astype(bool))
+        img1.get_fdata().flatten().astype(bool),
+        img2.get_fdata().flatten().astype(bool))
