@@ -285,7 +285,7 @@ def create_density_map(tractogram, n_sls=None, to_vox=False):
 def compute_dice_similarity_coefficient(density_map_img1, density_map_img2):
     """
     Compute the Dice dissimilarity between two density maps
-    using scipy's dice. 
+    using scipy's dice.
 
     Parameters
     ----------
