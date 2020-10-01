@@ -132,7 +132,7 @@ def bundle_selector(bundle_dict, colors, b):
 
 
 def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
-                    n_sls=200):
+                    n_sls_viz=3600):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -169,11 +169,12 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
-    n_sls : int or None:
-        Number of streamlines to randomly select per bundle if plotting
-        all bundles.
-        If None, do use all streamlines.
-        Default: 200
+    n_sls_viz : int or None:
+        Number of streamlines to randomly select if plotting
+        all bundles. Selections will be proportional to the original number of
+        streamlines per bundle, with a minimun number of streamlines
+        per bundle.
+        Default: 3600
 
     Returns
     -------
@@ -211,10 +212,15 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         if bundle is None:
             # No selection: visualize all of them:
 
-            for b in np.unique(sft.data_per_streamline['bundle']):
+            bundles = np.unique(sft.data_per_streamline['bundle'])
+            n_sls = len(sft.streamlines)
+            mean_n_sl_per_bundle_viz = n_sls_viz / len(bundles)
+            for b in bundles:
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
-                if n_sls is not None and len(idx) > n_sls:
-                    idx = np.random.choice(idx, size=n_sls, replace=False)
+                n_sl_viz = (len(idx) * mean_n_sl_per_bundle_viz) // n_sls\
+                    + mean_n_sl_per_bundle_viz // 2
+                if len(idx) > n_sl_viz:
+                    idx = np.random.choice(idx, size=n_sl_viz, replace=False)
                 these_sls = streamlines[idx]
                 if n_points is not None:
                     these_sls = dps.set_number_of_points(these_sls, n_points)
