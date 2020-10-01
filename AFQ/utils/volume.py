@@ -7,9 +7,11 @@ from skimage.morphology import convex_hull_image
 from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import dice
 
+import nibabel as nib
+
 from dipy.io.utils import (create_nifti_header, get_reference_info)
 from dipy.tracking.streamline import select_random_set_of_streamlines
-from dipy.tracking.utils import density_map
+import dipy.tracking.utils as dtu
 
 
 def patch_up_roi(roi, bundle_name="ROI"):
@@ -80,7 +82,7 @@ def density_map(tractogram, n_sls=None, to_vox=False):
         sls = select_random_set_of_streamlines(sls, n_sls)
 
     affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
-    tractogram_density = density_map(sls, np.eye(4), vol_dims)
+    tractogram_density = dtu.density_map(sls, np.eye(4), vol_dims)
     nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
     density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
 
