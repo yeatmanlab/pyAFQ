@@ -49,9 +49,9 @@ def patch_up_roi(roi, bundle_name="ROI"):
         return hole_filled
 
 
-def create_density_map(tractogram, n_sls=None, to_vox=False):
+def density_map(tractogram, n_sls=None, to_vox=False):
     """
-    Write streamline density maps.
+    Create a streamline density map.
     based on:
     https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
 
@@ -87,7 +87,7 @@ def create_density_map(tractogram, n_sls=None, to_vox=False):
     return density_map_img
 
 
-def compute_dice_similarity_coefficient(img1, img2):
+def dice_coeff(img1, img2):
     """
     Compute Dice's coefficient between two imagess.
 
