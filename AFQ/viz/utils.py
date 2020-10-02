@@ -131,7 +131,8 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
+def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
+                    n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -168,10 +169,20 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
+    n_sls_viz : int
+        Number of streamlines to randomly select if plotting
+        all bundles. Selections will be proportional to the original number of
+        streamlines per bundle.
+        Default: 3600
+    n_sls_min : int
+        Minimun number of streamlines to display per bundle.
+        Default: 75
+
     Returns
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
+    bundle_dict = bundle_dict.copy()
     bundle_dict.pop('whole_brain', None)
 
     if isinstance(sft, str):
@@ -205,6 +216,11 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
 
             for b in np.unique(sft.data_per_streamline['bundle']):
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
+                n_sl_viz = (len(idx) * n_sls_viz) //\
+                    len(sft.streamlines)
+                n_sl_viz = max(n_sls_min, n_sl_viz)
+                if len(idx) > n_sl_viz:
+                    idx = np.random.choice(idx, size=n_sl_viz, replace=False)
                 these_sls = streamlines[idx]
                 if n_points is not None:
                     these_sls = dps.set_number_of_points(these_sls, n_points)
