@@ -21,3 +21,27 @@ help:
 
 upload: html
 		./upload-gh-pages.sh build/html/ pyAFQ yeatmanlab
+
+.PHONY: distclean realclean
+
+# find artifacts from sphinx-gallery in examples folder
+ARTIFACTS := $(strip \
+			 	$(wildcard ../examples/*.gz) $(wildcard ../examples/**/*.gz) \
+			 	$(wildcard ../examples/*.trk) $(wildcard ../examples/**/*.trk) \
+			 	$(wildcard ../examples/*.npy) $(wildcard ../examples/**/*.npy) \
+			  )
+
+# leaves only the files that were in the distribution. deletes files created
+# by sphinx-build within source
+distclean: clean
+	@echo Removing files created by sphinx-build
+	rm -rf $(BUILDDIR)
+	rm -f $(SOURCEDIR)/usage.rst
+	rm -rf $(SOURCEDIR)/auto_examples/
+	$(if $(ARTIFACTS),rm -f $(ARTIFACTS))
+
+# delete more files than distclean. this would also remove the data files.
+realclean: distclean
+	@echo Removing data files from $(HOME)
+	rm -rf $(HOME)/.dipy/
+	rm -rf $(HOME)/AFQ_data/
