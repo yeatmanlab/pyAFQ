@@ -91,7 +91,7 @@ def density_map(tractogram, n_sls=None, to_vox=False):
 
 def dice_coeff(arr1, arr2):
     """
-    Compute Dice's coefficient between two imagess.
+    Compute Dice's coefficient between two images.
 
     Parameters
     ----------
