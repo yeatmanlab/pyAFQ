@@ -132,7 +132,7 @@ def bundle_selector(bundle_dict, colors, b):
 
 
 def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
-                    n_sls_viz=3600):
+                    n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -169,12 +169,14 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
-    n_sls_viz : int or None:
+    n_sls_viz : int
         Number of streamlines to randomly select if plotting
         all bundles. Selections will be proportional to the original number of
-        streamlines per bundle, with a minimun number of streamlines
-        per bundle.
+        streamlines per bundle.
         Default: 3600
+    n_sls_min : int
+        Minimun number of streamlines to display per bundle.
+        Default: 75
 
     Returns
     -------
@@ -212,13 +214,11 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         if bundle is None:
             # No selection: visualize all of them:
 
-            bundles = np.unique(sft.data_per_streamline['bundle'])
-            n_sls = len(sft.streamlines)
-            mean_n_sl_per_bundle_viz = n_sls_viz // len(bundles)
-            for b in bundles:
+            for b in np.unique(sft.data_per_streamline['bundle']):
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
-                n_sl_viz = (len(idx) * mean_n_sl_per_bundle_viz) // n_sls\
-                    + mean_n_sl_per_bundle_viz // 2
+                n_sl_viz = (len(idx) * n_sls_viz) //\
+                    len(sft.streamlines)
+                n_sl_viz = max(n_sls_min, n_sl_viz)
                 if len(idx) > n_sl_viz:
                     idx = np.random.choice(idx, size=n_sl_viz, replace=False)
                 these_sls = streamlines[idx]
