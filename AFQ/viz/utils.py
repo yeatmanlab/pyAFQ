@@ -912,7 +912,7 @@ class GroupCSVComparison():
             return None
 
         ba = BrainAxes(positions=positions)
-        median_ci = np.zeros(len(self.bundles))
+        ci_all_df = np.zeros((len(self.bundles), self.prof_len))
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
@@ -920,7 +920,7 @@ class GroupCSVComparison():
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": COLOR_DICT[bundle]},
                 plot_subject_lines=plot_subject_lines)
-            median_ci[j] = np.nanmedian(ci_df["diff"])
+            ci_all_df[j] = ci_df["diff"]
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
@@ -930,7 +930,7 @@ class GroupCSVComparison():
         if not show_plots:
             plt.close(ba.fig)
             plt.ion()
-        return np.median(mean_ci)
+        return ci_all_df
 
     def lateral_contrast_index(self, name, scalar="dti_fa",
                                show_plots=False, n_boot=1000,
