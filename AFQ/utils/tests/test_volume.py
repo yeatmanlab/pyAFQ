@@ -8,21 +8,21 @@ import nibabel as nib
 from dipy.io.stateful_tractogram import Space
 from dipy.io.streamline import StatefulTractogram
 
-import AFQ.utils.volume as AFV
-import AFQ.data as AFD
+import AFQ.utils.volume as afv
+import AFQ.data as afd
 
 
 def test_patch_up_roi():
     roi_bad = np.zeros((10, 10, 10))
     roi_good = np.ones((10, 10, 10))
 
-    AFV.patch_up_roi(roi_good)
+    afv.patch_up_roi(roi_good)
     with pytest.raises(ValueError):
-        AFV.patch_up_roi(roi_bad)
+        afv.patch_up_roi(roi_bad)
 
 
 def test_density_map():
-    file_dict = AFD.read_stanford_hardi_tractography()
+    file_dict = afd.read_stanford_hardi_tractography()
 
     # subsample even more
     subsampled_tractography = file_dict["tractography_subsampled.trk"][441:444]
@@ -30,7 +30,7 @@ def test_density_map():
         subsampled_tractography,
         file_dict["mapping.nii.gz"],
         Space.VOX)
-    density_map = AFV.density_map(sft)
+    density_map = afv.density_map(sft)
     npt.assert_equal(int(np.sum(density_map.get_fdata())), 69)
 
 
@@ -52,4 +52,4 @@ def test_dice_coeff():
             [0.6, 0, 0],
             [0, 0, 0]]),
         affine)
-    npt.assert_equal(AFV.dice_coeff(img1, img2), 0.5)
+    npt.assert_equal(afv.dice_coeff(img1, img2), 0.5)
