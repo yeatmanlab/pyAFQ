@@ -13,8 +13,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import sys, os
+
+sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('sphinxext'))
-# sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
@@ -181,6 +182,7 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 from plotly.io._sg_scraper import plotly_sg_scraper
 image_scrapers = ('matplotlib', plotly_sg_scraper,)
 
+from _progressbars import reset_progressbars
 
 sphinx_gallery_conf = {
      # path to your examples scripts
@@ -188,6 +190,7 @@ sphinx_gallery_conf = {
      # path where to save gallery generated examples
      'gallery_dirs': 'auto_examples',
      'image_scrapers': image_scrapers,
+     'reset_modules': (reset_progressbars),
 }
 
 # Auto API
