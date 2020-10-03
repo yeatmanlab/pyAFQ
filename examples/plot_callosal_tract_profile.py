@@ -37,7 +37,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
-from AFQ.utils.volume import patch_up_roi
+from AFQ.utils.volume import patch_up_roi, density_map
 
 import logging
 import sys
@@ -108,30 +108,6 @@ def show_anatomical_slices(img_data, title):
     plt.suptitle(title)
     plt.show()
 
-# Imports for create_density_map
-
-
-from dipy.io.utils import (create_nifti_header, get_reference_info)
-from dipy.tracking.streamline import select_random_set_of_streamlines
-from dipy.tracking.utils import density_map
-
-
-def create_density_map(tractogram, fname):
-    """
-    Write streamline density maps.
-
-    based on:
-    https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
-    """
-
-    tractogram.to_vox()
-    streamlines = select_random_set_of_streamlines(tractogram.streamlines,
-                                                   1000)
-    affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
-    tractogram_density = density_map(streamlines, np.eye(4), vol_dims)
-    nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
-    density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
-    nib.save(density_map_img, op.join(working_dir, fname))
 
 ##########################################################################
 # Get example data:
@@ -395,7 +371,9 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     save_tractogram(tractogram, op.join(working_dir, 'dti_streamlines.trk'),
                     bbox_valid_check=False)
 
-    create_density_map(tractogram, 'afq_dti_density_map.nii.gz')
+    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    nib.save(tractogram_img, op.join(working_dir,
+                                     'afq_dti_density_map.nii.gz'))
 else:
     tractogram = load_tractogram(op.join(working_dir, 'dti_streamlines.trk'),
                                  img)
@@ -465,9 +443,9 @@ for bundle in bundles:
     save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}_seg.trk'),
                     bbox_valid_check=False)
 
-    create_density_map(tractogram, f'afq_{bundle}_seg_density_map.nii.gz')
-    tractogram_img = nib.load(op.join(working_dir,
-                                      f'afq_{bundle}_seg_density_map.nii.gz'))
+    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    nib.save(tractogram_img, op.join(working_dir,
+                                     f'afq_{bundle}_seg_density_map.nii.gz'))
     show_anatomical_slices(tractogram_img.get_fdata(),
                            f'Segmented {bundle} Density Map')
 
@@ -511,9 +489,9 @@ for bundle in bundles:
     save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
                     bbox_valid_check=False)
 
-    create_density_map(tractogram, f'afq_{bundle}_density_map.nii.gz')
-    tractogram_img = nib.load(op.join(working_dir,
-                                      f'afq_{bundle}_density_map.nii.gz'))
+    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    nib.save(tractogram_img, op.join(working_dir,
+                                     f'afq_{bundle}_density_map.nii.gz'))
     show_anatomical_slices(tractogram_img.get_fdata(),
                            f'Cleaned {bundle} Density Map')
 
