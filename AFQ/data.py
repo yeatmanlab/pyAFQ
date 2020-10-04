@@ -2092,7 +2092,16 @@ def bundles_to_aal(bundles, atlas=None):
         "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
         "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
         "ARC_L": [['leftfrontal'], ['leftarctemp']],
-        "ARC_R": [['rightfrontal'], ['rightarctemp']]}
+        "ARC_R": [['rightfrontal'], ['rightarctemp']],
+        "AntFrontal": [['rightfrontal'], ['leftfrontal']],
+        # TODO NOT CORRECT ENDPOINTS
+        "Motor": [['rightfrontal'], ['leftfrontal']],
+        "Occipital": [['rightfrontal'], ['leftfrontal']],
+        "Orbital": [['rightfrontal'], ['leftfrontal']],
+        "PostParietal": [['rightfrontal'], ['leftfrontal']],
+        "SupFrontal": [['rightfrontal'], ['leftfrontal']],
+        "SupParietal": [['rightfrontal'], ['leftfrontal']],
+        "Temporal": [['rightfrontal'], ['leftfrontal']]}
 
     targets = []
     for bundle in bundles:
