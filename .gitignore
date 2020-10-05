@@ -6,7 +6,7 @@ docs/_build
 docs/build
 docs/auto_examples
 docs/source/auto_examples
-docs/source/usage.rst
+docs/source/usage/config.rst
 examples/*.nii.gz
 examples/*.trk
 examples/*.npy

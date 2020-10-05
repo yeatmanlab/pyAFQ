@@ -91,7 +91,7 @@ NSF grant (1551330) to Jason Yeatman.
     :maxdepth: 2
 
     installation_guide
-    usage
+    usage/index
     auto_examples/index
     getting_help
     contributing
