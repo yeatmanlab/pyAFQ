@@ -61,6 +61,9 @@ RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor.trk"
                    "LL", "MCP", "MdLF", "ML", "MLF", "OPT", "OR", "PC", "PPT",
                    "RST", "SCP", "SLF", "STT", "TPT", "UF", "V", "VOF"]
 
+RECO_UNIQUE = [
+    'CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP', 'AC', 'PC', 'SCP',
+    'V']
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
@@ -147,7 +150,7 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
         uid = 1
         afq_bundles["whole_brain"] = bundle_dict["whole_brain"]
         for name in bundle_names:
-            if name in ['CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP']:
+            if name in RECO_UNIQUE:
                 afq_bundles[name] = bundle_dict[name]
                 afq_bundles[name]['uid'] = uid
                 uid += 1
