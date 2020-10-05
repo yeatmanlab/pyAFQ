@@ -367,7 +367,6 @@ def register_series(series, ref, pipeline):
 
 
 def register_dwi(data_files, bval_files, bvec_files,
-                 b0_ref=0,
                  pipeline=[c_of_mass, translation, rigid, affine],
                  out_dir=None):
     """
