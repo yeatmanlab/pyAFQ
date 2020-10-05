@@ -28,4 +28,4 @@ jobs:
     - name: Test
       run: |
         export TEST_WITH_XVFB=true
-        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "not nightly and not nightly2 and not nightly3" --durations=0
+        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "not nightly and not nightly2 and not nightly3 and not nightly4" --durations=0
