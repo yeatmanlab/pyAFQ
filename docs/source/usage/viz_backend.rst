@@ -29,3 +29,16 @@ backend. Currently, there are three choices:
 By default, plotly_no_gif is used. Fury requires additional
 installations and does not make interactive figures, and Plotly takes a
 significant amount of time to generate rotating GIFs.
+
+
+Fury Dockerfile for Cloudknot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If using the fury visualization backend while running pyAFQ on cloudknot, you
+must provide a base image with the fury requiements installed.
+Below is an example dockerfile that can be used to build that base image: 
+   # Use official python base image
+   FROM python:3.7
+   # Install libgl
+   RUN apt-get update
+   RUN apt-get install -y libgl1-mesa-glx
+   RUN apt-get install -y xvfb
