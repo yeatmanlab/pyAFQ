@@ -47,7 +47,7 @@ def _fit(gtab, data, mask, response=None, sh_order=None, lambda_=1, tau=0.1):
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
-            b0_threshold=0, sh_order=None, lambda_=1, tau=0.1, out_dir=None):
+            b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None):
     """
     Fit the CSD model and save file with SH coefficients.
 
@@ -71,7 +71,7 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
         these values.
     b0_threshold : float,optional.
       The value of diffusion-weighting under which we consider it to be
-      equivalent to 0. Default:0
+      equivalent to 0. Default:50
     sh_order : int, optional.
         default: infer the number of parameters from the number of data
         volumes, but no larger than 8.

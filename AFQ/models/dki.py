@@ -18,8 +18,9 @@ def _fit(gtab, data, mask=None):
     dkimodel = dki.DiffusionKurtosisModel(gtab)
     return dkimodel.fit(data, mask=mask)
 
+
 def fit_dki(data_files, bval_files, bvec_files, mask=None,
-            min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=0):
+            min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=50):
     """
     Fit the DKI model, save files with derived maps
 
@@ -172,7 +173,7 @@ def avs_dki_df(gtab, data, mask=None, min_signal=1.0e-6):
 
 
 def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
-             b0_threshold=0):
+             b0_threshold=50):
     """
     Fit the DKI model, save files with derived maps
 
@@ -242,7 +243,7 @@ def fit_mdki(data_files, bval_files, bvec_files, mask=None, out_dir=None,
 
 def fit_dkimicro(data_files, bval_files, bvec_files, mask=None,
                  min_kurtosis=-1, max_kurtosis=3, out_dir=None,
-                 b0_threshold=0):
+                 b0_threshold=50):
     """
     Fit the DKI model, save files with derived maps
 
