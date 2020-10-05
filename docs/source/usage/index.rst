@@ -27,5 +27,6 @@ The csv file has the same format as
 
     data
     usage
+    config
     viz_backend
     tracking
