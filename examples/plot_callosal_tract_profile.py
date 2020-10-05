@@ -268,7 +268,7 @@ show_anatomical_slices(warped_MNI_T2_img.get_fdata(), 'Warped MNI T2')
 #
 # .. note::
 #
-#   It is also possible to utilize probablity maps to further refine ROIs. If
+#   It is also possible to utilize probablity maps to further refine the segmentation. If
 #   `prob_map` key is not specified the probablities will all be ones and same
 #   shape as the ROI.
 #
@@ -326,7 +326,7 @@ bundles["AntFrontal"] = {
 #   By default tractography:
 #
 #   - Will identify streamlines with lengths between 10 mm and 1 m, with
-#     turning angles of less than 30.
+#     turning angles of less than 30 degrees.
 #
 #   - Is seeded with a single seed in each voxel on each dimension
 #
@@ -334,7 +334,7 @@ bundles["AntFrontal"] = {
 #
 # .. note::
 #   In this example tractography results in a large number of candidate
-#   streamlines for the anterior forceps.
+#   streamlines for the anterior forceps, but not many streamlines anywhere else.
 
 
 print("Tracking...")
