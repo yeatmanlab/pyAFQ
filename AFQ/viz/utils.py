@@ -668,6 +668,7 @@ class GroupCSVComparison():
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
         if bundles is None:
             self.bundles = self.profile_dict[names[0]]['tractID'].unique()
+            self.bundles.sort()
         else:
             self.bundles = bundles
 
