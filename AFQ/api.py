@@ -51,7 +51,7 @@ BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
 # See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
 
 RECO_BUNDLES_16 = [
-    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid', 'AF',
+    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
 
 RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor.trk"
