@@ -155,7 +155,7 @@ def create_dummy_bids_path(n_subjects, n_sessions):
     return bids_dir
 
 
-@pytest.mark.nightly3
+@pytest.mark.nightly4
 def test_AFQ_custom_tract():
     """
     Test whether AFQ can use tractography from
@@ -375,7 +375,7 @@ def test_AFQ_pft():
     my_afq.export_rois()
 
 
-@pytest.mark.nightly3
+@pytest.mark.nightly4
 def test_AFQ_custom_subject_reg():
     """
     Test custom subject registration using AFQ object
