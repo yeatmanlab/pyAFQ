@@ -183,7 +183,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  use_prealign=True,
                  virtual_frame_buffer=False,
-                 viz_backend="plotly",
+                 viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -271,9 +271,11 @@ class AFQ(object):
             [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
         viz_backend : str, optional
-            [VIZ] Which visualization backend to us.
+            [VIZ] Which visualization backend to use.
+            See visualization backend page in documentation
+            for details.
             One of {"fury", "plotly", "plotly_no_gif"}.
-            Default: "plotly"
+            Default: "plotly_no_gif"
         segmentation_params : dict, optional
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
