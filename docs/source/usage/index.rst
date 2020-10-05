@@ -17,6 +17,8 @@ whole-brain tractography, segment the tracts, and extract tract-profiles for
 each tract, generating a CSV file under
 `study/derivatives/afq/tract_profiles.csv` that contains the tract profiles for
 all participants/tracts/statistics.
+The csv file has the same format as
+`nodes.csv in AFQ Browser <https://yeatmanlab.github.io/AFQ-Browser/dataformat.html>`_.
 
 
 .. toctree::
