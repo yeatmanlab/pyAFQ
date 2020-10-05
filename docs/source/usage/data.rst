@@ -1,7 +1,7 @@
 Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
-pyAFQ works with `BIDS compliant<http://bids.neuroimaging.io/>`_ diffusion data. 
+pyAFQ works with `BIDS compliant <http://bids.neuroimaging.io/>`_ diffusion data. 
 While not required it is the prefered data format for neuroimaging interoperability.
 Anatomical data and segmentation are optional. If a T1-weighted anatomical image and its
 segmentation are not provided, the software will use the diffusion data to
@@ -34,13 +34,13 @@ run::
     afd.organize_stanford_data()
 
 This should create a folder in your home directory with a properly-formatted
-data set in a directory called `stanford_hardi`.
+data set in a directory called `stanford_hardi`::
 
-    ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
-    ├── dataset_description.json
-    └── sub-01
-        └── ses-01
-            └── dwi
-                ├── sub-01_ses-01_dwi.bvals
-                ├── sub-01_ses-01_dwi.bvecs
-                └── sub-01_ses-01_dwi.nii.gz
+|    ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
+|    ├── dataset_description.json
+|    └── sub-01
+|        └── ses-01
+|            └── dwi
+|                ├── sub-01_ses-01_dwi.bvals
+|                ├── sub-01_ses-01_dwi.bvecs
+|                └── sub-01_ses-01_dwi.nii.gz
