@@ -153,7 +153,7 @@ print(f'bvec: f{np.loadtxt(hardi_fbvec)}')
 # --------------
 # Fit the DTI model using default settings, save files with derived maps.
 #
-# The by default following DTI measurements are calculated:
+# By default following DTI measurements are calculated:
 #
 # - Fractional anisotropy (FA),
 #
