@@ -234,7 +234,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         # There are no bundles in here:
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
-        yield streamlines, [0.5, 0.5, 0.5], "all_bundles"
+        yield streamlines, tableau_20_sns[0], "all_bundles"
 
     else:
         # There are bundles:
