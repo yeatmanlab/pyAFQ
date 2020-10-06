@@ -570,6 +570,8 @@ def test_AFQ_data_waypoint():
                   BUNDLES=dict(
                       bundle_names=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
+                  VIZ=dict(
+                      viz_backend="plotly_no_gif"),
                   TRACTOGRAPHY=tracking_params,
                   SEGMENTATION=segmentation_params,
                   CLEANING=clean_params)

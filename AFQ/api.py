@@ -183,7 +183,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  use_prealign=True,
                  virtual_frame_buffer=False,
-                 viz_backend="fury",
+                 viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -271,9 +271,11 @@ class AFQ(object):
             [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
         viz_backend : str, optional
-            [VIZ] Which visualization backend to us.
-            One of {"fury", "plotly"}.
-            Default: "fury"
+            [VIZ] Which visualization backend to use.
+            See Visualization Backends page in documentation for details:
+            https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
+            One of {"fury", "plotly", "plotly_no_gif"}.
+            Default: "plotly_no_gif"
         segmentation_params : dict, optional
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
@@ -1358,22 +1360,25 @@ class AFQ(object):
 
         sl_counts.to_csv(sl_count_file)
 
-    def _viz_prepare_vols(self, row,
-                          volume=None,
-                          xform_volume=False,
-                          color_by_volume=None,
-                          xform_color_by_volume=False):
-        if volume is None:
-            volume = self._get_best_scalar()
-        if volume in self.scalars:
-            volume = nib.load(
-                self._scalar_dict[volume](self, row)).get_fdata()
+    def _viz_prepare_vol(self, row, vol, xform, mapping):
+        if vol in self.scalars:
+            vol = nib.load(
+                self._scalar_dict[vol](self, row)).get_fdata()
+        if isinstance(vol, str):
+            vol = nib.load(vol).get_fdata()
+        if xform:
+            vol = mapping.transform_inverse(vol)
+        return vol
 
+    def _viz_prepare_vols(self, row,
+                          volume,
+                          xform_volume,
+                          color_by_volume,
+                          xform_color_by_volume):
+        if volume is None:
+            volume = self._b0(row)
         if color_by_volume is None:
             color_by_volume = self._get_best_scalar()
-        if color_by_volume in self.scalars:
-            color_by_volume = nib.load(
-                self._scalar_dict[color_by_volume](self, row)).get_fdata()
 
         if xform_volume or xform_color_by_volume:
             if self.use_prealign:
@@ -1386,15 +1391,21 @@ class AFQ(object):
                                        row['dwi_file'],
                                        self.reg_template_img,
                                        prealign=reg_prealign_inv)
+        else:
+            mapping = None
 
-        if xform_volume:
-            if isinstance(volume, str):
-                volume = nib.load(volume).get_fdata()
-            volume = mapping.transform_inverse(volume)
-        if xform_color_by_volume:
-            if isinstance(color_by_volume, str):
-                color_by_volume = nib.load(color_by_volume).get_fdata()
-            color_by_volume = mapping.transform_inverse(color_by_volume)
+        volume = self._viz_prepare_vol(
+            row,
+            volume,
+            xform_volume,
+            mapping)
+
+        color_by_volume = self._viz_prepare_vol(
+            row,
+            color_by_volume,
+            xform_color_by_volume,
+            mapping)
+
         return volume, color_by_volume
 
     def _viz_bundles(self, row,
@@ -1405,7 +1416,7 @@ class AFQ(object):
                      xform_volume=False,
                      color_by_volume=None,
                      xform_color_by_volume=False,
-                     n_points=100):
+                     n_points=40):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1430,7 +1441,7 @@ class AFQ(object):
                                             figure=figure)
 
         if export:
-            if self.viz.backend == 'fury':
+            if "no_gif" not in self.viz.backend:
                 fname = self._get_fname(
                     row,
                     '_viz.gif',
@@ -1438,7 +1449,7 @@ class AFQ(object):
                     include_seg=True)
 
                 self.viz.create_gif(figure, fname)
-            else:
+            if "plotly" in self.viz.backend:
                 fname = self._get_fname(
                     row,
                     '_viz.html',
@@ -1459,7 +1470,7 @@ class AFQ(object):
                   xform_volume=False,
                   color_by_volume=None,
                   xform_color_by_volume=False,
-                  n_points=100):
+                  n_points=40):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1513,9 +1524,9 @@ class AFQ(object):
                         figure=figure)
 
             if export:
-                if self.viz.backend == 'fury':
-                    roi_dir = op.join(row['results_dir'], 'viz_bundles')
-                    os.makedirs(roi_dir, exist_ok=True)
+                roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                os.makedirs(roi_dir, exist_ok=True)
+                if "no_gif" not in self.viz.backend:
                     fname = op.split(
                         self._get_fname(
                             row,
@@ -1526,7 +1537,7 @@ class AFQ(object):
 
                     fname = op.join(roi_dir, fname[1])
                     self.viz.create_gif(figure, fname)
-                else:
+                if "plotly" in self.viz.backend:
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
                     os.makedirs(roi_dir, exist_ok=True)
                     fname = op.split(
@@ -1831,7 +1842,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
-                    n_points=100,
+                    n_points=40,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1852,7 +1863,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
-                 n_points=100,
+                 n_points=40,
                  inline=False,
                  interactive=False):
         return self.data_frame.apply(
