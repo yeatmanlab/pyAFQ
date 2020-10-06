@@ -315,9 +315,10 @@ class AFQ(object):
             raise TypeError(
                 "reg_template must be a str or Nifti1Image")
         if not isinstance(reg_subject, str)\
-                and not isinstance(reg_subject, nib.Nifti1Image):
+            and not isinstance(reg_subject, nib.Nifti1Image)\
+                and not isinstance(reg_subject, dict):
             raise TypeError(
-                "reg_subject must be a str or Nifti1Image")
+                "reg_subject must be a str, dict, or Nifti1Image")
         if brain_mask is not None and not check_mask_methods(brain_mask):
             raise TypeError(
                 "brain_mask must be None or a mask defined in `AFQ.mask`")
