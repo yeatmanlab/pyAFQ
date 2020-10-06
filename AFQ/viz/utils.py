@@ -710,6 +710,7 @@ class GroupCSVComparison():
             self.bundles.sort()
         else:
             self.bundles = bundles
+        self.color_dict = gen_color_dict(self.bundles)
 
     def _threshold_scalar(self, bound, threshold, val):
         """
@@ -878,7 +879,7 @@ class GroupCSVComparison():
                     {
                         "dashes": [(2**i, 2**i)],
                         "hue": "tractID",
-                        "palette": [COLOR_DICT[bundle]]},
+                        "palette": [self.color_dict[bundle]]},
                     plot_subject_lines=plot_subject_lines)
                 if j == 0:
                     line = Line2D(
@@ -974,7 +975,7 @@ class GroupCSVComparison():
                 [bundle], names, scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
             ci_all_df[j] = ci_df["diff"]
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
@@ -1040,7 +1041,7 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
 
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
