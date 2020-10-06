@@ -272,8 +272,8 @@ class AFQ(object):
             generating GIFs in a headless environment. Default: False
         viz_backend : str, optional
             [VIZ] Which visualization backend to use.
-            See Visualization Backends page in documentation
-            for details.
+            See Visualization Backends page in documentation for details:
+            https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
             One of {"fury", "plotly", "plotly_no_gif"}.
             Default: "plotly_no_gif"
         segmentation_params : dict, optional
