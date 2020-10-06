@@ -75,6 +75,40 @@ SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
 
 
+def gen_color_dict(bundles):
+    """
+    Helper function.
+    Generate a color dict given a list of bundles.
+    """
+    def incr_color_idx(color_idx):
+        return (color_idx + 1) % 20
+    custom_color_dict = {}
+    color_idx = 0
+    for bundle in bundles:
+        if bundle not in custom_color_dict.keys():
+            if bundle in COLOR_DICT.keys():
+                custom_color_dict[bundle] = COLOR_DICT[bundle]
+            else:
+                other_bundle = list(bundle)
+                if bundle[-2:] == '_L':
+                    other_bundle[-2:] = '_R'
+                elif bundle[-2:] == '_R':
+                    other_bundle[-2:] = '_L'
+                other_bundle = str(other_bundle)
+
+                if other_bundle == bundle:  # lone bundle
+                    custom_color_dict[bundle] = tableau_20_sns[color_idx]
+                    color_idx = incr_color_idx(color_idx)
+                else:  # right left pair
+                    if color_idx % 2 != 0:
+                        color_idx = incr_color_idx(color_idx)
+                    custom_color_dict[bundle] =\
+                        tableau_20_sns[color_idx]
+                    custom_color_dict[other_bundle] =\
+                        tableau_20_sns[color_idx + 1]
+                    color_idx = incr_color_idx(incr_color_idx(color_idx))
+
+
 def viz_import_msg_error(module):
     """Alerts user to install the appropriate viz module """
     msg = f"To use {module.upper()} visualizations in pyAFQ, you will need "
@@ -182,9 +216,6 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
-    bundle_dict = bundle_dict.copy()
-    bundle_dict.pop('whole_brain', None)
-
     if isinstance(sft, str):
         viz_logger.info("Loading Stateful Tractogram...")
         sft = load_tractogram(sft, 'same', Space.VOX, bbox_valid_check=False)
@@ -199,10 +230,6 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
     streamlines = sft.streamlines
     viz_logger.info("Generating colorful lines from tractography...")
 
-    if colors is None:
-        # Use the color dict provided
-        colors = COLOR_DICT
-
     if list(sft.data_per_streamline.keys()) == []:
         # There are no bundles in here:
         if n_points is not None:
@@ -211,6 +238,18 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
 
     else:
         # There are bundles:
+        if colors is None:
+            if bundle is not None:
+                colors = gen_color_dict([str(bundle)])
+            elif bundle_dict is not None:
+                colors = gen_color_dict(bundle_dict.keys())
+            else:
+                colors = COLOR_DICT
+
+        if bundle_dict is not None:
+            bundle_dict = bundle_dict.copy()
+            bundle_dict.pop('whole_brain', None)
+
         if bundle is None:
             # No selection: visualize all of them:
 
