@@ -18,7 +18,7 @@ def _fit(gtab, data, mask=None):
 
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
-            out_dir=None, file_prefix=None, b0_threshold=0):
+            out_dir=None, file_prefix=None, b0_threshold=50):
     """
     Fit the DTI model using default settings, save files with derived maps
 

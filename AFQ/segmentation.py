@@ -187,7 +187,7 @@ class Segmentation:
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
-                reg_template=None, b0_threshold=0, img_affine=None):
+                reg_template=None, b0_threshold=50, img_affine=None):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.

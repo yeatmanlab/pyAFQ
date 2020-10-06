@@ -391,7 +391,7 @@ def register_dwi(data_files, bval_files, bvec_files,
     if np.sum(gtab.b0s_mask) > 1:
         # First, register the b0s into one image:
         b0_img = nib.Nifti1Image(data[..., gtab.b0s_mask], img.affine)
-        trans_b0 = register_series(b0_img, ref=0, pipeline=pipeline)
+        trans_b0 = register_series(b0_img, ref=b0_ref, pipeline=pipeline)
         ref_data = np.mean(trans_b0, -1)
     else:
         ref_data = data[..., gtab.b0s_mask]
