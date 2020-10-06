@@ -107,6 +107,7 @@ def gen_color_dict(bundles):
                     custom_color_dict[other_bundle] =\
                         tableau_20_sns[color_idx + 1]
                     color_idx = incr_color_idx(incr_color_idx(color_idx))
+    return custom_color_dict
 
 
 def viz_import_msg_error(module):
