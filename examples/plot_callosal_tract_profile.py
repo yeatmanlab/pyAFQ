@@ -23,6 +23,7 @@ using waypoint ROIs.
 """
 import os.path as op
 import matplotlib.pyplot as plt
+import plotly
 import numpy as np
 import nibabel as nib
 import dipy.data as dpd
@@ -38,6 +39,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 from AFQ.utils.volume import patch_up_roi, density_map
+from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
 import logging
 import sys
@@ -418,6 +420,7 @@ segmentation.segment(bundles,
 fiber_groups = segmentation.fiber_groups
 
 for bundle in bundles:
+    
     tractogram = StatefulTractogram(fiber_groups[bundle]['sl'].streamlines,
                                     img,
                                     Space.VOX)
@@ -477,6 +480,13 @@ for bundle in bundles:
     show_anatomical_slices(tractogram_img.get_fdata(),
                            f'Cleaned {bundle} Density Map')
 
+##########################################################################
+# Visualizing bundles and tract profiles:
+# ---------------------------------------
+
+plotly.io.show(visualize_bundles(tractogram,
+                                 figure=visualize_volume(warped_MNI_T2_data),
+                                 color_by_volume=FA_data))
 
 ##########################################################################
 # Bundle profiles:
