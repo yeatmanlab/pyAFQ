@@ -216,6 +216,12 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
+    if colors is None:
+        if bundle_dict is None:
+            colors = tableau_20_sns
+        else:
+            colors = gen_color_dict(bundle_dict.keys())
+
     if isinstance(sft, str):
         viz_logger.info("Loading Stateful Tractogram...")
         sft = load_tractogram(sft, 'same', Space.VOX, bbox_valid_check=False)
@@ -234,18 +240,10 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         # There are no bundles in here:
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
-        yield streamlines, tableau_20_sns[0], "all_bundles"
+            yield streamlines, colors[0], "all_bundles"
 
     else:
         # There are bundles:
-        if colors is None:
-            if bundle is not None:
-                colors = gen_color_dict([str(bundle)])
-            elif bundle_dict is not None:
-                colors = gen_color_dict(bundle_dict.keys())
-            else:
-                colors = COLOR_DICT
-
         if bundle_dict is not None:
             bundle_dict = bundle_dict.copy()
             bundle_dict.pop('whole_brain', None)
