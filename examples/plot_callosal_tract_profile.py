@@ -39,6 +39,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 from AFQ.utils.volume import patch_up_roi, density_map
+from AFQ.viz.utils import show_anatomical_slices
 from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
 import logging
@@ -55,38 +56,6 @@ root.addHandler(handler)
 
 # Target directory for this example's output files
 working_dir = "./callosal_tract_profile"
-
-##########################################################################
-# Helper functions:
-# -----------------
-
-
-def show_anatomical_slices(img_data, title):
-    """
-    display anatomical slices from midpoint
-
-    based on:
-    https://nipy.org/nibabel/coordinate_systems.html
-    """
-
-    axial_slice = img_data[:, :, int(img_data.shape[2] / 2)]
-    coronal_slice = img_data[:, int(img_data.shape[1] / 2), :]
-    sagittal_slice = img_data[int(img_data.shape[0] / 2), :, :]
-
-    fig = plt.figure(constrained_layout=False)
-    gs = fig.add_gridspec(nrows=3, ncols=2, wspace=0.01, hspace=0.01)
-    ax1 = fig.add_subplot(gs[:-1, :])
-    ax1.imshow(axial_slice.T, cmap="gray", origin="lower")
-    ax1.axis('off')
-    ax2 = fig.add_subplot(gs[2, 0])
-    ax2.imshow(coronal_slice.T, cmap="gray", origin="lower")
-    ax2.axis('off')
-    ax3 = fig.add_subplot(gs[2, 1])
-    ax3.imshow(sagittal_slice.T, cmap="gray", origin="lower")
-    ax3.axis('off')
-
-    plt.suptitle(title)
-    plt.show()
 
 
 ##########################################################################
@@ -420,7 +389,6 @@ segmentation.segment(bundles,
 fiber_groups = segmentation.fiber_groups
 
 for bundle in bundles:
-    
     tractogram = StatefulTractogram(fiber_groups[bundle]['sl'].streamlines,
                                     img,
                                     Space.VOX)

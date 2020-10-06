@@ -1335,3 +1335,31 @@ def visualize_gif_inline(fname, use_s3fs=False):
         fs.get(fname_remote, fname)
 
     display.display(display.Image(fname))
+
+
+def show_anatomical_slices(img_data, title):
+    """
+    display anatomical slices from midpoint
+
+    based on:
+    https://nipy.org/nibabel/coordinate_systems.html
+    """
+
+    axial_slice = img_data[:, :, int(img_data.shape[2] / 2)]
+    coronal_slice = img_data[:, int(img_data.shape[1] / 2), :]
+    sagittal_slice = img_data[int(img_data.shape[0] / 2), :, :]
+
+    fig = plt.figure(constrained_layout=False)
+    gs = fig.add_gridspec(nrows=3, ncols=2, wspace=0.01, hspace=0.01)
+    ax1 = fig.add_subplot(gs[:-1, :])
+    ax1.imshow(axial_slice.T, cmap="gray", origin="lower")
+    ax1.axis('off')
+    ax2 = fig.add_subplot(gs[2, 0])
+    ax2.imshow(coronal_slice.T, cmap="gray", origin="lower")
+    ax2.axis('off')
+    ax3 = fig.add_subplot(gs[2, 1])
+    ax3.imshow(sagittal_slice.T, cmap="gray", origin="lower")
+    ax3.axis('off')
+
+    plt.suptitle(title)
+    plt.show()
