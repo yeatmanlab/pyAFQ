@@ -150,7 +150,10 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     ----------
     sft : Stateful Tractogram, str
         A Stateful Tractogram containing streamline information
-        or a path to a trk file
+        or a path to a trk file.
+        In order to visualize individual bundles, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'`.
 
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
