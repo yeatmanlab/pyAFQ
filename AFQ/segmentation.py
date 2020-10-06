@@ -805,7 +805,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         Default: False.
     Returns
     -------
-    A nibabel.Streamlines class instance containing only the streamlines
+    A StatefulTractogram class instance containing only the streamlines
     that have a Mahalanobis distance smaller than `clean_threshold` from
     the mean of each one of the nodes.
     """
