@@ -51,28 +51,6 @@ handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
 root.addHandler(handler)
 
-# Monkey patch the progress bars so don't pollute this example's output
-import AFQ._fixes as fixes
-
-def notqdm(iterable, *args, **kwargs):
-    """
-    replacement for tqdm that just passes back the iterable to silence `tqdm`
-    """
-    return iterable
-
-
-afd.tqdm = notqdm
-fixes.tqdm = notqdm
-seg.tqdm = notqdm
-
-
-def update_progressbar(progress, total_length):
-    return
-
-
-fetcher.update_progressbar = update_progressbar
-
-
 # Target directory for this example's output files
 working_dir = "./callosal_tract_profile"
 
@@ -268,9 +246,9 @@ show_anatomical_slices(warped_MNI_T2_img.get_fdata(), 'Warped MNI T2')
 #
 # .. note::
 #
-#   It is also possible to utilize probablity maps to further refine the segmentation. If
-#   `prob_map` key is not specified the probablities will all be ones and same
-#   shape as the ROI.
+#   It is also possible to utilize probablity maps to further refine the
+#   segmentation. If `prob_map` key is not specified the probablities will
+#   all be ones and same shape as the ROI.
 #
 # .. note::
 #
@@ -334,7 +312,8 @@ bundles["AntFrontal"] = {
 #
 # .. note::
 #   In this example tractography results in a large number of candidate
-#   streamlines for the anterior forceps, but not many streamlines anywhere else.
+#   streamlines for the anterior forceps, but not many streamlines anywhere
+#   else.
 
 
 print("Tracking...")
@@ -398,7 +377,6 @@ tractogram.to_vox()
 #   - All b-values less than or equal to 50 are considered to be
 #     without diffusion weighting.
 #
-# 
 # Segmentation will result in a `fiber_group` for each bundle, which
 # contains the following keys:
 #
