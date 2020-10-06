@@ -234,7 +234,11 @@ show_anatomical_slices(warped_MNI_T2_img.get_fdata(), 'Warped MNI T2')
 #   lists the ROI templates.
 #
 # .. note::
-#   Order of the `ROIs` matters and may result in different tract profiles
+#   Order of the `ROIs` matters and may result in different tract profiles.
+#   Given a sequence of waypoint ROIs the endpoints should appear first. Which
+#   endpoint appears first should be consistent with the directionality of
+#   other bundles defintions. Any intermediate waypoints ROIs should respect
+#   this ordering.
 #
 # - `rules`
 #
