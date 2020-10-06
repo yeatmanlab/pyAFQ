@@ -36,11 +36,11 @@ run::
 This should create a folder in your home directory with a properly-formatted
 data set in a directory called `stanford_hardi`::
 
-|    ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
-|    ├── dataset_description.json
-|    └── sub-01
-|        └── ses-01
-|            └── dwi
-|                ├── sub-01_ses-01_dwi.bvals
-|                ├── sub-01_ses-01_dwi.bvecs
-|                └── sub-01_ses-01_dwi.nii.gz
+    ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
+    ├── dataset_description.json
+    └── sub-01
+        └── ses-01
+            └── dwi
+                ├── sub-01_ses-01_dwi.bvals
+                ├── sub-01_ses-01_dwi.bvecs
+                └── sub-01_ses-01_dwi.nii.gz

@@ -36,9 +36,10 @@ Fury Dockerfile for Cloudknot
 If using the fury visualization backend while running pyAFQ on cloudknot, you
 must provide a base image with the fury requiements installed.
 Below is an example dockerfile that can be used to build that base image:: 
-|   # Use official python base image
-|   FROM python:3.7
-|   # Install libgl
-|   RUN apt-get update
-|   RUN apt-get install -y libgl1-mesa-glx
-|   RUN apt-get install -y xvfb
+
+   # Use official python base image
+   FROM python:3.7
+   # Install libgl
+   RUN apt-get update
+   RUN apt-get install -y libgl1-mesa-glx
+   RUN apt-get install -y xvfb
