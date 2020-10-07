@@ -344,6 +344,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
+@pytest.mark.nightly2
 def test_AFQ_reco80():
     """
     Test if API can run registeration with FA
