@@ -347,7 +347,7 @@ def test_AFQ_reco():
 @pytest.mark.nightly2
 def test_AFQ_reco80():
     """
-    Test if API can run registeration with FA
+    Test API segmentation with the 80-bundle atlas
     """
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
