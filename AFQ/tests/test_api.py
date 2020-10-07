@@ -23,7 +23,6 @@ import dipy.data as dpd
 from dipy.data import fetcher, get_fnames
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.testing.decorators import xvfb_it
 
 from AFQ import api
 import AFQ.data as afd
@@ -467,7 +466,6 @@ def test_run_using_auto_cli():
     afb.parse_config_run_afq(config_file, arg_dict, False)
 
 
-@xvfb_it
 def test_AFQ_data_waypoint():
     """
     Test with some actual data again, this time for track segmentation
