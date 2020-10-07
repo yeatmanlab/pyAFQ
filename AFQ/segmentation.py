@@ -196,7 +196,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_space=False):
+                reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -276,7 +276,7 @@ class Segmentation:
         else:
             raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
                              "is not recognized")
-        if reset_space:
+        if reset_tg_space:
             # Return the input to the original space when you are done:
             self.tg.to_space(self._tg_orig_space)
 

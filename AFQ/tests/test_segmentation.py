@@ -127,7 +127,7 @@ def test_segment_keep_space():
                          hardi_fbval,
                          hardi_fbvec,
                          mapping=mapping,
-                         reset_space=True)
+                         reset_tg_space=True)
 
     npt.assert_equal(tg.space, orig_space)
 
