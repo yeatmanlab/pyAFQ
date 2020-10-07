@@ -23,6 +23,7 @@ import dipy.data as dpd
 from dipy.data import fetcher, get_fnames
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.testing.decorators import xvfb_it
 
 from AFQ import api
 import AFQ.data as afd
@@ -203,6 +204,18 @@ def test_AFQ_no_derivs():
                   + " following the BIDS format."):
         my_afq = api.AFQ(bids_path,
                          dmriprep="synthetic")
+
+
+#@pytest.mark.nightly4
+@xvfb_it
+def test_AFQ_fury():
+    _, bids_path, _ = get_temp_hardi()
+
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        viz_backend="fury")
+    myafq.viz_bundles()
 
 
 @pytest.mark.nightly3
