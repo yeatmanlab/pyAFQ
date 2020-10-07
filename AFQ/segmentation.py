@@ -191,6 +191,7 @@ class Segmentation:
         else:
             self.tg = tg
         self._tg_orig_space = self.tg.space
+        return tg
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
@@ -246,7 +247,7 @@ class Segmentation:
         self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
         self.logger.info("Preprocessing Streamlines")
-        self._read_tg(tg)
+        tg = self._read_tg(tg)
 
         # If resampling over-write the sft:
         if self.nb_points:
@@ -265,7 +266,7 @@ class Segmentation:
         else:
             raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
                              "is not recognized")
-
+        # Return the input to the original space when you are done:
         self.tg.to_space(self._tg_orig_space)
 
     def prepare_img(self, fdata, fbval, fbvec):
@@ -456,7 +457,7 @@ class Segmentation:
         ----------
         tg : StatefulTractogram class instance
         """
-        self._read_tg(self, tg=tg)
+        tg = self._read_tg(tg=tg)
         self.tg.to_vox()
 
         # For expedience, we approximate each streamline as a 100 point curve.
@@ -669,7 +670,7 @@ class Segmentation:
         registration_algo : str
             "slr" or "syn"
         """
-        self._read_tg(self, tg=tg)
+        tg = self._read_tg(tg=tg)
         if reg_algo is None:
             if self.mapping is None:
                 reg_algo = 'slr'
@@ -720,7 +721,7 @@ class Segmentation:
             The streamlines in each object have all been oriented to have the
             same orientation (using `dts.orient_by_streamline`).
         """
-        self._read_tg(self, tg=tg)
+        tg = self._read_tg(tg=tg)
         fiber_groups = {}
 
         self.move_streamlines(tg, self.reg_algo)
