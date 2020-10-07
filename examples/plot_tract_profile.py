@@ -31,6 +31,8 @@ from AFQ.utils.volume import patch_up_roi
 import logging
 logging.basicConfig(level=logging.INFO)
 
+# Target directory for this example's output files
+working_dir = "./tract_profile"
 
 ##########################################################################
 # Get example data:
@@ -48,12 +50,12 @@ img = nib.load(hardi_fdata)
 # -------------------------
 
 print("Calculating DTI...")
-if not op.exists('./dti_FA.nii.gz'):
+if not op.exists(op.join(working_dir, 'dti_FA.nii.gz')):
     dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
-                             out_dir='.')
+                             out_dir=working_dir)
 else:
-    dti_params = {'FA': './dti_FA.nii.gz',
-                  'params': './dti_params.nii.gz'}
+    dti_params = {'FA': op.join(working_dir, 'dti_FA.nii.gz'),
+                  'params': op.join(working_dir, 'dti_params.nii.gz')}
 
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
@@ -75,14 +77,15 @@ FA_data = FA_img.get_fdata()
 #
 print("Registering to template...")
 MNI_T2_img = afd.read_mni_template()
-if not op.exists('mapping.nii.gz'):
+if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
 
     warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab)
-    reg.write_mapping(mapping, './mapping.nii.gz')
+    reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
 else:
-    mapping = reg.read_mapping('./mapping.nii.gz', img, MNI_T2_img)
+    mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
+                               img, MNI_T2_img)
 
 
 ##########################################################################
@@ -104,7 +107,7 @@ bundles = api.make_bundle_dict(bundle_names=["CST", "ARC"],
 # algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 print("Tracking...")
-if not op.exists('dti_streamlines.trk'):
+if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
@@ -116,17 +119,17 @@ if not op.exists('dti_streamlines.trk'):
                         bundle_name=bundle)
 
                 nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         f"{bundle}_{idx+1}.nii.gz")
+                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
-                             'seed_roi.nii.gz')
+                             op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     stop_mask=FA_data, stop_threshold=0.1)
-    save_tractogram(sft, './dti_streamlines.trk',
+    save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
                     bbox_valid_check=False)
 else:
-    sft = load_tractogram('./dti_streamlines.trk', img)
+    sft = load_tractogram(op.join(working_dir, 'dti_streamlines.trk'), img)
 
 sft.to_vox()
 
@@ -167,12 +170,12 @@ for bundle in bundles:
     print(f"Afer cleaning: {len(new_fibers)} streamlines")
 
     idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
-    np.save(f'{bundle}_idx.npy', idx_in_global)
+    np.save(op.join(working_dir, f'{bundle}_idx.npy'), idx_in_global)
     sft = StatefulTractogram(new_fibers.streamlines,
                              img,
                              Space.VOX)
     sft.to_rasmm()
-    save_tractogram(sft, f'./{bundle}_afq.trk',
+    save_tractogram(sft, op.join(working_dir, f'{bundle}_afq.trk'),
                     bbox_valid_check=False)
 
 
@@ -186,7 +189,8 @@ for bundle in bundles:
 
 print("Extracting tract profiles...")
 for bundle in bundles:
-    sft = load_tractogram(f'./{bundle}_afq.trk', img, to_space=Space.VOX)
+    sft = load_tractogram(op.join(working_dir, f'{bundle}_afq.trk'),
+                          img, to_space=Space.VOX)
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(sft.streamlines)
     profile = afq_profile(FA_data, sft.streamlines,

@@ -36,6 +36,7 @@ obvious from mean measures of that tract ([Yeatman2012]_).
 
 .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman, "Tract profiles of white matter properties: automating fiber-tract quantification", PloS One, 7: e49790
 
+
 Tractometry
 ~~~~~~~~~~~
 
@@ -69,6 +70,7 @@ Tractometry
   include detailed page that distguished tractometry versus tractography 
   and benefits
 
+
 Acknowledgements
 ~~~~~~~~~~~~~~~~
 
@@ -91,7 +93,7 @@ NSF grant (1551330) to Jason Yeatman.
     :maxdepth: 2
 
     installation_guide
-    usage
+    usage/index
     auto_examples/index
     getting_help
     contributing

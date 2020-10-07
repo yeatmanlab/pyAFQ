@@ -89,12 +89,12 @@ afd.organize_stanford_data()
 # .. note::
 #
 #    We will also be using plotly to generate an interactive visualization.
-#    So we will specify plotly as the visualization backend.
+#    So we will specify plotly_no_gif as the visualization backend.
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                viz_backend='plotly')
+                viz_backend='plotly_no_gif')
 
 ##########################################################################
 # Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)

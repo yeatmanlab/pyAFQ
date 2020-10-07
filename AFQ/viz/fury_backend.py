@@ -47,6 +47,9 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     sft : Stateful Tractogram, str
         A Stateful Tractogram containing streamline information
         or a path to a trk file
+        In order to visualize individual bundles, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'`.
 
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
@@ -69,7 +72,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
         If this is a list, each item is an RGB tuple. Defaults to a list
-        with Tableau 20 RGB values
+        with Tableau 20 RGB values if bundle_dict is None, or dict from
+        bundles to Tableau 20 RGB values if bundle_dict is not None.
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white

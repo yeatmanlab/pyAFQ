@@ -183,7 +183,7 @@ class AFQ(object):
                  scalars=["dti_fa", "dti_md"],
                  use_prealign=True,
                  virtual_frame_buffer=False,
-                 viz_backend="fury",
+                 viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None):
@@ -271,9 +271,11 @@ class AFQ(object):
             [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
         viz_backend : str, optional
-            [VIZ] Which visualization backend to us.
-            One of {"fury", "plotly"}.
-            Default: "fury"
+            [VIZ] Which visualization backend to use.
+            See Visualization Backends page in documentation for details:
+            https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
+            One of {"fury", "plotly", "plotly_no_gif"}.
+            Default: "plotly_no_gif"
         segmentation_params : dict, optional
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
@@ -287,6 +289,73 @@ class AFQ(object):
             Default: use the default behavior of the seg.clean_bundle
             function.
         '''
+        if not isinstance(bids_path, str):
+            raise TypeError("bids_path must be a string")
+        if not op.exists(bids_path):
+            raise ValueError("bids_path not found")
+        if not op.exists(op.join(bids_path, "dataset_description.json")):
+            raise ValueError("There must be a dataset_description.json"
+                             + " in bids_path")
+        if not isinstance(bids_filters, dict):
+            raise TypeError("bids_filters must be a dict")
+        # dmriprep typechecking handled by pyBIDS
+        if custom_tractography_bids_filters is not None\
+                and not isinstance(custom_tractography_bids_filters, dict):
+            raise TypeError(
+                "custom_tractography_bids_filters must be"
+                + " either a dict or None")
+        if not isinstance(b0_threshold, int):
+            raise TypeError("b0_threshold must be an int")
+        if min_bval is not None and not isinstance(min_bval, int):
+            raise TypeError("min_bval must be an int")
+        if max_bval is not None and not isinstance(max_bval, int):
+            raise TypeError("max_bval must be an int")
+        if not isinstance(reg_template, str)\
+                and not isinstance(reg_template, nib.Nifti1Image):
+            raise TypeError(
+                "reg_template must be a str or Nifti1Image")
+        if not isinstance(reg_subject, str)\
+            and not isinstance(reg_subject, nib.Nifti1Image)\
+                and not isinstance(reg_subject, dict):
+            raise TypeError(
+                "reg_subject must be a str, dict, or Nifti1Image")
+        if brain_mask is not None and not check_mask_methods(brain_mask):
+            raise TypeError(
+                "brain_mask must be None or a mask defined in `AFQ.mask`")
+        if bundle_names is not None and not (
+                isinstance(bundle_names, list)
+                and isinstance(bundle_names[0], str)):
+            raise TypeError(
+                "bundle_names must be None or a list of strings")
+        if not isinstance(dask_it, bool):
+            raise TypeError("dask_it must be a bool")
+        if not isinstance(force_recompute, bool):
+            raise TypeError("force_recompute must be a bool")
+        if scalars is not None and not (
+                isinstance(scalars, list)
+                and isinstance(scalars[0], str)):
+            raise TypeError(
+                "scalars must be None or a list of strings")
+        if not isinstance(use_prealign, bool):
+            raise TypeError("use_prealign must be a bool")
+        if not isinstance(virtual_frame_buffer, bool):
+            raise TypeError("virtual_frame_buffer must be a bool")
+        if "fury" not in viz_backend and "plotly" not in viz_backend:
+            raise TypeError(
+                "viz_backend must contain either 'fury' or 'plotly'")
+        if tracking_params is not None\
+                and not isinstance(tracking_params, dict):
+            raise TypeError(
+                "tracking_params must be None or a dict")
+        if segmentation_params is not None\
+                and not isinstance(segmentation_params, dict):
+            raise TypeError(
+                "segmentation_params must be None or a dict")
+        if clean_params is not None\
+                and not isinstance(clean_params, dict):
+            raise TypeError(
+                "clean_params must be None or a dict")
+
         self.logger = logging.getLogger('AFQ.api')
 
         # validate input and fail early
@@ -376,7 +445,7 @@ class AFQ(object):
                 bundle_names = BUNDLES
 
         # Create the bundle dict after reg_template has been resolved:
-        self.reg_template_img, _ = self._reg_img(self.reg_template)
+        self.reg_template_img, _ = self._reg_img(self.reg_template, False)
         self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
                                             seg_algo=self.seg_algo,
                                             resample_to=self.reg_template_img)
@@ -768,11 +837,10 @@ class AFQ(object):
                 return scalar
         return self.scalars[0]
 
-    def _reg_img(self, img, row=None):
+    def _reg_img(self, img, mask, row=None):
         if row is not None and row["reg_subject"] is not None:
-            return nib.load(row["reg_subject"]), None
-
-        if isinstance(img, str):
+            img = nib.load(row["reg_subject"])
+        elif isinstance(img, str):
             img_l = img.lower()
             if img_l == "mni_t2":
                 img = afd.read_mni_template(
@@ -813,13 +881,22 @@ class AFQ(object):
             else:
                 img = nib.load(img)
 
+        if mask:
+            brain_mask_file = self._brain_mask(row)
+            brain_mask = nib.load(brain_mask_file).get_fdata().astype(bool)
+
+            masked_data = img.get_fdata()
+            masked_data[~brain_mask] = 0
+
+            img = nib.Nifti1Image(masked_data, img.affine)
+
         return img, None
 
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if self.force_recompute or not op.exists(prealign_file):
-            reg_subject_img, _ = self._reg_img(self.reg_subject, row)
+            reg_subject_img, _ = self._reg_img(self.reg_subject, True, row)
             _, aff = reg.affine_registration(
                 reg_subject_img.get_fdata(),
                 self.reg_template_img.get_fdata(),
@@ -845,13 +922,14 @@ class AFQ(object):
 
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
+                reg_prealign_inv = np.linalg.inv(reg_prealign)
             else:
-                reg_prealign = None
+                reg_prealign_inv = None
 
             mapping_file = self._mapping(row)
             mapping = reg.read_mapping(mapping_file, b0_file,
                                        self.reg_template_img,
-                                       prealign=reg_prealign)
+                                       prealign=reg_prealign_inv)
 
             warped_b0 = mapping.transform(mean_b0)
 
@@ -881,9 +959,9 @@ class AFQ(object):
                 reg_prealign = None
 
             reg_template_img, reg_template_sls = \
-                self._reg_img(self.reg_template, row)
+                self._reg_img(self.reg_template, False, row)
             reg_subject_img, reg_subject_sls = \
-                self._reg_img(self.reg_subject, row)
+                self._reg_img(self.reg_subject, True, row)
 
             start_time = time()
             if self.reg_algo == "slr":
@@ -1296,22 +1374,25 @@ class AFQ(object):
 
         sl_counts.to_csv(sl_count_file)
 
-    def _viz_prepare_vols(self, row,
-                          volume=None,
-                          xform_volume=False,
-                          color_by_volume=None,
-                          xform_color_by_volume=False):
-        if volume is None:
-            volume = self._get_best_scalar()
-        if volume in self.scalars:
-            volume = nib.load(
-                self._scalar_dict[volume](self, row)).get_fdata()
+    def _viz_prepare_vol(self, row, vol, xform, mapping):
+        if vol in self.scalars:
+            vol = nib.load(
+                self._scalar_dict[vol](self, row)).get_fdata()
+        if isinstance(vol, str):
+            vol = nib.load(vol).get_fdata()
+        if xform:
+            vol = mapping.transform_inverse(vol)
+        return vol
 
+    def _viz_prepare_vols(self, row,
+                          volume,
+                          xform_volume,
+                          color_by_volume,
+                          xform_color_by_volume):
+        if volume is None:
+            volume = self._b0(row)
         if color_by_volume is None:
             color_by_volume = self._get_best_scalar()
-        if color_by_volume in self.scalars:
-            color_by_volume = nib.load(
-                self._scalar_dict[color_by_volume](self, row)).get_fdata()
 
         if xform_volume or xform_color_by_volume:
             if self.use_prealign:
@@ -1324,15 +1405,21 @@ class AFQ(object):
                                        row['dwi_file'],
                                        self.reg_template_img,
                                        prealign=reg_prealign_inv)
+        else:
+            mapping = None
 
-        if xform_volume:
-            if isinstance(volume, str):
-                volume = nib.load(volume).get_fdata()
-            volume = mapping.transform_inverse(volume)
-        if xform_color_by_volume:
-            if isinstance(color_by_volume, str):
-                color_by_volume = nib.load(color_by_volume).get_fdata()
-            color_by_volume = mapping.transform_inverse(color_by_volume)
+        volume = self._viz_prepare_vol(
+            row,
+            volume,
+            xform_volume,
+            mapping)
+
+        color_by_volume = self._viz_prepare_vol(
+            row,
+            color_by_volume,
+            xform_color_by_volume,
+            mapping)
+
         return volume, color_by_volume
 
     def _viz_bundles(self, row,
@@ -1343,7 +1430,7 @@ class AFQ(object):
                      xform_volume=False,
                      color_by_volume=None,
                      xform_color_by_volume=False,
-                     n_points=100):
+                     n_points=40):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1368,7 +1455,7 @@ class AFQ(object):
                                             figure=figure)
 
         if export:
-            if self.viz.backend == 'fury':
+            if "no_gif" not in self.viz.backend:
                 fname = self._get_fname(
                     row,
                     '_viz.gif',
@@ -1376,7 +1463,7 @@ class AFQ(object):
                     include_seg=True)
 
                 self.viz.create_gif(figure, fname)
-            else:
+            if "plotly" in self.viz.backend:
                 fname = self._get_fname(
                     row,
                     '_viz.html',
@@ -1397,7 +1484,7 @@ class AFQ(object):
                   xform_volume=False,
                   color_by_volume=None,
                   xform_color_by_volume=False,
-                  n_points=100):
+                  n_points=40):
         bundles_file = self._clean_bundles(row)
 
         start_time = time()
@@ -1451,9 +1538,9 @@ class AFQ(object):
                         figure=figure)
 
             if export:
-                if self.viz.backend == 'fury':
-                    roi_dir = op.join(row['results_dir'], 'viz_bundles')
-                    os.makedirs(roi_dir, exist_ok=True)
+                roi_dir = op.join(row['results_dir'], 'viz_bundles')
+                os.makedirs(roi_dir, exist_ok=True)
+                if "no_gif" not in self.viz.backend:
                     fname = op.split(
                         self._get_fname(
                             row,
@@ -1464,7 +1551,7 @@ class AFQ(object):
 
                     fname = op.join(roi_dir, fname[1])
                     self.viz.create_gif(figure, fname)
-                else:
+                if "plotly" in self.viz.backend:
                     roi_dir = op.join(row['results_dir'], 'viz_bundles')
                     os.makedirs(roi_dir, exist_ok=True)
                     fname = op.split(
@@ -1769,7 +1856,7 @@ class AFQ(object):
                     xform_volume=False,
                     color_by_volume=None,
                     xform_color_by_volume=False,
-                    n_points=100,
+                    n_points=40,
                     inline=False,
                     interactive=False):
         return self.data_frame.apply(
@@ -1790,7 +1877,7 @@ class AFQ(object):
                  xform_volume=False,
                  color_by_volume=None,
                  xform_color_by_volume=False,
-                 n_points=100,
+                 n_points=40,
                  inline=False,
                  interactive=False):
         return self.data_frame.apply(

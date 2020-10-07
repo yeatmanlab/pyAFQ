@@ -13,9 +13,11 @@ import AFQ.viz.utils as vut
 try:
     import plotly
     import plotly.graph_objs as go
+    import plotly.io as pio
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
+scope = pio.kaleido.scope
 viz_logger = logging.getLogger("AFQ.viz")
 
 
@@ -150,7 +152,10 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     ----------
     sft : Stateful Tractogram, str
         A Stateful Tractogram containing streamline information
-        or a path to a trk file
+        or a path to a trk file.
+        In order to visualize individual bundles, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'`.
 
     affine : ndarray, optional
        An affine transformation to apply to the streamlines before
@@ -173,7 +178,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
         If this is a list, each item is an RGB tuple. Defaults to a list
-        with Tableau 20 RGB values
+        with Tableau 20 RGB values if bundle_dict is None, or dict from
+        bundles to Tableau 20 RGB values if bundle_dict is not None.
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
@@ -219,7 +225,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
 def create_gif(figure,
                file_name,
-               n_frames=60,
+               n_frames=30,
                zoom=2.5,
                z_offset=0.5,
                size=(600, 600)):
@@ -257,6 +263,7 @@ def create_gif(figure,
         )
         figure.update_layout(scene_camera=camera)
         figure.write_image(tdir + f"/tgif{i}.png")
+        scope._shutdown_kaleido()  # temporary fix for memory leak
 
     vut.gif_from_pngs(tdir, file_name, n_frames,
                       png_fname="tgif", add_zeros=False)

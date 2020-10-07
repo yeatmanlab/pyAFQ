@@ -75,6 +75,41 @@ SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
 
 
+def gen_color_dict(bundles):
+    """
+    Helper function.
+    Generate a color dict given a list of bundles.
+    """
+    def incr_color_idx(color_idx):
+        return (color_idx + 1) % 20
+    custom_color_dict = {}
+    color_idx = 0
+    for bundle in bundles:
+        if bundle not in custom_color_dict.keys():
+            if bundle in COLOR_DICT.keys():
+                custom_color_dict[bundle] = COLOR_DICT[bundle]
+            else:
+                other_bundle = list(bundle)
+                if bundle[-2:] == '_L':
+                    other_bundle[-2:] = '_R'
+                elif bundle[-2:] == '_R':
+                    other_bundle[-2:] = '_L'
+                other_bundle = str(other_bundle)
+
+                if other_bundle == bundle:  # lone bundle
+                    custom_color_dict[bundle] = tableau_20_sns[color_idx]
+                    color_idx = incr_color_idx(color_idx)
+                else:  # right left pair
+                    if color_idx % 2 != 0:
+                        color_idx = incr_color_idx(color_idx)
+                    custom_color_dict[bundle] =\
+                        tableau_20_sns[color_idx]
+                    custom_color_dict[other_bundle] =\
+                        tableau_20_sns[color_idx + 1]
+                    color_idx = incr_color_idx(incr_color_idx(color_idx))
+    return custom_color_dict
+
+
 def viz_import_msg_error(module):
     """Alerts user to install the appropriate viz module """
     msg = f"To use {module.upper()} visualizations in pyAFQ, you will need "
@@ -131,7 +166,8 @@ def bundle_selector(bundle_dict, colors, b):
     return color, b_name
 
 
-def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
+def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
+                    n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
@@ -168,11 +204,24 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
+    n_sls_viz : int
+        Number of streamlines to randomly select if plotting
+        all bundles. Selections will be proportional to the original number of
+        streamlines per bundle.
+        Default: 3600
+    n_sls_min : int
+        Minimun number of streamlines to display per bundle.
+        Default: 75
+
     Returns
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
-    bundle_dict.pop('whole_brain', None)
+    if colors is None:
+        if bundle_dict is None:
+            colors = tableau_20_sns
+        else:
+            colors = gen_color_dict(bundle_dict.keys())
 
     if isinstance(sft, str):
         viz_logger.info("Loading Stateful Tractogram...")
@@ -188,23 +237,28 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points):
     streamlines = sft.streamlines
     viz_logger.info("Generating colorful lines from tractography...")
 
-    if colors is None:
-        # Use the color dict provided
-        colors = COLOR_DICT
-
     if list(sft.data_per_streamline.keys()) == []:
         # There are no bundles in here:
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
-        yield streamlines, [0.5, 0.5, 0.5], "all_bundles"
+        yield streamlines, colors[0], "all_bundles"
 
     else:
         # There are bundles:
+        if bundle_dict is not None:
+            bundle_dict = bundle_dict.copy()
+            bundle_dict.pop('whole_brain', None)
+
         if bundle is None:
             # No selection: visualize all of them:
 
             for b in np.unique(sft.data_per_streamline['bundle']):
                 idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
+                n_sl_viz = (len(idx) * n_sls_viz) //\
+                    len(sft.streamlines)
+                n_sl_viz = max(n_sls_min, n_sl_viz)
+                if len(idx) > n_sl_viz:
+                    idx = np.random.choice(idx, size=n_sl_viz, replace=False)
                 these_sls = streamlines[idx]
                 if n_points is not None:
                     these_sls = dps.set_number_of_points(these_sls, n_points)
@@ -243,6 +297,7 @@ def gif_from_pngs(tdir, gif_fname, n_frames,
         fname_suffix100 = ""
         fname_suffix1000 = ""
     angles = []
+    n_frame_copies = 60 // n_frames
     for i in range(n_frames):
         if i < 10:
             angle_fname = f"{png_fname}{fname_suffix10}{i}.png"
@@ -250,7 +305,9 @@ def gif_from_pngs(tdir, gif_fname, n_frames,
             angle_fname = f"{png_fname}{fname_suffix100}{i}.png"
         else:
             angle_fname = f"{png_fname}{fname_suffix1000}{i}.png"
-        angles.append(io.imread(op.join(tdir, angle_fname)))
+        frame = io.imread(op.join(tdir, angle_fname))
+        for j in range(n_frame_copies):
+            angles.append(frame)
 
     io.mimsave(gif_fname, angles)
 
@@ -358,7 +415,7 @@ class Viz:
                 Default: "fury"
         """
         self.backend = backend
-        if backend == "fury":
+        if "fury" in backend:
             try:
                 import AFQ.viz.fury_backend
             except ImportError:
@@ -367,7 +424,7 @@ class Viz:
             self.visualize_roi = AFQ.viz.fury_backend.visualize_roi
             self.visualize_volume = AFQ.viz.fury_backend.visualize_volume
             self.create_gif = AFQ.viz.fury_backend.create_gif
-        elif backend == "plotly":
+        elif "plotly" in backend:
             try:
                 import AFQ.viz.plotly_backend
             except ImportError:
@@ -377,7 +434,7 @@ class Viz:
             self.visualize_volume = AFQ.viz.plotly_backend.visualize_volume
             self.create_gif = AFQ.viz.plotly_backend.create_gif
         else:
-            raise TypeError("Visualization backend should be"
+            raise TypeError("Visualization backend contain"
                             + " either 'plotly' or 'fury'. "
                             + "It is currently set to %s"
                             % backend)
@@ -652,8 +709,10 @@ class GroupCSVComparison():
         self.prof_len = 100 - (percent_nan_tol // 2) * 2
         if bundles is None:
             self.bundles = self.profile_dict[names[0]]['tractID'].unique()
+            self.bundles.sort()
         else:
             self.bundles = bundles
+        self.color_dict = gen_color_dict(self.bundles)
 
     def _threshold_scalar(self, bound, threshold, val):
         """
@@ -822,7 +881,7 @@ class GroupCSVComparison():
                     {
                         "dashes": [(2**i, 2**i)],
                         "hue": "tractID",
-                        "palette": [COLOR_DICT[bundle]]},
+                        "palette": [self.color_dict[bundle]]},
                     plot_subject_lines=plot_subject_lines)
                 if j == 0:
                     line = Line2D(
@@ -912,13 +971,15 @@ class GroupCSVComparison():
             return None
 
         ba = BrainAxes(positions=positions)
+        ci_all_df = np.zeros((len(self.bundles), self.prof_len))
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
+            ci_all_df[j] = ci_df["diff"]
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
@@ -928,6 +989,7 @@ class GroupCSVComparison():
         if not show_plots:
             plt.close(ba.fig)
             plt.ion()
+        return ci_all_df
 
     def lateral_contrast_index(self, name, scalar="dti_fa",
                                show_plots=False, n_boot=1000,
@@ -981,7 +1043,7 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
-                n_boot, 1.0, {"color": COLOR_DICT[bundle]},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
 
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
