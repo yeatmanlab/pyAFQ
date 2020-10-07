@@ -195,7 +195,8 @@ class Segmentation:
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
-                reg_template=None, b0_threshold=50, img_affine=None):
+                reg_template=None, b0_threshold=50, img_affine=None,
+                reset_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -223,6 +224,15 @@ class Segmentation:
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
+        reset_tg_space : bool, optional
+            Whether to reset the space of the input tractogram after
+            segmentation is complete. Default: False.
+
+        Returns
+        -------
+        dict : Where keys are bundle names, values are tractograms of
+            these bundles.
+
         References
         ----------
         .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
@@ -260,14 +270,17 @@ class Segmentation:
         self.cross_streamlines()
 
         if self.seg_algo == "afq":
-            return self.segment_afq()
+            fiber_groups = self.segment_afq()
         elif self.seg_algo.startswith("reco"):
-            return self.segment_reco()
+            fiber_groups = self.segment_reco()
         else:
             raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
                              "is not recognized")
-        # Return the input to the original space when you are done:
-        self.tg.to_space(self._tg_orig_space)
+        if reset_space:
+            # Return the input to the original space when you are done:
+            self.tg.to_space(self._tg_orig_space)
+
+        return fiber_groups
 
     def prepare_img(self, fdata, fbval, fbvec):
         """
