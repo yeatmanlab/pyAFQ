@@ -219,11 +219,11 @@ class AFQ(object):
             it is considered to be b0. Default: 50.
         min_bval : float, optional
             [REGISTRATION] Minimum b value you want to use
-            from the dataset (other than b0).
+            from the dataset (other than b0), inclusive.
             If None, there is no minimum limit. Default: None
         max_bval : float, optional
             [REGISTRATION] Maximum b value you want to use
-            from the dataset (other than b0).
+            from the dataset (other than b0), inclusive.
             If None, there is no maximum limit. Default: None
         reg_subject : str, Nifti1Image, dict, optional
             [REGISTRATION] The source image data to be registered.
