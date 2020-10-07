@@ -206,7 +206,7 @@ def test_AFQ_no_derivs():
                          dmriprep="synthetic")
 
 
-#@pytest.mark.nightly4
+@pytest.mark.nightly4
 @xvfb_it
 def test_AFQ_fury():
     _, bids_path, _ = get_temp_hardi()
