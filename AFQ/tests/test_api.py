@@ -344,6 +344,23 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
+def test_AFQ_reco80():
+    """
+    Test if API can run registeration with FA
+    """
+    _, bids_path, _ = get_temp_hardi()
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        segmentation_params={
+            'seg_algo': 'reco80',
+            'rng': 42})
+
+    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    npt.assert_(len(bundles['CCMid']) > 0)
+
+
 @pytest.mark.nightly2
 def test_AFQ_pft():
     """
