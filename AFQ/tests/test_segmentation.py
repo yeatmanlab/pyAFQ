@@ -114,6 +114,24 @@ def test_segment_return_idx():
     npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
 
 
+def test_segment_keep_space():
+    # Test with the return_idx kwarg set to True:
+    segmentation = seg.Segmentation(return_idx=True)
+    # We move the tg to rasmm to make sure that it ends
+    # up there
+    tg.to_rasmm()
+    orig_space = tg.space
+    segmentation.segment(bundles,
+                         tg,
+                         hardi_fdata,
+                         hardi_fbval,
+                         hardi_fbvec,
+                         mapping=mapping,
+                         reset_tg_space=True)
+
+    npt.assert_equal(tg.space, orig_space)
+
+
 @pytest.mark.nightly
 def test_segment_clip_edges():
     # Test with the clip_edges kwarg set to True:

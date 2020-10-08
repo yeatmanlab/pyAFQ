@@ -185,9 +185,18 @@ class Segmentation:
         self.save_intermediates = save_intermediates
         self.clip_edges = clip_edges
 
+    def _read_tg(self, tg=None):
+        if tg is None:
+            tg = self.tg
+        else:
+            self.tg = tg
+        self._tg_orig_space = self.tg.space
+        return tg
+
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
-                reg_template=None, b0_threshold=50, img_affine=None):
+                reg_template=None, b0_threshold=50, img_affine=None,
+                reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -215,6 +224,15 @@ class Segmentation:
         img_affine : array, optional.
             The spatial transformation from the measurement to the scanner
             space.
+        reset_tg_space : bool, optional
+            Whether to reset the space of the input tractogram after
+            segmentation is complete. Default: False.
+
+        Returns
+        -------
+        dict : Where keys are bundle names, values are tractograms of
+            these bundles.
+
         References
         ----------
         .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
@@ -239,7 +257,7 @@ class Segmentation:
         self.img_affine = img_affine
         self.prepare_img(fdata, fbval, fbvec)
         self.logger.info("Preprocessing Streamlines")
-        self.tg = tg
+        tg = self._read_tg(tg)
 
         # If resampling over-write the sft:
         if self.nb_points:
@@ -252,12 +270,17 @@ class Segmentation:
         self.cross_streamlines()
 
         if self.seg_algo == "afq":
-            return self.segment_afq()
+            fiber_groups = self.segment_afq()
         elif self.seg_algo.startswith("reco"):
-            return self.segment_reco()
+            fiber_groups = self.segment_reco()
         else:
             raise ValueError(f"The seg_algo input is {self.seg_algo}, which",
                              "is not recognized")
+        if reset_tg_space:
+            # Return the input to the original space when you are done:
+            self.tg.to_space(self._tg_orig_space)
+
+        return fiber_groups
 
     def prepare_img(self, fdata, fbval, fbvec):
         """
@@ -447,11 +470,7 @@ class Segmentation:
         ----------
         tg : StatefulTractogram class instance
         """
-        if tg is None:
-            tg = self.tg
-        else:
-            self.tg = tg
-
+        tg = self._read_tg(tg=tg)
         self.tg.to_vox()
 
         # For expedience, we approximate each streamline as a 100 point curve.
@@ -664,11 +683,7 @@ class Segmentation:
         registration_algo : str
             "slr" or "syn"
         """
-        if tg is None:
-            tg = self.tg
-        else:
-            self.tg = tg
-
+        tg = self._read_tg(tg=tg)
         if reg_algo is None:
             if self.mapping is None:
                 reg_algo = 'slr'
@@ -719,11 +734,7 @@ class Segmentation:
             The streamlines in each object have all been oriented to have the
             same orientation (using `dts.orient_by_streamline`).
         """
-        if tg is None:
-            tg = self.tg
-        else:
-            self.tg = tg
-
+        tg = self._read_tg(tg=tg)
         fiber_groups = {}
 
         self.move_streamlines(tg, self.reg_algo)
