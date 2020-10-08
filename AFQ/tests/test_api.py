@@ -206,6 +206,18 @@ def test_AFQ_no_derivs():
                          dmriprep="synthetic")
 
 
+@pytest.mark.nightly4
+@xvfb_it
+def test_AFQ_fury():
+    _, bids_path, _ = get_temp_hardi()
+
+    myafq = api.AFQ(
+        bids_path=bids_path,
+        dmriprep='vistasoft',
+        viz_backend="fury")
+    myafq.viz_bundles()
+
+
 @pytest.mark.nightly3
 def test_AFQ_init():
     """
@@ -485,7 +497,6 @@ def test_run_using_auto_cli():
     afb.parse_config_run_afq(config_file, arg_dict, False)
 
 
-@xvfb_it
 def test_AFQ_data_waypoint():
     """
     Test with some actual data again, this time for track segmentation
