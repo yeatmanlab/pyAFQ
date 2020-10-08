@@ -339,7 +339,7 @@ def test_AFQ_slr():
 @pytest.mark.nightly2
 def test_AFQ_reco():
     """
-    Test if API can run registeration with FA
+    Test if API can run segmentation with recobundles
     """
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
@@ -632,3 +632,14 @@ def test_AFQ_data_waypoint():
         myafq.data_frame['results_dir'][0],
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+
+
+# @pytest.mark.nightly
+def test_afq_msmt():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    afd.organize_cfin_data(path=tmpdir.name)
+    myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
+                    dmriprep='dipy', tracking_params={"odf_model": "MSMT"})
+    npt.assert_equal(
+        op.split(myafq.streamlines[0])[-1],
+        "sub-01_ses-01_dwi_space-RASMM_model-MSMT_desc-det_tractography.trk")

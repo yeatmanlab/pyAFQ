@@ -11,6 +11,7 @@ import random
 
 import sys
 import math
+import cvxpy as cvx
 
 
 class ConformedAffineMap(AffineMap):
@@ -217,3 +218,42 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
     odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
     odf[mask] = proj_norm.T
     return odf
+
+
+def solve_qp(P, Q, G, H):
+    r"""
+    Helper function to set up and solve the Quadratic Program (QP) in CVXPY.
+    A QP problem has the following form:
+    minimize      1/2 x' P x + Q' x
+    subject to    G x <= H
+    Here the QP solver is based on CVXPY and uses OSQP.
+    Parameters
+    ----------
+    P : ndarray
+        n x n matrix for the primal QP objective function.
+    Q : ndarray
+        n x 1 matrix for the primal QP objective function.
+    G : ndarray
+        m x n matrix for the inequality constraint.
+    H : ndarray
+        m x 1 matrix for the inequality constraint.
+    Returns
+    -------
+    x : array
+        Optimal solution to the QP problem.
+    """
+    x = cvx.Variable(Q.shape[0])
+    P = cvx.Constant(P)
+    objective = cvx.Minimize(0.5 * cvx.quad_form(x, P) + Q * x)
+    constraints = [G * x <= H]
+
+    # setting up the problem
+    prob = cvx.Problem(objective, constraints)
+    try:
+        prob.solve()
+        opt = np.array(x.value).reshape((Q.shape[0],))
+    except cvx.error.SolverError:
+        opt = np.empty((Q.shape[0],))
+        opt[:] = np.NaN
+
+    return opt
