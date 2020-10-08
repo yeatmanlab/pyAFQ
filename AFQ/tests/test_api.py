@@ -251,7 +251,7 @@ def test_AFQ_data():
         myafq.export_rois()
 
 
-@pytest.mark.nightly3
+@pytest.mark.nightly5
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -356,7 +356,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
-@pytest.mark.nightly2
+@pytest.mark.nightly4
 def test_AFQ_reco80():
     """
     Test API segmentation with the 80-bundle atlas
