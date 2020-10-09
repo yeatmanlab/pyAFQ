@@ -2094,7 +2094,6 @@ def bundles_to_aal(bundles, atlas=None):
         "ARC_L": [['leftfrontal'], ['leftarctemp']],
         "ARC_R": [['rightfrontal'], ['rightarctemp']],
         "AntFrontal": [['rightfrontal'], ['leftfrontal']],
-        # TODO NOT CORRECT ENDPOINTS
         "Motor": [['rightfrontal'], ['leftfrontal']],
         "Occipital": [['rightfrontal'], ['leftfrontal']],
         "Orbital": [['rightfrontal'], ['leftfrontal']],

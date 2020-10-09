@@ -43,7 +43,7 @@ bids.config.set_option('extension_initial_dot', True)
 logging.basicConfig(level=logging.INFO)
 
 
-__all__ = ["AFQ", "make_bundle_dict", "make_callosum_bundle_dict"]
+__all__ = ["AFQ", "make_bundle_dict"]
 
 
 def do_preprocessing():
@@ -52,6 +52,10 @@ def do_preprocessing():
 
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
+
+CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
+                    "PostParietal", "SupFrontal", "SupParietal",
+                    "Temporal"]
 
 # See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
 
@@ -73,7 +77,9 @@ RECO_UNIQUE = [
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
+def make_bundle_dict(bundle_names=BUNDLES,
+                     seg_algo="afq",
+                     resample_to=False):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -118,6 +124,15 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
                              callosal_templates["Callosum_midsag"]],
                     'rules': [True, True, True],
                     'prob_map': templates[name + "_prob_map"],
+                    'cross_midline': True,
+                    'uid': uid}
+                uid += 1
+            elif name in CALLOSUM_BUNDLES:
+                afq_bundles[name] = {
+                    'ROIs': [callosal_templates["L_" + name],
+                             callosal_templates["R_" + name],
+                             callosal_templates["Callosum_midsag"]],
+                    'rules': [True, True, True],
                     'cross_midline': True,
                     'uid': uid}
                 uid += 1
@@ -168,49 +183,6 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
         raise ValueError("Input: %s is not a valid input`seg_algo`" % seg_algo)
 
     return afq_bundles
-
-
-CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
-                    "PostParietal", "SupFrontal", "SupParietal",
-                    "Temporal"]
-
-
-def make_callosum_bundle_dict(bundle_names=CALLOSUM_BUNDLES,
-                              seg_algo="afq",
-                              resample_to=False):
-    """
-    Create a bundle dictionary, needed for the segmentation
-
-    Parameters
-    ----------
-    bundle_names : list, optional
-        A list of the bundles to be used in this case. Default: all of them
-
-    seg_algo: One of {"afq"}
-        The bundle segmentation algorithm to use.
-            "afq" : Use waypoint ROIs + probability maps, as described
-            in [Yeatman2012]_
-
-    resample_to : Nifti1Image, optional
-        If set, templates will be resampled to the affine and shape of this
-        image.
-    """
-    if seg_algo != "afq":
-        raise ValueError("Input: %s is not a valid input`seg_algo`" % seg_algo)
-
-    callosal_templates = afd.read_callosum_templates(resample_to=resample_to)
-    afq_callosal_bundles = {}
-
-    for name in bundle_names:
-        afq_callosal_bundles[name] = {
-            'ROIs': [callosal_templates["L_" + name],
-                     callosal_templates["R_" + name],
-                     callosal_templates["Callosum_midsag"]],
-            'rules': [True, True, True],
-            'cross_midline': True
-        }
-
-    return afq_callosal_bundles
 
 
 class AFQ(object):
