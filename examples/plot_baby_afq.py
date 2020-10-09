@@ -23,7 +23,7 @@ import nibabel as nib
 
 from AFQ import api
 import AFQ.registration as reg
-from AFQ.mask import RoiMask
+from AFQ.mask import RoiMask, MaskFile
 
 
 # Ensure segmentation logging information is included in this example's output
@@ -425,6 +425,8 @@ myafq = api.AFQ(# ==== BIDS parameters ====
                 # reg_subject="power_map", # default
                 reg_subject="b0",  # override
                 # brain_mask=B0Mask(), # default
+                brain_mask=MaskFile("brainmask",
+                                    {"scope": "dHCP neonatal dMRI pipeline"}),
                 # use_prealign=True, # default
                 # ==== Bundle parameters ====
                 bundle_names=pediatric_bundle_names,
@@ -443,7 +445,7 @@ myafq = api.AFQ(# ==== BIDS parameters ====
                 # tracking_params=None, # default
                 # tracking_params={"seed_threshold": 0.15},  # override
                 tracking_params={"seed_mask": RoiMask(),
-                                 "seed_threshold": 0.2},
+                                 "stop_threshold": 0.1},
                 # params_file, directions="det", max_angle=30., sphere=None,
                 # ==== Segmentation parameters ====
                 # defaults:

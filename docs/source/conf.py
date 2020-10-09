@@ -209,6 +209,7 @@ sphinx_gallery_conf = {
      'examples_dirs': '../../examples',
      # path where to save gallery generated examples
      'gallery_dirs': 'auto_examples',
+     'ignore_pattern': 'plot_baby_afq.py',
      'image_scrapers': image_scrapers,
      'reset_modules': (reset_progressbars),
 }
