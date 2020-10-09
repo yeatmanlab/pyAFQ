@@ -150,16 +150,21 @@ def make_bundle_dict(bundle_names=BUNDLES,
                     uid += 1
             else:
                 for hemi in ['_R', '_L']:
-                    afq_bundles[name + hemi] = {
-                        'ROIs': [templates[name + '_roi1' + hemi],
-                                 templates[name + '_roi2' + hemi]],
-                        'rules': [True, True],
-                        'prob_map': templates[name + hemi + '_prob_map'],
-                        'cross_midline': False,
-                        'uid': uid}
+                    if (templates.get(name + '_roi1' + hemi)
+                        and templates.get(name + '_roi2' + hemi)
+                        and templates.get(name + hemi + '_prob_map')):
+                        afq_bundles[name + hemi] = {
+                            'ROIs': [templates[name + '_roi1' + hemi],
+                                     templates[name + '_roi2' + hemi]],
+                            'rules': [True, True],
+                            'prob_map': templates[name + hemi + '_prob_map'],
+                            'cross_midline': False,
+                            'uid': uid}
+                    else:
+                        logger = logging.getLogger('AFQ.api')
+                        logger.warning(f"{name} is not in AFQ templates")
 
                     uid += 1
-
     elif seg_algo.startswith("reco"):
         if seg_algo.endswith("80"):
             bundle_dict = afd.read_hcp_atlas(80)

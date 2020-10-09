@@ -209,10 +209,9 @@ def test_make_bundle_dict():
 
     # Vertical Occipital Fasciculus
     # not included and does not exist in templates
-    try:
-        api.make_bundle_dict(bundle_names=["VOF"])
-    except KeyError:
-        pass
+    afq_bundles = api.make_bundle_dict(bundle_names=["VOF"])
+    
+    assert len(afq_bundles) == 0
 
 
 @pytest.mark.nightly4
@@ -224,7 +223,7 @@ def test_AFQ_custom_tract():
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = ["SLF", "ARC", "CST", "FP", "AntFrontal"]
 
     # move subsampled tractography into bids folder
     os.rename(
