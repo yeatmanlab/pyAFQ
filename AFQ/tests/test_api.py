@@ -229,7 +229,7 @@ def test_AFQ_init():
         my_afq = api.AFQ(bids_path,
                          dmriprep="synthetic")
         npt.assert_equal(my_afq.data_frame.shape,
-                         (n_subjects * n_sessions, 11))
+                         (n_subjects * n_sessions, 12))
 
 
 @pytest.mark.nightly2
