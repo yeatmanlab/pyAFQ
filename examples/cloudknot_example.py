@@ -74,32 +74,6 @@ knot = ck.Knot(
 # launch a process for each subject
 result_futures = knot.map(subjects)
 
-
-def merge_results(future):
-    # after all the subjects are done, we create another knot
-    # which takes the resulting profiles of each subject
-    # and combines them into one csv file
-    # this can also be done locally
-    # by using download_and_combine_afq_profiles in AFQ.api
-    def afq_combine_profiles(dummy_argument):
-        from AFQ.api import download_and_combine_afq_profiles
-        download_and_combine_afq_profiles(
-            "temp", "my_study_bucket", "my_study_prefix/derivatives/afq")
-
-    knot2 = ck.Knot(
-        name='afq_combine_subjects-201009-0',
-        func=afq_combine_profiles,
-        base_image='python:3.8',
-        image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
-        pars_policies=('AmazonS3FullAccess',),
-        bid_percentage=100)
-
-    futures = knot.map(["dummy_argument"], job_type="independent")
-    futures.add_done_callback(knot2.clobber)
-
-
-result_futures.add_done_callback(merge_results)
-
 ##########################################################################
 # this function can be called repeatedly in a jupyter notebook
 # to view the progress of jobs
@@ -107,8 +81,32 @@ result_futures.add_done_callback(merge_results)
 
 # you can also view the status of a specific job
 # knot.jobs[0].status
+##########################################################################
+
 
 # When all jobs are finished, remember to clobber the knot
 # either using the aws console or this function in jupyter notebook:
-# knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
-##########################################################################
+result_futures.result()  # waits for futures to resolve, not needed in notebook
+knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
+
+# we create another knot which takes the resulting profiles of each subject
+# and combines them into one csv file
+
+
+def afq_combine_profiles(dummy_argument):
+    from AFQ.api import download_and_combine_afq_profiles
+    download_and_combine_afq_profiles(
+        "temp", "my_study_bucket", "my_study_prefix/derivatives/afq")
+
+
+knot2 = ck.Knot(
+    name='afq_combine_subjects-201009-0',
+    func=afq_combine_profiles,
+    base_image='python:3.8',
+    image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
+    pars_policies=('AmazonS3FullAccess',),
+    bid_percentage=100)
+
+result_futures2 = knot2.map(["dummy_argument"], job_type="independent")
+result_futures2.result()
+knot2.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
