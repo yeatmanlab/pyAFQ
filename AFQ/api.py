@@ -721,7 +721,7 @@ class AFQ(object):
             mask = nib.load(brain_mask_file).get_fdata()
             csdf = csd_fit(gtab, data, mask=mask,
                            response=response, sh_order=sh_order,
-                           lambda_=lambda_, tau=tau)
+                           lambda_=lambda_, tau=tau, msmt=msmt)
             self.log_and_save_nii(nib.Nifti1Image(csdf.shm_coeff,
                                                   row['dwi_affine']),
                                   csd_params_file)
