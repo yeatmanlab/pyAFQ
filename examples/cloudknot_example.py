@@ -1,3 +1,12 @@
+"""
+==============================
+Using cloudknot to run pyAFQ on AWS batch:
+==============================
+
+The following is an example of running tractometry on AWS using a
+software called cloudknot: https://nrdg.github.io/cloudknot/
+"""
+
 # import cloudknot and set the correct region
 import cloudknot as ck
 ck.set_region('us-east-1')
