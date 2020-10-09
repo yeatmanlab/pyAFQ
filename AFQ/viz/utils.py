@@ -486,13 +486,13 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         None,
         [tract_profiles],
         ["my_tract_profiles"],
+        bundles=bundles,
         scalar_bounds={'lb': {}, 'ub': {}})
 
     df = csv_comparison.tract_profiles(
         scalar=scalar,
         ylim=ylim,
         positions=positions,
-        bundles=bundles,
         out_file=file_name,
         n_boot=n_boot)
 
