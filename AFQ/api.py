@@ -31,7 +31,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.segmentation as seg
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
-from AFQ.viz.utils import Viz, visualize_tract_profiles
+from AFQ.viz.utils import Viz, visualize_tract_profiles, POSITIONS
 from AFQ.utils.bin import get_default_args
 from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
 import logging
@@ -1574,6 +1574,9 @@ class AFQ(object):
     def _plot_tract_profiles(self, row):
         start_time = time()
         fnames = []
+        anatomically_known_bundles =\
+            [bundle for bundle in POSITIONS.keys()
+                if bundle in self.bundle_dict.keys()],
         for scalar in self.scalars:
             fname = self._get_fname(
                 row,
@@ -1584,6 +1587,7 @@ class AFQ(object):
             visualize_tract_profiles(self._tract_profiles(row),
                                      scalar=scalar,
                                      file_name=fname,
+                                     bundles=anatomically_known_bundles,
                                      n_boot=100)
             fnames.append(fname)
         row['timing']['Visualization'] =\

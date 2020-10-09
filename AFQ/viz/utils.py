@@ -443,6 +443,7 @@ class Viz:
 def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
                              n_boot=1000,
                              file_name=None,
+                             bundles=None,
                              positions=POSITIONS):
     """
     Visualize all tract profiles for a scalar in one plot
@@ -472,6 +473,11 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         Dictionary that maps bundle names to position in plot.
         Default: POSITIONS
 
+    bundles : list of strings, optional
+        Bundles to compare.
+        If None, use all bundles in the first profile group.
+        Default: None
+
     Returns
     -------
         Matplotlib figure and axes.
@@ -486,6 +492,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         scalar=scalar,
         ylim=ylim,
         positions=positions,
+        bundles=bundles,
         out_file=file_name,
         n_boot=n_boot)
 
