@@ -347,7 +347,6 @@ def make_pediatric_bundle_dict(bundle_names=pediatric_bundle_names,
                                               prob_map_order.index(name + hemi)],
                     'uid': uid}
                 uid += 1
-        # TODO confirm with @mareike no probabilty map for MdLF (only 20 not 22)
         elif name == "MdLF":
             for hemi in ['_R', '_L']:
                 pediatric_bundles[name + hemi] = {
@@ -355,6 +354,9 @@ def make_pediatric_bundle_dict(bundle_names=pediatric_bundle_names,
                              pediatric_templates[name + '_roi2' + hemi]],
                     'rules': [True, True],
                     'cross_midline': False,
+                    # reuse probability map from ILF
+                    'prob_map': prob_map_data[...,
+                                              prob_map_order.index("ILF" + hemi)],
                     'uid': uid}
                 uid += 1
         # Default: two ROIs within hemisphere
