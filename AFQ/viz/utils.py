@@ -1319,9 +1319,10 @@ class GroupCSVComparison():
             mini = ylims[0]
 
         if only_plot_above_thr is not None:
-            removal_idx =\
+            is_removed_bundle =\
                 np.logical_not(
                     np.any(all_sub_coef > only_plot_above_thr, axis=0))
+            removal_idx = np.where(is_removed_bundle)[0]
             bundle_prof_means_removed = np.delete(
                 bundle_prof_means,
                 removal_idx,
@@ -1335,14 +1336,14 @@ class GroupCSVComparison():
                 removal_idx,
                 axis=1)
         else:
-            removal_idx = [False]*len(self.bundles)
+            is_removed_bundle = [False]*len(self.bundles)
 
         df_bundle_prof_means = pd.DataFrame(
             columns=['scalar', 'tractID', 'value'])
         updated_bundles = []
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
-                if not removal_idx[k]:
+                if not is_removed_bundle[k]:
                     df_bundle_prof_means = df_bundle_prof_means.append({
                         'scalar': scalar,
                         'tractID': bundle,
@@ -1359,7 +1360,7 @@ class GroupCSVComparison():
         df_all_sub_coef = pd.DataFrame(columns=['scalar', 'tractID', 'value'])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
-                if not removal_idx[k]:
+                if not is_removed_bundle[k]:
                     df_all_sub_coef = df_all_sub_coef.append({
                         'scalar': scalar,
                         'tractID': bundle,
