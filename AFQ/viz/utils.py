@@ -1213,8 +1213,8 @@ class GroupCSVComparison():
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
-                    f"{names[0]}_vs_{names[1]}_profile_r_distributions",
-                    f"_{bundle}"))
+                    (f"{names[0]}_vs_{names[1]}_profile_r_distributions"
+                    f"_{bundle}")))
 
         ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format(disable_x=False)
@@ -1253,8 +1253,8 @@ class GroupCSVComparison():
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
-                    f"{names[0]}_vs_{names[1]}_node_profiles",
-                    f"_{bundle}"))
+                    (f"{names[0]}_vs_{names[1]}_node_profiles"
+                    f"_{bundle}")))
 
         ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format()
@@ -1291,8 +1291,8 @@ class GroupCSVComparison():
                 ba.save_temp_fig(
                     self._get_fname(
                         f"rel_plots/{'_'.join(scalars)}/verbose",
-                        f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles",
-                        f"_{bundle}"))
+                        (f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"
+                        f"_{bundle}")))
 
             ba.fig.legend([scalar], loc='center', fontsize=medium_font)
             ba.format(disable_x=False)
