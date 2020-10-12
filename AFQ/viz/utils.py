@@ -1114,6 +1114,7 @@ class GroupCSVComparison():
                           scalars=["dti_fa", "dti_md"],
                           ylims=[0.0, 1.0],
                           show_plots=False,
+                          only_plot_above_thr=None,
                           positions=POSITIONS):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
@@ -1136,6 +1137,11 @@ class GroupCSVComparison():
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
+
+        only_plot_above_thr : int or None, optional
+            Only plot bundles with intrersubject reliability above this
+            threshold on the final reliability bar plots. If None, plot all.
+            Default: None
 
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
@@ -1315,35 +1321,63 @@ class GroupCSVComparison():
             maxi = ylims[1]
             mini = ylims[0]
 
+        if only_plot_above_thr is not None:
+            removal_idx =\
+                np.logical_not(
+                    np.any(all_sub_coef > only_plot_above_thr, axis=0))
+            bundle_prof_means_removed = np.delete(
+                bundle_prof_means,
+                removal_idx,
+                axis=1)
+            bundle_prof_stds_removed = np.delete(
+                bundle_prof_stds,
+                removal_idx,
+                axis=1)
+            all_sub_coef_removed = np.delete(
+                all_sub_coef,
+                removal_idx,
+                axis=1)
+        else:
+            removal_idx = [False]*len(self.bundles)
+
         df_bundle_prof_means = pd.DataFrame(
             columns=['scalar', 'tractID', 'value'])
+        updated_bundles = []
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
-                df_bundle_prof_means = df_bundle_prof_means.append({
-                    'scalar': scalar,
-                    'tractID': bundle,
-                    'value': bundle_prof_means[m, k]}, ignore_index=True)
+                if not removal_idx[k]:
+                    df_bundle_prof_means = df_bundle_prof_means.append({
+                        'scalar': scalar,
+                        'tractID': bundle,
+                        'value': bundle_prof_means[m, k]}, ignore_index=True)
+                    if m == 0:
+                        updated_bundles.append(bundle)
             df_bundle_prof_means = df_bundle_prof_means.append({
                 'scalar': scalar,
                 'tractID': "median",
-                'value': np.median(bundle_prof_means[m])}, ignore_index=True)
+                'value': np.median(bundle_prof_means_removed[m])},
+                ignore_index=True)
+            if m == 0:
+                updated_bundles.append("median")
         df_all_sub_coef = pd.DataFrame(columns=['scalar', 'tractID', 'value'])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
-                df_all_sub_coef = df_all_sub_coef.append({
-                    'scalar': scalar,
-                    'tractID': bundle,
-                    'value': all_sub_coef[m, k]}, ignore_index=True)
+                if not removal_idx[k]:
+                    df_all_sub_coef = df_all_sub_coef.append({
+                        'scalar': scalar,
+                        'tractID': bundle,
+                        'value': all_sub_coef[m, k]}, ignore_index=True)
             df_all_sub_coef = df_all_sub_coef.append({
                 'scalar': scalar,
                 'tractID': "median",
-                'value': np.median(all_sub_coef[m])}, ignore_index=True)
+                'value': np.median(all_sub_coef_removed[m])},
+                ignore_index=True)
 
         sns.set(style="whitegrid")
         sns.barplot(
             data=df_bundle_prof_means, x='tractID', y='value', hue='scalar',
             palette=tableau_20_sns[:len(scalars) * 2 + 2:2],
-            yerr=[*bundle_prof_stds[m], 0],
+            yerr=[*bundle_prof_stds_removed[m], 0],
             ax=axes[0])
         axes[0].legend_.remove()
         sns.barplot(
@@ -1358,14 +1392,14 @@ class GroupCSVComparison():
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
         axes[0].set_xticklabels(
-            [*self.bundles, "median"], fontsize=small_font)
+            updated_bundles, fontsize=small_font)
         axes[1].set_title("B", fontsize=large_font)
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles',
-                           fontsize=small_font)
+                           fontsize=medium_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
         axes[1].set_xticklabels(
-            [*self.bundles, "median"], fontsize=small_font)
+            updated_bundles, fontsize=small_font)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
