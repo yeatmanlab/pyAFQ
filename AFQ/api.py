@@ -1576,7 +1576,7 @@ class AFQ(object):
         fnames = []
         anatomically_known_bundles =\
             [bundle for bundle in POSITIONS.keys()
-                if bundle in self.bundle_dict.keys()],
+                if bundle in self.bundle_dict.keys()]
         for scalar in self.scalars:
             fname = self._get_fname(
                 row,
