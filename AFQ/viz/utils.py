@@ -900,6 +900,12 @@ class GroupCSVComparison():
             plt.ioff()
         if names is None:
             names = list(self.profile_dict.keys())
+        if out_file is None:
+            fname = self._get_fname(
+                f"tract_profiles/{scalar}",
+                f"{'_'.join(names)}")
+        else:
+            fname = out_file
 
         ba = BrainAxes(positions=positions)
         labels = []
@@ -929,20 +935,11 @@ class GroupCSVComparison():
             if ba.is_using_temp_axis():
                 ba.temp_fig.legend(
                     labels_temp, names, fontsize=medium_font)
-                ba.save_temp_fig(
-                    self._get_fname(
-                        f"tract_profiles/{scalar}",
-                        f"{'_'.join(names)}_{bundle}"))
+                ba.save_temp_fig(f"{fname}_{bundle}")
         ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
         ba.format()
 
-        if out_file is None:
-            ba.fig.savefig(
-                self._get_fname(
-                    f"tract_profiles/{scalar}",
-                    f"{'_'.join(names)}"))
-        else:
-            ba.fig.savefig(out_file)
+        ba.fig.savefig(fname)
 
         if not show_plots:
             ba.close_all()

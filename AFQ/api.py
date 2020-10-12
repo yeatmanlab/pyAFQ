@@ -1577,7 +1577,7 @@ class AFQ(object):
         for scalar in self.scalars:
             fname = self._get_fname(
                 row,
-                f'_{scalar}_profile_plots.png',
+                f'_{scalar}_profile_plots',
                 include_track=True,
                 include_seg=True)
 
