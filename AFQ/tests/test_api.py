@@ -232,6 +232,15 @@ def test_AFQ_init():
                          (n_subjects * n_sessions, 12))
 
 
+def test_AFQ_custom_bundle_dict():
+    bids_path = create_dummy_bids_path(3, 1)
+    bundle_dict = api.make_bundle_dict()
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep="synthetic",
+        bundle_info=bundle_dict)
+
+
 @pytest.mark.nightly2
 def test_AFQ_data():
     """
