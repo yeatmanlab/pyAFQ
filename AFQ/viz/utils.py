@@ -494,6 +494,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
 
 class BrainAxes():
     '''
+    Helper class.
     Creates and handles a grid of axes.
     Each axis corresponds to a bundle.
     Axis placement should roughly correspond
@@ -516,13 +517,22 @@ class BrainAxes():
             wspace=0.4,
             hspace=0.6)
         self.fig.set_size_inches((18, 18))
+        self.temp_fig, self.temp_axis = plt.subplots()
+        self.temp_axis_owner = None
 
     def get_axis(self, bundle):
         '''
         Given a bundle, turn on and get an axis.
+        If bundle not positioned, will claim the temporary axis.
         '''
-        self.on_grid[self.positions[bundle]] = True
-        return self.axes[self.positions[bundle]]
+        if bundle in self.positions.keys():
+            self.on_grid[self.positions[bundle]] = True
+            return self.axes[self.positions[bundle]]
+        else:
+            if self.temp_axis_owner != bundle:
+                self.temp_fig.clf()
+            self.temp_axis_owner = bundle
+            return self.temp_axis
 
     def plot_line(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
                   lineplot_kwargs, plot_subject_lines=True):
@@ -572,6 +582,29 @@ class BrainAxes():
                     self.axes[i, j].set_xticklabels([])
                     self.axes[i, j].set_xlabel("")
         self.fig.tight_layout()
+
+    def save_temp_fig(self, fname):
+        '''
+        If using a temporary axis, save it out and clear it.
+        Returns True if temporary axis was saved, false if no
+        temporary axis was in use
+        '''
+        if self.temp_axis_owner is None:
+            return False
+        self.temp_fig.savefig(fname)
+        self.temp_fig.clf()
+        self.temp_axis_owner = None
+        return True
+
+    def is_using_temp_axis(self):
+        return (self.temp_axis_owner is not None)
+
+    def close_all(self):
+        '''
+        Close all associated figures.
+        '''
+        plt.close(self.temp_fig)
+        plt.close(self.fig)
 
 
 class GroupCSVComparison():
@@ -872,6 +905,7 @@ class GroupCSVComparison():
         labels = []
         self.logger.info("Calculating means and CIs...")
         for j, bundle in enumerate(tqdm(self.bundles)):
+            labels_temp = []
             for i, name in enumerate(names):
                 profile = self.profile_dict[name]
                 profile = profile[profile['tractID'] == bundle]
@@ -888,7 +922,17 @@ class GroupCSVComparison():
                         [], [],
                         color=[0, 0, 0])
                     line.set_dashes((2**(i + 1), 2**(i + 1)))
-                    labels.append(line)
+                    if ba.is_using_temp_axis():
+                        labels_temp.append(line)
+                    else:
+                        labels.append(line)
+            if ba.is_using_temp_axis():
+                ba.temp_fig.legend(
+                    labels_temp, names, fontsize=medium_font)
+                ba.save_temp_fig(
+                    self._get_fname(
+                        f"tract_profiles/{scalar}",
+                        f"{'_'.join(names)}_{bundle}"))
         ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
         ba.format()
 
@@ -901,7 +945,7 @@ class GroupCSVComparison():
             ba.fig.savefig(out_file)
 
         if not show_plots:
-            plt.close(ba.fig)
+            ba.close_all()
             plt.ion()
 
     def _contrast_index_df_maker(self, bundles, names, scalar):
@@ -980,6 +1024,10 @@ class GroupCSVComparison():
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
             ci_all_df[j] = ci_df["diff"]
+            ba.save_temp_fig(
+                self._get_fname(
+                    f"contrast_plots/{scalar}/",
+                    f"{names[0]}_vs_{names[1]}_contrast_index_{bundle}"))
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
@@ -987,7 +1035,7 @@ class GroupCSVComparison():
                 f"contrast_plots/{scalar}/",
                 f"{names[0]}_vs_{names[1]}_contrast_index"))
         if not show_plots:
-            plt.close(ba.fig)
+            ba.close_all()
             plt.ion()
         return ci_all_df
 
@@ -1045,6 +1093,10 @@ class GroupCSVComparison():
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
+            ba.save_temp_fig(
+                self._get_fname(
+                    f"contrast_plots/{scalar}/",
+                    f"{name}_lateral_contrast_index_{bundle}"))
 
         ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
@@ -1053,7 +1105,7 @@ class GroupCSVComparison():
                 f"contrast_plots/{scalar}/",
                 f"{name}_lateral_contrast_index"))
         if not show_plots:
-            plt.close(ba.fig)
+            ba.close_all()
 
         if not show_plots:
             plt.ion()
@@ -1157,6 +1209,12 @@ class GroupCSVComparison():
             ax.set_title(bundle, fontsize=large_font)
             ax.set_xlabel("Pearson's r", fontsize=medium_font)
             ax.set_ylabel("Count", fontsize=medium_font)
+            ba.temp_fig.legend(scalars, loc='center', fontsize=medium_font)
+            ba.save_temp_fig(
+                self._get_fname(
+                    f"rel_plots/{'_'.join(scalars)}/verbose",
+                    f"{names[0]}_vs_{names[1]}_profile_r_distributions",
+                    f"_{bundle}"))
 
         ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format(disable_x=False)
@@ -1166,7 +1224,7 @@ class GroupCSVComparison():
                 f"{names[0]}_vs_{names[1]}_profile_r_distributions"))
 
         if not show_plots:
-            plt.close(ba.fig)
+            ba.close_all()
 
         # plot node reliability profile
         all_node_coef[np.isnan(all_node_coef)] = 0
@@ -1191,6 +1249,12 @@ class GroupCSVComparison():
             ax.set_ylim([mini, maxi])
             ax.set_title(bundle, fontsize=large_font)
             ax.set_ylabel("Pearson's r", fontsize=medium_font)
+            ba.temp_fig.legend(scalars, loc='center', fontsize=medium_font)
+            ba.save_temp_fig(
+                self._get_fname(
+                    f"rel_plots/{'_'.join(scalars)}/verbose",
+                    f"{names[0]}_vs_{names[1]}_node_profiles",
+                    f"_{bundle}"))
 
         ba.fig.legend(scalars, loc='center', fontsize=medium_font)
         ba.format()
@@ -1200,7 +1264,7 @@ class GroupCSVComparison():
                 f"{names[0]}_vs_{names[1]}_node_profiles"))
 
         if not show_plots:
-            plt.close(ba.fig)
+            ba.close_all()
 
         # plot mean profile scatter plots
         for m, scalar in enumerate(scalars):
@@ -1222,6 +1286,13 @@ class GroupCSVComparison():
                 ax.set_ylabel(names[1], fontsize=medium_font)
                 ax.set_ylim([mini, maxi])
                 ax.set_xlim([mini, maxi])
+                ba.temp_fig.legend(
+                    [scalar], loc='center', fontsize=medium_font)
+                ba.save_temp_fig(
+                    self._get_fname(
+                        f"rel_plots/{'_'.join(scalars)}/verbose",
+                        f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles",
+                        f"_{bundle}"))
 
             ba.fig.legend([scalar], loc='center', fontsize=medium_font)
             ba.format(disable_x=False)
@@ -1230,7 +1301,7 @@ class GroupCSVComparison():
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
             if not show_plots:
-                plt.close(ba.fig)
+                ba.close_all()
 
         # plot bar plots of pearson's r
         fig, axes = plt.subplots(2, 1)
