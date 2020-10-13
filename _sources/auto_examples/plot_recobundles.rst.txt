@@ -273,7 +273,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 8 minutes  52.334 seconds)
+   **Total running time of the script:** ( 9 minutes  1.845 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:
