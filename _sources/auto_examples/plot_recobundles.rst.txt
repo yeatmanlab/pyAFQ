@@ -22,7 +22,6 @@ difference here is that segmentation uses the RecoBundles algorithm, instead of
 the AFQ waypoint ROI approach.
 
 
-
 .. code-block:: default
 
 
@@ -274,7 +273,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 7 minutes  11.584 seconds)
+   **Total running time of the script:** ( 8 minutes  52.334 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

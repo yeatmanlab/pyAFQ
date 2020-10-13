@@ -16,8 +16,6 @@ AFQ API
 An example using the AFQ API
 
 
-
-
 .. code-block:: default
 
     import os.path as op
@@ -140,10 +138,10 @@ compliant data.
  .. code-block:: none
 
     Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz
-      0%|          | 0.00/13.4k [00:00<?, ?B/s]     45%|####5     | 6.08k/13.4k [00:00<00:00, 60.8kB/s]     98%|#########8| 13.1k/13.4k [00:00<00:00, 63.4kB/s]    13.4kB [00:00, 65.1kB/s]                            
+      0%|          | 0.00/13.4k [00:00<?, ?B/s]     28%|##7       | 3.68k/13.4k [00:00<00:00, 36.8kB/s]     68%|######8   | 9.12k/13.4k [00:00<00:00, 40.8kB/s]    13.4kB [00:00, 48.0kB/s]                            
     Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz
-      0%|          | 0.00/155 [00:00<?, ?B/s]    156B [00:00, 6.69kB/s]                   
-    /opt/hostedtoolcache/Python/3.6.12/x64/lib/python3.6/site-packages/bids/layout/models.py:102: FutureWarning:
+      0%|          | 0.00/155 [00:00<?, ?B/s]    156B [00:00, 7.64kB/s]                   
+    /opt/hostedtoolcache/Python/3.7.9/x64/lib/python3.7/site-packages/bids/layout/models.py:102: FutureWarning:
 
     The 'extension' entity currently excludes the leading dot ('.'). As of version 0.14.0, it will include the leading dot. To suppress this warning and include the leading dot, use `bids.config.set_option('extension_initial_dot', True)`.
 
@@ -304,7 +302,7 @@ plots show both FA (left) and MD (right) layed out anatomically.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 28 minutes  47.961 seconds)
+   **Total running time of the script:** ( 33 minutes  44.967 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_afq_api.py:
