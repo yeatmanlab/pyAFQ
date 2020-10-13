@@ -221,4 +221,3 @@ def test_bundles_to_aal():
     targets = afd.bundles_to_aal(["VOF"], atlas)
     assert len(targets) == 1
     npt.assert_equal(targets, [[None, None]])
-
