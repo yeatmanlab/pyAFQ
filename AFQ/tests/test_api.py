@@ -181,7 +181,7 @@ def test_AFQ_custom_tract():
     my_afq = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_names=bundle_names,
+        bundle_info=bundle_names,
         custom_tractography_bids_filters={
             "suffix": "tractography",
             "scope": "vistasoft"
@@ -230,6 +230,15 @@ def test_AFQ_init():
                          dmriprep="synthetic")
         npt.assert_equal(my_afq.data_frame.shape,
                          (n_subjects * n_sessions, 12))
+
+
+def test_AFQ_custom_bundle_dict():
+    bids_path = create_dummy_bids_path(3, 1)
+    bundle_dict = api.make_bundle_dict()
+    my_afq = api.AFQ(
+        bids_path,
+        dmriprep="synthetic",
+        bundle_info=bundle_dict)
 
 
 @pytest.mark.nightly2
@@ -318,8 +327,8 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="bundle_names must be None or a list of strings"):
-        api.AFQ(bids_path, bundle_names=[2, 3])
+            match="bundle_info must be None, a list of strings, or a dict"):
+        api.AFQ(bids_path, bundle_info=[2, 3])
 
 
 @pytest.mark.skip(reason="may cause OOM")
@@ -396,7 +405,7 @@ def test_AFQ_pft():
     my_afq = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_names=bundle_names,
+        bundle_info=bundle_names,
         tracking_params={
             "stop_mask": stop_mask,
             "stop_threshold": "CMC",
@@ -418,7 +427,7 @@ def test_AFQ_custom_subject_reg():
     b0_file = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_names=bundle_names).get_b0()[0]
+        bundle_info=bundle_names).get_b0()[0]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()
@@ -428,7 +437,7 @@ def test_AFQ_custom_subject_reg():
     my_afq = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_names=bundle_names,
+        bundle_info=bundle_names,
         reg_template="mni_T2",
         reg_subject={
             "suffix": "customb0",
@@ -516,7 +525,7 @@ def test_AFQ_data_waypoint():
 
     myafq = api.AFQ(bids_path=bids_path,
                     dmriprep='vistasoft',
-                    bundle_names=bundle_names,
+                    bundle_info=bundle_names,
                     scalars=["dti_FA", "dti_MD"],
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
@@ -597,7 +606,7 @@ def test_AFQ_data_waypoint():
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
                   BUNDLES=dict(
-                      bundle_names=bundle_names,
+                      bundle_info=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
                   VIZ=dict(
                       viz_backend="plotly_no_gif"),

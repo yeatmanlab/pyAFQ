@@ -180,7 +180,7 @@ class AFQ(object):
                  reg_template="mni_T1",
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
-                 bundle_names=None,
+                 bundle_info=None,
                  dask_it=False,
                  force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
@@ -251,8 +251,9 @@ class AFQ(object):
             If None, no brain mask will not be applied,
             and no brain mask will be applied to the template.
             Default: B0Mask()
-        bundle_names : list of strings, optional
-            [BUNDLES] List of bundle names to include in segmentation.
+        bundle_info : list of strings or dict, optional
+            [BUNDLES] List of bundle names to include in segmentation,
+            or a bundle dictionary (see make_bundle_dict for inspiration).
             If None, will get all appropriate bundles for the chosen
             segmentation algorithm.
             Default: None
@@ -325,11 +326,12 @@ class AFQ(object):
         if brain_mask is not None and not check_mask_methods(brain_mask):
             raise TypeError(
                 "brain_mask must be None or a mask defined in `AFQ.mask`")
-        if bundle_names is not None and not (
-                isinstance(bundle_names, list)
-                and isinstance(bundle_names[0], str)):
+        if bundle_info is not None and not ((
+                isinstance(bundle_info, list)
+                and isinstance(bundle_info[0], str)) or (
+                    isinstance(bundle_info, dict))):
             raise TypeError(
-                "bundle_names must be None or a list of strings")
+                "bundle_info must be None, a list of strings, or a dict")
         if not isinstance(dask_it, bool):
             raise TypeError("dask_it must be a bool")
         if not isinstance(force_recompute, bool):
@@ -439,19 +441,23 @@ class AFQ(object):
 
         self.clean_params = default_clean_params
 
-        if bundle_names is None:
+        if bundle_info is None:
             if self.seg_algo == "reco" or self.seg_algo == "reco16":
-                bundle_names = RECO_BUNDLES_16
+                bundle_info = RECO_BUNDLES_16
             elif self.seg_algo == "reco80":
-                bundle_names = RECO_BUNDLES_80
+                bundle_info = RECO_BUNDLES_80
             else:
-                bundle_names = BUNDLES
+                bundle_info = BUNDLES
 
         # Create the bundle dict after reg_template has been resolved:
         self.reg_template_img, _ = self._reg_img(self.reg_template, False)
-        self.bundle_dict = make_bundle_dict(bundle_names=bundle_names,
-                                            seg_algo=self.seg_algo,
-                                            resample_to=self.reg_template_img)
+        if isinstance(bundle_info, list):
+            self.bundle_dict = make_bundle_dict(
+                bundle_names=bundle_info,
+                seg_algo=self.seg_algo,
+                resample_to=self.reg_template_img)
+        else:
+            self.bundle_dict = bundle_info
 
         # Initialize dict to store relevant timing information
         timing_dict = {
