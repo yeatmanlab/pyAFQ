@@ -331,7 +331,7 @@ class AFQ(object):
                 and isinstance(bundle_info[0], str)) or (
                     isinstance(bundle_info, dict))):
             raise TypeError(
-                "bundle_info must be None or a list of strings")
+                "bundle_info must be None, a list of strings, or a dict")
         if not isinstance(dask_it, bool):
             raise TypeError("dask_it must be a bool")
         if not isinstance(force_recompute, bool):
