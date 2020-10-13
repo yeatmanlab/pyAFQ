@@ -227,8 +227,28 @@ Functions
 
 .. function:: organize_stanford_data(path=None)
 
-   Create the expected file-system structure for the Stanford HARDI data-set.
+   If necessary, downloads the Stanford HARDI dataset into DIPY directory and
+   creates a BIDS compliant file-system structure in AFQ data directory:
 
+   ~/AFQ_data/
+   └── stanford_hardi
+   ├── dataset_description.json
+   └── derivatives
+       ├── freesurfer
+       │   ├── dataset_description.json
+       │   └── sub-01
+       │       └── ses-01
+       │           └── anat
+       │               ├── sub-01_ses-01_T1w.nii.gz
+       │               └── sub-01_ses-01_seg.nii.gz
+       └── vistasoft
+           ├── dataset_description.json
+           └── sub-01
+               └── ses-01
+                   └── dwi
+                       ├── sub-01_ses-01_dwi.bvals
+                       ├── sub-01_ses-01_dwi.bvecs
+                       └── sub-01_ses-01_dwi.nii.gz
 
 
 
@@ -248,7 +268,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_names=BUNDLES, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='fury', tracking_params=None, segmentation_params=None, clean_params=None)
+.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_info=None, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None)
 
    Bases: :class:`object`
 
@@ -382,7 +402,7 @@ Functions
    .. method:: _dki(self, row)
 
 
-   .. method:: _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1)
+   .. method:: _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1, msmt=False)
 
 
    .. method:: _anisotropic_power_map(self, row)
@@ -409,7 +429,7 @@ Functions
    .. method:: _get_best_scalar(self)
 
 
-   .. method:: _reg_img(self, img, row=None)
+   .. method:: _reg_img(self, img, mask, row=None)
 
 
    .. method:: _reg_prealign(self, row)
@@ -442,13 +462,19 @@ Functions
    .. method:: _export_bundles(self, row)
 
 
-   .. method:: _viz_prepare_vols(self, row, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False)
+   .. method:: _export_sl_counts(self, row)
 
 
-   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None)
+   .. method:: _viz_prepare_vol(self, row, vol, xform, mapping)
 
 
-   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None)
+   .. method:: _viz_prepare_vols(self, row, volume, xform_volume, color_by_volume, xform_color_by_volume)
+
+
+   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40)
+
+
+   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40)
 
 
    .. method:: _plot_tract_profiles(self, row)
@@ -586,10 +612,13 @@ Functions
    .. method:: export_bundles(self)
 
 
-   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None, inline=False, interactive=False)
+   .. method:: export_sl_counts(self)
 
 
-   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=None, inline=False, interactive=False)
+   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40, inline=False, interactive=False)
+
+
+   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40, inline=False, interactive=False)
 
 
    .. method:: plot_tract_profiles(self)
@@ -660,6 +689,14 @@ Functions
 
        **bundle_names** : list, optional
            A list of the bundles to be used in this case. Default: all of them
+
+       **seg_algo: One of {"afq", "reco", "reco16", "reco80"}**
+           The bundle segmentation algorithm to use.
+               "afq" : Use waypoint ROIs + probability maps, as described
+               in [Yeatman2012]_
+               "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
+               with a 16-bundle set.
+               "reco80": Use Recobundles with an 80-bundle set.
 
        **resample_to** : Nifti1Image, optional
            If set, templates will be resampled to the affine and shape of this

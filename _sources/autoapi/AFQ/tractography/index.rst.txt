@@ -66,20 +66,21 @@ Functions
        **stop_mask** : array or str, optional.
            If array: A float or binary mask that determines a stopping criterion
            (e.g. FA).
-           If str: "CMC" for Continuous Map Criterion [R2bb8bf7259c4-Girard2014]_.
-                   "ACT" for Anatomically-constrained tractography [Smith2012]_.
-           Defaults to no stopping (all ones). A string is required if
-           the tracker is set to "pft".
+           If tuple: it contains a sequence that is interpreted as:
+           (pve_wm, pve_gm, pve_csf), each item of which is either a string
+           (full path) or a nibabel img to be used in particle filtering
+           tractography.
+           A tuple is required if tracker is set to "pft".
+           Defaults to no stopping (all ones).
 
        **stop_threshold** : float or tuple, optional.
            If float, this a value of the stop_mask below which tracking is
-           terminated (and stop_mask has to be an array). Defaults to
-           0 (this means that if no stop_mask is passed, we will stop only at
-           the edge of the image). If this is a tuple, it contains a sequence
-           that is interpreted as: (pve_wm, pve_gm, pve_csf), each item of
-           which is either a string (full path) or a nibabel img to be used
-           in particle filtering tractography. A tuple is required if tracker
-           is set to "pft".
+           terminated (and stop_mask has to be an array).
+           If str, "CMC" for Continuous Map Criterion [R2bb8bf7259c4-Girard2014]_.
+                   "ACT" for Anatomically-constrained tractography [Smith2012]_.
+           A string is required if the tracker is set to "pft".
+           Defaults to 0 (this means that if no stop_mask is passed,
+           we will stop only at the edge of the image).
 
        **step_size** : float, optional.
            The size (in mm) of a step of tractography. Default: 1.0
@@ -88,10 +89,10 @@ Functions
            The miminal length (mm) in a streamline. Default: 10
 
        **max_length: int, optional**
-           The miminal length (mm) in a streamline. Default: 250
+           The miminal length (mm) in a streamline. Default: 1000
 
        **odf_model** : str, optional
-           One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
+           One of {"DTI", "CSD", "DKI", "MSMT"}. Defaults to use "DTI"
 
        **tracker** : str, optional
            Which strategy to use in tracking. This can be the standard local

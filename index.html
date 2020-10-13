@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
@@ -36,16 +37,16 @@
 
           <div class="body" role="main">
             
-  <div class="align-center figure" id="home">
+  <span class="target" id="home"></span><div class="align-center figure">
 <a class="reference external image-reference" href="http://brainandeducation.com"><img alt="_images/BDE_Banner_revised20160211-01.jpg" src="_images/BDE_Banner_revised20160211-01.jpg" /></a>
 </div>
 <div class="section" id="afq-automated-fiber-quantification">
 <h1>AFQ: Automated Fiber Quantification<a class="headerlink" href="#afq-automated-fiber-quantification" title="Permalink to this headline">¶</a></h1>
-<p>Tractography based on diffusion weighted MRI (dMRI) is used to find  the major
+<p>Tractography based on diffusion weighted MRI (dMRI) is used to find the major
 white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
 disorders.</p>
-<p><cite>AFQ</cite> is a sofware package focused on automated delineation of the major fiber
+<p><cite>AFQ</cite> is a software package focused on automated delineation of the major fiber
 tracts in individual human brains, and quantification of the tissue properties
 within the tracts.</p>
 <p>Tissue properties may vary systematically along each tract: different
@@ -53,12 +54,38 @@ populations of axons enter and exit the tract, and disease can strike at local
 positions within the tract. Because of this, quantifying and understanding
 diffusion measures along each fiber tract (the tract profile) may reveal new
 insights into white matter development, function, and disease that are not
-obvious from mean measures of that tract (<a class="reference internal" href="#yeatman2012" id="id1"><span>[Yeatman2012]</span></a>).</p>
+obvious from mean measures of that tract (<a class="reference internal" href="#yeatman2012" id="id3"><span>[Yeatman2012]</span></a>).</p>
 <dl class="citation">
-<dt class="label" id="yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
+<dt class="label" id="yeatman2012"><span class="brackets"><a class="fn-backref" href="#id3">Yeatman2012</a></span></dt>
 <dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman, “Tract profiles of white matter properties: automating fiber-tract quantification”, PloS One, 7: e49790</p>
 </dd>
 </dl>
+</div>
+<div class="section" id="tractometry">
+<h1>Tractometry<a class="headerlink" href="#tractometry" title="Permalink to this headline">¶</a></h1>
+<table class="colwidths-auto docutils align-default" id="id7">
+<caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><p>Tractography</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>&gt; → Segmentation</p></td>
+<td><p>→ Cleaning</p></td>
+<td><p>→ Profiling</p></td>
+<td><p>→ Visualization</p></td>
+</tr>
+<tr class="row-odd"><td><p>Registration</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="acknowledgements">
 <h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
@@ -100,7 +127,7 @@ NSF grant (1551330) to Jason Yeatman.</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>

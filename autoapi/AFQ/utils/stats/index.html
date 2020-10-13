@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
@@ -49,14 +50,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.stats.contrast_index" title="AFQ.utils.stats.contrast_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contrast_index</span></code></a>(x1, x2)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.stats.contrast_index" title="AFQ.utils.stats.contrast_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contrast_index</span></code></a>(x1, x2, double=True)</p></td>
 <td><p>Calculate the contrast index between two arrays.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="AFQ.utils.stats.contrast_index">
-<code class="sig-prename descclassname">AFQ.utils.stats.</code><code class="sig-name descname">contrast_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x1</span></em>, <em class="sig-param"><span class="n">x2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/stats.html#contrast_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.stats.contrast_index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.utils.stats.</code><code class="sig-name descname">contrast_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x1</span></em>, <em class="sig-param"><span class="n">x2</span></em>, <em class="sig-param"><span class="n">double</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/stats.html#contrast_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.stats.contrast_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the contrast index between two arrays.
 The contrast index is symmetrical with respect to
 the choice of the baseline for comparison</p>
@@ -68,6 +69,10 @@ where x1 &gt; x2.</p>
 </dd>
 <dt><strong>x2</strong><span class="classifier">ndarray of floats</span></dt><dd><p>An ndarray to compare. The contrast index will have negative values
 where x2 &gt; x1.</p>
+</dd>
+<dt><strong>double</strong><span class="classifier">bool, optional</span></dt><dd><p>Double the contrast index.
+This makes it comparable to a percent difference.
+Default: True</p>
 </dd>
 </dl>
 </dd>
@@ -108,7 +113,7 @@ where x2 &gt; x1.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>

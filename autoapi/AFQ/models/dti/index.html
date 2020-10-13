@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
@@ -49,7 +50,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.models.dti.fit_dti" title="AFQ.models.dti.fit_dti"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_dti</span></code></a>(data_files, bval_files, bvec_files, mask=None, out_dir=None, file_prefix=None, b0_threshold=0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.models.dti.fit_dti" title="AFQ.models.dti.fit_dti"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_dti</span></code></a>(data_files, bval_files, bvec_files, mask=None, out_dir=None, file_prefix=None, b0_threshold=50)</p></td>
 <td><p>Fit the DTI model using default settings, save files with derived maps</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.models.dti.predict" title="AFQ.models.dti.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(params_file, gtab, S0_file=None, out_dir=None)</p></td>
@@ -59,7 +60,7 @@
 </table>
 <dl class="py function">
 <dt id="AFQ.models.dti.fit_dti">
-<code class="sig-prename descclassname">AFQ.models.dti.</code><code class="sig-name descname">fit_dti</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_prefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/models/dti.html#fit_dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.models.dti.fit_dti" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.models.dti.</code><code class="sig-name descname">fit_dti</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_prefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/models/dti.html#fit_dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.models.dti.fit_dti" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit the DTI model using default settings, save files with derived maps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -134,7 +135,7 @@ contain the S0 data must be the same as the gtab.b0s_mask.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>

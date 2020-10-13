@@ -16,7 +16,7 @@ Functions
    AFQ.utils.stats.contrast_index
 
 
-.. function:: contrast_index(x1, x2)
+.. function:: contrast_index(x1, x2, double=True)
 
    Calculate the contrast index between two arrays.
    The contrast index is symmetrical with respect to
@@ -32,6 +32,11 @@ Functions
        **x2** : ndarray of floats
            An ndarray to compare. The contrast index will have negative values
            where x2 > x1.
+
+       **double** : bool, optional
+           Double the contrast index.
+           This makes it comparable to a percent difference.
+           Default: True
 
    :Returns:
 

@@ -1,0 +1,919 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_callosal_tract_profile.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_callosal_tract_profile.py:
+
+
+==============================
+Plotting Novel Tract Profiles:
+==============================
+
+The following is an example of tractometry for a novel bundle and plotting the
+resulting FA tract profile. We will run tractometry for the *anterior forceps*
+using waypoint ROIs.
+
+**AFQ Waypoint ROI Tractometry:**
+
+.. note::
+
+  This example uses the Yeatman et al. waypoint ROI approach, first
+  described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
+
+  The waypoint ROIs used in this example are from the anterior frontal lobe of
+  the corpus callosum (AntFrontal). The waypoint ROIs are from the human corpus
+  callosum templates:
+
+    https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
+
+
+
+.. code-block:: default
+
+    import os.path as op
+    import matplotlib.pyplot as plt
+    import plotly
+    import numpy as np
+    import nibabel as nib
+    import dipy.data as dpd
+    from dipy.data import fetcher
+    from dipy.io.streamline import save_tractogram, load_tractogram
+    from dipy.stats.analysis import afq_profile, gaussian_weights
+    from dipy.io.stateful_tractogram import StatefulTractogram
+    from dipy.io.stateful_tractogram import Space
+
+    import AFQ.data as afd
+    import AFQ.tractography as aft
+    import AFQ.registration as reg
+    import AFQ.models.dti as dti
+    import AFQ.segmentation as seg
+    from AFQ.utils.volume import patch_up_roi, density_map
+    from AFQ.viz.utils import show_anatomical_slices
+    from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
+
+    import logging
+    import sys
+
+    # Ensure segmentation logging information is included in this example's output
+    root = logging.getLogger()
+    root.setLevel(logging.ERROR)
+    logging.getLogger('AFQ.Segmentation').setLevel(logging.INFO)
+    logging.getLogger('AFQ.tractography').setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+    root.addHandler(handler)
+
+    # Target directory for this example's output files
+    working_dir = "./callosal_tract_profile"
+
+
+
+
+
+
+
+
+
+Get example data:
+-----------------
+**Diffusion dataset**
+
+.. note::
+  The diffusion data used in this example are from the Stanford High Angular
+  Resolution Diffusion Imaging (HARDI) dataset:
+
+    https://purl.stanford.edu/ng782rw8378
+
+
+.. code-block:: default
+
+
+
+    print("Fetching data...")
+
+    # If does not already exist `fetch_stanford_hardi` will download the first
+    # subject's session from the HARDI data into fetcher.dipy_home:
+    # `~/.dipy/stanford_hardi`
+    dpd.fetch_stanford_hardi()
+
+    # Reference to data file locations
+    hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
+    hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
+    hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
+    hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+
+    print(f'Loading data file: {hardi_fdata}')
+    img = nib.load(hardi_fdata)
+
+    # Display output from this step
+    img_data = img.get_fdata()
+
+    # working with space and time data
+    img_data = img_data[..., int(img_data.shape[3] / 2)]
+
+    show_anatomical_slices(img_data, 'HARDI 150 DWI')
+    print(f'bvals: f{np.loadtxt(hardi_fbval)}')
+    print(f'bvec: f{np.loadtxt(hardi_fbvec)}')
+
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_001.png
+    :alt: HARDI 150 DWI
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Fetching data...
+    Loading data file: /home/runner/.dipy/stanford_hardi/HARDI150.nii.gz
+    bvals: f[   0.    0.    0.    0.    0.    0.    0.    0.    0.    0. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000. 2000.
+     2000. 2000. 2000. 2000.]
+    bvec: f[[ 0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00
+       0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  2.1828e-02 -1.5425e-02
+      -7.0918e-01 -2.4650e-01 -4.8347e-01  1.5103e-01 -5.4968e-01  2.3308e-01
+      -1.1361e-02  2.7345e-01  1.0646e-02 -2.5044e-01  3.9140e-01  6.8950e-01
+      -7.7143e-01  9.4523e-01  1.0391e-02  7.3680e-01 -9.8470e-01 -8.9374e-01
+       5.5402e-01 -4.0213e-01  4.0755e-01  2.7149e-01  6.9603e-01 -3.3597e-01
+       5.0008e-01 -1.9431e-01 -2.5439e-01  1.1981e-01  7.4913e-01  5.2236e-01
+      -7.7609e-01  4.6538e-01  6.5168e-01 -5.4572e-01  8.4130e-01 -7.2432e-01
+      -4.7036e-01 -6.9871e-01 -2.6719e-01 -2.6594e-01 -2.1274e-01  8.3845e-01
+      -1.9750e-01  5.1026e-01 -5.0455e-01 -5.0390e-02  9.8875e-01  7.1962e-01
+       6.5373e-01  2.2238e-01  2.0814e-01  2.9695e-01  4.4322e-01 -8.9404e-01
+       9.5936e-01 -5.0099e-01 -2.9853e-01 -9.8271e-01 -5.1163e-01  3.0748e-01
+       2.6653e-01 -5.4932e-01  6.8606e-01 -6.5757e-01  8.7456e-01 -2.8195e-01
+      -5.1032e-01 -7.5223e-02  3.1713e-01  2.8225e-01 -8.6210e-01 -2.7580e-01
+       6.4700e-01  2.7836e-01  7.9794e-01  7.3818e-01 -8.4873e-01 -5.2726e-01
+      -9.2786e-01  9.5555e-02 -2.3265e-01  7.0854e-01  8.9240e-01  5.2176e-01
+      -2.9506e-01 -4.1043e-01 -8.5959e-01 -4.7509e-01  2.5831e-02 -5.6402e-02
+       5.3298e-01  2.6141e-01  2.3467e-01  8.2903e-03 -9.7191e-01  8.6497e-01
+       9.0014e-01 -2.5954e-01  4.8713e-01  2.7571e-01  2.3591e-02 -3.7415e-01
+      -6.4550e-01  5.6569e-01  9.8128e-01 -6.3212e-02  2.8306e-01  4.1599e-01
+      -7.5213e-01  5.0235e-01 -2.9472e-01 -7.2887e-01 -4.8141e-01 -7.3825e-01
+      -1.1825e-01  1.8412e-02 -2.5614e-01 -9.7014e-01  8.8535e-01  8.9293e-01
+      -6.9859e-01  3.3797e-02 -5.7521e-01  7.5409e-01  8.9627e-01 -7.3790e-01
+       2.4103e-01  2.3733e-02 -4.6618e-01  4.7867e-01 -6.8918e-01 -5.1816e-01
+      -8.5670e-01 -1.1827e-02 -9.0725e-01 -8.8020e-01 -7.3942e-01  1.9922e-02
+       5.0924e-01 -5.0611e-01  7.6960e-01  7.3579e-01 -9.0321e-01 -6.6243e-01
+       5.8520e-01 -1.7711e-01  1.6554e-01  9.7435e-01]
+     [ 0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00
+       0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  8.0242e-01  2.2098e-01
+      -6.3106e-04  1.0430e-01  4.3910e-01  9.6523e-01 -5.7211e-01 -5.4777e-01
+       7.3029e-01  4.3337e-01  5.0304e-01  8.5038e-01 -8.9093e-02 -5.8216e-01
+      -1.5056e-01  3.0314e-01  5.7944e-01  1.7151e-01 -8.8200e-04  1.4602e-01
+      -8.3235e-01  9.1302e-01 -1.7493e-01  3.4653e-01 -3.5761e-01 -5.0281e-01
+       6.3699e-01  9.4448e-01  9.4863e-01 -6.7153e-01  4.5794e-01  6.9589e-01
+      -4.4153e-01 -3.5160e-01 -6.1256e-01 -8.9358e-02  5.4003e-01  2.7439e-01
+      -7.7533e-01 -7.1371e-01  4.1599e-01 -9.6358e-01 -8.1226e-01 -1.2171e-01
+      -2.1432e-01 -8.1467e-01  7.9680e-01  9.9871e-01  1.1770e-01  4.5070e-01
+       7.5593e-01  4.8801e-02 -9.3675e-01 -9.5448e-01 -6.0860e-01  3.7185e-01
+      -1.2590e-01  2.1601e-01 -2.4495e-01  2.2219e-02  7.0846e-01  8.3106e-01
+      -4.4696e-01  6.0906e-01 -1.0546e-01  7.5037e-01 -8.6456e-02  8.0573e-01
+       4.9591e-01 -9.7013e-01 -7.9817e-01  8.6906e-01 -1.3478e-01 -6.1451e-01
+      -7.6464e-02 -9.2634e-01  5.3984e-01 -6.5899e-01 -4.8099e-01  3.6635e-01
+      -2.7932e-01 -2.3017e-01 -9.3617e-01  6.5232e-01 -4.5053e-01  3.9092e-01
+       6.0799e-01 -3.7828e-01 -5.0426e-01 -8.7112e-02 -7.1859e-01 -4.6297e-01
+       4.7253e-01  6.2769e-01  9.6634e-01 -8.6208e-01  2.3515e-01 -3.8367e-01
+       1.4078e-01  3.6743e-01  8.5064e-01 -7.8971e-01  8.8680e-01  1.0942e-01
+      -6.8034e-01 -3.6912e-01 -1.8969e-01 -4.6654e-01  6.7667e-01  8.9864e-01
+       3.7798e-01  1.0985e-01 -8.5442e-01  5.0158e-01 -6.5782e-01  5.9212e-01
+      -3.9925e-02  9.4744e-01  6.6828e-01 -2.3682e-01  2.3060e-01 -3.5732e-01
+      -6.5961e-01 -9.1251e-01 -3.6582e-01 -6.3240e-01  3.7064e-01 -4.4490e-01
+       1.5192e-01 -3.4211e-02 -8.6070e-01 -6.0633e-01  1.3776e-01  8.2740e-01
+       5.1392e-01  3.0082e-01 -2.1703e-01  8.8006e-02  6.3973e-01 -9.9684e-01
+       2.0460e-01 -8.5336e-01 -3.5989e-01  1.9537e-01  3.2539e-01 -2.9331e-01
+       7.4103e-01 -7.0962e-01 -2.8380e-01  4.9151e-03]
+     [ 0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00
+       0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00 -5.9636e-01  9.7516e-01
+      -7.0503e-01 -9.6351e-01 -7.5726e-01  2.1336e-01 -6.0872e-01 -8.0351e-01
+       6.8305e-01 -8.5873e-01  8.6420e-01 -4.6275e-01 -9.1590e-01 -4.3091e-01
+       6.1824e-01  1.2101e-01 -8.1495e-01  6.5399e-01 -1.7427e-01 -4.2415e-01
+      -1.5825e-02  6.8411e-02  8.9627e-01  8.9789e-01 -6.2263e-01  7.9643e-01
+       5.8666e-01  2.6496e-01 -1.8812e-01  7.3123e-01 -4.7863e-01 -4.9281e-01
+      -4.5026e-01 -8.1228e-01  4.4729e-01  8.3319e-01 -2.4024e-02 -6.3252e-01
+      -4.2145e-01  4.9125e-02 -8.6923e-01  2.7981e-02 -5.4311e-01 -5.3121e-01
+      -9.5659e-01  2.7558e-01  3.3248e-01  5.4406e-03 -9.2290e-02  5.2821e-01
+       3.4822e-02  9.7374e-01  2.8139e-01  2.8103e-02  6.5815e-01 -2.4985e-01
+      -2.5254e-01 -8.3806e-01  9.2243e-01  1.8383e-01 -4.8613e-01  4.6346e-01
+       8.5393e-01  5.7210e-01  7.1987e-01  6.7413e-02  4.7714e-01  5.2087e-01
+      -7.0260e-01  2.3063e-01  5.1221e-01 -4.0629e-01 -4.8849e-01 -7.3913e-01
+      -7.5864e-01 -2.5377e-01  2.6806e-01 -1.4432e-01  2.1977e-01  7.6667e-01
+      -2.4709e-01  9.6845e-01 -2.6354e-01 -2.6917e-01 -2.5489e-02  7.5825e-01
+       7.3708e-01 -8.2973e-01 -8.2583e-02 -8.7561e-01 -6.9495e-01  8.8458e-01
+      -7.0189e-01  7.3326e-01 -1.0540e-01  5.0670e-01 -1.0111e-02 -3.2345e-01
+      -4.1223e-01  8.9310e-01 -1.9775e-01 -5.4803e-01  4.6155e-01  9.2089e-01
+       3.4710e-01  7.3739e-01  3.3227e-02 -8.8224e-01 -6.7970e-01  1.3925e-01
+       5.3984e-01  8.5766e-01  4.2791e-01 -4.6601e-01  5.7923e-01  3.2307e-01
+       9.9218e-01 -3.1940e-01 -6.9842e-01  5.2432e-02  4.0370e-01  2.7385e-01
+      -2.7729e-01 -4.0765e-01  7.3165e-01  1.7724e-01 -2.4358e-01  5.0751e-01
+      -9.5855e-01 -9.9913e-01  2.0461e-01 -6.3502e-01  7.1137e-01 -2.1659e-01
+       4.4157e-02 -9.5361e-01  3.6028e-01  4.6637e-01 -2.0975e-01 -7.6839e-02
+      -8.3595e-01 -1.2505e-01  5.2745e-01 -6.4841e-01  2.7989e-01 -6.8931e-01
+       3.2927e-01  6.8196e-01 -9.4449e-01  2.2501e-01]]
+
+
+
+
+Calculate DTI:
+--------------
+Fit the DTI model using default settings, save files with derived maps.
+
+By default following DTI measurements are calculated:
+
+- Fractional anisotropy (FA),
+
+- Mean diffusivity (MD),
+
+- Axial diffusivity (AD),
+
+- and Radial diffusivity (RD)
+
+In this example we will only use FA.
+
+.. note::
+  By default:
+
+  - All b-values less than or equal to 50 are considered to be
+    without diffusion weighting.
+
+  - No binary masks are applied; therefore all voxels are processed.
+
+.. note::
+  The diffusion tensor imaging parameters contain the associated eigenvalues
+  and eigenvectors from eigen decomposition on the diffusion tensor.
+
+
+.. code-block:: default
+
+
+
+    print("Calculating DTI...")
+
+    if not op.exists(op.join(working_dir, 'dti_FA.nii.gz')):
+        dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
+                                 out_dir=working_dir)
+    else:
+        dti_params = {'FA': op.join(working_dir, 'dti_FA.nii.gz'),
+                      'params': op.join(working_dir, 'dti_params.nii.gz')}
+
+    print(f"Loading {dti_params['FA']}")
+    FA_img = nib.load(dti_params['FA'])
+    FA_data = FA_img.get_fdata()
+
+    show_anatomical_slices(FA_data, 'Fractional Anisotropy (FA)')
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_002.png
+    :alt: Fractional Anisotropy (FA)
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Calculating DTI...
+    Loading ./callosal_tract_profile/dti_FA.nii.gz
+
+
+
+
+Register the individual data to a template:
+-------------------------------------------
+For the purpose of bundle segmentation, the individual brain is registered
+to the MNI T2 template. The waypoint ROIs used in segmentation are then each
+brought into each subject's native space to test streamlines for whether they
+fulfill the segmentation criteria.
+
+.. note::
+   Here, for simplicity we only perform a non-linear transformation between
+   the individual's brain and the MNI T2 template. This is likely why the
+   occipital/parietal junction appears concave. In practice, it's a good idea
+   to also perform a pre-alignment using an affine transformation. Moreover,
+   by default, registration uses APM (Anisotropic Power Map) which also tends
+   to provide better results.
+
+
+.. code-block:: default
+
+
+
+    print("Registering to template...")
+
+    MNI_T2_img = afd.read_mni_template()
+    nib.save(MNI_T2_img, op.join(working_dir, 'MNI_T2.nii.gz'))
+    show_anatomical_slices(MNI_T2_img.get_fdata(), 'MNI T2 Template')
+
+    # create a diffeomorphic map from subject to MNI space
+    if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
+        import dipy.core.gradients as dpg
+        gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
+
+        warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab)
+        reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
+    else:
+        mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
+                                   img,
+                                   MNI_T2_img)
+
+    mapping_img = nib.load(op.join(working_dir, 'mapping.nii.gz'))
+    mapping_img_data = mapping_img.get_fdata()
+
+    # Working with diffeomorphic map data
+    mapping_img_data = mapping_img_data[..., 0, 0]
+    show_anatomical_slices(mapping_img_data, 'Registration Displacement Mapping')
+
+    # plot the transformational map of MNI T2 onto subject space
+    warped_MNI_T2_data = mapping.transform_inverse(MNI_T2_img.get_fdata())
+    warped_MNI_T2_img = nib.Nifti1Image(warped_MNI_T2_data.astype(float),
+                                        img.affine)
+
+    nib.save(warped_MNI_T2_img, op.join(working_dir, 'warped_MNI_T2.nii.gz'))
+
+    show_anatomical_slices(warped_MNI_T2_img.get_fdata(), 'Warped MNI T2')
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_003.png
+          :alt: MNI T2 Template
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_004.png
+          :alt: Registration Displacement Mapping
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_005.png
+          :alt: Warped MNI T2
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Registering to template...
+
+
+
+
+Create novel bundle specification:
+----------------------------------
+The bundles specify meta-data for the segmentation.
+
+The following keys are required for a `bundle` entry:
+
+- `ROIs`
+
+  lists the ROI templates.
+
+.. note::
+  Order of the `ROIs` matters and may result in different tract profiles.
+  Given a sequence of waypoint ROIs the endpoints should appear first. Which
+  endpoint appears first should be consistent with the directionality of
+  other bundles defintions. Any intermediate waypoints ROIs should respect
+  this ordering.
+
+- `rules`
+
+  label each ROI as inclusionary `True` or exclusionary `False`.
+
+- `cross_midline`
+
+  whether or not the streamline crosses the midline
+
+.. note::
+
+  It is also possible to utilize probablity maps to further refine the
+  segmentation. If `prob_map` key is not specified the probablities will
+  all be ones and same shape as the ROI.
+
+.. note::
+
+  If using multiple bundles it is recommended to add an optional identifier
+  key such as `uid`. This key is not used by segmentation, but can be helpful
+  for debugging or quality control reports.
+
+To identify candidate streamlines for the anterior forceps we will use three
+waypoint ROI templates:
+
+1. Left anterior frontal,
+
+2. Right anterior frontal,
+
+3. and midsaggital.
+
+The templates are first resampled into the MNI space, before
+they are brought into the subject's individual native space.
+
+
+.. code-block:: default
+
+
+
+    print("Fetching callosum ROI templates...")
+
+    callosal_templates = afd.read_callosum_templates(resample_to=MNI_T2_img)
+
+    show_anatomical_slices(callosal_templates["L_AntFrontal"].get_fdata(),
+                           'Left anterior frontal ROI')
+    show_anatomical_slices(callosal_templates["R_AntFrontal"].get_fdata(),
+                           'Right anterior frontal ROI')
+    show_anatomical_slices(callosal_templates["Callosum_midsag"].get_fdata(),
+                           'Midsagittal ROI')
+
+    print("Creating callosal bundle specification...")
+
+    # bundle dict
+    bundles = {}
+
+    # anterior frontal ROIs
+    bundles["AntFrontal"] = {
+        'ROIs': [callosal_templates["L_AntFrontal"],
+                 callosal_templates["R_AntFrontal"],
+                 callosal_templates["Callosum_midsag"]],
+        'rules': [True, True, True],
+        'cross_midline': True
+    }
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_006.png
+          :alt: Left anterior frontal ROI
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_007.png
+          :alt: Right anterior frontal ROI
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_008.png
+          :alt: Midsagittal ROI
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Fetching callosum ROI templates...
+    Creating callosal bundle specification...
+
+
+
+
+Tracking:
+---------
+Streamlines are generate using DTI and a deterministic tractography
+algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
+
+.. note::
+  By default tractography:
+
+  - Will identify streamlines with lengths between 10 mm and 1 m, with
+    turning angles of less than 30 degrees.
+
+  - Is seeded with a single seed in each voxel on each dimension
+
+  - Each step is 0.5 mm
+
+.. note::
+  In this example tractography results in a large number of candidate
+  streamlines for the anterior forceps, but not many streamlines anywhere
+  else.
+
+
+.. code-block:: default
+
+
+
+    print("Tracking...")
+
+    if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
+        seed_roi = np.zeros(img.shape[:-1])
+        for bundle in bundles:
+            for idx, roi in enumerate(bundles[bundle]['ROIs']):
+                if bundles[bundle]['rules'][idx]:
+                    warped_roi = patch_up_roi(
+                        mapping.transform_inverse(
+                            roi.get_fdata().astype(np.float32),
+                            interpolation='linear'),
+                        bundle_name=bundle)
+
+                    nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                             op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+
+                    warped_roi_img = nib.load(op.join(working_dir,
+                                                      f"{bundle}_{idx+1}.nii.gz"))
+                    show_anatomical_slices(warped_roi_img.get_fdata(),
+                                           f'warped {bundle}_{idx+1} ROI')
+
+                    # Add voxels that aren't there yet:
+                    seed_roi = np.logical_or(seed_roi, warped_roi)
+
+        seed_roi_img = nib.Nifti1Image(seed_roi.astype(float), img.affine)
+        nib.save(seed_roi_img, op.join(working_dir, 'seed_roi.nii.gz'))
+
+        show_anatomical_slices(seed_roi_img.get_fdata(), 'Seed ROI')
+
+        tractogram = aft.track(dti_params['params'], seed_mask=seed_roi,
+                               stop_mask=FA_data, stop_threshold=0.1)
+        save_tractogram(tractogram, op.join(working_dir, 'dti_streamlines.trk'),
+                        bbox_valid_check=False)
+
+        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        nib.save(tractogram_img, op.join(working_dir,
+                                         'afq_dti_density_map.nii.gz'))
+    else:
+        tractogram = load_tractogram(op.join(working_dir, 'dti_streamlines.trk'),
+                                     img)
+
+    tractogram.to_vox()
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_009.png
+          :alt: warped AntFrontal_1 ROI
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_010.png
+          :alt: warped AntFrontal_2 ROI
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_011.png
+          :alt: warped AntFrontal_3 ROI
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_012.png
+          :alt: Seed ROI
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Tracking...
+    Loading Image...
+    Generating Seeds...
+    Getting Directions...
+    Tracking...
+
+
+
+
+Segmentation:
+-------------
+In this stage, streamlines are tested for several criteria: whether the
+probability that they belong to a bundle is larger than a threshold (set to
+0, per default), whether they pass through inclusion ROIs and whether they do
+not pass through exclusion ROIs.
+
+.. note::
+  By default segmentation:
+
+  - uses Streamlinear Registration algorithm
+
+  - does not clip streamlines to be between ROIs
+
+  - All b-values less than or equal to 50 are considered to be
+    without diffusion weighting.
+
+Segmentation will result in a `fiber_group` for each bundle, which
+contains the following keys:
+
+   - `sl`
+
+      StatefulTractogram encompassing the selected streamlines
+
+   - `idx`
+
+      indexes to selected streamlines
+
+.. note::
+   Currently it is not possible to define endpoint filters for novel bundles,
+   but this is something we expect to address. However we can run
+   segmentation by ignoring endpoint filters. This means that additional
+   streamlines may be included that would otherwise be excluded.
+
+
+.. code-block:: default
+
+
+
+    tractogram_img = nib.load(op.join(working_dir, 'afq_dti_density_map.nii.gz'))
+    show_anatomical_slices(tractogram_img.get_fdata(), 'DTI Density Map')
+
+    print("Segmenting fiber groups...")
+
+    segmentation = seg.Segmentation(return_idx=True,
+                                    filter_by_endpoints=False)
+
+    segmentation.segment(bundles,
+                         tractogram,
+                         fdata=hardi_fdata,
+                         fbval=hardi_fbval,
+                         fbvec=hardi_fbvec,
+                         mapping=mapping,
+                         reg_template=MNI_T2_img)
+
+    fiber_groups = segmentation.fiber_groups
+
+    for bundle in bundles:
+        tractogram = StatefulTractogram(fiber_groups[bundle]['sl'].streamlines,
+                                        img,
+                                        Space.VOX)
+        tractogram.to_rasmm()
+        save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}_seg.trk'),
+                        bbox_valid_check=False)
+
+        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        nib.save(tractogram_img, op.join(working_dir,
+                                         f'afq_{bundle}_seg_density_map.nii.gz'))
+        show_anatomical_slices(tractogram_img.get_fdata(),
+                               f'Segmented {bundle} Density Map')
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_013.png
+          :alt: DTI Density Map
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_014.png
+          :alt: Segmented AntFrontal Density Map
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Segmenting fiber groups...
+    Preparing Segmentation Parameters
+    Preprocessing Streamlines
+    Assigning Streamlines to Bundles
+    Finding Streamlines for AntFrontal
+    3873 streamlines exceed the probability threshold.
+    663 streamlines selected with waypoint ROIs
+    Re-orienting streamlines to consistent directions
+    Processing AntFrontal
+
+
+
+
+Cleaning:
+---------
+Each fiber group is cleaned to exclude streamlines that are outliers in terms
+of their trajectory and/or length.
+
+.. note::
+  By default cleaning
+
+  - resamples streamlines to 100 points
+
+  - given there are more than 20 streamlines cleaining will make maximum 5
+    attempts to prune streamlines that are:
+
+     - greater than 5 standard deviations from the mean Mahalanobis distance,
+       or
+
+     - greather than 4 standard deviations from the mean length
+
+
+
+.. code-block:: default
+
+
+
+    print("Cleaning fiber groups...")
+    for bundle in bundles:
+        print(f"Cleaning {bundle}...")
+        print(f"Before cleaning: {len(fiber_groups[bundle]['sl'])} streamlines")
+        new_fibers, idx_in_bundle = seg.clean_bundle(
+            fiber_groups[bundle]['sl'],
+            return_idx=True)
+        print(f"After cleaning: {len(new_fibers)} streamlines")
+
+        idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
+        np.save(op.join(working_dir, f'{bundle}_idx.npy'), idx_in_global)
+
+        tractogram = StatefulTractogram(new_fibers.streamlines,
+                                        img,
+                                        Space.VOX)
+        tractogram.to_rasmm()
+        save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
+                        bbox_valid_check=False)
+
+        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        nib.save(tractogram_img, op.join(working_dir,
+                                         f'afq_{bundle}_density_map.nii.gz'))
+        show_anatomical_slices(tractogram_img.get_fdata(),
+                               f'Cleaned {bundle} Density Map')
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_015.png
+    :alt: Cleaned AntFrontal Density Map
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Cleaning fiber groups...
+    Cleaning AntFrontal...
+    Before cleaning: 663 streamlines
+    After cleaning: 646 streamlines
+
+
+
+
+Visualizing bundles and tract profiles:
+---------------------------------------
+
+
+.. code-block:: default
+
+
+    plotly.io.show(visualize_bundles(tractogram,
+                                     figure=visualize_volume(warped_MNI_T2_data),
+                                     color_by_volume=FA_data))
+
+
+
+
+.. raw:: html
+    :file: images/sphx_glr_plot_callosal_tract_profile_016.html
+
+
+
+
+
+Bundle profiles:
+----------------
+Streamlines are represented in the original diffusion space (`Space.VOX`) and
+scalar properties along the length of each bundle are queried from this
+scalar data. Here, the contribution of each streamline is weighted according
+to how representative this streamline is of the bundle overall.
+
+.. note::
+  As a sanity check the anterior forceps the tract profile is relatively
+  symmetric?
+
+
+.. code-block:: default
+
+
+    print("Extracting tract profiles...")
+    for bundle in bundles:
+        print(f"Extracting {bundle}...")
+        tractogram = load_tractogram(op.join(working_dir, f'afq_{bundle}.trk'),
+                                     img, to_space=Space.VOX)
+        fig, ax = plt.subplots(1)
+        weights = gaussian_weights(tractogram.streamlines)
+        profile = afq_profile(FA_data, tractogram.streamlines,
+                              np.eye(4), weights=weights)
+        ax.plot(profile)
+        ax.set_title(bundle)
+
+    plt.show()
+    plt.savefig(op.join(working_dir, 'AntFrontal_tractprofile.png'))
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_017.png
+    :alt: AntFrontal
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Extracting tract profiles...
+    Extracting AntFrontal...
+
+
+
+
+References:
+-------------------------
+.. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
+                 Brian A Wandell, Heidi M Feldman, "Tract profiles of
+                 white matter properties: automating fiber-tract
+                 quantification", PloS One, 7: e49790
+
+.. [Yeatman2014] Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
+                 "Lifespan maturation and degeneration of human brain white
+                 matter", Nature Communications 5: 4932
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 6 minutes  10.449 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_callosal_tract_profile.py <plot_callosal_tract_profile.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_callosal_tract_profile.ipynb <plot_callosal_tract_profile.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

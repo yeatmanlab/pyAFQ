@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
@@ -546,6 +547,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span></div>
 
 
+<span class="k">class</span> <span class="nc">PFTMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">WM_probseg</span><span class="p">,</span> <span class="n">GM_probseg</span><span class="p">,</span> <span class="n">CSF_probseg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define a mask for use in PFT tractography. Only use</span>
+<span class="sd">        if tracker set to &#39;pft&#39; in tractography.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        WM_probseg : MaskFile</span>
+<span class="sd">            White matter segmentation file.</span>
+<span class="sd">        GM_probseg : MaskFile</span>
+<span class="sd">            Gray matter segmentation file.</span>
+<span class="sd">        CSF_probseg : MaskFile</span>
+<span class="sd">            Corticospinal fluid segmentation file.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        stop_mask = PFTMask(</span>
+<span class="sd">            afm.MaskFile(&quot;WMprobseg&quot;),</span>
+<span class="sd">            afm.MaskFile(&quot;GMprobseg&quot;),</span>
+<span class="sd">            afm.MaskFile(&quot;CSFprobseg&quot;))</span>
+<span class="sd">        api.AFQ(tracking_params={</span>
+<span class="sd">            &quot;stop_mask&quot;: stop_mask,</span>
+<span class="sd">            &quot;stop_threshold&quot;: &quot;CMC&quot;,</span>
+<span class="sd">            &quot;tracker&quot;: &quot;pft&quot;})</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span> <span class="o">=</span> <span class="p">(</span><span class="n">WM_probseg</span><span class="p">,</span> <span class="n">GM_probseg</span><span class="p">,</span> <span class="n">CSF_probseg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">probseg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span><span class="p">:</span>
+            <span class="n">probseg</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span><span class="n">bids_layout</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">probseg_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">probseg_metas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">probseg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">probseg</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">probseg_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">))</span>
+            <span class="n">probseg_metas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">probseg_imgs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sources</span><span class="o">=</span><span class="n">probseg_metas</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="CombinedMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.CombinedMask">[docs]</a><span class="k">class</span> <span class="nc">CombinedMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_list</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="s2">&quot;and&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -621,7 +664,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>

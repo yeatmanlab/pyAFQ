@@ -14,6 +14,8 @@ Functions
 .. autoapisummary::
 
    AFQ.utils.volume.patch_up_roi
+   AFQ.utils.volume.density_map
+   AFQ.utils.volume.dice_coeff
 
 
 .. function:: patch_up_roi(roi, bundle_name='ROI')
@@ -41,6 +43,85 @@ Functions
    :Returns:
 
        ROI after dilation and hole-filling
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: density_map(tractogram, n_sls=None, to_vox=False)
+
+   Create a streamline density map.
+   based on:
+   https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
+
+
+   :Parameters:
+
+       **tractogram** : StatefulTractogram
+           Stateful tractogram whose streamlines are used to make
+           the density map.
+
+       **n_sls** : int or None
+           n_sls to randomly select to make the density map.
+           If None, all streamlines are used.
+           Default: None
+
+       **to_vox** : bool
+           Whether to put the stateful tractogram in VOX space before making
+           the density map.
+
+   :Returns:
+
+       Nifti1Image containing the density map.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: dice_coeff(arr1, arr2)
+
+   Compute Dice's coefficient between two images.
+
+
+   :Parameters:
+
+       **arr1** : Nifti1Image, str, ndarray
+           One ndarray to compare. Can be a path or image, which will be
+           converted to an ndarray.
+
+       **arr2** : Nifti1Image, str, ndarray
+           The other ndarray to compare. Can be a path or image, which will be
+           converted to an ndarray.
+
+   :Returns:
+
+       The dice similarity between the images.
            ..
 
 

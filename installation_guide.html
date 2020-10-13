@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
@@ -19,7 +20,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Using pyAFQ" href="usage.html" />
+    <link rel="next" title="Using pyAFQ" href="usage/index.html" />
     <link rel="prev" title="AFQ: Automated Fiber Quantification" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -63,8 +64,21 @@ uses <code class="docutils literal notranslate"><span class="pre">pip</span></co
 </pre></div>
 </div>
 <p>Then, change your working directory into the top-level directory of this repo and issue:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">dev</span><span class="p">,</span><span class="n">fury</span><span class="p">]</span>
 </pre></div>
+</div>
+<p>which will install pyAFQ locally in editible mode and include extensions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The project follows the standard github fork and pull request workflow. So if
+you plan on contributing to pyAFQ it is recommended that you fork the
+repository and issue pull requests.</p>
+</div>
+<p>See <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing to pyAFQ</span></a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is also recommended that you utilize python virtual environment and
+package mangagement tools and begin with a clean environment.</p>
 </div>
 </div>
 </div>
@@ -97,7 +111,7 @@ uses <code class="docutils literal notranslate"><span class="pre">pip</span></co
 <li class="toctree-l2"><a class="reference internal" href="#installing-the-development-version">Installing the development version</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>
@@ -109,7 +123,7 @@ uses <code class="docutils literal notranslate"><span class="pre">pip</span></co
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">AFQ: Automated Fiber Quantification</a></li>
-      <li>Next: <a href="usage.html" title="next chapter">Using pyAFQ</a></li>
+      <li>Next: <a href="usage/index.html" title="next chapter">Using pyAFQ</a></li>
   </ul></li>
 </ul>
 </div>

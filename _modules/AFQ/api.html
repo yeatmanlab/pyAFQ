@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
@@ -46,10 +47,8 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage.morphology</span> <span class="kn">import</span> <span class="n">binary_dilation</span>
 
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
-<span class="kn">from</span> <span class="nn">dipy.segment.mask</span> <span class="kn">import</span> <span class="n">median_otsu</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">save_tractogram</span><span class="p">,</span> <span class="n">load_tractogram</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
@@ -73,8 +72,7 @@
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">Viz</span><span class="p">,</span> <span class="n">visualize_tract_profiles</span>
 <span class="kn">from</span> <span class="nn">AFQ.utils.bin</span> <span class="kn">import</span> <span class="n">get_default_args</span>
-<span class="kn">from</span> <span class="nn">AFQ.mask</span> <span class="kn">import</span> <span class="n">B0Mask</span><span class="p">,</span> <span class="n">CombinedMask</span><span class="p">,</span> \
-    <span class="n">ThresholdedScalarMask</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">,</span> <span class="n">FullMask</span><span class="p">,</span> <span class="n">check_mask_methods</span>
+<span class="kn">from</span> <span class="nn">AFQ.mask</span> <span class="kn">import</span> <span class="p">(</span><span class="n">B0Mask</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">,</span> <span class="n">FullMask</span><span class="p">,</span> <span class="n">check_mask_methods</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
@@ -89,6 +87,23 @@
 <span class="n">BUNDLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ATR&quot;</span><span class="p">,</span> <span class="s2">&quot;CGC&quot;</span><span class="p">,</span> <span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC&quot;</span><span class="p">,</span>
            <span class="s2">&quot;FA&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span><span class="p">]</span>
 
+<span class="c1"># See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa</span>
+
+<span class="n">RECO_BUNDLES_16</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;CST&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;UF&#39;</span><span class="p">,</span> <span class="s1">&#39;MCP&#39;</span><span class="p">,</span> <span class="s1">&#39;AF&#39;</span><span class="p">,</span> <span class="s1">&#39;CCMid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CC_ForcepsMajor&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_ForcepsMinor&#39;</span><span class="p">,</span> <span class="s1">&#39;IFOF&#39;</span><span class="p">]</span>
+
+<span class="n">RECO_BUNDLES_80</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="s2">&quot;AF&quot;</span><span class="p">,</span> <span class="s2">&quot;AR&quot;</span><span class="p">,</span> <span class="s2">&quot;AST&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;CB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">,</span> <span class="s2">&quot;CCMid&quot;</span><span class="p">,</span> <span class="s2">&quot;CNII&quot;</span><span class="p">,</span> <span class="s2">&quot;CNII&quot;</span><span class="p">,</span> <span class="s2">&quot;CNIII&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CNIV&quot;</span><span class="p">,</span> <span class="s2">&quot;CNV&quot;</span><span class="p">,</span> <span class="s2">&quot;CNVII&quot;</span><span class="p">,</span> <span class="s2">&quot;CNVIII&quot;</span><span class="p">,</span> <span class="s2">&quot;CS&quot;</span><span class="p">,</span> <span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;CT&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;CTT&quot;</span><span class="p">,</span> <span class="s2">&quot;DLF&quot;</span><span class="p">,</span> <span class="s2">&quot;EMC&quot;</span><span class="p">,</span> <span class="s2">&quot;F_L_R&quot;</span><span class="p">,</span> <span class="s2">&quot;FPT&quot;</span><span class="p">,</span> <span class="s2">&quot;ICP&quot;</span><span class="p">,</span> <span class="s2">&quot;IFOF&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;LL&quot;</span><span class="p">,</span> <span class="s2">&quot;MCP&quot;</span><span class="p">,</span> <span class="s2">&quot;MdLF&quot;</span><span class="p">,</span> <span class="s2">&quot;ML&quot;</span><span class="p">,</span> <span class="s2">&quot;MLF&quot;</span><span class="p">,</span> <span class="s2">&quot;OPT&quot;</span><span class="p">,</span> <span class="s2">&quot;OR&quot;</span><span class="p">,</span> <span class="s2">&quot;PC&quot;</span><span class="p">,</span> <span class="s2">&quot;PPT&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;RST&quot;</span><span class="p">,</span> <span class="s2">&quot;SCP&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF&quot;</span><span class="p">,</span> <span class="s2">&quot;STT&quot;</span><span class="p">,</span> <span class="s2">&quot;TPT&quot;</span><span class="p">,</span> <span class="s2">&quot;UF&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;VOF&quot;</span><span class="p">]</span>
+
+<span class="n">RECO_UNIQUE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;CCMid&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_ForcepsMajor&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_ForcepsMinor&#39;</span><span class="p">,</span> <span class="s1">&#39;MCP&#39;</span><span class="p">,</span> <span class="s1">&#39;AC&#39;</span><span class="p">,</span> <span class="s1">&#39;PC&#39;</span><span class="p">,</span> <span class="s1">&#39;SCP&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;CC&#39;</span><span class="p">,</span> <span class="s1">&#39;F_L_R&#39;</span><span class="p">]</span>
+
 <span class="n">DIPY_GH</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/dipy/dipy/blob/master/dipy/&quot;</span>
 
 
@@ -100,6 +115,14 @@
 <span class="sd">    ----------</span>
 <span class="sd">    bundle_names : list, optional</span>
 <span class="sd">        A list of the bundles to be used in this case. Default: all of them</span>
+
+<span class="sd">    seg_algo: One of {&quot;afq&quot;, &quot;reco&quot;, &quot;reco16&quot;, &quot;reco80&quot;}</span>
+<span class="sd">        The bundle segmentation algorithm to use.</span>
+<span class="sd">            &quot;afq&quot; : Use waypoint ROIs + probability maps, as described</span>
+<span class="sd">            in [Yeatman2012]_</span>
+<span class="sd">            &quot;reco&quot; / &quot;reco16&quot; : Use Recobundles [Garyfallidis2017]_</span>
+<span class="sd">            with a 16-bundle set.</span>
+<span class="sd">            &quot;reco80&quot;: Use Recobundles with an 80-bundle set.</span>
 
 <span class="sd">    resample_to : Nifti1Image, optional</span>
 <span class="sd">        If set, templates will be resampled to the affine and shape of this</span>
@@ -156,13 +179,17 @@
 
                     <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">elif</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reco&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;80&quot;</span><span class="p">):</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_hcp_atlas</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_hcp_atlas</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
         <span class="n">afq_bundles</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">uid</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_hcp_atlas_16_bundles</span><span class="p">()</span>
         <span class="n">afq_bundles</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">bundle_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CCMid&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_ForcepsMajor&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_ForcepsMinor&#39;</span><span class="p">,</span> <span class="s1">&#39;MCP&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">RECO_UNIQUE</span><span class="p">:</span>
                 <span class="n">afq_bundles</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
                 <span class="n">afq_bundles</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uid</span>
                 <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -185,19 +212,20 @@
                  <span class="n">bids_path</span><span class="p">,</span>
                  <span class="n">bids_filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;dwi&quot;</span><span class="p">},</span>
                  <span class="n">dmriprep</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                 <span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">reg_template</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">,</span>
                  <span class="n">reg_subject</span><span class="o">=</span><span class="s2">&quot;power_map&quot;</span><span class="p">,</span>
                  <span class="n">brain_mask</span><span class="o">=</span><span class="n">B0Mask</span><span class="p">(),</span>
-                 <span class="n">bundle_names</span><span class="o">=</span><span class="n">BUNDLES</span><span class="p">,</span>
+                 <span class="n">bundle_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dask_it</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">force_recompute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">scalars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">],</span>
                  <span class="n">use_prealign</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">viz_backend</span><span class="o">=</span><span class="s2">&quot;fury&quot;</span><span class="p">,</span>
+                 <span class="n">viz_backend</span><span class="o">=</span><span class="s2">&quot;plotly_no_gif&quot;</span><span class="p">,</span>
                  <span class="n">tracking_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">segmentation_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">clean_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -224,21 +252,25 @@
 <span class="sd">        dmriprep : str, optional.</span>
 <span class="sd">            [BIDS] The name of the pipeline used to preprocess the DWI data.</span>
 <span class="sd">            Default: &quot;all&quot;.</span>
+<span class="sd">        custom_tractography_bids_filters : dict, optional</span>
+<span class="sd">            [BIDS] BIDS filters for inputing a user made tractography file.</span>
+<span class="sd">            If None, tractography will be performed automatically.</span>
+<span class="sd">            Default: None</span>
 <span class="sd">        b0_threshold : int, optional</span>
 <span class="sd">            [REGISTRATION] The value of b under which</span>
 <span class="sd">            it is considered to be b0. Default: 50.</span>
 <span class="sd">        min_bval : float, optional</span>
 <span class="sd">            [REGISTRATION] Minimum b value you want to use</span>
-<span class="sd">            from the dataset (other than b0).</span>
+<span class="sd">            from the dataset (other than b0), inclusive.</span>
 <span class="sd">            If None, there is no minimum limit. Default: None</span>
 <span class="sd">        max_bval : float, optional</span>
 <span class="sd">            [REGISTRATION] Maximum b value you want to use</span>
-<span class="sd">            from the dataset (other than b0).</span>
+<span class="sd">            from the dataset (other than b0), inclusive.</span>
 <span class="sd">            If None, there is no maximum limit. Default: None</span>
-<span class="sd">        reg_subject : str or Nifti1Image, optional</span>
+<span class="sd">        reg_subject : str, Nifti1Image, dict, optional</span>
 <span class="sd">            [REGISTRATION] The source image data to be registered.</span>
-<span class="sd">            Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
-<span class="sd">            If &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
+<span class="sd">            Can either be a Nifti1Image, bids filters for a Nifti1Image, or</span>
+<span class="sd">            if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
 <span class="sd">            image data will be loaded automatically.</span>
 <span class="sd">            If &quot;subject_sls&quot; is used, slr registration will be used</span>
 <span class="sd">            and reg_template should be &quot;hcp_atlas&quot;.</span>
@@ -246,7 +278,7 @@
 <span class="sd">        reg_template : str or Nifti1Image, optional</span>
 <span class="sd">            [REGISTRATION] The target image data for registration.</span>
 <span class="sd">            Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
-<span class="sd">            If &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
+<span class="sd">            if &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
 <span class="sd">            image data will be loaded automatically.</span>
 <span class="sd">            If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
 <span class="sd">            and reg_subject should be &quot;subject_sls&quot;.</span>
@@ -258,9 +290,12 @@
 <span class="sd">            If None, no brain mask will not be applied,</span>
 <span class="sd">            and no brain mask will be applied to the template.</span>
 <span class="sd">            Default: B0Mask()</span>
-<span class="sd">        bundle_names : list of strings, optional</span>
-<span class="sd">            [BUNDLES] List of bundle names to include in segmentation.</span>
-<span class="sd">            Default: BUNDLES</span>
+<span class="sd">        bundle_info : list of strings or dict, optional</span>
+<span class="sd">            [BUNDLES] List of bundle names to include in segmentation,</span>
+<span class="sd">            or a bundle dictionary (see make_bundle_dict for inspiration).</span>
+<span class="sd">            If None, will get all appropriate bundles for the chosen</span>
+<span class="sd">            segmentation algorithm.</span>
+<span class="sd">            Default: None</span>
 <span class="sd">        dask_it : bool, optional</span>
 <span class="sd">            [COMPUTE] Whether to use a dask DataFrame object.</span>
 <span class="sd">            Default: False</span>
@@ -279,9 +314,11 @@
 <span class="sd">            [VIZ] Whether to use a virtual fram buffer. This is neccessary if</span>
 <span class="sd">            generating GIFs in a headless environment. Default: False</span>
 <span class="sd">        viz_backend : str, optional</span>
-<span class="sd">            [VIZ] Which visualization backend to us.</span>
-<span class="sd">            One of {&quot;fury&quot;, &quot;plotly&quot;}.</span>
-<span class="sd">            Default: &quot;fury&quot;</span>
+<span class="sd">            [VIZ] Which visualization backend to use.</span>
+<span class="sd">            See Visualization Backends page in documentation for details:</span>
+<span class="sd">            https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</span>
+<span class="sd">            One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
+<span class="sd">            Default: &quot;plotly_no_gif&quot;</span>
 <span class="sd">        segmentation_params : dict, optional</span>
 <span class="sd">            The parameters for segmentation.</span>
 <span class="sd">            Default: use the default behavior of the seg.Segmentation object.</span>
@@ -295,15 +332,87 @@
 <span class="sd">            Default: use the default behavior of the seg.clean_bundle</span>
 <span class="sd">            function.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;bids_path must be a string&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bids_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bids_path not found&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s2">&quot;dataset_description.json&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;There must be a dataset_description.json&quot;</span>
+                             <span class="o">+</span> <span class="s2">&quot; in bids_path&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bids_filters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;bids_filters must be a dict&quot;</span><span class="p">)</span>
+        <span class="c1"># dmriprep typechecking handled by pyBIDS</span>
+        <span class="k">if</span> <span class="n">custom_tractography_bids_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">custom_tractography_bids_filters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;custom_tractography_bids_filters must be&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; either a dict or None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b0_threshold</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;b0_threshold must be an int&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">min_bval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_bval</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;min_bval must be an int&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_bval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_bval</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;max_bval must be an int&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;reg_template must be a str or Nifti1Image&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>\
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">)</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;reg_subject must be a str, dict, or Nifti1Image&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">brain_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="n">brain_mask</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;brain_mask must be None or a mask defined in `AFQ.mask`&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bundle_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">((</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;bundle_info must be None, a list of strings, or a dict&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dask_it</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;dask_it must be a bool&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force_recompute</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;force_recompute must be a bool&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scalars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;scalars must be None or a list of strings&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_prealign</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;use_prealign must be a bool&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">virtual_frame_buffer</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;virtual_frame_buffer must be a bool&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;fury&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">viz_backend</span> <span class="ow">and</span> <span class="s2">&quot;plotly&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">viz_backend</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;viz_backend must contain either &#39;fury&#39; or &#39;plotly&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tracking_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tracking_params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;tracking_params must be None or a dict&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">segmentation_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">segmentation_params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;segmentation_params must be None or a dict&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">clean_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clean_params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;clean_params must be None or a dict&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span>
+
+        <span class="c1"># validate input and fail early</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bids_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to locate BIDS dataset in: </span><span class="si">{</span><span class="n">bids_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="o">=</span> <span class="n">force_recompute</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">max_bval</span> <span class="o">=</span> <span class="n">max_bval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_bval</span> <span class="o">=</span> <span class="n">min_bval</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span> <span class="o">=</span> <span class="n">reg_subject</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span> <span class="o">=</span> <span class="n">reg_subject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span>
         <span class="k">if</span> <span class="n">brain_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">FullMask</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mask_template</span> <span class="o">=</span> <span class="kc">False</span>
@@ -311,12 +420,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">brain_mask</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mask_template</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">if</span> <span class="n">reg_subject</span> <span class="o">==</span> <span class="s1">&#39;subject_sls&#39;</span> <span class="ow">or</span> <span class="n">reg_template</span> <span class="o">==</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">reg_template</span> <span class="o">!=</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>\
+                <span class="ow">and</span> <span class="p">(</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;subject_sls&#39;</span>
+                     <span class="ow">or</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;hcp_atlas&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                     <span class="s2">&quot;If reg_subject is &#39;subject_sls&#39;,&quot;</span>
                     <span class="o">+</span> <span class="s2">&quot; reg_template must be &#39;hcp_atlas&#39;&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">reg_subject</span> <span class="o">!=</span> <span class="s1">&#39;subject_sls&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reg_subject</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;subject_sls&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                     <span class="s2">&quot;If reg_template is &#39;hcp_atlas&#39;,&quot;</span>
                     <span class="o">+</span> <span class="s2">&quot; reg_subject must be &#39;subject_sls&#39;&quot;</span><span class="p">)</span>
@@ -326,6 +437,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;syn&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span> <span class="o">=</span> <span class="p">(</span><span class="n">use_prealign</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">!=</span> <span class="s1">&#39;slr&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_tractography_bids_filters</span> <span class="o">=</span>\
+            <span class="n">custom_tractography_bids_filters</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">scalars</span><span class="p">]</span>
 
@@ -342,8 +455,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">())</span>
         <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
         <span class="n">default_tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
-        <span class="c1"># Replace the defaults only for kwargs for which a non-default value was</span>
-        <span class="c1"># given:</span>
+        <span class="c1"># Replace the defaults only for kwargs for which a non-default value</span>
+        <span class="c1"># was given:</span>
         <span class="k">if</span> <span class="n">tracking_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tracking_params</span><span class="p">:</span>
                 <span class="n">default_tracking_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -367,11 +480,23 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">clean_params</span> <span class="o">=</span> <span class="n">default_clean_params</span>
 
+        <span class="k">if</span> <span class="n">bundle_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco16&quot;</span><span class="p">:</span>
+                <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">RECO_BUNDLES_16</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco80&quot;</span><span class="p">:</span>
+                <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">RECO_BUNDLES_80</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">BUNDLES</span>
+
         <span class="c1"># Create the bundle dict after reg_template has been resolved:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span>
-                                            <span class="n">seg_algo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="p">,</span>
-                                            <span class="n">resample_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">make_bundle_dict</span><span class="p">(</span>
+                <span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_info</span><span class="p">,</span>
+                <span class="n">seg_algo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="p">,</span>
+                <span class="n">resample_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_info</span>
 
         <span class="c1"># Initialize dict to store relevant timing information</span>
         <span class="n">timing_dict</span> <span class="o">=</span> <span class="p">{</span>
@@ -404,6 +529,12 @@
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pipeline_description</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;subject&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`bids_path` contains no subjects in derivatives folders.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; This could be caused by derivatives folders not following&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; the BIDS format.&quot;</span><span class="p">)</span>
+
         <span class="n">sessions</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="n">sessions</span>
@@ -415,6 +546,8 @@
         <span class="n">dwi_file_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">bvec_file_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">bval_file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">custom_tract_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">reg_subject_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">timing_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">results_dir_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
@@ -446,6 +579,28 @@
                                     <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
                                     <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
+                <span class="k">if</span> <span class="n">custom_tractography_bids_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">custom_tract_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+                                        <span class="n">extension</span><span class="o">=</span><span class="p">[</span>
+                                            <span class="s1">&#39;.trk&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;.tck&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;.vtk&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;.fib&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;.dpy&#39;</span><span class="p">],</span>
+                                        <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="n">custom_tractography_bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">custom_tract_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">reg_subject_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+                                        <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">reg_subject_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
                 <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                         <span class="n">bids_layout</span><span class="p">,</span>
@@ -474,6 +629,8 @@
                                             <span class="n">dwi_file</span><span class="o">=</span><span class="n">dwi_file_list</span><span class="p">,</span>
                                             <span class="n">bvec_file</span><span class="o">=</span><span class="n">bvec_file_list</span><span class="p">,</span>
                                             <span class="n">bval_file</span><span class="o">=</span><span class="n">bval_file_list</span><span class="p">,</span>
+                                            <span class="n">custom_tract</span><span class="o">=</span><span class="n">custom_tract_list</span><span class="p">,</span>
+                                            <span class="n">reg_subject</span><span class="o">=</span><span class="n">reg_subject_list</span><span class="p">,</span>
                                             <span class="n">ses</span><span class="o">=</span><span class="n">ses_list</span><span class="p">,</span>
                                             <span class="n">timing</span><span class="o">=</span><span class="n">timing_list</span><span class="p">,</span>
                                             <span class="n">results_dir</span><span class="o">=</span><span class="n">results_dir_list</span><span class="p">))</span>
@@ -592,23 +749,34 @@
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dki_params_file</span></div>
 
-<div class="viewcode-block" id="AFQ._csd"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._csd">[docs]</a>    <span class="k">def</span> <span class="nf">_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,):</span>
-        <span class="n">csd_params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_diffmodel.nii.gz&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="AFQ._csd"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._csd">[docs]</a>    <span class="k">def</span> <span class="nf">_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+             <span class="n">msmt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msmt</span><span class="p">:</span>
+            <span class="n">model_str</span> <span class="o">=</span> <span class="s2">&quot;MSMT&quot;</span>
+            <span class="n">model_file</span> <span class="o">=</span> <span class="s2">&quot;mcsd.py&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_str</span> <span class="o">=</span> <span class="s2">&quot;CSD&quot;</span>
+            <span class="n">model_file</span> <span class="o">=</span> <span class="s2">&quot;csdeconv.py&quot;</span>
+        <span class="n">csd_params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;_model-</span><span class="si">{</span><span class="n">model_str</span><span class="si">}</span><span class="s1">_diffmodel.nii.gz&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csd_params_file</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
             <span class="n">csdf</span> <span class="o">=</span> <span class="n">csd_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
                            <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
-                           <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+                           <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">csdf</span><span class="o">.</span><span class="n">shm_coeff</span><span class="p">,</span>
                                                   <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
                                   <span class="n">csd_params_file</span><span class="p">)</span>
-            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_diffmodel.json&#39;</span><span class="p">)</span>
+            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                <span class="n">row</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;_model-</span><span class="si">{</span><span class="n">model_str</span><span class="si">}</span><span class="s1">_diffmodel.json&#39;</span><span class="p">)</span>
             <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">SphericalHarmonicDegree</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
                         <span class="n">ResponseFunctionTensor</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
                         <span class="n">SphericalHarmonicBasis</span><span class="o">=</span><span class="s2">&quot;DESCOTEAUX&quot;</span><span class="p">,</span>
-                        <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/csdeconv.py&quot;</span><span class="p">,</span>
+                        <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/</span><span class="si">{</span><span class="n">model_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                         <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span>
                         <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
@@ -616,7 +784,7 @@
 
 <div class="viewcode-block" id="AFQ._anisotropic_power_map"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._anisotropic_power_map">[docs]</a>    <span class="k">def</span> <span class="nf">_anisotropic_power_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">pmap_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
-            <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_anisotropic_power_map.nii.gz&#39;</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_APM.nii.gz&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pmap_file</span><span class="p">):</span>
             <span class="n">dwi_data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
@@ -624,6 +792,9 @@
                 <span class="n">dwi_data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
             <span class="n">pmap</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">pmap</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">pmap</span><span class="p">,</span> <span class="n">pmap_file</span><span class="p">)</span>
+            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_APM.json&#39;</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">pmap_file</span></div>
 
@@ -714,8 +885,10 @@
                 <span class="k">return</span> <span class="n">scalar</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="AFQ._reg_img"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._reg_img">[docs]</a>    <span class="k">def</span> <span class="nf">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AFQ._reg_img"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._reg_img">[docs]</a>    <span class="k">def</span> <span class="nf">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;reg_subject&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;reg_subject&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">img_l</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;mni_t2&quot;</span><span class="p">:</span>
                 <span class="n">img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">(</span>
@@ -756,13 +929,22 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">mask</span><span class="p">:</span>
+            <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+            <span class="n">masked_data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">masked_data</span><span class="p">[</span><span class="o">~</span><span class="n">brain_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">masked_data</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="AFQ._reg_prealign"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._reg_prealign">[docs]</a>    <span class="k">def</span> <span class="nf">_reg_prealign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">prealign_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.npy&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">):</span>
-            <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">aff</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">affine_registration</span><span class="p">(</span>
                 <span class="n">reg_subject_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
@@ -788,13 +970,14 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
                 <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_prealign</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">reg_prealign</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">reg_prealign</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="n">mapping_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">mapping_file</span><span class="p">,</span> <span class="n">b0_file</span><span class="p">,</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
-                                       <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign</span><span class="p">)</span>
+                                       <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign_inv</span><span class="p">)</span>
 
             <span class="n">warped_b0</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">)</span>
 
@@ -824,9 +1007,9 @@
                 <span class="n">reg_prealign</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
 
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;slr&quot;</span><span class="p">:</span>
@@ -856,6 +1039,9 @@
         <span class="k">return</span> <span class="n">mapping_file</span></div>
 
 <div class="viewcode-block" id="AFQ._streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_tractography_bids_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;custom_tract&quot;</span><span class="p">]</span>
+
         <span class="n">odf_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span>
 
         <span class="n">streamlines_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
@@ -868,6 +1054,8 @@
                 <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;CSD&quot;</span><span class="p">:</span>
                 <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_csd</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;MSMT&quot;</span><span class="p">:</span>
+                <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_csd</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;DKI&quot;</span><span class="p">:</span>
                 <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dki</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
@@ -1073,8 +1261,8 @@
                 <span class="n">node_numbers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
 
             <span class="n">profile_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">profile_dict</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_names</span>
-            <span class="n">profile_dict</span><span class="p">[</span><span class="s1">&#39;node&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_numbers</span>
+            <span class="n">profile_dict</span><span class="p">[</span><span class="s2">&quot;tractID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_names</span>
+            <span class="n">profile_dict</span><span class="p">[</span><span class="s2">&quot;nodeID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_numbers</span>
             <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">):</span>
                 <span class="n">profile_dict</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
 
@@ -1179,7 +1367,6 @@
 
                     <span class="n">this_tgm</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">this_sl</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_img&#39;</span><span class="p">],</span>
                                                   <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
-
                     <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                             <span class="n">row</span><span class="p">,</span>
@@ -1193,22 +1380,67 @@
                     <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
                     <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AFQ._viz_prepare_vols"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_prepare_vols">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_prepare_vols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span>
-                          <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                          <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">volume</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
-            <span class="n">volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">volume</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+<div class="viewcode-block" id="AFQ._export_sl_counts"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_sl_counts">[docs]</a>    <span class="k">def</span> <span class="nf">_export_sl_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">total_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streamlines</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">total_sl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">total_file</span><span class="p">)</span><span class="o">.</span><span class="n">tractogram</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+        <span class="n">sl_counts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">folder</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segment</span><span class="p">],</span>
+                                <span class="p">[</span><span class="s1">&#39;clean_bundles&#39;</span><span class="p">,</span> <span class="s1">&#39;bundles&#39;</span><span class="p">]):</span>
+            <span class="n">sl_counts</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="n">bundles_file</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">trk</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">)</span>
+            <span class="n">tg</span> <span class="o">=</span> <span class="n">trk</span><span class="o">.</span><span class="n">tractogram</span>
+            <span class="n">streamlines</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span>
+            <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bundle</span> <span class="o">!=</span> <span class="s2">&quot;whole_brain&quot;</span><span class="p">:</span>
+                    <span class="n">uid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">this_sl</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span><span class="p">(</span>
+                        <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]))</span>
 
+                    <span class="n">this_tgm</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">this_sl</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_img&#39;</span><span class="p">],</span>
+                                                  <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+                    <span class="n">sl_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">this_tgm</span><span class="o">.</span><span class="n">streamlines</span><span class="p">))</span>
+            <span class="n">sl_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_sl</span><span class="p">)</span>
+
+        <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s1">&#39;whole_brain&#39;</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
+            <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
+        <span class="n">bundle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Total&quot;</span><span class="p">)</span>
+
+        <span class="n">sl_counts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bundle</span><span class="o">=</span><span class="n">bundle_list</span><span class="p">,</span>
+                      <span class="n">n_streamlines</span><span class="o">=</span><span class="n">sl_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">n_streamlines_cleaned</span><span class="o">=</span><span class="n">sl_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">sl_count_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">,</span>
+            <span class="s1">&#39;_sl_count.csv&#39;</span><span class="p">,</span>
+            <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">sl_counts</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">sl_count_file</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AFQ._viz_prepare_vol"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_prepare_vol">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_prepare_vol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="n">xform</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">vol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
+            <span class="n">vol</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">vol</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vol</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">vol</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">vol</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">xform</span><span class="p">:</span>
+            <span class="n">vol</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">vol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vol</span></div>
+
+<div class="viewcode-block" id="AFQ._viz_prepare_vols"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_prepare_vols">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_prepare_vols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span>
+                          <span class="n">volume</span><span class="p">,</span>
+                          <span class="n">xform_volume</span><span class="p">,</span>
+                          <span class="n">color_by_volume</span><span class="p">,</span>
+                          <span class="n">xform_color_by_volume</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b0</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">color_by_volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">color_by_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_scalar</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">color_by_volume</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
-            <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="n">color_by_volume</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">xform_volume</span> <span class="ow">or</span> <span class="n">xform_color_by_volume</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
@@ -1221,15 +1453,21 @@
                                        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
                                        <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign_inv</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">xform_volume</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="n">volume</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">xform_color_by_volume</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_by_volume</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">color_by_volume</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">color_by_volume</span><span class="p">)</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_prepare_vol</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">,</span>
+            <span class="n">volume</span><span class="p">,</span>
+            <span class="n">xform_volume</span><span class="p">,</span>
+            <span class="n">mapping</span><span class="p">)</span>
+
+        <span class="n">color_by_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_prepare_vol</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">,</span>
+            <span class="n">color_by_volume</span><span class="p">,</span>
+            <span class="n">xform_color_by_volume</span><span class="p">,</span>
+            <span class="n">mapping</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">volume</span><span class="p">,</span> <span class="n">color_by_volume</span></div>
 
 <div class="viewcode-block" id="AFQ._viz_bundles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_bundles">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span>
@@ -1240,7 +1478,7 @@
                      <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                     <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
@@ -1265,18 +1503,18 @@
                                             <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">export</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;fury&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;no_gif&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                     <span class="n">row</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s1">&#39;_viz.gif&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;_viz.gif&#39;</span><span class="p">,</span>
                     <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;plotly&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                     <span class="n">row</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
                     <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -1294,7 +1532,7 @@
                   <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                  <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
@@ -1348,9 +1586,9 @@
                         <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">export</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;fury&#39;</span><span class="p">:</span>
-                    <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;no_gif&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
                     <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                             <span class="n">row</span><span class="p">,</span>
@@ -1361,7 +1599,7 @@
 
                     <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;plotly&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
                     <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
@@ -1379,19 +1617,19 @@
         <span class="k">return</span> <span class="n">figure</span></div>
 
 <div class="viewcode-block" id="AFQ._plot_tract_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._plot_tract_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">_plot_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">tract_profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tract_profiles</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">fnames</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                 <span class="n">row</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s1">_profile_plots.png&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">scalar</span><span class="si">}</span><span class="s1">_profile_plots&#39;</span><span class="p">,</span>
                 <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            <span class="n">visualize_tract_profiles</span><span class="p">(</span><span class="n">tract_profiles</span><span class="p">,</span>
+            <span class="n">visualize_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tract_profiles</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
                                      <span class="n">scalar</span><span class="o">=</span><span class="n">scalar</span><span class="p">,</span>
-                                     <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span>
+                                     <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span>
+                                     <span class="n">n_boot</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
             <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">=</span>\
             <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Visualization&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
@@ -1403,8 +1641,8 @@
             <span class="n">row</span><span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">],</span>
             <span class="s1">&#39;index&#39;</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">])</span>
-        <span class="n">timing_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;_desc-timing&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">timing_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;_desc-timing.csv&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ._get_affine"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_affine">[docs]</a>    <span class="k">def</span> <span class="nf">_get_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">affine</span></div>
@@ -1615,6 +1853,7 @@
 <div class="viewcode-block" id="AFQ.set_clean_bundles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_clean_bundles">[docs]</a>    <span class="k">def</span> <span class="nf">set_clean_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;clean_bundles_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_bundles</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;clean_bundles_file&#39;</span><span class="p">]</span> <span class="o">=</span>\
                     <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;bundles_file&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1656,13 +1895,16 @@
 <div class="viewcode-block" id="AFQ.export_bundles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_bundles">[docs]</a>    <span class="k">def</span> <span class="nf">export_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_export_bundles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="AFQ.export_sl_counts"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_sl_counts">[docs]</a>    <span class="k">def</span> <span class="nf">export_sl_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_export_sl_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AFQ.viz_bundles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.viz_bundles">[docs]</a>    <span class="k">def</span> <span class="nf">viz_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                     <span class="n">export</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                     <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
@@ -1683,7 +1925,7 @@
                  <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                  <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
@@ -1720,6 +1962,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">export_registered_b0</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_template_xform</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_bundles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_sl_counts</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_tract_profiles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viz_bundles</span><span class="p">(</span><span class="n">export</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
@@ -1735,7 +1978,7 @@
 
 
 <span class="k">def</span> <span class="nf">download_and_combine_afq_profiles</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">study_s3_prefix</span><span class="p">,</span>
-                                      <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                      <span class="n">upload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download and combine tract profiles from different subjects / sessions</span>
 <span class="sd">    on an s3 bucket into one CSV.</span>
@@ -1747,7 +1990,12 @@
 <span class="sd">        The S3 bucket that contains the study data.</span>
 <span class="sd">    study_s3_prefix : str</span>
 <span class="sd">        The S3 prefix common to all of the study objects on S3.</span>
-<span class="sd">    session : str</span>
+<span class="sd">    upload : s3fs, optional</span>
+<span class="sd">        If not None,</span>
+<span class="sd">        Upload the combined CSV after combining using the s3fs object.</span>
+<span class="sd">        Uploads to bucket/study_s3_prefix/derivatives/afq</span>
+<span class="sd">        Defaut: None</span>
+<span class="sd">    session : str, optional</span>
 <span class="sd">        Session to get CSVs from. If None, all sessions are used.</span>
 <span class="sd">        Default: None</span>
 <span class="sd">    Returns</span>
@@ -1780,6 +2028,15 @@
                 <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;profiles&#39;</span><span class="p">,</span>
                 <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">combine_list_of_profiles</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">out_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">upload</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upload</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="n">out_file</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">bucket</span><span class="p">,</span>
+                <span class="n">study_s3_prefix</span><span class="p">,</span>
+                <span class="s2">&quot;derivatives/afq&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;combined_tract_profiles.csv&quot;</span>
+            <span class="p">))</span>
     <span class="k">return</span> <span class="n">df</span>
 
 
@@ -1837,7 +2094,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
@@ -85,6 +86,9 @@
 <span class="sd">    sft : Stateful Tractogram, str</span>
 <span class="sd">        A Stateful Tractogram containing streamline information</span>
 <span class="sd">        or a path to a trk file</span>
+<span class="sd">        In order to visualize individual bundles, the Stateful Tractogram</span>
+<span class="sd">        must contain a bundle key in it&#39;s data_per_streamline which is a list</span>
+<span class="sd">        of bundle `&#39;uid&#39;`.</span>
 
 <span class="sd">    affine : ndarray, optional</span>
 <span class="sd">       An affine transformation to apply to the streamlines before</span>
@@ -107,7 +111,8 @@
 <span class="sd">    colors : dict or list</span>
 <span class="sd">        If this is a dict, keys are bundle names and values are RGB tuples.</span>
 <span class="sd">        If this is a list, each item is an RGB tuple. Defaults to a list</span>
-<span class="sd">        with Tableau 20 RGB values</span>
+<span class="sd">        with Tableau 20 RGB values if bundle_dict is None, or dict from</span>
+<span class="sd">        bundles to Tableau 20 RGB values if bundle_dict is not None.</span>
 
 <span class="sd">    background : tuple, optional</span>
 <span class="sd">        RGB values for the background. Default: (1, 1, 1), which is white</span>
@@ -468,7 +473,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>

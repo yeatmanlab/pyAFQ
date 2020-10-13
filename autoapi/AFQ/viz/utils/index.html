@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
@@ -63,7 +64,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_tract_profiles" title="AFQ.viz.utils.visualize_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_tract_profiles</span></code></a>(tract_profiles, scalar=’dti_fa’, ylim=None, file_name=None, use_fa_ticks=None, positions=POSITIONS)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_tract_profiles" title="AFQ.viz.utils.visualize_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_tract_profiles</span></code></a>(tract_profiles, scalar=’dti_fa’, ylim=None, n_boot=1000, file_name=None, positions=POSITIONS)</p></td>
 <td><p>Visualize all tract profiles for a scalar in one plot</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_gif_inline" title="AFQ.viz.utils.visualize_gif_inline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_gif_inline</span></code></a>(fname, use_s3fs=False)</p></td>
@@ -78,13 +79,12 @@
 
 <dl class="py function">
 <dt id="AFQ.viz.utils.visualize_tract_profiles">
-<code class="sig-prename descclassname">AFQ.viz.utils.</code><code class="sig-name descname">visualize_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tract_profiles</span></em>, <em class="sig-param"><span class="n">scalar</span><span class="o">=</span><span class="default_value">'dti_fa'</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_fa_ticks</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">positions</span><span class="o">=</span><span class="default_value">POSITIONS</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.utils.</code><code class="sig-name descname">visualize_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tract_profiles</span></em>, <em class="sig-param"><span class="n">scalar</span><span class="o">=</span><span class="default_value">'dti_fa'</span></em>, <em class="sig-param"><span class="n">ylim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_boot</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">file_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">positions</span><span class="o">=</span><span class="default_value">POSITIONS</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize all tract profiles for a scalar in one plot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>tract_profiles</strong><span class="classifier">pandas dataframe</span></dt><dd><p>Pandas dataframe of tract_profiles. For example,
-tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])</p>
+<dt><strong>tract_profiles</strong><span class="classifier">string</span></dt><dd><p>Path to CSV containing tract_profiles.</p>
 </dd>
 <dt><strong>scalar</strong><span class="classifier">string, optional</span></dt><dd><p>Scalar to use in plots. Default: “dti_fa”.</p>
 </dd>
@@ -92,13 +92,11 @@ tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])</p>
 If None, ylim is not set.
 Default: None</p>
 </dd>
-<dt><strong>file_name</strong><span class="classifier">string, optional</span></dt><dd><p>File name to save figure to if not None. Default: None</p>
+<dt><strong>n_boot</strong><span class="classifier">int, optional</span></dt><dd><p>Number of bootstrap resamples for seaborn to use
+to estimate the ci.
+Default: 1000</p>
 </dd>
-<dt><strong>use_fa_ticks</strong><span class="classifier">bool, optional</span></dt><dd><p>Set min and max y limit to 0 and 1, and only use yticks at
-0.2, 0.4, 0.6 . Useful for plotting FA.
-If None, set to evaluation of (“fa” in scalar).
-If ultimately True, takes precedence over ylim.
-Default: None</p>
+<dt><strong>file_name</strong><span class="classifier">string, optional</span></dt><dd><p>File name to save figure to if not None. Default: None</p>
 </dd>
 <dt><strong>positions</strong><span class="classifier">dictionary, optional</span></dt><dd><p>Dictionary that maps bundle names to position in plot.
 Default: POSITIONS</p>
@@ -147,7 +145,7 @@ Default: POSITIONS</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>

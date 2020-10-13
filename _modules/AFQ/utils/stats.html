@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
@@ -36,7 +37,7 @@
           <div class="body" role="main">
             
   <h1>Source code for AFQ.utils.stats</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="contrast_index"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/stats/index.html#AFQ.utils.stats.contrast_index">[docs]</a><span></span><span class="k">def</span> <span class="nf">contrast_index</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<div class="viewcode-block" id="contrast_index"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/stats/index.html#AFQ.utils.stats.contrast_index">[docs]</a><span></span><span class="k">def</span> <span class="nf">contrast_index</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">double</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the contrast index between two arrays.</span>
 <span class="sd">    The contrast index is symmetrical with respect to</span>
@@ -50,13 +51,21 @@
 <span class="sd">    x2 : ndarray of floats</span>
 <span class="sd">        An ndarray to compare. The contrast index will have negative values</span>
 <span class="sd">        where x2 &gt; x1.</span>
+<span class="sd">    double : bool, optional</span>
+<span class="sd">        Double the contrast index.</span>
+<span class="sd">        This makes it comparable to a percent difference.</span>
+<span class="sd">        Default: True</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    contrast_index : ndarray of floats</span>
 <span class="sd">        Contrast index calculated by doing (x1 - x2) / (x1 + x2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">)</span></div>
+    <span class="n">ci</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">double</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ci</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ci</span></div>
 </pre></div>
 
           </div>
@@ -82,7 +91,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>

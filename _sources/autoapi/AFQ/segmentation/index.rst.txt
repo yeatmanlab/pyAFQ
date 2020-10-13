@@ -16,9 +16,12 @@ Classes
 
 
 
-.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=40, reduction_thr=40, refine=False, pruning_thr=6, b0_threshold=50, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
 
-   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=0, img_affine=None)
+   .. method:: _read_tg(self, tg=None)
+
+
+   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
 
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -46,8 +49,27 @@ Classes
       img_affine : array, optional.
           The spatial transformation from the measurement to the scanner
           space.
-      References
-      ----------
+      reset_tg_space : bool, optional
+          Whether to reset the space of the input tractogram after
+          segmentation is complete. Default: False.
+
+
+
+      :Returns:
+
+          **dict** : Where keys are bundle names, values are tractograms of
+              these bundles.
+
+
+
+
+
+
+
+
+
+      .. rubric:: References
+
       .. [R03e71c6d7dc6-Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
       Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of
       White Matter Properties: Automating Fiber-Tract Quantification"
@@ -56,17 +78,9 @@ Classes
       bundles using local and global streamline-based registration and
       clustering, Neuroimage, 2017.
 
+      .. only:: latex
 
-
-
-
-
-
-
-
-
-
-
+         [R03e71c6d7dc6-Yeatman2012]_, [R03e71c6d7dc6-Garyfallidis17]_
 
 
 
@@ -271,6 +285,32 @@ Classes
       ----------
       tg : StatefulTractogram class instance
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: move_streamlines(self, tg=None, reg_algo='slr')
+
+      Streamline-based registration of a whole-brain tractogram to
+      the MNI whole-brain atlas.
+
+      registration_algo : str
+          "slr" or "syn"
 
 
 

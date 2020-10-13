@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
@@ -45,12 +46,9 @@
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">zscore</span>
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">from</span> <span class="nn">templateflow</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">tflow</span>
-
 <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 
-<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
 <span class="kn">from</span> <span class="nn">dipy.segment.bundles</span> <span class="kn">import</span> <span class="n">RecoBundles</span>
@@ -58,6 +56,7 @@
 <span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <span class="n">gaussian_weights</span>
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">save_tractogram</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
@@ -83,14 +82,15 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">nb_points</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;AFQ&#39;</span><span class="p">,</span>
+                 <span class="n">reg_algo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">clip_edges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">greater_than</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">rm_small_clusters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-                 <span class="n">model_clust_thr</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
-                 <span class="n">reduction_thr</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+                 <span class="n">model_clust_thr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                 <span class="n">reduction_thr</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
                  <span class="n">refine</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">pruning_thr</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                 <span class="n">pruning_thr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                  <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -113,6 +113,13 @@
 <span class="sd">            &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
 <span class="sd">            [Garyfallidis2017].</span>
 <span class="sd">            Default: &#39;AFQ&#39;</span>
+<span class="sd">        reg_algo : string or None, optional</span>
+<span class="sd">            Algorithm for streamline registration (case-insensitive):</span>
+<span class="sd">            &#39;slr&#39; : Use Streamlinear Registration [Garyfallidis2015]_</span>
+<span class="sd">            &#39;syn&#39; : Use image-based nonlinear registration</span>
+<span class="sd">            If None, will use SyN if a mapping is provided, slr otherwise.</span>
+<span class="sd">            If  seg_algo=&quot;AFQ&quot;, SyN is always used.</span>
+<span class="sd">            Default: None</span>
 <span class="sd">        clip_edges : bool</span>
 <span class="sd">            Whether to clip the streamlines to be only in between the ROIs.</span>
 <span class="sd">            Default: False</span>
@@ -124,11 +131,11 @@
 <span class="sd">        model_clust_thr : int</span>
 <span class="sd">            Parameter passed on to recognize for Recobundles.</span>
 <span class="sd">            See Recobundles documentation.</span>
-<span class="sd">            Default: 40</span>
+<span class="sd">            Default: 5</span>
 <span class="sd">        reduction_thr : int</span>
 <span class="sd">            Parameter passed on to recognize for Recobundles.</span>
 <span class="sd">            See Recobundles documentation.</span>
-<span class="sd">            Default: 40</span>
+<span class="sd">            Default: 20</span>
 <span class="sd">        refine : bool</span>
 <span class="sd">            Parameter passed on to recognize for Recobundles.</span>
 <span class="sd">            See Recobundles documentation.</span>
@@ -136,7 +143,7 @@
 <span class="sd">        pruning_thr : int</span>
 <span class="sd">            Parameter passed on to recognize for Recobundles.</span>
 <span class="sd">            See Recobundles documentation.</span>
-<span class="sd">            Default: 6</span>
+<span class="sd">            Default: 5</span>
 <span class="sd">        progressive : boolean, optional</span>
 <span class="sd">            Using RecoBundles Algorithm.</span>
 <span class="sd">            Whether or not to use progressive technique</span>
@@ -158,8 +165,10 @@
 <span class="sd">            from [Hua2008]_. Here, we choose an average probability that</span>
 <span class="sd">            needs to be exceeded for an individual streamline to be retained.</span>
 <span class="sd">            Default: 0.</span>
-<span class="sd">        rng : RandomState</span>
-<span class="sd">            If None, creates RandomState. Used in RecoBundles Algorithm.</span>
+<span class="sd">        rng : RandomState or int</span>
+<span class="sd">            If None, creates RandomState.</span>
+<span class="sd">            If int, creates RandomState with seed rng.</span>
+<span class="sd">            Used in RecoBundles Algorithm.</span>
 <span class="sd">            Default: None.</span>
 <span class="sd">        return_idx : bool</span>
 <span class="sd">            Whether to return the indices in the original streamlines as part</span>
@@ -187,10 +196,15 @@
 
         <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">=</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reg_algo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reg_algo</span> <span class="o">=</span> <span class="n">reg_algo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">=</span> <span class="n">reg_algo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span> <span class="o">=</span> <span class="n">prob_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progressive</span> <span class="o">=</span> <span class="n">progressive</span>
@@ -210,9 +224,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="o">=</span> <span class="n">save_intermediates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clip_edges</span> <span class="o">=</span> <span class="n">clip_edges</span>
 
+<div class="viewcode-block" id="Segmentation._read_tg"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._read_tg">[docs]</a>    <span class="k">def</span> <span class="nf">_read_tg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tg_orig_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">space</span>
+        <span class="k">return</span> <span class="n">tg</span></div>
+
 <div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">fdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">fbvec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles based on either waypoint ROIs</span>
 <span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
@@ -240,6 +263,15 @@
 <span class="sd">        img_affine : array, optional.</span>
 <span class="sd">            The spatial transformation from the measurement to the scanner</span>
 <span class="sd">            space.</span>
+<span class="sd">        reset_tg_space : bool, optional</span>
+<span class="sd">            Whether to reset the space of the input tractogram after</span>
+<span class="sd">            segmentation is complete. Default: False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict : Where keys are bundle names, values are tractograms of</span>
+<span class="sd">            these bundles.</span>
+
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        .. [Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.</span>
@@ -264,7 +296,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="n">img_affine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_img</span><span class="p">(</span><span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preprocessing Streamlines&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
+        <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
 
         <span class="c1"># If resampling over-write the sft:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span><span class="p">:</span>
@@ -277,9 +309,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cross_streamlines</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_afq</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_reco</span><span class="p">()</span></div>
+            <span class="n">fiber_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_afq</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reco&quot;</span><span class="p">):</span>
+            <span class="n">fiber_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_reco</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The seg_algo input is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="si">}</span><span class="s2">, which&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;is not recognized&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reset_tg_space</span><span class="p">:</span>
+            <span class="c1"># Return the input to the original space when you are done:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tg_orig_space</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fiber_groups</span></div>
 
 <div class="viewcode-block" id="Segmentation.prepare_img"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.prepare_img">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -322,9 +362,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span>
 
         <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
-                                                <span class="n">template</span><span class="o">=</span><span class="n">reg_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;syn&quot;</span><span class="p">:</span>
+                <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
+                                                    <span class="n">template</span><span class="o">=</span><span class="n">reg_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">reg_prealign</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
@@ -466,11 +509,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        tg : StatefulTractogram class instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
-
+        <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
 
         <span class="c1"># For expedience, we approximate each streamline as a 100 point curve.</span>
@@ -676,6 +715,50 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">select_sl</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span></div>
 
+<div class="viewcode-block" id="Segmentation.move_streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.move_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">move_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_algo</span><span class="o">=</span><span class="s1">&#39;slr&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Streamline-based registration of a whole-brain tractogram to</span>
+<span class="sd">        the MNI whole-brain atlas.</span>
+
+<span class="sd">        registration_algo : str</span>
+<span class="sd">            &quot;slr&quot; or &quot;syn&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reg_algo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;slr&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;syn&#39;</span>
+
+        <span class="k">if</span> <span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;slr&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering tractogram with SLR&quot;</span><span class="p">)</span>
+            <span class="n">atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">whole_brain_slr</span><span class="p">(</span>
+                <span class="n">atlas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">progressive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progressive</span><span class="p">,</span>
+                <span class="n">greater_than</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span><span class="p">,</span>
+                <span class="n">rm_small_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rm_small_clusters</span><span class="p">,</span>
+                <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;syn&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering tractogram based on syn&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="n">s</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">moved_sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+            <span class="n">save_tractogram</span><span class="p">(</span>
+                <span class="n">moved_sft</span><span class="p">,</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                        <span class="s1">&#39;sls_in_mni.trk&#39;</span><span class="p">),</span>
+                <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Segmentation.segment_reco"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment_reco">[docs]</a>    <span class="k">def</span> <span class="nf">segment_reco</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]</span>
@@ -690,26 +773,13 @@
 <span class="sd">            The streamlines in each object have all been oriented to have the</span>
 <span class="sd">            same orientation (using `dts.orient_by_streamline`).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">tg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
-
+        <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
         <span class="n">fiber_groups</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering Whole-brain with SLR&quot;</span><span class="p">)</span>
-        <span class="c1"># We start with whole-brain SLR:</span>
-        <span class="n">atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span>
-        <span class="n">moved</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">qb_centroids1</span><span class="p">,</span> <span class="n">qb_centroids2</span> <span class="o">=</span> <span class="n">whole_brain_slr</span><span class="p">(</span>
-            <span class="n">atlas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">progressive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progressive</span><span class="p">,</span>
-            <span class="n">greater_than</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span><span class="p">,</span>
-            <span class="n">rm_small_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rm_small_clusters</span><span class="p">,</span>
-            <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_streamlines</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span><span class="p">)</span>
         <span class="c1"># We generate our instance of RB with the moved streamlines:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting Bundles&quot;</span><span class="p">)</span>
-        <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="n">moved</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
-
+        <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="c1"># Next we&#39;ll iterate over bundles, registering each one:</span>
         <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
@@ -727,7 +797,7 @@
 
             <span class="c1"># Use the streamlines in the original space:</span>
             <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">recognized_sl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">rec_labels</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">model_sl</span><span class="p">,</span> <span class="n">recognized_sl</span><span class="p">,</span>
                                           <span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span><span class="p">,</span>
                                           <span class="n">reduction_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span><span class="p">,</span>
@@ -785,7 +855,7 @@
 <span class="sd">        Default: False.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    A nibabel.Streamlines class instance containing only the streamlines</span>
+<span class="sd">    A StatefulTractogram class instance containing only the streamlines</span>
 <span class="sd">    that have a Mahalanobis distance smaller than `clean_threshold` from</span>
 <span class="sd">    the mean of each one of the nodes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -874,7 +944,7 @@
 
     <span class="c1"># Check whether it&#39;s already in the right format:</span>
     <span class="n">sp_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets0</span> <span class="ow">is</span> <span class="kc">None</span>
-                 <span class="ow">or</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+                 <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
                     <span class="ow">and</span> <span class="n">targets0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
 
     <span class="n">ep_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets1</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -951,7 +1021,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>

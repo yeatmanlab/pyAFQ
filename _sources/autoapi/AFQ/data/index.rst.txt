@@ -192,8 +192,28 @@ Functions
 
 .. function:: organize_stanford_data(path=None)
 
-   Create the expected file-system structure for the Stanford HARDI data-set.
+   If necessary, downloads the Stanford HARDI dataset into DIPY directory and
+   creates a BIDS compliant file-system structure in AFQ data directory:
 
+   ~/AFQ_data/
+   └── stanford_hardi
+   ├── dataset_description.json
+   └── derivatives
+       ├── freesurfer
+       │   ├── dataset_description.json
+       │   └── sub-01
+       │       └── ses-01
+       │           └── anat
+       │               ├── sub-01_ses-01_T1w.nii.gz
+       │               └── sub-01_ses-01_seg.nii.gz
+       └── vistasoft
+           ├── dataset_description.json
+           └── sub-01
+               └── ses-01
+                   └── dwi
+                       ├── sub-01_ses-01_dwi.bvals
+                       ├── sub-01_ses-01_dwi.bvecs
+                       └── sub-01_ses-01_dwi.nii.gz
 
 
 

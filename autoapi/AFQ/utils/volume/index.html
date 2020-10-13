@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
@@ -52,6 +53,12 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.volume.patch_up_roi" title="AFQ.utils.volume.patch_up_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_up_roi</span></code></a>(roi, bundle_name=’ROI’)</p></td>
 <td><p>After being non-linearly transformed, ROIs tend to have holes in them.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.volume.density_map" title="AFQ.utils.volume.density_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_map</span></code></a>(tractogram, n_sls=None, to_vox=False)</p></td>
+<td><p>Create a streamline density map.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.volume.dice_coeff" title="AFQ.utils.volume.dice_coeff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dice_coeff</span></code></a>(arr1, arr2)</p></td>
+<td><p>Compute Dice’s coefficient between two images.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py function">
@@ -77,6 +84,58 @@ Default: None</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
 <dt>ROI after dilation and hole-filling</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.volume.density_map">
+<code class="sig-prename descclassname">AFQ.utils.volume.</code><code class="sig-name descname">density_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tractogram</span></em>, <em class="sig-param"><span class="n">n_sls</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_vox</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/volume.html#density_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.volume.density_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a streamline density map.
+based on:
+<a class="reference external" href="https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/">https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tractogram</strong><span class="classifier">StatefulTractogram</span></dt><dd><p>Stateful tractogram whose streamlines are used to make
+the density map.</p>
+</dd>
+<dt><strong>n_sls</strong><span class="classifier">int or None</span></dt><dd><p>n_sls to randomly select to make the density map.
+If None, all streamlines are used.
+Default: None</p>
+</dd>
+<dt><strong>to_vox</strong><span class="classifier">bool</span></dt><dd><p>Whether to put the stateful tractogram in VOX space before making
+the density map.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>Nifti1Image containing the density map.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="AFQ.utils.volume.dice_coeff">
+<code class="sig-prename descclassname">AFQ.utils.volume.</code><code class="sig-name descname">dice_coeff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr1</span></em>, <em class="sig-param"><span class="n">arr2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/volume.html#dice_coeff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.volume.dice_coeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Dice’s coefficient between two images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arr1</strong><span class="classifier">Nifti1Image, str, ndarray</span></dt><dd><p>One ndarray to compare. Can be a path or image, which will be
+converted to an ndarray.</p>
+</dd>
+<dt><strong>arr2</strong><span class="classifier">Nifti1Image, str, ndarray</span></dt><dd><p>The other ndarray to compare. Can be a path or image, which will be
+converted to an ndarray.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The dice similarity between the images.</dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -110,7 +169,7 @@ Default: None</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>

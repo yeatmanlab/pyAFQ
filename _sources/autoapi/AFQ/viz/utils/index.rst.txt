@@ -28,16 +28,15 @@ Functions
 .. py:class:: Viz(backend='fury')
 
 
-.. function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', ylim=None, file_name=None, use_fa_ticks=None, positions=POSITIONS)
+.. function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', ylim=None, n_boot=1000, file_name=None, positions=POSITIONS)
 
    Visualize all tract profiles for a scalar in one plot
 
 
    :Parameters:
 
-       **tract_profiles** : pandas dataframe
-           Pandas dataframe of tract_profiles. For example,
-           tract_profiles = pd.read_csv(my_afq.get_tract_profiles()[0])
+       **tract_profiles** : string
+           Path to CSV containing tract_profiles.
 
        **scalar** : string, optional
            Scalar to use in plots. Default: "dti_fa".
@@ -47,15 +46,13 @@ Functions
            If None, ylim is not set.
            Default: None
 
+       **n_boot** : int, optional
+           Number of bootstrap resamples for seaborn to use
+           to estimate the ci.
+           Default: 1000
+
        **file_name** : string, optional
            File name to save figure to if not None. Default: None
-
-       **use_fa_ticks** : bool, optional
-           Set min and max y limit to 0 and 1, and only use yticks at
-           0.2, 0.4, 0.6 . Useful for plotting FA.
-           If None, set to evaluation of ("fa" in scalar).
-           If ultimately True, takes precedence over ylim.
-           Default: None
 
        **positions** : dictionary, optional
            Dictionary that maps bundle names to position in plot.

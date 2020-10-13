@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
@@ -56,8 +57,9 @@
     <span class="n">dkimodel</span> <span class="o">=</span> <span class="n">dki</span><span class="o">.</span><span class="n">DiffusionKurtosisModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dkimodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
+
 <div class="viewcode-block" id="fit_dki"><a class="viewcode-back" href="../../../autoapi/AFQ/models/dki/index.html#AFQ.models.dki.fit_dki">[docs]</a><span class="k">def</span> <span class="nf">fit_dki</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">min_kurtosis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_kurtosis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">min_kurtosis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_kurtosis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit the DKI model, save files with derived maps</span>
 
@@ -210,7 +212,7 @@
 
 
 <span class="k">def</span> <span class="nf">fit_mdki</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+             <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit the DKI model, save files with derived maps</span>
 
@@ -280,7 +282,7 @@
 
 <span class="k">def</span> <span class="nf">fit_dkimicro</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">min_kurtosis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_kurtosis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                 <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit the DKI model, save files with derived maps</span>
 
@@ -416,7 +418,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>

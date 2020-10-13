@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
@@ -43,6 +44,13 @@
 <span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">gaussian</span>
 <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">convex_hull_image</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.qhull</span> <span class="kn">import</span> <span class="n">QhullError</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">dice</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+
+<span class="kn">from</span> <span class="nn">dipy.io.utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">create_nifti_header</span><span class="p">,</span> <span class="n">get_reference_info</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">select_random_set_of_streamlines</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
 
 
 <div class="viewcode-block" id="patch_up_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">[docs]</a><span class="k">def</span> <span class="nf">patch_up_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="s2">&quot;ROI&quot;</span><span class="p">):</span>
@@ -80,6 +88,77 @@
         <span class="k">return</span> <span class="n">convex_hull_image</span><span class="p">(</span><span class="n">hole_filled</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">QhullError</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">hole_filled</span></div>
+
+
+<div class="viewcode-block" id="density_map"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.density_map">[docs]</a><span class="k">def</span> <span class="nf">density_map</span><span class="p">(</span><span class="n">tractogram</span><span class="p">,</span> <span class="n">n_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_vox</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a streamline density map.</span>
+<span class="sd">    based on:</span>
+<span class="sd">    https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tractogram : StatefulTractogram</span>
+<span class="sd">        Stateful tractogram whose streamlines are used to make</span>
+<span class="sd">        the density map.</span>
+<span class="sd">    n_sls : int or None</span>
+<span class="sd">        n_sls to randomly select to make the density map.</span>
+<span class="sd">        If None, all streamlines are used.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    to_vox : bool</span>
+<span class="sd">        Whether to put the stateful tractogram in VOX space before making</span>
+<span class="sd">        the density map.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Nifti1Image containing the density map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">to_vox</span><span class="p">:</span>
+        <span class="n">tractogram</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+
+    <span class="n">sls</span> <span class="o">=</span> <span class="n">tractogram</span><span class="o">.</span><span class="n">streamlines</span>
+    <span class="k">if</span> <span class="n">n_sls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sls</span> <span class="o">=</span> <span class="n">select_random_set_of_streamlines</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_sls</span><span class="p">)</span>
+
+    <span class="n">affine</span><span class="p">,</span> <span class="n">vol_dims</span><span class="p">,</span> <span class="n">voxel_sizes</span><span class="p">,</span> <span class="n">voxel_order</span> <span class="o">=</span> <span class="n">get_reference_info</span><span class="p">(</span><span class="n">tractogram</span><span class="p">)</span>
+    <span class="n">tractogram_density</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">density_map</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">vol_dims</span><span class="p">)</span>
+    <span class="n">nifti_header</span> <span class="o">=</span> <span class="n">create_nifti_header</span><span class="p">(</span><span class="n">affine</span><span class="p">,</span> <span class="n">vol_dims</span><span class="p">,</span> <span class="n">voxel_sizes</span><span class="p">)</span>
+    <span class="n">density_map_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">tractogram_density</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">nifti_header</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">density_map_img</span></div>
+
+
+<div class="viewcode-block" id="dice_coeff"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.dice_coeff">[docs]</a><span class="k">def</span> <span class="nf">dice_coeff</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute Dice&#39;s coefficient between two images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr1 : Nifti1Image, str, ndarray</span>
+<span class="sd">        One ndarray to compare. Can be a path or image, which will be</span>
+<span class="sd">        converted to an ndarray.</span>
+<span class="sd">    arr2 : Nifti1Image, str, ndarray</span>
+<span class="sd">        The other ndarray to compare. Can be a path or image, which will be</span>
+<span class="sd">        converted to an ndarray.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    The dice similarity between the images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">arr1</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">arr1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">arr2</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">arr2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+        <span class="n">arr1</span> <span class="o">=</span> <span class="n">arr1</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+        <span class="n">arr2</span> <span class="o">=</span> <span class="n">arr2</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+
+    <span class="c1"># scipy&#39;s dice function returns the dice *dissimilarity*</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">dice</span><span class="p">(</span>
+        <span class="n">arr1</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span>
+        <span class="n">arr2</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span></div>
 </pre></div>
 
           </div>
@@ -105,7 +184,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>

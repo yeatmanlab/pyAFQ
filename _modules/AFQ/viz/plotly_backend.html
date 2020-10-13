@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
@@ -51,9 +52,11 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">plotly</span>
     <span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
+    <span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plotly&quot;</span><span class="p">))</span>
 
+<div class="viewcode-block" id="scope"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.scope">[docs]</a><span class="n">scope</span> <span class="o">=</span> <span class="n">pio</span><span class="o">.</span><span class="n">kaleido</span><span class="o">.</span><span class="n">scope</span></div>
 <div class="viewcode-block" id="viz_logger"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.viz_logger">[docs]</a><span class="n">viz_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;AFQ.viz&quot;</span><span class="p">)</span></div>
 
 
@@ -162,8 +165,11 @@
             <span class="n">x</span><span class="o">=</span><span class="n">x_pts</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y_pts</span><span class="p">,</span>
             <span class="n">z</span><span class="o">=</span><span class="n">z_pts</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+            <span class="p">),</span>  <span class="c1"># this is necessary to add color to legend</span>
             <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
                 <span class="n">color</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span>
@@ -185,7 +191,10 @@
 <span class="sd">    ----------</span>
 <span class="sd">    sft : Stateful Tractogram, str</span>
 <span class="sd">        A Stateful Tractogram containing streamline information</span>
-<span class="sd">        or a path to a trk file</span>
+<span class="sd">        or a path to a trk file.</span>
+<span class="sd">        In order to visualize individual bundles, the Stateful Tractogram</span>
+<span class="sd">        must contain a bundle key in it&#39;s data_per_streamline which is a list</span>
+<span class="sd">        of bundle `&#39;uid&#39;`.</span>
 
 <span class="sd">    affine : ndarray, optional</span>
 <span class="sd">       An affine transformation to apply to the streamlines before</span>
@@ -208,7 +217,8 @@
 <span class="sd">    colors : dict or list</span>
 <span class="sd">        If this is a dict, keys are bundle names and values are RGB tuples.</span>
 <span class="sd">        If this is a list, each item is an RGB tuple. Defaults to a list</span>
-<span class="sd">        with Tableau 20 RGB values</span>
+<span class="sd">        with Tableau 20 RGB values if bundle_dict is None, or dict from</span>
+<span class="sd">        bundles to Tableau 20 RGB values if bundle_dict is not None.</span>
 
 <span class="sd">    background : tuple, optional</span>
 <span class="sd">        RGB values for the background. Default: (1, 1, 1), which is white</span>
@@ -248,12 +258,13 @@
             <span class="n">name</span><span class="p">,</span>
             <span class="n">cbv</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">)</span>
 
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">itemsizing</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_gif"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.create_gif">[docs]</a><span class="k">def</span> <span class="nf">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span>
                <span class="n">file_name</span><span class="p">,</span>
-               <span class="n">n_frames</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+               <span class="n">n_frames</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
                <span class="n">zoom</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
                <span class="n">z_offset</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">)):</span>
@@ -291,6 +302,7 @@
         <span class="p">)</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">scene_camera</span><span class="o">=</span><span class="n">camera</span><span class="p">)</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">tdir</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/tgif</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+        <span class="n">scope</span><span class="o">.</span><span class="n">_shutdown_kaleido</span><span class="p">()</span>  <span class="c1"># temporary fix for memory leak</span>
 
     <span class="n">vut</span><span class="o">.</span><span class="n">gif_from_pngs</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span>
                       <span class="n">png_fname</span><span class="o">=</span><span class="s2">&quot;tgif&quot;</span><span class="p">,</span> <span class="n">add_zeros</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
@@ -596,7 +608,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Organizing your data &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The pyAFQ configuration file" href="config.html" />
+    <link rel="prev" title="Using pyAFQ" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="organizing-your-data">
+<h1>Organizing your data<a class="headerlink" href="#organizing-your-data" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ works with <a class="reference external" href="http://bids.neuroimaging.io/">BIDS compliant</a> diffusion data.
+While not required it is the prefered data format for neuroimaging interoperability.
+Anatomical data and segmentation are optional. If a T1-weighted anatomical image and its
+segmentation are not provided, the software will use the diffusion data to
+estimate the parts of the image that comprise the white matter.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The structure within the <cite>raw</cite> part of the BIDS directory doesn’t matter
+much to the <cite>pyAFQ</cite> software, as the software will not touch this data at
+all.</p>
+</div>
+<p>As part of its operation, the software will create another directory, under
+<cite>study/derivatives/afq</cite>, which will contain all of the derivatives created by
+the software.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the BIDS format for derivatives matures, we intend to update the pyAFQ
+software to support a fully BIDS-compliant set of derivatives. Both as
+inputs, as well as outputs.</p>
+</div>
+<div class="section" id="example-data">
+<h2>Example data<a class="headerlink" href="#example-data" title="Permalink to this headline">¶</a></h2>
+<p>To get some example diffusion data formatted for input into <cite>pyAFQ</cite>, you can
+run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This should create a folder in your home directory with a properly-formatted
+data set in a directory called <cite>stanford_hardi</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~/AFQ_data/stanford_hardi/derivatives/vistasoft/
+├── dataset_description.json
+└── sub-01
+    └── ses-01
+        └── dwi
+            ├── sub-01_ses-01_dwi.bvals
+            ├── sub-01_ses-01_dwi.bvecs
+            └── sub-01_ses-01_dwi.nii.gz
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Using pyAFQ</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Using pyAFQ</a></li>
+      <li>Next: <a href="config.html" title="next chapter">The pyAFQ configuration file</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/data.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

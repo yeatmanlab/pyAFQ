@@ -16,7 +16,7 @@ Functions
    AFQ.models.csd.fit_csd
 
 
-.. function:: fit_csd(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=0, sh_order=None, lambda_=1, tau=0.1, out_dir=None)
+.. function:: fit_csd(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None, msmt=False)
 
    Fit the CSD model and save file with SH coefficients.
 
@@ -46,7 +46,7 @@ Functions
 
        **b0_threshold** : float,optional.
            The value of diffusion-weighting under which we consider it to be
-           equivalent to 0. Default:0
+           equivalent to 0. Default:50
 
        **sh_order** : int, optional.
            default: infer the number of parameters from the number of data
@@ -67,6 +67,9 @@ Functions
            A full path to a directory to store the maps that get computed.
            Default: file with coefficients gets stored in the same directory as
            the first DWI file in `data_files`.
+
+       **msmt** : bool, optional
+           If False, standard single-shell CSD will be used. Otherwise,
 
    :Returns:
 

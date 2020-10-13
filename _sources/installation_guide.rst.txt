@@ -33,4 +33,19 @@ The other requires that you clone the source code to your machine::
 
 Then, change your working directory into the top-level directory of this repo and issue::
 
-  pip install .
+  pip install -e .[dev,fury]
+
+which will install pyAFQ locally in editible mode and include extensions.
+
+.. note::
+
+  The project follows the standard github fork and pull request workflow. So if
+  you plan on contributing to pyAFQ it is recommended that you fork the
+  repository and issue pull requests.
+
+See :ref:`contributing`
+
+.. note::
+
+  It is also recommended that you utilize python virtual environment and
+  package mangagement tools and begin with a clean environment.

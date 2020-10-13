@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
@@ -81,7 +82,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_bundles" title="AFQ.viz.plotly_backend.visualize_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_bundles</span></code></a>(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, figure=None, background=(1, 1, 1), interact=False, inline=False)</p></td>
 <td><p>Visualize bundles in 3D</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.create_gif" title="AFQ.viz.plotly_backend.create_gif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_gif</span></code></a>(figure, file_name, n_frames=60, zoom=2.5, z_offset=0.5, size=(600, 600))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.create_gif" title="AFQ.viz.plotly_backend.create_gif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_gif</span></code></a>(figure, file_name, n_frames=30, zoom=2.5, z_offset=0.5, size=(600, 600))</p></td>
 <td><p>Convert a Plotly Figure object into a gif</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_roi" title="AFQ.viz.plotly_backend._draw_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_roi</span></code></a>(figure, roi, name, color, opacity)</p></td>
@@ -104,6 +105,11 @@
 </tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt id="AFQ.viz.plotly_backend.scope">
+<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">scope</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.scope" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py data">
 <dt id="AFQ.viz.plotly_backend.viz_logger">
 <code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">viz_logger</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#viz_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.viz_logger" title="Permalink to this definition">¶</a></dt>
@@ -143,7 +149,10 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>sft</strong><span class="classifier">Stateful Tractogram, str</span></dt><dd><p>A Stateful Tractogram containing streamline information
-or a path to a trk file</p>
+or a path to a trk file.
+In order to visualize individual bundles, the Stateful Tractogram
+must contain a bundle key in it’s data_per_streamline which is a list
+of bundle <cite>‘uid’</cite>.</p>
 </dd>
 <dt><strong>affine</strong><span class="classifier">ndarray, optional</span></dt><dd><p>An affine transformation to apply to the streamlines before
 visualization. Default: no transform.</p>
@@ -161,7 +170,8 @@ or an integer for selection from the sft metadata.</p>
 </dd>
 <dt><strong>colors</strong><span class="classifier">dict or list</span></dt><dd><p>If this is a dict, keys are bundle names and values are RGB tuples.
 If this is a list, each item is an RGB tuple. Defaults to a list
-with Tableau 20 RGB values</p>
+with Tableau 20 RGB values if bundle_dict is None, or dict from
+bundles to Tableau 20 RGB values if bundle_dict is not None.</p>
 </dd>
 <dt><strong>background</strong><span class="classifier">tuple, optional</span></dt><dd><p>RGB values for the background. Default: (1, 1, 1), which is white
 background.</p>
@@ -187,7 +197,7 @@ Only works in the notebook context. Default: False.</p>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.create_gif">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">create_gif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">n_frames</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">2.5</span></em>, <em class="sig-param"><span class="n">z_offset</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">600, 600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#create_gif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.create_gif" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">create_gif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">n_frames</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">2.5</span></em>, <em class="sig-param"><span class="n">z_offset</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">600, 600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#create_gif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.create_gif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a Plotly Figure object into a gif</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -269,7 +279,7 @@ Only works in the notebook context. Default: False.</p>
 <dl class="py class">
 <dt id="AFQ.viz.plotly_backend.Axes">
 <em class="property">class </em><code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">Axes</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
 <p>Enum where members are also (and must be) ints</p>
 <dl class="py attribute">
 <dt id="AFQ.viz.plotly_backend.Axes.X">
@@ -382,7 +392,7 @@ Only works in the notebook context. Default: False.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>

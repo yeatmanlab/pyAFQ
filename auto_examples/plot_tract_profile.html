@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
@@ -68,6 +69,9 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="c1"># Target directory for this example&#39;s output files</span>
+<span class="n">working_dir</span> <span class="o">=</span> <span class="s2">&quot;./tract_profile&quot;</span>
 </pre></div>
 </div>
 <div class="section" id="get-example-data">
@@ -84,12 +88,12 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 <div class="section" id="calculate-dti">
 <h2>Calculate DTI:<a class="headerlink" href="#calculate-dti" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">):</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">)):</span>
     <span class="n">dti_params</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
-                             <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                             <span class="n">out_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_FA.nii.gz&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="s1">&#39;./dti_params.nii.gz&#39;</span><span class="p">}</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">),</span>
+                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_params.nii.gz&#39;</span><span class="p">)}</span>
 
 <span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
 <span class="n">FA_data</span> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
@@ -116,14 +120,15 @@ CLI.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
 <span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">):</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
     <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
     <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
 
     <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">)</span>
-    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="s1">&#39;./mapping.nii.gz&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
+                               <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -131,10 +136,13 @@ CLI.</p>
 Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz
 
   0%|          | 0.00/13.0k [00:00&lt;?, ?B/s]
- 29%|##8       | 3.72k/13.0k [00:00&lt;00:00, 37.2kB/s]
- 63%|######3   | 8.18k/13.0k [00:00&lt;00:00, 39.2kB/s]
- 97%|#########7| 12.6k/13.0k [00:00&lt;00:00, 40.6kB/s]
-13.0kB [00:00, 42.0kB/s]
+  9%|8         | 1.12k/13.0k [00:00&lt;00:01, 10.9kB/s]
+ 20%|#9        | 2.53k/13.0k [00:00&lt;00:00, 11.6kB/s]
+ 32%|###2      | 4.17k/13.0k [00:00&lt;00:00, 12.6kB/s]
+ 47%|####6     | 6.04k/13.0k [00:00&lt;00:00, 13.9kB/s]
+ 63%|######2   | 8.16k/13.0k [00:00&lt;00:00, 15.5kB/s]
+ 81%|########1 | 10.5k/13.0k [00:00&lt;00:00, 17.3kB/s]
+13.0kB [00:00, 18.2kB/s]
 </pre></div>
 </div>
 </div>
@@ -154,7 +162,7 @@ For speed, we only segment two bundles here.</p>
 <p>Streamlines are generate using DTI and a deterministic tractography
 algorithm. For speed, we seed only within the waypoint ROIs for each bundle.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">):</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">)):</span>
     <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
@@ -166,280 +174,23 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.</p>
                         <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
 
                 <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">)</span>
+                         <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">))</span>
                 <span class="c1"># Add voxels that aren&#39;t there yet:</span>
                 <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seed_roi</span><span class="p">,</span> <span class="n">warped_roi</span><span class="p">)</span>
     <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">seed_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-                             <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">)</span>
+                             <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">))</span>
     <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><span class="n">seed_roi</span><span class="p">,</span>
                     <span class="n">stop_mask</span><span class="o">=</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;./dti_streamlines.trk&#39;</span><span class="p">,</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span>
                     <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="s1">&#39;./dti_streamlines.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span> <span class="n">img</span><span class="p">)</span>
 
 <span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Tracking...
-
-  0%|          | 0/100 [00:00&lt;?, ?it/s]
-  1%|1         | 1/100 [00:00&lt;00:31,  3.12it/s]
-  2%|2         | 2/100 [00:00&lt;00:31,  3.12it/s]
-  3%|3         | 3/100 [00:00&lt;00:31,  3.11it/s]
-  4%|4         | 4/100 [00:01&lt;00:30,  3.12it/s]
-  5%|5         | 5/100 [00:01&lt;00:30,  3.13it/s]
-  6%|6         | 6/100 [00:01&lt;00:30,  3.13it/s]
-  7%|7         | 7/100 [00:02&lt;00:29,  3.14it/s]
-  8%|8         | 8/100 [00:02&lt;00:29,  3.15it/s]
-  9%|9         | 9/100 [00:02&lt;00:28,  3.15it/s]
- 10%|#         | 10/100 [00:03&lt;00:28,  3.15it/s]
- 11%|#1        | 11/100 [00:03&lt;00:28,  3.14it/s]
- 12%|#2        | 12/100 [00:03&lt;00:27,  3.14it/s]
- 13%|#3        | 13/100 [00:04&lt;00:27,  3.15it/s]
- 14%|#4        | 14/100 [00:04&lt;00:27,  3.15it/s]
- 15%|#5        | 15/100 [00:04&lt;00:27,  3.14it/s]
- 16%|#6        | 16/100 [00:05&lt;00:26,  3.14it/s]
- 17%|#7        | 17/100 [00:05&lt;00:26,  3.14it/s]
- 18%|#8        | 18/100 [00:05&lt;00:26,  3.15it/s]
- 19%|#9        | 19/100 [00:06&lt;00:25,  3.13it/s]
- 20%|##        | 20/100 [00:06&lt;00:25,  3.14it/s]
- 21%|##1       | 21/100 [00:06&lt;00:25,  3.13it/s]
- 22%|##2       | 22/100 [00:07&lt;00:25,  3.09it/s]
- 23%|##3       | 23/100 [00:07&lt;00:24,  3.10it/s]
- 24%|##4       | 24/100 [00:07&lt;00:24,  3.09it/s]
- 25%|##5       | 25/100 [00:08&lt;00:24,  3.06it/s]
- 26%|##6       | 26/100 [00:08&lt;00:24,  3.05it/s]
- 27%|##7       | 27/100 [00:08&lt;00:23,  3.05it/s]
- 28%|##8       | 28/100 [00:08&lt;00:23,  3.08it/s]
- 29%|##9       | 29/100 [00:09&lt;00:22,  3.11it/s]
- 30%|###       | 30/100 [00:09&lt;00:22,  3.08it/s]
- 31%|###1      | 31/100 [00:09&lt;00:22,  3.10it/s]
- 32%|###2      | 32/100 [00:10&lt;00:21,  3.13it/s]
- 33%|###3      | 33/100 [00:10&lt;00:21,  3.12it/s]
- 34%|###4      | 34/100 [00:10&lt;00:21,  3.14it/s]
- 35%|###5      | 35/100 [00:11&lt;00:20,  3.13it/s]
- 36%|###6      | 36/100 [00:11&lt;00:20,  3.12it/s]
- 37%|###7      | 37/100 [00:11&lt;00:20,  3.13it/s]
- 38%|###8      | 38/100 [00:12&lt;00:19,  3.13it/s]
- 39%|###9      | 39/100 [00:12&lt;00:19,  3.12it/s]
- 40%|####      | 40/100 [00:12&lt;00:19,  3.11it/s]
- 41%|####1     | 41/100 [00:13&lt;00:18,  3.12it/s]
- 42%|####2     | 42/100 [00:13&lt;00:18,  3.12it/s]
- 43%|####3     | 43/100 [00:13&lt;00:18,  3.11it/s]
- 44%|####4     | 44/100 [00:14&lt;00:17,  3.12it/s]
- 45%|####5     | 45/100 [00:14&lt;00:17,  3.12it/s]
- 46%|####6     | 46/100 [00:14&lt;00:17,  3.13it/s]
- 47%|####6     | 47/100 [00:15&lt;00:16,  3.14it/s]
- 48%|####8     | 48/100 [00:15&lt;00:16,  3.14it/s]
- 49%|####9     | 49/100 [00:15&lt;00:16,  3.15it/s]
- 50%|#####     | 50/100 [00:16&lt;00:15,  3.14it/s]
- 51%|#####1    | 51/100 [00:16&lt;00:15,  3.15it/s]
- 52%|#####2    | 52/100 [00:16&lt;00:15,  3.14it/s]
- 53%|#####3    | 53/100 [00:16&lt;00:14,  3.14it/s]
- 54%|#####4    | 54/100 [00:17&lt;00:14,  3.14it/s]
- 55%|#####5    | 55/100 [00:17&lt;00:14,  3.10it/s]
- 56%|#####6    | 56/100 [00:17&lt;00:14,  3.10it/s]
- 57%|#####6    | 57/100 [00:18&lt;00:13,  3.12it/s]
- 58%|#####8    | 58/100 [00:18&lt;00:13,  3.13it/s]
- 59%|#####8    | 59/100 [00:18&lt;00:13,  3.14it/s]
- 60%|######    | 60/100 [00:19&lt;00:12,  3.13it/s]
- 61%|######1   | 61/100 [00:19&lt;00:12,  3.14it/s]
- 62%|######2   | 62/100 [00:19&lt;00:12,  3.15it/s]
- 63%|######3   | 63/100 [00:20&lt;00:11,  3.14it/s]
- 64%|######4   | 64/100 [00:20&lt;00:11,  3.14it/s]
- 65%|######5   | 65/100 [00:20&lt;00:11,  3.11it/s]
- 66%|######6   | 66/100 [00:21&lt;00:10,  3.12it/s]
- 67%|######7   | 67/100 [00:21&lt;00:10,  3.13it/s]
- 68%|######8   | 68/100 [00:21&lt;00:10,  3.13it/s]
- 69%|######9   | 69/100 [00:22&lt;00:09,  3.13it/s]
- 70%|#######   | 70/100 [00:22&lt;00:09,  3.12it/s]
- 71%|#######1  | 71/100 [00:22&lt;00:09,  3.13it/s]
- 72%|#######2  | 72/100 [00:23&lt;00:08,  3.11it/s]
- 73%|#######3  | 73/100 [00:23&lt;00:08,  3.10it/s]
- 74%|#######4  | 74/100 [00:23&lt;00:08,  3.12it/s]
- 75%|#######5  | 75/100 [00:24&lt;00:07,  3.13it/s]
- 76%|#######6  | 76/100 [00:24&lt;00:07,  3.13it/s]
- 77%|#######7  | 77/100 [00:24&lt;00:07,  3.14it/s]
- 78%|#######8  | 78/100 [00:24&lt;00:06,  3.15it/s]
- 79%|#######9  | 79/100 [00:25&lt;00:06,  3.15it/s]
- 80%|########  | 80/100 [00:25&lt;00:06,  3.14it/s]
- 81%|########1 | 81/100 [00:25&lt;00:06,  3.15it/s]
- 82%|########2 | 82/100 [00:26&lt;00:05,  3.15it/s]
- 83%|########2 | 83/100 [00:26&lt;00:05,  3.13it/s]
- 84%|########4 | 84/100 [00:26&lt;00:05,  3.14it/s]
- 85%|########5 | 85/100 [00:27&lt;00:04,  3.13it/s]
- 86%|########6 | 86/100 [00:27&lt;00:04,  3.14it/s]
- 87%|########7 | 87/100 [00:27&lt;00:04,  3.11it/s]
- 88%|########8 | 88/100 [00:28&lt;00:03,  3.13it/s]
- 89%|########9 | 89/100 [00:28&lt;00:03,  3.13it/s]
- 90%|######### | 90/100 [00:28&lt;00:03,  3.14it/s]
- 91%|#########1| 91/100 [00:28&lt;00:02,  3.65it/s]
- 94%|#########3| 94/100 [00:29&lt;00:01,  4.88it/s]
- 97%|#########7| 97/100 [00:29&lt;00:00,  6.39it/s]
-100%|##########| 100/100 [00:29&lt;00:00,  8.15it/s]
-
-  0%|          | 0/5747 [00:00&lt;?, ?it/s]
-  2%|1         | 98/5747 [00:00&lt;00:05, 976.77it/s]
-  3%|2         | 172/5747 [00:00&lt;00:06, 886.92it/s]
-  4%|4         | 236/5747 [00:00&lt;00:07, 784.94it/s]
-  5%|5         | 289/5747 [00:00&lt;00:08, 679.26it/s]
-  6%|5         | 344/5747 [00:00&lt;00:08, 626.80it/s]
-  7%|7         | 414/5747 [00:00&lt;00:08, 625.82it/s]
-  8%|8         | 479/5747 [00:00&lt;00:08, 630.33it/s]
-  9%|9         | 537/5747 [00:00&lt;00:08, 592.09it/s]
- 10%|#         | 593/5747 [00:00&lt;00:10, 501.55it/s]
- 11%|#1        | 648/5747 [00:01&lt;00:09, 513.37it/s]
- 12%|#2        | 700/5747 [00:01&lt;00:12, 412.80it/s]
- 13%|#2        | 745/5747 [00:01&lt;00:12, 397.95it/s]
- 14%|#3        | 788/5747 [00:01&lt;00:15, 316.75it/s]
- 14%|#4        | 830/5747 [00:01&lt;00:14, 338.31it/s]
- 15%|#5        | 868/5747 [00:01&lt;00:18, 262.21it/s]
- 16%|#5        | 913/5747 [00:02&lt;00:16, 297.21it/s]
- 16%|#6        | 948/5747 [00:02&lt;00:21, 226.65it/s]
- 17%|#7        | 990/5747 [00:02&lt;00:18, 261.69it/s]
- 18%|#7        | 1023/5747 [00:02&lt;00:24, 193.75it/s]
- 18%|#8        | 1054/5747 [00:02&lt;00:21, 217.24it/s]
- 19%|#8        | 1088/5747 [00:02&lt;00:19, 243.53it/s]
- 20%|#9        | 1122/5747 [00:02&lt;00:17, 264.70it/s]
- 20%|##        | 1157/5747 [00:03&lt;00:16, 283.90it/s]
- 21%|##        | 1189/5747 [00:03&lt;00:18, 242.84it/s]
- 21%|##1       | 1223/5747 [00:03&lt;00:17, 265.42it/s]
- 22%|##1       | 1253/5747 [00:03&lt;00:19, 230.14it/s]
- 22%|##2       | 1279/5747 [00:03&lt;00:20, 215.39it/s]
- 23%|##2       | 1312/5747 [00:03&lt;00:18, 236.60it/s]
- 23%|##3       | 1338/5747 [00:03&lt;00:21, 207.52it/s]
- 24%|##3       | 1361/5747 [00:04&lt;00:24, 177.70it/s]
- 24%|##4       | 1401/5747 [00:04&lt;00:20, 212.53it/s]
- 25%|##4       | 1427/5747 [00:04&lt;00:22, 194.86it/s]
- 25%|##5       | 1450/5747 [00:04&lt;00:24, 176.96it/s]
- 26%|##5       | 1486/5747 [00:04&lt;00:20, 208.79it/s]
- 26%|##6       | 1512/5747 [00:04&lt;00:21, 197.65it/s]
- 27%|##6       | 1535/5747 [00:04&lt;00:26, 156.81it/s]
- 27%|##7       | 1576/5747 [00:05&lt;00:21, 192.25it/s]
- 28%|##7       | 1602/5747 [00:05&lt;00:24, 166.98it/s]
- 28%|##8       | 1631/5747 [00:05&lt;00:21, 190.20it/s]
- 29%|##8       | 1659/5747 [00:05&lt;00:19, 207.60it/s]
- 29%|##9       | 1684/5747 [00:05&lt;00:19, 203.85it/s]
- 30%|##9       | 1708/5747 [00:05&lt;00:19, 212.54it/s]
- 30%|###       | 1732/5747 [00:05&lt;00:18, 216.10it/s]
- 31%|###       | 1755/5747 [00:05&lt;00:18, 216.54it/s]
- 31%|###       | 1778/5747 [00:06&lt;00:18, 217.00it/s]
- 31%|###1      | 1804/5747 [00:06&lt;00:17, 226.70it/s]
- 32%|###1      | 1828/5747 [00:06&lt;00:17, 222.98it/s]
- 32%|###2      | 1851/5747 [00:06&lt;00:19, 203.04it/s]
- 33%|###2      | 1874/5747 [00:06&lt;00:18, 210.41it/s]
- 33%|###3      | 1900/5747 [00:06&lt;00:17, 219.24it/s]
- 33%|###3      | 1923/5747 [00:06&lt;00:17, 219.72it/s]
- 34%|###3      | 1946/5747 [00:06&lt;00:19, 190.73it/s]
- 34%|###4      | 1971/5747 [00:06&lt;00:18, 204.63it/s]
- 35%|###4      | 2001/5747 [00:07&lt;00:16, 224.51it/s]
- 35%|###5      | 2025/5747 [00:07&lt;00:17, 208.39it/s]
- 36%|###5      | 2047/5747 [00:07&lt;00:20, 184.15it/s]
- 36%|###5      | 2067/5747 [00:07&lt;00:19, 186.51it/s]
- 37%|###6      | 2102/5747 [00:07&lt;00:16, 215.10it/s]
- 37%|###6      | 2126/5747 [00:07&lt;00:17, 207.77it/s]
- 37%|###7      | 2149/5747 [00:07&lt;00:20, 179.50it/s]
- 38%|###7      | 2169/5747 [00:07&lt;00:20, 178.19it/s]
- 38%|###8      | 2208/5747 [00:08&lt;00:16, 212.05it/s]
- 39%|###8      | 2233/5747 [00:08&lt;00:17, 200.25it/s]
- 39%|###9      | 2256/5747 [00:08&lt;00:20, 168.24it/s]
- 40%|###9      | 2278/5747 [00:08&lt;00:19, 178.83it/s]
- 40%|####      | 2313/5747 [00:08&lt;00:16, 209.53it/s]
- 41%|####      | 2338/5747 [00:08&lt;00:16, 208.95it/s]
- 41%|####1     | 2362/5747 [00:08&lt;00:16, 202.55it/s]
- 42%|####1     | 2393/5747 [00:08&lt;00:14, 225.82it/s]
- 42%|####2     | 2425/5747 [00:09&lt;00:13, 246.41it/s]
- 43%|####3     | 2474/5747 [00:09&lt;00:11, 288.53it/s]
- 44%|####3     | 2509/5747 [00:09&lt;00:10, 304.07it/s]
- 44%|####4     | 2543/5747 [00:09&lt;00:11, 282.17it/s]
- 45%|####4     | 2574/5747 [00:09&lt;00:11, 264.47it/s]
- 45%|####5     | 2603/5747 [00:09&lt;00:15, 204.88it/s]
- 46%|####5     | 2642/5747 [00:09&lt;00:13, 237.48it/s]
- 46%|####6     | 2671/5747 [00:10&lt;00:15, 199.88it/s]
- 47%|####6     | 2696/5747 [00:10&lt;00:17, 174.39it/s]
- 48%|####7     | 2735/5747 [00:10&lt;00:14, 207.39it/s]
- 48%|####8     | 2761/5747 [00:10&lt;00:14, 204.29it/s]
- 48%|####8     | 2785/5747 [00:10&lt;00:15, 187.78it/s]
- 49%|####9     | 2831/5747 [00:10&lt;00:12, 227.51it/s]
- 50%|####9     | 2860/5747 [00:10&lt;00:12, 222.21it/s]
- 50%|#####     | 2887/5747 [00:11&lt;00:14, 200.31it/s]
- 51%|#####1    | 2934/5747 [00:11&lt;00:11, 241.47it/s]
- 52%|#####1    | 2965/5747 [00:11&lt;00:13, 213.97it/s]
- 52%|#####2    | 2992/5747 [00:11&lt;00:12, 217.26it/s]
- 53%|#####2    | 3024/5747 [00:11&lt;00:11, 239.55it/s]
- 53%|#####3    | 3052/5747 [00:11&lt;00:11, 227.00it/s]
- 54%|#####3    | 3077/5747 [00:11&lt;00:12, 222.49it/s]
- 54%|#####4    | 3107/5747 [00:11&lt;00:10, 240.36it/s]
- 55%|#####4    | 3134/5747 [00:11&lt;00:10, 247.82it/s]
- 55%|#####4    | 3160/5747 [00:12&lt;00:10, 238.71it/s]
- 56%|#####5    | 3192/5747 [00:12&lt;00:10, 253.64it/s]
- 56%|#####6    | 3226/5747 [00:12&lt;00:09, 274.16it/s]
- 57%|#####6    | 3255/5747 [00:12&lt;00:09, 252.47it/s]
- 57%|#####7    | 3287/5747 [00:12&lt;00:09, 267.28it/s]
- 58%|#####7    | 3327/5747 [00:12&lt;00:08, 296.05it/s]
- 58%|#####8    | 3359/5747 [00:12&lt;00:09, 256.45it/s]
- 59%|#####8    | 3387/5747 [00:12&lt;00:09, 252.41it/s]
- 60%|#####9    | 3427/5747 [00:13&lt;00:08, 283.34it/s]
- 60%|######    | 3458/5747 [00:13&lt;00:09, 233.63it/s]
- 61%|######    | 3485/5747 [00:13&lt;00:09, 235.58it/s]
- 61%|######1   | 3511/5747 [00:13&lt;00:09, 238.95it/s]
- 62%|######1   | 3542/5747 [00:13&lt;00:08, 254.67it/s]
- 62%|######2   | 3569/5747 [00:13&lt;00:10, 217.31it/s]
- 63%|######2   | 3593/5747 [00:13&lt;00:09, 221.13it/s]
- 63%|######3   | 3630/5747 [00:13&lt;00:08, 248.32it/s]
- 64%|######3   | 3658/5747 [00:14&lt;00:08, 249.54it/s]
- 64%|######4   | 3685/5747 [00:14&lt;00:09, 217.46it/s]
- 65%|######4   | 3712/5747 [00:14&lt;00:08, 229.80it/s]
- 65%|######5   | 3742/5747 [00:14&lt;00:08, 246.23it/s]
- 66%|######5   | 3773/5747 [00:14&lt;00:07, 259.34it/s]
- 66%|######6   | 3801/5747 [00:14&lt;00:08, 231.95it/s]
- 67%|######6   | 3826/5747 [00:14&lt;00:08, 220.50it/s]
- 67%|######6   | 3850/5747 [00:14&lt;00:08, 224.18it/s]
- 68%|######7   | 3885/5747 [00:14&lt;00:07, 249.23it/s]
- 68%|######8   | 3912/5747 [00:15&lt;00:09, 192.96it/s]
- 68%|######8   | 3935/5747 [00:15&lt;00:09, 193.04it/s]
- 69%|######8   | 3961/5747 [00:15&lt;00:08, 208.59it/s]
- 69%|######9   | 3990/5747 [00:15&lt;00:07, 227.36it/s]
- 70%|######9   | 4016/5747 [00:15&lt;00:07, 235.46it/s]
- 70%|#######   | 4041/5747 [00:15&lt;00:10, 168.35it/s]
- 71%|#######   | 4068/5747 [00:15&lt;00:08, 189.75it/s]
- 71%|#######1  | 4094/5747 [00:16&lt;00:08, 205.62it/s]
- 72%|#######1  | 4133/5747 [00:16&lt;00:06, 238.41it/s]
- 72%|#######2  | 4161/5747 [00:16&lt;00:07, 212.89it/s]
- 73%|#######2  | 4192/5747 [00:16&lt;00:06, 233.02it/s]
- 73%|#######3  | 4223/5747 [00:16&lt;00:06, 249.72it/s]
- 74%|#######4  | 4256/5747 [00:16&lt;00:05, 269.30it/s]
- 75%|#######4  | 4285/5747 [00:16&lt;00:05, 249.09it/s]
- 75%|#######5  | 4312/5747 [00:16&lt;00:07, 196.38it/s]
- 76%|#######5  | 4357/5747 [00:17&lt;00:05, 236.22it/s]
- 76%|#######6  | 4390/5747 [00:17&lt;00:05, 258.01it/s]
- 77%|#######6  | 4421/5747 [00:17&lt;00:04, 270.01it/s]
- 77%|#######7  | 4452/5747 [00:17&lt;00:05, 238.35it/s]
- 78%|#######8  | 4507/5747 [00:17&lt;00:04, 286.38it/s]
- 79%|#######9  | 4544/5747 [00:17&lt;00:03, 305.95it/s]
- 80%|#######9  | 4580/5747 [00:17&lt;00:03, 304.03it/s]
- 81%|########  | 4642/5747 [00:17&lt;00:03, 356.51it/s]
- 82%|########1 | 4684/5747 [00:17&lt;00:02, 372.97it/s]
- 82%|########2 | 4729/5747 [00:18&lt;00:02, 390.22it/s]
- 83%|########3 | 4795/5747 [00:18&lt;00:02, 443.61it/s]
- 84%|########4 | 4845/5747 [00:18&lt;00:02, 449.79it/s]
- 85%|########5 | 4900/5747 [00:18&lt;00:01, 473.45it/s]
- 86%|########6 | 4966/5747 [00:18&lt;00:01, 515.23it/s]
- 87%|########7 | 5021/5747 [00:18&lt;00:01, 519.90it/s]
- 88%|########8 | 5079/5747 [00:18&lt;00:01, 533.72it/s]
- 89%|########9 | 5134/5747 [00:18&lt;00:01, 532.18it/s]
- 90%|######### | 5198/5747 [00:18&lt;00:00, 559.78it/s]
- 91%|#########1| 5256/5747 [00:19&lt;00:00, 552.14it/s]
- 93%|#########2| 5319/5747 [00:19&lt;00:00, 569.34it/s]
- 94%|#########3| 5377/5747 [00:19&lt;00:00, 571.93it/s]
- 95%|#########4| 5435/5747 [00:19&lt;00:00, 571.58it/s]
- 96%|#########5| 5504/5747 [00:19&lt;00:00, 599.17it/s]
- 97%|#########6| 5565/5747 [00:19&lt;00:00, 600.87it/s]
- 98%|#########7| 5626/5747 [00:19&lt;00:00, 599.65it/s]
- 99%|#########9| 5695/5747 [00:19&lt;00:00, 623.64it/s]
-100%|##########| 5747/5747 [00:19&lt;00:00, 290.83it/s]
 </pre></div>
 </div>
 </div>
@@ -464,53 +215,6 @@ not pass through exclusion ROIs.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
-
-  0%|          | 0/1949 [00:00&lt;?, ?it/s]
- 37%|###7      | 723/1949 [00:00&lt;00:00, 7155.25it/s]
- 62%|######2   | 1214/1949 [00:00&lt;00:00, 6260.19it/s]
- 77%|#######7  | 1510/1949 [00:00&lt;00:00, 3764.62it/s]
-100%|##########| 1949/1949 [00:00&lt;00:00, 4503.87it/s]
-
-  0%|          | 0/1511 [00:00&lt;?, ?it/s]
- 19%|#8        | 280/1511 [00:00&lt;00:00, 2772.07it/s]
- 28%|##8       | 428/1511 [00:00&lt;00:00, 2189.98it/s]
- 73%|#######3  | 1110/1511 [00:00&lt;00:00, 2749.95it/s]
-100%|##########| 1511/1511 [00:00&lt;00:00, 4556.06it/s]
-
-  0%|          | 0/1959 [00:00&lt;?, ?it/s]
- 15%|#5        | 299/1959 [00:00&lt;00:00, 2914.99it/s]
- 26%|##6       | 516/1959 [00:00&lt;00:00, 2632.96it/s]
- 33%|###2      | 642/1959 [00:00&lt;00:00, 1365.90it/s]
- 38%|###8      | 750/1959 [00:00&lt;00:01, 915.52it/s]
- 43%|####2     | 841/1959 [00:00&lt;00:01, 768.57it/s]
- 47%|####7     | 922/1959 [00:00&lt;00:01, 696.44it/s]
- 51%|#####     | 996/1959 [00:01&lt;00:01, 614.64it/s]
- 54%|#####4    | 1062/1959 [00:01&lt;00:01, 606.01it/s]
- 58%|#####7    | 1128/1959 [00:01&lt;00:01, 620.01it/s]
- 61%|######    | 1193/1959 [00:01&lt;00:01, 616.76it/s]
- 65%|######4   | 1273/1959 [00:01&lt;00:01, 661.93it/s]
- 69%|######8   | 1351/1959 [00:01&lt;00:00, 691.53it/s]
- 73%|#######3  | 1433/1959 [00:01&lt;00:00, 722.44it/s]
- 78%|#######7  | 1523/1959 [00:01&lt;00:00, 764.44it/s]
- 82%|########2 | 1612/1959 [00:01&lt;00:00, 796.18it/s]
- 86%|########6 | 1694/1959 [00:01&lt;00:00, 784.84it/s]
- 91%|######### | 1779/1959 [00:02&lt;00:00, 802.85it/s]
- 95%|#########4| 1861/1959 [00:02&lt;00:00, 781.82it/s]
-100%|##########| 1959/1959 [00:02&lt;00:00, 847.63it/s]
-
-  0%|          | 0/1560 [00:00&lt;?, ?it/s]
-  9%|9         | 141/1560 [00:00&lt;00:01, 1400.31it/s]
- 17%|#7        | 266/1560 [00:00&lt;00:00, 1350.37it/s]
- 25%|##4       | 384/1560 [00:00&lt;00:00, 1293.52it/s]
- 31%|###       | 479/1560 [00:00&lt;00:00, 1164.91it/s]
- 36%|###6      | 566/1560 [00:00&lt;00:00, 1053.57it/s]
- 42%|####1     | 652/1560 [00:00&lt;00:00, 970.47it/s]
- 47%|####7     | 737/1560 [00:00&lt;00:00, 882.12it/s]
- 52%|#####2    | 819/1560 [00:00&lt;00:00, 848.79it/s]
- 58%|#####8    | 907/1560 [00:00&lt;00:00, 855.62it/s]
- 64%|######3   | 994/1560 [00:01&lt;00:00, 858.32it/s]
- 73%|#######3  | 1139/1560 [00:01&lt;00:00, 971.64it/s]
-100%|##########| 1560/1560 [00:01&lt;00:00, 1286.93it/s]
 </pre></div>
 </div>
 </div>
@@ -528,12 +232,12 @@ of their trajector and/or length.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Afer cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_fibers</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
 
     <span class="n">idx_in_global</span> <span class="o">=</span> <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">][</span><span class="n">idx_in_bundle</span><span class="p">]</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_idx.npy&#39;</span><span class="p">,</span> <span class="n">idx_in_global</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_idx.npy&#39;</span><span class="p">),</span> <span class="n">idx_in_global</span><span class="p">)</span>
     <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">new_fibers</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
                              <span class="n">img</span><span class="p">,</span>
                              <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
     <span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
-    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">,</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
                     <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -562,7 +266,8 @@ scalar data. Here, the contribution of each streamline is weighted according
 to how representative this streamline is of the bundle overall.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
+                          <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
     <span class="n">profile</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
@@ -603,7 +308,7 @@ quantification”, PloS One, 7: e49790</p>
 matter”, Nature Communications 5: 4932</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 6 minutes  54.108 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  54.796 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
@@ -640,11 +345,12 @@ matter”, Nature Communications 5: 4932</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
