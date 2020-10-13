@@ -173,6 +173,7 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
 
     return bids_dir
 
+
 def test_make_bundle_dict():
     """
     Tests bundle dict
@@ -210,7 +211,7 @@ def test_make_bundle_dict():
     # Vertical Occipital Fasciculus
     # not included and does not exist in templates
     afq_bundles = api.make_bundle_dict(bundle_names=["VOF"])
-    
+
     assert len(afq_bundles) == 0
 
 
