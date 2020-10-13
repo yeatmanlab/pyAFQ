@@ -31,7 +31,7 @@ viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_sns = sns.color_palette("tab20")
 large_font = 24
 medium_font = 20
-small_font = 18
+small_font = 16
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
@@ -530,8 +530,9 @@ class BrainAxes():
             return self.axes[self.positions[bundle]]
         else:
             if self.temp_axis_owner != bundle:
-                self.temp_fig.clf()
-            self.temp_axis_owner = bundle
+                plt.close(self.temp_fig)
+                self.temp_fig, self.temp_axis = plt.subplots()
+                self.temp_axis_owner = bundle
             return self.temp_axis
 
     def plot_line(self, bundle, x, y, data, ylabel, ylim, n_boot, alpha,
@@ -591,8 +592,9 @@ class BrainAxes():
         '''
         if self.temp_axis_owner is None:
             return False
+        self.temp_fig.tight_layout()
         self.temp_fig.savefig(fname)
-        self.temp_fig.clf()
+        plt.close(self.temp_fig)
         self.temp_axis_owner = None
         return True
 
@@ -1212,7 +1214,7 @@ class GroupCSVComparison():
             ax.set_title(bundle, fontsize=large_font)
             ax.set_xlabel("Pearson's r", fontsize=medium_font)
             ax.set_ylabel("Count", fontsize=medium_font)
-            ba.temp_fig.legend(scalars, loc='center', fontsize=medium_font)
+            ba.temp_fig.legend(scalars, fontsize=medium_font)
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
@@ -1252,7 +1254,7 @@ class GroupCSVComparison():
             ax.set_ylim([mini, maxi])
             ax.set_title(bundle, fontsize=large_font)
             ax.set_ylabel("Pearson's r", fontsize=medium_font)
-            ba.temp_fig.legend(scalars, loc='center', fontsize=medium_font)
+            ba.temp_fig.legend(scalars, fontsize=medium_font)
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
@@ -1290,7 +1292,7 @@ class GroupCSVComparison():
                 ax.set_ylim([mini, maxi])
                 ax.set_xlim([mini, maxi])
                 ba.temp_fig.legend(
-                    [scalar], loc='center', fontsize=medium_font)
+                    [scalar], fontsize=medium_font)
                 ba.save_temp_fig(
                     self._get_fname(
                         f"rel_plots/{'_'.join(scalars)}/verbose",
@@ -1384,20 +1386,25 @@ class GroupCSVComparison():
             ax=axes[1])
         axes[1].legend_.remove()
 
+        if len(updated_bundles) > 20:
+            xaxis_font_size = small_font - 4
+        else:
+            xaxis_font_size = small_font
+
         axes[0].set_title("A", fontsize=large_font)
         axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles',
                            fontsize=medium_font)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
         axes[0].set_xticklabels(
-            updated_bundles, fontsize=small_font)
+            updated_bundles, fontsize=xaxis_font_size)
         axes[1].set_title("B", fontsize=large_font)
         axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles',
                            fontsize=medium_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
         axes[1].set_xticklabels(
-            updated_bundles, fontsize=small_font)
+            updated_bundles, fontsize=xaxis_font_size)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=45,
