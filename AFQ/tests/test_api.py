@@ -188,7 +188,7 @@ def test_make_bundle_dict():
     num_hemi_bundles = (len(api.BUNDLES)-2)*2
 
     # bundles that cross the midline
-    num_whole_bundles = 2+len(api.CALLOSUM_BUNDLES)
+    num_whole_bundles = 2
 
     assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
 
