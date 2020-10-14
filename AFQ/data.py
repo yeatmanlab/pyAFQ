@@ -180,12 +180,17 @@ def read_roi(roi, resample_to=None):
 
     if isinstance(resample_to, str):
         resample_to = nib.load(resample_to)
+
+    if np.allclose(resample_to.affine, roi.affine):
+        return roi
+
     img = nib.Nifti1Image(
         reg.resample(roi.get_fdata(),
                      resample_to,
                      roi.affine,
                      resample_to.affine),
         resample_to.affine)
+
 
     return img
 
