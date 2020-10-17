@@ -63,14 +63,16 @@ FA_data = FA_img.get_fdata()
 ##########################################################################
 # Register the individual data to a template:
 # -------------------------------------------
-# For the purpose of bundle segmentation, the individual brain is registered
-# to the MNI T2 template. The waypoint ROIs used in segmentation are then each
+# For the purpose of bundle segmentation, the individual brain is registered to
+# the MNI T2 template. The waypoint ROIs used in segmentation are then each
 # brought into each subject's native space to test streamlines for whether they
 # fulfill the segmentation criteria.
 #
 # .. note::
+#
 #     To find the right place for the waypoint ROIs, we calculate a non-linear
-#     transformation between the individual's brain and the MNI T2 template.
+#     transformation between the individual's brain DWI measurement (the b0
+#     measurements) and the MNI T2 template.
 #     Before calculating this non-linear warping, we perform a pre-alignment
 #     using an affine transformation.
 
@@ -78,17 +80,18 @@ print("Registering to template...")
 MNI_T2_img = afd.read_mni_template()
 
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
+    import dipy.core.gradients as dpg
+    gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
+    b0 = np.mean(img.get_fdata()[..., gtab.b0s_mask], -1)
     # Prealign using affine registration
     _, prealign = reg.affine_registration(
-        img.get_fdata(),
+        b0,
         MNI_T2_img.get_fdata(),
         img.affine,
         MNI_T2_img.affine)
 
     # Then register using a non-linear registration using the affine for
     # prealignment
-    import dipy.core.gradients as dpg
-    gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab,
                                                  prealign=prealign)
     reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
