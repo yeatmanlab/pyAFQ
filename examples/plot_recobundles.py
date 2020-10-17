@@ -60,14 +60,24 @@ FA_data = FA_img.get_fdata()
 print("Registering to template...")
 MNI_T2_img = afd.read_mni_template()
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
+    # Prealign using affine registration
+    _, prealign = reg.affine_registration(
+        img.get_fdata(),
+        MNI_T2_img.get_fdata(),
+        img.affine,
+        MNI_T2_img.affine)
+
+    # Then register using a non-linear registration using the affine for
+    # prealignment
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab,
-                                                 template=MNI_T2_img)
+                                                 prealign=prealign)
     reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
 else:
-    mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'), img,
-                               MNI_T2_img)
+    mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
+                               img, MNI_T2_img)
+
 
 bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
 bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco80")
@@ -102,7 +112,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
                          sl_as_idx[:, 1],
                          sl_as_idx[:, 2]] = 1
 
-    nib.save(nib.Nifti1Image(seed_roi, img.affine), 
+    nib.save(nib.Nifti1Image(seed_roi, img.affine),
              op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     directions='det', stop_mask=FA_data,

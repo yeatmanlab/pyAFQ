@@ -69,19 +69,28 @@ FA_data = FA_img.get_fdata()
 # fulfill the segmentation criteria.
 #
 # .. note::
-#     Here, we calculate just a non-linear transformation between the
-#     individual's brain and the MNI T2 template. In practice, it's a good idea
-#     to also perform a pre-alignment using an affine transformation. We don't
-#     do that here, but this is part of the full pipeline implemented in the
-#     CLI.
-#
+#     To find the right place for the waypoint ROIs, we calculate a non-linear
+#     transformation between the individual's brain and the MNI T2 template.
+#     Before calculating this non-linear warping, we perform a pre-alignment
+#     using an affine transformation.
+
 print("Registering to template...")
 MNI_T2_img = afd.read_mni_template()
+
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
+    # Prealign using affine registration
+    _, prealign = reg.affine_registration(
+        img.get_fdata(),
+        MNI_T2_img.get_fdata(),
+        img.affine,
+        MNI_T2_img.affine)
+
+    # Then register using a non-linear registration using the affine for
+    # prealignment
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
-
-    warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab)
+    warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab,
+                                                 prealign=prealign)
     reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
 else:
     mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
