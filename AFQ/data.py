@@ -151,7 +151,7 @@ def read_callosum_templates(resample_to=False):
     return template_dict
 
 
-def read_roi(roi, resample_to=None):
+def read_resample_roi(roi, resample_to=None):
     """
     Reads an roi from file-name/img and resamples it to conform with
     another file-name/img.
