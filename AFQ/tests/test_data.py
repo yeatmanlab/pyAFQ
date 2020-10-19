@@ -219,5 +219,5 @@ def test_read_roi():
     aff2 = aff1[:]
     aff2[0, 0] = -1
     roi = nib.Nifti1Image(np.zeros((10, 10, 10)), aff2)
-    img = afd.read_roi(roi, resample_to=template)
+    img = afd.read_resample_roi(roi, resample_to=template)
     npt.assert_equal(img.affine, template.affine)
