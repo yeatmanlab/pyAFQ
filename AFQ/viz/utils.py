@@ -1507,7 +1507,7 @@ class GroupCSVComparison():
     def compare_reliability(self, reliability_df1, reliability_df2,
                             analysis_label1, analysis_label2,
                             scalar_remove_model=SCALAR_REMOVE_MODEL,
-                            rtype="Intersubject",
+                            rtype="Inter-subject",
                             show_plots=False):
         """
         Plot a comparison of scan-rescan reliability between two analyses.
@@ -1532,7 +1532,7 @@ class GroupCSVComparison():
 
         rtype : str
             type of reliability. Can be any string; used in x axis lavel.
-            Default: Intersubject
+            Default: Inter-subject
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -1569,7 +1569,7 @@ class GroupCSVComparison():
             ax=ax)
         g.set(ylim=(0, 1))
         g.set(xlim=(0, 1))
-        plt.legend(bbox_to_anchor=(1.01, 1),borderaxespad=0)
+        plt.legend(bbox_to_anchor=(1.1, 1),borderaxespad=0)
         ax.plot([[0, 0], [1, 1]], [[0, 0], [1, 1]], '--')
 
         return fig, ax
