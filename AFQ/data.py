@@ -22,7 +22,27 @@ from dask.diagnostics import ProgressBar
 from pathlib import Path
 from tqdm.auto import tqdm
 import nibabel as nib
-from templateflow import api as tflow
+
+# capture templateflow resource warning and log
+import warnings
+default_warning_format = warnings.formatwarning
+try:
+    warnings.formatwarning = lambda msg, *args, **kwargs: f'{msg}'
+    logging.captureWarnings(True)
+    pywarnings_logger = logging.getLogger('py.warnings')
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
+    pywarnings_logger.addHandler(console_handler)
+
+    warnings.filterwarnings(
+        "default", category=ResourceWarning,
+        module="templateflow")
+
+    from templateflow import api as tflow
+finally:
+    logging.captureWarnings(False)
+    warnings.formatwarning = default_warning_format
+
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
@@ -34,12 +54,13 @@ from dipy.segment.clustering import QuickBundles
 
 import AFQ.registration as reg
 
-
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
            "organize_stanford_data"]
+
+
 
 BUNDLE_RECO_2_AFQ = \
     {
