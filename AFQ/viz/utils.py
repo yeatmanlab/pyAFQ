@@ -1504,17 +1504,18 @@ class GroupCSVComparison():
             plt.ion()
         return fig, axes, miss_counts, df_all_sub_coef, df_bundle_prof_means
 
-    def compare_reliability(self, intersubject_df1, intersubject_df2,
+    def compare_reliability(self, reliability_df1, reliability_df2,
                             analysis_label1, analysis_label2,
                             scalar_remove_model=SCALAR_REMOVE_MODEL,
+                            rtype="Intersubject",
                             show_plots=False):
         """
         Plot a comparison of scan-rescan reliability between two analyses.
 
         Parameters
         ----------
-        intersubject_df1, intersubject_df2 : Pandas DataFrames
-            Pandas dataframe describing the intersubject reliabilities.
+        reliability_df1, reliability_df2 : Pandas DataFrames
+            Pandas dataframe describing reliabilities.
             Typically, each of this will be outputs of separate calls
             to reliability_plots.
 
@@ -1529,6 +1530,10 @@ class GroupCSVComparison():
             get mapped to 'FA'.
             Default: SCALAR_REMOVE_MODEL
 
+        rtype : str
+            type of reliability. Can be any string; used in x axis lavel.
+            Default: Intersubject
+
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
             Default: False
@@ -1537,27 +1542,27 @@ class GroupCSVComparison():
         -------
         Returns a Matplotlib figure and axes.
         """
-        intersubject_df1 = intersubject_df1.rename(columns={
-            'value': f"{analysis_label1} Interubject Reliability"})
-        intersubject_df1['scalar'] = \
-            intersubject_df1['scalar'].apply(
+        reliability_df1 = reliability_df1.rename(columns={
+            'value': f"{analysis_label1} {rtype} Reliability"})
+        reliability_df1['scalar'] = \
+            reliability_df1['scalar'].apply(
                 lambda x: scalar_remove_model[x])
 
-        intersubject_df2 = intersubject_df2.rename(columns={
-            'value': f"{analysis_label2} Interubject Reliability"})
-        intersubject_df2['scalar'] = \
-            intersubject_df2['scalar'].apply(
+        reliability_df2 = reliability_df2.rename(columns={
+            'value': f"{analysis_label2} {rtype} Reliability"})
+        reliability_df2['scalar'] = \
+            reliability_df2['scalar'].apply(
                 lambda x: scalar_remove_model[x])
 
-        merged_intersubject = intersubject_df1.merge(
-            intersubject_df2,
+        merged_intersubject = reliability_df1.merge(
+            reliability_df2,
             on=['scalar', 'tractID'])
 
         fig, ax = plt.subplots()
         g = sns.scatterplot(
             data=merged_intersubject,
-            x=f"{analysis_label1} Interubject Reliability",
-            y=f"{analysis_label2} Interubject Reliability",
+            x=f"{analysis_label1} {rtype} Reliability",
+            y=f"{analysis_label2} {rtype} Reliability",
             style='scalar',
             hue='tractID',
             palette=self.color_dict,
