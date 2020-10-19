@@ -29,9 +29,9 @@ __all__ = ["Viz", "visualize_tract_profiles", "visualize_gif_inline"]
 
 viz_logger = logging.getLogger("AFQ.viz")
 tableau_20_sns = sns.color_palette("tab20")
-large_font = 24
-medium_font = 20
-small_font = 16
+large_font = 28
+medium_font = 24
+small_font = 20
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
@@ -53,7 +53,8 @@ COLOR_DICT = OrderedDict({
     "UNC_L": tableau_20_sns[16], "UF_L": tableau_20_sns[16],
     "UNC_R": tableau_20_sns[17], "UF_R": tableau_20_sns[17],
     "ARC_L": tableau_20_sns[18], "AF_L": tableau_20_sns[18],
-    "ARC_R": tableau_20_sns[19], "AF_R": tableau_20_sns[19]})
+    "ARC_R": tableau_20_sns[19], "AF_R": tableau_20_sns[19],
+    "median": tableau_20_sns[6]})
 
 POSITIONS = OrderedDict({
     "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
@@ -74,6 +75,8 @@ CSV_MAT_2_PYTHON = \
 SCALE_MAT_2_PYTHON = \
     {'dti_md': 0.001}
 
+SCALAR_REMOVE_MODEL = \
+    {'dti_md': 'MD', 'dki_md': 'MD', 'dki_fa': 'FA', 'dti_fa': 'FA'}
 
 def gen_color_dict(bundles):
     """
@@ -514,15 +517,24 @@ class BrainAxes():
     to the actual bundle placement in the brain.
     '''
 
-    def __init__(self, size=(5, 5), positions=POSITIONS):
+    def __init__(self, size=(5, 5), positions=POSITIONS, fig=None):
         self.size = size
         self.positions = positions
         self.on_grid = np.zeros((5, 5), dtype=bool)
-        self.fig, self.axes = plt.subplots(
+
+        if fig is None:
+            self.fig = plt.figure()
+            label = "1"
+            self.twinning = False
+        else:  # we are twinning with another BrainAxes
+            self.fig = fig
+            label = "2"
+            self.twinning = True
+        self.axes = self.fig.subplots(
             self.size[0],
             self.size[1],
-            frameon=False)
-        plt.subplots_adjust(
+            subplot_kw={"label": label, "frame_on": False})
+        self.fig.subplots_adjust(
             left=None,
             bottom=None,
             right=None,
@@ -587,14 +599,31 @@ class BrainAxes():
         '''
         for i in range(self.size[0]):
             for j in range(self.size[1]):
+                if self.twinning:
+                    self.axes[i, j].xaxis.tick_top()
+                    self.axes[i, j].yaxis.tick_right()     
+                    self.axes[i, j].xaxis.set_label_position('top') 
+                    self.axes[i, j].yaxis.set_label_position('right')
+                self.axes[i, j].tick_params(
+                    axis='y', which='major', labelsize=small_font)
+                self.axes[i, j].tick_params(
+                    axis='x', which='major', labelsize=small_font)
                 if not self.on_grid[i, j]:
                     self.axes[i, j].axis("off")
-                if j != 0 and self.on_grid[i][j - 1]:
-                    self.axes[i, j].set_yticklabels([])
-                    self.axes[i, j].set_ylabel("")
-                if disable_x or (i != 4 and self.on_grid[i + 1][j]):
+                if self. twinning:
+                    if j != self.size[1] - 1 and self.on_grid[i][j + 1]:
+                        self.axes[i, j].set_yticklabels([])
+                        self.axes[i, j].set_ylabel("")
                     self.axes[i, j].set_xticklabels([])
                     self.axes[i, j].set_xlabel("")
+                else:
+                    if j != 0 and self.on_grid[i][j - 1]:
+                        self.axes[i, j].set_yticklabels([])
+                        self.axes[i, j].set_ylabel("")
+                    if disable_x or (i != self.size[0] - 1
+                            and self.on_grid[i + 1][j]):
+                        self.axes[i, j].set_xticklabels([])
+                        self.axes[i, j].set_xlabel("")
         self.fig.tight_layout()
 
     def save_temp_fig(self, fname):
@@ -760,7 +789,7 @@ class GroupCSVComparison():
             self.bundles.sort()
         else:
             self.bundles = bundles
-        self.color_dict = gen_color_dict(self.bundles)
+        self.color_dict = gen_color_dict([*self.bundles, "median"])
 
     def _threshold_scalar(self, bound, threshold, val):
         """
@@ -1027,7 +1056,7 @@ class GroupCSVComparison():
             return None
 
         ba = BrainAxes(positions=positions)
-        ci_all_df = np.zeros((len(self.bundles), self.prof_len))
+        ci_all_df = []
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
@@ -1035,7 +1064,7 @@ class GroupCSVComparison():
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
-            ci_all_df[j] = ci_df["diff"]
+            ci_all_df.append(ci_df)
             ba.save_temp_fig(
                 self._get_fname(
                     f"contrast_plots/{scalar}/",
@@ -1161,7 +1190,15 @@ class GroupCSVComparison():
 
         Returns
         -------
-        Matplotlib figure and axes.
+        Returns 4 objects:
+        1. Matplotlib figure
+        2. Matplotlib axes
+        3. A dictionary containing the number of missing bundles
+           for each dataset.
+        4. A pandas dataframe describing the intersubject reliabilities,
+           per bundle
+        5. A pandas dataframe desribing the profile reliabilities,
+           per bundle
         """
         if not show_plots:
             plt.ioff()
@@ -1180,6 +1217,8 @@ class GroupCSVComparison():
             np.zeros((len(scalars), len(self.bundles), len(self.subjects)))
         all_node_coef = np.zeros(
             (len(scalars), len(self.bundles), self.prof_len))
+        miss_counts = pd.DataFrame(0, index=self.bundles, columns=[
+            f"miss_count{names[0]}", f"miss_count{names[1]}"])
         for m, scalar in enumerate(scalars):
             for k, bundle in enumerate(self.bundles):
                 bundle_profiles =\
@@ -1190,6 +1229,8 @@ class GroupCSVComparison():
                             name, bundle, subject, scalar, repl_nan=False)
                         if single_profile is None:
                             bundle_profiles[j, i] = np.nan
+                            miss_counts.at[bundle, f"miss_count{name}"] =\
+                                miss_counts.at[bundle, f"miss_count{name}"] + 1
                         else:
                             bundle_profiles[j, i] = single_profile
 
@@ -1288,7 +1329,13 @@ class GroupCSVComparison():
         for m, scalar in enumerate(scalars):
             maxi = np.nanmax(all_sub_means[m])
             mini = np.nanmin(all_sub_means[m])
-            ba = BrainAxes(positions=positions)
+            if len(scalars) == 2:
+                twinning_next = (m == 0)
+                twinning = (m == 1)
+            if twinning:
+                ba = BrainAxes(positions=positions, fig=ba.fig)
+            else:
+                ba = BrainAxes(positions=positions)
             for k, bundle in enumerate(self.bundles):
                 this_sub_means = self._array_to_df(all_sub_means[m, k])
                 ax = ba.get_axis(bundle)
@@ -1299,7 +1346,8 @@ class GroupCSVComparison():
                     color=tableau_20_sns[m * 2],
                     legend=False,
                     ax=ax)
-                ax.set_title(bundle, fontsize=large_font)
+                if not twinning:
+                    ax.set_title(bundle, fontsize=large_font)
                 ax.set_xlabel(names[0], fontsize=medium_font)
                 ax.set_ylabel(names[1], fontsize=medium_font)
                 ax.set_ylim([mini, maxi])
@@ -1311,14 +1359,21 @@ class GroupCSVComparison():
                         f"rel_plots/{'_'.join(scalars)}/verbose",
                         (f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"
                          f"_{bundle}")))
-
-            ba.fig.legend([scalar], loc='center', fontsize=medium_font)
-            ba.format(disable_x=False)
-            ba.fig.savefig(
-                self._get_fname(
-                    f"rel_plots/{'_'.join(scalars)}/verbose",
+            if twinning:
+                leg = ba.fig.legend(
+                    [scalars[0], scalars[1]],
+                    loc='center',
+                    fontsize=medium_font)
+                leg.legendHandles[0].set_color('C0')
+                leg.legendHandles[1].set_color('C1')
+            elif not twinning_next:
+                ba.fig.legend([scalar], loc='center', fontsize=medium_font)
+                ba.fig.savefig(
+                    self._get_fname(
+                        f"rel_plots/{'_'.join(scalars)}/verbose",
                     f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
-            if not show_plots:
+            ba.format(disable_x=False)
+            if not (show_plots or twinning_next):
                 ba.close_all()
 
         # plot bar plots of pearson's r
@@ -1351,7 +1406,10 @@ class GroupCSVComparison():
                 removal_idx,
                 axis=1)
         else:
-            is_removed_bundle = [False] * len(self.bundles)
+            is_removed_bundle = [False]*len(self.bundles)
+            bundle_prof_means_removed = bundle_prof_means
+            bundle_prof_stds_removed = bundle_prof_stds
+            all_sub_coef_removed = all_sub_coef
 
         df_bundle_prof_means = pd.DataFrame(
             columns=['scalar', 'tractID', 'value'])
@@ -1400,7 +1458,7 @@ class GroupCSVComparison():
         axes[1].legend_.remove()
 
         if len(updated_bundles) > 20:
-            xaxis_font_size = small_font - 4
+            xaxis_font_size = small_font - 6
         else:
             xaxis_font_size = small_font
 
@@ -1444,7 +1502,72 @@ class GroupCSVComparison():
         if not show_plots:
             plt.close(fig)
             plt.ion()
-        return fig, axes
+        return fig, axes, miss_counts, df_all_sub_coef, df_bundle_prof_means
+
+    def compare_reliability(self, intersubject_df1, intersubject_df2,
+                            analysis_label1, analysis_label2,
+                            scalar_remove_model=SCALAR_REMOVE_MODEL,
+                            show_plots=False):
+        """
+        Plot a comparison of scan-rescan reliability between two analyses.
+
+        Parameters
+        ----------
+        intersubject_df1, intersubject_df2 : Pandas DataFrames
+            Pandas dataframe describing the intersubject reliabilities.
+            Typically, each of this will be outputs of separate calls
+            to reliability_plots.
+
+        analysis_label1, analysis_label2 : Strings
+            Names of the analyses used to obtain each dataset.
+            Used to label the x and y axes.
+
+        scalar_remove_model : dict, optional
+            Dictionary that maps scalar names to more generic scalar names,
+            allowing comparison across different analyses.
+            For example, in the default dict, 'dti_fa' and 'dki_fa' both
+            get mapped to 'FA'.
+            Default: SCALAR_REMOVE_MODEL
+
+        show_plots : bool, optional
+            Whether to show plots if in an interactive environment.
+            Default: False
+
+        Returns
+        -------
+        Returns a Matplotlib figure and axes.
+        """
+        intersubject_df1 = intersubject_df1.rename(columns={
+            'value': f"{analysis_label1} Interubject Reliability"})
+        intersubject_df1['scalar'] = \
+            intersubject_df1['scalar'].apply(
+                lambda x: scalar_remove_model[x])
+
+        intersubject_df2 = intersubject_df2.rename(columns={
+            'value': f"{analysis_label2} Interubject Reliability"})
+        intersubject_df2['scalar'] = \
+            intersubject_df2['scalar'].apply(
+                lambda x: scalar_remove_model[x])
+
+        merged_intersubject = intersubject_df1.merge(
+            intersubject_df2,
+            on=['scalar', 'tractID'])
+
+        fig, ax = plt.subplots()
+        g = sns.scatterplot(
+            data=merged_intersubject,
+            x=f"{analysis_label1} Interubject Reliability",
+            y=f"{analysis_label2} Interubject Reliability",
+            style='scalar',
+            hue='tractID',
+            palette=self.color_dict,
+            ax=ax)
+        g.set(ylim=(0, 1))
+        g.set(xlim=(0, 1))
+        plt.legend(bbox_to_anchor=(1.01, 1),borderaxespad=0)
+        ax.plot([[0, 0], [1, 1]], [[0, 0], [1, 1]], '--')
+
+        return fig, ax
 
 
 def visualize_gif_inline(fname, use_s3fs=False):
