@@ -862,6 +862,7 @@ class AFQ(object):
                                      img,
                                      Space.VOX,
                                      bbox_valid_check=False)
+                tg.to_rasmm()
                 return img, tg.streamlines
             elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
