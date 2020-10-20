@@ -1190,7 +1190,7 @@ class GroupCSVComparison():
 
         Returns
         -------
-        Returns 4 objects:
+        Returns 5 objects:
         1. Matplotlib figure
         2. Matplotlib axes
         3. A dictionary containing the number of missing bundles
