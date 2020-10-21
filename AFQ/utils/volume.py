@@ -89,7 +89,7 @@ def density_map(tractogram, n_sls=None, to_vox=False):
     return density_map_img
 
 
-def dice_coeff(arr1, arr2):
+def dice_coeff(arr1, arr2, weighted=True):
     """
     Compute Dice's coefficient between two images.
 
@@ -101,6 +101,9 @@ def dice_coeff(arr1, arr2):
     arr2 : Nifti1Image, str, ndarray
         The other ndarray to compare. Can be a path or image, which will be
         converted to an ndarray.
+    weighted : bool, optional
+        Whether or not to weight the DICE coefficient as in [Cousineau2017]_.
+        Default: True
 
     Returns
     -------
@@ -116,7 +119,16 @@ def dice_coeff(arr1, arr2):
     if isinstance(arr2, nib.Nifti1Image):
         arr2 = arr2.get_fdata()
 
-    # scipy's dice function returns the dice *dissimilarity*
-    return 1 - dice(
-        arr1.flatten().astype(bool),
-        arr2.flatten().astype(bool))
+    arr1 = arr1.flatten()
+    arr2 = arr2.flatten()
+
+    if weighted:
+        return (
+            np.sum(arr1 * arr2.astype(bool))
+            + np.sum(arr2 * arr1.astype(bool)))\
+            / (np.sum(arr1) + np.sum(arr2))
+    else:
+        # scipy's dice function returns the dice *dissimilarity*
+        return 1 - dice(
+            arr1.astype(bool),
+            arr2.astype(bool))
