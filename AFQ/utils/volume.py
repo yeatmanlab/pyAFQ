@@ -103,11 +103,22 @@ def dice_coeff(arr1, arr2, weighted=True):
         converted to an ndarray.
     weighted : bool, optional
         Whether or not to weight the DICE coefficient as in [Cousineau2017]_.
+        The weighted Dice coefficient is calculated by adding the sum of all
+        values in arr1 where arr2 is nonzero to the sum of all values in arr2
+        where arr1 is nonzero, then dividing that by the sum of all values in
+        arr1 and arr2.
         Default: True
 
     Returns
     -------
     The dice similarity between the images.
+
+    Notes
+    -----
+    .. [1] Cousineau M, Jodoin PM, Morency FC, et al. A test-retest study on
+           Parkinson's PPMI dataset yields statistically significant white
+           matter fascicles. Neuroimage Clin. 2017;16:222-233. Published 2017
+           Jul 25. doi:10.1016/j.nicl.2017.07.020
     """
     if isinstance(arr1, str):
         arr1 = nib.load(arr1)
