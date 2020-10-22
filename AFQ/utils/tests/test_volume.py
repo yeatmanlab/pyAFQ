@@ -52,4 +52,4 @@ def test_dice_coeff():
             [0.6, 0, 0],
             [0, 0, 0]]),
         affine)
-    npt.assert_equal(afv.dice_coeff(img1, img2), 0.5)
+    npt.assert_equal(afv.dice_coeff(img1, img2), (0.5+0.8)/(0.5+0.6+0.8+0.9))
