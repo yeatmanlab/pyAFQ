@@ -224,8 +224,9 @@ def test_clean_by_endpoints():
     clean_sl = seg.clean_by_endpoints(sl, [1], None, atlas=atlas)
     npt.assert_equal(list(clean_sl), [sl[0], sl[2], sl[3]])
 
+
 def test_segment_sampled_streamlines():
-    
+
     # default segmentation
     segmentation = seg.Segmentation()
     fiber_groups = segmentation.segment(
@@ -257,7 +258,7 @@ def test_segment_sampled_streamlines():
         hardi_fbvec,
         mapping=mapping
     )
-        
+
     # sampled streamlines should equal the sample number
     npt.assert_equal(len(sampled_segmentation.tg), nb_streamlines)
 
@@ -265,12 +266,13 @@ def test_segment_sampled_streamlines():
     npt.assert_(
         np.all(
             np.isin(
-                sampled_segmentation.tg.streamlines._data, 
+                sampled_segmentation.tg.streamlines._data,
                 tg.streamlines._data
             )
         )
     )
 
-    # expect the number of resulting streamlines to be more than 0 but less than default
-    # given that random sample and given there are only two streamlines strictly less than
+    # expect the number of resulting streamlines to be more than 0 but less
+    # than default; given that random sample and given there are only two
+    # streamlines less than equal
     npt.assert_(0 <= len(sampled_fiber_groups['CST_R']) <= len(fiber_groups['CST_R']))
