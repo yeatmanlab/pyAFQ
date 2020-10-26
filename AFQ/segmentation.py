@@ -42,6 +42,7 @@ def _resample_tg(tg, n_points):
 class Segmentation:
     def __init__(self,
                  nb_points=False,
+                 nb_streamlines=False,
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
@@ -67,6 +68,9 @@ class Segmentation:
         nb_points : int, boolean
             Resample streamlines to nb_points number of points.
             If False, no resampling is done. Default: False
+        nb_streamlines : int, boolean
+            Subsample streamlines to nb_streamlines.
+            If False, no subsampling is don. Default: False
         seg_algo : string
             Algorithm for segmentation (case-insensitive):
             'AFQ': Segment streamlines into bundles,
@@ -154,6 +158,7 @@ class Segmentation:
         """
         self.logger = logging.getLogger('AFQ.Segmentation')
         self.nb_points = nb_points
+        self.nb_streamlines = nb_streamlines
 
         if rng is None:
             self.rng = np.random.RandomState()
@@ -191,6 +196,16 @@ class Segmentation:
         else:
             self.tg = tg
         self._tg_orig_space = self.tg.space
+
+        if self.nb_streamlines and len(self.tg) > self.nb_streamlines:
+            self.tg = StatefulTractogram.from_sft(
+                dts.select_random_set_of_streamlines(
+                    self.tg.streamlines,
+                    self.nb_streamlines
+                ),
+                self.tg
+            )
+
         return tg
 
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
