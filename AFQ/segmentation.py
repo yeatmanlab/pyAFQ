@@ -825,7 +825,7 @@ class Segmentation:
         # that segmentation, else
         # RecoBundles based on the whole brain tractogram
         if self.presegment_roi:
-            roiseg = self.Segmentation(**self.presegment_kawrgs)
+            roiseg = Segmentation(**self.presegment_kawrgs)
         else:
             rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
