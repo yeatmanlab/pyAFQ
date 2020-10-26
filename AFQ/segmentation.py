@@ -837,7 +837,7 @@ class Segmentation:
             model_sl = self.bundle_dict[bundle]['sl']
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
-            if presegment_roi:
+            if self.presegment_roi:
                 # Need to add the ROI definitions to the bundle dict
                 indiv_bundle_dict = {}
                 indiv_bundle_dict[bundle] = self.bundle_dict[bundle]
