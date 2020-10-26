@@ -58,6 +58,8 @@ class Segmentation:
                  dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
+                 presegment_roi=False,
+                 presegment_kawrgs={},
                  filter_by_endpoints=True,
                  dist_to_atlas=4,
                  save_intermediates=None):
@@ -144,6 +146,14 @@ class Segmentation:
         return_idx : bool
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
+        presegment_roi : bool
+            Whether to presegment by ROIs before performing
+            RecoBundles. Only used if seg_algo starts with 'Reco'.
+            Default: False
+        presegment_kawrgs : dict
+            Optional arguments for initializing the segmentation for the
+            presegment_roi. Only used if presegment_roi is True.
+            Default: {}
         filter_by_endpoints: bool
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
@@ -188,6 +198,8 @@ class Segmentation:
         self.refine = refine
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
+        self.presegment_roi = presegment_roi
+        self.presegment_kawrgs = presegment_kawrgs
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_atlas = dist_to_atlas
 
@@ -353,6 +365,7 @@ class Segmentation:
         if reg_template is None:
             reg_template = afd.read_mni_template()
 
+        self.reg_prealign = reg_prealign
         self.reg_template = reg_template
 
         if mapping is None:
@@ -788,7 +801,7 @@ class Segmentation:
                         'sls_in_mni.trk'),
                 bbox_valid_check=False)
 
-    def segment_reco(self, tg=None, presegment_roi=False):
+    def segment_reco(self, tg=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
         Parameters
@@ -808,9 +821,12 @@ class Segmentation:
         self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
-        # If not doing a presegmentation based on ROIs then initialize 
+        # If doing a presegmentation based on ROIs then initialize
+        # that segmentation, else
         # RecoBundles based on the whole brain tractogram
-        if presegment_roi == False:
+        if self.presegment_roi:
+            roiseg = self.Segmentation(**self.presegment_kawrgs)
+        else:
             rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
@@ -822,15 +838,35 @@ class Segmentation:
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if presegment_roi == True:
-                roiseg = self.Segmentation(return_idx=True, filter_by_endpoints=False)
                 # Need to add the ROI definitions to the bundle dict
-                roiseg.segment(bundle,self.moved_sl)
+                indiv_bundle_dict = {}
+                indiv_bundle_dict[bundle] = self.bundle_dict[bundle]
+
+                # segment using ROIs
+                roiseg.segment(
+                    indiv_bundle_dict,
+                    self.tg,
+                    self.fdata,
+                    self.fbval,
+                    self.fbvec,
+                    reg_template=self.reg_template,
+                    mapping=self.mapping,
+                    reg_prealign=self.reg_prealign)
+
+                if self.presegment_kawrgs["return_idx"]:
+                    indiv_tg = roiseg.fiber_groups[bundle]['sl']
+                else:
+                    indiv_tg = roiseg.fiber_groups[bundle]
+
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
-                rb = RecoBundles(roiseg.fiber_groups, verbose=False, rng=self.rng)
-                
-           # Either whole brain tracgtogram or roi presegmented fiber group 
-           # goes to rb.recognize     
+                rb = RecoBundles(
+                    indiv_tg,
+                    verbose=False,
+                    rng=self.rng)
+
+           # Either whole brain tracgtogram or roi presegmented fiber group
+           # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
                                          model_clust_thr=self.model_clust_thr,
                                          reduction_thr=self.reduction_thr,
