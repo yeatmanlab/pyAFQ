@@ -822,10 +822,20 @@ class Segmentation:
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
         # If doing a presegmentation based on ROIs then initialize
-        # that segmentation, else
+        # that segmentation and segment using ROIs, else
         # RecoBundles based on the whole brain tractogram
         if self.presegment_roi:
             roiseg = Segmentation(**self.presegment_kawrgs)
+            roiseg.segment(
+                    self.bundle_dict,
+                    self.tg,
+                    self.fdata,
+                    self.fbval,
+                    self.fbvec,
+                    reg_template=self.reg_template,
+                    mapping=self.mapping,
+                    reg_prealign=self.reg_prealign)
+            roiseg_fg = roiseg.fiber_groups
         else:
             rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
@@ -838,25 +848,10 @@ class Segmentation:
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_roi:
-                # Need to add the ROI definitions to the bundle dict
-                indiv_bundle_dict = {}
-                indiv_bundle_dict[bundle] = self.bundle_dict[bundle]
-
-                # segment using ROIs
-                roiseg.segment(
-                    indiv_bundle_dict,
-                    self.tg,
-                    self.fdata,
-                    self.fbval,
-                    self.fbvec,
-                    reg_template=self.reg_template,
-                    mapping=self.mapping,
-                    reg_prealign=self.reg_prealign)
-
                 if self.presegment_kawrgs["return_idx"]:
-                    indiv_tg = roiseg.fiber_groups[bundle]['sl']
+                    indiv_tg = roiseg_fg[bundle]['sl']
                 else:
-                    indiv_tg = roiseg.fiber_groups[bundle]
+                    indiv_tg = roiseg_fg[bundle]
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
