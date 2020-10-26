@@ -788,7 +788,7 @@ class Segmentation:
                         'sls_in_mni.trk'),
                 bbox_valid_check=False)
 
-    def segment_reco(self, tg=None):
+    def segment_reco(self, tg=None, presegment_roi=False):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
         Parameters
@@ -808,7 +808,10 @@ class Segmentation:
         self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
-        rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
+        # If not doing a presegmentation based on ROIs then initialize 
+        # RecoBundles based on the whole brain tractogram
+        if presegment_roi == False:
+            rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         bundle_list.remove('whole_brain')
@@ -816,6 +819,18 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
             model_sl = self.bundle_dict[bundle]['sl']
+            # If doing a presegmentation based on ROIs then initialize rb after
+            # Filtering the whole brain tractogram to pass through ROIs
+            if presegment_roi == True:
+                roiseg = self.Segmentation(return_idx=True, filter_by_endpoints=False)
+                # Need to add the ROI definitions to the bundle dict
+                roiseg.segment(bundle,self.moved_sl)
+                # Now rb should be initialized based on the fiber group coming
+                # out of the roi segmentation
+                rb = RecoBundles(roiseg.fiber_groups, verbose=False, rng=self.rng)
+                
+           # Either whole brain tracgtogram or roi presegmented fiber group 
+           # goes to rb.recognize     
             _, rec_labels = rb.recognize(model_bundle=model_sl,
                                          model_clust_thr=self.model_clust_thr,
                                          reduction_thr=self.reduction_thr,
