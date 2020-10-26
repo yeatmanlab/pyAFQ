@@ -806,7 +806,7 @@ class Segmentation:
                         'sls_in_mni.trk'),
                 bbox_valid_check=False)
 
-    def segment_reco(self, tg=None, presegment_roi=False):
+    def segment_reco(self, tg=None):
         """
         Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
         Parameters
