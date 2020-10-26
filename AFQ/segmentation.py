@@ -837,7 +837,7 @@ class Segmentation:
             model_sl = self.bundle_dict[bundle]['sl']
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
-            if presegment_roi == True:
+            if presegment_roi:
                 # Need to add the ROI definitions to the bundle dict
                 indiv_bundle_dict = {}
                 indiv_bundle_dict[bundle] = self.bundle_dict[bundle]
@@ -865,8 +865,8 @@ class Segmentation:
                     verbose=False,
                     rng=self.rng)
 
-           # Either whole brain tracgtogram or roi presegmented fiber group
-           # goes to rb.recognize
+            # Either whole brain tracgtogram or roi presegmented fiber group
+            # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
                                          model_clust_thr=self.model_clust_thr,
                                          reduction_thr=self.reduction_thr,
