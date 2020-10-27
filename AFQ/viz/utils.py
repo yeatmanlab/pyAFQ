@@ -665,6 +665,7 @@ class GroupCSVComparison():
                  bundles=None,
                  percent_nan_tol=10,
                  percent_edges_removed=10,
+                 remove_model=False,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON):
@@ -720,6 +721,10 @@ class GroupCSVComparison():
             5 nodes from each edge.
             Default: 10
 
+        remove_model : bool, optional
+            Whether to remove prefix of scalars which specify model
+            i.e., dti_fa => FA.
+            Default: False
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
@@ -762,6 +767,9 @@ class GroupCSVComparison():
                 for scalar, scale in mat_scale_converter.items():
                     profile[scalar] = \
                         profile[scalar].apply(lambda x: x * scale)
+            if remove_model:
+                profile.rename(
+                    columns=SCALAR_REMOVE_MODEL, inplace=True)
 
             for bound, constraint in scalar_bounds.items():
                 for scalar, threshold in constraint.items():
