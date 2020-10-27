@@ -6,11 +6,69 @@ import nibabel as nib
 
 from dipy.core.geometry import vector_norm
 from dipy.reconst import dti
+from dipy.io.gradients import read_bvals_bvecs
+from scipy.special import gamma
 
 import AFQ.utils.models as ut
 
 __all__ = ["fit_dti", "predict"]
 
+
+def noise_from_b0(data, gtab, bvals, mask=None):
+    """
+    Coped from vistasoft's dtiComputeImageNoise
+    https://github.com/vistalab/vistasoft
+    And converted to python...
+
+    Parameters
+    ----------
+    data_files : str or list
+        Files containing DWI data. If this is a str, that's the full path to a
+        single file. If it's a list, each entry is a full path.
+    bval_files : str or list
+        Equivalent to `data_files`.
+    mask : ndarray, optional
+        Binary mask, set to True or 1 in voxels to be processed.
+        Default: Process all voxels.
+    """
+    # make all-inclusive mask if None is provided
+    if mask is None:
+        mask = np.ones(data.shape[:3])
+
+    # Number of volumes in the dw dataset
+    num_vols = data.shape[3]
+
+    # Get brainmask indices
+    brain_inds = (mask > 0)
+
+    # preallocate a 2d array
+    # The first dimension is the number of volumes
+    # and the 2nd is each voxel (within the brain mask)
+    masked_data = np.zeros(num_vols, len(brain_inds))
+    # Loop over the volumes and assign the voxels within the brain mask
+    # to masked_data
+    for i in range(num_vols):
+        tmp = data[:,:,:,i]
+        masked_data[i,:] = tmp[brainInds]
+    
+    # Find which volumes are b=0
+    b0_inds = (bvals == 0)
+    n = len(b0_inds)
+    # Pull out the b=0 volumes
+    b0_data = squeeze(masked_data[b0_inds,:])
+    # Calculate the median of the standard deviation. We do not think that
+    # this needs to be rescaled. Henkelman et al. (1985) suggest that this
+    # aproaches the true noise as the signal increases.
+    sigma = np.median(np.std(b0_data,0,1))
+    
+    # std of a sample underestimates sigma
+    # (see http://nbviewer.ipython.org/4287207/)
+    # This can be very big for small n (e.g., 20# for n=2)
+    # We can compute the underestimation bias:
+    bias = sigma * (1. - np.sqrt(2. / (n-1)) * (gamma(n / 2.) / gamma((n-1) / 2.)))
+    
+    # and correct for it:
+    return sigma + bias
 
 def _fit(gtab, data, mask=None):
     dtimodel = dti.TensorModel(gtab)
@@ -49,6 +107,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     ----
     Maps that are calculated: FA, MD, AD, RD
     """
+    bvals, bvecs = read_bvals_bvecs(bval_files, bvec_files)
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
                                             bvec_files, mask=mask,
                                             b0_threshold=b0_threshold)
