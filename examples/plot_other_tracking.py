@@ -101,7 +101,7 @@ afd.to_bids_description(
 bundle_info = ["SLF", "ARC", "CST", "FP"]
 
 ##########################################################################
-# Now, we can run AFQ, pointing to the derivatives of the
+# Now, we can define our AFQ object, pointing to the derivatives of the
 # "my_tractography" pipeline as inputs. This is done by setting the
 # `custom_tractography_bids_filters` key-word argument. We pass the
 # `bundle_info` defined above. We also point to the preprocessed
@@ -125,5 +125,10 @@ my_afq = api.AFQ(
         "scope": "my_tractography"
     },
     segmentation_params={'nb_streamlines': 10000})
+
+##########################################################################
+# Finally, to run the segmentation and extract tract profiles, we call
+# The `export_all` method. This creates all of the derivative outputs of
+# AFQ within the 'stanford_hardi/derivatives/afq' folder.
 
 my_afq.export_all()
