@@ -124,7 +124,7 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
     figure.add_trace(
         go.Scatter3d(
             x=x_pts,
-            y=y_pts,
+            y=-y_pts,
             z=z_pts,
             name=name,
             marker=dict(
@@ -274,7 +274,7 @@ def _draw_roi(figure, roi, name, color, opacity):
     figure.add_trace(
         go.Scatter3d(
             x=roi[0] + 1,
-            y=roi[1] + 1,
+            y=-(roi[1] + 1),
             z=roi[2] + 1,
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
