@@ -25,8 +25,8 @@ import AFQ.data as afd
 # Example data
 # ---------------------
 # The example data we will use here is generated from the Stanford HARDI
-# dataset (https://purl.stanford.edu/ng782rw8378). The calls below organize the # preprocessed data according fetches
-# the results of tractography with this dataset and organizes it within
+# dataset (https://purl.stanford.edu/ng782rw8378). The calls below fetch
+# the results of tractography with this dataset and organize it within
 # the `~/AFQ_data` folder.
 
 afd.organize_stanford_data()
@@ -48,7 +48,7 @@ os.rename(
         op.expanduser('~'),
         'AFQ_data',
         'stanford_hardi_tractography',
-        'tractography_subsampled.trk'),
+        'full_segmented_cleaned_tractography.trk'),
     op.join(
         sub_path,
         'sub-01_ses-01-dwi_tractography.trk'))
@@ -90,19 +90,40 @@ afd.to_bids_description(
 
 
 ##########################################################################
+# We specify the information we need to define the bundles that we will
+# segment. In this case, we are going to use a list of bundle names for the
+# bundle info. These names refer to bundles for which we already have
+# clear definitions of the information needed to segment them (e.g.,
+# waypoint ROIs and probability maps). For an example that includes
+# custom definition of bundle info, see the `plot_callosal_tract_profile`
+# example.
+
+bundle_info = ["SLF", "ARC", "CST", "FP"]
+
+##########################################################################
 # Now, we can run AFQ, pointing to the derivatives of the
-# "my_tractography" pipeline as inputs:
-
-bundle_names = ["SLF", "ARC", "CST", "FP"]
-
+# "my_tractography" pipeline as inputs. This is done by setting the
+# `custom_tractography_bids_filters` key-word argument. We pass the
+# `bundle_info` defined above. We also point to the preprocessed
+# data that is in a `dmriprep` derivatives folder. These data were
+# preprocessed with 'vistasoft', so this is the pipeline we'll point to
+# If we were using 'qsiprep', this is where we would pass that
+# string instead. If we did that, AFQ would look for a derivatives
+# folder called 'stanford_hardi/derivatives/qsiprep' and find the
+# preprocessed DWI data within it. Finally, to speed things up
+# a bit, we also sub-sample the provided tractography. This is
+# done by defining the segmentation_params dictionary input.
+# To sub-sample to 10,000 streamlines, we define
+# `'nb_streamlines' = 10000`.
 
 my_afq = api.AFQ(
     bids_path,
     dmriprep='vistasoft',
-    bundle_info=bundle_names,
+    bundle_info=bundle_info,
     custom_tractography_bids_filters={
         "suffix": "tractography",
         "scope": "my_tractography"
-    })
+    },
+    segmentation_params={'nb_streamlines': 10000})
 
-my_afq.tract_profiles
+my_afq.export_all()

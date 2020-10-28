@@ -1633,11 +1633,13 @@ def fetch_hcp(subjects,
     return data_files, op.join(my_path, study)
 
 
-stanford_hardi_tractography_remote_fnames = ["5325715", "5325718"]
+stanford_hardi_tractography_remote_fnames = ["5325715", "5325718", "25289735"]
 stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
-                                      'f20854b4f710577c58bd01072cfb4de6']
+                                      'f20854b4f710577c58bd01072cfb4de6',
+                                      '294bfd1831861e8635eef8834ff18892']
 stanford_hardi_tractography_fnames = ['mapping.nii.gz',
-                                      'tractography_subsampled.trk']
+                                      'tractography_subsampled.trk',
+                                      'full_segmented_cleaned_tractography.trk']
 
 fetch_stanford_hardi_tractography = _make_fetcher(
     "fetch_stanford_hardi_tractography",
@@ -1662,13 +1664,20 @@ def read_stanford_hardi_tractography():
                 'stanford_hardi_tractography',
                 'mapping.nii.gz'))
 
+    # We need the original data as reference
+    dwi_img, gtab = dpd.read_stanford_hardi()
+
     files_dict['tractography_subsampled.trk'] = load_trk(
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'),
-        nib.Nifti1Image(np.zeros((10, 10, 10)), np.eye(4)),
-        bbox_valid_check=False,
-        trk_header_check=False).streamlines
+        dwi_img).streamlines
+
+    files_dict['full_segmented_cleaned_tractography.trk'] = load_trk(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'full_segmented_cleaned_tractography.trk'),
+        dwi_img).streamlines
 
     return files_dict
 
