@@ -247,7 +247,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         # There are no bundles in here:
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
-        yield streamlines, colors[0], "all_bundles"
+        yield streamlines, colors[0], "all_bundles", sft.dimensions
 
     else:
         # There are bundles:
@@ -271,7 +271,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
                 color, b_name = bundle_selector(bundle_dict, colors, b)
                 if color is None:
                     continue
-                yield these_sls, color, b_name
+                yield these_sls, color, b_name, sft.dimensions
 
         else:
             # Select just one to visualize:
@@ -287,7 +287,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
             if n_points is not None:
                 these_sls = dps.set_number_of_points(these_sls, n_points)
             color, b_name = bundle_selector(bundle_dict, colors, uid)
-            yield these_sls, color, b_name
+            yield these_sls, color, b_name, sft.dimensions
 
 
 def gif_from_pngs(tdir, gif_fname, n_frames,

@@ -71,7 +71,7 @@ def set_layout(figure, color=None):
     )
 
 
-def _draw_streamlines(figure, sls, color, name, cbv=None):
+def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None):
     color = np.asarray(color)
 
     plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
@@ -123,8 +123,8 @@ def _draw_streamlines(figure, sls, color, name, cbv=None):
 
     figure.add_trace(
         go.Scatter3d(
-            x=x_pts,
-            y=-y_pts,
+            x=dimensions[0]-x_pts,
+            y=y_pts,
             z=z_pts,
             name=name,
             marker=dict(
@@ -210,11 +210,12 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
     set_layout(figure, color=_color_arr2str(background))
 
-    for (sls, color, name) in vut.tract_generator(
+    for (sls, color, name, dimensions) in vut.tract_generator(
             sft, affine, bundle, bundle_dict, colors, n_points):
         _draw_streamlines(
             figure,
             sls,
+            dimensions,
             color,
             name,
             cbv=color_by_volume)
@@ -269,12 +270,12 @@ def create_gif(figure,
                       png_fname="tgif", add_zeros=False)
 
 
-def _draw_roi(figure, roi, name, color, opacity):
+def _draw_roi(figure, roi, name, color, opacity, dimensions):
     roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
-            x=roi[0] + 1,
-            y=-(roi[1] + 1),
+            x=dimensions[0]-(roi[0] + 1),
+            y=roi[1] + 1,
             z=roi[2] + 1,
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
@@ -349,7 +350,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
     set_layout(figure)
 
-    _draw_roi(figure, roi, name, color, opacity)
+    _draw_roi(figure, roi, name, color, opacity, roi.shape)
 
     return _inline_interact(figure, interact, inline)
 
