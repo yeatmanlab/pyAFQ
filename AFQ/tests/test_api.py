@@ -555,6 +555,7 @@ def test_AFQ_data_waypoint():
                     dmriprep='vistasoft',
                     bundle_info=bundle_names,
                     scalars=["dti_FA", "dti_MD"],
+                    robust_tensor_fitting=True,
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
@@ -633,6 +634,8 @@ def test_AFQ_data_waypoint():
                            rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
+                  REGISTRATION=dict(
+                      robust_tensor_fitting=True),
                   BUNDLES=dict(
                       bundle_info=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
