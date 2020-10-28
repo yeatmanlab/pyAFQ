@@ -37,10 +37,10 @@ def test_noise_from_b0():
         img, data, gtab, mask = ut.prepare_data(
             fdata, fbval, fbvec,
             mask=mask, b0_threshold=50)
-        
+
         # test noise_from_b0
         noise = dti.noise_from_b0(data, gtab, bvals, mask=mask)
-        npt.assert_equal(noise, 0)
+        npt.assert_almost_equal(noise, 0)
 
 def test_fit_dti():
     # Let's see whether we can pass a list of files for each one:

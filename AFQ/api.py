@@ -22,6 +22,7 @@ from bids.layout import BIDSLayout
 from .version import version as pyafq_version
 import AFQ.data as afd
 from AFQ.models.dti import _fit as dti_fit
+from AFQ.models.dti import noise_from_b0
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.csd import _fit as csd_fit
 from AFQ.models.csd import fit_anisotropic_power_map

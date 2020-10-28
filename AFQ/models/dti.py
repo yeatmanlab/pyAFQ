@@ -6,7 +6,6 @@ import nibabel as nib
 
 from dipy.core.geometry import vector_norm
 from dipy.reconst import dti
-from dipy.io.gradients import read_bvals_bvecs
 from scipy.special import gamma
 
 import AFQ.utils.models as ut
@@ -49,27 +48,29 @@ def noise_from_b0(data, gtab, bvals, mask=None, b0_threshold=50):
     # Loop over the volumes and assign the voxels within the brain mask
     # to masked_data
     for i in range(num_vols):
-        tmp = data[:,:,:,i]
-        masked_data[i,:] = tmp[brain_inds]
-    
+        tmp = data[:, :, :, i]
+        masked_data[i, :] = tmp[brain_inds]
+
     # Find which volumes are b=0
     b0_inds = (bvals > b0_threshold)
     n = len(b0_inds)
     # Pull out the b=0 volumes
-    b0_data = masked_data[b0_inds,:]
+    b0_data = masked_data[b0_inds, :]
     # Calculate the median of the standard deviation. We do not think that
     # this needs to be rescaled. Henkelman et al. (1985) suggest that this
     # aproaches the true noise as the signal increases.
     sigma = np.median(np.std(b0_data, axis=1, ddof=1))
-    
+
     # std of a sample underestimates sigma
     # (see http://nbviewer.ipython.org/4287207/)
     # This can be very big for small n (e.g., 20# for n=2)
     # We can compute the underestimation bias:
-    bias = sigma * (1. - np.sqrt(2. / (n-1)) * (gamma(n / 2.) / gamma((n-1) / 2.)))
-    
+    bias = sigma * (1. - np.sqrt(2. / (n - 1))
+                    * (gamma(n / 2.) / gamma((n - 1) / 2.)))
+
     # and correct for it:
     return sigma + bias
+
 
 def _fit(gtab, data, mask=None, sigma=None):
     if sigma is None:
@@ -117,18 +118,12 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
     ----
     Maps that are calculated: FA, MD, AD, RD
     """
-    bvals, bvecs = read_bvals_bvecs(bval_files, bvec_files)
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
                                             bvec_files, mask=mask,
                                             b0_threshold=b0_threshold)
 
-    if rtf:
-        sigma = noise_from_b0(data, gtab, bvals, mask=mask)
-    else:
-        sigma = None
-
     # In this case, we dump the fit object
-    dtf = _fit(gtab, data, mask=None, sigma=sigma)
+    dtf = _fit(gtab, data, mask=None)
     FA, MD, AD, RD, params = dtf.fa, dtf.md, dtf.ad, dtf.rd, dtf.model_params
 
     maps = [FA, MD, AD, RD, params]
