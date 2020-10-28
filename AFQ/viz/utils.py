@@ -164,7 +164,7 @@ def bundle_selector(bundle_dict, colors, b):
                 b_name = b_name_iter
                 b_found = True
                 break
-        
+
         # ignore bundle if it is not in the bundle_dict
         if b_found is False:
             return None, None
