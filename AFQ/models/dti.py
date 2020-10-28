@@ -14,7 +14,7 @@ import AFQ.utils.models as ut
 __all__ = ["fit_dti", "predict"]
 
 
-def noise_from_b0(data, gtab, bvals, mask=None):
+def noise_from_b0(data, gtab, bvals, mask=None, b0_threshold=50):
     """
     Coped from vistasoft's dtiComputeImageNoise
     https://github.com/vistalab/vistasoft
@@ -30,6 +30,7 @@ def noise_from_b0(data, gtab, bvals, mask=None):
     mask : ndarray, optional
         Binary mask, set to True or 1 in voxels to be processed.
         Default: Process all voxels.
+    b0_threshold : float
     """
     # make all-inclusive mask if None is provided
     if mask is None:
@@ -52,7 +53,7 @@ def noise_from_b0(data, gtab, bvals, mask=None):
         masked_data[i,:] = tmp[brain_inds]
     
     # Find which volumes are b=0
-    b0_inds = (bvals == 0)
+    b0_inds = (bvals > b0_threshold)
     n = len(b0_inds)
     # Pull out the b=0 volumes
     b0_data = masked_data[b0_inds,:]
