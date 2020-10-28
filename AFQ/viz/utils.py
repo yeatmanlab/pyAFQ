@@ -245,6 +245,11 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
 
     if list(sft.data_per_streamline.keys()) == []:
         # There are no bundles in here:
+        if len(streamlines) > n_sls_viz:
+            idx = np.arange(len(streamlines))
+            idx = np.random.choice(
+                idx, size=n_sls_viz, replace=False)
+            streamlines = streamlines[idx]
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
         yield streamlines, colors[0], "all_bundles", sft.dimensions
