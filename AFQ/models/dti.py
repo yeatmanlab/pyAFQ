@@ -70,13 +70,20 @@ def noise_from_b0(data, gtab, bvals, mask=None):
     # and correct for it:
     return sigma + bias
 
-def _fit(gtab, data, mask=None):
-    dtimodel = dti.TensorModel(gtab)
+def _fit(gtab, data, mask=None, sigma=None):
+    if sigma is None:
+        dtimodel = dti.TensorModel(gtab)
+    else:
+        dtimodel = dti.TensorModel(
+            gtab,
+            fit_method="RT",
+            sigma=sigma)
     return dtimodel.fit(data, mask=mask)
 
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
-            out_dir=None, file_prefix=None, b0_threshold=50):
+            out_dir=None, file_prefix=None, b0_threshold=50,
+            rtf=False):
     """
     Fit the DTI model using default settings, save files with derived maps
 
@@ -97,6 +104,8 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
         Default: maps get stored in the same directory as the last DWI file
         in `data_files`.
     b0_threshold : float
+    rtf : bool, optional
+        If true, use robust tensor fitting. Default: False
 
     Returns
     -------
@@ -112,8 +121,13 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
                                             bvec_files, mask=mask,
                                             b0_threshold=b0_threshold)
 
+    if rtf:
+        sigma = noise_from_b0(data, gtab, bvals, mask=mask)
+    else:
+        sigma = None
+
     # In this case, we dump the fit object
-    dtf = _fit(gtab, data, mask=None)
+    dtf = _fit(gtab, data, mask=None, sigma=sigma)
     FA, MD, AD, RD, params = dtf.fa, dtf.md, dtf.ad, dtf.rd, dtf.model_params
 
     maps = [FA, MD, AD, RD, params]
