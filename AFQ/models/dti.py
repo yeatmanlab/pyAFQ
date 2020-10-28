@@ -44,22 +44,22 @@ def noise_from_b0(data, gtab, bvals, mask=None):
     # preallocate a 2d array
     # The first dimension is the number of volumes
     # and the 2nd is each voxel (within the brain mask)
-    masked_data = np.zeros(num_vols, len(brain_inds))
+    masked_data = np.zeros((num_vols, np.sum(brain_inds)))
     # Loop over the volumes and assign the voxels within the brain mask
     # to masked_data
     for i in range(num_vols):
         tmp = data[:,:,:,i]
-        masked_data[i,:] = tmp[brainInds]
+        masked_data[i,:] = tmp[brain_inds]
     
     # Find which volumes are b=0
     b0_inds = (bvals == 0)
     n = len(b0_inds)
     # Pull out the b=0 volumes
-    b0_data = squeeze(masked_data[b0_inds,:])
+    b0_data = masked_data[b0_inds,:]
     # Calculate the median of the standard deviation. We do not think that
     # this needs to be rescaled. Henkelman et al. (1985) suggest that this
     # aproaches the true noise as the signal increases.
-    sigma = np.median(np.std(b0_data,0,1))
+    sigma = np.median(np.std(b0_data, axis=1, ddof=1))
     
     # std of a sample underestimates sigma
     # (see http://nbviewer.ipython.org/4287207/)
