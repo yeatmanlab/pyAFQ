@@ -331,7 +331,7 @@ def test_API_type_checking():
         api.AFQ(bids_path, bundle_info=[2, 3])
 
 
-@pytest.mark.skip(reason="may cause OOM")
+@pytest.mark.nightly5
 def test_AFQ_slr():
     """
     Test if API can run using slr map
@@ -342,7 +342,10 @@ def test_AFQ_slr():
         dmriprep='vistasoft',
         reg_subject='subject_sls',
         reg_template='hcp_atlas')
-    myafq.export_rois()
+
+    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    npt.assert_(len(bundles['CST_L']) > 0)
 
 
 @pytest.mark.nightly2
