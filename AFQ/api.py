@@ -509,15 +509,22 @@ class AFQ(object):
                 if session is not None:
                     results_dir = op.join(results_dir, 'ses-' + session)
 
+                dwi_files = bids_layout.get(subject=subject, session=session,
+                                            extension='nii.gz',
+                                            return_type='filename',
+                                            scope=dmriprep,
+                                            **bids_filters)
+
+                if (not len(dwi_files)):
+                    self.logger.warning(
+                        f"No dwi found for subject {subject} and session "
+                        f"{session}. Skipping.")
+                    continue
+
                 results_dir_list.append(results_dir)
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
-                dwi_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension='nii.gz',
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
+                dwi_file_list.append(dwi_files[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
