@@ -55,6 +55,7 @@ def get_temp_hardi():
 
     return tmpdir, bids_path, sub_path
 
+
 def create_dummy_data(dmriprep_dir, subject, session=None):
     aff = np.eye(4)
     data = np.ones((10, 10, 10, 6))
@@ -89,6 +90,7 @@ def create_dummy_data(dmriprep_dir, subject, session=None):
         op.join(
             dmriprep_dir, data_dir, 'anat', 'seg.nii.gz'))
 
+
 def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
     subjects = ['sub-0%s' % (d + 1) for d in range(n_subjects)]
 
@@ -104,16 +106,16 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
             afd.to_bids_description(
                 bids_dir,
                 **{"Name": "Dummy",
-                "Subjects": subjects,
-                "Sessions": sessions})
+                   "Subjects": subjects,
+                   "Sessions": sessions})
 
             dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
             os.makedirs(dmriprep_dir)
             afd.to_bids_description(
                 dmriprep_dir,
                 **{"Name": "Dummy",
-                "PipelineDescription": {"Name": "synthetic"}})
-            
+                   "PipelineDescription": {"Name": "synthetic"}})
+
             for subject in subjects:
                 for session in sessions:
                     for modality in ['anat', 'dwi']:
@@ -130,15 +132,15 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
             afd.to_bids_description(
                 bids_dir,
                 **{"Name": "Dummy",
-                "Subjects": subjects,
-                "Sessions": sessions})
+                   "Subjects": subjects,
+                   "Sessions": sessions})
 
             dmriprep_dir = op.join(bids_dir, "derivatives", "dmriprep")
             os.makedirs(dmriprep_dir)
             afd.to_bids_description(
                 dmriprep_dir,
                 **{"Name": "Dummy",
-                "PipelineDescription": {"Name": "synthetic"}})
+                   "PipelineDescription": {"Name": "synthetic"}})
 
             for d in range(n_subjects):
                 subject = subjects[d]
@@ -243,11 +245,11 @@ def test_AFQ_init():
     for n_sessions in [1, 2, 3]:
         n_subjects = 3
         bids_path = create_dummy_bids_path(n_subjects, n_sessions,
-                                           n_subjects!=n_sessions)
+                                           (n_subjects != n_sessions))
         my_afq = api.AFQ(bids_path,
                          dmriprep="synthetic")
 
-        if  n_subjects!=n_sessions:
+        if n_subjects != n_sessions:
             npt.assert_equal(my_afq.data_frame.shape,
                              (n_subjects * n_sessions, 12))
         else:
