@@ -1966,9 +1966,9 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
             t_dir,
             include_modality_agnostic=False,
             include_derivs="afq",
-            include_derivs_dataset_description=False,
+            include_derivs_dataset_description=True,
             suffix="profiles.csv")
-        temp_study = BIDSLayout(t_dir, validate=False)
+        temp_study = BIDSLayout(t_dir, validate=False, derivatives=True)
         if session is None:
             profiles = temp_study.get(
                 extension='csv',
