@@ -2019,6 +2019,11 @@ def combine_list_of_profiles(profile_fnames, out_file):
         dfs.append(profiles)
 
     df = pd.concat(dfs)
-    os.makedirs(op.dirname(out_file), exist_ok=True)
+    out_dir = op.dirname(out_file)
+    if out_dir:
+        # If user supplied only a filename with no dirname, then op.dirname
+        # will return an empty string and we assume the user wants the file in
+        # the current directory. Therefore, no mkdir is necessary.
+        os.makedirs(out_dir, exist_ok=True)
     df.to_csv(out_file, index=False)
     return df
