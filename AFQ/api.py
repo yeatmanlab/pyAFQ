@@ -17,6 +17,8 @@ from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
 
 from bids.layout import BIDSLayout
+import bids.config as bids_config
+bids_config.set_option('extension_initial_dot', True)
 
 from .version import version as pyafq_version
 import AFQ.data as afd

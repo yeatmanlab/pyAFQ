@@ -15,6 +15,9 @@ import logging
 import time
 
 from bids import BIDSLayout
+import bids.config as bids_config
+bids_config.set_option('extension_initial_dot', True)
+
 from botocore import UNSIGNED
 from botocore.client import Config
 from dask import compute, delayed
@@ -539,6 +542,8 @@ class S3BIDSSubject:
         study : AFQ.data.S3BIDSStudy
             The S3BIDSStudy for which this subject was a participant
         """
+        logging.getLogger("botocore").setLevel(logging.WARNING)
+
         if not isinstance(subject_id, str):
             raise TypeError('subject_id must be a string.')
 
@@ -903,6 +908,8 @@ class S3BIDSStudy:
             class that quacks like AFQ.data.S3BIDSSubject. Default:
             S3BIDSSubject
         """
+        logging.getLogger("botocore").setLevel(logging.WARNING)
+
         if not isinstance(study_id, str):
             raise TypeError('`study_id` must be a string.')
 
