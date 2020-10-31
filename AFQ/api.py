@@ -1986,12 +1986,13 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
     if upload is not None:
         upload.put(
             out_file,
-            os.join(
+            "/".join([
                 bucket,
                 study_s3_prefix,
-                "derivatives/afq",
+                "derivatives",
+                "afq",
                 "combined_tract_profiles.csv"
-            ))
+            ]))
     return df
 
 
