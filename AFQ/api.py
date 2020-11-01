@@ -1905,9 +1905,13 @@ class AFQ(object):
         self.data_frame.apply(self._export_registered_b0, axis=1)
 
     def combine_profiles(self):
-        return combine_list_of_profiles(
-            self.tract_profiles,
-            op.join(self.afq_path, 'tract_profiles.csv'))
+        _df = combine_list_of_profiles(self.tract_profiles)
+        out_file = op.abspath(op.join(
+            self.afq_path, "tract_profiles.csv"
+        ))
+        os.makedirs(op.dirname(out_file), exist_ok=True)
+        _df.to_csv(out_file, index=False)
+        return _df
 
     def export_timing(self):
         self.data_frame.apply(self._export_timing, axis=1)
@@ -1932,19 +1936,19 @@ class AFQ(object):
         s3fs.put(self.afq_path, remote_path, recursive=True)
 
 
-def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
+def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
                                       upload=None, session=None):
     """
     Download and combine tract profiles from different subjects / sessions
     on an s3 bucket into one CSV.
     Parameters
     ----------
-    outfile : filename
-        Filename for the combined output CSV.
     bucket : str
         The S3 bucket that contains the study data.
     study_s3_prefix : str
         The S3 prefix common to all of the study objects on S3.
+    out_file : filename, optional
+        Filename for the combined output CSV.
     upload : s3fs, optional
         If not None,
         Upload the combined CSV after combining using the s3fs object.
@@ -1982,30 +1986,38 @@ def download_and_combine_afq_profiles(out_file, bucket, study_s3_prefix,
                 extension='csv',
                 suffix='profiles',
                 return_type='filename')
-        df = combine_list_of_profiles(profiles, out_file)
-    if upload is not None:
-        upload.put(
-            out_file,
-            "/".join([
-                bucket,
-                study_s3_prefix,
-                "derivatives",
-                "afq",
-                "combined_tract_profiles.csv"
-            ]))
+
+        df = combine_list_of_profiles(profiles)
+        df.to_csv("tmp.csv")
+        if upload is not None:
+            bids_prefix = "/".join([bucket, study_s3_prefix]).rstrip("/")
+            upload.put(
+                "tmp.csv",
+                "/".join([
+                    bids_prefix,
+                    "derivatives",
+                    "afq",
+                    "combined_tract_profiles.csv"
+                ]))
+
+    if out_file is not None:
+        out_file = op.abspath(out_file)
+        os.makedirs(op.dirname(out_file), exist_ok=True)
+        df.to_csv(out_file, index=False)
+
     return df
 
 
-def combine_list_of_profiles(profile_fnames, out_file):
+def combine_list_of_profiles(profile_fnames):
     """
     Combine tract profiles from different subjects / sessions
     into one CSV.
+
     Parameters
     ----------
     profile_fnames : list of str
         List of csv filenames.
-    outfile : filename
-        Filename for the combined output CSV.
+
     Returns
     -------
     Ouput CSV's pandas dataframe.
@@ -2021,12 +2033,4 @@ def combine_list_of_profiles(profile_fnames, out_file):
         profiles['sessionID'] = session_name
         dfs.append(profiles)
 
-    df = pd.concat(dfs)
-    out_dir = op.dirname(out_file)
-    if out_dir:
-        # If user supplied only a filename with no dirname, then op.dirname
-        # will return an empty string and we assume the user wants the file in
-        # the current directory. Therefore, no mkdir is necessary.
-        os.makedirs(out_dir, exist_ok=True)
-    df.to_csv(out_file, index=False)
-    return df
+    return pd.concat(dfs)
