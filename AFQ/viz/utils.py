@@ -1356,6 +1356,19 @@ class GroupCSVComparison():
                     s=marker_size,
                     legend=False,
                     ax=ax)
+                if twinning or twinning_next:
+                    if twinning_next:
+                        ax.spines['bottom'].set_color(tableau_20_sns[m * 2])
+                        ax.spines['left'].set_color(tableau_20_sns[m * 2])
+                    else:
+                        ax.spines['top'].set_color(tableau_20_sns[m * 2])
+                        ax.spines['right'].set_color(tableau_20_sns[m * 2])
+                    ax.xaxis.label.set_color(tableau_20_sns[m * 2])
+                    ax.tick_params(axis='x', colors=tableau_20_sns[m * 2])
+                    ax.xaxis.label.set_color(tableau_20_sns[m * 2])
+                    ax.yaxis.label.set_color(tableau_20_sns[m * 2])
+                    ax.tick_params(axis='y', colors=tableau_20_sns[m * 2])
+                    ax.yaxis.label.set_color(tableau_20_sns[m * 2])
                 if not twinning:
                     ax.set_title(bundle, fontsize=large_font)
                 ax.set_xlabel(names[0], fontsize=medium_font)
