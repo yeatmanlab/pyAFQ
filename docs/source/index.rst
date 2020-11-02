@@ -19,7 +19,7 @@ disorders.
 tracts in individual human brains, and quantification of the tissue properties
 within the tracts.
 
-.. todo:: 
+.. todo::
   create and link to page that lists the `major fiber tracts` supported by
   default. include information on how to add custom fiber bundles defintions.
 
@@ -52,7 +52,7 @@ Tractometry
      -
      -
      -
-   * - 
+   * -
      - |gt| |rArr| Segmentation
      - |rArr| Cleaning
      - |rArr| Profiling
@@ -67,7 +67,7 @@ Tractometry
   can make this table a pretty graphic
 
 .. todo::
-  include detailed page that distguished tractometry versus tractography 
+  include detailed page that distguished tractometry versus tractography
   and benefits
 
 
@@ -98,3 +98,4 @@ NSF grant (1551330) to Jason Yeatman.
     getting_help
     contributing
     autoapi/index
+    developing/index
