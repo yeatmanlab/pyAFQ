@@ -22,7 +22,27 @@ from dask.diagnostics import ProgressBar
 from pathlib import Path
 from tqdm.auto import tqdm
 import nibabel as nib
-from templateflow import api as tflow
+
+# capture templateflow resource warning and log
+import warnings
+default_warning_format = warnings.formatwarning
+try:
+    warnings.formatwarning = lambda msg, *args, **kwargs: f'{msg}'
+    logging.captureWarnings(True)
+    pywarnings_logger = logging.getLogger('py.warnings')
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
+    pywarnings_logger.addHandler(console_handler)
+
+    warnings.filterwarnings(
+        "default", category=ResourceWarning,
+        module="templateflow")
+
+    from templateflow import api as tflow
+finally:
+    logging.captureWarnings(False)
+    warnings.formatwarning = default_warning_format
+
 import dipy.data as dpd
 from dipy.data.fetcher import _make_fetcher
 from dipy.io.streamline import load_tractogram, load_trk
@@ -34,12 +54,13 @@ from dipy.segment.clustering import QuickBundles
 
 import AFQ.registration as reg
 
-
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
            "organize_stanford_data"]
+
+
 
 BUNDLE_RECO_2_AFQ = \
     {
@@ -149,6 +170,59 @@ def read_callosum_templates(resample_to=False):
     logger.debug(f'callosum templates loaded in {toc - tic:0.4f} seconds')
 
     return template_dict
+
+
+def read_resample_roi(roi, resample_to=None, threshold=False):
+    """
+    Reads an roi from file-name/img and resamples it to conform with
+    another file-name/img.
+
+    Parameters
+    ----------
+    roi : str or nibabel image class instance.
+        Should contain a binary volume with 1s in the region of interest and
+        0s elsewhere.
+
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template.
+
+    threshold: bool or float
+        If set to False (default), resampled result is returned. Otherwise,
+        the resampled result is thresholded at this value and binarized.
+        This is not applied if the input ROI is already in the space of the
+        output.
+
+    Returns
+    -------
+    nibabel image class instance that contains the binary ROI resampled into
+    the requested space.
+    """
+    if isinstance(roi, str):
+        roi = nib.load(roi)
+
+    if resample_to is None:
+        resample_to = read_mni_template()
+
+    if isinstance(resample_to, str):
+        resample_to = nib.load(resample_to)
+
+    if np.allclose(resample_to.affine, roi.affine):
+        return roi
+
+    as_array = reg.resample(roi.get_fdata(),
+                            resample_to,
+                            roi.affine,
+                            resample_to.affine)
+    if threshold:
+        as_array = (as_array > threshold).astype(int)
+
+    img = nib.Nifti1Image(
+        as_array,
+        resample_to.affine)
+
+    return img
 
 
 template_fnames = ["ATR_roi1_L.nii.gz",

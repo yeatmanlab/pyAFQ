@@ -182,7 +182,6 @@ class AFQ(object):
                  brain_mask=B0Mask(),
                  bundle_info=None,
                  dask_it=False,
-                 force_recompute=False,
                  scalars=["dti_fa", "dti_md"],
                  use_prealign=True,
                  virtual_frame_buffer=False,
@@ -260,10 +259,6 @@ class AFQ(object):
         dask_it : bool, optional
             [COMPUTE] Whether to use a dask DataFrame object.
             Default: False
-        force_recompute : bool, optional
-            [COMPUTE] Whether to recompute or ignore existing derivatives.
-            This parameter can be turned on/off dynamically.
-            Default: False
         scalars : list of strings, optional
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
@@ -334,8 +329,6 @@ class AFQ(object):
                 "bundle_info must be None, a list of strings, or a dict")
         if not isinstance(dask_it, bool):
             raise TypeError("dask_it must be a bool")
-        if not isinstance(force_recompute, bool):
-            raise TypeError("force_recompute must be a bool")
         if scalars is not None and not (
                 isinstance(scalars, list)
                 and isinstance(scalars[0], str)):
@@ -366,8 +359,6 @@ class AFQ(object):
         # validate input and fail early
         if not op.exists(bids_path):
             raise ValueError(f'Unable to locate BIDS dataset in: {bids_path}')
-
-        self.force_recompute = force_recompute
 
         self.max_bval = max_bval
         self.min_bval = min_bval
@@ -518,15 +509,22 @@ class AFQ(object):
                 if session is not None:
                     results_dir = op.join(results_dir, 'ses-' + session)
 
+                dwi_files = bids_layout.get(subject=subject, session=session,
+                                            extension='nii.gz',
+                                            return_type='filename',
+                                            scope=dmriprep,
+                                            **bids_filters)
+
+                if (not len(dwi_files)):
+                    self.logger.warning(
+                        f"No dwi found for subject {subject} and session "
+                        f"{session}. Skipping.")
+                    continue
+
                 results_dir_list.append(results_dir)
 
                 os.makedirs(results_dir_list[-1], exist_ok=True)
-                dwi_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension='nii.gz',
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
+                dwi_file_list.append(dwi_files[0])
                 bvec_file_list.append(
                     bids_layout.get(subject=subject, session=session,
                                     extension=['bvec', 'bvecs'],
@@ -633,7 +631,7 @@ class AFQ(object):
 
     def _b0(self, row):
         b0_file = self._get_fname(row, '_b0.nii.gz')
-        if self.force_recompute or not op.exists(b0_file):
+        if not op.exists(b0_file):
             data, gtab, img = self._get_data_gtab(row, filter_b=False)
             mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
             mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
@@ -648,7 +646,7 @@ class AFQ(object):
     def _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False,
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
-        if self.force_recompute or not op.exists(brain_mask_file):
+        if not op.exists(brain_mask_file):
             brain_mask, brain_affine, meta = \
                 self.brain_mask_definition.get_mask(self, row)
             brain_mask_img = nib.Nifti1Image(
@@ -668,7 +666,7 @@ class AFQ(object):
 
     def _dti(self, row):
         dti_params_file = self._get_fname(row, '_model-DTI_diffmodel.nii.gz')
-        if self.force_recompute or not op.exists(dti_params_file):
+        if not op.exists(dti_params_file):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
@@ -694,7 +692,7 @@ class AFQ(object):
 
     def _dki(self, row):
         dki_params_file = self._get_fname(row, '_model-DKI_diffmodel.nii.gz')
-        if self.force_recompute or not op.exists(dki_params_file):
+        if not op.exists(dki_params_file):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
@@ -721,7 +719,7 @@ class AFQ(object):
         csd_params_file = self._get_fname(
             row,
             f'_model-{model_str}_diffmodel.nii.gz')
-        if self.force_recompute or not op.exists(csd_params_file):
+        if not op.exists(csd_params_file):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
@@ -746,7 +744,7 @@ class AFQ(object):
     def _anisotropic_power_map(self, row):
         pmap_file = self._get_fname(
             row, '_model-CSD_APM.nii.gz')
-        if self.force_recompute or not op.exists(pmap_file):
+        if not op.exists(pmap_file):
             dwi_data, gtab, img = self._get_data_gtab(row)
             mask = self._brain_mask(row)
             pmap = fit_anisotropic_power_map(
@@ -761,7 +759,7 @@ class AFQ(object):
 
     def _dti_fa(self, row):
         dti_fa_file = self._get_fname(row, '_model-DTI_FA.nii.gz')
-        if self.force_recompute or not op.exists(dti_fa_file):
+        if not op.exists(dti_fa_file):
             tf = self._dti_fit(row)
             fa = tf.fa
             self.log_and_save_nii(nib.Nifti1Image(fa, row['dwi_affine']),
@@ -773,7 +771,7 @@ class AFQ(object):
 
     def _dti_cfa(self, row):
         dti_cfa_file = self._get_fname(row, '_model-DTI_desc-DEC_FA.nii.gz')
-        if self.force_recompute or not op.exists(dti_cfa_file):
+        if not op.exists(dti_cfa_file):
             tf = self._dti_fit(row)
             cfa = tf.color_fa
             self.log_and_save_nii(nib.Nifti1Image(cfa, row['dwi_affine']),
@@ -785,7 +783,7 @@ class AFQ(object):
 
     def _dti_pdd(self, row):
         dti_pdd_file = self._get_fname(row, '_model-DTI_PDD.nii.gz')
-        if self.force_recompute or not op.exists(dti_pdd_file):
+        if not op.exists(dti_pdd_file):
             tf = self._dti_fit(row)
             pdd = tf.directions.squeeze()
             # Invert the x coordinates:
@@ -800,7 +798,7 @@ class AFQ(object):
 
     def _dti_md(self, row):
         dti_md_file = self._get_fname(row, '_model-DTI_MD.nii.gz')
-        if self.force_recompute or not op.exists(dti_md_file):
+        if not op.exists(dti_md_file):
             tf = self._dti_fit(row)
             md = tf.md
             self.log_and_save_nii(nib.Nifti1Image(md, row['dwi_affine']),
@@ -812,7 +810,7 @@ class AFQ(object):
 
     def _dki_fa(self, row):
         dki_fa_file = self._get_fname(row, '_model-DKI_FA.nii.gz')
-        if self.force_recompute or not op.exists(dki_fa_file):
+        if not op.exists(dki_fa_file):
             tf = self._dki_fit(row)
             fa = tf.fa
             nib.save(nib.Nifti1Image(fa, row['dwi_affine']),
@@ -824,7 +822,7 @@ class AFQ(object):
 
     def _dki_md(self, row):
         dki_md_file = self._get_fname(row, '_model-DKI_MD.nii.gz')
-        if self.force_recompute or not op.exists(dki_md_file):
+        if not op.exists(dki_md_file):
             tf = self._dki_fit(row)
             md = tf.md
             nib.save(nib.Nifti1Image(md, row['dwi_affine']),
@@ -871,6 +869,7 @@ class AFQ(object):
                                      img,
                                      Space.VOX,
                                      bbox_valid_check=False)
+                tg.to_rasmm()
                 return img, tg.streamlines
             elif img_l == "hcp_atlas":
                 atlas_fname = op.join(
@@ -904,7 +903,7 @@ class AFQ(object):
     def _reg_prealign(self, row):
         prealign_file = self._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
-        if self.force_recompute or not op.exists(prealign_file):
+        if not op.exists(prealign_file):
             reg_subject_img, _ = self._reg_img(self.reg_subject, True, row)
             _, aff = reg.affine_registration(
                 reg_subject_img.get_fdata(),
@@ -925,7 +924,7 @@ class AFQ(object):
             b0_warped_file = self._get_fname(
                 row, '_b0_in_MNI_without_prealign.nii.gz')
 
-        if self.force_recompute or not op.exists(b0_warped_file):
+        if not op.exists(b0_warped_file):
             b0_file = self._b0(row)
             mean_b0 = nib.load(b0_file).get_fdata()
 
@@ -961,7 +960,7 @@ class AFQ(object):
             mapping_file = mapping_file + '.nii.gz'
         meta_fname = meta_fname + '.json'
 
-        if self.force_recompute or not op.exists(mapping_file):
+        if not op.exists(mapping_file):
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
@@ -1010,7 +1009,7 @@ class AFQ(object):
             '_tractography.trk',
             include_track=True)
 
-        if self.force_recompute or not op.exists(streamlines_file):
+        if not op.exists(streamlines_file):
             if odf_model == "DTI":
                 params_file = self._dti(row)
             elif odf_model == "CSD":
@@ -1076,7 +1075,7 @@ class AFQ(object):
             include_track=True,
             include_seg=True)
 
-        if self.force_recompute or not op.exists(bundles_file):
+        if not op.exists(bundles_file):
             streamlines_file = self._streamlines(row)
 
             img = nib.load(row['dwi_file'])
@@ -1123,7 +1122,7 @@ class AFQ(object):
             include_track=True,
             include_seg=True)
 
-        if self.force_recompute or not op.exists(clean_bundles_file):
+        if not op.exists(clean_bundles_file):
             bundles_file = self._segment(row)
 
             sft = load_tractogram(bundles_file,
@@ -1186,7 +1185,7 @@ class AFQ(object):
 
     def _tract_profiles(self, row):
         profiles_file = self._get_fname(row, '_profiles.csv')
-        if self.force_recompute or not op.exists(profiles_file):
+        if not op.exists(profiles_file):
             bundles_file = self._clean_bundles(row)
             keys = []
             vals = []
@@ -1238,7 +1237,7 @@ class AFQ(object):
 
     def _template_xform(self, row):
         template_xform_file = self._get_fname(row, "_template_xform.nii.gz")
-        if self.force_recompute or not op.exists(template_xform_file):
+        if not op.exists(template_xform_file):
             if self.use_prealign:
                 reg_prealign_inv = np.linalg.inv(
                     np.load(self._reg_prealign(row))

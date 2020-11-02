@@ -223,3 +223,56 @@ def test_clean_by_endpoints():
     # Sometimes no requirement for one side:
     clean_sl = seg.clean_by_endpoints(sl, [1], None, atlas=atlas)
     npt.assert_equal(list(clean_sl), [sl[0], sl[2], sl[3]])
+
+
+def test_segment_sampled_streamlines():
+
+    # default segmentation
+    segmentation = seg.Segmentation()
+    fiber_groups = segmentation.segment(
+        bundles,
+        tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping
+    )
+
+    # Already using a subsampled tck
+    # the CST_R has two streamlines and CST_L has none
+    npt.assert_(0 < len(fiber_groups['CST_R']))
+
+    # number of streamlines to sample
+    nb_streamlines = int(len(tg)*0.8)
+
+    # sample and segment streamlines
+    sampled_segmentation = seg.Segmentation(
+        nb_streamlines=nb_streamlines
+    )
+
+    sampled_fiber_groups = sampled_segmentation.segment(
+        bundles,
+        tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping
+    )
+
+    # sampled streamlines should equal the sample number
+    npt.assert_equal(len(sampled_segmentation.tg), nb_streamlines)
+
+    # sampled streamlines should be subset of the original streamlines
+    npt.assert_(
+        np.all(
+            np.isin(
+                sampled_segmentation.tg.streamlines._data,
+                tg.streamlines._data
+            )
+        )
+    )
+
+    # expect the number of resulting streamlines to be more than 0 but less
+    # than default; given that random sample and given there are only two
+    # streamlines less than equal
+    npt.assert_(0 <= len(sampled_fiber_groups['CST_R']) <= len(fiber_groups['CST_R']))

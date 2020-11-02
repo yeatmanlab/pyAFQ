@@ -13,6 +13,7 @@ from moto import mock_s3
 from uuid import uuid4
 
 import AFQ.data as afd
+import nibabel as nib
 
 DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "data")
 TEST_BUCKET = "test-bucket"
@@ -221,3 +222,13 @@ def test_bundles_to_aal():
     targets = afd.bundles_to_aal(["VOF"], atlas)
     assert len(targets) == 1
     npt.assert_equal(targets, [[None, None]])
+
+    
+def test_read_roi():
+    aff1 = np.eye(4)
+    template = nib.Nifti1Image(np.ones((10, 10, 10)), aff1)
+    aff2 = aff1[:]
+    aff2[0, 0] = -1
+    roi = nib.Nifti1Image(np.zeros((10, 10, 10)), aff2)
+    img = afd.read_resample_roi(roi, resample_to=template)
+    npt.assert_equal(img.affine, template.affine)
