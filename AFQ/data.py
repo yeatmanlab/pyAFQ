@@ -1674,9 +1674,10 @@ def read_stanford_hardi_tractography():
         dwi_img).streamlines
 
     files_dict['full_segmented_cleaned_tractography.trk'] = load_trk(
-        op.join(afq_home,
-                'stanford_hardi_tractography',
-                'full_segmented_cleaned_tractography.trk'),
+        op.join(
+            afq_home,
+            'stanford_hardi_tractography',
+            'full_segmented_cleaned_tractography.trk'),
         dwi_img).streamlines
 
     return files_dict
