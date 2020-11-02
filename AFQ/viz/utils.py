@@ -1517,7 +1517,7 @@ class GroupCSVComparison():
     def compare_reliability(self, reliability_df1, reliability_df2,
                             analysis_label1, analysis_label2,
                             scalar_remove_model=SCALAR_REMOVE_MODEL,
-                            rtype="Inter-subject",
+                            rtype="Subject Reliability",
                             show_plots=False):
         """
         Plot a comparison of scan-rescan reliability between two analyses.
@@ -1542,7 +1542,7 @@ class GroupCSVComparison():
 
         rtype : str
             type of reliability. Can be any string; used in x axis lavel.
-            Default: Inter-subject
+            Default: Subject Reliability
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -1553,13 +1553,13 @@ class GroupCSVComparison():
         Returns a Matplotlib figure and axes.
         """
         reliability_df1 = reliability_df1.rename(columns={
-            'value': f"{analysis_label1} {rtype} Reliability"})
+            'value': f"{analysis_label1} {rtype}"})
         reliability_df1['scalar'] = \
             reliability_df1['scalar'].apply(
                 lambda x: scalar_remove_model[x])
 
         reliability_df2 = reliability_df2.rename(columns={
-            'value': f"{analysis_label2} {rtype} Reliability"})
+            'value': f"{analysis_label2} {rtype}"})
         reliability_df2['scalar'] = \
             reliability_df2['scalar'].apply(
                 lambda x: scalar_remove_model[x])
@@ -1571,8 +1571,8 @@ class GroupCSVComparison():
         fig, ax = plt.subplots()
         g = sns.scatterplot(
             data=merged_intersubject,
-            x=f"{analysis_label1} {rtype} Reliability",
-            y=f"{analysis_label2} {rtype} Reliability",
+            x=f"{analysis_label1} {rtype}",
+            y=f"{analysis_label2} {rtype}",
             s=marker_size,
             style='scalar',
             hue='tractID',
