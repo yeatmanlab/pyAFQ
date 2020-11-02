@@ -1671,7 +1671,9 @@ def read_stanford_hardi_tractography():
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'),
-        dwi_img).streamlines
+        dwi_img,
+        bbox_valid_check=False,
+        trk_header_check=False).streamlines
 
     files_dict['full_segmented_cleaned_tractography.trk'] = load_trk(
         op.join(
