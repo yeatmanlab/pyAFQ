@@ -172,6 +172,59 @@ def read_callosum_templates(resample_to=False):
     return template_dict
 
 
+def read_resample_roi(roi, resample_to=None, threshold=False):
+    """
+    Reads an roi from file-name/img and resamples it to conform with
+    another file-name/img.
+
+    Parameters
+    ----------
+    roi : str or nibabel image class instance.
+        Should contain a binary volume with 1s in the region of interest and
+        0s elsewhere.
+
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template.
+
+    threshold: bool or float
+        If set to False (default), resampled result is returned. Otherwise,
+        the resampled result is thresholded at this value and binarized.
+        This is not applied if the input ROI is already in the space of the
+        output.
+
+    Returns
+    -------
+    nibabel image class instance that contains the binary ROI resampled into
+    the requested space.
+    """
+    if isinstance(roi, str):
+        roi = nib.load(roi)
+
+    if resample_to is None:
+        resample_to = read_mni_template()
+
+    if isinstance(resample_to, str):
+        resample_to = nib.load(resample_to)
+
+    if np.allclose(resample_to.affine, roi.affine):
+        return roi
+
+    as_array = reg.resample(roi.get_fdata(),
+                            resample_to,
+                            roi.affine,
+                            resample_to.affine)
+    if threshold:
+        as_array = (as_array > threshold).astype(int)
+
+    img = nib.Nifti1Image(
+        as_array,
+        resample_to.affine)
+
+    return img
+
+
 template_fnames = ["ATR_roi1_L.nii.gz",
                    "ATR_roi1_R.nii.gz",
                    "ATR_roi2_L.nii.gz",
