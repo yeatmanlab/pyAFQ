@@ -32,6 +32,7 @@ tableau_20_sns = sns.color_palette("tab20")
 large_font = 28
 medium_font = 24
 small_font = 20
+marker_size = 200
 
 COLOR_DICT = OrderedDict({
     "ATR_L": tableau_20_sns[0], "C_L": tableau_20_sns[0],
@@ -1352,6 +1353,7 @@ class GroupCSVComparison():
                     data=this_sub_means, x='x', y='y',
                     label=scalar,
                     color=tableau_20_sns[m * 2],
+                    s=marker_size,
                     legend=False,
                     ax=ax)
                 if not twinning:
@@ -1571,6 +1573,7 @@ class GroupCSVComparison():
             data=merged_intersubject,
             x=f"{analysis_label1} {rtype} Reliability",
             y=f"{analysis_label2} {rtype} Reliability",
+            s=marker_size,
             style='scalar',
             hue='tractID',
             palette=self.color_dict,
