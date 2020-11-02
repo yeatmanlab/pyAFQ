@@ -84,8 +84,7 @@ def _fit(gtab, data, mask=None, sigma=None):
 
 
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
-            out_dir=None, file_prefix=None, b0_threshold=50,
-            rtf=False):
+            out_dir=None, file_prefix=None, b0_threshold=50):
     """
     Fit the DTI model using default settings, save files with derived maps
 
@@ -106,8 +105,6 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
         Default: maps get stored in the same directory as the last DWI file
         in `data_files`.
     b0_threshold : float
-    rtf : bool, optional
-        If true, use robust tensor fitting. Default: False
 
     Returns
     -------
