@@ -279,10 +279,13 @@ class AFQ(object):
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
-            The parameters for tracking.
-            Default: use the default behavior of the aft.track function.
-            Seed mask and seed threshold, if not specified, are replaced
-            with scalar masks from scalar[0] thresholded to 0.2.
+            The parameters for tracking. Default: use the default behavior of
+            the aft.track function. Seed mask and seed threshold, if not
+            specified, are replaced with scalar masks from scalar[0]
+            thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
+            this dict may be ``AFQ.mask.MaskFile`` instances. If ``tracker``
+            is set to "pft" then ``stop_mask`` should be an instance of
+            ``AFQ.mask.PFTMask``.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -509,11 +512,17 @@ class AFQ(object):
                 if session is not None:
                     results_dir = op.join(results_dir, 'ses-' + session)
 
-                dwi_files = bids_layout.get(subject=subject, session=session,
-                                            extension='nii.gz',
-                                            return_type='filename',
-                                            scope=dmriprep,
-                                            **bids_filters)
+                dwi_bids_filters = {
+                    "subject": subject,
+                    "session": session,
+                    "return_type": "filename",
+                    "scope": dmriprep,
+                    "data_type": "dwi",
+                    "extension": "nii.gz",
+                    "suffix": "dwi",
+                }
+                dwi_bids_filters.update(bids_filters)
+                dwi_files = bids_layout.get(dwi_bids_filters)
 
                 if (not len(dwi_files)):
                     self.logger.warning(
@@ -522,21 +531,21 @@ class AFQ(object):
                     continue
 
                 results_dir_list.append(results_dir)
-
                 os.makedirs(results_dir_list[-1], exist_ok=True)
-                dwi_file_list.append(dwi_files[0])
-                bvec_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bvec', 'bvecs'],
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
-                bval_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bval', 'bvals'],
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
+
+                dwi_data_file = dwi_files[0]
+                dwi_file_list.append(dwi_data_file)
+
+                # For bvals and bvecs, use ``get_bval()`` and ``get_bvec()`` to
+                # walk up the file tree and inherit the closest bval and bvec
+                # files. Maintain input ``bids_filters`` in case user wants to
+                # specify acquisition labels, but pop suffix since it is
+                # already specified inside ``get_bvec()`` and ``get_bval()``
+                suffix = bids_filters.pop("suffix", None)
+                bvec_file_list.append(bids_layout.get_bvec(dwi_data_file, **bids_filters))
+                bval_file_list.append(bids_layout.get_bval(dwi_data_file, **bids_filters))
+                if suffix is not None:
+                    bids_filters["suffix"] = suffix
 
                 if custom_tractography_bids_filters is not None:
                     custom_tract_list.append(
@@ -554,15 +563,23 @@ class AFQ(object):
 
                 if isinstance(self.reg_subject, dict):
                     reg_subject_list.append(
-                        bids_layout.get(subject=subject, session=session,
-                                        return_type='filename',
-                                        **self.reg_subject)[0])
+                        bids_layout.get_nearest(
+                            dwi_data_file,
+                            **self.reg_subject,
+                            session=session,
+                            subject=subject,
+                            full_search=True,
+                            strict=True,
+                            ignore_strict_entities=["session"]
+                        )
+                    )
                 else:
                     reg_subject_list.append(None)
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
+                        dwi_data_file,
                         subject,
                         session
                     )
@@ -570,12 +587,14 @@ class AFQ(object):
                 if check_mask_methods(self.tracking_params["stop_mask"]):
                     self.tracking_params["stop_mask"].find_path(
                         bids_layout,
+                        dwi_data_file,
                         subject,
                         session
                     )
 
                 self.brain_mask_definition.find_path(
                     bids_layout,
+                    dwi_data_file,
                     subject,
                     session
                 )
