@@ -522,7 +522,7 @@ class AFQ(object):
                     "suffix": "dwi",
                 }
                 dwi_bids_filters.update(bids_filters)
-                dwi_files = bids_layout.get(dwi_bids_filters)
+                dwi_files = bids_layout.get(**dwi_bids_filters)
 
                 if (not len(dwi_files)):
                     self.logger.warning(
