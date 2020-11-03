@@ -542,8 +542,10 @@ class AFQ(object):
                 # specify acquisition labels, but pop suffix since it is
                 # already specified inside ``get_bvec()`` and ``get_bval()``
                 suffix = bids_filters.pop("suffix", None)
-                bvec_file_list.append(bids_layout.get_bvec(dwi_data_file, **bids_filters))
-                bval_file_list.append(bids_layout.get_bval(dwi_data_file, **bids_filters))
+                bvec_file_list.append(bids_layout.get_bvec(dwi_data_file,
+                                                           **bids_filters))
+                bval_file_list.append(bids_layout.get_bval(dwi_data_file,
+                                                           **bids_filters))
                 if suffix is not None:
                     bids_filters["suffix"] = suffix
 

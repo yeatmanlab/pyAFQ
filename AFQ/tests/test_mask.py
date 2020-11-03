@@ -84,17 +84,19 @@ def test_find_path(subject, session):
     bids_layout = BIDSLayout(bids_dir, derivatives=True)
 
     test_dwi_path = bids_layout.get(
-        subject=subject, session=session, return_type="filename", suffix="dwi", extension="nii.gz"
+        subject=subject, session=session, return_type="filename",
+        suffix="dwi", extension="nii.gz"
     )[0]
 
     mask_file = MaskFile("seg", {'scope': 'synthetic'})
     mask_file.find_path(bids_layout, test_dwi_path, subject, session)
 
     assert mask_file.fnames[session][subject] == op.join(
-        bids_dir, "derivatives", "dmriprep", "sub-" + subject, "ses-" + session, "anat", "seg.nii.gz"
+        bids_dir, "derivatives", "dmriprep", "sub-" + subject,
+        "ses-" + session, "anat", "seg.nii.gz"
     )
 
-    other_sub = "01" if subject=="02" else "02",
+    other_sub = "01" if subject == "02" else "02"
     with pytest.raises(ValueError):
         mask_file.find_path(
             bids_layout,

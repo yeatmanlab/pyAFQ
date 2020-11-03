@@ -162,7 +162,7 @@ class MaskFile(StrInstantiatesMixin):
     def find_path(self, bids_layout, from_path, subject, session):
         if session not in self.fnames:
             self.fnames[session] = {}
-        
+
         nearest_mask = bids_layout.get_nearest(
             from_path,
             **self.filters,
@@ -175,8 +175,12 @@ class MaskFile(StrInstantiatesMixin):
         )
 
         self.fnames[session][subject] = nearest_mask
-        from_path_subject = bids_layout.parse_file_entities(from_path).get("subject", None)
-        mask_subject = bids_layout.parse_file_entities(nearest_mask).get("subject", None)
+        from_path_subject = bids_layout.parse_file_entities(from_path).get(
+            "subject", None
+        )
+        mask_subject = bids_layout.parse_file_entities(nearest_mask).get(
+            "subject", None
+        )
         if from_path_subject != mask_subject:
             raise ValueError(
                 f"Expected subject IDs to match for the retrieved mask file "
