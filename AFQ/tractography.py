@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 import numpy as np
 import nibabel as nib
 import dipy.reconst.shm as shm
@@ -166,7 +167,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                 "You are using PFT tracking, but did not provide a string ",
                 "'stop_threshold' input. ",
                 "Possible inputs are: 'CMC' or 'ACT'")
-        if not isinstance(stop_mask, tuple):
+        if not isinstance(stop_mask, Iterable) and len(stop_mask) == 3:
             raise RuntimeError(
                 "You are using PFT tracking, but did not provide a tuple for",
                 "`stop_mask`",
