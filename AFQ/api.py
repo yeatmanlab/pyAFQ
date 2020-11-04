@@ -4,6 +4,7 @@ import dask.dataframe as ddf
 import os
 import os.path as op
 import json
+import s3fs
 from time import time
 
 import numpy as np
@@ -1937,7 +1938,7 @@ class AFQ(object):
 
 
 def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
-                                      upload=None, session=None):
+                                      upload=False, session=None):
     """
     Download and combine tract profiles from different subjects / sessions
     on an s3 bucket into one CSV.
@@ -1949,11 +1950,11 @@ def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
         The S3 prefix common to all of the study objects on S3.
     out_file : filename, optional
         Filename for the combined output CSV.
-    upload : s3fs, optional
-        If not None,
-        Upload the combined CSV after combining using the s3fs object.
-        Uploads to bucket/study_s3_prefix/derivatives/afq
-        Defaut: None
+    upload : bool or str, optional
+        If True, upload the combined CSV to Amazon S3 at 
+        bucket/study_s3_prefix/derivatives/afq. If a string,
+        assume string is an Amazon S3 URI and upload there.
+        Defaut: False
     session : str, optional
         Session to get CSVs from. If None, all sessions are used.
         Default: None
@@ -1989,9 +1990,10 @@ def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
 
         df = combine_list_of_profiles(profiles)
         df.to_csv("tmp.csv")
-        if upload is not None:
+        if upload is True:
             bids_prefix = "/".join([bucket, study_s3_prefix]).rstrip("/")
-            upload.put(
+            fs = s3fs.S3FileSystem()
+            fs.put(
                 "tmp.csv",
                 "/".join([
                     bids_prefix,
@@ -1999,6 +2001,9 @@ def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
                     "afq",
                     "combined_tract_profiles.csv"
                 ]))
+        elif isinstance(upload, str):
+            fs = s3fs.S3FileSystem()
+            fs.put("tmp.csv", upload.replace("s3://", ""))
 
     if out_file is not None:
         out_file = op.abspath(out_file)
