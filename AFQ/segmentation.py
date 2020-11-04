@@ -58,7 +58,8 @@ class Segmentation:
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
-                 dist_to_aal=4,
+                 dist_to_atlas=4,
+                 endpoint_dict=None,
                  save_intermediates=None):
         """
         Segment streamlines into bundles.
@@ -142,9 +143,16 @@ class Segmentation:
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
-        dist_to_aal : float
-            If filter_by_endpoints is True, this is the distance from the
-            endpoints to the AAL atlas ROIs that is required.
+        dist_to_atlas : float
+            If filter_by_endpoints is True, this is the required distance
+            from the endpoints to the atlas ROIs.
+        endpoint_dict : dict, optional. This overrides use of the
+            AAL atlas, which is the default behavior, but only
+            defined in some cases. The format for this should be:
+            {'atlas': img,
+             'bundle1': {'endpoint': val1, 'startpoint': val2},
+             'bundle2': {'endpoint': val3, 'startpoint': val4}}
+
         save_intermediates : str, optional
             The full path to a folder into which intermediate products
             are saved. Default: None, means no saving of intermediates.
@@ -182,7 +190,8 @@ class Segmentation:
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
-        self.dist_to_aal = dist_to_aal
+        self.dist_to_atlas = dist_to_atlas
+        self.endpoint_dict = endpoint_dict
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -282,9 +291,10 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.cross_streamlines()
 
         if self.seg_algo == "afq":
+            # We only care about midline crossing if we use AFQ:
+            self.cross_streamlines()
             fiber_groups = self.segment_afq()
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
@@ -504,19 +514,28 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            aal_atlas = afd.read_aal_atlas(self.reg_template)
+            if self.endpoint_dict:
+                atlas = self.endpoint_dict['atlas']
+                # Resample to template:
+                atlas = reg.resample(atlas,
+                                     self.reg_template,
+                                     atlas.affine,
+                                     self.reg_template.affine)
+            else:
+                aal_atlas = afd.read_aal_atlas(self.reg_template)
+                atlas = aal_atlas['atlas']
             if self.save_intermediates is not None:
                 nib.save(
-                    aal_atlas['atlas'],
+                    atlas,
                     op.join(self.save_intermediates,
-                            'AAL_registered_to_template.nii.gz'))
+                            'atlas_registered_to_template.nii.gz'))
 
-            aal_atlas = aal_atlas['atlas'].get_fdata()
+                atlas = atlas.get_fdata()
             # We need to calculate the size of a voxel, so we can transform
             # from mm to voxel units:
             R = self.img_affine[0:3, 0:3]
             vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
-            dist_to_aal = self.dist_to_aal / vox_dim
+            dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
@@ -620,28 +639,52 @@ class Segmentation:
 
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
-                # Create binary masks and warp these into subject's DWI space:
-                aal_targets = afd.bundles_to_aal([bundle], atlas=aal_atlas)[0]
-                aal_idx = []
-                for targ in aal_targets:
-                    if targ is not None:
-                        aal_roi = np.zeros(aal_atlas.shape[:3])
-                        aal_roi[targ[:, 0], targ[:, 1], targ[:, 2]] = 1
-                        warped_roi = self.mapping.transform_inverse(
-                            aal_roi,
-                            interpolation='nearest')
-                        aal_idx.append(np.array(np.where(warped_roi > 0)).T)
-                    else:
-                        aal_idx.append(None)
-
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
+                if self.endpoint_dict:
+                    # We use definitions of endpoints provided
+                    # through this dict:
+                    ep = self.endpoint_dict[bundle]['endpoint']
+                    sp = self.endpoint_dict[bundle]['startpoint']
 
-                new_select_sl = clean_by_endpoints(select_sl,
-                                                   aal_idx[0],
-                                                   aal_idx[1],
-                                                   tol=dist_to_aal,
-                                                   return_idx=self.return_idx)
+                    atlas_idx = []
+                    for pp in [sp, ep]:
+                        atlas_roi = np.zeros(atlas.shape)
+                        atlas_roi[np.where(atlas == pp)] = 1
+                        warped_roi = self.mapping.transform_inverse(
+                            atlas_roi,
+                            interpolation='nearest')
+                        atlas_idx.append(
+                            np.array(np.where(warped_roi > 0)).T)
+                else:
+                    # We automatically fallback on AAL, which as its own
+                    # set of rules.
+                    # Create binary masks and warp these into subject's
+                    # DWI space:
+                    aal_targets = afd.bundles_to_aal(
+                        [bundle], atlas=atlas)[0]
+                    atlas_idx = []
+                    for targ in aal_targets:
+                        if targ is not None:
+                            aal_roi = np.zeros(atlas.shape[:3])
+                            aal_roi[targ[:, 0],
+                                    targ[:, 1],
+                                    targ[:, 2]] = 1
+                            warped_roi = self.mapping.transform_inverse(
+                                aal_roi,
+                                interpolation='nearest')
+                            atlas_idx.append(
+                                np.array(np.where(warped_roi > 0)).T)
+                        else:
+                            atlas_idx.append(None)
+
+                new_select_sl = clean_by_endpoints(
+                    select_sl,
+                    atlas_idx[0],
+                    atlas_idx[1],
+                    tol=dist_to_atlas,
+                    return_idx=self.return_idx)
+
                 # Generate immediately:
                 new_select_sl = list(new_select_sl)
 
@@ -928,7 +971,9 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                      and targets1.shape[1] == 3))
 
     if atlas is None and not (ep_is_idx and sp_is_idx):
-        raise ValueError()
+        e_s = "Need to provide endpoint and startpoint as "
+        e_s += "indices, or provide an atlas"
+        raise ValueError("Need to provide")
 
     if sp_is_idx:
         idxes0 = targets0
