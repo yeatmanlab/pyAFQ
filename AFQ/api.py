@@ -517,7 +517,7 @@ class AFQ(object):
                     "session": session,
                     "return_type": "filename",
                     "scope": dmriprep,
-                    "data_type": "dwi",
+                    "datatype": "dwi",
                     "extension": "nii.gz",
                     "suffix": "dwi",
                 }
