@@ -1706,8 +1706,8 @@ def organize_cfin_data(path=None):
         nib.save(t1_img, op.join(anat_folder, 'sub-01_ses-01_T1w.nii.gz'))
         dwi_img, gtab = dpd.read_cfin_dwi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvec'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bval'), gtab.bvals)
 
     to_bids_description(
         bids_path,
@@ -1743,8 +1743,8 @@ def organize_stanford_data(path=None):
             └── sub-01
                 └── ses-01
                     └── dwi
-                        ├── sub-01_ses-01_dwi.bvals
-                        ├── sub-01_ses-01_dwi.bvecs
+                        ├── sub-01_ses-01_dwi.bval
+                        ├── sub-01_ses-01_dwi.bvec
                         └── sub-01_ses-01_dwi.nii.gz
 
     """
@@ -1785,8 +1785,8 @@ def organize_stanford_data(path=None):
 
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvec'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bval'), gtab.bvals)
     else:
         logger.info('Dataset is already in place. If you want to fetch it '
                     + 'again please first remove the folder '
