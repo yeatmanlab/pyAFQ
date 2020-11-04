@@ -167,11 +167,11 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                 "You are using PFT tracking, but did not provide a string ",
                 "'stop_threshold' input. ",
                 "Possible inputs are: 'CMC' or 'ACT'")
-        if not isinstance(stop_mask, Iterable) and len(stop_mask) == 3:
+        if not (isinstance(stop_mask, Iterable) and len(stop_mask) == 3):
             raise RuntimeError(
-                "You are using PFT tracking, but did not provide a tuple for",
-                "`stop_mask`",
-                "input. Expected a (pve_wm, pve_gm, pve_csf) tuple.")
+                "You are using PFT tracking, but did not provide a length "
+                "3 iterable for `stop_mask`. "
+                "Expected a (pve_wm, pve_gm, pve_csf) tuple.")
         pves = []
         pve_imgs = []
         vox_sizes = []
