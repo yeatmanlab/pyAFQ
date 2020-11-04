@@ -133,28 +133,87 @@ afd.to_bids_description(
 # To explore the layout of these derivatives, we will initialize a
 # :class:`BIDSLayout` class instance to help us see what is in this dataset
 
+layout = bids.BIDSLayout(bids_path, derivatives=True)
 
 ##########################################################################
-# We specify the information we need to define the bundles that we will
-# segment. In this case, we are going to use a list of bundle names for the
-# bundle info. These names refer to bundles for which we already have
-# clear definitions of the information needed to segment them (e.g.,
-# waypoint ROIs and probability maps). For an example that includes
-# custom definition of bundle info, see the `plot_callosal_tract_profile`
-# example.
+# Because there is no raw data in this BIDS layout (only derivatives),
+# pybids will report that there are no subjects and sessions:
+
+print(layout)
+
+##########################################################################
+# But a query on the derivatives will reveal the different derivatives that
+# are stored here:
+
+print(layout.derivatives)
+
+##########################################################################
+# We can use a :class:`bids.BIDSValidator` object to make sure that the
+# files within our data set are BIDS-compliant. For example, we can
+# extract the tractography derivatives part of our layout using:
+
+my_tractography = layout.derivatives["my_tractography"]
+
+##########################################################################
+# This variable is also a BIDS layout object. This object has a ``get``
+# method, which allows us to query and find specific items within the
+# layout. For example, we can ask for files that have a suffix consistent
+# with tractography results:
+
+tractography_files = my_tractography.get(suffix='tractography')
+
+##########################################################################
+# Or ask for files that have a ``.trk`` extension:
+
+tractography_files = my_tractography.get(extension='.trk')
+
+##########################################################################
+# In this case, both of these would produce the same result.
+
+tractography_file = tractography_files[0]
+print(tractography_file)
+
+##########################################################################
+# We can also get some more structured information about this file:
+
+print(tractography_file.get_entities())
+
+
+##########################################################################
+# We can use a :class:`bids.BIDSValidator` class instance to validate that
+# this file is compliant with the specification. Note that the validator
+# requires that the filename be provided relative to the root of the BIDS
+# dataset, so we have to split the string that contains the full path
+# of the tractography to extract only the part that is relative to the
+# root of the entire BIDS ``layout`` object:
+
+tractography_full_path = tractography_file.path
+tractography_relative_path = tractography_full_path.split(layout.root)[-1]
+
+validator = bids.BIDSValidator()
+print(validator.is_bids(tractography_relative_path))
+
+##########################################################################
+# Next, we specify the information we need to define the bundles that we are
+# interested in segmenting. In this case, we are going to use a list of
+# bundle names for the bundle info. These names refer to bundles for
+# which we already have clear definitions of the information
+# needed to segment them (e.g., waypoint ROIs and probability maps).
+# For an example that includes custom definition of bundle info, see the
+# `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
 bundle_info = ["SLF", "ARC", "CST", "FP"]
 
 ##########################################################################
 # Now, we can define our AFQ object, pointing to the derivatives of the
-# "my_tractography" pipeline as inputs. This is done by setting the
+# `'my_tractography'` pipeline as inputs. This is done by setting the
 # `custom_tractography_bids_filters` key-word argument. We pass the
 # `bundle_info` defined above. We also point to the preprocessed
-# data that is in a `dmriprep` derivatives folder. These data were
+# data that is in a `'dmriprep'` derivatives folder. These data were
 # preprocessed with 'vistasoft', so this is the pipeline we'll point to
-# If we were using 'qsiprep', this is where we would pass that
+# If we were using `'qsiprep'`, this is where we would pass that
 # string instead. If we did that, AFQ would look for a derivatives
-# folder called 'stanford_hardi/derivatives/qsiprep' and find the
+# folder called `'stanford_hardi/derivatives/qsiprep'` and find the
 # preprocessed DWI data within it. Finally, to speed things up
 # a bit, we also sub-sample the provided tractography. This is
 # done by defining the segmentation_params dictionary input.
@@ -182,5 +241,7 @@ my_afq.export_all()
 ##########################################################################
 # A few common issues that can hinder BIDS from working properly are:
 #
-# 1. Faulty dataset_description.json
-# 2. File naming convention doesn't uniquely identify file with bids filters
+# 1. Faulty `dataset_description.json` file. You need to make sure that the
+#    file contains the right names for the pipeline. See above for an example
+#    of that.
+# 2. File naming convention doesn't uniquely identify file with bids filters.
