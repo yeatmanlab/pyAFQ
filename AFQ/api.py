@@ -1951,7 +1951,7 @@ def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
     out_file : filename, optional
         Filename for the combined output CSV.
     upload : bool or str, optional
-        If True, upload the combined CSV to Amazon S3 at 
+        If True, upload the combined CSV to Amazon S3 at
         bucket/study_s3_prefix/derivatives/afq. If a string,
         assume string is an Amazon S3 URI and upload there.
         Defaut: False
