@@ -55,6 +55,7 @@ class Segmentation:
                  pruning_thr=5,
                  b0_threshold=50,
                  prob_threshold=0,
+                 dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
@@ -131,6 +132,11 @@ class Segmentation:
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
+        dist_to_waypoint : float.
+            The distance that a streamline node has to be from the waypoint
+            ROI in order to be included or excluded.
+            If set to None (default), will be calculated as the
+            center-to-corner distance of the voxel in the diffusion data.
         rng : RandomState or int
             If None, creates RandomState.
             If int, creates RandomState with seed rng.
@@ -152,7 +158,6 @@ class Segmentation:
             {'atlas': img,
              'bundle1': {'endpoint': val1, 'startpoint': val2},
              'bundle2': {'endpoint': val3, 'startpoint': val4}}
-
         save_intermediates : str, optional
             The full path to a folder into which intermediate products
             are saved. Default: None, means no saving of intermediates.
@@ -180,6 +185,7 @@ class Segmentation:
             reg_algo = reg_algo.lower()
         self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
+        self.dist_to_waypoint = dist_to_waypoint
         self.b0_threshold = b0_threshold
         self.progressive = progressive
         self.greater_than = greater_than
@@ -541,7 +547,10 @@ class Segmentation:
         # Tolerance is set to the square of the distance to the corner
         # because we are using the squared Euclidean distance in calls to
         # `cdist` to make those calls faster.
-        tol = dts.dist_to_corner(self.img_affine)**2
+        if self.dist_to_waypoint is None:
+            tol = dts.dist_to_corner(self.img_affine)**2
+        else:
+            tol = self.dist_to_waypoint ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
@@ -644,13 +653,15 @@ class Segmentation:
                 if self.endpoint_dict:
                     # We use definitions of endpoints provided
                     # through this dict:
-                    ep = self.endpoint_dict[bundle]['endpoint']
-                    sp = self.endpoint_dict[bundle]['startpoint']
+                    start_p = self.endpoint_dict[bundle]['startpoint']
+                    end_p = self.endpoint_dict[bundle]['endpoint']
 
                     atlas_idx = []
-                    for pp in [sp, ep]:
+                    for pp in [start_p, end_p]:
                         atlas_roi = np.zeros(atlas.shape)
                         atlas_roi[np.where(atlas == pp)] = 1
+                        # Create binary masks and warp these into subject's
+                        # DWI space:
                         warped_roi = self.mapping.transform_inverse(
                             atlas_roi,
                             interpolation='nearest')
@@ -659,8 +670,6 @@ class Segmentation:
                 else:
                     # We automatically fallback on AAL, which as its own
                     # set of rules.
-                    # Create binary masks and warp these into subject's
-                    # DWI space:
                     aal_targets = afd.bundles_to_aal(
                         [bundle], atlas=atlas)[0]
                     atlas_idx = []
