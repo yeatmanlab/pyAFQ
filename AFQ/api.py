@@ -190,6 +190,7 @@ class AFQ(object):
                  viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
+                 endpoint_dict=None,
                  clean_params=None):
         '''
         Initialize an AFQ object.
@@ -452,6 +453,7 @@ class AFQ(object):
         else:
             self.bundle_dict = bundle_info
 
+        self.endpoint_dict = endpoint_dict
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
@@ -1096,7 +1098,8 @@ class AFQ(object):
                                            row['bvec_file'],
                                            reg_template=self.reg_template_img,
                                            mapping=self._mapping(row),
-                                           reg_prealign=reg_prealign)
+                                           reg_prealign=reg_prealign,
+                                           endpoint_dict=self.endpoint_dict)
 
             if self.segmentation_params['return_idx']:
                 idx = {bundle: bundles[bundle]['idx'].tolist()
