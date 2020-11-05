@@ -250,12 +250,14 @@ class Segmentation:
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
         endpoint_dict : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior, but only
-            defined in some cases. The format for this should be:
-            {'atlas': img,
-             'bundle1': {'endpoint': val1, 'startpoint': val2},
-             'bundle2': {'endpoint': val3, 'startpoint': val4}}
-
+            AAL atlas, which is the default behavior.
+            The format for this should be:
+            {"bundle1": {"startpoint":img1_1,
+                         "endpoint":img1_2},
+             "bundle2": {"startpoint":img2_1,
+                          "endpoint":img2_2}}
+            where the images used are binary masks of the desired
+            endpoints.
 
         Returns
         -------
@@ -520,21 +522,14 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            if self.endpoint_dict is not None:
-                atlas = self.endpoint_dict['atlas']
-                # Resample to template:
-                atlas = reg.resample(atlas.get_fdata(),
-                                     self.reg_template,
-                                     atlas.affine,
-                                     self.reg_template.affine)
-            else:
+            if self.endpoint_dict is None:
                 aal_atlas = afd.read_aal_atlas(self.reg_template)
                 atlas = aal_atlas['atlas']
-            if self.save_intermediates is not None:
-                nib.save(
-                    atlas,
-                    op.join(self.save_intermediates,
-                            'atlas_registered_to_template.nii.gz'))
+                if self.save_intermediates is not None:
+                    nib.save(
+                        atlas,
+                        op.join(self.save_intermediates,
+                                'atlas_registered_to_template.nii.gz'))
 
                 atlas = atlas.get_fdata()
             # We need to calculate the size of a voxel, so we can transform
@@ -658,8 +653,13 @@ class Segmentation:
 
                     atlas_idx = []
                     for pp in [start_p, end_p]:
-                        atlas_roi = np.zeros(atlas.shape)
-                        atlas_roi[np.where(atlas == pp)] = 1
+                        pp = reg.resample(pp.get_fdata(),
+                                          self.reg_template,
+                                          pp.affine,
+                                          self.reg_template.affine)
+
+                        atlas_roi = np.zeros(pp.shape)
+                        atlas_roi[np.where(pp > 0)] = 1
                         # Create binary masks and warp these into subject's
                         # DWI space:
                         warped_roi = self.mapping.transform_inverse(
@@ -699,6 +699,8 @@ class Segmentation:
 
                 # We need to check this again:
                 if len(new_select_sl) == 0:
+                    self.logger.info("After filtering "
+                                     f"{len(select_sl)} streamlines")
                     # There's nothing here, set and move to the next bundle:
                     self._return_empty(bundle)
                     continue
