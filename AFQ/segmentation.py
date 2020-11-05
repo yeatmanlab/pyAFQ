@@ -60,7 +60,6 @@ class Segmentation:
                  return_idx=False,
                  filter_by_endpoints=True,
                  dist_to_atlas=4,
-                 endpoint_dict=None,
                  save_intermediates=None):
         """
         Segment streamlines into bundles.
@@ -152,12 +151,6 @@ class Segmentation:
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance
             from the endpoints to the atlas ROIs.
-        endpoint_dict : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior, but only
-            defined in some cases. The format for this should be:
-            {'atlas': img,
-             'bundle1': {'endpoint': val1, 'startpoint': val2},
-             'bundle2': {'endpoint': val3, 'startpoint': val4}}
         save_intermediates : str, optional
             The full path to a folder into which intermediate products
             are saved. Default: None, means no saving of intermediates.
@@ -197,7 +190,6 @@ class Segmentation:
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_atlas = dist_to_atlas
-        self.endpoint_dict = endpoint_dict
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -226,7 +218,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_tg_space=False):
+                reset_tg_space=False, endpoint_dict=None):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -257,6 +249,13 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
+        endpoint_dict : dict, optional. This overrides use of the
+            AAL atlas, which is the default behavior, but only
+            defined in some cases. The format for this should be:
+            {'atlas': img,
+             'bundle1': {'endpoint': val1, 'startpoint': val2},
+             'bundle2': {'endpoint': val3, 'startpoint': val4}}
+
 
         Returns
         -------
@@ -297,6 +296,7 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
+        self.endpoint_dict = endpoint_dict
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
@@ -520,10 +520,10 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            if self.endpoint_dict:
+            if self.endpoint_dict is not None:
                 atlas = self.endpoint_dict['atlas']
                 # Resample to template:
-                atlas = reg.resample(atlas,
+                atlas = reg.resample(atlas.get_fdata(),
                                      self.reg_template,
                                      atlas.affine,
                                      self.reg_template.affine)
@@ -650,7 +650,7 @@ class Segmentation:
                 self.logger.info("Filtering by endpoints")
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
-                if self.endpoint_dict:
+                if self.endpoint_dict is not None:
                     # We use definitions of endpoints provided
                     # through this dict:
                     start_p = self.endpoint_dict[bundle]['startpoint']
