@@ -18,6 +18,8 @@ from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
+import bids
+bids.config.set_option('extension_initial_dot', True)
 from bids.layout import BIDSLayout
 
 from .version import version as pyafq_version
