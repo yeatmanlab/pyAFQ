@@ -205,7 +205,7 @@ def test_AFQ_custom_tract():
             "suffix": "tractography",
             "scope": "vistasoft"
         })
-    my_afq.export_rois()
+    my_afq.get_streamlines()
 
 
 @pytest.mark.nightly2
@@ -439,7 +439,7 @@ def test_AFQ_pft():
             "stop_threshold": "CMC",
             "tracker": "pft"
         })
-    my_afq.export_rois()
+    my_afq.get_streamlines()
 
 
 @pytest.mark.nightly4
