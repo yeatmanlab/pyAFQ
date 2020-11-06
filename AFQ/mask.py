@@ -168,7 +168,6 @@ class MaskFile(StrInstantiatesMixin):
             **self.filters,
             extension=".nii.gz",
             suffix=self.suffix,
-            session=session,
             subject=subject,
             full_search=True,
             strict=False,
