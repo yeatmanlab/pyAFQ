@@ -163,15 +163,29 @@ class MaskFile(StrInstantiatesMixin):
         if session not in self.fnames:
             self.fnames[session] = {}
 
+        # First, try to match the session.
         nearest_mask = bids_layout.get_nearest(
             from_path,
             **self.filters,
             extension=".nii.gz",
             suffix=self.suffix,
+            session=session,
             subject=subject,
             full_search=True,
             strict=False,
         )
+
+        if nearest_mask is None:
+            # If that fails, loosen session restriction
+            nearest_mask = bids_layout.get_nearest(
+                from_path,
+                **self.filters,
+                extension=".nii.gz",
+                suffix=self.suffix,
+                subject=subject,
+                full_search=True,
+                strict=False,
+            )
 
         self.fnames[session][subject] = nearest_mask
         from_path_subject = bids_layout.parse_file_entities(from_path).get(
