@@ -15,6 +15,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.reconst import shm
 
 from bids.layout import BIDSLayout
 
@@ -746,9 +747,8 @@ class AFQ(object):
             row, '_model-CSD_APM.nii.gz')
         if not op.exists(pmap_file):
             dwi_data, gtab, img = self._get_data_gtab(row)
-            mask = self._brain_mask(row)
-            pmap = fit_anisotropic_power_map(
-                dwi_data, gtab, mask)
+            sh_coeff = self._csd(self, row)
+            pmap = shm.anisotropic_power(sh_coeff)
             pmap = nib.Nifti1Image(pmap, img.affine)
             self.log_and_save_nii(pmap, pmap_file)
             meta_fname = self._get_fname(row, '_model-CSD_APM.json')
