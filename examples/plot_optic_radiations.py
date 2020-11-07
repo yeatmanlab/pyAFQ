@@ -15,6 +15,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
+from dipy.reconst import shm
 
 import AFQ.data as afd
 import AFQ.tractography as aft
@@ -66,12 +67,13 @@ if not op.exists(op.join(working_dir, 'csd_sh_coeff.nii.gz')):
 else:
     sh_coeff = op.join(working_dir, "csd_sh_coeff.nii.gz")
 
+apm = shm.anisotropic_power(nib.load(sh_coeff).get_fdata())
 
 ##########################################################################
 # Register the individual data to a template:
 # -------------------------------------------
 # For the purpose of bundle segmentation, the individual brain is registered to
-# the MNI T2 template. The waypoint ROIs used in segmentation are then each
+# the MNI T1 template. The waypoint ROIs used in segmentation are then each
 # brought into each subject's native space to test streamlines for whether they
 # fulfill the segmentation criteria.
 #
@@ -79,23 +81,23 @@ else:
 #
 #     To find the right place for the waypoint ROIs, we calculate a non-linear
 #     transformation between the individual's brain DWI measurement (the b0
-#     measurements) and the MNI T2 template.
+#     measurements) and the MNI T1 template.
 #     Before calculating this non-linear warping, we perform a pre-alignment
 #     using an affine transformation.
 
 print("Registering to template...")
-MNI_T2_img = afd.read_mni_template()
+
+MNI_T1w_img = afd.read_mni_template(weight="T1w")
 
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
-    b0 = np.mean(img.get_fdata()[..., gtab.b0s_mask], -1)
     # Prealign using affine registration
     _, prealign = reg.affine_registration(
-        b0,
-        MNI_T2_img.get_fdata(),
+        apm,
+        MNI_T1w_img.get_fdata(),
         img.affine,
-        MNI_T2_img.affine)
+        MNI_T1w_img.affine)
 
     # Then register using a non-linear registration using the affine for
     # prealignment
@@ -104,7 +106,7 @@ if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
 else:
     mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
-                               img, MNI_T2_img)
+                               img, MNI_T1w_img)
 
 
 ##########################################################################
@@ -220,24 +222,25 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            if bundles[bundle]['rules'][idx]:
-                warped_roi = patch_up_roi(
-                    mapping.transform_inverse(
-                        roi.get_fdata().astype(np.float32),
-                        interpolation='linear'),
-                    bundle_name=bundle)
+            warped_roi = patch_up_roi(
+                mapping.transform_inverse(
+                    roi.get_fdata().astype(np.float32),
+                    interpolation='linear'),
+                bundle_name=bundle)
+            print(roi)
+            nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                     op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
 
-                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
-                # Add voxels that aren't there yet:
+            # Add voxels that aren't there yet:
+            if bundles[bundle]['rules'][idx]:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
 
         # for ii, pp in enumerate(endpoint_spec[bundle].keys()):
         #     roi = endpoint_spec[bundle][pp]
         #     roi = reg.resample(roi.get_fdata(),
-        #                        MNI_T2_img,
+        #                        MNI_T1w_img,
         #                        roi.affine,
-        #                        MNI_T2_img.affine)
+        #                        MNI_T1w_img.affine)
 
         #     warped_roi = patch_up_roi(
         #         mapping.transform_inverse(
@@ -283,7 +286,7 @@ segmentation.segment(bundles,
                      fbval=hardi_fbval,
                      fbvec=hardi_fbvec,
                      mapping=mapping,
-                     reg_template=MNI_T2_img,
+                     reg_template=MNI_T1w_img,
                      endpoint_dict=endpoint_spec)
 
 fiber_groups = segmentation.fiber_groups
