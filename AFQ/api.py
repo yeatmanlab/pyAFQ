@@ -747,7 +747,7 @@ class AFQ(object):
             row, '_model-CSD_APM.nii.gz')
         if not op.exists(pmap_file):
             dwi_data, gtab, img = self._get_data_gtab(row)
-            sh_coeff = self._csd(self, row)
+            sh_coeff = self._csd(row)
             pmap = shm.anisotropic_power(sh_coeff)
             pmap = nib.Nifti1Image(pmap, img.affine)
             self.log_and_save_nii(pmap, pmap_file)
