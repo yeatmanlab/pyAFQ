@@ -15,6 +15,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.reconst.dki_micro import axonal_water_fraction
 
 from bids.layout import BIDSLayout
 
@@ -832,11 +833,24 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dki_md_file
 
+    def _dki_awf(self, row, sphere='repulsion100', gtol=1e-2):
+        dki_awf_file = self._get_fname(row, '_model-DKI_AWF.nii.gz')
+        if not op.exists(dki_awf_file):
+            dki_params = self._dki(row).get_fdata()
+            awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
+            nib.save(nib.Nifti1Image(awf, row['dwi_affine']),
+                     dki_awf_file)
+            meta_fname = self._get_fname(row, '_model-DKI_AWF.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_awf_file
+
     # Keep track of functions that compute scalars:
     _scalar_dict = {"dti_fa": _dti_fa,
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
-                    "dki_md": _dki_md}
+                    "dki_md": _dki_md,
+                    "dki_awf": _dki_awf}
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
