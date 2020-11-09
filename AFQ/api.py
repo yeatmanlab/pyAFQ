@@ -1110,7 +1110,7 @@ class AFQ(object):
                                            reg_template=self.reg_template_img,
                                            mapping=self._mapping(row),
                                            reg_prealign=reg_prealign,
-                                           endpoint_dict=self.endpoint_dict)
+                                           endpoint_info=self.endpoint_info)
 
             if self.segmentation_params['return_idx']:
                 idx = {bundle: bundles[bundle]['idx'].tolist()
