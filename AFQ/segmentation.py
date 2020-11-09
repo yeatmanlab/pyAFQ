@@ -218,7 +218,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_tg_space=False, endpoint_dict=None):
+                reset_tg_space=False, endpoint_info=None):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -249,7 +249,7 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
-        endpoint_dict : dict, optional. This overrides use of the
+        endpoint_info : dict, optional. This overrides use of the
             AAL atlas, which is the default behavior.
             The format for this should be:
             {"bundle1": {"startpoint":img1_1,
@@ -298,7 +298,7 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.endpoint_dict = endpoint_dict
+        self.endpoint_info = endpoint_info
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
@@ -522,7 +522,7 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            if self.endpoint_dict is None:
+            if self.endpoint_info is None:
                 aal_atlas = afd.read_aal_atlas(self.reg_template)
                 atlas = aal_atlas['atlas']
                 if self.save_intermediates is not None:
@@ -645,11 +645,11 @@ class Segmentation:
                 self.logger.info("Filtering by endpoints")
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
-                if self.endpoint_dict is not None:
+                if self.endpoint_info is not None:
                     # We use definitions of endpoints provided
                     # through this dict:
-                    start_p = self.endpoint_dict[bundle]['startpoint']
-                    end_p = self.endpoint_dict[bundle]['endpoint']
+                    start_p = self.endpoint_info[bundle]['startpoint']
+                    end_p = self.endpoint_info[bundle]['endpoint']
 
                     atlas_idx = []
                     for pp in [start_p, end_p]:
