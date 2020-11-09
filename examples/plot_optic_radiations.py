@@ -235,23 +235,21 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
             if bundles[bundle]['rules'][idx]:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
 
-        # for ii, pp in enumerate(endpoint_spec[bundle].keys()):
-        #     roi = endpoint_spec[bundle][pp]
-        #     roi = reg.resample(roi.get_fdata(),
-        #                        MNI_T1w_img,
-        #                        roi.affine,
-        #                        MNI_T1w_img.affine)
+        for ii, pp in enumerate(endpoint_spec[bundle].keys()):
+            roi = endpoint_spec[bundle][pp]
+            roi = reg.resample(roi.get_fdata(),
+                               MNI_T1w_img,
+                               roi.affine,
+                               MNI_T1w_img.affine)
 
-        #     warped_roi = patch_up_roi(
-        #         mapping.transform_inverse(
-        #             roi.astype(np.float32),
-        #             interpolation='linear'),
-        #         bundle_name=bundle)
+            warped_roi = patch_up_roi(
+                mapping.transform_inverse(
+                    roi.astype(np.float32),
+                    interpolation='linear'),
+                bundle_name=bundle)
 
-        #     nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-        #              op.join(working_dir, f"{bundle}_{pp}.nii.gz"))
-        #     # Add voxels that aren't there yet:
-        #     seed_roi = np.logical_or(seed_roi, warped_roi)
+            nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                     op.join(working_dir, f"{bundle}_{pp}.nii.gz"))
 
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
              op.join(working_dir, 'seed_roi.nii.gz'))
