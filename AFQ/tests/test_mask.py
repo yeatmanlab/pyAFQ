@@ -1,5 +1,7 @@
+import os.path as op
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 from bids.layout import BIDSLayout
 
@@ -75,13 +77,30 @@ def test_resample_mask():
         mask_data.dtype)
 
 
-def test_find_path():
+@pytest.mark.parametrize("subject", ["01", "02"])
+@pytest.mark.parametrize("session", ["01", "02"])
+def test_find_path(subject, session):
     bids_dir = create_dummy_bids_path(2, 2)
-    print(bids_dir)
     bids_layout = BIDSLayout(bids_dir, derivatives=True)
 
+    test_dwi_path = bids_layout.get(
+        subject=subject, session=session, return_type="filename",
+        suffix="dwi", extension="nii.gz"
+    )[0]
+
     mask_file = MaskFile("seg", {'scope': 'synthetic'})
-    mask_file.find_path(bids_layout, '01', '01')
-    mask_file.find_path(bids_layout, '02', '01')
-    mask_file.find_path(bids_layout, '01', '02')
-    mask_file.find_path(bids_layout, '02', '02')
+    mask_file.find_path(bids_layout, test_dwi_path, subject, session)
+
+    assert mask_file.fnames[session][subject] == op.join(
+        bids_dir, "derivatives", "dmriprep", "sub-" + subject,
+        "ses-" + session, "anat", "seg.nii.gz"
+    )
+
+    other_sub = "01" if subject == "02" else "02"
+    with pytest.raises(ValueError):
+        mask_file.find_path(
+            bids_layout,
+            test_dwi_path,
+            subject=other_sub,
+            session=session,
+        )

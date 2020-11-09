@@ -71,11 +71,11 @@ def create_dummy_data(dmriprep_dir, subject, session=None):
 
     np.savetxt(
         op.join(
-            dmriprep_dir, data_dir, 'dwi', 'dwi.bvals'),
+            dmriprep_dir, data_dir, 'dwi', 'dwi.bval'),
         bvals)
     np.savetxt(
         op.join(
-            dmriprep_dir, data_dir, 'dwi', 'dwi.bvecs'),
+            dmriprep_dir, data_dir, 'dwi', 'dwi.bvec'),
         bvecs)
     nib.save(
         nib.Nifti1Image(data, aff),
@@ -205,7 +205,7 @@ def test_AFQ_custom_tract():
             "suffix": "tractography",
             "scope": "vistasoft"
         })
-    my_afq.export_rois()
+    my_afq.get_streamlines()
 
 
 @pytest.mark.nightly2
@@ -439,7 +439,7 @@ def test_AFQ_pft():
             "stop_threshold": "CMC",
             "tracker": "pft"
         })
-    my_afq.export_rois()
+    my_afq.get_streamlines()
 
 
 @pytest.mark.nightly4

@@ -159,15 +159,48 @@ class MaskFile(StrInstantiatesMixin):
         self.filters = filters
         self.fnames = {}
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         if session not in self.fnames:
             self.fnames[session] = {}
-        self.fnames[session][subject] = bids_layout.get(
-            subject=subject, session=session,
-            extension='.nii.gz',
-            return_type='filename',
+
+        # First, try to match the session.
+        nearest_mask = bids_layout.get_nearest(
+            from_path,
+            **self.filters,
+            extension=".nii.gz",
             suffix=self.suffix,
-            **self.filters)[0]
+            session=session,
+            subject=subject,
+            full_search=True,
+            strict=False,
+        )
+
+        if nearest_mask is None:
+            # If that fails, loosen session restriction
+            nearest_mask = bids_layout.get_nearest(
+                from_path,
+                **self.filters,
+                extension=".nii.gz",
+                suffix=self.suffix,
+                subject=subject,
+                full_search=True,
+                strict=False,
+            )
+
+        self.fnames[session][subject] = nearest_mask
+        from_path_subject = bids_layout.parse_file_entities(from_path).get(
+            "subject", None
+        )
+        mask_subject = bids_layout.parse_file_entities(nearest_mask).get(
+            "subject", None
+        )
+        if from_path_subject != mask_subject:
+            raise ValueError(
+                f"Expected subject IDs to match for the retrieved mask file "
+                f"and the supplied `from_path` file. Got sub-{mask_subject} "
+                f"from mask file {nearest_mask} and sub-{from_path_subject} "
+                f"from `from_path` file {from_path}."
+            )
 
     def get_path_data_affine(self, afq_object, row):
         mask_file = self.fnames[row['ses']][row['subject']]
@@ -209,7 +242,7 @@ class FullMask(StrInstantiatesMixin):
     def __init__(self):
         pass
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     def get_mask(self, afq_object, row):
@@ -234,7 +267,7 @@ class RoiMask(StrInstantiatesMixin):
     def __init__(self):
         pass
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     def get_mask(self, afq_object, row):
@@ -286,7 +319,7 @@ class B0Mask(StrInstantiatesMixin):
     def __init__(self, median_otsu_kwargs={}):
         self.median_otsu_kwargs = median_otsu_kwargs
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     def get_mask(self, afq_object, row):
@@ -448,7 +481,7 @@ class ScalarMask(MaskFile):
         self.scalar = scalar
 
     # overrides MaskFile
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     # overrides MaskFile
@@ -536,9 +569,9 @@ class PFTMask(StrInstantiatesMixin):
         """
         self.probsegs = (WM_probseg, GM_probseg, CSF_probseg)
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         for probseg in self.probsegs:
-            probseg.find_path(bids_layout, subject, session)
+            probseg.find_path(bids_layout, from_path, subject, session)
 
     def get_mask(self, afq_object, row):
         probseg_imgs = []
@@ -547,7 +580,7 @@ class PFTMask(StrInstantiatesMixin):
             data, affine, meta = probseg.get_mask(afq_object, row)
             probseg_imgs.append(nib.Nifti1Image(data, affine))
             probseg_metas.append(meta)
-        return probseg_imgs, _, dict(sources=probseg_metas)
+        return probseg_imgs, None, dict(sources=probseg_metas)
 
 
 class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
@@ -581,9 +614,9 @@ class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
         CombineMaskMixin.__init__(self, combine)
         self.mask_list = mask_list
 
-    def find_path(self, bids_layout, subject, session):
+    def find_path(self, bids_layout, from_path, subject, session):
         for mask in self.mask_list:
-            mask.find_path(bids_layout, subject, session)
+            mask.find_path(bids_layout, from_path, subject, session)
 
     def get_mask(self, afq_object, row):
         self.mask_draft = None
