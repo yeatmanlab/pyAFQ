@@ -24,7 +24,6 @@ import AFQ.data as afd
 from AFQ.models.dti import _fit as dti_fit
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.csd import _fit as csd_fit
-from AFQ.models.csd import fit_anisotropic_power_map
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.dki as dpy_dki
