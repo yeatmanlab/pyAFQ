@@ -193,7 +193,7 @@ class AFQ(object):
                  viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
-                 endpoint_dict=None,
+                 endpoint_info=None,
                  clean_params=None):
         '''
         Initialize an AFQ object.
@@ -288,6 +288,17 @@ class AFQ(object):
         segmentation_params : dict, optional
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
+        endpoint_info : dict, optional.
+            [SEGMENTATION]
+            In endpoint filtering, this overrides use of the AAL atlas, which
+            is the default behavior.
+            The format for this should be:
+            {"bundle1": {"startpoint":img1_1,
+                         "endpoint":img1_2},
+             "bundle2": {"startpoint":img2_1,
+                          "endpoint":img2_2}}
+            where the images used are binary masks of the desired
+            endpoints.
         tracking_params: dict, optional
             The parameters for tracking. Default: use the default behavior of
             the aft.track function. Seed mask and seed threshold, if not
@@ -466,7 +477,7 @@ class AFQ(object):
         else:
             self.bundle_dict = bundle_info
 
-        self.endpoint_dict = endpoint_dict
+        self.endpoint_info = endpoint_info
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
