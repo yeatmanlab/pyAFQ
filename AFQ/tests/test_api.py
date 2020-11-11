@@ -555,6 +555,7 @@ def test_AFQ_data_waypoint():
                     dmriprep='vistasoft',
                     bundle_info=bundle_names,
                     scalars=["dti_FA", "dti_MD"],
+                    robust_tensor_fitting=True,
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)
@@ -602,7 +603,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (500, 5)
+    assert tract_profiles.shape == (400, 5)
 
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
@@ -633,6 +634,8 @@ def test_AFQ_data_waypoint():
                            rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
+                  REGISTRATION=dict(
+                      robust_tensor_fitting=True),
                   BUNDLES=dict(
                       bundle_info=bundle_names,
                       scalars=["dti_fa", "dti_md"]),
@@ -654,7 +657,7 @@ def test_AFQ_data_waypoint():
         myafq._get_fname(myafq.data_frame.iloc[0], '_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (500, 7)
+    assert combined_profiles.shape == (400, 7)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:

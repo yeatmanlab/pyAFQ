@@ -22,6 +22,7 @@ from bids.layout import BIDSLayout
 from .version import version as pyafq_version
 import AFQ.data as afd
 from AFQ.models.dti import _fit as dti_fit
+from AFQ.models.dti import noise_from_b0
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.csd import _fit as csd_fit
 from AFQ.models.csd import fit_anisotropic_power_map
@@ -176,6 +177,7 @@ class AFQ(object):
                  dmriprep="all",
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
+                 robust_tensor_fitting=False,
                  min_bval=None,
                  max_bval=None,
                  reg_template="mni_T1",
@@ -220,6 +222,10 @@ class AFQ(object):
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
+        robust_tensor_fitting : bool, optional
+            [REGISTRATION] Whether to use robust_tensor_fitting when
+            doing dti. Only applies to dti.
+            Default: False
         min_bval : float, optional
             [REGISTRATION] Minimum b value you want to use
             from the dataset (other than b0), inclusive.
@@ -309,6 +315,8 @@ class AFQ(object):
                 + " either a dict or None")
         if not isinstance(b0_threshold, int):
             raise TypeError("b0_threshold must be an int")
+        if not isinstance(robust_tensor_fitting, bool):
+            raise TypeError("robust_tensor_fitting must be a bool")
         if min_bval is not None and not isinstance(min_bval, int):
             raise TypeError("min_bval must be an int")
         if max_bval is not None and not isinstance(max_bval, int):
@@ -393,6 +401,7 @@ class AFQ(object):
             self.reg_algo = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
         self.b0_threshold = b0_threshold
+        self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
 
@@ -692,7 +701,16 @@ class AFQ(object):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
-            dtf = dti_fit(gtab, data, mask=mask)
+
+            if self.robust_tensor_fitting:
+                bvals, bvecs = read_bvals_bvecs(
+                    row['bval_file'], row['bvec_file'])
+                sigma = noise_from_b0(
+                    data, gtab, bvals, mask=mask,
+                    b0_threshold=self.b0_threshold)
+            else:
+                sigma = None
+            dtf = dti_fit(gtab, data, mask=mask, sigma=sigma)
             self.log_and_save_nii(nib.Nifti1Image(dtf.model_params,
                                                   row['dwi_affine']),
                                   dti_params_file)
