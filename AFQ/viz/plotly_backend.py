@@ -71,7 +71,8 @@ def set_layout(figure, color=None):
     )
 
 
-def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None):
+def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
+                      cbv_lims=(None, None)):
     color = np.asarray(color)
 
     plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
@@ -80,10 +81,16 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None):
     y_pts = np.zeros(plotting_shape)
     z_pts = np.zeros(plotting_shape)
 
+    if cbv_lims[0] is None:
+        cbv_lims[0] = 0
+    if cbv_lims[1] is None:
+        cbv_lims[1] = cbv.max()
+
     if cbv is not None:
         customdata = np.zeros(plotting_shape)
         line_color = np.zeros((plotting_shape, 3))
-        color_constant = (color / color.max()) * (1.4 / cbv.max())
+        color_constant = (color / color.max()) * (1.4 /
+            (cbv_lims[1] - cbv_lims[0])) + cbv_lims[0]
     else:
         customdata = np.zeros(plotting_shape)
         line_color = np.zeros((plotting_shape, 3))
@@ -123,7 +130,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None):
 
     figure.add_trace(
         go.Scatter3d(
-            x=dimensions[0]-x_pts,
+            x=dimensions[0] - x_pts,
             y=y_pts,
             z=z_pts,
             name=name,
@@ -143,7 +150,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None):
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
-                      figure=None, background=(1, 1, 1), interact=False,
+                      cbv_lims=(None, None), figure=None,
+                      background=(1, 1, 1), interact=False,
                       inline=False):
     """
     Visualize bundles in 3D
@@ -180,6 +188,19 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         If this is a list, each item is an RGB tuple. Defaults to a list
         with Tableau 20 RGB values if bundle_dict is None, or dict from
         bundles to Tableau 20 RGB values if bundle_dict is not None.
+
+    color_by_volume : ndarray or str, optional
+        3d volume use to shade the bundles. If None, no shading
+        is performed. Only works when using the plotly backend.
+        Default: None
+
+    cbv_lims : tuple
+        Of the form (lower bound, upper bound). Shading based on
+        color_by_volume will only differentiate values within these bounds.
+        If lower bound is None, will default to 0.
+        If upper bound is None, will default to the maximum value in
+        color_by_volume.
+        Default: (None, None)
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
@@ -218,7 +239,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             dimensions,
             color,
             name,
-            cbv=color_by_volume)
+            cbv=color_by_volume,
+            cbv_lims=cbv_lims)
 
     figure.update_layout(legend=dict(itemsizing="constant"))
     return _inline_interact(figure, interact, inline)
@@ -274,7 +296,7 @@ def _draw_roi(figure, roi, name, color, opacity, dimensions):
     roi = np.where(roi == 1)
     figure.add_trace(
         go.Scatter3d(
-            x=dimensions[0]-(roi[0] + 1),
+            x=dimensions[0] - (roi[0] + 1),
             y=roi[1] + 1,
             z=roi[2] + 1,
             name=name,
