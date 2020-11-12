@@ -1513,18 +1513,10 @@ class GroupCSVComparison():
             xaxis_font_size = small_font - 6
         else:
             xaxis_font_size = small_font
-        if len(f'Subject {rtype}') > 15:
-            rotation = 90
-            labelpad = 0
-        else:
-            rotation = 90
-            labelpad = 0
 
         axes[0].set_title("A", fontsize=large_font)
         axes[0].set_ylabel(f'Profile {rtype}',
-                           fontsize=medium_font,
-                           rotation=rotation,
-                           labelpad=0)
+                           fontsize=medium_font)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
         axes[0].set_xticks(x+1)
@@ -1532,9 +1524,7 @@ class GroupCSVComparison():
             updated_bundles, fontsize=xaxis_font_size)
         axes[1].set_title("B", fontsize=large_font)
         axes[1].set_ylabel(f'Subject {rtype}',
-                           fontsize=medium_font,
-                           rotation=rotation,
-                           labelpad=0)
+                           fontsize=medium_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
         axes[1].set_xticks(x+1)
