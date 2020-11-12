@@ -510,7 +510,10 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
 
 
 def display_scalar(scalar_name):
-    return scalar_name.replace("_", " ").upper()
+    if isinstance(scalar_name, str):
+        return scalar_name.replace("_", " ").upper()
+    else:
+        return [sn.replace("_", " ").upper() for sn in scalar_name]
 
 
 class BrainAxes():
@@ -1169,6 +1172,7 @@ class GroupCSVComparison():
                           ylims=[0.0, 1.0],
                           show_plots=False,
                           only_plot_above_thr=None,
+                          rtype="Reliability",
                           positions=POSITIONS):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
@@ -1197,20 +1201,29 @@ class GroupCSVComparison():
             threshold on the final reliability bar plots. If None, plot all.
             Default: None
 
+        rtype : str, optional
+            Type of reliability to name the y axis of the reliability bar
+            charts. Default: "Reliability"
+
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
 
         Returns
         -------
-        Returns 5 objects:
+        Returns 8 objects:
         1. Matplotlib figure
         2. Matplotlib axes
         3. A dictionary containing the number of missing bundles
            for each dataset.
-        4. A pandas dataframe describing the intersubject reliabilities,
+        4. A list of bundles with sufficient correlation
+        5. A pandas dataframe describing the intersubject reliabilities,
+           per 
+        6. A numpy array describing the intersubject reliability errors,
            per bundle
-        5. A pandas dataframe desribing the profile reliabilities,
+        7. A pandas dataframe desribing the profile reliabilities,
+           per 
+        8. A numpy array desribing the profile reliability errors,
            per bundle
         """
         if not show_plots:
@@ -1287,14 +1300,14 @@ class GroupCSVComparison():
             ax.set_title(bundle, fontsize=large_font)
             ax.set_xlabel("Pearson's r", fontsize=medium_font)
             ax.set_ylabel("Count", fontsize=medium_font)
-            ba.temp_fig.legend(scalars, fontsize=medium_font)
+            ba.temp_fig.legend(display_scalar(scalars), fontsize=medium_font)
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     (f"{names[0]}_vs_{names[1]}_profile_r_distributions"
                      f"_{bundle}")))
 
-        ba.fig.legend(scalars, loc='center', fontsize=medium_font)
+        ba.fig.legend(display_scalar(scalars), loc='center', fontsize=medium_font)
         ba.format(disable_x=False)
         ba.fig.savefig(
             self._get_fname(
@@ -1327,14 +1340,14 @@ class GroupCSVComparison():
             ax.set_ylim([mini, maxi])
             ax.set_title(bundle, fontsize=large_font)
             ax.set_ylabel("Pearson's r", fontsize=medium_font)
-            ba.temp_fig.legend(scalars, fontsize=medium_font)
+            ba.temp_fig.legend(display_scalar(scalars), fontsize=medium_font)
             ba.save_temp_fig(
                 self._get_fname(
                     f"rel_plots/{'_'.join(scalars)}/verbose",
                     (f"{names[0]}_vs_{names[1]}_node_profiles"
                      f"_{bundle}")))
 
-        ba.fig.legend(scalars, loc='center', fontsize=medium_font)
+        ba.fig.legend(display_scalar(scalars), loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
@@ -1424,7 +1437,10 @@ class GroupCSVComparison():
         if only_plot_above_thr is not None:
             is_removed_bundle =\
                 np.logical_not(
-                    np.any(all_sub_coef > only_plot_above_thr, axis=0))
+                    np.logical_and(
+                        np.all(all_sub_coef > only_plot_above_thr, axis=0),
+                        np.all(bundle_prof_means > only_plot_above_thr,
+                               axis=0)))
             removal_idx = np.where(is_removed_bundle)[0]
             bundle_prof_means_removed = np.delete(
                 bundle_prof_means,
@@ -1449,79 +1465,87 @@ class GroupCSVComparison():
             all_sub_coef_err_removed = all_sub_coef_err
             all_sub_coef_removed = all_sub_coef
 
-        df_bundle_prof_means = pd.DataFrame(
-            columns=['scalar', 'tractID', 'value'])
         updated_bundles = []
-        for m, scalar in enumerate(scalars):
-            for k, bundle in enumerate(self.bundles):
-                if not is_removed_bundle[k]:
-                    df_bundle_prof_means = df_bundle_prof_means.append({
-                        'scalar': scalar,
-                        'tractID': bundle,
-                        'value': bundle_prof_means[m, k]}, ignore_index=True)
-                    if m == 0:
-                        updated_bundles.append(bundle)
-            df_bundle_prof_means = df_bundle_prof_means.append({
-                'scalar': scalar,
-                'tractID': "median",
-                'value': np.median(bundle_prof_means_removed[m])},
-                ignore_index=True)
-            if m == 0:
-                updated_bundles.append("median")
-        df_all_sub_coef = pd.DataFrame(columns=['scalar', 'tractID', 'value'])
-        for m, scalar in enumerate(scalars):
-            for k, bundle in enumerate(self.bundles):
-                if not is_removed_bundle[k]:
-                    df_all_sub_coef = df_all_sub_coef.append({
-                        'scalar': scalar,
-                        'tractID': bundle,
-                        'value': all_sub_coef[m, k]}, ignore_index=True)
-            df_all_sub_coef = df_all_sub_coef.append({
-                'scalar': scalar,
-                'tractID': "median",
-                'value': np.median(all_sub_coef_removed[m])},
-                ignore_index=True)
+        for k, bundle in enumerate(self.bundles):
+            if not is_removed_bundle[k]:
+                if bundle == "CC_ForcepsMinor":
+                    updated_bundles.append("CC_FMi")
+                else:
+                    updated_bundles.append(bundle)
+        updated_bundles.append("median")
 
         sns.set(style="whitegrid")
-        print(np.transpose([*all_sub_coef_err_removed[m], np.asarray([0, 0])]))
-        sns.barplot(
-            data=df_bundle_prof_means, x='tractID', y='value', hue='scalar',
-            palette=tableau_20_sns[:len(scalars) * 2 + 2:2],
-            yerr=[*bundle_prof_stds_removed[m], 0],
-            ax=axes[0])
-        axes[0].legend_.remove()
-        sns.barplot(
-            data=df_all_sub_coef, x='tractID', y='value', hue='scalar',
-            palette=tableau_20_sns[:len(scalars) * 2 + 2:2],
-            yerr=np.transpose([*all_sub_coef_err_removed[m], np.asarray([0, 0])]),
-            ax=axes[1])
-        axes[1].legend_.remove()
+        width = 0.6
+        spacing = 1.5
+        x = np.arange(len(updated_bundles)) * spacing
+        x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
+
+        bundle_prof_means_removed =  np.pad(
+            bundle_prof_means_removed, [(0, 0), (0, 1)])
+        bundle_prof_stds_removed = np.pad(
+            bundle_prof_stds_removed, [(0, 0), (0, 1)])
+        all_sub_coef_removed =  np.pad(
+            all_sub_coef_removed, [(0, 0), (0, 1)])
+        all_sub_coef_err_removed = np.transpose(np.pad(
+            all_sub_coef_err_removed, [(0, 0), (0, 1), (0, 0)]))
+
+        for m, scalar in enumerate(scalars):
+            bundle_prof_means_removed[m, -1] = np.median(
+                bundle_prof_means_removed[m, :-1])
+            all_sub_coef_removed[m, -1] = np.median(
+                all_sub_coef_removed[m, :-1])
+            axes[0].bar(
+                x + x_shift[m],
+                bundle_prof_means_removed[m],
+                width,
+                label=scalar,
+                yerr=bundle_prof_stds_removed[m],
+                color=tableau_20_sns[m*2])
+            axes[1].bar(
+                x + x_shift[m],
+                all_sub_coef_removed[m],
+                width,
+                label=scalar,
+                yerr=all_sub_coef_err_removed[:, :, m],
+                color=tableau_20_sns[m*2])
 
         if len(updated_bundles) > 20:
             xaxis_font_size = small_font - 6
         else:
             xaxis_font_size = small_font
+        if len(f'Subject {rtype}') > 15:
+            rotation = 90
+            labelpad = 0
+        else:
+            rotation = 90
+            labelpad = 0
 
         axes[0].set_title("A", fontsize=large_font)
-        axes[0].set_ylabel('Mean of\nPearson\'s r\nof profiles',
-                           fontsize=medium_font)
+        axes[0].set_ylabel(f'Profile {rtype}',
+                           fontsize=medium_font,
+                           rotation=rotation,
+                           labelpad=0)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
+        axes[0].set_xticks(x+1)
         axes[0].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
         axes[1].set_title("B", fontsize=large_font)
-        axes[1].set_ylabel('Pearson\'s r\nof mean\nof profiles',
-                           fontsize=medium_font)
+        axes[1].set_ylabel(f'Subject {rtype}',
+                           fontsize=medium_font,
+                           rotation=rotation,
+                           labelpad=0)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
+        axes[1].set_xticks(x+1)
         axes[1].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
 
         plt.setp(axes[0].get_xticklabels(),
-                 rotation=45,
+                 rotation=65,
                  horizontalalignment='right')
         plt.setp(axes[1].get_xticklabels(),
-                 rotation=45,
+                 rotation=65,
                  horizontalalignment='right')
 
         fig.tight_layout()
@@ -1532,7 +1556,7 @@ class GroupCSVComparison():
                 color=tableau_20_sns[m * 2]))
         fig.legend(
             legend_labels,
-            scalars,
+            display_scalar(scalars),
             fontsize=small_font,
             bbox_to_anchor=(1.25, 0.5))
         fig.savefig(self._get_fname(
@@ -1542,11 +1566,15 @@ class GroupCSVComparison():
         if not show_plots:
             plt.close(fig)
             plt.ion()
-        return fig, axes, miss_counts, df_all_sub_coef, df_bundle_prof_means
+        return fig, axes, miss_counts, updated_bundles,\
+            all_sub_coef_removed, all_sub_coef_err_removed,\
+            bundle_prof_means_removed, bundle_prof_stds_removed
 
-    def compare_reliability(self, reliability_df1, reliability_df2,
+    def compare_reliability(self, reliability1, reliability2,
                             analysis_label1, analysis_label2,
-                            scalar_remove_model=SCALAR_REMOVE_MODEL,
+                            errors1, errors2,
+                            bundles,
+                            scalars=["FA", "MD"],
                             rtype="Subject Reliability",
                             show_plots=False):
         """
@@ -1554,8 +1582,8 @@ class GroupCSVComparison():
 
         Parameters
         ----------
-        reliability_df1, reliability_df2 : Pandas DataFrames
-            Pandas dataframe describing reliabilities.
+        reliability1, reliability2 : numpy arrays
+            numpy arrays of reliabilities.
             Typically, each of this will be outputs of separate calls
             to reliability_plots.
 
@@ -1563,12 +1591,18 @@ class GroupCSVComparison():
             Names of the analyses used to obtain each dataset.
             Used to label the x and y axes.
 
-        scalar_remove_model : dict, optional
-            Dictionary that maps scalar names to more generic scalar names,
-            allowing comparison across different analyses.
-            For example, in the default dict, 'dti_fa' and 'dki_fa' both
-            get mapped to 'FA'.
-            Default: SCALAR_REMOVE_MODEL
+        errors1, errors2 : numpy arrays
+            Numpy arrays describing the errors.
+            Typically, each of this will be outputs of separate calls
+            to reliability_plots.
+
+        bundles : list of str
+            List of bundles that correspond to the second dimension of the
+            reliability arrays.
+
+        scalars : list of str, optional
+            Lsit of scalars that correspond to the first dimension of the
+            reliability arrays. Default: ["FA", "MD"]
 
         rtype : str
             type of reliability. Can be any string; used in x axis lavel.
@@ -1582,32 +1616,38 @@ class GroupCSVComparison():
         -------
         Returns a Matplotlib figure and axes.
         """
-        reliability_df1 = reliability_df1.rename(columns={
-            'value': f"{analysis_label1} {rtype}"})
-        reliability_df1['scalar'] = \
-            reliability_df1['scalar'].apply(
-                lambda x: scalar_remove_model[x])
-
-        reliability_df2 = reliability_df2.rename(columns={
-            'value': f"{analysis_label2} {rtype}"})
-        reliability_df2['scalar'] = \
-            reliability_df2['scalar'].apply(
-                lambda x: scalar_remove_model[x])
-
-        merged_intersubject = reliability_df1.merge(
-            reliability_df2,
-            on=['scalar', 'tractID'])
+        # TODO: this should be user input, and have more entries by default
+        markers = ["o", "x"]
 
         fig, ax = plt.subplots()
-        g = sns.scatterplot(
-            data=merged_intersubject,
-            x=f"{analysis_label1} {rtype}",
-            y=f"{analysis_label2} {rtype}",
-            s=marker_size,
-            style='scalar',
-            hue='tractID',
-            palette=self.color_dict,
-            ax=ax)
+        for i, scalar in enumerate(scalars):
+            for j, bundle in enumerate(bundles):
+                if len(errors1.shape) > 2:
+                    xerr = errors1[:, j, i].reshape((2, 1))
+                else:
+                    xerr = errors1[i, j]
+                if len(errors2.shape) > 2:
+                    yerr = errors2[:, j, i].reshape((2, 1))
+                else:
+                    yerr = errors2[i, j]
+
+                ax.scatter(
+                    reliability1[i, j],
+                    reliability2[i, j],
+                    s=marker_size,
+                    c=[self.color_dict[bundle]],
+                    marker=markers[i]
+                )
+                ax.errorbar(
+                    reliability1[i, j],
+                    reliability2[i, j],
+                    xerr=xerr,
+                    yerr=yerr,
+                    c=[self.color_dict[bundle]],
+                    alpha=0.5,
+                    fmt="none"
+                )
+
         ax.set_xlabel(f"{analysis_label1} {rtype}",
                       fontsize=medium_font)
         ax.set_ylabel(f"{analysis_label2} {rtype}",
@@ -1616,8 +1656,8 @@ class GroupCSVComparison():
             axis='x', which='major', labelsize=medium_font)
         ax.tick_params(
             axis='y', which='major', labelsize=medium_font)
-        g.set(ylim=(0.2, 1))
-        g.set(xlim=(0.2, 1))
+        ax.set_ylim(0.2, 1)
+        ax.set_xlim(0.2, 1)
         plt.legend(loc="lower left", ncol=7, bbox_to_anchor=(0., -0.8))
         ax.plot([[0, 0], [1, 1]], [[0, 0], [1, 1]], '--')
 
