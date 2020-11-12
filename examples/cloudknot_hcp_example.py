@@ -1,19 +1,31 @@
 """
-==============================
-Using cloudknot to run pyAFQ with multiple configurations on AWS batch,
-using the HCP dataset:
-==============================
-
-The following is an example of how to use cloudknot to run multiple
-confiugrations of pyAFQ on the HCP dataset. Specifically, here we will run
+==========================
+AFQ with HCP data
+==========================
+This example demonstrates how to use the AFQ API to analyze HCP data.
+For this example to run properly, you will need to gain access to the HCP data.
+This can be done by following this instructions on the webpage
+`here <https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS>`_.
+We will use the ``Cloudknot`` library to run our AFQ analysis in the AWS 
+Batch service (see also 
+`this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_).
+In the following we will use ``Cloudknot`` to run multiple
+configurations of pyAFQ on the HCP dataset. Specifically, here we will run
 pyAFQ with different tractography seeding strategies. 
 """
 
-# import cloudknot and set the correct region
+##########################################################################
+# Import cloudknot and set the correct region. The HCP data is stored in `us-east-1`, so it's best
+# to analyze it there.
 import configparser
 import itertools
 import cloudknot as ck
 ck.set_region('us-east-1')
+
+##########################################################################
+# Define a function to run. This function allows us to pass in the subject ID for the subjects we would
+# like to analyze , as well as strategies for seeding tractography (different masks and/or different
+# numbers of seeds per voxel).
 
 
 def afq_process_subject(subject, seed_mask, n_seeds,
@@ -35,7 +47,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger(__name__)
 
-    # Download the given subject to your local machine from s3
+    # Download the given subject to the AWS Batch machine from s3
     _, hcp_bids = fetch_hcp(
         [subject],
         profile_name=False,
@@ -86,29 +98,38 @@ def afq_process_subject(subject, seed_mask, n_seeds,
         f"{seed_mask}_{n_seeds}"))
 
 
-# here we provide a list of subjects that we have selected to process
+##########################################################################
+# In this example, we will process the data from the following subjects
 subjects = [103818, 105923, 111312]
 
-# here we construct lists of everything we want to test:
-subjects = [str(i) for i in subjects]
+##########################################################################
+# We will test combinations of different conditions:
+# subjects, seed masks, and number of seeds
 seed_mask = ["fa", "roi"]
 n_seeds = [1, 2, 1000000, 2000000]
 
-# and here we mix the above lists, such that every subject is tried with
-# every mask and every number of seeds
+##########################################################################
+# The following function creates all the combinations of the above lists, such that every subject is
+# run with every mask and every number of seeds.
 args = list(itertools.product(subjects, seed_mask, n_seeds))
 
-# Use configparser to get the relevant hcp keys
-# Requires an hcp entry in your ~/.aws/credentials file
+##########################################################################
+# We assume that the credentials for HCP usage are stored in the home directory in a
+# `~/.aws/credentials` file. This is where these credentials are stored if the AWS CLI is used to
+# configure the profile. We use the standard lib ``configparser`` library
+# to get the relevant hcp keys from there.
 CP = configparser.ConfigParser()
 CP.read_file(open(op.join(op.expanduser('~'), '.aws', 'credentials')))
 CP.sections()
 aws_access_key = CP.get('hcp', 'AWS_ACCESS_KEY_ID')
 aws_secret_key = CP.get('hcp', 'AWS_SECRET_ACCESS_KEY')
 
-# This function will attach your keys to each list in a list of lists
+##########################################################################
+# The following function will attach your AWS keys to each list in a list of lists
 # We use this with each list being a list of arguments,
-# and we append the aws keys to each list of arguments.
+# and we append the AWS keys to each list of arguments, so that we can pass
+# them into the function to be used on AWS Batch to download the data into the
+# AWS Batch machines.
 
 
 def attach_keys(list_of_arg_lists):
@@ -120,13 +141,14 @@ def attach_keys(list_of_arg_lists):
     return new_list_of_arg_lists
 
 
-# here we attach the access keys to the argument list
+##########################################################################
+# This calls the function to attach the access keys to the argument list
 args = attach_keys(args)
 
-# define the knot to run your jobs on
-# this not bids for access to ec2 resources,
-# so its jobs are cheaper to run but may be evicted
-# installs pyAFQ from github
+##########################################################################
+# Define the :meth:`Knot` object to run your jobs on. See
+# `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
+# details about the arguments to the object.
 knot = ck.Knot(
     name='afq_hcp_tractography-201110-0',
     func=afq_process_subject,
@@ -135,27 +157,31 @@ knot = ck.Knot(
     pars_policies=('AmazonS3FullAccess',),
     bid_percentage=100)
 
-# launch a process for each combination
-# Because starmap is True, each list in args will be unfolded
-# and passed into afq_process_subject as arguments
+##########################################################################
+# This launches a process for each combination.
+# Because `starmap` is `True`, each list in `args` will be unfolded
+# and passed into `afq_process_subject` as arguments.
 result_futures = knot.map(args, starmap=True)
 
 ##########################################################################
-# this function can be called repeatedly in a jupyter notebook
-# to view the progress of jobs
-# knot.view_jobs()
+# The following function can be called repeatedly in a jupyter notebook
+# to view the progress of jobs::
+#
+#     knot.view_jobs()
+#
+# You can also view the status of a specific job::
+#
+#     knot.jobs[0].status
 
-# you can also view the status of a specific job
-# knot.jobs[0].status
 ##########################################################################
-
-# When all jobs are finished, remember to clobber the knot
-# either using the aws console or this function in jupyter notebook:
+# When all jobs are finished, remember to clobber the knot to destroy all the resources that were
+# created in AWS.
 result_futures.result()  # waits for futures to resolve, not needed in notebook
 knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 
-# we create another knot which takes the resulting profiles of each combination
-# and combines them into one csv file
+##########################################################################
+# We continue processing to create another knot which takes the resulting profiles of each
+# combination and combines them all into one csv file
 
 
 def afq_combine_profiles(seed_mask, n_seeds):
@@ -173,7 +199,8 @@ knot2 = ck.Knot(
     pars_policies=('AmazonS3FullAccess',),
     bid_percentage=100)
 
-# the args here are all the different configurations of pyAFQ that we ran
+##########################################################################
+# the arguments to this call to :meth:`map` are all the different configurations of pyAFQ that we ran
 seed_mask = ["fa", "roi"]
 n_seeds = [1, 2, 1000000, 2000000]
 args = list(itertools.product(seed_mask, n_seeds))
