@@ -33,6 +33,9 @@ def test_density_map():
     density_map = afv.density_map(sft)
     npt.assert_equal(int(np.sum(density_map.get_fdata())), 69)
 
+    density_map = afv.density_map(sft, normalize=True)
+    npt.assert_equal(density_map.get_fdata().max(), 1)
+
 
 def test_dice_coeff():
     affine = np.asarray([
