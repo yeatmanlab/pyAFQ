@@ -1490,7 +1490,7 @@ class AFQ(object):
                      volume=None,
                      xform_volume=False,
                      color_by_volume=None,
-                     cbv_lims=(None, None),
+                     cbv_lims=[None, None],
                      xform_color_by_volume=False,
                      n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1546,7 +1546,7 @@ class AFQ(object):
                   volume=None,
                   xform_volume=False,
                   color_by_volume=None,
-                  cbv_lims=(None, None),
+                  cbv_lims=[None, None],
                   xform_color_by_volume=False,
                   n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1920,7 +1920,7 @@ class AFQ(object):
                     volume=None,
                     xform_volume=False,
                     color_by_volume=None,
-                    cbv_lims=(None, None),
+                    cbv_lims=[None, None],
                     xform_color_by_volume=False,
                     n_points=40,
                     inline=False,
@@ -1943,7 +1943,7 @@ class AFQ(object):
                  volume=None,
                  xform_volume=False,
                  color_by_volume=None,
-                 cbv_lims=(None, None),
+                 cbv_lims=[None, None],
                  xform_color_by_volume=False,
                  n_points=40,
                  inline=False,

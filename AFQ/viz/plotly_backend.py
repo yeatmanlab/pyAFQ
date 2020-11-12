@@ -72,7 +72,7 @@ def set_layout(figure, color=None):
 
 
 def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=(None, None)):
+                      cbv_lims=[None, None]):
     color = np.asarray(color)
 
     plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
@@ -89,8 +89,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
     if cbv is not None:
         customdata = np.zeros(plotting_shape)
         line_color = np.zeros((plotting_shape, 3))
-        color_constant = (color / color.max()) * (1.4 /
-            (cbv_lims[1] - cbv_lims[0])) + cbv_lims[0]
+        color_constant = (color / color.max())\
+            * (1.4 / (cbv_lims[1] - cbv_lims[0])) + cbv_lims[0]
     else:
         customdata = np.zeros(plotting_shape)
         line_color = np.zeros((plotting_shape, 3))
@@ -150,7 +150,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=(None, None), figure=None,
+                      cbv_lims=[None, None], figure=None,
                       background=(1, 1, 1), interact=False,
                       inline=False):
     """
@@ -194,13 +194,13 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         is performed. Only works when using the plotly backend.
         Default: None
 
-    cbv_lims : tuple
+    cbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
         color_by_volume will only differentiate values within these bounds.
         If lower bound is None, will default to 0.
         If upper bound is None, will default to the maximum value in
         color_by_volume.
-        Default: (None, None)
+        Default: [None, None]
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
