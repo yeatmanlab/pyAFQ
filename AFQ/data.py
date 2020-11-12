@@ -2078,9 +2078,13 @@ def bundles_to_aal(bundles, atlas=None):
         "ARC_R": [['rightfrontal'], ['rightarctemp']]}
 
     targets = []
+    logger = logging.getLogger('AFQ.data')
     for bundle in bundles:
         targets.append([])
         if bundle not in endpoint_dict.keys():
+            logger.warning((
+                f"Endpoints not found for bundle {bundle}. "
+                f"Endpoint filtering will not be performed for this bundle."))
             targets[-1].append(None)
             targets[-1].append(None)
         else:
