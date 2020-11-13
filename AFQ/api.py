@@ -1490,6 +1490,7 @@ class AFQ(object):
                      volume=None,
                      xform_volume=False,
                      color_by_volume=None,
+                     cbv_lims=[None, None],
                      xform_color_by_volume=False,
                      n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1509,6 +1510,7 @@ class AFQ(object):
 
         figure = self.viz.visualize_bundles(bundles_file,
                                             color_by_volume=color_by_volume,
+                                            cbv_lims=cbv_lims,
                                             bundle_dict=self.bundle_dict,
                                             n_points=n_points,
                                             interact=interactive,
@@ -1544,6 +1546,7 @@ class AFQ(object):
                   volume=None,
                   xform_volume=False,
                   color_by_volume=None,
+                  cbv_lims=[None, None],
                   xform_color_by_volume=False,
                   n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1570,6 +1573,7 @@ class AFQ(object):
                 figure = self.viz.visualize_bundles(
                     bundles_file,
                     color_by_volume=color_by_volume,
+                    cbv_lims=cbv_lims,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
                     n_points=n_points,
@@ -1916,6 +1920,7 @@ class AFQ(object):
                     volume=None,
                     xform_volume=False,
                     color_by_volume=None,
+                    cbv_lims=[None, None],
                     xform_color_by_volume=False,
                     n_points=40,
                     inline=False,
@@ -1926,6 +1931,7 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
+            cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
             n_points=n_points,
             inline=inline,
@@ -1937,6 +1943,7 @@ class AFQ(object):
                  volume=None,
                  xform_volume=False,
                  color_by_volume=None,
+                 cbv_lims=[None, None],
                  xform_color_by_volume=False,
                  n_points=40,
                  inline=False,
@@ -1951,6 +1958,7 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
+            cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
             n_points=n_points)
 
