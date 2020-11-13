@@ -2085,11 +2085,18 @@ def bundles_to_aal(bundles, atlas=None):
     targets = []
     for bundle in bundles:
         targets.append([])
-        for region in endpoint_dict[bundle]:
-            if region is None:
-                targets[-1].append(None)
-            else:
-                targets[-1].append(aal_to_regions(region, atlas=atlas))
+
+        if (endpoint_dict.get(bundle)):
+            for region in endpoint_dict[bundle]:
+                if region is None:
+                    targets[-1].append(None)
+                else:
+                    targets[-1].append(aal_to_regions(region, atlas=atlas))
+        else:
+            logger = logging.getLogger('AFQ.data')
+            logger.warning(f"Segmentation end points undefined for {bundle},"
+                           + " continuing without end points")
+            targets[-1] = [None, None]
 
     return targets
 
