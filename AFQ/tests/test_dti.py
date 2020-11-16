@@ -11,11 +11,36 @@ import nibabel.tmpdirs as nbtmp
 from dipy.core.geometry import vector_norm
 import dipy.core.gradients as dpg
 import dipy.data as dpd
+from dipy.io.gradients import read_bvals_bvecs
 
+import AFQ.utils.models as ut
 from AFQ.models import dti
 from AFQ._fixes import in_place_norm
 from AFQ.utils.testing import make_dti_data
 
+
+def test_noise_from_b0():
+    out_shape = (5, 6, 7)
+    with nbtmp.InTemporaryDirectory() as tmpdir:
+        # make artificial dti data
+        fbval = op.join(tmpdir, 'dti.bval')
+        fbvec = op.join(tmpdir, 'dti.bvec')
+        fdata = op.join(tmpdir, 'dti.nii.gz')
+        make_dti_data(fbval, fbvec, fdata, out_shape=out_shape)
+
+        # make artifical mask
+        mask = np.ones(out_shape)
+        mask[0, 0, :] = 0
+
+        # load data and mask
+        bvals, bvecs = read_bvals_bvecs(fbval, fbvec)
+        img, data, gtab, mask = ut.prepare_data(
+            fdata, fbval, fbvec,
+            mask=mask, b0_threshold=50)
+
+        # test noise_from_b0
+        noise = dti.noise_from_b0(data, gtab, bvals, mask=mask)
+        npt.assert_almost_equal(noise, 0)
 
 def test_fit_dti():
     # Let's see whether we can pass a list of files for each one:

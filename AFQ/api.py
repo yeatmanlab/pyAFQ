@@ -16,12 +16,14 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.reconst import shm
+from dipy.reconst.dki_micro import axonal_water_fraction
 
 from bids.layout import BIDSLayout
 
 from .version import version as pyafq_version
 import AFQ.data as afd
 from AFQ.models.dti import _fit as dti_fit
+from AFQ.models.dti import noise_from_b0
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.csd import _fit as csd_fit
 import AFQ.tractography as aft
@@ -175,6 +177,7 @@ class AFQ(object):
                  dmriprep="all",
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
+                 robust_tensor_fitting=False,
                  min_bval=None,
                  max_bval=None,
                  reg_template="mni_T1",
@@ -219,6 +222,10 @@ class AFQ(object):
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
+        robust_tensor_fitting : bool, optional
+            [REGISTRATION] Whether to use robust_tensor_fitting when
+            doing dti. Only applies to dti.
+            Default: False
         min_bval : float, optional
             [REGISTRATION] Minimum b value you want to use
             from the dataset (other than b0), inclusive.
@@ -279,10 +286,13 @@ class AFQ(object):
             The parameters for segmentation.
             Default: use the default behavior of the seg.Segmentation object.
         tracking_params: dict, optional
-            The parameters for tracking.
-            Default: use the default behavior of the aft.track function.
-            Seed mask and seed threshold, if not specified, are replaced
-            with scalar masks from scalar[0] thresholded to 0.2.
+            The parameters for tracking. Default: use the default behavior of
+            the aft.track function. Seed mask and seed threshold, if not
+            specified, are replaced with scalar masks from scalar[0]
+            thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
+            this dict may be ``AFQ.mask.MaskFile`` instances. If ``tracker``
+            is set to "pft" then ``stop_mask`` should be an instance of
+            ``AFQ.mask.PFTMask``.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -305,6 +315,8 @@ class AFQ(object):
                 + " either a dict or None")
         if not isinstance(b0_threshold, int):
             raise TypeError("b0_threshold must be an int")
+        if not isinstance(robust_tensor_fitting, bool):
+            raise TypeError("robust_tensor_fitting must be a bool")
         if min_bval is not None and not isinstance(min_bval, int):
             raise TypeError("min_bval must be an int")
         if max_bval is not None and not isinstance(max_bval, int):
@@ -389,6 +401,7 @@ class AFQ(object):
             self.reg_algo = 'syn'
         self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
         self.b0_threshold = b0_threshold
+        self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
 
@@ -509,11 +522,17 @@ class AFQ(object):
                 if session is not None:
                     results_dir = op.join(results_dir, 'ses-' + session)
 
-                dwi_files = bids_layout.get(subject=subject, session=session,
-                                            extension='nii.gz',
-                                            return_type='filename',
-                                            scope=dmriprep,
-                                            **bids_filters)
+                dwi_bids_filters = {
+                    "subject": subject,
+                    "session": session,
+                    "return_type": "filename",
+                    "scope": dmriprep,
+                    "datatype": "dwi",
+                    "extension": "nii.gz",
+                    "suffix": "dwi",
+                }
+                dwi_bids_filters.update(bids_filters)
+                dwi_files = bids_layout.get(**dwi_bids_filters)
 
                 if (not len(dwi_files)):
                     self.logger.warning(
@@ -522,21 +541,23 @@ class AFQ(object):
                     continue
 
                 results_dir_list.append(results_dir)
-
                 os.makedirs(results_dir_list[-1], exist_ok=True)
-                dwi_file_list.append(dwi_files[0])
-                bvec_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bvec', 'bvecs'],
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
-                bval_file_list.append(
-                    bids_layout.get(subject=subject, session=session,
-                                    extension=['bval', 'bvals'],
-                                    return_type='filename',
-                                    scope=dmriprep,
-                                    **bids_filters)[0])
+
+                dwi_data_file = dwi_files[0]
+                dwi_file_list.append(dwi_data_file)
+
+                # For bvals and bvecs, use ``get_bval()`` and ``get_bvec()`` to
+                # walk up the file tree and inherit the closest bval and bvec
+                # files. Maintain input ``bids_filters`` in case user wants to
+                # specify acquisition labels, but pop suffix since it is
+                # already specified inside ``get_bvec()`` and ``get_bval()``
+                suffix = bids_filters.pop("suffix", None)
+                bvec_file_list.append(bids_layout.get_bvec(dwi_data_file,
+                                                           **bids_filters))
+                bval_file_list.append(bids_layout.get_bval(dwi_data_file,
+                                                           **bids_filters))
+                if suffix is not None:
+                    bids_filters["suffix"] = suffix
 
                 if custom_tractography_bids_filters is not None:
                     custom_tract_list.append(
@@ -554,15 +575,23 @@ class AFQ(object):
 
                 if isinstance(self.reg_subject, dict):
                     reg_subject_list.append(
-                        bids_layout.get(subject=subject, session=session,
-                                        return_type='filename',
-                                        **self.reg_subject)[0])
+                        bids_layout.get_nearest(
+                            dwi_data_file,
+                            **self.reg_subject,
+                            session=session,
+                            subject=subject,
+                            full_search=True,
+                            strict=True,
+                            ignore_strict_entities=["session"]
+                        )
+                    )
                 else:
                     reg_subject_list.append(None)
 
                 if check_mask_methods(self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
+                        dwi_data_file,
                         subject,
                         session
                     )
@@ -570,12 +599,14 @@ class AFQ(object):
                 if check_mask_methods(self.tracking_params["stop_mask"]):
                     self.tracking_params["stop_mask"].find_path(
                         bids_layout,
+                        dwi_data_file,
                         subject,
                         session
                     )
 
                 self.brain_mask_definition.find_path(
                     bids_layout,
+                    dwi_data_file,
                     subject,
                     session
                 )
@@ -670,7 +701,16 @@ class AFQ(object):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
-            dtf = dti_fit(gtab, data, mask=mask)
+
+            if self.robust_tensor_fitting:
+                bvals, bvecs = read_bvals_bvecs(
+                    row['bval_file'], row['bvec_file'])
+                sigma = noise_from_b0(
+                    data, gtab, bvals, mask=mask,
+                    b0_threshold=self.b0_threshold)
+            else:
+                sigma = None
+            dtf = dti_fit(gtab, data, mask=mask, sigma=sigma)
             self.log_and_save_nii(nib.Nifti1Image(dtf.model_params,
                                                   row['dwi_affine']),
                                   dti_params_file)
@@ -831,11 +871,24 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dki_md_file
 
+    def _dki_awf(self, row, sphere='repulsion100', gtol=1e-2):
+        dki_awf_file = self._get_fname(row, '_model-DKI_AWF.nii.gz')
+        if not op.exists(dki_awf_file):
+            dki_params = self._dki(row).get_fdata()
+            awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
+            nib.save(nib.Nifti1Image(awf, row['dwi_affine']),
+                     dki_awf_file)
+            meta_fname = self._get_fname(row, '_model-DKI_AWF.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_awf_file
+
     # Keep track of functions that compute scalars:
     _scalar_dict = {"dti_fa": _dti_fa,
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
-                    "dki_md": _dki_md}
+                    "dki_md": _dki_md,
+                    "dki_awf": _dki_awf}
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
@@ -1436,6 +1489,7 @@ class AFQ(object):
                      volume=None,
                      xform_volume=False,
                      color_by_volume=None,
+                     cbv_lims=[None, None],
                      xform_color_by_volume=False,
                      n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1455,6 +1509,7 @@ class AFQ(object):
 
         figure = self.viz.visualize_bundles(bundles_file,
                                             color_by_volume=color_by_volume,
+                                            cbv_lims=cbv_lims,
                                             bundle_dict=self.bundle_dict,
                                             n_points=n_points,
                                             interact=interactive,
@@ -1490,6 +1545,7 @@ class AFQ(object):
                   volume=None,
                   xform_volume=False,
                   color_by_volume=None,
+                  cbv_lims=[None, None],
                   xform_color_by_volume=False,
                   n_points=40):
         bundles_file = self._clean_bundles(row)
@@ -1516,6 +1572,7 @@ class AFQ(object):
                 figure = self.viz.visualize_bundles(
                     bundles_file,
                     color_by_volume=color_by_volume,
+                    cbv_lims=cbv_lims,
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
                     n_points=n_points,
@@ -1862,6 +1919,7 @@ class AFQ(object):
                     volume=None,
                     xform_volume=False,
                     color_by_volume=None,
+                    cbv_lims=[None, None],
                     xform_color_by_volume=False,
                     n_points=40,
                     inline=False,
@@ -1872,6 +1930,7 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
+            cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
             n_points=n_points,
             inline=inline,
@@ -1883,6 +1942,7 @@ class AFQ(object):
                  volume=None,
                  xform_volume=False,
                  color_by_volume=None,
+                 cbv_lims=[None, None],
                  xform_color_by_volume=False,
                  n_points=40,
                  inline=False,
@@ -1897,6 +1957,7 @@ class AFQ(object):
             volume=volume,
             xform_volume=xform_volume,
             color_by_volume=color_by_volume,
+            cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
             n_points=n_points)
 

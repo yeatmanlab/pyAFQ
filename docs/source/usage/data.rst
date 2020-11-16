@@ -41,6 +41,6 @@ data set in a directory called `stanford_hardi`::
     └── sub-01
         └── ses-01
             └── dwi
-                ├── sub-01_ses-01_dwi.bvals
-                ├── sub-01_ses-01_dwi.bvecs
+                ├── sub-01_ses-01_dwi.bval
+                ├── sub-01_ses-01_dwi.bvec
                 └── sub-01_ses-01_dwi.nii.gz

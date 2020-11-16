@@ -212,7 +212,18 @@ def test_bundles_to_aal():
         ],
     )
 
+    targets = afd.bundles_to_aal([], atlas)
+    assert len(targets) == 0
 
+    targets = afd.bundles_to_aal(["HCC_L"], atlas)
+    assert len(targets) == 1
+    npt.assert_equal(targets, [[None, None]])
+
+    targets = afd.bundles_to_aal(["VOF"], atlas)
+    assert len(targets) == 1
+    npt.assert_equal(targets, [[None, None]])
+
+    
 def test_read_roi():
     aff1 = np.eye(4)
     template = nib.Nifti1Image(np.ones((10, 10, 10)), aff1)

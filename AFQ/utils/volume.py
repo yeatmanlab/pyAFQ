@@ -51,7 +51,7 @@ def patch_up_roi(roi, bundle_name="ROI"):
         return hole_filled
 
 
-def density_map(tractogram, n_sls=None, to_vox=False):
+def density_map(tractogram, n_sls=None, to_vox=False, normalize=False):
     """
     Create a streamline density map.
     based on:
@@ -62,13 +62,17 @@ def density_map(tractogram, n_sls=None, to_vox=False):
     tractogram : StatefulTractogram
         Stateful tractogram whose streamlines are used to make
         the density map.
-    n_sls : int or None
+    n_sls : int or None, optional
         n_sls to randomly select to make the density map.
         If None, all streamlines are used.
         Default: None
-    to_vox : bool
+    to_vox : bool, optional
         Whether to put the stateful tractogram in VOX space before making
         the density map.
+        Default: False
+    normalize : bool, optional
+        Whether to normalize maximum values to 1.
+        Default: False
 
     Returns
     -------
@@ -83,6 +87,9 @@ def density_map(tractogram, n_sls=None, to_vox=False):
 
     affine, vol_dims, voxel_sizes, voxel_order = get_reference_info(tractogram)
     tractogram_density = dtu.density_map(sls, np.eye(4), vol_dims)
+    if normalize:
+        tractogram_density = tractogram_density / tractogram_density.max()
+
     nifti_header = create_nifti_header(affine, vol_dims, voxel_sizes)
     density_map_img = nib.Nifti1Image(tractogram_density, affine, nifti_header)
 
