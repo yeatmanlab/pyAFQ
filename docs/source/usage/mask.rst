@@ -8,15 +8,18 @@ just providing a path to a file, because each subject and each session will
 have a different mask. That is why we developed pyAFQ's Mask API. 
 
 Currently, there are three different masks that pyAFQ uses for tractometry:
+
 #. The brain mask. This is used to mask the dwi data and throwout any signal
    that is outside of the brain. It is typicall applied before fitting ODF
    models. By default, it is calculated using B0Mask().
+
 #. The tractography seed mask. This mask determines where tractography is
    seeded. If it is floating point, the mask is thresholded interally after
    interpolation using the seed_threshold parameter. This is reccomended.
    However, the seed mask can aslo be a binary mask. By default, the
    seed mask is ScalarMask(best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
+
 #. The tractography stop mask. This mask determines where tractography stops.
    If it is floating point, the mask is thresholded interally after
    interpolation using the stop_threshold parameter. This is reccomended.
@@ -28,17 +31,22 @@ In AFQ/mask.py, there are several mask classes one can use to specify masks.
 As a user, one should initialize mask classes and pass them to the AFQ object,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
+
 - MaskFile: The simplest mask class is MaskFile. If the mask you want to use
   is already generated, use this class. It is initialized using BIDS filters,
   which pyAFQ will use to find masks for each subject in each session.
+
 - FullMask: The FullMask class is used if one does not want to mask at all.
   This mask is True everywhere.
+
 - RoiMask: All ROIs are "logically or'd" together in subject space to create
   this mask. This is useful to provide as the seed mask. In segmentation,
   pyAFQ retains only streamlines that pass through the ROIs. So, for
   efficiency, one can choose to only seed in the ROIs in the first place.
+
 - B0Mask: This mask uses dipy's median_otsu on the subject's b0 to generate
   a mask. This is the default brain mask.
+
 - LabelledMaskFile: This mask is similar to MaskFile. It is also initialized
   using BIDS filters but instead expects to find a labelled segmentation file.
   In the initialization, the user also provides inclusive and exclusive
@@ -49,29 +57,34 @@ for use with the CLI.
   BIDS filters to some segmentation file, and also set exclusive_labels = [0].
   This will mark all labels that are not 0 as a part of the mask, and can
   be used as a brain mask.
+
 - ThresholdedMaskFile: This mask is similar to MaskFile. It allows the user to
   also provide a lower and upper bound. The bounds threshold the data from
   the file. Note that for the tractography seed and stop masks, thresholding
   should typically be done using the seed_threshold and stop_threshold
   parameters, not using an already thresholded mask.
+
 - ScalarMask: This mask is initialized only by specifying a scalar. Use this
   mask if you want a mask to be based on a scalar that pyAFQ already
   calculates, like "dti_fa" or "dti_md".
+
 - ThresholdedScalarMask: This mask is similar to ScalarMask. It allows the user to
   also provide a lower and upper bound. The bounds threshold the scalar data.
   Note that for the tractography seed and stop masks, thresholding
   should typically be done using the seed_threshold and stop_threshold
   parameters, not using an already thresholded mask.
+
 - PFTMask: A mask for specifying the segmentations used in PFT. Should only
   be used as a stop mask. It's three arguments are three other masks, which
   specify the three segmentations: white matter, gray matter, and
   corticospinal fluid.
+
 - CombinedMask: This class can be used to combine the other masks. It takes
   a list of masks and allows the user to specify whether they should be
   combined using a logical "and" or "or".
 
 You can refer to the
-`mask.py https://github.com/yeatmanlab/pyAFQ/blob/master/AFQ/mask.py`_
+`mask.py <https://github.com/yeatmanlab/pyAFQ/blob/master/AFQ/mask.py>`_
 file for details on how to initialize each class and for more examples. 
 
 Here is an example of using the RoiMask and LabelledMaskFile on the HCP
