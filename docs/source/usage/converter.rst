@@ -3,7 +3,7 @@ Matlab AFQ to Python AFQ conversion
 pyAFQ provides tools to convert between the results of the original Matlab
 based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.
 The functions we use to convert are in 
-`conversion.py https://github.com/yeatmanlab/pyAFQ/blob/master/AFQ/utils/conversion.py`_ . 
+`conversion.py <https://github.com/yeatmanlab/pyAFQ/blob/master/AFQ/utils/conversion.py>`_ . 
 
 To convert an mAFQ tractography file, use matlab_tractography. This function
 takes in a path to the mAFQ tractography file and a path to an image.
