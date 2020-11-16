@@ -30,4 +30,5 @@ The csv file has the same format as
     config
     viz_backend
     mask
+    converter
     tracking
