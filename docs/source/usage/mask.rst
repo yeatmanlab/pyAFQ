@@ -25,7 +25,7 @@ Currently, there are three different masks that pyAFQ uses for tractometry:
    based on valid scalars (typically "dti_fa"). 
 
 In AFQ/mask.py, there are several mask classes one can use to specify masks.
-As a user, one should initialize mask classes and pass them into the API,
+As a user, one should initialize mask classes and pass them to the AFQ object,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
 - MaskFile: The simplest mask class is MaskFile. If the mask you want to use
@@ -72,4 +72,37 @@ for use with the CLI.
 
 You can refer to the
 `mask.py https://github.com/yeatmanlab/pyAFQ/blob/master/AFQ/mask.py`_
-file for details on how to initialize each class and for examples. 
+file for details on how to initialize each class and for more examples. 
+
+Here is an example of using the RoiMask and LabelledMaskFile on the HCP
+data with the AFQ object::
+
+    from AFQ.data import fetch_hcp
+    import AFQ.api as api
+    import AFQ.mask as afm
+
+    # Download a subject to the AWS Batch machine from s3
+    _, hcp_bids = fetch_hcp(
+        [1],
+        profile_name=False,
+        study=f"HCP_1200")
+
+    # make 500,000 seeds randomly distributed in the ROIs
+    tracking_params = {
+        "seed_mask": afm.RoiMask(),
+        "n_seeds": 500000,
+        "random_seeds": True}
+
+    # use segmentation file from HCP to get a brain mask,
+    # where everything not labelled 0 is considered a part of the brain
+    brain_mask = afm.LabelledMaskFile(
+        'seg', {'scope': 'dmriprep'}, exclusive_labels=[0])
+
+    # define the api AFQ object
+    myafq = api.AFQ(
+        hcp_bids,
+        brain_mask=brain_mask,
+        tracking_params=tracking_params)
+
+    # export_all runs the entire pipeline and creates many useful derivates
+    myafq.export_all()
