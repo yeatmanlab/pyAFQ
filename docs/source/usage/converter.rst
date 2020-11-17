@@ -3,14 +3,14 @@ Matlab AFQ to Python AFQ conversion
 pyAFQ provides tools to convert between the results of the original Matlab
 based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.
 
-To convert an mAFQ tractography file, use :func:`matlab_tractography`. This function
+To convert an mAFQ tractography file, use :func:`AFQ.utils.conversion.matlab_tractography`. This function
 takes in a path to the mAFQ tractography file and a path to an image.
 The function returns a Dipy Stateful Tractogram using the image as reference.
 Here is an example::
     from AFQ.utils.conversion import matlab_tractography
     sft = matlab_tractography("WholeBrainFG-1106.mat", "sub-1106.dwi.nii.gz")
 
-To convert an mAFQ mori groups file, use :func:`matlab_mori_groups`. This function
+To convert an mAFQ mori groups file, use :func:`AFQ.utils.conversion.matlab_mori_groups`. This function
 takes in a path to the mAFQ mori groups file and a path to an image.
 The function returns a dictionary where keys are the pyAFQ bundle names and
 values are Dipy Stateful Tractograms using the image as reference. This is
