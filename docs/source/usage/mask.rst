@@ -11,20 +11,20 @@ Currently, there are three different masks that pyAFQ uses for tractometry:
 
 #. The brain mask. This is used to mask the dwi data and throwout any signal
    that is outside of the brain. It is typicall applied before fitting ODF
-   models. By default, it is calculated using :class:`B0Mask`.
+   models. By default, it is calculated using :class:`B0Masksss`.
 
 #. The tractography seed mask. This mask determines where tractography is
    seeded. If it is floating point, the mask is thresholded interally after
    interpolation using the seed_threshold parameter. This is reccomended.
    However, the seed mask can aslo be a binary mask. By default, the
-   seed mask is :class:`ScalarMask`(best_scalar) where best_scalar is chosen by the API
+   seed mask is :class:`AFQ.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 #. The tractography stop mask. This mask determines where tractography stops.
    If it is floating point, the mask is thresholded interally after
    interpolation using the stop_threshold parameter. This is reccomended.
    However, the stop mask can aslo be a binary mask. By default, the
-   stop mask is :class:`ScalarMask`(best_scalar) where best_scalar is chosen by the API
+   stop mask is :class:`mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 In AFQ/mask.py, there are several mask classes one can use to specify masks.
