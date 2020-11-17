@@ -491,8 +491,8 @@ class Segmentation:
         # For expedience, we approximate each streamline as a 100 point curve.
         # This is only used in extracting the values from the probability map,
         # so will not affect measurement of distance from the waypoint ROIs
-        fgarray = np.array(_resample_tg(tg, 100))
-        n_streamlines = fgarray.shape[0]
+        fgarray = _resample_tg(tg, 100)
+        n_streamlines = len(fgarray)
 
         streamlines_in_bundles = np.zeros(
             (n_streamlines, len(self.bundle_dict)))
