@@ -15,6 +15,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
 from bids.layout import BIDSLayout
@@ -25,7 +26,6 @@ from AFQ.models.dti import _fit as dti_fit
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.csd import _fit as csd_fit
-from AFQ.models.csd import fit_anisotropic_power_map
 import AFQ.tractography as aft
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.dki as dpy_dki
@@ -786,9 +786,8 @@ class AFQ(object):
             row, '_model-CSD_APM.nii.gz')
         if not op.exists(pmap_file):
             dwi_data, gtab, img = self._get_data_gtab(row)
-            mask = self._brain_mask(row)
-            pmap = fit_anisotropic_power_map(
-                dwi_data, gtab, mask)
+            sh_coeff = nib.load(self._csd(row)).get_fdata()
+            pmap = shm.anisotropic_power(sh_coeff)
             pmap = nib.Nifti1Image(pmap, img.affine)
             self.log_and_save_nii(pmap, pmap_file)
             meta_fname = self._get_fname(row, '_model-CSD_APM.json')
