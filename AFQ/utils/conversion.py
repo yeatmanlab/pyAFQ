@@ -1,7 +1,7 @@
 import numpy as np
 
 from tqdm import tqdm
-import h5py
+import scipy.io
 
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import nibabel as nib
@@ -18,16 +18,15 @@ class MatlabFileTracking():
     and the location of the streamlines in that h5py file.
     """
 
-    def __init__(self, mat_file, fg_ref):
-        self.mat_file = mat_file
+    def __init__(self, fg_ref):
         self.fg_ref = fg_ref
 
     def __iter__(self):
-        for i in tqdm(range(self.fg_ref.shape[1])):
-            yield self.mat_file[self.fg_ref[0, i]][:]
+        for i in tqdm(range(self.fg_ref.shape[0])):
+            yield np.transpose(self.fg_ref[i, 0])
 
 
-def matlab_tractography(mat_file, img_file):
+def matlab_tractography(mat_file, img):
     """
     Converts a matlab tractography file to a stateful tractogram.
 
@@ -35,23 +34,23 @@ def matlab_tractography(mat_file, img_file):
     ----------
     mat_file : str
         Path to a matlab tractography file.
-    img_file : str
-        Path to an img file to be loaded with nibabel and serve as
-        the reference for the stateful tractogram.
+    img : Nifti1Image or str
+        Path to an img file to be loaded with nibabel or an img
+        to serve as the reference for the stateful tractogram.
 
     Returns
     -------
     Dipy StatefulTractogram in RASMM space.
     """
-    mat_file = h5py.File(mat_file, 'r')
-    reference = nib.load(img_file)
+    mat_file = scipy.io.loadmat(mat_file)
+    if isinstance(img, str):
+        img = nib.load(img)
 
-    fg_ref = mat_file['fg']['fibers'][:]
-    tracker = MatlabFileTracking(mat_file, fg_ref)
-    return StatefulTractogram(tracker, reference, Space.RASMM)
+    tracker = MatlabFileTracking(mat_file['fg']['fibers'][0][0])
+    return StatefulTractogram(tracker, img, Space.RASMM)
 
 
-def matlab_mori_groups(mat_file, img_file):
+def matlab_mori_groups(mat_file, img):
     """
     Converts a matlab mori groups file to a dictionary of fiber groups.
     This dictionary is structured the same way as the results of pyAFQ
@@ -64,26 +63,26 @@ def matlab_mori_groups(mat_file, img_file):
     ----------
     mat_file : str
         Path to a matlab mori groups file.
-    img_file : str
-        Path to an img file to be loaded with nibabel and serve as
-        the reference for the stateful tractogram.
+    img : Nifti1Image or str
+        Path to an img file to be loaded with nibabel or an img
+        to serve as the reference for the stateful tractogram.
 
     Returns
     -------
     Dictionary where keys are the pyAFQ bundle names and values are
     Dipy StatefulTractograms in RASMM space.
     """
-    mat_file = h5py.File(mat_file, 'r')
-    reference = nib.load(img_file)
+    mat_file = scipy.io.loadmat(mat_file)
+    if isinstance(img, str):
+        img = nib.load(img)
 
     fiber_groups = {}
-    for i in range(mat_file["fg"]["name"].shape[0]):
-        name_data = mat_file[mat_file["fg"]["name"][i][0]]
-        name = ''.join(chr(i) for i in name_data[:])
+    for i in range(mat_file["fg"]["name"].shape[1]):
+        name = mat_file["fg"]["name"][0][i][0]
         if name in BUNDLE_MAT_2_PYTHON.keys():
-            bundle_ref = mat_file[mat_file["fg"]["fibers"][i][0]]
-            tracker = MatlabFileTracking(mat_file, bundle_ref)
+            bundle_ref = mat_file["fg"]["fibers"][0][i]
+            tracker = MatlabFileTracking(bundle_ref)
             fiber_groups[BUNDLE_MAT_2_PYTHON[name]] =\
-                StatefulTractogram(tracker, reference, Space.RASMM)
+                StatefulTractogram(tracker, img, Space.RASMM)
 
     return fiber_groups
