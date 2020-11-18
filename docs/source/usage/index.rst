@@ -29,4 +29,5 @@ The csv file has the same format as
     usage
     config
     viz_backend
+    mask
     tracking
