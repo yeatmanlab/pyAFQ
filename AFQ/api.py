@@ -1394,7 +1394,7 @@ class AFQ(object):
 
     def _export_sl_counts(self, row):
         total_file = self._streamlines(row)
-        total_sl = len(nib.streamlines.load(total_file).tractogram.streamlines)
+        total_sl = nib.streamlines.load(total_file).header["nb_streamlines"]
         sl_counts = []
         for func, folder in zip([self._clean_bundles, self._segment],
                                 ['clean_bundles', 'bundles']):
