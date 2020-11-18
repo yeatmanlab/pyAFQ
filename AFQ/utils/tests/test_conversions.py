@@ -4,9 +4,10 @@ import numpy.testing as npt
 import AFQ.data as afd
 from AFQ.utils.conversion import matlab_tractography, matlab_mori_groups
 
-import os
+import os.path as op
 
 DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "../../tests/data")
+
 
 def test_matlab_tractography():
     sft = matlab_tractography(
