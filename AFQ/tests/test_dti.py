@@ -59,22 +59,6 @@ def test_predict_dti():
                                 nib.load(fdata).get_fdata()[mask])
 
 
-def test_cli():
-    with nbtmp.InTemporaryDirectory() as tmpdir:
-        fbval = op.join(tmpdir, 'dti.bval')
-        fbvec = op.join(tmpdir, 'dti.bvec')
-        fdata = op.join(tmpdir, 'dti.nii.gz')
-        make_dti_data(fbval, fbvec, fdata)
-        cmd = " ".join(
-            ["pyAFQ_dti",
-             "-d", op.join(tmpdir, "dti.nii.gz"),
-             "-l", op.join(tmpdir, "dti.bval"),
-             "-c", op.join(tmpdir, "dti.bvec")])
-        out = os.system(cmd)
-        assert out ==  0
-        assert op.exists(op.join(tmpdir, 'dti', 'dti_params.nii.gz'))
-
-
 def test_inplace_norm():
     vec = [[8, 15, 0], [0, 36, 77]]
     norm1 = vector_norm(vec)
