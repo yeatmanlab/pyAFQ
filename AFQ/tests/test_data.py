@@ -63,7 +63,7 @@ def test_get_matching_s3_keys():
     fnames = []
     for pattern in ["**", "*/.*", "*/.*/.*", "*/.*/**"]:
         fnames += [
-            s for s in glob(op.join(DATA_PATH, pattern), recursive=True) if op.isfile(s)
+            s for s in glob(op.join(DATA_PATH, "ds" + pattern), recursive=True) if op.isfile(s)
         ]
 
     fnames = [s.replace(DATA_PATH + "/", "") for s in fnames]
