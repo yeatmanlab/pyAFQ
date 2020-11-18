@@ -98,46 +98,6 @@ myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                 segmentation_params={"seg_algo": "reco80"})
 
 ##########################################################################
-# Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
-# ------------------------------------------------------------------
-# The AFQ object holds a table with file names to various data derivatives.
-#
-# For example, the file where the FA computed from DTI is stored can be
-# retrieved by inspecting the ``dti_fa`` property. The measures are stored
-# in a series, and since we only have one subject and one session we will
-# access the first (and only) file name from the example data.
-#
-# .. note::
-#
-#    The AFQ API computes quantities lazily. This means that DTI parameters
-#    are not computed until they are required. This means that the first
-#    line below is the one that requires time.
-#
-# We will then use `nibabel` to load the deriviative file and retrieve the
-# data array.
-
-FA_fname = myafq.dti_fa[0]
-FA_img = nib.load(FA_fname)
-FA = FA_img.get_fdata()
-
-##########################################################################
-# Visualize the result with Matplotlib
-# -------------------------------------
-# At this point `FA` is an array, and we can use standard Python tools to
-# visualize it or perform additional computations with it.
-#
-# In this case we are going to take an axial slice halfway through the
-# FA data array and plot using a sequential color map.
-#
-# .. note::
-#
-#    The data array is structured as a xyz coordinate system.
-
-fig, ax = plt.subplots(1)
-ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
-ax.axis("off")
-
-##########################################################################
 # Visualizing bundles and tract profiles:
 # ---------------------------------------
 # The pyAFQ API provides several ways to visualize bundles and profiles.
@@ -164,15 +124,3 @@ ax.axis("off")
 
 bundle_html = myafq.viz_bundles(export=True, n_points=50)
 plotly.io.show(bundle_html[0])
-
-##########################################################################
-# We can also visualize the tract profiles in all of the bundles. These
-# plots show both FA (left) and MD (right) layed out anatomically.
-#
-
-myafq.plot_tract_profiles()
-fig_files = myafq.data_frame['tract_profiles_viz'][0]
-
-##########################################################################
-# .. figure:: {{ fig_files[0] }}
-#
