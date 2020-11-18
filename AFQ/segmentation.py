@@ -58,7 +58,7 @@ class Segmentation:
                  dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
-                 presegment_roi=False,
+                 presegment_bundle_dict=None,
                  presegment_kawrgs={},
                  filter_by_endpoints=True,
                  dist_to_atlas=4,
@@ -146,13 +146,18 @@ class Segmentation:
         return_idx : bool
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
-        presegment_roi : bool
-            Whether to presegment by ROIs before performing
+        presegment_bundle_dict : dict or None
+            If not None, presegment by ROIs before performing
             RecoBundles. Only used if seg_algo starts with 'Reco'.
-            Default: False
+            Meta-data for the segmentation. The format is something like::
+                {'name': {'ROIs':[img1, img2],
+                'rules':[True, True]},
+                'prob_map': img3,
+                'cross_midline': False}
+            Default: None
         presegment_kawrgs : dict
             Optional arguments for initializing the segmentation for the
-            presegment_roi. Only used if presegment_roi is True.
+            presegmentation. Only used if presegment_bundle_dict is not None.
             Default: {}
         filter_by_endpoints: bool
             Whether to filter the bundles based on their endpoints relative
@@ -198,7 +203,7 @@ class Segmentation:
         self.refine = refine
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
-        self.presegment_roi = presegment_roi
+        self.presegment_bundle_dict = presegment_bundle_dict
         self.presegment_kawrgs = presegment_kawrgs
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_atlas = dist_to_atlas
@@ -824,10 +829,10 @@ class Segmentation:
         # If doing a presegmentation based on ROIs then initialize
         # that segmentation and segment using ROIs, else
         # RecoBundles based on the whole brain tractogram
-        if self.presegment_roi:
+        if self.presegment_bundle_dict is not None:
             roiseg = Segmentation(**self.presegment_kawrgs)
             roiseg.segment(
-                    self.bundle_dict,
+                    self.presegment_bundle_dict,
                     self.tg,
                     self.fdata,
                     self.fbval,
@@ -847,7 +852,7 @@ class Segmentation:
             model_sl = self.bundle_dict[bundle]['sl']
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
-            if self.presegment_roi:
+            if self.presegment_bundle_dict is not None:
                 if self.presegment_kawrgs["return_idx"]:
                     indiv_tg = roiseg_fg[bundle]['sl']
                 else:

@@ -521,6 +521,15 @@ class AFQ(object):
             self.bundle_dict = bundle_info
 
         self.endpoint_info = endpoint_info
+        if isinstance(
+                self.segmentation_params["presegment_bundle_dict"], list):
+            self.segmentation_params["presegment_bundle_dict"] =\
+                make_bundle_dict(
+                    bundle_names=self.segmentation_params[
+                        "presegment_bundle_dict"],
+                    seg_algo="afq",
+                    resample_to=self.reg_template_img)
+
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
