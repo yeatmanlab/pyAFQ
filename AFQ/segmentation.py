@@ -853,7 +853,8 @@ class Segmentation:
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
-                if self.presegment_kawrgs["return_idx"]:
+                if "return_idx" in self.presegment_kawrgs\
+                        and self.presegment_kawrgs["return_idx"]:
                     indiv_tg = roiseg_fg[bundle]['sl']
                 else:
                     indiv_tg = roiseg_fg[bundle]
