@@ -3,7 +3,13 @@
 Plotting the Optic Radiations
 =============================
 
+pyAFQ is designed to be customizable. This example shows how
+you can customize it to define a new bundle based
+on both waypoint ROIs of your design, as well as endpoint
+ROIs of your design.
 
+For now, this is a hypothetical example, as we do not yet
+provide these ROIs as part of the software.
 """
 import os.path as op
 import matplotlib.pyplot as plt
@@ -112,6 +118,10 @@ else:
 ##########################################################################
 # Bundle specification
 # -------------------------------------------
+#
+# Here, a bundle specification is defined as a series of waypoint ROIs.
+# For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
+# exclusion ROIs.
 
 roi_folder = op.join(op.expanduser('~'), "AFQ_Data", "visual")
 waypoint_folder = op.join(roi_folder, "waypoint")
@@ -157,41 +167,13 @@ bundles = {
         }
     }
 
-endpoint_folder = op.join(roi_folder, "endpoint")
-
-# bundles = {
-#     "L_OR": {
-#         "ROIs": [nib.load(op.join(endpoint_folder,
-#                                        'left_thal_MNI.nii.gz')),
-#                  nib.load(op.join(endpoint_folder,
-#                                      'left_V1_MNI.nii.gz')),
-#                  waypoint_rois["left_OP_MNI"],
-#                  waypoint_rois["left_TP_MNI"],
-#                  waypoint_rois["left_pos_thal_MNI"]],
-#         "rules": [True, True, False, False, False],
-#         "cross_midline": False,
-#         "uid": 1
-#         },
-#     "R_OR": {
-#         "ROIs": [nib.load(op.join(endpoint_folder,
-#                                        'right_thal_MNI.nii.gz')),
-#                  nib.load(op.join(endpoint_folder,
-#                                      'right_V1_MNI.nii.gz')),
-#                  waypoint_rois["right_OP_MNI"],
-#                  waypoint_rois["right_TP_MNI"],
-#                  waypoint_rois["right_pos_thal_MNI"]],
-#         "rules": [True, True, False, False, False],
-#         "cross_midline": False,
-#         "uid": 2
-#         }
-#     }
-
-
-
-
 ##########################################################################
 # Endpoints
 # ----------
+# In addition to the waypoint ROIs, we will customize the endpoint ROIs
+# used for filtering the streamlines that are selected based on the
+# waypoint ROIs defined above.
+
 endpoint_folder = op.join(roi_folder, "endpoint")
 
 endpoint_spec = {
@@ -209,6 +191,9 @@ endpoint_spec = {
 ##########################################################################
 # Tracking
 # --------
+# We will use PFT and generate a large number of streamlines from seeds
+# placed only within the inclusion ROIs. This allows us to oversample that
+# part of the brain, without having to deal with very large tractograms.
 
 from dipy.data import get_fnames
 f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
@@ -270,11 +255,14 @@ else:
 
 sft.to_vox()
 
-
 ##########################################################################
 # Segmentation
 # ------------
-
+# We run the segmentation using both the ``bundles`` and the
+# ``endpoint_spec`` we defined above. In this particular case, we set a
+# rather lenient criterion for endpoint filtering, by changing from the
+# default value of ``dist_to_atlas`` (4 mm) to 5 mm.
+#
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
                                 dist_to_atlas=5)
@@ -293,6 +281,8 @@ fiber_groups = segmentation.fiber_groups
 ##########################################################################
 # Cleaning
 # --------
+# We proceed to clean outliers and save out trk files with the bundles.
+
 
 print("Cleaning fiber groups...")
 for bundle in bundles:
@@ -316,6 +306,7 @@ for bundle in bundles:
 ##########################################################################
 # Bundle profiles
 # ---------------
+# Finally, we can extract and plot bundle profiles.
 
 print("Extracting tract profiles...")
 for bundle in bundles:
