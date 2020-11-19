@@ -1706,8 +1706,8 @@ def organize_cfin_data(path=None):
         nib.save(t1_img, op.join(anat_folder, 'sub-01_ses-01_T1w.nii.gz'))
         dwi_img, gtab = dpd.read_cfin_dwi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvec'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bval'), gtab.bvals)
 
     to_bids_description(
         bids_path,
@@ -1743,8 +1743,8 @@ def organize_stanford_data(path=None):
             └── sub-01
                 └── ses-01
                     └── dwi
-                        ├── sub-01_ses-01_dwi.bvals
-                        ├── sub-01_ses-01_dwi.bvecs
+                        ├── sub-01_ses-01_dwi.bval
+                        ├── sub-01_ses-01_dwi.bvec
                         └── sub-01_ses-01_dwi.nii.gz
 
     """
@@ -1785,8 +1785,8 @@ def organize_stanford_data(path=None):
 
         dwi_img, gtab = dpd.read_stanford_hardi()
         nib.save(dwi_img, op.join(dwi_folder, 'sub-01_ses-01_dwi.nii.gz'))
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvecs'), gtab.bvecs)
-        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvals'), gtab.bvals)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bvec'), gtab.bvecs)
+        np.savetxt(op.join(dwi_folder, 'sub-01_ses-01_dwi.bval'), gtab.bvals)
     else:
         logger.info('Dataset is already in place. If you want to fetch it '
                     + 'again please first remove the folder '
@@ -2085,11 +2085,18 @@ def bundles_to_aal(bundles, atlas=None):
     targets = []
     for bundle in bundles:
         targets.append([])
-        for region in endpoint_dict[bundle]:
-            if region is None:
-                targets[-1].append(None)
-            else:
-                targets[-1].append(aal_to_regions(region, atlas=atlas))
+
+        if (endpoint_dict.get(bundle)):
+            for region in endpoint_dict[bundle]:
+                if region is None:
+                    targets[-1].append(None)
+                else:
+                    targets[-1].append(aal_to_regions(region, atlas=atlas))
+        else:
+            logger = logging.getLogger('AFQ.data')
+            logger.warning(f"Segmentation end points undefined for {bundle},"
+                           + " continuing without end points")
+            targets[-1] = [None, None]
 
     return targets
 
