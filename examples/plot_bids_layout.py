@@ -31,13 +31,19 @@ import nibabel as nib
 from AFQ import api
 import AFQ.data as afd
 
+
+##########################################################################
+# To interact with and query BIDS datasets, we use
+#  `pyBIDS <https://bids-standard.github.io/pybids/>`_.
+
 import bids
 
 
 ##########################################################################
 # We start with some example data. The data we will use here is
-# generated from the Stanford HARDI dataset
-# (https://purl.stanford.edu/ng782rw8378). The call below fetches
+# generated from the
+# `Stanford HARDI dataset <https://purl.stanford.edu/ng782rw8378>`_.
+# The call below fetches
 # this dataset and organized it within the `~/AFQ_data` folder in the BIDS
 # format.
 
