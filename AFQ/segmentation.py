@@ -984,7 +984,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
     if atlas is None and not (ep_is_idx and sp_is_idx):
         e_s = "Need to provide endpoint and startpoint as "
         e_s += "indices, or provide an atlas"
-        raise ValueError("Need to provide")
+        raise ValueError(e_s)
 
     if sp_is_idx:
         idxes0 = targets0
