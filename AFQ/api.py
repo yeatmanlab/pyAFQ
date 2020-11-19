@@ -490,8 +490,7 @@ class AFQ(object):
         # Initialize dataframe to store sl count information
         bundle_names = list(self.bundle_dict.keys())
         sl_count_df = pd.DataFrame(
-            data=[[0] * len(bundle_names),
-                  [0] * len(bundle_names)],
+            data=[[0, 0]] * len(bundle_names),
             index=bundle_names,
             columns=["n_streamlines", "n_clean_streamlines"])
 
