@@ -12,6 +12,7 @@ import IPython.display as display
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from tqdm.auto import tqdm
 
 import nibabel as nib
@@ -807,6 +808,12 @@ class GroupCSVComparison():
             self.bundles = bundles
         self.color_dict = gen_color_dict([*self.bundles, "median"])
 
+        # TODO: make these parameters
+        self.scalar_markers = ["o", "x"] 
+        self.patterns = (
+            None, '/', 'o', 'x', '-', '.',
+            '+', '//', '\\', '*', 'O', '|')
+
     def _threshold_scalar(self, bound, threshold, val):
         """
         Threshold scalars by a lower and upper bound.
@@ -1172,6 +1179,7 @@ class GroupCSVComparison():
                           ylims=[0.0, 1.0],
                           show_plots=False,
                           only_plot_above_thr=None,
+                          rotate_y_labels=False,
                           rtype="Reliability",
                           positions=POSITIONS):
         """
@@ -1200,6 +1208,10 @@ class GroupCSVComparison():
             Only plot bundles with intrersubject reliability above this
             threshold on the final reliability bar plots. If None, plot all.
             Default: None
+
+        rotate_y_labels : bool, optional
+            Rotate y labels on final reliability plots.
+            Default: False
 
         rtype : str, optional
             Type of reliability to name the y axis of the reliability bar
@@ -1294,8 +1306,9 @@ class GroupCSVComparison():
                     data=bundle_coefs,
                     bins=bins,
                     alpha=0.5,
+                    color=self.color_dict[bundle],
+                    hatch=self.patterns[m],
                     label=scalar,
-                    color=tableau_20_sns[m * 2],
                     ax=ax)
             ax.set_title(bundle, fontsize=large_font)
             ax.set_xlabel("Pearson's r", fontsize=medium_font)
@@ -1307,7 +1320,14 @@ class GroupCSVComparison():
                     (f"{names[0]}_vs_{names[1]}_profile_r_distributions"
                      f"_{bundle}")))
 
-        ba.fig.legend(display_scalar(scalars), loc='center', fontsize=medium_font)
+        legend_labels = []
+        for m, _ in enumerate(scalars):
+            legend_labels.append(Patch(
+                facecolor='k',
+                hatch=self.patterns[m]))
+        ba.fig.legend(
+            legend_labels, display_scalar(scalars),
+            loc='center', fontsize=medium_font)
         ba.format(disable_x=False)
         ba.fig.savefig(
             self._get_fname(
@@ -1369,29 +1389,37 @@ class GroupCSVComparison():
             else:
                 ba = BrainAxes(positions=positions)
             for k, bundle in enumerate(self.bundles):
-                this_sub_means = self._array_to_df(all_sub_means[m, k])
+                if twinning:
+                    fc = 'w'
+                    ec = self.color_dict[bundle]
+                else:
+                    fc = self.color_dict[bundle]
+                    ec = 'w'
                 ax = ba.get_axis(bundle)
                 sns.set(style="whitegrid")
-                sns.scatterplot(
-                    data=this_sub_means, x='x', y='y',
+                ax.scatter(
+                    all_sub_means[m, k, 0],
+                    all_sub_means[m, k, 1],
                     label=scalar,
-                    color=tableau_20_sns[m * 2],
+                    marker=self.scalar_markers[m-twinning],
+                    facecolors=fc,
+                    edgecolors=ec,
                     s=marker_size,
-                    legend=False,
-                    ax=ax)
+                    linewidth=1)
                 if twinning or twinning_next:
+                    twinning_color = 'k'
                     if twinning_next:
-                        ax.spines['bottom'].set_color(tableau_20_sns[m * 2])
-                        ax.spines['left'].set_color(tableau_20_sns[m * 2])
+                        ax.spines['bottom'].set_color(twinning_color)
+                        ax.spines['left'].set_color(twinning_color)
                     else:
-                        ax.spines['top'].set_color(tableau_20_sns[m * 2])
-                        ax.spines['right'].set_color(tableau_20_sns[m * 2])
-                    ax.xaxis.label.set_color(tableau_20_sns[m * 2])
-                    ax.tick_params(axis='x', colors=tableau_20_sns[m * 2])
-                    ax.xaxis.label.set_color(tableau_20_sns[m * 2])
-                    ax.yaxis.label.set_color(tableau_20_sns[m * 2])
-                    ax.tick_params(axis='y', colors=tableau_20_sns[m * 2])
-                    ax.yaxis.label.set_color(tableau_20_sns[m * 2])
+                        ax.spines['top'].set_color(twinning_color)
+                        ax.spines['right'].set_color(twinning_color)
+                    ax.xaxis.label.set_color(twinning_color)
+                    ax.tick_params(axis='x', colors=twinning_color)
+                    ax.xaxis.label.set_color(twinning_color)
+                    ax.yaxis.label.set_color(twinning_color)
+                    ax.tick_params(axis='y', colors=twinning_color)
+                    ax.yaxis.label.set_color(twinning_color)
                 if not twinning:
                     ax.set_title(bundle, fontsize=large_font)
                 ax.set_xlabel(names[0], fontsize=medium_font)
@@ -1406,12 +1434,26 @@ class GroupCSVComparison():
                         (f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"
                          f"_{bundle}")))
             if twinning:
+                legend_labels = [
+                    Line2D(
+                        [], [],
+                        markerfacecolor='k',
+                        markeredgecolor='w',
+                        marker=self.scalar_markers[0],
+                        linewidth=0,
+                        markersize=15),
+                    Line2D(
+                        [], [],
+                        markeredgecolor='k',
+                        markerfacecolor='w',
+                        marker=self.scalar_markers[0],
+                        linewidth=0,
+                        markersize=15)]
                 leg = ba.fig.legend(
-                    [scalars[0], scalars[1]],
+                    legend_labels,
+                    display_scalar(scalars),
                     loc='center',
                     fontsize=medium_font)
-                leg.legendHandles[0].set_color('C0')
-                leg.legendHandles[1].set_color('C1')
             elif not twinning_next:
                 ba.fig.legend([scalar], loc='center', fontsize=medium_font)
                 ba.fig.savefig(
@@ -1500,14 +1542,16 @@ class GroupCSVComparison():
                 width,
                 label=scalar,
                 yerr=bundle_prof_stds_removed[m],
-                color=tableau_20_sns[m*2])
+                hatch=self.patterns[m],
+                color=self.color_dict.values())
             axes[1].bar(
                 x + x_shift[m],
                 all_sub_coef_removed[m],
                 width,
                 label=scalar,
                 yerr=all_sub_coef_err_removed[:, :, m],
-                color=tableau_20_sns[m*2])
+                hatch=self.patterns[m],
+                color=self.color_dict.values())
 
         if len(updated_bundles) > 20:
             xaxis_font_size = small_font - 6
@@ -1519,6 +1563,9 @@ class GroupCSVComparison():
                            fontsize=medium_font)
         axes[0].set_ylim([mini, maxi])
         axes[0].set_xlabel("")
+        axes[0].set_yticklabels(
+            [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+            fontsize=small_font - 8)
         axes[0].set_xticks(x+1)
         axes[0].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
@@ -1527,6 +1574,9 @@ class GroupCSVComparison():
                            fontsize=medium_font)
         axes[1].set_ylim([mini, maxi])
         axes[1].set_xlabel("")
+        axes[1].set_yticklabels(
+            [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+            fontsize=small_font - 8)
         axes[1].set_xticks(x+1)
         axes[1].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
@@ -1538,12 +1588,18 @@ class GroupCSVComparison():
                  rotation=65,
                  horizontalalignment='right')
 
+        if rotate_y_labels:
+            plt.setp(axes[0].get_yticklabels(),
+                    rotation=90)
+            plt.setp(axes[1].get_yticklabels(),
+                    rotation=90)
+
         fig.tight_layout()
         legend_labels = []
         for m, _ in enumerate(scalars):
-            legend_labels.append(Line2D(
-                [], [],
-                color=tableau_20_sns[m * 2]))
+            legend_labels.append(Patch(
+                facecolor='k',
+                hatch=self.patterns[m]))
         fig.legend(
             legend_labels,
             display_scalar(scalars),
@@ -1606,9 +1662,6 @@ class GroupCSVComparison():
         -------
         Returns a Matplotlib figure and axes.
         """
-        # TODO: this should be user input, and have more entries by default
-        markers = ["o", "x"]
-
         fig, ax = plt.subplots()
         for i, scalar in enumerate(scalars):
             for j, bundle in enumerate(bundles):
@@ -1626,7 +1679,7 @@ class GroupCSVComparison():
                     reliability2[i, j],
                     s=marker_size,
                     c=[self.color_dict[bundle]],
-                    marker=markers[i]
+                    marker=self.scalar_markers[i]
                 )
                 ax.errorbar(
                     reliability1[i, j],
