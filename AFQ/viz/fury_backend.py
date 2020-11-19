@@ -291,19 +291,23 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
     image_actor_z.opacity(slicer_opacity)
 
     image_actor_x = image_actor_z.copy()
-    x_midpoint = int(np.round(shape[0] / 2))
-    image_actor_x.display_extent(x_midpoint,
-                                 x_midpoint, 0,
+    if x is None:
+        x = int(np.round(shape[0] / 2))
+    image_actor_x.display_extent(x,
+                                 x,
+                                 0,
                                  shape[1] - 1,
                                  0,
                                  shape[2] - 1)
 
     image_actor_y = image_actor_z.copy()
-    y_midpoint = int(np.round(shape[1] / 2))
+
+    if y is None:
+        y = int(np.round(shape[1] / 2))
     image_actor_y.display_extent(0,
                                  shape[0] - 1,
-                                 y_midpoint,
-                                 y_midpoint,
+                                 y,
+                                 y,
                                  0,
                                  shape[2] - 1)
 
