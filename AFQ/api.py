@@ -487,6 +487,14 @@ class AFQ(object):
             "Visualization": 0
         }
 
+        # Initialize dataframe to store sl count information
+        bundle_names = list(self.bundle_dict.keys())
+        sl_count_df = pd.DataFrame(
+            data=[[0] * len(bundle_names),
+                  [0] * len(bundle_names)],
+            index=bundle_names,
+            columns=["n_streamlines", "n_clean_streamlines"])
+
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
 
@@ -530,6 +538,7 @@ class AFQ(object):
         reg_subject_list = []
         timing_list = []
         results_dir_list = []
+        sl_counts_list = []
         for subject in self.subjects:
             for session in self.sessions:
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
@@ -629,6 +638,7 @@ class AFQ(object):
                 sub_list.append(subject)
                 ses_list.append(session)
                 timing_list.append(timing_dict.copy())
+                sl_counts_list.append(sl_count_df.copy())
 
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
@@ -638,6 +648,7 @@ class AFQ(object):
                                             reg_subject=reg_subject_list,
                                             ses=ses_list,
                                             timing=timing_list,
+                                            sl_counts=sl_counts_list,
                                             results_dir=results_dir_list))
 
         if dask_it:
@@ -1180,6 +1191,9 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
             row['timing']['Segmentation'] =\
                 row['timing']['Segmentation'] + time() - start_time
+            for bundle in self.bundle_dict.keys():
+                row["sl_counts"].at[bundle, "n_streamlines"] =\
+                    len(bundles[bundle].streamlines)
 
         return bundles_file
 
@@ -1225,6 +1239,9 @@ class AFQ(object):
                                        * [self.bundle_dict[b]['uid']])},
                             affine_to_rasmm=row['dwi_affine'])
                     tgram = aus.add_bundles(tgram, this_tgram)
+                    row["sl_counts"].at[b, "n_clean_streamlines"] =\
+                        len(this_tg.streamlines)
+
             self.log_and_save_trk(
                 StatefulTractogram(
                     tgram.streamlines,
@@ -1409,46 +1426,13 @@ class AFQ(object):
                     afd.write_json(meta_fname, meta)
 
     def _export_sl_counts(self, row):
-        total_file = self._streamlines(row)
-        total_sl = len(nib.streamlines.load(total_file).tractogram.streamlines)
-        sl_counts = []
-        for func, folder in zip([self._clean_bundles, self._segment],
-                                ['clean_bundles', 'bundles']):
-            sl_counts.append([])
-            bundles_file = func(row)
-            trk = nib.streamlines.load(bundles_file)
-            tg = trk.tractogram
-            streamlines = tg.streamlines
-            for bundle in self.bundle_dict:
-                if bundle != "whole_brain":
-                    uid = self.bundle_dict[bundle]['uid']
-                    idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
-                    this_sl = dtu.transform_tracking_output(
-                        streamlines[idx],
-                        np.linalg.inv(row['dwi_affine']))
-
-                    this_tgm = StatefulTractogram(this_sl, row['dwi_img'],
-                                                  Space.VOX)
-                    sl_counts[-1].append(len(this_tgm.streamlines))
-            sl_counts[-1].append(total_sl)
-
-        bundle_list = list(self.bundle_dict.keys())
-        if 'whole_brain' in bundle_list:
-            bundle_list.remove('whole_brain')
-        bundle_list.append("Total")
-
-        sl_counts = pd.DataFrame(
-            data=dict(bundle=bundle_list,
-                      n_streamlines=sl_counts[1],
-                      n_streamlines_cleaned=sl_counts[0]))
-
         sl_count_file = self._get_fname(
             row,
             '_sl_count.csv',
             include_track=True,
             include_seg=True)
 
-        sl_counts.to_csv(sl_count_file)
+        row["sl_counts"].to_csv(sl_count_file)
 
     def _viz_prepare_vol(self, row, vol, xform, mapping):
         if vol in self.scalars:
