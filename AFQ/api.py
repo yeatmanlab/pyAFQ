@@ -1252,8 +1252,16 @@ class AFQ(object):
 
             tgram = aus.bundles_to_tgram(bundles, self.bundle_dict, img)
             self.log_and_save_trk(tgram, bundles_file)
+
+            segmentation_params_out = {}
+            for arg_name, value in self.segmentation_params.items():
+                if isinstance(value, (int, float, bool, str))\
+                        or (value is None):
+                    segmentation_params_out[arg_name] = value
+                else:
+                    segmentation_params_out[arg_name] = str(value)
             meta = dict(source=streamlines_file,
-                        Parameters=self.segmentation_params)
+                        Parameters=segmentation_params_out)
             meta_fname = bundles_file.split('.')[0] + '.json'
             afd.write_json(meta_fname, meta)
             row['timing']['Segmentation'] =\
