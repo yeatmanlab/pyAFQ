@@ -55,10 +55,11 @@ class Segmentation:
                  pruning_thr=5,
                  b0_threshold=50,
                  prob_threshold=0,
+                 dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
                  filter_by_endpoints=True,
-                 dist_to_aal=4,
+                 dist_to_atlas=4,
                  save_intermediates=None):
         """
         Segment streamlines into bundles.
@@ -130,6 +131,11 @@ class Segmentation:
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
+        dist_to_waypoint : float.
+            The distance that a streamline node has to be from the waypoint
+            ROI in order to be included or excluded.
+            If set to None (default), will be calculated as the
+            center-to-corner distance of the voxel in the diffusion data.
         rng : RandomState or int
             If None, creates RandomState.
             If int, creates RandomState with seed rng.
@@ -142,9 +148,9 @@ class Segmentation:
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
-        dist_to_aal : float
-            If filter_by_endpoints is True, this is the distance from the
-            endpoints to the AAL atlas ROIs that is required.
+        dist_to_atlas : float
+            If filter_by_endpoints is True, this is the required distance
+            from the endpoints to the atlas ROIs.
         save_intermediates : str, optional
             The full path to a folder into which intermediate products
             are saved. Default: None, means no saving of intermediates.
@@ -172,6 +178,7 @@ class Segmentation:
             reg_algo = reg_algo.lower()
         self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
+        self.dist_to_waypoint = dist_to_waypoint
         self.b0_threshold = b0_threshold
         self.progressive = progressive
         self.greater_than = greater_than
@@ -182,7 +189,7 @@ class Segmentation:
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
         self.filter_by_endpoints = filter_by_endpoints
-        self.dist_to_aal = dist_to_aal
+        self.dist_to_atlas = dist_to_atlas
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -211,7 +218,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_tg_space=False):
+                reset_tg_space=False, endpoint_info=None):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -242,6 +249,15 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
+        endpoint_info : dict, optional. This overrides use of the
+            AAL atlas, which is the default behavior.
+            The format for this should be:
+            {"bundle1": {"startpoint":img1_1,
+                         "endpoint":img1_2},
+             "bundle2": {"startpoint":img2_1,
+                          "endpoint":img2_2}}
+            where the images used are binary masks of the desired
+            endpoints.
 
         Returns
         -------
@@ -282,9 +298,11 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.cross_streamlines()
+        self.endpoint_info = endpoint_info
 
         if self.seg_algo == "afq":
+            # We only care about midline crossing if we use AFQ:
+            self.cross_streamlines()
             fiber_groups = self.segment_afq()
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
@@ -504,25 +522,30 @@ class Segmentation:
             out_idx = np.arange(n_streamlines, dtype=int)
 
         if self.filter_by_endpoints:
-            aal_atlas = afd.read_aal_atlas(self.reg_template)
-            if self.save_intermediates is not None:
-                nib.save(
-                    aal_atlas['atlas'],
-                    op.join(self.save_intermediates,
-                            'AAL_registered_to_template.nii.gz'))
+            if self.endpoint_info is None:
+                aal_atlas = afd.read_aal_atlas(self.reg_template)
+                atlas = aal_atlas['atlas']
+                if self.save_intermediates is not None:
+                    nib.save(
+                        atlas,
+                        op.join(self.save_intermediates,
+                                'atlas_registered_to_template.nii.gz'))
 
-            aal_atlas = aal_atlas['atlas'].get_fdata()
+                atlas = atlas.get_fdata()
             # We need to calculate the size of a voxel, so we can transform
             # from mm to voxel units:
             R = self.img_affine[0:3, 0:3]
             vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
-            dist_to_aal = self.dist_to_aal / vox_dim
+            dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
         # because we are using the squared Euclidean distance in calls to
         # `cdist` to make those calls faster.
-        tol = dts.dist_to_corner(self.img_affine)**2
+        if self.dist_to_waypoint is None:
+            tol = dts.dist_to_corner(self.img_affine)**2
+        else:
+            tol = self.dist_to_waypoint ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
@@ -620,33 +643,64 @@ class Segmentation:
 
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
-                # Create binary masks and warp these into subject's DWI space:
-                aal_targets = afd.bundles_to_aal([bundle], atlas=aal_atlas)[0]
-                aal_idx = []
-                for targ in aal_targets:
-                    if targ is not None:
-                        aal_roi = np.zeros(aal_atlas.shape[:3])
-                        aal_roi[targ[:, 0], targ[:, 1], targ[:, 2]] = 1
-                        warped_roi = self.mapping.transform_inverse(
-                            aal_roi,
-                            interpolation='nearest')
-                        aal_idx.append(np.array(np.where(warped_roi > 0)).T)
-                    else:
-                        aal_idx.append(None)
-
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
+                if self.endpoint_info is not None:
+                    # We use definitions of endpoints provided
+                    # through this dict:
+                    start_p = self.endpoint_info[bundle]['startpoint']
+                    end_p = self.endpoint_info[bundle]['endpoint']
 
-                new_select_sl = clean_by_endpoints(select_sl,
-                                                   aal_idx[0],
-                                                   aal_idx[1],
-                                                   tol=dist_to_aal,
-                                                   return_idx=self.return_idx)
+                    atlas_idx = []
+                    for pp in [start_p, end_p]:
+                        pp = reg.resample(pp.get_fdata(),
+                                          self.reg_template,
+                                          pp.affine,
+                                          self.reg_template.affine)
+
+                        atlas_roi = np.zeros(pp.shape)
+                        atlas_roi[np.where(pp > 0)] = 1
+                        # Create binary masks and warp these into subject's
+                        # DWI space:
+                        warped_roi = self.mapping.transform_inverse(
+                            atlas_roi,
+                            interpolation='nearest')
+                        atlas_idx.append(
+                            np.array(np.where(warped_roi > 0)).T)
+                else:
+                    # We automatically fallback on AAL, which as its own
+                    # set of rules.
+                    aal_targets = afd.bundles_to_aal(
+                        [bundle], atlas=atlas)[0]
+                    atlas_idx = []
+                    for targ in aal_targets:
+                        if targ is not None:
+                            aal_roi = np.zeros(atlas.shape[:3])
+                            aal_roi[targ[:, 0],
+                                    targ[:, 1],
+                                    targ[:, 2]] = 1
+                            warped_roi = self.mapping.transform_inverse(
+                                aal_roi,
+                                interpolation='nearest')
+                            atlas_idx.append(
+                                np.array(np.where(warped_roi > 0)).T)
+                        else:
+                            atlas_idx.append(None)
+
+                new_select_sl = clean_by_endpoints(
+                    select_sl,
+                    atlas_idx[0],
+                    atlas_idx[1],
+                    tol=dist_to_atlas,
+                    return_idx=self.return_idx)
+
                 # Generate immediately:
                 new_select_sl = list(new_select_sl)
 
                 # We need to check this again:
                 if len(new_select_sl) == 0:
+                    self.logger.info("After filtering "
+                                     f"{len(select_sl)} streamlines")
                     # There's nothing here, set and move to the next bundle:
                     self._return_empty(bundle)
                     continue
@@ -928,7 +982,9 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                      and targets1.shape[1] == 3))
 
     if atlas is None and not (ep_is_idx and sp_is_idx):
-        raise ValueError()
+        e_s = "Need to provide endpoint and startpoint as "
+        e_s += "indices, or provide an atlas"
+        raise ValueError(e_s)
 
     if sp_is_idx:
         idxes0 = targets0
