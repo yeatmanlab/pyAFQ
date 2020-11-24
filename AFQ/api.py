@@ -489,8 +489,8 @@ class AFQ(object):
 
         # Initialize dataframe to store sl count information
         bundle_names = list(self.bundle_dict.keys())
-        if "whole_brain" in bundle_names:
-            bundle_names.remove("whole_brain")
+        if "whole_brain" not in bundle_names:
+            bundle_names.append("whole_brain")
         sl_count_df = pd.DataFrame(
             data=[[0, 0]] * len(bundle_names),
             index=bundle_names,
@@ -1196,7 +1196,10 @@ class AFQ(object):
                 if bundle != "whole_brain":
                     row["sl_counts"].at[bundle, "n_streamlines"] =\
                         len(bundles[bundle].streamlines)
-
+            row["sl_counts"].at["whole_brain", "n_streamlines"] =\
+                len(tg.streamlines)
+            row["sl_counts"].at["whole_brain", "n_clean_streamlines"] =\
+                len(tg.streamlines)
         return bundles_file
 
     def _clean_bundles(self, row):
