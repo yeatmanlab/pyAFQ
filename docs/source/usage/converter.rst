@@ -15,7 +15,7 @@ takes in a path to the mAFQ mori groups file and a path to an image.
 The function returns a dictionary where keys are the pyAFQ bundle names and
 values are DIPY :class:`StatefulTractogram` class instances using the image as reference. This is
 the same structure of the output of pyAFQ's segmentation. If one wants to
-convert this dictionary to a single Stateful Tractogram, use bundles_to_tgram.
+convert this dictionary to a single :class:`StatefulTractogram` object, use :func:`bundles_to_tgram`.
 Here is an example::
     from AFQ.utils.conversion import matlab_mori_groups
     fg = matlab_mori_groups("MoriGroups-1106.mat", "sub-1106.dwi.nii.gz")
