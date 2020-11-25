@@ -14,11 +14,13 @@ To convert an mAFQ mori groups file, use :func:`AFQ.utils.conversion.matlab_mori
 takes in a path to the mAFQ Mori groups file and a path to an image.
 The function returns a dictionary where keys are the pyAFQ bundle names and
 values are DIPY :class:`StatefulTractogram` class instances using the image as reference. This is
-the same structure of the output of pyAFQ's segmentation. If one wants to
-convert this dictionary to a single :class:`StatefulTractogram` object, use :func:`bundles_to_tgram`.
+the same structure of the output of pyAFQ's segmentation.
 Here is an example::
     from AFQ.utils.conversion import matlab_mori_groups
     fg = matlab_mori_groups("MoriGroups-1106.mat", "sub-1106.dwi.nii.gz")
+If one wants to
+convert this 'fg' dictionary to a single :class:`StatefulTractogram` object,
+use :func:`bundles_to_tgram`.
 
 Matlab tract profiles in the .csv format should already be compatible
 with pyAFQ, so there is no need for conversion.
