@@ -13,7 +13,7 @@ Here is an example::
 To convert an mAFQ mori groups file, use :func:`AFQ.utils.conversion.matlab_mori_groups`. This function
 takes in a path to the mAFQ mori groups file and a path to an image.
 The function returns a dictionary where keys are the pyAFQ bundle names and
-values are Dipy Stateful Tractograms using the image as reference. This is
+values are DIPY :class:`StatefulTractogram` class instances using the image as reference. This is
 the same structure of the output of pyAFQ's segmentation. If one wants to
 convert this dictionary to a single Stateful Tractogram, use bundles_to_tgram.
 Here is an example::
