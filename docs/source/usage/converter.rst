@@ -5,7 +5,7 @@ based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.
 
 To convert an mAFQ tractography file, use :func:`AFQ.utils.conversion.matlab_tractography`. This function
 takes in a path to the mAFQ tractography file and a path to an image.
-The function returns a Dipy Stateful Tractogram using the image as reference.
+The function returns a DIPY :class:`StatefulTractogram` class instance using the image as reference.
 Here is an example::
     from AFQ.utils.conversion import matlab_tractography
     sft = matlab_tractography("WholeBrainFG-1106.mat", "sub-1106.dwi.nii.gz")
