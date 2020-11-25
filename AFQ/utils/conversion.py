@@ -62,7 +62,7 @@ def matlab_mori_groups(mat_file, img):
     Parameters
     ----------
     mat_file : str
-        Path to a matlab mori groups file.
+        Path to a matlab Mori groups file.
     img : Nifti1Image or str
         Path to an img file to be loaded with nibabel or an img
         to serve as the reference for the stateful tractogram.
