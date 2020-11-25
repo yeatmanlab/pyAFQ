@@ -56,7 +56,7 @@ def matlab_mori_groups(mat_file, img):
     This dictionary is structured the same way as the results of pyAFQ
     segmentation. The keys are bundle names and the values are stateful
     tractograms.
-    If you want to merge this dictionary into one stateful tractogram,
+    If you want to merge this dictionary into one :class:`StatefulTractogram`,
     use bundles_to_tgram.
 
     Parameters
