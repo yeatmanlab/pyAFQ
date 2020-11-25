@@ -52,7 +52,7 @@ def matlab_tractography(mat_file, img):
 
 def matlab_mori_groups(mat_file, img):
     """
-    Converts a matlab mori groups file to a dictionary of fiber groups.
+    Converts a matlab Mori groups file to a dictionary of fiber groups.
     This dictionary is structured the same way as the results of pyAFQ
     segmentation. The keys are bundle names and the values are 
     :class:`StatefulTractogram` instances.
