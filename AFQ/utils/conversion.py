@@ -70,7 +70,7 @@ def matlab_mori_groups(mat_file, img):
     Returns
     -------
     Dictionary where keys are the pyAFQ bundle names and values are
-    Dipy StatefulTractograms in RASMM space.
+    DIPY :class:`StatefulTractogram` instances in RASMM space.
     """
     mat_file = scipy.io.loadmat(mat_file)
     if isinstance(img, str):
