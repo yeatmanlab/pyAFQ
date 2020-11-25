@@ -54,8 +54,8 @@ def matlab_mori_groups(mat_file, img):
     """
     Converts a matlab mori groups file to a dictionary of fiber groups.
     This dictionary is structured the same way as the results of pyAFQ
-    segmentation. The keys are bundle names and the values are stateful
-    tractograms.
+    segmentation. The keys are bundle names and the values are 
+    :class:`StatefulTractogram` instances.
     If you want to merge this dictionary into one :class:`StatefulTractogram`,
     use :func:`bundles_to_tgram`.
 
