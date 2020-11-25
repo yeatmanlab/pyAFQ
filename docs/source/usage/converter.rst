@@ -36,3 +36,6 @@ Here is an example custom_tractography_bids_filters::
     custom_tractography_bids_filters = {'scope': 'qsiprep', 'suffix': 'tractography'}
 This would look for a file with the suffix 'tractography' inside of the
 'qsiprep' derivatives folder.
+
+There is an example usage of custom_tractography_bids_filters with the
+:class:`AFQ.api.AFQ` object in the 'How pyAFQ uses BIDS' example in :ref:`examples`.
