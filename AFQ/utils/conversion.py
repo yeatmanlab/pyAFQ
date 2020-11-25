@@ -40,7 +40,7 @@ def matlab_tractography(mat_file, img):
 
     Returns
     -------
-    Dipy StatefulTractogram in RASMM space.
+    DIPY :class:`StatefulTractogram` in RASMM space.
     """
     mat_file = scipy.io.loadmat(mat_file)
     if isinstance(img, str):
