@@ -15,7 +15,7 @@ from uuid import uuid4
 import AFQ.data as afd
 import nibabel as nib
 
-DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "data")
+DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "data/mocks3")
 TEST_BUCKET = "test-bucket"
 TEST_DATASET = "ds000102-mimic"
 
@@ -63,7 +63,8 @@ def test_get_matching_s3_keys():
     fnames = []
     for pattern in ["**", "*/.*", "*/.*/.*", "*/.*/**"]:
         fnames += [
-            s for s in glob(op.join(DATA_PATH, pattern), recursive=True) if op.isfile(s)
+            s for s in glob(op.join(DATA_PATH, pattern),
+                            recursive=True) if op.isfile(s)
         ]
 
     fnames = [s.replace(DATA_PATH + "/", "") for s in fnames]
