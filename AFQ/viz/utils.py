@@ -505,6 +505,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         ylim=ylim,
         positions=positions,
         out_file=file_name,
+        plot_subject_lines=False,
         n_boot=n_boot)
 
     return df
@@ -980,15 +981,21 @@ class GroupCSVComparison():
         for j, bundle in enumerate(tqdm(self.bundles)):
             labels_temp = []
             for i, name in enumerate(names):
+                if i == 0:
+                    plot_kwargs = {
+                        "hue": "tractID",
+                        "palette": [self.color_dict[bundle]]}
+                else:
+                    plot_kwargs = {
+                        "dashes": [(2**(i-1), 2**(i-1))],
+                        "hue": "tractID",
+                        "palette": [self.color_dict[bundle]]}
                 profile = self.profile_dict[name]
                 profile = profile[profile['tractID'] == bundle]
                 ba.plot_line(
                     bundle, "nodeID", scalar, profile,
                     display_scalar(scalar), ylim, n_boot, self._alpha(0.6 + 0.2 * i),
-                    {
-                        "dashes": [(2**i, 2**i)],
-                        "hue": "tractID",
-                        "palette": [self.color_dict[bundle]]},
+                    plot_kwargs,
                     plot_subject_lines=plot_subject_lines)
                 if j == 0:
                     line = Line2D(
@@ -1003,7 +1010,8 @@ class GroupCSVComparison():
                 ba.temp_fig.legend(
                     labels_temp, names, fontsize=medium_font)
                 ba.save_temp_fig(f"{fname}_{bundle}")
-        ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
+        if len(names) > 1:
+            ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
         ba.format()
 
         ba.fig.savefig(fname)
@@ -1036,6 +1044,7 @@ class GroupCSVComparison():
 
     def contrast_index(self, names=None, scalar="dti_fa",
                        show_plots=False, n_boot=1000,
+                       show_legend=False,
                        positions=POSITIONS, plot_subject_lines=True):
         """
         Calculate the contrast index for each bundle in two datasets.
@@ -1060,6 +1069,10 @@ class GroupCSVComparison():
             to estimate the ci.
             Default: 1000
 
+        show_legend : bool, optional
+            Show legend in center with single entry denoting the scalar used.
+            Default: False
+
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
             Default: POSITIONS
@@ -1079,7 +1092,7 @@ class GroupCSVComparison():
             return None
 
         ba = BrainAxes(positions=positions)
-        ci_all_df = []
+        ci_all_df = {}
         for j, bundle in enumerate(tqdm(self.bundles)):
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
@@ -1087,12 +1100,13 @@ class GroupCSVComparison():
                 bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
-            ci_all_df.append(ci_df)
+            ci_all_df[bundle] = ci_df
             ba.save_temp_fig(
                 self._get_fname(
                     f"contrast_plots/{scalar}/",
                     f"{names[0]}_vs_{names[1]}_contrast_index_{bundle}"))
-        ba.fig.legend([scalar], loc='center', fontsize=medium_font)
+        if show_legend:
+            ba.fig.legend([scalar], loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
