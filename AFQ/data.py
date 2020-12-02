@@ -68,6 +68,8 @@ BUNDLE_RECO_2_AFQ = \
         "UF_L": "UNC_L", "UF_R": "UNC_R",
         "IFOF_L": "IFO_L", "IFOF_R": "IFO_R",
         "CST_L": "CST_L", "CST_R": "CST_R",
+        "ILF_L": "ILF_L", "ILF_R": "ILF_R",
+        "SLF_L": "SLF_L", "SLF_R": "SLF_R"
     }
 
 BUNDLE_MAT_2_PYTHON = \
