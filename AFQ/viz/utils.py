@@ -1344,7 +1344,6 @@ class GroupCSVComparison():
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
                 bundle_coefs = bundle_coefs[~np.isnan(bundle_coefs)]
-                print(bundle_coefs)
                 sns.set(style="whitegrid")
                 sns.histplot(
                     data=bundle_coefs,
@@ -1712,12 +1711,15 @@ class GroupCSVComparison():
         fig, ax = plt.subplots()
         for i, scalar in enumerate(scalars):
             for j, bundle in enumerate(bundles):
+                marker = self.scalar_markers[i]
+                if marker == "x":
+                    marker = marker.upper()
                 ax.scatter(
                     reliability1[i, j],
                     reliability2[i, j],
                     s=marker_size,
                     c=[self.color_dict[bundle]],
-                    marker=self.scalar_markers[i]
+                    marker=marker
                 )
                 if show_error:
                     if len(errors1.shape) > 2:
