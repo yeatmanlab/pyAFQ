@@ -53,6 +53,10 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
+CALLOSAL_BUNDLES = [
+    'AntFrontal', 'Motor', 'Occipital', 'Orbital', 'PostParietal',
+    'SupFrontal', 'SupParietal', 'Temporal']
+
 # See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
 
 RECO_BUNDLES_16 = [
@@ -131,6 +135,16 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
                         'rules': [True, True, False],
                         'prob_map': templates[name + hemi + '_prob_map'],
                         'cross_midline': False,
+                        'uid': uid}
+                    uid += 1
+            elif name in CALLOSAL_BUNDLES:
+                for hemi in ['_R', '_L']:
+                    afq_bundles["AntFrontal" + hemi] = {
+                        'ROIs': [callosal_templates["L_" + name],
+                                callosal_templates["R_" + name],
+                                callosal_templates["Callosum_midsag"]],
+                        'rules': [True, True, True],
+                        'cross_midline': True,
                         'uid': uid}
                     uid += 1
             else:
