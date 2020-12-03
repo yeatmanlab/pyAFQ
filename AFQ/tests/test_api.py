@@ -224,7 +224,7 @@ def test_AFQ_custom_tract():
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP", "AntFrontal"]
+    bundle_names = ["SLF", "ARC", "CST", "FP"]
 
     # move subsampled tractography into bids folder
     os.rename(
