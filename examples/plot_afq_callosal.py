@@ -2,8 +2,8 @@
 ==========================
 Calossal bundles using AFQ API
 ==========================
-An example using the AFQ API to find calossal bundles with the
-# TODO : find source of calossal bundles
+An example using the AFQ API to find calossal bundles using the templates from:
+http://hdl.handle.net/1773/34926
 """
 import os.path as op
 
