@@ -1,22 +1,4 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
-import logging
-from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
-from AFQ.utils.bin import get_default_args
-from AFQ.viz.utils import Viz, visualize_tract_profiles
-import AFQ.utils.volume as auv
-import AFQ.registration as reg
-import AFQ.segmentation as seg
-import AFQ.utils.streamlines as aus
-import dipy.reconst.dki as dpy_dki
-import dipy.reconst.dti as dpy_dti
-import AFQ.tractography as aft
-from AFQ.models.csd import _fit as csd_fit
-from AFQ.models.dki import _fit as dki_fit
-from AFQ.models.dti import noise_from_b0
-from AFQ.models.dti import _fit as dti_fit
-import AFQ.data as afd
-from .version import version as pyafq_version
-from bids.layout import BIDSLayout
 import pandas as pd
 import dask.dataframe as ddf
 import os
@@ -37,8 +19,27 @@ from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
 import bids
-bids.config.set_option('extension_initial_dot', True)
+from bids.layout import BIDSLayout
 
+from .version import version as pyafq_version
+import AFQ.data as afd
+from AFQ.models.dti import _fit as dti_fit
+from AFQ.models.dti import noise_from_b0
+from AFQ.models.dki import _fit as dki_fit
+from AFQ.models.csd import _fit as csd_fit
+import AFQ.tractography as aft
+import dipy.reconst.dti as dpy_dti
+import dipy.reconst.dki as dpy_dki
+import AFQ.utils.streamlines as aus
+import AFQ.segmentation as seg
+import AFQ.registration as reg
+import AFQ.utils.volume as auv
+from AFQ.viz.utils import Viz, visualize_tract_profiles
+from AFQ.utils.bin import get_default_args
+from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
+import logging
+
+bids.config.set_option('extension_initial_dot', True)
 logging.basicConfig(level=logging.INFO)
 
 
