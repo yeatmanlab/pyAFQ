@@ -9,8 +9,6 @@ An example using the AFQ API to run recobundles with the
 """
 import os.path as op
 
-import matplotlib.pyplot as plt
-import nibabel as nib
 import plotly
 
 from AFQ import api
