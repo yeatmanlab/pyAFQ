@@ -19,7 +19,6 @@ from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
 import bids
-bids.config.set_option('extension_initial_dot', True)
 from bids.layout import BIDSLayout
 
 from .version import version as pyafq_version
@@ -39,6 +38,8 @@ from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
 from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
 import logging
+
+bids.config.set_option('extension_initial_dot', True)
 logging.basicConfig(level=logging.INFO)
 
 
@@ -600,16 +601,12 @@ class AFQ(object):
 
                 if isinstance(self.reg_subject, dict):
                     reg_subject_list.append(
-                        bids_layout.get_nearest(
-                            dwi_data_file,
+                        bids_layout.get(
                             **self.reg_subject,
                             session=session,
                             subject=subject,
-                            full_search=True,
-                            strict=True,
-                            ignore_strict_entities=["session"]
-                        )
-                    )
+                            return_type='filename'
+                        )[0])
                 else:
                     reg_subject_list.append(None)
 
