@@ -32,7 +32,7 @@ afd.organize_stanford_data()
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                bundle_info=api.BUNDLES + api.CALLOSAL_BUNDLES)
+                bundle_info=api.BUNDLES + api.CALLOSUM_BUNDLES)
 
 ##########################################################################
 # Visualizing bundles and tract profiles:
