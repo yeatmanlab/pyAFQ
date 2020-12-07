@@ -672,12 +672,12 @@ class GroupCSVComparison():
 
     def __init__(self, out_folder, csv_fnames, names, is_special="",
                  subjects=None,
-                 scalar_bounds={'lb': {'dti_fa': 0.2},
-                                'ub': {'dti_md': 0.002}},
+                 scalar_bounds={'lb': {'FA': 0.2},
+                                'ub': {'MD': 0.002}},
                  bundles=None,
                  percent_nan_tol=10,
                  percent_edges_removed=10,
-                 remove_model=False,
+                 remove_model=True,
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON,
@@ -713,7 +713,7 @@ class GroupCSVComparison():
             series of scalar / threshold pairs used as a white-matter mask
             on the profiles (any values outside of the threshold will be
             marked NaN and not used or set to 0, depending on the case).
-            Default: {'lb': {'dti_fa': 0.2}, 'ub': {'dti_md': 0.002}}
+            Default: {'lb': {'FA': 0.2}, 'ub': {'MD': 0.002}}
 
         bundles : list of strings, optional
             Bundles to compare.
@@ -739,7 +739,7 @@ class GroupCSVComparison():
         remove_model : bool, optional
             Whether to remove prefix of scalars which specify model
             i.e., dti_fa => FA.
-            Default: False
+            Default: True
 
         mat_bundle_converter : dictionary, optional
             Dictionary that maps matlab bundle names to python bundle names.
