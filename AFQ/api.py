@@ -898,7 +898,7 @@ class AFQ(object):
     def _dki_awf(self, row, sphere='repulsion100', gtol=1e-2):
         dki_awf_file = self._get_fname(row, '_model-DKI_AWF.nii.gz')
         if not op.exists(dki_awf_file):
-            dki_params = self._dki(row).get_fdata()
+            dki_params = nib.load(self._dki(row)).get_fdata()
             awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
             nib.save(nib.Nifti1Image(awf, row['dwi_affine']),
                      dki_awf_file)
