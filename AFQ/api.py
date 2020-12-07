@@ -151,8 +151,8 @@ def make_bundle_dict(bundle_names=BUNDLES,
             else:
                 for hemi in ['_R', '_L']:
                     if (templates.get(name + '_roi1' + hemi)
-                        and templates.get(name + '_roi2' + hemi)
-                        and templates.get(name + hemi + '_prob_map')):
+                            and templates.get(name + '_roi2' + hemi)
+                            and templates.get(name + hemi + '_prob_map')):
                         afq_bundles[name + hemi] = {
                             'ROIs': [templates[name + '_roi1' + hemi],
                                      templates[name + '_roi2' + hemi]],
