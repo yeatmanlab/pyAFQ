@@ -24,6 +24,19 @@ import AFQ.data as afd
 afd.organize_stanford_data()
 
 ##########################################################################
+# Set tractography parameters (optional)
+# ---------------------
+# We make this tracking_params which we will pass to the AFQ object
+# which specifies that we want 50,000 seeds randomly distributed
+# in the white matter.
+#
+# We only do this to make this example faster and consume less space.
+
+tracking_params = dict(n_seeds=50000,
+                       random_seeds=True,
+                       rng_seed=42)
+
+##########################################################################
 # Initialize an AFQ object:
 # -------------------------
 #
@@ -34,7 +47,8 @@ afd.organize_stanford_data()
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                segmentation_params={"seg_algo": "reco80"})
+                segmentation_params={"seg_algo": "reco80"},
+                tracking_params=tracking_params)
 
 ##########################################################################
 # Visualizing bundles and tract profiles:

@@ -10,6 +10,7 @@ import os.path as op
 import plotly
 
 from AFQ import api
+from AFQ.mask import RoiMask
 import AFQ.data as afd
 
 ##########################################################################
@@ -22,6 +23,20 @@ import AFQ.data as afd
 afd.organize_stanford_data()
 
 ##########################################################################
+# Set tractography parameters (optional)
+# ---------------------
+# We make this tracking_params which we will pass to the AFQ object
+# which specifies that we want 100,000 seeds randomly distributed
+# in the ROIs of every bundle.
+#
+# We only do this to make this example faster and consume less space.
+
+tracking_params = dict(seed_mask=RoiMask(),
+                       n_seeds=10000,
+                       random_seeds=True,
+                       rng_seed=42)
+
+##########################################################################
 # Initialize an AFQ object:
 # -------------------------
 #
@@ -32,7 +47,8 @@ afd.organize_stanford_data()
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                bundle_info=api.BUNDLES + api.CALLOSUM_BUNDLES)
+                bundle_info=api.BUNDLES + api.CALLOSUM_BUNDLES,
+                tracking_params=tracking_params)
 
 ##########################################################################
 # Visualizing bundles and tract profiles:
