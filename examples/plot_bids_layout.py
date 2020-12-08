@@ -47,7 +47,7 @@ import bids
 # this dataset and organized it within the `~/AFQ_data` folder in the BIDS
 # format.
 
-afd.organize_stanford_data()
+afd.organize_stanford_data(clear_previous_afq=True)
 
 ##########################################################################
 # After doing that, we should have a folder that looks like this:
