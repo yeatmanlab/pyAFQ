@@ -907,12 +907,25 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dki_awf_file
 
+    def _dki_mk(self, row):
+        dki_mk_file = self._get_fname(row, '_model-DKI_MK.nii.gz')
+        if not op.exists(dki_mk_file):
+            tf = self._dki_fit(row)
+            mk = tf.mk()
+            nib.save(nib.Nifti1Image(mk, row['dwi_affine']),
+                     dki_mk_file)
+            meta_fname = self._get_fname(row, '_model-DKI_MK.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_mk_file
+
     # Keep track of functions that compute scalars:
     _scalar_dict = {"dti_fa": _dti_fa,
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md,
-                    "dki_awf": _dki_awf}
+                    "dki_awf": _dki_awf,
+                    "dki_mk": _dki_mk}
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
