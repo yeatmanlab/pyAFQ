@@ -1823,6 +1823,18 @@ class AFQ(object):
 
     dki = property(get_dki, set_dki)
 
+    def set_dki_mk(self):
+        if 'dki_mk_file' not in self.data_frame.columns:
+            self.data_frame['dki_mk_file'] =\
+                self.data_frame.apply(self._dki_mk,
+                                      axis=1)
+
+    def get_dki_mk(self):
+        self.set_dki_mk()
+        return self.data_frame['dki_mk_file']
+
+    dki_mk = property(get_dki_mk, set_dki_mk)
+
     def set_dki_fa(self):
         if 'dki_fa_file' not in self.data_frame.columns:
             self.data_frame['dki_fa_file'] =\
@@ -1846,6 +1858,18 @@ class AFQ(object):
         return self.data_frame['dki_md_file']
 
     dki_md = property(get_dki_md, set_dki_md)
+
+    def set_dki_awf(self):
+        if 'dki_awf_file' not in self.data_frame.columns:
+            self.data_frame['dki_awf_file'] =\
+                self.data_frame.apply(self._dki_awf,
+                                      axis=1)
+
+    def get_dki_awf(self):
+        self.set_dki_awf()
+        return self.data_frame['dki_awf_file']
+
+    dki_awf = property(get_dki_awf, set_dki_awf)
 
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
