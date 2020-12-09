@@ -100,7 +100,20 @@ def make_bundle_dict(bundle_names=BUNDLES,
         If set, templates will be resampled to the affine and shape of this
         image.
     """
+    logger = logging.getLogger('AFQ.api')
     if seg_algo == "afq":
+        if "FP" in bundle_names and "Occipital" in bundle_names:
+            logger.warning((
+                f"FP and Occipital bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only Occipital will be used."))
+            bundle_names.remove("FP")
+        if "FA" in bundle_names and "Orbital" in bundle_names:
+            logger.warning((
+                f"FA and Orbital bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only Orbital will be used."))
+            bundle_names.remove("FA")
         templates = afd.read_templates(resample_to=resample_to)
         callosal_templates = afd.read_callosum_templates(
             resample_to=resample_to)
@@ -161,7 +174,6 @@ def make_bundle_dict(bundle_names=BUNDLES,
                             'cross_midline': False,
                             'uid': uid}
                     else:
-                        logger = logging.getLogger('AFQ.api')
                         logger.warning(f"{name} is not in AFQ templates")
 
                     uid += 1
