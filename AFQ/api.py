@@ -114,6 +114,12 @@ def make_bundle_dict(bundle_names=BUNDLES,
                 f" assigns each streamline to only one bundle."
                 f" Only Orbital will be used."))
             bundle_names.remove("FA")
+        if "FA" in bundle_names and "AntFrontal" in bundle_names:
+            logger.warning((
+                f"FA and AntFrontal bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only AntFrontal will be used."))
+            bundle_names.remove("FA")
         templates = afd.read_templates(resample_to=resample_to)
         callosal_templates = afd.read_callosum_templates(
             resample_to=resample_to)
