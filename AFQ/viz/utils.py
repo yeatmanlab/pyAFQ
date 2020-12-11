@@ -500,6 +500,7 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         None,
         [tract_profiles],
         ["my_tract_profiles"],
+        remove_model=False,
         scalar_bounds={'lb': {}, 'ub': {}})
 
     df = csv_comparison.tract_profiles(
@@ -933,7 +934,7 @@ class GroupCSVComparison():
             return np.nan
         return np.corrcoef(arr[:, mask])[0][1]
 
-    def tract_profiles(self, names=None, scalar="dti_fa",
+    def tract_profiles(self, names=None, scalar="FA",
                        ylim=[0.0, 1.0],
                        show_plots=False,
                        positions=POSITIONS,
@@ -953,7 +954,7 @@ class GroupCSVComparison():
             Default: None
 
         scalar : string, optional
-            Scalar to use in plots. Default: "dti_fa".
+            Scalar to use in plots. Default: "FA".
 
         ylim : list of 2 floats, optional
             Minimum and maximum value used for y-axis bounds.
@@ -1060,7 +1061,7 @@ class GroupCSVComparison():
                         ignore_index=True)
         return ci_df
 
-    def contrast_index(self, names=None, scalar="dti_fa",
+    def contrast_index(self, names=None, scalar="FA",
                        show_plots=False, n_boot=1000,
                        show_legend=False,
                        positions=POSITIONS, plot_subject_lines=True):
@@ -1076,7 +1077,7 @@ class GroupCSVComparison():
             Default: None
 
         scalar : string, optional
-            Scalar to use for the contrast index. Default: "dti_fa".
+            Scalar to use for the contrast index. Default: "FA".
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -1135,7 +1136,7 @@ class GroupCSVComparison():
             plt.ion()
         return ci_all_df
 
-    def lateral_contrast_index(self, name, scalar="dti_fa",
+    def lateral_contrast_index(self, name, scalar="FA",
                                show_plots=False, n_boot=1000,
                                positions=POSITIONS, plot_subject_lines=True):
         """
@@ -1148,7 +1149,7 @@ class GroupCSVComparison():
             Names of dataset to plot profiles of.
 
         scalar : string, optional
-            Scalar to use for the contrast index. Default: "dti_fa".
+            Scalar to use for the contrast index. Default: "FA".
 
         show_plots : bool, optional
             Whether to show plots if in an interactive environment.
@@ -1207,7 +1208,7 @@ class GroupCSVComparison():
             plt.ion()
 
     def reliability_plots(self, names=None,
-                          scalars=["dti_fa", "dti_md"],
+                          scalars=["FA", "MD"],
                           ylims=[0.0, 1.0],
                           show_plots=False,
                           only_plot_above_thr=None,
@@ -1226,7 +1227,7 @@ class GroupCSVComparison():
             Default: None
 
         scalars : list of strings, optional
-            Scalars to correlate. Default: ["dti_fa", "dti_md"].
+            Scalars to correlate. Default: ["FA", "MD"].
 
         ylims : 2-tuple of floats, optional
             Limits of the y-axis. Useful to synchronize axes across graphs.
@@ -1665,7 +1666,8 @@ class GroupCSVComparison():
                             errors1=None, errors2=None,
                             scalars=["FA", "MD"],
                             rtype="Subject Reliability",
-                            show_plots=False):
+                            show_plots=False,
+                            show_legend=True):
         """
         Plot a comparison of scan-rescan reliability between two analyses.
 
@@ -1703,17 +1705,22 @@ class GroupCSVComparison():
             Whether to show plots if in an interactive environment.
             Default: False
 
+        show_legend : bool, optional
+            Show legend for the plot, off to the right hand side.
+            Default: True
+
         Returns
         -------
         Returns a Matplotlib figure and axes.
         """
         show_error = ((errors1 is not None) and (errors2 is not None))
         fig, ax = plt.subplots()
+        legend_labels = []
         for i, scalar in enumerate(scalars):
+            marker = self.scalar_markers[i]
+            if marker == "x":
+                marker = marker.upper()
             for j, bundle in enumerate(bundles):
-                marker = self.scalar_markers[i]
-                if marker == "x":
-                    marker = marker.upper()
                 ax.scatter(
                     reliability1[i, j],
                     reliability2[i, j],
@@ -1740,6 +1747,17 @@ class GroupCSVComparison():
                         alpha=0.5,
                         fmt="none"
                     )
+                if i == 0:
+                    legend_labels.append(Patch(
+                        facecolor=self.color_dict[bundle],
+                        label=bundle))
+            legend_labels.append(Line2D(
+                [0], [0],
+                marker=marker,
+                color='k',
+                lw=0,
+                markersize=10,
+                label=scalar))
 
         ax.set_xlabel(f"{analysis_label1} {rtype}",
                       fontsize=medium_font)
@@ -1751,9 +1769,15 @@ class GroupCSVComparison():
             axis='y', which='major', labelsize=medium_font)
         ax.set_ylim(0.2, 1)
         ax.set_xlim(0.2, 1)
-        plt.legend(loc="lower left", ncol=7, bbox_to_anchor=(0., -0.8))
-        ax.plot([[0, 0], [1, 1]], [[0, 0], [1, 1]], '--')
-
+        ax.plot([[0, 0], [1, 1]], [[0, 0], [1, 1]], '--', color='red')
+        legend_labels.append(Line2D(
+            [0], [0], linewidth=3, linestyle='--', color='red', label='X=Y'))
+        if show_legend:
+            fig.legend(
+                handles=legend_labels,
+                fontsize=small_font - 6,
+                bbox_to_anchor=(1.5, 2.0))
+            fig.tight_layout()
         return fig, ax
 
 
