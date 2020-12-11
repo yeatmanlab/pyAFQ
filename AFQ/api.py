@@ -898,7 +898,7 @@ class AFQ(object):
     def _dki_awf(self, row, sphere='repulsion100', gtol=1e-2):
         dki_awf_file = self._get_fname(row, '_model-DKI_AWF.nii.gz')
         if not op.exists(dki_awf_file):
-            dki_params = self._dki(row).get_fdata()
+            dki_params = nib.load(self._dki(row)).get_fdata()
             awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
             nib.save(nib.Nifti1Image(awf, row['dwi_affine']),
                      dki_awf_file)
@@ -907,12 +907,25 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return dki_awf_file
 
+    def _dki_mk(self, row):
+        dki_mk_file = self._get_fname(row, '_model-DKI_MK.nii.gz')
+        if not op.exists(dki_mk_file):
+            tf = self._dki_fit(row)
+            mk = tf.mk()
+            nib.save(nib.Nifti1Image(mk, row['dwi_affine']),
+                     dki_mk_file)
+            meta_fname = self._get_fname(row, '_model-DKI_MK.json')
+            meta = dict()
+            afd.write_json(meta_fname, meta)
+        return dki_mk_file
+
     # Keep track of functions that compute scalars:
     _scalar_dict = {"dti_fa": _dti_fa,
                     "dti_md": _dti_md,
                     "dki_fa": _dki_fa,
                     "dki_md": _dki_md,
-                    "dki_awf": _dki_awf}
+                    "dki_awf": _dki_awf,
+                    "dki_mk": _dki_mk}
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
@@ -1810,6 +1823,18 @@ class AFQ(object):
 
     dki = property(get_dki, set_dki)
 
+    def set_dki_mk(self):
+        if 'dki_mk_file' not in self.data_frame.columns:
+            self.data_frame['dki_mk_file'] =\
+                self.data_frame.apply(self._dki_mk,
+                                      axis=1)
+
+    def get_dki_mk(self):
+        self.set_dki_mk()
+        return self.data_frame['dki_mk_file']
+
+    dki_mk = property(get_dki_mk, set_dki_mk)
+
     def set_dki_fa(self):
         if 'dki_fa_file' not in self.data_frame.columns:
             self.data_frame['dki_fa_file'] =\
@@ -1833,6 +1858,18 @@ class AFQ(object):
         return self.data_frame['dki_md_file']
 
     dki_md = property(get_dki_md, set_dki_md)
+
+    def set_dki_awf(self):
+        if 'dki_awf_file' not in self.data_frame.columns:
+            self.data_frame['dki_awf_file'] =\
+                self.data_frame.apply(self._dki_awf,
+                                      axis=1)
+
+    def get_dki_awf(self):
+        self.set_dki_awf()
+        return self.data_frame['dki_awf_file']
+
+    dki_awf = property(get_dki_awf, set_dki_awf)
 
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
