@@ -287,10 +287,9 @@ class RoiMask(StrInstantiatesMixin):
         for bundle_name, bundle_info in afq_object.bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
                 if afq_object.bundle_dict[bundle_name]['rules'][idx]:
-                    warped_roi = auv.patch_up_roi(
-                        mapping.transform_inverse(
-                            roi.get_fdata().astype(np.float32),
-                            interpolation='linear'),
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        mapping,
                         bundle_name=bundle_name)
 
                     if mask_data is None:

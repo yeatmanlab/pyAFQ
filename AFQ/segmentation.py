@@ -420,10 +420,9 @@ class Segmentation:
         exclude_rois = []
         for rule_idx, rule in enumerate(rules):
             roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
-            if not isinstance(roi, np.ndarray):
-                roi = roi.get_fdata()
-            warped_roi = auv.patch_up_roi(self.mapping.transform_inverse(
-                roi.astype(np.float32), interpolation='linear'),
+            warped_roi = auv.transform_inverse_roi(
+                roi,
+                self.mapping,
                 bundle_name=bundle)
 
             if rule:

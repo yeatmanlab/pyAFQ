@@ -1427,12 +1427,10 @@ class AFQ(object):
 
                 fname = op.join(rois_dir, fname[1])
                 if not op.exists(fname):
-
-                    warped_roi = auv.patch_up_roi(
-                        (mapping.transform_inverse(
-                            roi.get_fdata(),
-                            interpolation='linear')) > 0,
-                        bundle_name=bundle).astype(int)
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        mapping,
+                        bundle_name=bundle)
 
                     # Cast to float32, so that it can be read in by MI-Brain:
                     self.log_and_save_nii(
