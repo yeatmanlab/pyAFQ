@@ -18,7 +18,6 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.segmentation as seg
 import AFQ.models.dti as dti
-from AFQ.utils.volume import patch_up_roi
 
 
 dpd.fetch_stanford_hardi()

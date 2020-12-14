@@ -1389,13 +1389,10 @@ class AFQ(object):
 
                 fname = op.join(rois_dir, fname[1])
                 if not op.exists(fname):
-                    from skimage.morphology import binary_dilation
-                    roi_data = binary_dilation(roi.get_fdata())
-                    warped_roi = auv.patch_up_roi(
-                        (mapping.transform_inverse(
-                            roi_data,
-                            interpolation='linear')) > 0,
-                        bundle_name=bundle).astype(int)
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        mapping,
+                        bundle_name=bundle)
 
                     # Cast to float32, so that it can be read in by MI-Brain:
                     self.log_and_save_nii(

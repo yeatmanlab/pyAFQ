@@ -38,7 +38,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
-from AFQ.utils.volume import patch_up_roi, density_map
+from AFQ.utils.volume import transform_inverse_roi, density_map
 from AFQ.viz.utils import show_anatomical_slices
 from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
@@ -301,10 +301,9 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
             if bundles[bundle]['rules'][idx]:
-                warped_roi = patch_up_roi(
-                    mapping.transform_inverse(
-                        roi.get_fdata().astype(np.float32),
-                        interpolation='linear'),
+                warped_roi = transform_inverse_roi(
+                    roi,
+                    mapping,
                     bundle_name=bundle)
 
                 nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),

@@ -3,7 +3,7 @@ import numpy as np
 
 import scipy.ndimage as ndim
 from skimage.filters import gaussian
-from skimage.morphology import convex_hull_image
+from skimage.morphology import convex_hull_image, binary_dilation
 from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import dice
 
@@ -12,6 +12,41 @@ import nibabel as nib
 from dipy.io.utils import (create_nifti_header, get_reference_info)
 from dipy.tracking.streamline import select_random_set_of_streamlines
 import dipy.tracking.utils as dtu
+
+
+def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
+    """
+    After being non-linearly transformed, ROIs tend to have holes in them.
+    We perform a couple of computational geometry operations on the ROI to
+    fix that up.
+
+    Parameters
+    ----------
+    roi : Nifti1Image, str, ndarray
+        The ROI to transform. Can be a path or image, which will be
+        converted to an ndarray.
+
+    mapping : DiffeomorphicMap object
+        A mapping between DWI space and a template.
+
+    bundle_name : str, optional
+        Name of bundle, which may be useful for error messages.
+        Default: None
+
+    Returns
+    -------
+    ROI after dilation and hole-filling
+    """
+    if isinstance(roi, str):
+        roi = nib.load(roi)
+    if isinstance(roi, nib.Nifti1Image):
+        roi = roi.get_fdata()
+
+    roi = binary_dilation(roi)
+    roi = mapping.transform_inverse(roi, interpolation='linear')
+    roi = patch_up_roi(roi > 0, bundle_name=bundle_name).astype(int)
+
+    return roi
 
 
 def patch_up_roi(roi, bundle_name="ROI"):

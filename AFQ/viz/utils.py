@@ -386,9 +386,9 @@ def prepare_roi(roi, affine_or_mapping, static_img,
                                                      static_img,
                                                      reg_template)
 
-            roi = auv.patch_up_roi(affine_or_mapping.transform_inverse(
-                                   roi,
-                                   interpolation='nearest')).astype(bool)
+            roi = auv.transform_inverse_roi(
+                roi,
+                affine_or_mapping).astype(bool)
     return roi
 
 
@@ -1351,7 +1351,7 @@ class GroupCSVComparison():
                 removal_idx,
                 axis=1)
         else:
-            is_removed_bundle = [False]*len(self.bundles)
+            is_removed_bundle = [False] * len(self.bundles)
 
         df_bundle_prof_means = pd.DataFrame(
             columns=['scalar', 'tractID', 'value'])

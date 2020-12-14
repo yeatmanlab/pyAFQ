@@ -11,6 +11,7 @@ ROIs of your design.
 For now, this is a hypothetical example, as we do not yet
 provide these ROIs as part of the software.
 """
+from dipy.data import get_fnames
 import os.path as op
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,7 +30,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.models.csd as csd
 import AFQ.segmentation as seg
-from AFQ.utils.volume import patch_up_roi
+from AFQ.utils.volume import transform_inverse_roi
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -195,7 +196,6 @@ endpoint_spec = {
 # placed only within the inclusion ROIs. This allows us to oversample that
 # part of the brain, without having to deal with very large tractograms.
 
-from dipy.data import get_fnames
 f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
 
 pve_csf = nib.load(f_pve_csf)
@@ -207,10 +207,9 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            warped_roi = patch_up_roi(
-                mapping.transform_inverse(
-                    roi.get_fdata().astype(np.float32),
-                    interpolation='linear'),
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
                 bundle_name=bundle)
             print(roi)
             nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
@@ -227,10 +226,9 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
                                roi.affine,
                                MNI_T1w_img.affine)
 
-            warped_roi = patch_up_roi(
-                mapping.transform_inverse(
-                    roi.astype(np.float32),
-                    interpolation='linear'),
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
                 bundle_name=bundle)
 
             nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
