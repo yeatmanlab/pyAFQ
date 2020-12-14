@@ -1,6 +1,6 @@
 """
 ==========================
-Calossal bundles using AFQ API
+Callosal bundles using AFQ API
 ==========================
 An example using the AFQ API to find calossal bundles using the templates from:
 http://hdl.handle.net/1773/34926
