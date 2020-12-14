@@ -1389,10 +1389,11 @@ class AFQ(object):
 
                 fname = op.join(rois_dir, fname[1])
                 if not op.exists(fname):
-
+                    from skimage.morphology import binary_dilation
+                    roi_data = binary_dilation(roi.get_fdata())
                     warped_roi = auv.patch_up_roi(
                         (mapping.transform_inverse(
-                            roi.get_fdata(),
+                            roi_data,
                             interpolation='linear')) > 0,
                         bundle_name=bundle).astype(int)
 
