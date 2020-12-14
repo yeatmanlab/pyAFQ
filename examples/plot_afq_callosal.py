@@ -1,17 +1,16 @@
 """
 ==========================
-RecoBundles80 using AFQ API
+Callosal bundles using AFQ API
 ==========================
-
-An example using the AFQ API to run recobundles with the
-`80 bundle atlas <https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883>`_.
-
+An example using the AFQ API to find callosal bundles using the templates from:
+http://hdl.handle.net/1773/34926
 """
 import os.path as op
 
 import plotly
 
 from AFQ import api
+from AFQ.mask import RoiMask
 import AFQ.data as afd
 
 ##########################################################################
@@ -27,12 +26,13 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # Set tractography parameters (optional)
 # ---------------------
 # We make this tracking_params which we will pass to the AFQ object
-# which specifies that we want 50,000 seeds randomly distributed
-# in the white matter.
+# which specifies that we want 100,000 seeds randomly distributed
+# in the ROIs of every bundle.
 #
 # We only do this to make this example faster and consume less space.
 
-tracking_params = dict(n_seeds=50000,
+tracking_params = dict(seed_mask=RoiMask(),
+                       n_seeds=10000,
                        random_seeds=True,
                        rng_seed=42)
 
@@ -40,14 +40,14 @@ tracking_params = dict(n_seeds=50000,
 # Initialize an AFQ object:
 # -------------------------
 #
-# We specify seg_algo as reco80 in segmentation_params. This tells the AFQ
-# object to perform RecoBundles using the 80 bundles atlas in the
-# segmentation step.
+# We specify bundle_info as the default bundles list (api.BUNDLES) plus the
+# callosal bundle list. This tells the AFQ object to use bundles from both
+# the standard and callosal templates.
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                segmentation_params={"seg_algo": "reco80"},
+                bundle_info=api.BUNDLES + api.CALLOSUM_BUNDLES,
                 tracking_params=tracking_params)
 
 ##########################################################################

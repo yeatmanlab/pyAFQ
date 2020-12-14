@@ -53,6 +53,10 @@ def do_preprocessing():
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
 
+CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
+                    "PostParietal", "SupFrontal", "SupParietal",
+                    "Temporal"]
+
 # See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
 
 RECO_BUNDLES_16 = [
@@ -73,7 +77,9 @@ RECO_UNIQUE = [
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
+def make_bundle_dict(bundle_names=BUNDLES,
+                     seg_algo="afq",
+                     resample_to=False):
     """
     Create a bundle dictionary, needed for the segmentation
 
@@ -94,7 +100,26 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
         If set, templates will be resampled to the affine and shape of this
         image.
     """
+    logger = logging.getLogger('AFQ.api')
     if seg_algo == "afq":
+        if "FP" in bundle_names and "Occipital" in bundle_names:
+            logger.warning((
+                f"FP and Occipital bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only Occipital will be used."))
+            bundle_names.remove("FP")
+        if "FA" in bundle_names and "Orbital" in bundle_names:
+            logger.warning((
+                f"FA and Orbital bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only Orbital will be used."))
+            bundle_names.remove("FA")
+        if "FA" in bundle_names and "AntFrontal" in bundle_names:
+            logger.warning((
+                f"FA and AntFrontal bundles are co-located, and AFQ"
+                f" assigns each streamline to only one bundle."
+                f" Only AntFrontal will be used."))
+            bundle_names.remove("FA")
         templates = afd.read_templates(resample_to=resample_to)
         callosal_templates = afd.read_callosum_templates(
             resample_to=resample_to)
@@ -121,6 +146,15 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
                     'cross_midline': True,
                     'uid': uid}
                 uid += 1
+            elif name in CALLOSUM_BUNDLES:
+                afq_bundles[name] = {
+                    'ROIs': [callosal_templates["L_" + name],
+                             callosal_templates["R_" + name],
+                             callosal_templates["Callosum_midsag"]],
+                    'rules': [True, True, True],
+                    'cross_midline': True,
+                    'uid': uid}
+                uid += 1
             # SLF is a special case, because it has an exclusion ROI:
             elif name == "SLF":
                 for hemi in ['_R', '_L']:
@@ -135,16 +169,20 @@ def make_bundle_dict(bundle_names=BUNDLES, seg_algo="afq", resample_to=False):
                     uid += 1
             else:
                 for hemi in ['_R', '_L']:
-                    afq_bundles[name + hemi] = {
-                        'ROIs': [templates[name + '_roi1' + hemi],
-                                 templates[name + '_roi2' + hemi]],
-                        'rules': [True, True],
-                        'prob_map': templates[name + hemi + '_prob_map'],
-                        'cross_midline': False,
-                        'uid': uid}
+                    if (templates.get(name + '_roi1' + hemi)
+                            and templates.get(name + '_roi2' + hemi)
+                            and templates.get(name + hemi + '_prob_map')):
+                        afq_bundles[name + hemi] = {
+                            'ROIs': [templates[name + '_roi1' + hemi],
+                                     templates[name + '_roi2' + hemi]],
+                            'rules': [True, True],
+                            'prob_map': templates[name + hemi + '_prob_map'],
+                            'cross_midline': False,
+                            'uid': uid}
+                    else:
+                        logger.warning(f"{name} is not in AFQ templates")
 
                     uid += 1
-
     elif seg_algo.startswith("reco"):
         if seg_algo.endswith("80"):
             bundle_dict = afd.read_hcp_atlas(80)

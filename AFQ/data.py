@@ -1733,7 +1733,7 @@ def organize_cfin_data(path=None):
            "PipelineDescription": {"Name": "dipy"}})
 
 
-def organize_stanford_data(path=None):
+def organize_stanford_data(path=None, clear_previous_afq=False):
     """
     If necessary, downloads the Stanford HARDI dataset into DIPY directory and
     creates a BIDS compliant file-system structure in AFQ data directory:
@@ -1759,6 +1759,8 @@ def organize_stanford_data(path=None):
                         ├── sub-01_ses-01_dwi.bvec
                         └── sub-01_ses-01_dwi.nii.gz
 
+    If clear_previous_afq is True and there is an afq folder in derivatives,
+    it will be removed.
     """
     logger = logging.getLogger('AFQ.data')
 
@@ -1776,6 +1778,11 @@ def organize_stanford_data(path=None):
     derivatives_path = op.join(bids_path, 'derivatives')
     dmriprep_folder = op.join(derivatives_path, 'vistasoft')
     freesurfer_folder = op.join(derivatives_path, 'freesurfer')
+
+    if clear_previous_afq:
+        afq_folder = op.join(derivatives_path, 'afq')
+        if op.exists(afq_folder):
+            shutil.rmtree(afq_folder)
 
     if not op.exists(derivatives_path):
         logger.info(f'creating derivatives directory: {derivatives_path}')
@@ -2092,7 +2099,15 @@ def bundles_to_aal(bundles, atlas=None):
         "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
         "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
         "ARC_L": [['leftfrontal'], ['leftarctemp']],
-        "ARC_R": [['rightfrontal'], ['rightarctemp']]}
+        "ARC_R": [['rightfrontal'], ['rightarctemp']],
+        "AntFrontal": [None, None],
+        "Motor": [None, None],
+        "Occipital": [None, None],
+        "Orbital": [None, None],
+        "PostParietal": [None, None],
+        "SupFrontal": [None, None],
+        "SupParietal": [None, None],
+        "Temporal": [None, None]}
 
     targets = []
     for bundle in bundles:

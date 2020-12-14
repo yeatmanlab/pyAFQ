@@ -38,8 +38,12 @@ import AFQ.data as afd
 #
 # This data represents the required preprocessed diffusion data necessary for
 # intializing the AFQ object (which we will do next)
+#
+# The clear_previous_afq is used to remove any previous runs of the afq object
+# stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to false if
+# you want to use the results of previous runs. 
 
-afd.organize_stanford_data()
+afd.organize_stanford_data(clear_previous_afq=True)
 
 ##########################################################################
 # Initialize an AFQ object:

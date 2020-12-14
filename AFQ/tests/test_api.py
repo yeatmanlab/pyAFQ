@@ -174,6 +174,47 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
     return bids_dir
 
 
+def test_make_bundle_dict():
+    """
+    Tests bundle dict
+    """
+
+    # test defaults
+    afq_bundles = api.make_bundle_dict()
+
+    # bundles restricted within hemisphere
+    # NOTE: FA and FP cross midline so are removed
+    # NOTE: all others generate two bundles
+    num_hemi_bundles = (len(api.BUNDLES)-2)*2
+
+    # bundles that cross the midline
+    num_whole_bundles = 2
+
+    assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
+
+    # Arcuate Fasciculus
+    afq_bundles = api.make_bundle_dict(bundle_names=["ARC"])
+
+    assert len(afq_bundles) == 2
+
+    # Forceps Minor
+    afq_bundles = api.make_bundle_dict(bundle_names=["FA"])
+
+    assert len(afq_bundles) == 1
+
+    # Cingulum Hippocampus
+    # not included but exists in templates
+    afq_bundles = api.make_bundle_dict(bundle_names=["HCC"])
+
+    assert len(afq_bundles) == 2
+
+    # Vertical Occipital Fasciculus
+    # not included and does not exist in templates
+    afq_bundles = api.make_bundle_dict(bundle_names=["VOF"])
+
+    assert len(afq_bundles) == 0
+
+
 @pytest.mark.nightly4
 def test_AFQ_custom_tract():
     """
