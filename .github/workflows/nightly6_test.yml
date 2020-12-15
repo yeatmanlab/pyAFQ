@@ -1,6 +1,8 @@
-name: Test suite
+name: Nightly test suite
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: '0 12 * * *'  # every day at 5 AM, PST
 
 jobs:
   build:
@@ -27,4 +29,4 @@ jobs:
         flake8 --ignore N802,N806,W503 --select W504 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py | grep -v /docs/`
     - name: Test
       run: |
-        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "not nightly and not nightly2 and not nightly3 and not nightly4 and not nightly5 and not nightly6" --durations=0
+        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "nightly6" --durations=0
