@@ -397,7 +397,7 @@ def test_API_type_checking():
         api.AFQ(bids_path, bundle_info=[2, 3])
 
 
-@pytest.mark.nightly5
+@pytest.mark.nightly6
 def test_AFQ_slr():
     """
     Test if API can run using slr map
