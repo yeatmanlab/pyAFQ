@@ -358,7 +358,7 @@ def test_AFQ_anisotropic():
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
     # check that the apm map was made
-    myafq.export_rois()
+    myafq.set_mapping()
     assert op.exists(op.join(
         myafq.data_frame['results_dir'][0],
         'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
