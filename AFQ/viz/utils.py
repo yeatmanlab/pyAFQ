@@ -1265,11 +1265,11 @@ class GroupCSVComparison():
            for each dataset.
         4. A list of bundles with sufficient correlation
         5. A pandas dataframe describing the intersubject reliabilities,
-           per 
+           per bundle
         6. A numpy array describing the intersubject reliability errors,
            per bundle
         7. A pandas dataframe desribing the profile reliabilities,
-           per 
+           per bundle
         8. A numpy array desribing the profile reliability errors,
            per bundle
         """
