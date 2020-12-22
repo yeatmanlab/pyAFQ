@@ -82,6 +82,7 @@ SCALAR_REMOVE_MODEL = \
 
 RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
+
 def gen_color_dict(bundles):
     """
     Helper function.
@@ -614,8 +615,8 @@ class BrainAxes():
             for j in range(self.size[1]):
                 if self.twinning:
                     self.axes[i, j].xaxis.tick_top()
-                    self.axes[i, j].yaxis.tick_right()     
-                    self.axes[i, j].xaxis.set_label_position('top') 
+                    self.axes[i, j].yaxis.tick_right()
+                    self.axes[i, j].xaxis.set_label_position('top')
                     self.axes[i, j].yaxis.set_label_position('right')
                 self.axes[i, j].tick_params(
                     axis='y', which='major', labelsize=small_font)
@@ -634,7 +635,7 @@ class BrainAxes():
                         self.axes[i, j].set_yticklabels([])
                         self.axes[i, j].set_ylabel("")
                     if disable_x or (i != self.size[0] - 1
-                            and self.on_grid[i + 1][j]):
+                                     and self.on_grid[i + 1][j]):
                         self.axes[i, j].set_xticklabels([])
                         self.axes[i, j].set_xlabel("")
         self.fig.tight_layout()
@@ -829,7 +830,7 @@ class GroupCSVComparison():
         self.color_dict = gen_color_dict([*self.bundles, "median"])
 
         # TODO: make these parameters
-        self.scalar_markers = ["o", "x"] 
+        self.scalar_markers = ["o", "x"]
         self.patterns = (
             None, '/', 'o', 'x', '-', '.',
             '+', '//', '\\', '*', 'O', '|')
@@ -1006,14 +1007,15 @@ class GroupCSVComparison():
                         "palette": [self.color_dict[bundle]]}
                 else:
                     plot_kwargs = {
-                        "dashes": [(2**(i-1), 2**(i-1))],
+                        "dashes": [(2**(i - 1), 2**(i - 1))],
                         "hue": "tractID",
                         "palette": [self.color_dict[bundle]]}
                 profile = self.profile_dict[name]
                 profile = profile[profile['tractID'] == bundle]
                 ba.plot_line(
                     bundle, "nodeID", scalar, profile,
-                    display_scalar(scalar), ylim, n_boot, self._alpha(0.6 + 0.2 * i),
+                    display_scalar(scalar), ylim, n_boot, self._alpha(
+                        0.6 + 0.2 * i),
                     plot_kwargs,
                     plot_subject_lines=plot_subject_lines)
                 if j == 0:
@@ -1304,7 +1306,7 @@ class GroupCSVComparison():
                             bundle_profiles[j, i] = np.nan
                             miss_counts.at[bundle, f"miss_count{name}"] =\
                                 miss_counts.at[
-                                    bundle, f"miss_count{name}"]+ 1
+                                    bundle, f"miss_count{name}"] + 1
                         else:
                             bundle_profiles[j, i] = single_profile
 
@@ -1317,7 +1319,7 @@ class GroupCSVComparison():
                         f"Not enough non-nan profiles"
                         f"for scalar {scalar} for bundle {bundle}"))
                 # use Fisher Transformation
-                err_prime = 1.95/np.sqrt(N_not_nan-3)
+                err_prime = 1.95 / np.sqrt(N_not_nan - 3)
                 corr_prime = np.arctanh(all_sub_coef[m, k])
                 all_sub_coef_err[m, k, 1] = np.tanh(corr_prime + err_prime)\
                     - all_sub_coef[m, k]
@@ -1411,7 +1413,8 @@ class GroupCSVComparison():
                     (f"{names[0]}_vs_{names[1]}_node_profiles"
                      f"_{bundle}")))
 
-        ba.fig.legend(display_scalar(scalars), loc='center', fontsize=medium_font)
+        ba.fig.legend(display_scalar(scalars),
+                      loc='center', fontsize=medium_font)
         ba.format()
         ba.fig.savefig(
             self._get_fname(
@@ -1445,7 +1448,7 @@ class GroupCSVComparison():
                     all_sub_means[m, k, 0],
                     all_sub_means[m, k, 1],
                     label=scalar,
-                    marker=self.scalar_markers[m-twinning],
+                    marker=self.scalar_markers[m - twinning],
                     facecolors=fc,
                     edgecolors=ec,
                     s=marker_size,
@@ -1503,7 +1506,7 @@ class GroupCSVComparison():
                 ba.fig.savefig(
                     self._get_fname(
                         f"rel_plots/{'_'.join(scalars)}/verbose",
-                    f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
+                        f"{names[0]}_vs_{names[1]}_{scalar}_mean_profiles"))
             ba.format(disable_x=False)
             if not (show_plots or twinning_next):
                 ba.close_all()
@@ -1512,7 +1515,8 @@ class GroupCSVComparison():
         fig, axes = plt.subplots(2, 1)
         fig.set_size_inches((8, 8))
         bundle_prof_means = np.nanmean(all_profile_coef, axis=2)
-        bundle_prof_stds = 1.95*sem(all_profile_coef, axis=2, nan_policy='omit')
+        bundle_prof_stds = 1.95 * \
+            sem(all_profile_coef, axis=2, nan_policy='omit')
         if ylims is None:
             maxi = np.maximum(bundle_prof_means.max(), all_sub_coef.max())
             mini = np.minimum(bundle_prof_means.min(), all_sub_coef.min())
@@ -1545,7 +1549,7 @@ class GroupCSVComparison():
                 removal_idx,
                 axis=1)
         else:
-            is_removed_bundle = [False]*len(self.bundles)
+            is_removed_bundle = [False] * len(self.bundles)
             bundle_prof_means_removed = bundle_prof_means
             bundle_prof_stds_removed = bundle_prof_stds
             all_sub_coef_err_removed = all_sub_coef_err
@@ -1566,11 +1570,11 @@ class GroupCSVComparison():
         x = np.arange(len(updated_bundles)) * spacing
         x_shift = np.linspace(-0.5 * width, 0.5 * width, num=len(scalars))
 
-        bundle_prof_means_removed =  np.pad(
+        bundle_prof_means_removed = np.pad(
             bundle_prof_means_removed, [(0, 0), (0, 1)])
         bundle_prof_stds_removed = np.pad(
             bundle_prof_stds_removed, [(0, 0), (0, 1)])
-        all_sub_coef_removed =  np.pad(
+        all_sub_coef_removed = np.pad(
             all_sub_coef_removed, [(0, 0), (0, 1)])
         all_sub_coef_err_removed = np.transpose(np.pad(
             all_sub_coef_err_removed, [(0, 0), (0, 1), (0, 0)]))
@@ -1610,7 +1614,7 @@ class GroupCSVComparison():
         axes[0].set_yticklabels(
             [0, 0.2, 0.4, 0.6, 0.8, 1.0],
             fontsize=small_font - 8)
-        axes[0].set_xticks(x+1)
+        axes[0].set_xticks(x + 1)
         axes[0].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
         axes[1].set_title("B", fontsize=large_font)
@@ -1621,7 +1625,7 @@ class GroupCSVComparison():
         axes[1].set_yticklabels(
             [0, 0.2, 0.4, 0.6, 0.8, 1.0],
             fontsize=small_font - 8)
-        axes[1].set_xticks(x+1)
+        axes[1].set_xticks(x + 1)
         axes[1].set_xticklabels(
             updated_bundles, fontsize=xaxis_font_size)
 
@@ -1634,9 +1638,9 @@ class GroupCSVComparison():
 
         if rotate_y_labels:
             plt.setp(axes[0].get_yticklabels(),
-                    rotation=90)
+                     rotation=90)
             plt.setp(axes[1].get_yticklabels(),
-                    rotation=90)
+                     rotation=90)
 
         fig.tight_layout()
         legend_labels = []
