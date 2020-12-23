@@ -1542,6 +1542,7 @@ class AFQ(object):
                      color_by_volume=None,
                      cbv_lims=[None, None],
                      xform_color_by_volume=False,
+                     volume_opacity=0.3,
                      n_points=40):
         bundles_file = self._clean_bundles(row)
 
@@ -1555,6 +1556,7 @@ class AFQ(object):
         )
 
         figure = self.viz.visualize_volume(volume,
+                                           opacity=volume_opacity,
                                            interact=False,
                                            inline=False)
 
@@ -1598,6 +1600,7 @@ class AFQ(object):
                   color_by_volume=None,
                   cbv_lims=[None, None],
                   xform_color_by_volume=False,
+                  volume_opacity=0.3,
                   n_points=40):
         bundles_file = self._clean_bundles(row)
 
@@ -1617,6 +1620,7 @@ class AFQ(object):
             self.logger.info(f"Generating {bundle_name} visualization...")
             uid = self.bundle_dict[bundle_name]['uid']
             figure = self.viz.visualize_volume(volume,
+                                               opacity=volume_opacity,
                                                interact=False,
                                                inline=False)
             try:
@@ -1996,6 +2000,7 @@ class AFQ(object):
                     color_by_volume=None,
                     cbv_lims=[None, None],
                     xform_color_by_volume=False,
+                    volume_opacity=0.3,
                     n_points=40,
                     inline=False,
                     interactive=False):
@@ -2007,6 +2012,7 @@ class AFQ(object):
             color_by_volume=color_by_volume,
             cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
+            volume_opacity=volume_opacity,
             n_points=n_points,
             inline=inline,
             interactive=interactive)
@@ -2019,6 +2025,7 @@ class AFQ(object):
                  color_by_volume=None,
                  cbv_lims=[None, None],
                  xform_color_by_volume=False,
+                 volume_opacity=0.3,
                  n_points=40,
                  inline=False,
                  interactive=False):
@@ -2034,6 +2041,7 @@ class AFQ(object):
             color_by_volume=color_by_volume,
             cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
+            volume_opacity=volume_opacity,
             n_points=n_points)
 
     def plot_tract_profiles(self):

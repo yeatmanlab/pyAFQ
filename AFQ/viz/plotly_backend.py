@@ -81,12 +81,12 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
     y_pts = np.zeros(plotting_shape)
     z_pts = np.zeros(plotting_shape)
 
-    if cbv_lims[0] is None:
-        cbv_lims[0] = 0
-    if cbv_lims[1] is None:
-        cbv_lims[1] = cbv.max()
-
     if cbv is not None:
+        if cbv_lims[0] is None:
+            cbv_lims[0] = 0
+        if cbv_lims[1] is None:
+            cbv_lims[1] = cbv.max()
+
         customdata = np.zeros(plotting_shape)
         line_color = np.zeros((plotting_shape, 3))
         color_constant = (color / color.max())\
