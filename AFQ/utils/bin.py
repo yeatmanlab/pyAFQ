@@ -187,7 +187,8 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     return arg_dict
 
 
-def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
+def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
+                         overwrite=False,
                          logger=None,
                          special_args={"CLEANING": "clean_params",
                                        "SEGMENTATION": "segmentation_params",
@@ -252,10 +253,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, overwrite=False,
 
     myafq = api.AFQ(bids_path, **kwargs)
 
-    # Do all the things:
-    myafq.set_dti_cfa()
-    myafq.set_dti_pdd()
-    myafq.export_all()
+    # call user specified function:
+    getattr(myafq, to_call)()
 
     # If you got this far, you can report on time ended and record that:
     default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(
