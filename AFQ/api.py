@@ -1722,7 +1722,7 @@ class AFQ(object):
                 row["timing"],
                 'index',
                 columns=['Time (s)'])
-            
+
             df.to_csv(timing_fname, index=True, index_label='step')
 
     def _get_affine(self, fname):
