@@ -520,6 +520,7 @@ class AFQ(object):
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
+            "Registration_pre_align": 0,
             "Registration": 0,
             "Segmentation": 0,
             "Cleaning": 0,
@@ -764,6 +765,7 @@ class AFQ(object):
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
 
+            start_time = time()
             if self.robust_tensor_fitting:
                 bvals, bvecs = read_bvals_bvecs(
                     row['bval_file'], row['bvec_file'])
@@ -783,6 +785,7 @@ class AFQ(object):
                 OutlierRejection=False,
                 ModelURL=f"{DIPY_GH}reconst/dti.py")
             afd.write_json(meta_fname, meta)
+            row['timing']['DTI'] = time() - start_time
         return dti_params_file
 
     def _dki_fit(self, row):
@@ -798,6 +801,7 @@ class AFQ(object):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
+            start_time = time()
             dkf = dki_fit(gtab, data, mask=mask)
             nib.save(nib.Nifti1Image(dkf.model_params, row['dwi_affine']),
                      dki_params_file)
@@ -808,6 +812,7 @@ class AFQ(object):
                 OutlierRejection=False,
                 ModelURL=f"{DIPY_GH}reconst/dki.py")
             afd.write_json(meta_fname, meta)
+            row['timing']['DKI'] = time() - start_time
         return dki_params_file
 
     def _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1,
@@ -825,6 +830,7 @@ class AFQ(object):
             data, gtab, _ = self._get_data_gtab(row)
             brain_mask_file = self._brain_mask(row)
             mask = nib.load(brain_mask_file).get_fdata()
+            start_time = time()
             csdf = csd_fit(gtab, data, mask=mask,
                            response=response, sh_order=sh_order,
                            lambda_=lambda_, tau=tau, msmt=msmt)
@@ -841,6 +847,7 @@ class AFQ(object):
                         lambda_=lambda_,
                         tau=tau)
             afd.write_json(meta_fname, meta)
+            row['timing']['CSD'] = time() - start_time
         return csd_params_file
 
     def _anisotropic_power_map(self, row):
@@ -1032,6 +1039,7 @@ class AFQ(object):
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if not op.exists(prealign_file):
             reg_subject_img, _ = self._reg_img(self.reg_subject, True, row)
+            start_time = time()
             _, aff = reg.affine_registration(
                 reg_subject_img.get_fdata(),
                 self.reg_template_img.get_fdata(),
@@ -1042,6 +1050,8 @@ class AFQ(object):
                 row, '_prealign_from-DWI_to-MNI_xfm.json')
             meta = dict(type="rigid")
             afd.write_json(meta_fname, meta)
+            row['timing']['Registration_pre_align'] =\
+                row['timing']['Registration_pre_align'] + time() - start_time
         return prealign_file
 
     def _export_registered_b0(self, row):
@@ -1707,13 +1717,17 @@ class AFQ(object):
 
         return fnames
 
-    def _export_timing(self, row):
-        df = pd.DataFrame.from_dict(
-            row["timing"],
-            'index',
-            columns=['Time (s)'])
+    def _export_timing(self, row, all_sub_sess=None):
         timing_fname = self._get_fname(row, "_desc-timing.csv", True, True)
-        df.to_csv(timing_fname, index=True, index_label='step')
+        if not op.exists(timing_fname):
+            if all_sub_sess is not None:
+                row["timing"]["all_sub_sess"] = all_sub_sess
+            df = pd.DataFrame.from_dict(
+                row["timing"],
+                'index',
+                columns=['Time (s)'])
+
+            df.to_csv(timing_fname, index=True, index_label='step')
 
     def _get_affine(self, fname):
         return nib.load(fname).affine
@@ -2057,11 +2071,15 @@ class AFQ(object):
             self.tract_profiles,
             op.join(self.afq_path, 'tract_profiles.csv'))
 
-    def export_timing(self):
-        self.data_frame.apply(self._export_timing, axis=1)
+    def export_timing(self, all_sub_sess=None):
+        self.data_frame.apply(
+            self._export_timing,
+            axis=1,
+            all_sub_sess=all_sub_sess)
 
     def export_all(self):
         """ Exports all the possible outputs"""
+        start_time = time()
         self.export_registered_b0()
         self.get_template_xform()
         self.export_bundles()
@@ -2073,7 +2091,8 @@ class AFQ(object):
             self.export_rois()
         if len(self.tract_profiles) > 1:
             self.combine_profiles()
-        self.export_timing()
+        all_sub_sess = time() - start_time
+        self.export_timing(all_sub_sess=all_sub_sess)
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
