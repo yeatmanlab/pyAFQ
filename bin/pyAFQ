@@ -57,6 +57,16 @@ def parse_cli(help_msg):
         + " preserving previous defaults when applicable.")
 
     cli_parser.add_argument(
+        '-c',
+        '--call',
+        dest='to_call',
+        action="store_true",
+        default="export_all",
+        help="AFQ.api method to call using the specified config file."
+        + " Defaults to 'export_all', which will perform the entire"
+        + " tractometry pipeline.")
+
+    cli_parser.add_argument(
         '-t', '--notrack', action="store_true", default=False,
         help="Disable the use of pyAFQ being recorded by Google Analytics. ")
 
@@ -71,17 +81,18 @@ def parse_cli(help_msg):
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
-    return opts.config, opts.generate_toml, opts.overwrite
+    return opts.config, opts.generate_toml, opts.overwrite, opts.to_call
 
 
 if __name__ == '__main__':
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
-    config_file, generate_only, overwrite = parse_cli(arg_dict)
+    config_file, generate_only, overwrite, to_call = parse_cli(arg_dict)
     if generate_only:
         afb.generate_config(config_file, arg_dict, overwrite, logger=logger)
     else:
         afb.parse_config_run_afq(
             config_file,
             arg_dict,
-            overwrite,
+            to_call=to_call,
+            overwrite=overwrite,
             logger=logger)
