@@ -520,7 +520,7 @@ class AFQ(object):
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
-            "Registration, pre-align": 0,
+            "Registration_pre_align": 0,
             "Registration": 0,
             "Segmentation": 0,
             "Cleaning": 0,
@@ -1050,8 +1050,8 @@ class AFQ(object):
                 row, '_prealign_from-DWI_to-MNI_xfm.json')
             meta = dict(type="rigid")
             afd.write_json(meta_fname, meta)
-            row['timing']['Registration, pre-align'] =\
-                row['timing']['Registration, pre-align'] + time() - start_time
+            row['timing']['Registration_pre_align'] =\
+                row['timing']['Registration_pre_align'] + time() - start_time
         return prealign_file
 
     def _export_registered_b0(self, row):
