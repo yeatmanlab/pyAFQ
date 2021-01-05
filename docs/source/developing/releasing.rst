@@ -5,8 +5,7 @@ The current release process entails the following steps:
 
 #. Make sure you have the `master` branch locally updated to the state on the `main fork of the project <https://github.com/yeatmanlab/pyAFQ/tree/master>`_.
 
-#. Update CHANGES.rst: run the script `.maintenance/update_changes.sh <next_tag>`, with the tag set to the version string of the upcoming release.
-Further edit the notes to add a short summary at the top.
+#. Update CHANGES.rst: run the script `.maintenance/update_changes.sh <next_tag>`, with the tag set to the version string of the upcoming release. Further edit the notes to add a short summary at the top.
 
 #. Make a commit with these changes and push the commit to the main fork on GitHub (i.e., `upstream`).
 
