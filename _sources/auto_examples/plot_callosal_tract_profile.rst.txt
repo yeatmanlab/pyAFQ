@@ -931,7 +931,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  38.465 seconds)
+   **Total running time of the script:** ( 17 minutes  40.217 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:
