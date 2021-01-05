@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How to create a release &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Developing pyAFQ" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-create-a-release">
+<h1>How to create a release<a class="headerlink" href="#how-to-create-a-release" title="Permalink to this headline">¶</a></h1>
+<p>The current release process entails the following steps:</p>
+<ol class="arabic">
+<li><p>Make sure you have the <cite>master</cite> branch locally updated to the state on the <a class="reference external" href="https://github.com/yeatmanlab/pyAFQ/tree/master">main fork of the project</a>.</p></li>
+<li><p>Update CHANGES.rst: run the script <cite>.maintenance/update_changes.sh &lt;next_tag&gt;</cite>, with the tag set to the version string of the upcoming release. Further edit the notes to add a short summary at the top.</p></li>
+<li><p>Make a commit with these changes and push the commit to the main fork on GitHub (i.e., <cite>upstream</cite>).</p></li>
+<li><p>Tag the release. For example, to release Version 0.5, we did:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="o">-</span><span class="n">a</span> <span class="mf">0.5</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;Version 0.5&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Push the tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+</li>
+<li><dl class="simple">
+<dt>On GitHub:</dt><dd><ul class="simple">
+<li><p>Navigate to the <a class="reference external" href="https://github.com/yeatmanlab/pyAFQ/releases">“Releases” tab</a></p></li>
+<li><p>Click on <a class="reference external" href="https://github.com/yeatmanlab/pyAFQ/releases/new">“Draft a new release”</a>.</p></li>
+<li><p>In the “Tag version” box enter the version string of this release.</p></li>
+<li><p>In “Release title” enter (for example) “Version 0.5”.</p></li>
+<li><p>In the description box copy the entry in CHANGES.rst corresponding to this release (with the exclusion of the title).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Announce the release through all channels currently used:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Slack to DIRECT collaborators.</p></li>
+<li><p>More to come…</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developing <cite>pyAFQ</cite></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to create a release</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Developing <cite>pyAFQ</cite></a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Developing <cite>pyAFQ</cite></a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/developing/releasing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

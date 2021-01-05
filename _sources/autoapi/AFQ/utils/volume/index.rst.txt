@@ -13,9 +13,51 @@ Functions
 
 .. autoapisummary::
 
+   AFQ.utils.volume.transform_inverse_roi
    AFQ.utils.volume.patch_up_roi
    AFQ.utils.volume.density_map
    AFQ.utils.volume.dice_coeff
+
+
+.. function:: transform_inverse_roi(roi, mapping, bundle_name='ROI')
+
+   After being non-linearly transformed, ROIs tend to have holes in them.
+   We perform a couple of computational geometry operations on the ROI to
+   fix that up.
+
+
+   :Parameters:
+
+       **roi** : Nifti1Image, str, ndarray
+           The ROI to transform. Can be a path or image, which will be
+           converted to an ndarray.
+
+       **mapping** : DiffeomorphicMap object
+           A mapping between DWI space and a template.
+
+       **bundle_name** : str, optional
+           Name of bundle, which may be useful for error messages.
+           Default: None
+
+   :Returns:
+
+       ROI after dilation and hole-filling
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 .. function:: patch_up_roi(roi, bundle_name='ROI')
@@ -61,7 +103,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: density_map(tractogram, n_sls=None, to_vox=False)
+.. function:: density_map(tractogram, n_sls=None, to_vox=False, normalize=False)
 
    Create a streamline density map.
    based on:
@@ -74,14 +116,19 @@ Functions
            Stateful tractogram whose streamlines are used to make
            the density map.
 
-       **n_sls** : int or None
+       **n_sls** : int or None, optional
            n_sls to randomly select to make the density map.
            If None, all streamlines are used.
            Default: None
 
-       **to_vox** : bool
+       **to_vox** : bool, optional
            Whether to put the stateful tractogram in VOX space before making
            the density map.
+           Default: False
+
+       **normalize** : bool, optional
+           Whether to normalize maximum values to 1.
+           Default: False
 
    :Returns:
 
@@ -104,7 +151,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: dice_coeff(arr1, arr2)
+.. function:: dice_coeff(arr1, arr2, weighted=True)
 
    Compute Dice's coefficient between two images.
 
@@ -119,6 +166,14 @@ Functions
            The other ndarray to compare. Can be a path or image, which will be
            converted to an ndarray.
 
+       **weighted** : bool, optional
+           Whether or not to weight the DICE coefficient as in [Cousineau2017]_.
+           The weighted Dice coefficient is calculated by adding the sum of all
+           values in arr1 where arr2 is nonzero to the sum of all values in arr2
+           where arr1 is nonzero, then dividing that by the sum of all values in
+           arr1 and arr2.
+           Default: True
+
    :Returns:
 
        The dice similarity between the images.
@@ -131,6 +186,12 @@ Functions
 
 
 
+   .. rubric:: Notes
+
+   .. [R525e1fe6798e-1] Cousineau M, Jodoin PM, Morency FC, et al. A test-retest study on
+          Parkinson's PPMI dataset yields statistically significant white
+          matter fascicles. Neuroimage Clin. 2017;16:222-233. Published 2017
+          Jul 25. doi:10.1016/j.nicl.2017.07.020
 
 
 

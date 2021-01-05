@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ with HCP data &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plotting tract profiles" href="plot_tract_profile.html" />
+    <link rel="prev" title="Using cloudknot to run pyAFQ on AWS batch:" href="cloudknot_example.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-cloudknot-hcp-example-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="afq-with-hcp-data">
+<span id="sphx-glr-auto-examples-cloudknot-hcp-example-py"></span><h1>AFQ with HCP data<a class="headerlink" href="#afq-with-hcp-data" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to use the AFQ API to analyze HCP data.
+For this example to run properly, you will need to gain access to the HCP data.
+This can be done by following this instructions on the webpage
+<a class="reference external" href="https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS">here</a>.
+We will use the <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> library to run our AFQ analysis in the AWS
+Batch service (see also
+<a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html">this example</a>).
+In the following we will use <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> to run multiple
+configurations of pyAFQ on the HCP dataset. Specifically, here we will run
+pyAFQ with different tractography seeding strategies.</p>
+<p>Import cloudknot and set the correct region. The HCP data is stored in <cite>us-east-1</cite>, so it’s best
+to analyze it there.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">cloudknot</span> <span class="k">as</span> <span class="nn">ck</span>
+<span class="n">ck</span><span class="o">.</span><span class="n">set_region</span><span class="p">(</span><span class="s1">&#39;us-east-1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Define a function to run. This function allows us to pass in the subject ID for the subjects we would
+like to analyze , as well as strategies for seeding tractography (different masks and/or different
+numbers of seeds per voxel).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">afq_process_subject</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">,</span>
+                        <span class="n">aws_access_key</span><span class="p">,</span> <span class="n">aws_secret_key</span><span class="p">):</span>
+    <span class="c1"># define a function that each job will run</span>
+    <span class="c1"># In this case, each process does a single subject</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="kn">import</span> <span class="nn">s3fs</span>
+    <span class="c1"># all imports must be at the top of the function</span>
+    <span class="c1"># cloudknot installs the appropriate packages from pip</span>
+    <span class="kn">from</span> <span class="nn">AFQ.data</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
+    <span class="kn">import</span> <span class="nn">AFQ.api</span> <span class="k">as</span> <span class="nn">api</span>
+    <span class="kn">import</span> <span class="nn">AFQ.mask</span> <span class="k">as</span> <span class="nn">afm</span>
+
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+    <span class="c1"># set logging level to your choice</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="c1"># Download the given subject to the AWS Batch machine from s3</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">hcp_bids</span> <span class="o">=</span> <span class="n">fetch_hcp</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">subject</span><span class="p">],</span>
+        <span class="n">profile_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">study</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;HCP_1200&quot;</span><span class="p">,</span>
+        <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key</span><span class="p">,</span>
+        <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">aws_secret_key</span><span class="p">)</span>
+
+    <span class="c1"># We make a new seed mask for each process based off of the</span>
+    <span class="c1"># seed_mask argument, which is a string.</span>
+    <span class="c1"># This is to avoid any complications with pickling the masks.</span>
+    <span class="k">if</span> <span class="n">seed_mask</span> <span class="o">==</span> <span class="s2">&quot;roi&quot;</span><span class="p">:</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">RoiMask</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">seed_mask</span> <span class="o">==</span> <span class="s2">&quot;fa&quot;</span><span class="p">:</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">ScalarMask</span><span class="p">(</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">FullMask</span><span class="p">()</span>
+
+    <span class="c1"># Determined if n_seeds is per voxel or not</span>
+    <span class="k">if</span> <span class="n">n_seeds</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">random_seeds</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">random_seeds</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># set the tracking_params based off our inputs</span>
+    <span class="n">tracking_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;seed_mask&quot;</span><span class="p">:</span> <span class="n">seed_mask_obj</span><span class="p">,</span>
+        <span class="s2">&quot;n_seeds&quot;</span><span class="p">:</span> <span class="n">n_seeds</span><span class="p">,</span>
+        <span class="s2">&quot;random_seeds&quot;</span><span class="p">:</span> <span class="n">random_seeds</span><span class="p">}</span>
+
+    <span class="c1"># use segmentation file from HCP to get a brain mask,</span>
+    <span class="c1"># where everything not labelled 0 is considered a part of the brain</span>
+    <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledMaskFile</span><span class="p">(</span>
+        <span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">},</span> <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># define the api AFQ object</span>
+    <span class="n">myafq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
+        <span class="n">hcp_bids</span><span class="p">,</span>
+        <span class="n">brain_mask</span><span class="o">=</span><span class="n">brain_mask</span><span class="p">,</span>
+        <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">)</span>
+
+    <span class="c1"># export_all runs the entire pipeline and creates many useful derivates</span>
+    <span class="n">myafq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+
+    <span class="c1"># upload the results to some location on s3</span>
+    <span class="n">myafq</span><span class="o">.</span><span class="n">upload_to_s3</span><span class="p">(</span>
+        <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;my_study_bucket/my_study_prefix/derivatives_afq_&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seed_mask</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n_seeds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In this example, we will process the data from the following subjects</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="mi">103818</span><span class="p">,</span> <span class="mi">105923</span><span class="p">,</span> <span class="mi">111312</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We will test combinations of different conditions:
+subjects, seed masks, and number of seeds</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">seed_mask</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fa&quot;</span><span class="p">,</span> <span class="s2">&quot;roi&quot;</span><span class="p">]</span>
+<span class="n">n_seeds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The following function creates all the combinations of the above lists, such that every subject is
+run with every mask and every number of seeds.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We assume that the credentials for HCP usage are stored in the home directory in a
+<cite>~/.aws/credentials</cite> file. This is where these credentials are stored if the AWS CLI is used to
+configure the profile. We use the standard lib <code class="docutils literal notranslate"><span class="pre">configparser</span></code> library
+to get the relevant hcp keys from there.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CP</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="n">CP</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.aws&#39;</span><span class="p">,</span> <span class="s1">&#39;credentials&#39;</span><span class="p">)))</span>
+<span class="n">CP</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+<span class="n">aws_access_key</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hcp&#39;</span><span class="p">,</span> <span class="s1">&#39;AWS_ACCESS_KEY_ID&#39;</span><span class="p">)</span>
+<span class="n">aws_secret_key</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hcp&#39;</span><span class="p">,</span> <span class="s1">&#39;AWS_SECRET_ACCESS_KEY&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following function will attach your AWS keys to each list in a list of lists
+We use this with each list being a list of arguments,
+and we append the AWS keys to each list of arguments, so that we can pass
+them into the function to be used on AWS Batch to download the data into the
+AWS Batch machines.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">attach_keys</span><span class="p">(</span><span class="n">list_of_arg_lists</span><span class="p">):</span>
+    <span class="n">new_list_of_arg_lists</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">list_of_arg_lists</span><span class="p">:</span>
+        <span class="n">arg_ls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">arg_ls</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">aws_access_key</span><span class="p">,</span> <span class="n">aws_secret_key</span><span class="p">])</span>
+        <span class="n">new_list_of_arg_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg_ls</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_list_of_arg_lists</span>
+</pre></div>
+</div>
+<p>This calls the function to attach the access keys to the argument list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="n">attach_keys</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Define the <code class="xref py py-meth docutils literal notranslate"><span class="pre">Knot()</span></code> object to run your jobs on. See
+<a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html">this example</a> for more
+details about the arguments to the object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span> <span class="o">=</span> <span class="n">ck</span><span class="o">.</span><span class="n">Knot</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;afq_hcp_tractography-201110-0&#39;</span><span class="p">,</span>
+    <span class="n">func</span><span class="o">=</span><span class="n">afq_process_subject</span><span class="p">,</span>
+    <span class="n">base_image</span><span class="o">=</span><span class="s1">&#39;python:3.8&#39;</span><span class="p">,</span>
+    <span class="n">image_github_installs</span><span class="o">=</span><span class="s2">&quot;https://github.com/yeatmanlab/pyAFQ.git&quot;</span><span class="p">,</span>
+    <span class="n">pars_policies</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;AmazonS3FullAccess&#39;</span><span class="p">,),</span>
+    <span class="n">bid_percentage</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This launches a process for each combination.
+Because <cite>starmap</cite> is <cite>True</cite>, each list in <cite>args</cite> will be unfolded
+and passed into <cite>afq_process_subject</cite> as arguments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following function can be called repeatedly in a jupyter notebook
+to view the progress of jobs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span><span class="o">.</span><span class="n">view_jobs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can also view the status of a specific job:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span>
+</pre></div>
+</div>
+<p>When all jobs are finished, remember to clobber the knot to destroy all the resources that were
+created in AWS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># waits for futures to resolve, not needed in notebook</span>
+<span class="n">knot</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We continue processing to create another knot which takes the resulting profiles of each
+combination and combines them all into one csv file</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">afq_combine_profiles</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">AFQ.api</span> <span class="kn">import</span> <span class="n">download_and_combine_afq_profiles</span>
+    <span class="n">download_and_combine_afq_profiles</span><span class="p">(</span>
+        <span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;my_study_bucket&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;my_study_prefix/derivatives/afq_</span><span class="si">{</span><span class="n">seed_mask</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n_seeds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="n">knot2</span> <span class="o">=</span> <span class="n">ck</span><span class="o">.</span><span class="n">Knot</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;afq_combine_subjects-201110-0&#39;</span><span class="p">,</span>
+    <span class="n">func</span><span class="o">=</span><span class="n">afq_combine_profiles</span><span class="p">,</span>
+    <span class="n">base_image</span><span class="o">=</span><span class="s1">&#39;python:3.8&#39;</span><span class="p">,</span>
+    <span class="n">image_github_installs</span><span class="o">=</span><span class="s2">&quot;https://github.com/yeatmanlab/pyAFQ.git&quot;</span><span class="p">,</span>
+    <span class="n">pars_policies</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;AmazonS3FullAccess&#39;</span><span class="p">,),</span>
+    <span class="n">bid_percentage</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the arguments to this call to <code class="xref py py-meth docutils literal notranslate"><span class="pre">map()</span></code> are all the different configurations of pyAFQ that we ran</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">seed_mask</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fa&quot;</span><span class="p">,</span> <span class="s2">&quot;roi&quot;</span><span class="p">]</span>
+<span class="n">n_seeds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">]</span>
+<span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
+
+<span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">result_futures2</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+<span class="n">knot2</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-cloudknot-hcp-example-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/1fa9d23e0b91e893d59c98b17144a6a2/cloudknot_hcp_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">cloudknot_hcp_example.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/0b5020f6d55ab9dec8de544d67467741/cloudknot_hcp_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">cloudknot_hcp_example.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optic_radiations.html">Plotting the Optic Radiations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="cloudknot_example.html" title="previous chapter">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+      <li>Next: <a href="plot_tract_profile.html" title="next chapter">Plotting tract profiles</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/cloudknot_hcp_example.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

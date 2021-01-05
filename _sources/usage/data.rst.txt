@@ -1,7 +1,7 @@
 Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
-pyAFQ works with `BIDS compliant <http://bids.neuroimaging.io/>`_ diffusion data. 
+pyAFQ works with `BIDS compliant <http://bids.neuroimaging.io/>`_ diffusion data.
 While not required it is the prefered data format for neuroimaging interoperability.
 Anatomical data and segmentation are optional. If a T1-weighted anatomical image and its
 segmentation are not provided, the software will use the diffusion data to
@@ -23,11 +23,22 @@ the software.
     software to support a fully BIDS-compliant set of derivatives. Both as
     inputs, as well as outputs.
 
+.. note::
+
+    We rely heavily on `DIPY <https://dipy.org>`_  for many of the underlying
+    implementational details. DIPY I/O functionality enforces that tractography
+    results be saved in the RASMM space (see
+    `this example <https://dipy.org/documentation/1.0.0./examples_built/streamline_formats/>`_
+    for more explanation). This means that to transform the coordinates of
+    streamlines stored in these files back into the subject-specific DWI space,
+    they would have to be transformed through the affine stored in the header
+    of the DWI nifti file.
+
 
 Example data
 ------------
 
-To get some example diffusion data formatted for input into `pyAFQ`, you can 
+To get some example diffusion data formatted for input into `pyAFQ`, you can
 run::
 
     import AFQ.data as afd
@@ -41,6 +52,6 @@ data set in a directory called `stanford_hardi`::
     └── sub-01
         └── ses-01
             └── dwi
-                ├── sub-01_ses-01_dwi.bvals
-                ├── sub-01_ses-01_dwi.bvecs
+                ├── sub-01_ses-01_dwi.bval
+                ├── sub-01_ses-01_dwi.bvec
                 └── sub-01_ses-01_dwi.nii.gz

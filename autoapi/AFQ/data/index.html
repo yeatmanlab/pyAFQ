@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.mask" href="../mask/index.html" />
@@ -62,7 +62,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.data.read_stanford_hardi_tractography" title="AFQ.data.read_stanford_hardi_tractography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_stanford_hardi_tractography</span></code></a>()</p></td>
 <td><p>Reads a minimal tractography from the Stanford dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.data.organize_stanford_data" title="AFQ.data.organize_stanford_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_stanford_data</span></code></a>(path=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.data.organize_stanford_data" title="AFQ.data.organize_stanford_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_stanford_data</span></code></a>(path=None, clear_previous_afq=False)</p></td>
 <td><p>If necessary, downloads the Stanford HARDI dataset into DIPY directory and</p></td>
 </tr>
 </tbody>
@@ -169,7 +169,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 
 <dl class="py function">
 <dt id="AFQ.data.organize_stanford_data">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clear_previous_afq</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>If necessary, downloads the Stanford HARDI dataset into DIPY directory and
 creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <p>~/AFQ_data/
@@ -191,8 +191,8 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <blockquote>
 <div><dl class="simple">
 <dt>└── ses-01</dt><dd><dl class="simple">
-<dt>└── dwi</dt><dd><p>├── sub-01_ses-01_dwi.bvals
-├── sub-01_ses-01_dwi.bvecs
+<dt>└── dwi</dt><dd><p>├── sub-01_ses-01_dwi.bval
+├── sub-01_ses-01_dwi.bvec
 └── sub-01_ses-01_dwi.nii.gz</p>
 </dd>
 </dl>
@@ -201,6 +201,8 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 </div></blockquote>
 </div></blockquote>
 </div></blockquote>
+<p>If clear_previous_afq is True and there is an afq folder in derivatives,
+it will be removed.</p>
 </dd></dl>
 
 </div>
@@ -239,6 +241,7 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -281,7 +284,7 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

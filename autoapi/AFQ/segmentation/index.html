@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.tractography" href="../tractography/index.html" />
@@ -57,7 +57,7 @@
 </table>
 <dl class="py class">
 <dt id="AFQ.segmentation.Segmentation">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_points</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'AFQ'</span></em>, <em class="sig-param"><span class="n">reg_algo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clip_edges</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progressive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">greater_than</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">rm_small_clusters</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">model_clust_thr</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">reduction_thr</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">refine</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pruning_thr</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">prob_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_idx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">filter_by_endpoints</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dist_to_aal</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">save_intermediates</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.segmentation.</code><code class="sig-name descname">Segmentation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_points</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">nb_streamlines</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'AFQ'</span></em>, <em class="sig-param"><span class="n">reg_algo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clip_edges</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progressive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">greater_than</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">rm_small_clusters</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">model_clust_thr</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">reduction_thr</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">refine</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pruning_thr</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">prob_threshold</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">dist_to_waypoint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_idx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">filter_by_endpoints</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dist_to_atlas</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">save_intermediates</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
 <dt id="AFQ.segmentation.Segmentation._read_tg">
 <code class="sig-name descname">_read_tg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">tg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._read_tg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._read_tg" title="Permalink to this definition">¶</a></dt>
@@ -65,7 +65,7 @@
 
 <dl class="py method">
 <dt id="AFQ.segmentation.Segmentation.segment">
-<code class="sig-name descname">segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">tg</span></em>, <em class="sig-param"><span class="n">fdata</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbvec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_prealign</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">img_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reset_tg_space</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_dict</span></em>, <em class="sig-param"><span class="n">tg</span></em>, <em class="sig-param"><span class="n">fdata</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbvec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_prealign</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">img_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reset_tg_space</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">endpoint_info</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Segment streamlines into bundles based on either waypoint ROIs
 <a class="reference internal" href="#r03e71c6d7dc6-yeatman2012" id="id1">[Yeatman2012]</a> or RecoBundles <a class="reference internal" href="../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>.
 Parameters
@@ -80,7 +80,7 @@ bundle_dict: dict</p>
 </dd>
 </dl>
 </div></blockquote>
-<dl class="simple">
+<dl>
 <dt>tg<span class="classifier">StatefulTractogram</span></dt><dd><p>Bundles to segment</p>
 </dd>
 <dt>fdata, fbval, fbvec<span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
@@ -99,6 +99,21 @@ space.</p>
 </dd>
 <dt>reset_tg_space<span class="classifier">bool, optional</span></dt><dd><p>Whether to reset the space of the input tractogram after
 segmentation is complete. Default: False.</p>
+</dd>
+<dt>endpoint_info<span class="classifier">dict, optional. This overrides use of the</span></dt><dd><p>AAL atlas, which is the default behavior.
+The format for this should be:
+{“bundle1”: {“startpoint”:img1_1,</p>
+<blockquote>
+<div><blockquote>
+<div><p>“endpoint”:img1_2},</p>
+</div></blockquote>
+<dl class="simple">
+<dt>“bundle2”: {“startpoint”:img2_1,</dt><dd><p>“endpoint”:img2_2}}</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>where the images used are binary masks of the desired
+endpoints.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -277,6 +292,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -319,7 +335,7 @@ same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

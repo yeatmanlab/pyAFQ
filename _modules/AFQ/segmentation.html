@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -81,6 +81,7 @@
 <div class="viewcode-block" id="Segmentation"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation">[docs]</a><span class="k">class</span> <span class="nc">Segmentation</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">nb_points</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">nb_streamlines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;AFQ&#39;</span><span class="p">,</span>
                  <span class="n">reg_algo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">clip_edges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -93,10 +94,11 @@
                  <span class="n">pruning_thr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                  <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">dist_to_waypoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">filter_by_endpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">dist_to_aal</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                 <span class="n">dist_to_atlas</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
                  <span class="n">save_intermediates</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles.</span>
@@ -106,6 +108,9 @@
 <span class="sd">        nb_points : int, boolean</span>
 <span class="sd">            Resample streamlines to nb_points number of points.</span>
 <span class="sd">            If False, no resampling is done. Default: False</span>
+<span class="sd">        nb_streamlines : int, boolean</span>
+<span class="sd">            Subsample streamlines to nb_streamlines.</span>
+<span class="sd">            If False, no subsampling is don. Default: False</span>
 <span class="sd">        seg_algo : string</span>
 <span class="sd">            Algorithm for segmentation (case-insensitive):</span>
 <span class="sd">            &#39;AFQ&#39;: Segment streamlines into bundles,</span>
@@ -165,6 +170,11 @@
 <span class="sd">            from [Hua2008]_. Here, we choose an average probability that</span>
 <span class="sd">            needs to be exceeded for an individual streamline to be retained.</span>
 <span class="sd">            Default: 0.</span>
+<span class="sd">        dist_to_waypoint : float.</span>
+<span class="sd">            The distance that a streamline node has to be from the waypoint</span>
+<span class="sd">            ROI in order to be included or excluded.</span>
+<span class="sd">            If set to None (default), will be calculated as the</span>
+<span class="sd">            center-to-corner distance of the voxel in the diffusion data.</span>
 <span class="sd">        rng : RandomState or int</span>
 <span class="sd">            If None, creates RandomState.</span>
 <span class="sd">            If int, creates RandomState with seed rng.</span>
@@ -177,9 +187,9 @@
 <span class="sd">            Whether to filter the bundles based on their endpoints relative</span>
 <span class="sd">            to regions defined in the AAL atlas. Applies only to the waypoint</span>
 <span class="sd">            approach (XXX for now). Default: True.</span>
-<span class="sd">        dist_to_aal : float</span>
-<span class="sd">            If filter_by_endpoints is True, this is the distance from the</span>
-<span class="sd">            endpoints to the AAL atlas ROIs that is required.</span>
+<span class="sd">        dist_to_atlas : float</span>
+<span class="sd">            If filter_by_endpoints is True, this is the required distance</span>
+<span class="sd">            from the endpoints to the atlas ROIs.</span>
 <span class="sd">        save_intermediates : str, optional</span>
 <span class="sd">            The full path to a folder into which intermediate products</span>
 <span class="sd">            are saved. Default: None, means no saving of intermediates.</span>
@@ -193,6 +203,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.Segmentation&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span> <span class="o">=</span> <span class="n">nb_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_streamlines</span> <span class="o">=</span> <span class="n">nb_streamlines</span>
 
         <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
@@ -206,6 +217,7 @@
             <span class="n">reg_algo</span> <span class="o">=</span> <span class="n">reg_algo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">=</span> <span class="n">reg_algo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span> <span class="o">=</span> <span class="n">prob_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="n">dist_to_waypoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progressive</span> <span class="o">=</span> <span class="n">progressive</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span> <span class="o">=</span> <span class="n">greater_than</span>
@@ -216,7 +228,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pruning_thr</span> <span class="o">=</span> <span class="n">pruning_thr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span> <span class="o">=</span> <span class="n">return_idx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">filter_by_endpoints</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_aal</span> <span class="o">=</span> <span class="n">dist_to_aal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="n">dist_to_atlas</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_intermediates</span><span class="p">)):</span>
@@ -230,12 +242,22 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">tg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tg_orig_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">space</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_streamlines</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_streamlines</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="o">.</span><span class="n">from_sft</span><span class="p">(</span>
+                <span class="n">dts</span><span class="o">.</span><span class="n">select_random_set_of_streamlines</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nb_streamlines</span>
+                <span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tg</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">tg</span></div>
 
 <div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">fdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">fbvec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">endpoint_info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles based on either waypoint ROIs</span>
 <span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
@@ -266,6 +288,15 @@
 <span class="sd">        reset_tg_space : bool, optional</span>
 <span class="sd">            Whether to reset the space of the input tractogram after</span>
 <span class="sd">            segmentation is complete. Default: False.</span>
+<span class="sd">        endpoint_info : dict, optional. This overrides use of the</span>
+<span class="sd">            AAL atlas, which is the default behavior.</span>
+<span class="sd">            The format for this should be:</span>
+<span class="sd">            {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
+<span class="sd">                         &quot;endpoint&quot;:img1_2},</span>
+<span class="sd">             &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
+<span class="sd">                          &quot;endpoint&quot;:img2_2}}</span>
+<span class="sd">            where the images used are binary masks of the desired</span>
+<span class="sd">            endpoints.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -306,9 +337,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_map</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cross_streamlines</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">endpoint_info</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
+            <span class="c1"># We only care about midline crossing if we use AFQ:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_streamlines</span><span class="p">()</span>
             <span class="n">fiber_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_afq</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reco&quot;</span><span class="p">):</span>
             <span class="n">fiber_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_reco</span><span class="p">()</span>
@@ -426,10 +459,9 @@
         <span class="n">exclude_rois</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rule_idx</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
             <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="n">rule_idx</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
-                <span class="n">roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">),</span>
+            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
+                <span class="n">roi</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
                 <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">rule</span><span class="p">:</span>
@@ -528,25 +560,30 @@
             <span class="n">out_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_streamlines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span><span class="p">:</span>
-            <span class="n">aal_atlas</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_aal_atlas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">aal_atlas</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">],</span>
-                    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
-                            <span class="s1">&#39;AAL_registered_to_template.nii.gz&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">aal_atlas</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_aal_atlas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">)</span>
+                <span class="n">atlas</span> <span class="o">=</span> <span class="n">aal_atlas</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                        <span class="n">atlas</span><span class="p">,</span>
+                        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                                <span class="s1">&#39;atlas_registered_to_template.nii.gz&#39;</span><span class="p">))</span>
 
-            <span class="n">aal_atlas</span> <span class="o">=</span> <span class="n">aal_atlas</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+                <span class="n">atlas</span> <span class="o">=</span> <span class="n">atlas</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
             <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
             <span class="c1"># from mm to voxel units:</span>
             <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
             <span class="n">vox_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
-            <span class="n">dist_to_aal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_aal</span> <span class="o">/</span> <span class="n">vox_dim</span>
+            <span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">/</span> <span class="n">vox_dim</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
         <span class="c1"># Tolerance is set to the square of the distance to the corner</span>
         <span class="c1"># because we are using the squared Euclidean distance in calls to</span>
         <span class="c1"># `cdist` to make those calls faster.</span>
-        <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">for</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finding Streamlines for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span> <span class="n">exclude_roi</span> <span class="o">=</span> \
@@ -644,33 +681,64 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Filtering by endpoints&quot;</span><span class="p">)</span>
-                <span class="c1"># Create binary masks and warp these into subject&#39;s DWI space:</span>
-                <span class="n">aal_targets</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">bundles_to_aal</span><span class="p">([</span><span class="n">bundle</span><span class="p">],</span> <span class="n">atlas</span><span class="o">=</span><span class="n">aal_atlas</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">aal_idx</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">targ</span> <span class="ow">in</span> <span class="n">aal_targets</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">targ</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">aal_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">aal_atlas</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-                        <span class="n">aal_roi</span><span class="p">[</span><span class="n">targ</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">targ</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">targ</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
-                        <span class="n">warped_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
-                            <span class="n">aal_roi</span><span class="p">,</span>
-                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-                        <span class="n">aal_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">aal_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Before filtering &quot;</span>
                                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">select_sl</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># We use definitions of endpoints provided</span>
+                    <span class="c1"># through this dict:</span>
+                    <span class="n">start_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;startpoint&#39;</span><span class="p">]</span>
+                    <span class="n">end_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;endpoint&#39;</span><span class="p">]</span>
 
-                <span class="n">new_select_sl</span> <span class="o">=</span> <span class="n">clean_by_endpoints</span><span class="p">(</span><span class="n">select_sl</span><span class="p">,</span>
-                                                   <span class="n">aal_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                   <span class="n">aal_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                                   <span class="n">tol</span><span class="o">=</span><span class="n">dist_to_aal</span><span class="p">,</span>
-                                                   <span class="n">return_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">)</span>
+                    <span class="n">atlas_idx</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">pp</span> <span class="ow">in</span> <span class="p">[</span><span class="n">start_p</span><span class="p">,</span> <span class="n">end_p</span><span class="p">]:</span>
+                        <span class="n">pp</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                                          <span class="n">pp</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+                        <span class="n">atlas_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                        <span class="n">atlas_roi</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="c1"># Create binary masks and warp these into subject&#39;s</span>
+                        <span class="c1"># DWI space:</span>
+                        <span class="n">warped_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                            <span class="n">atlas_roi</span><span class="p">,</span>
+                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+                        <span class="n">atlas_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># We automatically fallback on AAL, which as its own</span>
+                    <span class="c1"># set of rules.</span>
+                    <span class="n">aal_targets</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">bundles_to_aal</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">bundle</span><span class="p">],</span> <span class="n">atlas</span><span class="o">=</span><span class="n">atlas</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">atlas_idx</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">targ</span> <span class="ow">in</span> <span class="n">aal_targets</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">targ</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">aal_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">atlas</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+                            <span class="n">aal_roi</span><span class="p">[</span><span class="n">targ</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">targ</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">targ</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="n">warped_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+                                <span class="n">aal_roi</span><span class="p">,</span>
+                                <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+                            <span class="n">atlas_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">atlas_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">new_select_sl</span> <span class="o">=</span> <span class="n">clean_by_endpoints</span><span class="p">(</span>
+                    <span class="n">select_sl</span><span class="p">,</span>
+                    <span class="n">atlas_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">atlas_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">tol</span><span class="o">=</span><span class="n">dist_to_atlas</span><span class="p">,</span>
+                    <span class="n">return_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">)</span>
+
                 <span class="c1"># Generate immediately:</span>
                 <span class="n">new_select_sl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_select_sl</span><span class="p">)</span>
 
                 <span class="c1"># We need to check this again:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_select_sl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;After filtering &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">select_sl</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
                     <span class="c1"># There&#39;s nothing here, set and move to the next bundle:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_return_empty</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
                     <span class="k">continue</span>
@@ -952,7 +1020,9 @@
                      <span class="ow">and</span> <span class="n">targets1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ep_is_idx</span> <span class="ow">and</span> <span class="n">sp_is_idx</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="n">e_s</span> <span class="o">=</span> <span class="s2">&quot;Need to provide endpoint and startpoint as &quot;</span>
+        <span class="n">e_s</span> <span class="o">+=</span> <span class="s2">&quot;indices, or provide an atlas&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e_s</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">sp_is_idx</span><span class="p">:</span>
         <span class="n">idxes0</span> <span class="o">=</span> <span class="n">targets0</span>
@@ -1026,6 +1096,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -1066,7 +1137,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

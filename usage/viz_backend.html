@@ -6,21 +6,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualization Backends &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Usage tracking with Google Analytics" href="tracking.html" />
+    <link rel="next" title="The pyAFQ Mask API" href="mask.html" />
     <link rel="prev" title="The pyAFQ configuration file" href="config.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -114,6 +114,9 @@ Below is an example dockerfile that can be used to build that base image:</p>
 <li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualization Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
 </ul>
 </li>
@@ -121,6 +124,7 @@ Below is an example dockerfile that can be used to build that base image:</p>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -129,7 +133,7 @@ Below is an example dockerfile that can be used to build that base image:</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Using pyAFQ</a><ul>
       <li>Previous: <a href="config.html" title="previous chapter">The pyAFQ configuration file</a></li>
-      <li>Next: <a href="tracking.html" title="next chapter">Usage tracking with Google Analytics</a></li>
+      <li>Next: <a href="mask.html" title="next chapter">The pyAFQ Mask API</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -161,7 +165,7 @@ Below is an example dockerfile that can be used to build that base image:</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

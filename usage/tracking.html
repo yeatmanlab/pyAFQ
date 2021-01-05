@@ -6,22 +6,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Usage tracking with Google Analytics &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Examples" href="../auto_examples/index.html" />
-    <link rel="prev" title="Visualization Backends" href="viz_backend.html" />
+    <link rel="prev" title="Matlab AFQ to Python AFQ conversion" href="converter.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -85,6 +85,9 @@ operating system.</p>
 <li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Usage tracking with Google Analytics</a></li>
 </ul>
 </li>
@@ -92,6 +95,7 @@ operating system.</p>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -99,7 +103,7 @@ operating system.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Using pyAFQ</a><ul>
-      <li>Previous: <a href="viz_backend.html" title="previous chapter">Visualization Backends</a></li>
+      <li>Previous: <a href="converter.html" title="previous chapter">Matlab AFQ to Python AFQ conversion</a></li>
       <li>Next: <a href="../auto_examples/index.html" title="next chapter">Examples</a></li>
   </ul></li>
   </ul></li>
@@ -132,7 +136,7 @@ operating system.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

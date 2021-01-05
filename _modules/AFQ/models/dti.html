@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.models.dti &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -45,14 +45,80 @@
 
 <span class="kn">from</span> <span class="nn">dipy.core.geometry</span> <span class="kn">import</span> <span class="n">vector_norm</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">dti</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">gamma</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit_dti&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">dtimodel</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">TensorModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">noise_from_b0</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coped from vistasoft&#39;s dtiComputeImageNoise</span>
+<span class="sd">    https://github.com/vistalab/vistasoft</span>
+<span class="sd">    And converted to python...</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_files : str or list</span>
+<span class="sd">        Files containing DWI data. If this is a str, that&#39;s the full path to a</span>
+<span class="sd">        single file. If it&#39;s a list, each entry is a full path.</span>
+<span class="sd">    bval_files : str or list</span>
+<span class="sd">        Equivalent to `data_files`.</span>
+<span class="sd">    mask : ndarray, optional</span>
+<span class="sd">        Binary mask, set to True or 1 in voxels to be processed.</span>
+<span class="sd">        Default: Process all voxels.</span>
+<span class="sd">    b0_threshold : float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make all-inclusive mask if None is provided</span>
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c1"># Number of volumes in the dw dataset</span>
+    <span class="n">num_vols</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># Get brainmask indices</span>
+    <span class="n">brain_inds</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># preallocate a 2d array</span>
+    <span class="c1"># The first dimension is the number of volumes</span>
+    <span class="c1"># and the 2nd is each voxel (within the brain mask)</span>
+    <span class="n">masked_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_vols</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">brain_inds</span><span class="p">)))</span>
+    <span class="c1"># Loop over the volumes and assign the voxels within the brain mask</span>
+    <span class="c1"># to masked_data</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vols</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">masked_data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">brain_inds</span><span class="p">]</span>
+
+    <span class="c1"># Find which volumes are b=0</span>
+    <span class="n">b0_inds</span> <span class="o">=</span> <span class="p">(</span><span class="n">bvals</span> <span class="o">&gt;</span> <span class="n">b0_threshold</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b0_inds</span><span class="p">)</span>
+    <span class="c1"># Pull out the b=0 volumes</span>
+    <span class="n">b0_data</span> <span class="o">=</span> <span class="n">masked_data</span><span class="p">[</span><span class="n">b0_inds</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="c1"># Calculate the median of the standard deviation. We do not think that</span>
+    <span class="c1"># this needs to be rescaled. Henkelman et al. (1985) suggest that this</span>
+    <span class="c1"># aproaches the true noise as the signal increases.</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">b0_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># std of a sample underestimates sigma</span>
+    <span class="c1"># (see http://nbviewer.ipython.org/4287207/)</span>
+    <span class="c1"># This can be very big for small n (e.g., 20# for n=2)</span>
+    <span class="c1"># We can compute the underestimation bias:</span>
+    <span class="n">bias</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="o">*</span> <span class="p">(</span><span class="n">gamma</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)))</span>
+
+    <span class="c1"># and correct for it:</span>
+    <span class="k">return</span> <span class="n">sigma</span> <span class="o">+</span> <span class="n">bias</span>
+
+
+<span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dtimodel</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">TensorModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtimodel</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">TensorModel</span><span class="p">(</span>
+            <span class="n">gtab</span><span class="p">,</span>
+            <span class="n">fit_method</span><span class="o">=</span><span class="s2">&quot;RT&quot;</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dtimodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
 
@@ -184,6 +250,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -224,7 +291,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

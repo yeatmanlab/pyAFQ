@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -61,7 +61,27 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">from</span> <span class="nn">templateflow</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">tflow</span>
+
+<span class="c1"># capture templateflow resource warning and log</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">default_warning_format</span> <span class="o">=</span> <span class="n">warnings</span><span class="o">.</span><span class="n">formatwarning</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">formatwarning</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pywarnings_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;py.warnings&#39;</span><span class="p">)</span>
+    <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+    <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">BASIC_FORMAT</span><span class="p">))</span>
+    <span class="n">pywarnings_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">ResourceWarning</span><span class="p">,</span>
+        <span class="n">module</span><span class="o">=</span><span class="s2">&quot;templateflow&quot;</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">templateflow</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">tflow</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">formatwarning</span> <span class="o">=</span> <span class="n">default_warning_format</span>
+
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="kn">import</span> <span class="n">_make_fetcher</span>
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
@@ -73,12 +93,13 @@
 
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 
-
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fetch_callosum_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_callosum_templates&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch_hcp&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
            <span class="s2">&quot;read_stanford_hardi_tractography&quot;</span><span class="p">,</span>
            <span class="s2">&quot;organize_stanford_data&quot;</span><span class="p">]</span>
+
+
 
 <span class="n">BUNDLE_RECO_2_AFQ</span> <span class="o">=</span> \
     <span class="p">{</span>
@@ -86,20 +107,33 @@
         <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">,</span>
         <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_L&quot;</span><span class="p">,</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">,</span>
         <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_R&quot;</span>
     <span class="p">}</span>
 
 <span class="n">BUNDLE_MAT_2_PYTHON</span> <span class="o">=</span> \
     <span class="p">{</span><span class="s1">&#39;Right Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Left IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;Right IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;LeftIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;RightIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Left Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;LeftCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Callosum Forceps Major&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;Callosum Forceps Minor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;CallosumForcepsMajor&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;CallosumForcepsMinor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
      <span class="s1">&#39;Right ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">}</span>
+     <span class="s1">&#39;RightILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">}</span>
 
 <span class="n">afq_home</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">)</span>
 
@@ -188,6 +222,59 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;callosum templates loaded in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">template_dict</span></div>
+
+
+<span class="k">def</span> <span class="nf">read_resample_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">resample_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads an roi from file-name/img and resamples it to conform with</span>
+<span class="sd">    another file-name/img.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    roi : str or nibabel image class instance.</span>
+<span class="sd">        Should contain a binary volume with 1s in the region of interest and</span>
+<span class="sd">        0s elsewhere.</span>
+
+<span class="sd">    resample_to : str or nibabel image class instance, optional</span>
+<span class="sd">        A template image to resample to. Typically, this should be the</span>
+<span class="sd">        template to which individual-level data are registered. Defaults to</span>
+<span class="sd">        the MNI template.</span>
+
+<span class="sd">    threshold: bool or float</span>
+<span class="sd">        If set to False (default), resampled result is returned. Otherwise,</span>
+<span class="sd">        the resampled result is thresholded at this value and binarized.</span>
+<span class="sd">        This is not applied if the input ROI is already in the space of the</span>
+<span class="sd">        output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nibabel image class instance that contains the binary ROI resampled into</span>
+<span class="sd">    the requested space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">resample_to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">resample_to</span> <span class="o">=</span> <span class="n">read_mni_template</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">roi</span>
+
+    <span class="n">as_array</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                            <span class="n">resample_to</span><span class="p">,</span>
+                            <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                            <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">threshold</span><span class="p">:</span>
+        <span class="n">as_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">as_array</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+        <span class="n">as_array</span><span class="p">,</span>
+        <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span>
 
 
 <span class="n">template_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ATR_roi1_L.nii.gz&quot;</span><span class="p">,</span>
@@ -1598,11 +1685,13 @@
     <span class="k">return</span> <span class="n">data_files</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="n">study</span><span class="p">)</span></div>
 
 
-<span class="n">stanford_hardi_tractography_remote_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;5325715&quot;</span><span class="p">,</span> <span class="s2">&quot;5325718&quot;</span><span class="p">]</span>
+<span class="n">stanford_hardi_tractography_remote_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;5325715&quot;</span><span class="p">,</span> <span class="s2">&quot;5325718&quot;</span><span class="p">,</span> <span class="s2">&quot;25289735&quot;</span><span class="p">]</span>
 <span class="n">stanford_hardi_tractography_hashes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;6f4bdae702031a48d1cd3811e7a42ef9&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;f20854b4f710577c58bd01072cfb4de6&#39;</span><span class="p">]</span>
+                                      <span class="s1">&#39;f20854b4f710577c58bd01072cfb4de6&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;294bfd1831861e8635eef8834ff18892&#39;</span><span class="p">]</span>
 <span class="n">stanford_hardi_tractography_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">]</span>
+                                      <span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;full_segmented_cleaned_tractography.trk&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="fetch_stanford_hardi_tractography"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_stanford_hardi_tractography">[docs]</a><span class="n">fetch_stanford_hardi_tractography</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
     <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
@@ -1627,13 +1716,23 @@
                 <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
 
+    <span class="c1"># We need the original data as reference</span>
+    <span class="n">dwi_img</span><span class="p">,</span> <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_stanford_hardi</span><span class="p">()</span>
+
     <span class="n">files_dict</span><span class="p">[</span><span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_trk</span><span class="p">(</span>
         <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
                 <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;tractography_subsampled.trk&#39;</span><span class="p">),</span>
-        <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>
+        <span class="n">dwi_img</span><span class="p">,</span>
         <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">trk_header_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">streamlines</span>
+
+    <span class="n">files_dict</span><span class="p">[</span><span class="s1">&#39;full_segmented_cleaned_tractography.trk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_trk</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">afq_home</span><span class="p">,</span>
+            <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;full_segmented_cleaned_tractography.trk&#39;</span><span class="p">),</span>
+        <span class="n">dwi_img</span><span class="p">)</span><span class="o">.</span><span class="n">streamlines</span>
 
     <span class="k">return</span> <span class="n">files_dict</span></div>
 
@@ -1671,8 +1770,8 @@
         <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">t1_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">anat_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_T1w.nii.gz&#39;</span><span class="p">))</span>
         <span class="n">dwi_img</span><span class="p">,</span> <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_cfin_dwi</span><span class="p">()</span>
         <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dwi_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.nii.gz&#39;</span><span class="p">))</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvecs&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvals&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvec&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bval&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
 
     <span class="n">to_bids_description</span><span class="p">(</span>
         <span class="n">bids_path</span><span class="p">,</span>
@@ -1686,7 +1785,7 @@
            <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;dipy&quot;</span><span class="p">}})</span>
 
 
-<div class="viewcode-block" id="organize_stanford_data"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.organize_stanford_data">[docs]</a><span class="k">def</span> <span class="nf">organize_stanford_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="organize_stanford_data"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.organize_stanford_data">[docs]</a><span class="k">def</span> <span class="nf">organize_stanford_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_previous_afq</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If necessary, downloads the Stanford HARDI dataset into DIPY directory and</span>
 <span class="sd">    creates a BIDS compliant file-system structure in AFQ data directory:</span>
@@ -1708,10 +1807,12 @@
 <span class="sd">            └── sub-01</span>
 <span class="sd">                └── ses-01</span>
 <span class="sd">                    └── dwi</span>
-<span class="sd">                        ├── sub-01_ses-01_dwi.bvals</span>
-<span class="sd">                        ├── sub-01_ses-01_dwi.bvecs</span>
+<span class="sd">                        ├── sub-01_ses-01_dwi.bval</span>
+<span class="sd">                        ├── sub-01_ses-01_dwi.bvec</span>
 <span class="sd">                        └── sub-01_ses-01_dwi.nii.gz</span>
 
+<span class="sd">    If clear_previous_afq is True and there is an afq folder in derivatives,</span>
+<span class="sd">    it will be removed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.data&#39;</span><span class="p">)</span>
 
@@ -1729,6 +1830,11 @@
     <span class="n">derivatives_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">)</span>
     <span class="n">dmriprep_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">derivatives_path</span><span class="p">,</span> <span class="s1">&#39;vistasoft&#39;</span><span class="p">)</span>
     <span class="n">freesurfer_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">derivatives_path</span><span class="p">,</span> <span class="s1">&#39;freesurfer&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">clear_previous_afq</span><span class="p">:</span>
+        <span class="n">afq_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">derivatives_path</span><span class="p">,</span> <span class="s1">&#39;afq&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">afq_folder</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">afq_folder</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">derivatives_path</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;creating derivatives directory: </span><span class="si">{</span><span class="n">derivatives_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1750,8 +1856,8 @@
 
         <span class="n">dwi_img</span><span class="p">,</span> <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">read_stanford_hardi</span><span class="p">()</span>
         <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dwi_img</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.nii.gz&#39;</span><span class="p">))</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvecs&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvals&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bvec&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvecs</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_folder</span><span class="p">,</span> <span class="s1">&#39;sub-01_ses-01_dwi.bval&#39;</span><span class="p">),</span> <span class="n">gtab</span><span class="o">.</span><span class="n">bvals</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Dataset is already in place. If you want to fetch it &#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;again please first remove the folder &#39;</span>
@@ -2045,16 +2151,31 @@
         <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">]],</span>
         <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightuncinatefront&#39;</span><span class="p">]],</span>
         <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftarctemp&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]]}</span>
+        <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]],</span>
+        <span class="s2">&quot;AntFrontal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;Motor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;Occipital&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;Orbital&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;PostParietal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;SupFrontal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;SupParietal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;Temporal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]}</span>
 
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
         <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">endpoint_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aal_to_regions</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="n">atlas</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">endpoint_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bundle</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">endpoint_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aal_to_regions</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="n">atlas</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.data&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmentation end points undefined for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">,&quot;</span>
+                           <span class="o">+</span> <span class="s2">&quot; continuing without end points&quot;</span><span class="p">)</span>
+            <span class="n">targets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">targets</span>
 
@@ -2371,6 +2492,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -2411,7 +2533,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

@@ -1,0 +1,491 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting the Optic Radiations &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plotting Novel Tract Profiles:" href="plot_callosal_tract_profile.html" />
+    <link rel="prev" title="Plotting tract profiles using RecoBundles" href="plot_recobundles.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-optic-radiations-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="plotting-the-optic-radiations">
+<span id="sphx-glr-auto-examples-optic-radiations-py"></span><h1>Plotting the Optic Radiations<a class="headerlink" href="#plotting-the-optic-radiations" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ is designed to be customizable. This example shows how
+you can customize it to define a new bundle based
+on both waypoint ROIs of your design, as well as endpoint
+ROIs of your design.</p>
+<p>For now, this is a hypothetical example, as we do not yet
+provide these ROIs as part of the software.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">get_fnames</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">fetcher</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">save_tractogram</span><span class="p">,</span> <span class="n">load_tractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
+<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">import</span> <span class="nn">AFQ.models.dti</span> <span class="k">as</span> <span class="nn">dti</span>
+<span class="kn">import</span> <span class="nn">AFQ.models.csd</span> <span class="k">as</span> <span class="nn">csd</span>
+<span class="kn">import</span> <span class="nn">AFQ.segmentation</span> <span class="k">as</span> <span class="nn">seg</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.volume</span> <span class="kn">import</span> <span class="n">transform_inverse_roi</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="c1"># Target directory for this example&#39;s output files</span>
+<span class="n">working_dir</span> <span class="o">=</span> <span class="s2">&quot;./optic_radiations&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="get-example-data">
+<h2>Get example data:<a class="headerlink" href="#get-example-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span><span class="p">()</span>
+<span class="n">hardi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
+<span class="n">hardi_fdata</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbval</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
+<span class="n">hardi_fbvec</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculate-dti">
+<h2>Calculate DTI:<a class="headerlink" href="#calculate-dti" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">)):</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
+                             <span class="n">out_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">),</span>
+                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_params.nii.gz&#39;</span><span class="p">)}</span>
+
+<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
+<span class="n">FA_data</span> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculate-csd">
+<h2>Calculate CSD:<a class="headerlink" href="#calculate-csd" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating CSD...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;csd_sh_coeff.nii.gz&#39;</span><span class="p">)):</span>
+    <span class="n">sh_coeff</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">fit_csd</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
+                           <span class="n">sh_order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">sh_coeff</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;csd_sh_coeff.nii.gz&quot;</span><span class="p">)</span>
+
+<span class="n">apm</span> <span class="o">=</span> <span class="n">shm</span><span class="o">.</span><span class="n">anisotropic_power</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sh_coeff</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="register-the-individual-data-to-a-template">
+<h2>Register the individual data to a template:<a class="headerlink" href="#register-the-individual-data-to-a-template" title="Permalink to this headline">¶</a></h2>
+<p>For the purpose of bundle segmentation, the individual brain is registered to
+the MNI T1 template. The waypoint ROIs used in segmentation are then each
+brought into each subject’s native space to test streamlines for whether they
+fulfill the segmentation criteria.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To find the right place for the waypoint ROIs, we calculate a non-linear
+transformation between the individual’s brain DWI measurement (the b0
+measurements) and the MNI T1 template.
+Before calculating this non-linear warping, we perform a pre-alignment
+using an affine transformation.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
+
+<span class="n">MNI_T1w_img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="s2">&quot;T1w&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
+    <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
+    <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
+    <span class="c1"># Prealign using affine registration</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">prealign</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">affine_registration</span><span class="p">(</span>
+        <span class="n">apm</span><span class="p">,</span>
+        <span class="n">MNI_T1w_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+        <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+        <span class="n">MNI_T1w_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+    <span class="c1"># Then register using a non-linear registration using the affine for</span>
+    <span class="c1"># prealignment</span>
+    <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
+                                                 <span class="n">prealign</span><span class="o">=</span><span class="n">prealign</span><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
+                               <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T1w_img</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bundle-specification">
+<h2>Bundle specification<a class="headerlink" href="#bundle-specification" title="Permalink to this headline">¶</a></h2>
+<p>Here, a bundle specification is defined as a series of waypoint ROIs.
+For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
+exclusion ROIs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">roi_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s2">&quot;AFQ_Data&quot;</span><span class="p">,</span> <span class="s2">&quot;visual&quot;</span><span class="p">)</span>
+<span class="n">waypoint_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roi_folder</span><span class="p">,</span> <span class="s2">&quot;waypoint&quot;</span><span class="p">)</span>
+
+<span class="n">waypoint_roi_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;left_OR_1.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_OR_2.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_OP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_TP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_pos_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OR_1.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OR_2.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_pos_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_TP_MNI.nii.gz&quot;</span><span class="p">]</span>
+
+<span class="n">waypoint_rois</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">waypoint_roi_fnames</span><span class="p">:</span>
+    <span class="n">waypoint_rois</span><span class="p">[</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_resample_roi</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">waypoint_folder</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+
+<span class="n">bundles</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;L_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ROIs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;left_OR_1&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;left_OR_2&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;left_OP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;left_TP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;left_pos_thal_MNI&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;rules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="s2">&quot;cross_midline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">},</span>
+    <span class="s2">&quot;R_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ROIs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;right_OR_1&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;right_OR_2&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;right_OP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;right_TP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">waypoint_rois</span><span class="p">[</span><span class="s2">&quot;right_pos_thal_MNI&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;rules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="s2">&quot;cross_midline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="endpoints">
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the waypoint ROIs, we will customize the endpoint ROIs
+used for filtering the streamlines that are selected based on the
+waypoint ROIs defined above.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">endpoint_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roi_folder</span><span class="p">,</span> <span class="s2">&quot;endpoint&quot;</span><span class="p">)</span>
+
+<span class="n">endpoint_spec</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;L_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;startpoint&quot;</span><span class="p">:</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endpoint_folder</span><span class="p">,</span>
+                                       <span class="s1">&#39;left_thal_MNI.nii.gz&#39;</span><span class="p">)),</span>
+        <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endpoint_folder</span><span class="p">,</span>
+                                     <span class="s1">&#39;left_V1_MNI.nii.gz&#39;</span><span class="p">))},</span>
+    <span class="s2">&quot;R_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;startpoint&quot;</span><span class="p">:</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endpoint_folder</span><span class="p">,</span>
+                                       <span class="s1">&#39;right_thal_MNI.nii.gz&#39;</span><span class="p">)),</span>
+        <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endpoint_folder</span><span class="p">,</span>
+                                     <span class="s1">&#39;right_V1_MNI.nii.gz&#39;</span><span class="p">))}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tracking">
+<h2>Tracking<a class="headerlink" href="#tracking" title="Permalink to this headline">¶</a></h2>
+<p>We will use PFT and generate a large number of streamlines from seeds
+placed only within the inclusion ROIs. This allows us to oversample that
+part of the brain, without having to deal with very large tractograms.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f_pve_csf</span><span class="p">,</span> <span class="n">f_pve_gm</span><span class="p">,</span> <span class="n">f_pve_wm</span> <span class="o">=</span> <span class="n">get_fnames</span><span class="p">(</span><span class="s1">&#39;stanford_pve_maps&#39;</span><span class="p">)</span>
+
+<span class="n">pve_csf</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_pve_csf</span><span class="p">)</span>
+<span class="n">pve_gm</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_pve_gm</span><span class="p">)</span>
+<span class="n">pve_wm</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_pve_wm</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;pft_streamlines.trk&#39;</span><span class="p">)):</span>
+    <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
+            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">transform_inverse_roi</span><span class="p">(</span>
+                <span class="n">roi</span><span class="p">,</span>
+                <span class="n">mapping</span><span class="p">,</span>
+                <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                     <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Add voxels that aren&#39;t there yet:</span>
+            <span class="k">if</span> <span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seed_roi</span><span class="p">,</span> <span class="n">warped_roi</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">pp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">endpoint_spec</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">endpoint_spec</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="n">pp</span><span class="p">]</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                               <span class="n">MNI_T1w_img</span><span class="p">,</span>
+                               <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                               <span class="n">MNI_T1w_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">transform_inverse_roi</span><span class="p">(</span>
+                <span class="n">roi</span><span class="p">,</span>
+                <span class="n">mapping</span><span class="p">,</span>
+                <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
+
+            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                     <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pp</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">))</span>
+
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">seed_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+             <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">))</span>
+
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">sh_coeff</span><span class="p">,</span>
+                    <span class="n">seed_mask</span><span class="o">=</span><span class="n">seed_roi</span><span class="p">,</span>
+                    <span class="n">n_seeds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="n">tracker</span><span class="o">=</span><span class="s2">&quot;pft&quot;</span><span class="p">,</span>
+                    <span class="n">stop_mask</span><span class="o">=</span><span class="p">(</span><span class="n">pve_wm</span><span class="p">,</span> <span class="n">pve_gm</span><span class="p">,</span> <span class="n">pve_csf</span><span class="p">),</span>
+                    <span class="n">stop_threshold</span><span class="o">=</span><span class="s2">&quot;ACT&quot;</span><span class="p">,</span>
+                    <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;prob&quot;</span><span class="p">,</span>
+                    <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;CSD&quot;</span><span class="p">)</span>
+
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;pft_streamlines.trk&#39;</span><span class="p">),</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;pft_streamlines.trk&#39;</span><span class="p">),</span> <span class="n">img</span><span class="p">)</span>
+
+<span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="segmentation">
+<h2>Segmentation<a class="headerlink" href="#segmentation" title="Permalink to this headline">¶</a></h2>
+<p>We run the segmentation using both the <code class="docutils literal notranslate"><span class="pre">bundles</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">endpoint_spec</span></code> we defined above. In this particular case, we set a
+rather lenient criterion for endpoint filtering, by changing from the
+default value of <code class="docutils literal notranslate"><span class="pre">dist_to_atlas</span></code> (4 mm) to 5 mm.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segmenting fiber groups...&quot;</span><span class="p">)</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">dist_to_atlas</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
+                     <span class="n">sft</span><span class="p">,</span>
+                     <span class="n">fdata</span><span class="o">=</span><span class="n">hardi_fdata</span><span class="p">,</span>
+                     <span class="n">fbval</span><span class="o">=</span><span class="n">hardi_fbval</span><span class="p">,</span>
+                     <span class="n">fbvec</span><span class="o">=</span><span class="n">hardi_fbvec</span><span class="p">,</span>
+                     <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+                     <span class="n">reg_template</span><span class="o">=</span><span class="n">MNI_T1w_img</span><span class="p">,</span>
+                     <span class="n">endpoint_dict</span><span class="o">=</span><span class="n">endpoint_spec</span><span class="p">)</span>
+
+<span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cleaning">
+<h2>Cleaning<a class="headerlink" href="#cleaning" title="Permalink to this headline">¶</a></h2>
+<p>We proceed to clean outliers and save out trk files with the bundles.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning fiber groups...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaning </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+    <span class="n">new_fibers</span><span class="p">,</span> <span class="n">idx_in_bundle</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">clean_bundle</span><span class="p">(</span>
+        <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
+        <span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Afer cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_fibers</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+    <span class="n">new_fibers</span> <span class="o">=</span> <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span>
+    <span class="n">idx_in_global</span> <span class="o">=</span> <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">][</span><span class="n">idx_in_bundle</span><span class="p">]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_idx.npy&#39;</span><span class="p">),</span> <span class="n">idx_in_global</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">new_fibers</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                             <span class="n">img</span><span class="p">,</span>
+                             <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
+    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bundle-profiles">
+<h2>Bundle profiles<a class="headerlink" href="#bundle-profiles" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can extract and plot bundle profiles.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
+                          <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                          <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="citation">
+<dt class="label" id="yeatman2012"><span class="brackets">Yeatman2012</span></dt>
+<dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
+Brian A Wandell, Heidi M Feldman, “Tract profiles of
+white matter properties: automating fiber-tract
+quantification”, PloS One, 7: e49790</p>
+</dd>
+<dt class="label" id="yeatman2014"><span class="brackets">Yeatman2014</span></dt>
+<dd><p>Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
+“Lifespan maturation and degeneration of human brain white
+matter”, Nature Communications 5: 4932</p>
+</dd>
+</dl>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-optic-radiations-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8ab943d07f5bf69d24fd3b946f7ce98c/optic_radiations.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optic_radiations.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/f207eb40a64ec29a781ba7d36dcc6949/optic_radiations.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">optic_radiations.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting the Optic Radiations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_recobundles.html" title="previous chapter">Plotting tract profiles using RecoBundles</a></li>
+      <li>Next: <a href="plot_callosal_tract_profile.html" title="next chapter">Plotting Novel Tract Profiles:</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/optic_radiations.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

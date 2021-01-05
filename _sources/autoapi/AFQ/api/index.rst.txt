@@ -63,7 +63,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_info=None, dask_it=False, force_recompute=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None)
+.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_info=None, dask_it=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, endpoint_info=None, clean_params=None)
 
    Bases: :class:`object`
 
@@ -130,12 +130,22 @@ Functions
 
       
 
+   .. attribute:: dki_mk
+      
+
+      
+
    .. attribute:: dki_fa
       
 
       
 
    .. attribute:: dki_md
+      
+
+      
+
+   .. attribute:: dki_awf
       
 
       
@@ -221,6 +231,12 @@ Functions
    .. method:: _dki_md(self, row)
 
 
+   .. method:: _dki_awf(self, row, sphere='repulsion100', gtol=0.01)
+
+
+   .. method:: _dki_mk(self, row)
+
+
    .. method:: _get_best_scalar(self)
 
 
@@ -266,16 +282,16 @@ Functions
    .. method:: _viz_prepare_vols(self, row, volume, xform_volume, color_by_volume, xform_color_by_volume)
 
 
-   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40)
+   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
 
 
-   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40)
+   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
 
 
    .. method:: _plot_tract_profiles(self, row)
 
 
-   .. method:: _export_timing(self, row)
+   .. method:: _export_timing(self, row, all_sub_sess=None)
 
 
    .. method:: _get_affine(self, fname)
@@ -353,6 +369,12 @@ Functions
    .. method:: get_dki(self)
 
 
+   .. method:: set_dki_mk(self)
+
+
+   .. method:: get_dki_mk(self)
+
+
    .. method:: set_dki_fa(self)
 
 
@@ -363,6 +385,12 @@ Functions
 
 
    .. method:: get_dki_md(self)
+
+
+   .. method:: set_dki_awf(self)
+
+
+   .. method:: get_dki_awf(self)
 
 
    .. method:: set_mapping(self)
@@ -410,10 +438,10 @@ Functions
    .. method:: export_sl_counts(self)
 
 
-   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40, inline=False, interactive=False)
+   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40, inline=False, interactive=False)
 
 
-   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, xform_color_by_volume=False, n_points=40, inline=False, interactive=False)
+   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40, inline=False, interactive=False)
 
 
    .. method:: plot_tract_profiles(self)
@@ -425,7 +453,7 @@ Functions
    .. method:: combine_profiles(self)
 
 
-   .. method:: export_timing(self)
+   .. method:: export_timing(self, all_sub_sess=None)
 
 
    .. method:: export_all(self)

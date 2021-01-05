@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Using cloudknot to run pyAFQ on AWS batch: &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="AFQ with HCP data" href="cloudknot_hcp_example.html" />
+    <link rel="prev" title="How pyAFQ uses BIDS" href="plot_bids_layout.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-cloudknot-example-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="using-cloudknot-to-run-pyafq-on-aws-batch">
+<span id="sphx-glr-auto-examples-cloudknot-example-py"></span><h1>Using cloudknot to run pyAFQ on AWS batch:<a class="headerlink" href="#using-cloudknot-to-run-pyafq-on-aws-batch" title="Permalink to this headline">¶</a></h1>
+<p>One of the purposes of <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code> is to analyze large-scale openly-available datasets,
+such as those in the <a class="reference external" href="https://www.humanconnectome.org/">Human Connectome Project</a>.</p>
+<p>To analyze these datasets, large amounts of compute are needed. One way to gain access
+to massive computational power is by using cloud computing. Here, we will demonstrate
+how to use <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code> in the Amazon Web Services cloud.</p>
+<p>We will rely on the <a class="reference external" href="https://aws.amazon.com/batch/">AWS Batch Service</a> , and we will
+submit work into AWS Batch using software that our group developed called
+<a class="reference external" href="https://nrdg.github.io/cloudknot/">Cloudknot</a>.</p>
+<p>Import cloudknot and set the AWS region within which computations will take place. Setting a
+region is important, because if the data that you are analyzing is stored in
+<a class="reference external" href="https://aws.amazon.com/s3/">AWS S3</a> in a particular region, it is best to run the computation
+in that region as well. That is because AWS charges for inter-region transfer of data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cloudknot</span> <span class="k">as</span> <span class="nn">ck</span>
+<span class="n">ck</span><span class="o">.</span><span class="n">set_region</span><span class="p">(</span><span class="s1">&#39;us-east-1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="define-the-function-to-use">
+<h2>Define the function to use<a class="headerlink" href="#define-the-function-to-use" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> uses the single program multiple data paradigm of computing. This means that the same
+function will be run on multiple different inputs. For example, a <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code> processing function run
+on multiple different subjects in a dataset.
+Below, we define the function that we will use. Notice that <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> functions include the
+import statements of the dependencies used. This is necessary so that <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> knows
+what dependencies to install into AWS Batch to run this function.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">afq_process_subject</span><span class="p">(</span><span class="n">subject</span><span class="p">):</span>
+    <span class="c1"># define a function that each job will run</span>
+    <span class="c1"># In this case, each process does a single subject</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="kn">import</span> <span class="nn">s3fs</span>
+    <span class="c1"># all imports must be at the top of the function</span>
+    <span class="c1"># cloudknot installs the appropriate packages from pip</span>
+    <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afqd</span>
+    <span class="kn">import</span> <span class="nn">AFQ.api</span> <span class="k">as</span> <span class="nn">api</span>
+    <span class="kn">import</span> <span class="nn">AFQ.mask</span> <span class="k">as</span> <span class="nn">afm</span>
+
+    <span class="c1"># set logging level to your choice</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="c1"># Download the given subject to your local machine from s3</span>
+    <span class="n">study_ixi</span> <span class="o">=</span> <span class="n">afqd</span><span class="o">.</span><span class="n">S3BIDSStudy</span><span class="p">(</span>
+        <span class="s2">&quot;my_study&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;my_study_bucket&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;my_study_prefix&quot;</span><span class="p">,</span>
+        <span class="n">subjects</span><span class="o">=</span><span class="p">[</span><span class="n">subject</span><span class="p">],</span>
+        <span class="n">anon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">study_ixi</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+        <span class="s2">&quot;local_bids_dir&quot;</span><span class="p">,</span>
+        <span class="n">include_derivs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pipeline_name&quot;</span><span class="p">])</span>
+
+    <span class="c1"># you can optionally provide your own segmentation file</span>
+    <span class="c1"># in this case, we look for a file with suffix &#39;seg&#39;</span>
+    <span class="c1"># in the &#39;pipeline_name&#39; pipeline,</span>
+    <span class="c1"># and we consider all non-zero labels to be a part of the brain</span>
+    <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledMaskFile</span><span class="p">(</span>
+        <span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;pipeline_name&#39;</span><span class="p">},</span> <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># define the api AFQ object</span>
+    <span class="n">myafq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
+        <span class="n">local_bids_dir</span><span class="p">,</span>
+        <span class="n">dmriprep</span><span class="o">=</span><span class="s2">&quot;pipeline_name&quot;</span><span class="p">,</span>
+        <span class="n">brain_mask</span><span class="o">=</span><span class="n">brain_mask</span><span class="p">,</span>
+        <span class="n">viz_backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>  <span class="c1"># this will generate both interactive html and GIFs</span>
+        <span class="n">scalars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dki_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dki_md&quot;</span><span class="p">])</span>
+
+    <span class="c1"># export_all runs the entire pipeline and creates many useful derivates</span>
+    <span class="n">myafq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+
+    <span class="c1"># upload the results to some location on s3</span>
+    <span class="n">myafq</span><span class="o">.</span><span class="n">upload_to_s3</span><span class="p">(</span>
+        <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(),</span>
+        <span class="sa">f</span><span class="s2">&quot;my_study_bucket/my_study_prefix/derivatives/afq&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here we provide a list of subjects that we have selected to process
+to randomly select 3 subjects without replacement, instead do:
+subjects = [[1], [2], [3]]
+see the docstring for S3BIDSStudy.__init__ for more information</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123456</span><span class="p">,</span> <span class="mi">123457</span><span class="p">,</span> <span class="mi">123458</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="defining-a-knot-instance">
+<h2>Defining a <code class="docutils literal notranslate"><span class="pre">Knot</span></code> instance<a class="headerlink" href="#defining-a-knot-instance" title="Permalink to this headline">¶</a></h2>
+<p>We instantiate a class instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">ck.Knot</span></code> class.  This object will be used to run your jobs.
+The object is instantiated with the <cite>‘AmazonS3FullAccess’</cite> policy, so that it can write the results
+out to S3, into a bucket that you have write permissions on.
+Setting the <cite>bid_percentage</cite> key-word makes AWS Batch use
+<a class="reference external" href="https://aws.amazon.com/ec2/spot/">spot EC2 instances</a> for the computation.
+This can result in substantial cost-savings, as spot compute instances can cost
+much less than on-demand instances. However, not that spot instances can also
+be evicted, so if completing all of the work is very time-sensitive, do not set this
+key-word argument. Using the <cite>image_github_installs</cite> key-word argument will
+install pyAFQ from GitHub. You can also specify other forks and branches to
+install from.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span> <span class="o">=</span> <span class="n">ck</span><span class="o">.</span><span class="n">Knot</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;afq_process_subject-201009-0&#39;</span><span class="p">,</span>
+    <span class="n">func</span><span class="o">=</span><span class="n">afq_process_subject</span><span class="p">,</span>
+    <span class="n">base_image</span><span class="o">=</span><span class="s1">&#39;python:3.8&#39;</span><span class="p">,</span>
+    <span class="n">image_github_installs</span><span class="o">=</span><span class="s2">&quot;https://github.com/yeatmanlab/pyAFQ.git&quot;</span><span class="p">,</span>
+    <span class="n">pars_policies</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;AmazonS3FullAccess&#39;</span><span class="p">,),</span>
+    <span class="n">bid_percentage</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="launching-the-computation">
+<h2>Launching the computation<a class="headerlink" href="#launching-the-computation" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">map()</span></code> method of the :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>Knot object maps each of the inputs provided
+as a sequence onto the function and executes the function on each one of them in
+parallel.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once computations have started, you can call the following
+function to view the progress of jobs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span><span class="o">.</span><span class="n">view_jobs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can also view the status of a specific job:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knot</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span>
+</pre></div>
+</div>
+<p>When all jobs are finished, remember to use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">clobber()</span></code> method to
+destroy all of the AWS resources created by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Knot</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+<span class="n">knot</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In a second <code class="xref py py-class docutils literal notranslate"><span class="pre">Knot</span></code> object, we use a function that takes the resulting profiles of each subject
+and combines them into one csv file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">afq_combine_profiles</span><span class="p">(</span><span class="n">dummy_argument</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">AFQ.api</span> <span class="kn">import</span> <span class="n">download_and_combine_afq_profiles</span>
+    <span class="n">download_and_combine_afq_profiles</span><span class="p">(</span>
+        <span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;my_study_bucket&quot;</span><span class="p">,</span> <span class="s2">&quot;my_study_prefix/derivatives/afq&quot;</span><span class="p">)</span>
+
+
+<span class="n">knot2</span> <span class="o">=</span> <span class="n">ck</span><span class="o">.</span><span class="n">Knot</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;afq_combine_subjects-201009-0&#39;</span><span class="p">,</span>
+    <span class="n">func</span><span class="o">=</span><span class="n">afq_combine_profiles</span><span class="p">,</span>
+    <span class="n">base_image</span><span class="o">=</span><span class="s1">&#39;python:3.8&#39;</span><span class="p">,</span>
+    <span class="n">image_github_installs</span><span class="o">=</span><span class="s2">&quot;https://github.com/yeatmanlab/pyAFQ.git&quot;</span><span class="p">,</span>
+    <span class="n">pars_policies</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;AmazonS3FullAccess&#39;</span><span class="p">,),</span>
+    <span class="n">bid_percentage</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This knot is called with a dummy argument, which is not used within the function itself. The
+<cite>job_type</cite> key-word argument is used to signal to <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> that only one job is submitted
+rather than the default array of jobs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><span class="n">map</span><span class="p">([</span><span class="s2">&quot;dummy_argument&quot;</span><span class="p">],</span> <span class="n">job_type</span><span class="o">=</span><span class="s2">&quot;independent&quot;</span><span class="p">)</span>
+<span class="n">result_futures2</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+<span class="n">knot2</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-cloudknot-example-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/51e2d17f27d59b26364311a97dbed5e6/cloudknot_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">cloudknot_example.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/ac9b0ec04be84175a221ef605d36ebf2/cloudknot_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">cloudknot_example.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optic_radiations.html">Plotting the Optic Radiations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_bids_layout.html" title="previous chapter">How pyAFQ uses BIDS</a></li>
+      <li>Next: <a href="cloudknot_hcp_example.html" title="next chapter">AFQ with HCP data</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/cloudknot_example.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

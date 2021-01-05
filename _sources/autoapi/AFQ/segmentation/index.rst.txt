@@ -16,12 +16,12 @@ Classes
 
 
 
-.. py:class:: Segmentation(nb_points=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_aal=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
 
    .. method:: _read_tg(self, tg=None)
 
 
-   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
+   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False, endpoint_info=None)
 
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -52,6 +52,15 @@ Classes
       reset_tg_space : bool, optional
           Whether to reset the space of the input tractogram after
           segmentation is complete. Default: False.
+      endpoint_info : dict, optional. This overrides use of the
+          AAL atlas, which is the default behavior.
+          The format for this should be:
+          {"bundle1": {"startpoint":img1_1,
+                       "endpoint":img1_2},
+           "bundle2": {"startpoint":img2_1,
+                        "endpoint":img2_2}}
+          where the images used are binary masks of the desired
+          endpoints.
 
 
 

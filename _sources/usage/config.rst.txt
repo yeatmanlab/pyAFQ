@@ -55,6 +55,11 @@ See an example configuration file below::
     # it is considered to be b0. Default: 50.
     b0_threshold = 50
     
+    # Whether to use robust_tensor_fitting when
+    # doing dti. Only applies to dti.
+    # Default: False
+    robust_tensor_fitting = false
+    
     # Minimum b value you want to use
     # from the dataset (other than b0), inclusive.
     # If None, there is no minimum limit. Default: None
@@ -115,11 +120,6 @@ See an example configuration file below::
     # Default: False
     dask_it = false
     
-    # Whether to recompute or ignore existing derivatives.
-    # This parameter can be turned on/off dynamically.
-    # Default: False
-    force_recompute = false
-    
     [VIZ]
     
     # Whether to use a virtual fram buffer. This is neccessary if
@@ -132,6 +132,128 @@ See an example configuration file below::
     # One of {"fury", "plotly", "plotly_no_gif"}.
     # Default: "plotly_no_gif"
     viz_backend = 'plotly_no_gif'
+    
+    [SEGMENTATION]
+    
+    # 
+    # In endpoint filtering, this overrides use of the AAL atlas, which
+    # is the default behavior.
+    # The format for this should be:
+    # {"bundle1": {"startpoint":img1_1,
+    # "endpoint":img1_2},
+    # "bundle2": {"startpoint":img2_1,
+    # "endpoint":img2_2}}
+    # where the images used are binary masks of the desired
+    # endpoints.
+    endpoint_info = ''
+    
+    # Resample streamlines to nb_points number of points.
+    # If False, no resampling is done. Default: False
+    nb_points = false
+    
+    # Subsample streamlines to nb_streamlines.
+    # If False, no subsampling is don. Default: False
+    nb_streamlines = false
+    
+    # Algorithm for segmentation (case-insensitive):
+    # 'AFQ': Segment streamlines into bundles,
+    # based on inclusion/exclusion ROIs.
+    # 'Reco': Segment streamlines using the RecoBundles algorithm
+    # [Garyfallidis2017].
+    # Default: 'AFQ'
+    seg_algo = 'AFQ'
+    
+    # Algorithm for streamline registration (case-insensitive):
+    # 'slr' : Use Streamlinear Registration [Garyfallidis2015]_
+    # 'syn' : Use image-based nonlinear registration
+    # If None, will use SyN if a mapping is provided, slr otherwise.
+    # If  seg_algo="AFQ", SyN is always used.
+    # Default: None
+    reg_algo = ''
+    
+    # Whether to clip the streamlines to be only in between the ROIs.
+    # Default: False
+    clip_edges = false
+    
+    # Using RecoBundles Algorithm.
+    # Whether or not to use progressive technique
+    # during whole brain SLR.
+    # Default: True.
+    progressive = true
+    
+    # Using RecoBundles Algorithm.
+    # Keep streamlines that have length greater than this value
+    # during whole brain SLR.
+    # Default: 50.
+    greater_than = 50
+    
+    # Using RecoBundles Algorithm.
+    # Remove clusters that have less than this value
+    # during whole brain SLR.
+    # Default: 50
+    rm_small_clusters = 50
+    
+    # Parameter passed on to recognize for Recobundles.
+    # See Recobundles documentation.
+    # Default: 5
+    model_clust_thr = 5
+    
+    # Parameter passed on to recognize for Recobundles.
+    # See Recobundles documentation.
+    # Default: 20
+    reduction_thr = 20
+    
+    # Parameter passed on to recognize for Recobundles.
+    # See Recobundles documentation.
+    # Default: False
+    refine = false
+    
+    # Parameter passed on to recognize for Recobundles.
+    # See Recobundles documentation.
+    # Default: 5
+    pruning_thr = 5
+    
+    # Using AFQ Algorithm.
+    # All b-values with values less than or equal to `bo_threshold` are
+    # considered as b0s i.e. without diffusion weighting.
+    # Default: 50.
+    b0_threshold = 50
+    
+    # Using AFQ Algorithm.
+    # Initial cleaning of fiber groups is done using probability maps
+    # from [Hua2008]_. Here, we choose an average probability that
+    # needs to be exceeded for an individual streamline to be retained.
+    # Default: 0.
+    prob_threshold = 0
+    
+    # The distance that a streamline node has to be from the waypoint
+    # ROI in order to be included or excluded.
+    # If set to None (default), will be calculated as the
+    # center-to-corner distance of the voxel in the diffusion data.
+    dist_to_waypoint = ''
+    
+    # If None, creates RandomState.
+    # If int, creates RandomState with seed rng.
+    # Used in RecoBundles Algorithm.
+    # Default: None.
+    rng = ''
+    
+    # Whether to return the indices in the original streamlines as part
+    # of the output of segmentation.
+    return_idx = false
+    
+    # Whether to filter the bundles based on their endpoints relative
+    # to regions defined in the AAL atlas. Applies only to the waypoint
+    # approach (XXX for now). Default: True.
+    filter_by_endpoints = true
+    
+    # If filter_by_endpoints is True, this is the required distance
+    # from the endpoints to the atlas ROIs.
+    dist_to_atlas = 4
+    
+    # The full path to a folder into which intermediate products
+    # are saved. Default: None, means no saving of intermediates.
+    save_intermediates = ''
     
     [TRACTOGRAPHY]
     
@@ -205,106 +327,6 @@ See an example configuration file below::
     # tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
     # One of {"local", "pft"}. Default: "local"
     tracker = 'local'
-    
-    [SEGMENTATION]
-    
-    # Resample streamlines to nb_points number of points.
-    # If False, no resampling is done. Default: False
-    nb_points = false
-    
-    # Algorithm for segmentation (case-insensitive):
-    # 'AFQ': Segment streamlines into bundles,
-    # based on inclusion/exclusion ROIs.
-    # 'Reco': Segment streamlines using the RecoBundles algorithm
-    # [Garyfallidis2017].
-    # Default: 'AFQ'
-    seg_algo = 'AFQ'
-    
-    # Algorithm for streamline registration (case-insensitive):
-    # 'slr' : Use Streamlinear Registration [Garyfallidis2015]_
-    # 'syn' : Use image-based nonlinear registration
-    # If None, will use SyN if a mapping is provided, slr otherwise.
-    # If  seg_algo="AFQ", SyN is always used.
-    # Default: None
-    reg_algo = ''
-    
-    # Whether to clip the streamlines to be only in between the ROIs.
-    # Default: False
-    clip_edges = false
-    
-    # Using RecoBundles Algorithm.
-    # Whether or not to use progressive technique
-    # during whole brain SLR.
-    # Default: True.
-    progressive = true
-    
-    # Using RecoBundles Algorithm.
-    # Keep streamlines that have length greater than this value
-    # during whole brain SLR.
-    # Default: 50.
-    greater_than = 50
-    
-    # Using RecoBundles Algorithm.
-    # Remove clusters that have less than this value
-    # during whole brain SLR.
-    # Default: 50
-    rm_small_clusters = 50
-    
-    # Parameter passed on to recognize for Recobundles.
-    # See Recobundles documentation.
-    # Default: 5
-    model_clust_thr = 5
-    
-    # Parameter passed on to recognize for Recobundles.
-    # See Recobundles documentation.
-    # Default: 20
-    reduction_thr = 20
-    
-    # Parameter passed on to recognize for Recobundles.
-    # See Recobundles documentation.
-    # Default: False
-    refine = false
-    
-    # Parameter passed on to recognize for Recobundles.
-    # See Recobundles documentation.
-    # Default: 5
-    pruning_thr = 5
-    
-    # Using AFQ Algorithm.
-    # All b-values with values less than or equal to `bo_threshold` are
-    # considered as b0s i.e. without diffusion weighting.
-    # Default: 50.
-    b0_threshold = 50
-    
-    # Using AFQ Algorithm.
-    # Initial cleaning of fiber groups is done using probability maps
-    # from [Hua2008]_. Here, we choose an average probability that
-    # needs to be exceeded for an individual streamline to be retained.
-    # Default: 0.
-    prob_threshold = 0
-    
-    # If None, creates RandomState.
-    # If int, creates RandomState with seed rng.
-    # Used in RecoBundles Algorithm.
-    # Default: None.
-    rng = ''
-    
-    # Whether to return the indices in the original streamlines as part
-    # of the output of segmentation.
-    return_idx = false
-    
-    # Whether to filter the bundles based on their endpoints relative
-    # to regions defined in the AAL atlas. Applies only to the waypoint
-    # approach (XXX for now). Default: True.
-    filter_by_endpoints = true
-    
-    # If filter_by_endpoints is True, this is the distance from the
-    # endpoints to the AAL atlas ROIs that is required.
-    dist_to_aal = 4
-    
-    # The full path to a folder into which intermediate products
-    # are saved. Default: None, means no saving of intermediates.
-    save_intermediates = ''
     
     [CLEANING]
     

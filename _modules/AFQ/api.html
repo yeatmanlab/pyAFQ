@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.api &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -54,15 +54,18 @@
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
 <span class="kn">from</span> <span class="nn">dipy.io.gradients</span> <span class="kn">import</span> <span class="n">read_bvals_bvecs</span>
 <span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
+<span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
+<span class="kn">from</span> <span class="nn">dipy.reconst.dki_micro</span> <span class="kn">import</span> <span class="n">axonal_water_fraction</span>
 
+<span class="kn">import</span> <span class="nn">bids</span>
 <span class="kn">from</span> <span class="nn">bids.layout</span> <span class="kn">import</span> <span class="n">BIDSLayout</span>
 
 <span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">pyafq_version</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.dti</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">dti_fit</span>
+<span class="kn">from</span> <span class="nn">AFQ.models.dti</span> <span class="kn">import</span> <span class="n">noise_from_b0</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.dki</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">dki_fit</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.csd</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">csd_fit</span>
-<span class="kn">from</span> <span class="nn">AFQ.models.csd</span> <span class="kn">import</span> <span class="n">fit_anisotropic_power_map</span>
 <span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
 <span class="kn">import</span> <span class="nn">dipy.reconst.dti</span> <span class="k">as</span> <span class="nn">dpy_dti</span>
 <span class="kn">import</span> <span class="nn">dipy.reconst.dki</span> <span class="k">as</span> <span class="nn">dpy_dki</span>
@@ -74,6 +77,8 @@
 <span class="kn">from</span> <span class="nn">AFQ.utils.bin</span> <span class="kn">import</span> <span class="n">get_default_args</span>
 <span class="kn">from</span> <span class="nn">AFQ.mask</span> <span class="kn">import</span> <span class="p">(</span><span class="n">B0Mask</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">,</span> <span class="n">FullMask</span><span class="p">,</span> <span class="n">check_mask_methods</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">bids</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;extension_initial_dot&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 
@@ -86,6 +91,10 @@
 
 <span class="n">BUNDLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ATR&quot;</span><span class="p">,</span> <span class="s2">&quot;CGC&quot;</span><span class="p">,</span> <span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC&quot;</span><span class="p">,</span>
            <span class="s2">&quot;FA&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span><span class="p">]</span>
+
+<span class="n">CALLOSUM_BUNDLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AntFrontal&quot;</span><span class="p">,</span> <span class="s2">&quot;Motor&quot;</span><span class="p">,</span> <span class="s2">&quot;Occipital&quot;</span><span class="p">,</span> <span class="s2">&quot;Orbital&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;PostParietal&quot;</span><span class="p">,</span> <span class="s2">&quot;SupFrontal&quot;</span><span class="p">,</span> <span class="s2">&quot;SupParietal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Temporal&quot;</span><span class="p">]</span>
 
 <span class="c1"># See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa</span>
 
@@ -107,7 +116,9 @@
 <span class="n">DIPY_GH</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/dipy/dipy/blob/master/dipy/&quot;</span>
 
 
-<div class="viewcode-block" id="make_bundle_dict"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.api.make_bundle_dict">[docs]</a><span class="k">def</span> <span class="nf">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">BUNDLES</span><span class="p">,</span> <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;afq&quot;</span><span class="p">,</span> <span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="make_bundle_dict"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.api.make_bundle_dict">[docs]</a><span class="k">def</span> <span class="nf">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">BUNDLES</span><span class="p">,</span>
+                     <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;afq&quot;</span><span class="p">,</span>
+                     <span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a bundle dictionary, needed for the segmentation</span>
 
@@ -128,7 +139,26 @@
 <span class="sd">        If set, templates will be resampled to the affine and shape of this</span>
 <span class="sd">        image.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;FP&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span> <span class="ow">and</span> <span class="s2">&quot;Occipital&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="sa">f</span><span class="s2">&quot;FP and Occipital bundles are co-located, and AFQ&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; Only Occipital will be used.&quot;</span><span class="p">))</span>
+            <span class="n">bundle_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;FP&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;FA&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span> <span class="ow">and</span> <span class="s2">&quot;Orbital&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="sa">f</span><span class="s2">&quot;FA and Orbital bundles are co-located, and AFQ&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; Only Orbital will be used.&quot;</span><span class="p">))</span>
+            <span class="n">bundle_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;FA&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;FA&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span> <span class="ow">and</span> <span class="s2">&quot;AntFrontal&quot;</span> <span class="ow">in</span> <span class="n">bundle_names</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="sa">f</span><span class="s2">&quot;FA and AntFrontal bundles are co-located, and AFQ&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; Only AntFrontal will be used.&quot;</span><span class="p">))</span>
+            <span class="n">bundle_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;FA&quot;</span><span class="p">)</span>
         <span class="n">templates</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_templates</span><span class="p">(</span><span class="n">resample_to</span><span class="o">=</span><span class="n">resample_to</span><span class="p">)</span>
         <span class="n">callosal_templates</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_callosum_templates</span><span class="p">(</span>
             <span class="n">resample_to</span><span class="o">=</span><span class="n">resample_to</span><span class="p">)</span>
@@ -155,6 +185,15 @@
                     <span class="s1">&#39;cross_midline&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                     <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">}</span>
                 <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">CALLOSUM_BUNDLES</span><span class="p">:</span>
+                <span class="n">afq_bundles</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;ROIs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">callosal_templates</span><span class="p">[</span><span class="s2">&quot;L_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">],</span>
+                             <span class="n">callosal_templates</span><span class="p">[</span><span class="s2">&quot;R_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">],</span>
+                             <span class="n">callosal_templates</span><span class="p">[</span><span class="s2">&quot;Callosum_midsag&quot;</span><span class="p">]],</span>
+                    <span class="s1">&#39;rules&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+                    <span class="s1">&#39;cross_midline&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">}</span>
+                <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="c1"># SLF is a special case, because it has an exclusion ROI:</span>
             <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;SLF&quot;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">hemi</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;_R&#39;</span><span class="p">,</span> <span class="s1">&#39;_L&#39;</span><span class="p">]:</span>
@@ -169,16 +208,20 @@
                     <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">hemi</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;_R&#39;</span><span class="p">,</span> <span class="s1">&#39;_L&#39;</span><span class="p">]:</span>
-                    <span class="n">afq_bundles</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="s1">&#39;ROIs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi1&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">],</span>
-                                 <span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi2&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">]],</span>
-                        <span class="s1">&#39;rules&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
-                        <span class="s1">&#39;prob_map&#39;</span><span class="p">:</span> <span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="n">hemi</span> <span class="o">+</span> <span class="s1">&#39;_prob_map&#39;</span><span class="p">],</span>
-                        <span class="s1">&#39;cross_midline&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                        <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi1&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi2&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="n">hemi</span> <span class="o">+</span> <span class="s1">&#39;_prob_map&#39;</span><span class="p">)):</span>
+                        <span class="n">afq_bundles</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s1">&#39;ROIs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi1&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">],</span>
+                                     <span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_roi2&#39;</span> <span class="o">+</span> <span class="n">hemi</span><span class="p">]],</span>
+                            <span class="s1">&#39;rules&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+                            <span class="s1">&#39;prob_map&#39;</span><span class="p">:</span> <span class="n">templates</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="n">hemi</span> <span class="o">+</span> <span class="s1">&#39;_prob_map&#39;</span><span class="p">],</span>
+                            <span class="s1">&#39;cross_midline&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                            <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not in AFQ templates&quot;</span><span class="p">)</span>
 
                     <span class="n">uid</span> <span class="o">+=</span> <span class="mi">1</span>
-
     <span class="k">elif</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reco&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">seg_algo</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;80&quot;</span><span class="p">):</span>
             <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_hcp_atlas</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
@@ -214,6 +257,7 @@
                  <span class="n">dmriprep</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                  <span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">robust_tensor_fitting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">reg_template</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">,</span>
@@ -221,13 +265,13 @@
                  <span class="n">brain_mask</span><span class="o">=</span><span class="n">B0Mask</span><span class="p">(),</span>
                  <span class="n">bundle_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dask_it</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">force_recompute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">scalars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">],</span>
                  <span class="n">use_prealign</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">viz_backend</span><span class="o">=</span><span class="s2">&quot;plotly_no_gif&quot;</span><span class="p">,</span>
                  <span class="n">tracking_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">segmentation_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">endpoint_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">clean_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Initialize an AFQ object.</span>
@@ -259,6 +303,10 @@
 <span class="sd">        b0_threshold : int, optional</span>
 <span class="sd">            [REGISTRATION] The value of b under which</span>
 <span class="sd">            it is considered to be b0. Default: 50.</span>
+<span class="sd">        robust_tensor_fitting : bool, optional</span>
+<span class="sd">            [REGISTRATION] Whether to use robust_tensor_fitting when</span>
+<span class="sd">            doing dti. Only applies to dti.</span>
+<span class="sd">            Default: False</span>
 <span class="sd">        min_bval : float, optional</span>
 <span class="sd">            [REGISTRATION] Minimum b value you want to use</span>
 <span class="sd">            from the dataset (other than b0), inclusive.</span>
@@ -299,10 +347,6 @@
 <span class="sd">        dask_it : bool, optional</span>
 <span class="sd">            [COMPUTE] Whether to use a dask DataFrame object.</span>
 <span class="sd">            Default: False</span>
-<span class="sd">        force_recompute : bool, optional</span>
-<span class="sd">            [COMPUTE] Whether to recompute or ignore existing derivatives.</span>
-<span class="sd">            This parameter can be turned on/off dynamically.</span>
-<span class="sd">            Default: False</span>
 <span class="sd">        scalars : list of strings, optional</span>
 <span class="sd">            [BUNDLES] List of scalars to use.</span>
 <span class="sd">            Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;</span>
@@ -322,11 +366,25 @@
 <span class="sd">        segmentation_params : dict, optional</span>
 <span class="sd">            The parameters for segmentation.</span>
 <span class="sd">            Default: use the default behavior of the seg.Segmentation object.</span>
+<span class="sd">        endpoint_info : dict, optional.</span>
+<span class="sd">            [SEGMENTATION]</span>
+<span class="sd">            In endpoint filtering, this overrides use of the AAL atlas, which</span>
+<span class="sd">            is the default behavior.</span>
+<span class="sd">            The format for this should be:</span>
+<span class="sd">            {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
+<span class="sd">                         &quot;endpoint&quot;:img1_2},</span>
+<span class="sd">             &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
+<span class="sd">                          &quot;endpoint&quot;:img2_2}}</span>
+<span class="sd">            where the images used are binary masks of the desired</span>
+<span class="sd">            endpoints.</span>
 <span class="sd">        tracking_params: dict, optional</span>
-<span class="sd">            The parameters for tracking.</span>
-<span class="sd">            Default: use the default behavior of the aft.track function.</span>
-<span class="sd">            Seed mask and seed threshold, if not specified, are replaced</span>
-<span class="sd">            with scalar masks from scalar[0] thresholded to 0.2.</span>
+<span class="sd">            The parameters for tracking. Default: use the default behavior of</span>
+<span class="sd">            the aft.track function. Seed mask and seed threshold, if not</span>
+<span class="sd">            specified, are replaced with scalar masks from scalar[0]</span>
+<span class="sd">            thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of</span>
+<span class="sd">            this dict may be ``AFQ.mask.MaskFile`` instances. If ``tracker``</span>
+<span class="sd">            is set to &quot;pft&quot; then ``stop_mask`` should be an instance of</span>
+<span class="sd">            ``AFQ.mask.PFTMask``.</span>
 <span class="sd">        clean_params: dict, optional</span>
 <span class="sd">            The parameters for cleaning.</span>
 <span class="sd">            Default: use the default behavior of the seg.clean_bundle</span>
@@ -349,6 +407,8 @@
                 <span class="o">+</span> <span class="s2">&quot; either a dict or None&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b0_threshold</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;b0_threshold must be an int&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robust_tensor_fitting</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;robust_tensor_fitting must be a bool&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">min_bval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_bval</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;min_bval must be an int&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">max_bval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_bval</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -373,8 +433,6 @@
                 <span class="s2">&quot;bundle_info must be None, a list of strings, or a dict&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dask_it</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;dask_it must be a bool&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force_recompute</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;force_recompute must be a bool&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scalars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)):</span>
@@ -406,8 +464,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bids_path</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to locate BIDS dataset in: </span><span class="si">{</span><span class="n">bids_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="o">=</span> <span class="n">force_recompute</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">max_bval</span> <span class="o">=</span> <span class="n">max_bval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_bval</span> <span class="o">=</span> <span class="n">min_bval</span>
 
@@ -437,6 +493,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;syn&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span> <span class="o">=</span> <span class="p">(</span><span class="n">use_prealign</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span> <span class="o">!=</span> <span class="s1">&#39;slr&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span> <span class="o">=</span> <span class="n">b0_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robust_tensor_fitting</span> <span class="o">=</span> <span class="n">robust_tensor_fitting</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_tractography_bids_filters</span> <span class="o">=</span>\
             <span class="n">custom_tractography_bids_filters</span>
 
@@ -498,14 +555,25 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_info</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">endpoint_info</span>
         <span class="c1"># Initialize dict to store relevant timing information</span>
         <span class="n">timing_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;Tractography&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;Registration_pre_align&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;Registration&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;Segmentation&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;Cleaning&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;Visualization&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
+
+        <span class="c1"># Initialize dataframe to store sl count information</span>
+        <span class="n">bundle_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;whole_brain&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bundle_names</span><span class="p">:</span>
+            <span class="n">bundle_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">)</span>
+        <span class="n">sl_count_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bundle_names</span><span class="p">),</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;n_streamlines&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clean_streamlines&quot;</span><span class="p">])</span>
 
         <span class="c1"># This is where all the outputs will go:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;afq&#39;</span><span class="p">)</span>
@@ -550,6 +618,7 @@
         <span class="n">reg_subject_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">timing_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">results_dir_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sl_counts_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
                 <span class="n">results_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span><span class="p">,</span> <span class="s1">&#39;sub-&#39;</span> <span class="o">+</span> <span class="n">subject</span><span class="p">)</span>
@@ -557,27 +626,42 @@
                 <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">results_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s1">&#39;ses-&#39;</span> <span class="o">+</span> <span class="n">session</span><span class="p">)</span>
 
-                <span class="n">results_dir_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results_dir</span><span class="p">)</span>
+                <span class="n">dwi_bids_filters</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span>
+                    <span class="s2">&quot;session&quot;</span><span class="p">:</span> <span class="n">session</span><span class="p">,</span>
+                    <span class="s2">&quot;return_type&quot;</span><span class="p">:</span> <span class="s2">&quot;filename&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="n">dmriprep</span><span class="p">,</span>
+                    <span class="s2">&quot;datatype&quot;</span><span class="p">:</span> <span class="s2">&quot;dwi&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;extension&quot;</span><span class="p">:</span> <span class="s2">&quot;nii.gz&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;dwi&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">dwi_bids_filters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bids_filters</span><span class="p">)</span>
+                <span class="n">dwi_files</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">**</span><span class="n">dwi_bids_filters</span><span class="p">)</span>
 
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dwi_files</span><span class="p">)):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No dwi found for subject </span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s2"> and session &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s2">. Skipping.&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">results_dir_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results_dir</span><span class="p">)</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">results_dir_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">dwi_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                                    <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;nii.gz&#39;</span><span class="p">,</span>
-                                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
-                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">bvec_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                                    <span class="n">extension</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bvec&#39;</span><span class="p">,</span> <span class="s1">&#39;bvecs&#39;</span><span class="p">],</span>
-                                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
-                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">bval_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                                    <span class="n">extension</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bval&#39;</span><span class="p">,</span> <span class="s1">&#39;bvals&#39;</span><span class="p">],</span>
-                                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                    <span class="n">scope</span><span class="o">=</span><span class="n">dmriprep</span><span class="p">,</span>
-                                    <span class="o">**</span><span class="n">bids_filters</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">dwi_data_file</span> <span class="o">=</span> <span class="n">dwi_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">dwi_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">)</span>
+
+                <span class="c1"># For bvals and bvecs, use ``get_bval()`` and ``get_bvec()`` to</span>
+                <span class="c1"># walk up the file tree and inherit the closest bval and bvec</span>
+                <span class="c1"># files. Maintain input ``bids_filters`` in case user wants to</span>
+                <span class="c1"># specify acquisition labels, but pop suffix since it is</span>
+                <span class="c1"># already specified inside ``get_bvec()`` and ``get_bval()``</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">bids_filters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;suffix&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">bvec_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bids_layout</span><span class="o">.</span><span class="n">get_bvec</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">,</span>
+                                                           <span class="o">**</span><span class="n">bids_filters</span><span class="p">))</span>
+                <span class="n">bval_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bids_layout</span><span class="o">.</span><span class="n">get_bval</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">,</span>
+                                                           <span class="o">**</span><span class="n">bids_filters</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">bids_filters</span><span class="p">[</span><span class="s2">&quot;suffix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">suffix</span>
 
                 <span class="k">if</span> <span class="n">custom_tractography_bids_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">custom_tract_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -595,15 +679,19 @@
 
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                     <span class="n">reg_subject_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                                        <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
-                                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span>
+                            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+                            <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span>
+                            <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span>
+                        <span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">reg_subject_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                         <span class="n">bids_layout</span><span class="p">,</span>
+                        <span class="n">dwi_data_file</span><span class="p">,</span>
                         <span class="n">subject</span><span class="p">,</span>
                         <span class="n">session</span>
                     <span class="p">)</span>
@@ -611,12 +699,14 @@
                 <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                         <span class="n">bids_layout</span><span class="p">,</span>
+                        <span class="n">dwi_data_file</span><span class="p">,</span>
                         <span class="n">subject</span><span class="p">,</span>
                         <span class="n">session</span>
                     <span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                     <span class="n">bids_layout</span><span class="p">,</span>
+                    <span class="n">dwi_data_file</span><span class="p">,</span>
                     <span class="n">subject</span><span class="p">,</span>
                     <span class="n">session</span>
                 <span class="p">)</span>
@@ -624,6 +714,7 @@
                 <span class="n">sub_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
                 <span class="n">ses_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
                 <span class="n">timing_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timing_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="n">sl_counts_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sl_count_df</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">sub_list</span><span class="p">,</span>
                                             <span class="n">dwi_file</span><span class="o">=</span><span class="n">dwi_file_list</span><span class="p">,</span>
@@ -633,6 +724,7 @@
                                             <span class="n">reg_subject</span><span class="o">=</span><span class="n">reg_subject_list</span><span class="p">,</span>
                                             <span class="n">ses</span><span class="o">=</span><span class="n">ses_list</span><span class="p">,</span>
                                             <span class="n">timing</span><span class="o">=</span><span class="n">timing_list</span><span class="p">,</span>
+                                            <span class="n">sl_counts</span><span class="o">=</span><span class="n">sl_counts_list</span><span class="p">,</span>
                                             <span class="n">results_dir</span><span class="o">=</span><span class="n">results_dir_list</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">dask_it</span><span class="p">:</span>
@@ -672,7 +764,7 @@
 
 <div class="viewcode-block" id="AFQ._b0"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._b0">[docs]</a>    <span class="k">def</span> <span class="nf">_b0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">b0_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_b0.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">b0_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">b0_file</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">~</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
@@ -687,7 +779,7 @@
 <div class="viewcode-block" id="AFQ._brain_mask"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._brain_mask">[docs]</a>    <span class="k">def</span> <span class="nf">_brain_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">median_radius</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">numpass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">autocrop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">vol_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dilate</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_brain_mask.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">):</span>
             <span class="n">brain_mask</span><span class="p">,</span> <span class="n">brain_affine</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="n">brain_mask_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
@@ -707,11 +799,21 @@
 
 <div class="viewcode-block" id="AFQ._dti"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dti">[docs]</a>    <span class="k">def</span> <span class="nf">_dti</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dti_params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DTI_diffmodel.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_params_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_params_file</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="n">dtf</span> <span class="o">=</span> <span class="n">dti_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robust_tensor_fitting</span><span class="p">:</span>
+                <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span> <span class="o">=</span> <span class="n">read_bvals_bvecs</span><span class="p">(</span>
+                    <span class="n">row</span><span class="p">[</span><span class="s1">&#39;bval_file&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;bvec_file&#39;</span><span class="p">])</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">noise_from_b0</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+                    <span class="n">b0_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">dtf</span> <span class="o">=</span> <span class="n">dti_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">dtf</span><span class="o">.</span><span class="n">model_params</span><span class="p">,</span>
                                                   <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
                                   <span class="n">dti_params_file</span><span class="p">)</span>
@@ -722,6 +824,7 @@
                 <span class="n">OutlierRejection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/dti.py&quot;</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;DTI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="k">return</span> <span class="n">dti_params_file</span></div>
 
 <div class="viewcode-block" id="AFQ._dki_fit"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki_fit">[docs]</a>    <span class="k">def</span> <span class="nf">_dki_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
@@ -733,10 +836,11 @@
 
 <div class="viewcode-block" id="AFQ._dki"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki">[docs]</a>    <span class="k">def</span> <span class="nf">_dki</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dki_params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_diffmodel.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_params_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_params_file</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">dkf</span> <span class="o">=</span> <span class="n">dki_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
             <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">dkf</span><span class="o">.</span><span class="n">model_params</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
                      <span class="n">dki_params_file</span><span class="p">)</span>
@@ -747,6 +851,7 @@
                 <span class="n">OutlierRejection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/dki.py&quot;</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;DKI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="k">return</span> <span class="n">dki_params_file</span></div>
 
 <div class="viewcode-block" id="AFQ._csd"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._csd">[docs]</a>    <span class="k">def</span> <span class="nf">_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -760,10 +865,11 @@
         <span class="n">csd_params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span>
             <span class="sa">f</span><span class="s1">&#39;_model-</span><span class="si">{</span><span class="n">model_str</span><span class="si">}</span><span class="s1">_diffmodel.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csd_params_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csd_params_file</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">brain_mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">csdf</span> <span class="o">=</span> <span class="n">csd_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
                            <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
                            <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
@@ -780,16 +886,16 @@
                         <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span>
                         <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;CSD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="k">return</span> <span class="n">csd_params_file</span></div>
 
 <div class="viewcode-block" id="AFQ._anisotropic_power_map"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._anisotropic_power_map">[docs]</a>    <span class="k">def</span> <span class="nf">_anisotropic_power_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">pmap_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_APM.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pmap_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pmap_file</span><span class="p">):</span>
             <span class="n">dwi_data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brain_mask</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">pmap</span> <span class="o">=</span> <span class="n">fit_anisotropic_power_map</span><span class="p">(</span>
-                <span class="n">dwi_data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+            <span class="n">sh_coeff</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_csd</span><span class="p">(</span><span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">pmap</span> <span class="o">=</span> <span class="n">shm</span><span class="o">.</span><span class="n">anisotropic_power</span><span class="p">(</span><span class="n">sh_coeff</span><span class="p">)</span>
             <span class="n">pmap</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">pmap</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">pmap</span><span class="p">,</span> <span class="n">pmap_file</span><span class="p">)</span>
             <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-CSD_APM.json&#39;</span><span class="p">)</span>
@@ -800,7 +906,7 @@
 
 <div class="viewcode-block" id="AFQ._dti_fa"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dti_fa">[docs]</a>    <span class="k">def</span> <span class="nf">_dti_fa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dti_fa_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DTI_FA.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_fa_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_fa_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">fa</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fa</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
@@ -812,7 +918,7 @@
 
 <div class="viewcode-block" id="AFQ._dti_cfa"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dti_cfa">[docs]</a>    <span class="k">def</span> <span class="nf">_dti_cfa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dti_cfa_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DTI_desc-DEC_FA.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_cfa_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_cfa_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">cfa</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">color_fa</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">cfa</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
@@ -824,7 +930,7 @@
 
 <div class="viewcode-block" id="AFQ._dti_pdd"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dti_pdd">[docs]</a>    <span class="k">def</span> <span class="nf">_dti_pdd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dti_pdd_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DTI_PDD.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_pdd_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_pdd_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">pdd</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">directions</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
             <span class="c1"># Invert the x coordinates:</span>
@@ -839,7 +945,7 @@
 
 <div class="viewcode-block" id="AFQ._dti_md"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dti_md">[docs]</a>    <span class="k">def</span> <span class="nf">_dti_md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dti_md_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DTI_MD.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_md_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dti_md_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">md</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">md</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">md</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
@@ -851,7 +957,7 @@
 
 <div class="viewcode-block" id="AFQ._dki_fa"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki_fa">[docs]</a>    <span class="k">def</span> <span class="nf">_dki_fa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dki_fa_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_FA.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_fa_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_fa_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dki_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">fa</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fa</span>
             <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
@@ -863,7 +969,7 @@
 
 <div class="viewcode-block" id="AFQ._dki_md"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki_md">[docs]</a>    <span class="k">def</span> <span class="nf">_dki_md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">dki_md_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_MD.nii.gz&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_md_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_md_file</span><span class="p">):</span>
             <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dki_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">md</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">md</span>
             <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">md</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
@@ -873,11 +979,37 @@
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dki_md_file</span></div>
 
+<div class="viewcode-block" id="AFQ._dki_awf"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki_awf">[docs]</a>    <span class="k">def</span> <span class="nf">_dki_awf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="s1">&#39;repulsion100&#39;</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
+        <span class="n">dki_awf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_AWF.nii.gz&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_awf_file</span><span class="p">):</span>
+            <span class="n">dki_params</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dki</span><span class="p">(</span><span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">awf</span> <span class="o">=</span> <span class="n">axonal_water_fraction</span><span class="p">(</span><span class="n">dki_params</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="n">gtol</span><span class="p">)</span>
+            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">awf</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
+                     <span class="n">dki_awf_file</span><span class="p">)</span>
+            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_AWF.json&#39;</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dki_awf_file</span></div>
+
+<div class="viewcode-block" id="AFQ._dki_mk"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._dki_mk">[docs]</a>    <span class="k">def</span> <span class="nf">_dki_mk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">dki_mk_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_MK.nii.gz&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dki_mk_file</span><span class="p">):</span>
+            <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dki_fit</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">mk</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">mk</span><span class="p">()</span>
+            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mk</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
+                     <span class="n">dki_mk_file</span><span class="p">)</span>
+            <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_model-DKI_MK.json&#39;</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dki_mk_file</span></div>
+
     <span class="c1"># Keep track of functions that compute scalars:</span>
 <div class="viewcode-block" id="AFQ._scalar_dict"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._scalar_dict">[docs]</a>    <span class="n">_scalar_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">:</span> <span class="n">_dti_fa</span><span class="p">,</span>
                     <span class="s2">&quot;dti_md&quot;</span><span class="p">:</span> <span class="n">_dti_md</span><span class="p">,</span>
                     <span class="s2">&quot;dki_fa&quot;</span><span class="p">:</span> <span class="n">_dki_fa</span><span class="p">,</span>
-                    <span class="s2">&quot;dki_md&quot;</span><span class="p">:</span> <span class="n">_dki_md</span><span class="p">}</span></div>
+                    <span class="s2">&quot;dki_md&quot;</span><span class="p">:</span> <span class="n">_dki_md</span><span class="p">,</span>
+                    <span class="s2">&quot;dki_awf&quot;</span><span class="p">:</span> <span class="n">_dki_awf</span><span class="p">,</span>
+                    <span class="s2">&quot;dki_mk&quot;</span><span class="p">:</span> <span class="n">_dki_mk</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="AFQ._get_best_scalar"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_best_scalar">[docs]</a>    <span class="k">def</span> <span class="nf">_get_best_scalar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
@@ -910,6 +1042,7 @@
                                      <span class="n">img</span><span class="p">,</span>
                                      <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span>
                                      <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">tg</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
                 <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span>
             <span class="k">elif</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;hcp_atlas&quot;</span><span class="p">:</span>
                 <span class="n">atlas_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -943,8 +1076,9 @@
 <div class="viewcode-block" id="AFQ._reg_prealign"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._reg_prealign">[docs]</a>    <span class="k">def</span> <span class="nf">_reg_prealign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">prealign_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.npy&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">):</span>
             <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">aff</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">affine_registration</span><span class="p">(</span>
                 <span class="n">reg_subject_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
@@ -955,6 +1089,8 @@
                 <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.json&#39;</span><span class="p">)</span>
             <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;rigid&quot;</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration_pre_align&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration_pre_align&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="k">return</span> <span class="n">prealign_file</span></div>
 
 <div class="viewcode-block" id="AFQ._export_registered_b0"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_registered_b0">[docs]</a>    <span class="k">def</span> <span class="nf">_export_registered_b0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
@@ -964,7 +1100,7 @@
             <span class="n">b0_warped_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
                 <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_b0_in_MNI_without_prealign.nii.gz&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">b0_warped_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">b0_warped_file</span><span class="p">):</span>
             <span class="n">b0_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b0</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">b0_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
@@ -1000,7 +1136,7 @@
             <span class="n">mapping_file</span> <span class="o">=</span> <span class="n">mapping_file</span> <span class="o">+</span> <span class="s1">&#39;.nii.gz&#39;</span>
         <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">meta_fname</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mapping_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mapping_file</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
                 <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_prealign</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1049,7 +1185,7 @@
             <span class="s1">&#39;_tractography.trk&#39;</span><span class="p">,</span>
             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">streamlines_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">streamlines_file</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;DTI&quot;</span><span class="p">:</span>
                 <span class="n">params_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dti</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;CSD&quot;</span><span class="p">:</span>
@@ -1115,7 +1251,7 @@
             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">):</span>
             <span class="n">streamlines_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streamlines</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
             <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">])</span>
@@ -1134,7 +1270,8 @@
                                            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;bvec_file&#39;</span><span class="p">],</span>
                                            <span class="n">reg_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
                                            <span class="n">mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                           <span class="n">reg_prealign</span><span class="o">=</span><span class="n">reg_prealign</span><span class="p">)</span>
+                                           <span class="n">reg_prealign</span><span class="o">=</span><span class="n">reg_prealign</span><span class="p">,</span>
+                                           <span class="n">endpoint_info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="p">[</span><span class="s1">&#39;return_idx&#39;</span><span class="p">]:</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">bundle</span><span class="p">:</span> <span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -1152,7 +1289,14 @@
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
             <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Segmentation&#39;</span><span class="p">]</span> <span class="o">=</span>\
                 <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Segmentation&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-
+            <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">bundle</span> <span class="o">!=</span> <span class="s2">&quot;whole_brain&quot;</span><span class="p">:</span>
+                    <span class="n">row</span><span class="p">[</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;n_streamlines&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                        <span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">,</span> <span class="s2">&quot;n_streamlines&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clean_streamlines&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">bundles_file</span></div>
 
 <div class="viewcode-block" id="AFQ._clean_bundles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._clean_bundles">[docs]</a>    <span class="k">def</span> <span class="nf">_clean_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
@@ -1162,7 +1306,7 @@
             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">clean_bundles_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">clean_bundles_file</span><span class="p">):</span>
             <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segment</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
             <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">,</span>
@@ -1197,6 +1341,9 @@
                                        <span class="o">*</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]])},</span>
                             <span class="n">affine_to_rasmm</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">])</span>
                     <span class="n">tgram</span> <span class="o">=</span> <span class="n">aus</span><span class="o">.</span><span class="n">add_bundles</span><span class="p">(</span><span class="n">tgram</span><span class="p">,</span> <span class="n">this_tgram</span><span class="p">)</span>
+                    <span class="n">row</span><span class="p">[</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;n_clean_streamlines&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                        <span class="nb">len</span><span class="p">(</span><span class="n">this_tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_trk</span><span class="p">(</span>
                 <span class="n">StatefulTractogram</span><span class="p">(</span>
                     <span class="n">tgram</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
@@ -1225,7 +1372,7 @@
 
 <div class="viewcode-block" id="AFQ._tract_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._tract_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">profiles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_profiles.csv&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">profiles_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">profiles_file</span><span class="p">):</span>
             <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1277,7 +1424,7 @@
 
 <div class="viewcode-block" id="AFQ._template_xform"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._template_xform">[docs]</a>    <span class="k">def</span> <span class="nf">_template_xform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">template_xform_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;_template_xform.nii.gz&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_recompute</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">template_xform_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">template_xform_file</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
                 <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_prealign</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
@@ -1329,12 +1476,10 @@
 
                 <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-
-                    <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">patch_up_roi</span><span class="p">(</span>
-                        <span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
-                            <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-                        <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                    <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
+                        <span class="n">roi</span><span class="p">,</span>
+                        <span class="n">mapping</span><span class="p">,</span>
+                        <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
 
                     <span class="c1"># Cast to float32, so that it can be read in by MI-Brain:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span>
@@ -1381,46 +1526,13 @@
                     <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ._export_sl_counts"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_sl_counts">[docs]</a>    <span class="k">def</span> <span class="nf">_export_sl_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">total_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streamlines</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-        <span class="n">total_sl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">total_file</span><span class="p">)</span><span class="o">.</span><span class="n">tractogram</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
-        <span class="n">sl_counts</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">folder</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segment</span><span class="p">],</span>
-                                <span class="p">[</span><span class="s1">&#39;clean_bundles&#39;</span><span class="p">,</span> <span class="s1">&#39;bundles&#39;</span><span class="p">]):</span>
-            <span class="n">sl_counts</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-            <span class="n">bundles_file</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">trk</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">)</span>
-            <span class="n">tg</span> <span class="o">=</span> <span class="n">trk</span><span class="o">.</span><span class="n">tractogram</span>
-            <span class="n">streamlines</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span>
-            <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">bundle</span> <span class="o">!=</span> <span class="s2">&quot;whole_brain&quot;</span><span class="p">:</span>
-                    <span class="n">uid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
-                    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tg</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">this_sl</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span><span class="p">(</span>
-                        <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
-                        <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]))</span>
-
-                    <span class="n">this_tgm</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">this_sl</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_img&#39;</span><span class="p">],</span>
-                                                  <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
-                    <span class="n">sl_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">this_tgm</span><span class="o">.</span><span class="n">streamlines</span><span class="p">))</span>
-            <span class="n">sl_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_sl</span><span class="p">)</span>
-
-        <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="s1">&#39;whole_brain&#39;</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
-            <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
-        <span class="n">bundle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Total&quot;</span><span class="p">)</span>
-
-        <span class="n">sl_counts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bundle</span><span class="o">=</span><span class="n">bundle_list</span><span class="p">,</span>
-                      <span class="n">n_streamlines</span><span class="o">=</span><span class="n">sl_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                      <span class="n">n_streamlines_cleaned</span><span class="o">=</span><span class="n">sl_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-
         <span class="n">sl_count_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
             <span class="n">row</span><span class="p">,</span>
             <span class="s1">&#39;_sl_count.csv&#39;</span><span class="p">,</span>
             <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">sl_counts</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">sl_count_file</span><span class="p">)</span></div>
+        <span class="n">row</span><span class="p">[</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">sl_count_file</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ._viz_prepare_vol"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._viz_prepare_vol">[docs]</a>    <span class="k">def</span> <span class="nf">_viz_prepare_vol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="n">xform</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">vol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">:</span>
@@ -1477,7 +1589,9 @@
                      <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
                      <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">volume_opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                      <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
@@ -1491,11 +1605,13 @@
         <span class="p">)</span>
 
         <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">visualize_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span>
+                                           <span class="n">opacity</span><span class="o">=</span><span class="n">volume_opacity</span><span class="p">,</span>
                                            <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                            <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span><span class="n">bundles_file</span><span class="p">,</span>
                                             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
+                                            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
                                             <span class="n">bundle_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">,</span>
                                             <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
                                             <span class="n">interact</span><span class="o">=</span><span class="n">interactive</span><span class="p">,</span>
@@ -1531,7 +1647,9 @@
                   <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
                   <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">volume_opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                   <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
         <span class="n">bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_bundles</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
@@ -1551,12 +1669,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating </span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2"> visualization...&quot;</span><span class="p">)</span>
             <span class="n">uid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
             <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">visualize_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span>
+                                               <span class="n">opacity</span><span class="o">=</span><span class="n">volume_opacity</span><span class="p">,</span>
                                                <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                                <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span>
                     <span class="n">bundles_file</span><span class="p">,</span>
                     <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
+                    <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
                     <span class="n">bundle_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">,</span>
                     <span class="n">bundle</span><span class="o">=</span><span class="n">uid</span><span class="p">,</span>
                     <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
@@ -1636,13 +1756,17 @@
 
         <span class="k">return</span> <span class="n">fnames</span></div>
 
-<div class="viewcode-block" id="AFQ._export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">_export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
-            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">],</span>
-            <span class="s1">&#39;index&#39;</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="AFQ._export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">_export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">all_sub_sess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">timing_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;_desc-timing.csv&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">all_sub_sess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">][</span><span class="s2">&quot;all_sub_sess&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_sub_sess</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">],</span>
+                <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">])</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">timing_fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ._get_affine"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ._get_affine">[docs]</a>    <span class="k">def</span> <span class="nf">_get_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">affine</span></div>
@@ -1792,6 +1916,18 @@
 
 <div class="viewcode-block" id="AFQ.dki"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.dki">[docs]</a>    <span class="n">dki</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_dki</span><span class="p">,</span> <span class="n">set_dki</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="AFQ.set_dki_mk"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_dki_mk">[docs]</a>    <span class="k">def</span> <span class="nf">set_dki_mk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;dki_mk_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_mk_file&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dki_mk</span><span class="p">,</span>
+                                      <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AFQ.get_dki_mk"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.get_dki_mk">[docs]</a>    <span class="k">def</span> <span class="nf">get_dki_mk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_dki_mk</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_mk_file&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AFQ.dki_mk"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.dki_mk">[docs]</a>    <span class="n">dki_mk</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_dki_mk</span><span class="p">,</span> <span class="n">set_dki_mk</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AFQ.set_dki_fa"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_dki_fa">[docs]</a>    <span class="k">def</span> <span class="nf">set_dki_fa</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;dki_fa_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_fa_file&#39;</span><span class="p">]</span> <span class="o">=</span>\
@@ -1815,6 +1951,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_md_file&#39;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="AFQ.dki_md"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.dki_md">[docs]</a>    <span class="n">dki_md</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_dki_md</span><span class="p">,</span> <span class="n">set_dki_md</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AFQ.set_dki_awf"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_dki_awf">[docs]</a>    <span class="k">def</span> <span class="nf">set_dki_awf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;dki_awf_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_awf_file&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dki_awf</span><span class="p">,</span>
+                                      <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AFQ.get_dki_awf"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.get_dki_awf">[docs]</a>    <span class="k">def</span> <span class="nf">get_dki_awf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_dki_awf</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;dki_awf_file&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AFQ.dki_awf"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.dki_awf">[docs]</a>    <span class="n">dki_awf</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_dki_awf</span><span class="p">,</span> <span class="n">set_dki_awf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.set_mapping"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.set_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">set_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;mapping&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -1903,7 +2051,9 @@
                     <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
                     <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">volume_opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                     <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                     <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1913,7 +2063,9 @@
             <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
             <span class="n">xform_volume</span><span class="o">=</span><span class="n">xform_volume</span><span class="p">,</span>
             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
+            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
             <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="n">xform_color_by_volume</span><span class="p">,</span>
+            <span class="n">volume_opacity</span><span class="o">=</span><span class="n">volume_opacity</span><span class="p">,</span>
             <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span>
             <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span>
             <span class="n">interactive</span><span class="o">=</span><span class="n">interactive</span><span class="p">)</span></div>
@@ -1924,7 +2076,9 @@
                  <span class="n">volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">xform_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
                  <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">volume_opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                  <span class="n">n_points</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                  <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1938,7 +2092,9 @@
             <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
             <span class="n">xform_volume</span><span class="o">=</span><span class="n">xform_volume</span><span class="p">,</span>
             <span class="n">color_by_volume</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
+            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
             <span class="n">xform_color_by_volume</span><span class="o">=</span><span class="n">xform_color_by_volume</span><span class="p">,</span>
+            <span class="n">volume_opacity</span><span class="o">=</span><span class="n">volume_opacity</span><span class="p">,</span>
             <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.plot_tract_profiles"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.plot_tract_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">plot_tract_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1954,11 +2110,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tract_profiles</span><span class="p">,</span>
             <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">afq_path</span><span class="p">,</span> <span class="s1">&#39;tract_profiles.csv&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="AFQ.export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_export_timing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+<div class="viewcode-block" id="AFQ.export_timing"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_timing">[docs]</a>    <span class="k">def</span> <span class="nf">export_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_sub_sess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_timing</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">all_sub_sess</span><span class="o">=</span><span class="n">all_sub_sess</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.export_all"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Exports all the possible outputs&quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_registered_b0</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_template_xform</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_bundles</span><span class="p">()</span>
@@ -1970,7 +2130,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">export_rois</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tract_profiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">combine_profiles</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">export_timing</span><span class="p">()</span></div>
+        <span class="n">all_sub_sess</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_timing</span><span class="p">(</span><span class="n">all_sub_sess</span><span class="o">=</span><span class="n">all_sub_sess</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AFQ.upload_to_s3"><a class="viewcode-back" href="../../autoapi/AFQ/api/index.html#AFQ.api.AFQ.upload_to_s3">[docs]</a>    <span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s3fs</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Upload entire AFQ derivatives folder to S3&quot;&quot;&quot;</span>
@@ -2099,6 +2260,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -2139,7 +2301,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

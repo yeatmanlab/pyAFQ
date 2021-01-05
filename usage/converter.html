@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matlab AFQ to Python AFQ conversion &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Usage tracking with Google Analytics" href="tracking.html" />
+    <link rel="prev" title="The pyAFQ Mask API" href="mask.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="matlab-afq-to-python-afq-conversion">
+<h1>Matlab AFQ to Python AFQ conversion<a class="headerlink" href="#matlab-afq-to-python-afq-conversion" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ provides tools to convert between the results of the original Matlab
+based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.</p>
+<p>To convert an mAFQ tractography file, use <code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.utils.conversion.matlab_tractography()</span></code>. This function
+takes in a path to the mAFQ tractography file and a path to an image.
+The function returns a DIPY <code class="xref py py-class docutils literal notranslate"><span class="pre">StatefulTractogram</span></code> class instance using the image as reference.
+Here is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AFQ.utils.conversion</span> <span class="kn">import</span> <span class="n">matlab_tractography</span>
+<span class="n">sft</span> <span class="o">=</span> <span class="n">matlab_tractography</span><span class="p">(</span><span class="s2">&quot;WholeBrainFG-1106.mat&quot;</span><span class="p">,</span> <span class="s2">&quot;sub-1106.dwi.nii.gz&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To convert an mAFQ mori groups file, use <code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.utils.conversion.matlab_mori_groups()</span></code>. This function
+takes in a path to the mAFQ Mori groups file and a path to an image.
+The function returns a dictionary where keys are the pyAFQ bundle names and
+values are DIPY <code class="xref py py-class docutils literal notranslate"><span class="pre">StatefulTractogram</span></code> class instances using the image as reference. This is
+the same structure of the output of pyAFQ’s segmentation.
+Here is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AFQ.utils.conversion</span> <span class="kn">import</span> <span class="n">matlab_mori_groups</span>
+<span class="n">fg</span> <span class="o">=</span> <span class="n">matlab_mori_groups</span><span class="p">(</span><span class="s2">&quot;MoriGroups-1106.mat&quot;</span><span class="p">,</span> <span class="s2">&quot;sub-1106.dwi.nii.gz&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If one wants to
+convert this ‘fg’ dictionary to a single <code class="xref py py-class docutils literal notranslate"><span class="pre">StatefulTractogram</span></code> object,
+use <code class="xref py py-func docutils literal notranslate"><span class="pre">bundles_to_tgram()</span></code>.</p>
+<p>Matlab tract profiles in the .csv format should already be compatible
+with pyAFQ, so there is no need for conversion.</p>
+</div>
+<div class="section" id="tractography-from-other-pipelines">
+<h1>Tractography from other pipelines<a class="headerlink" href="#tractography-from-other-pipelines" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
+tractography from another pipeline, use the custom_tractography_bids_filters
+argument in the AFQ object or in the configuration file. This argument expects
+a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
+tractography for each subject in each session.
+Here is an example custom_tractography_bids_filters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">,</span> <span class="s1">&#39;suffix&#39;</span><span class="p">:</span> <span class="s1">&#39;tractography&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>This would look for a file with the suffix ‘tractography’ inside of the
+‘qsiprep’ derivatives folder.</p>
+<p>There is an example usage of custom_tractography_bids_filters with the
+<a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object in the ‘How pyAFQ uses BIDS’ example in <span class="xref std std-ref">examples</span>.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Using pyAFQ</a><ul>
+      <li>Previous: <a href="mask.html" title="previous chapter">The pyAFQ Mask API</a></li>
+      <li>Next: <a href="tracking.html" title="next chapter">Usage tracking with Google Analytics</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/converter.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

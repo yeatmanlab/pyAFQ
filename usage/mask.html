@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The pyAFQ Mask API &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Matlab AFQ to Python AFQ conversion" href="converter.html" />
+    <link rel="prev" title="Visualization Backends" href="viz_backend.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-pyafq-mask-api">
+<h1>The pyAFQ Mask API<a class="headerlink" href="#the-pyafq-mask-api" title="Permalink to this headline">¶</a></h1>
+<p>In the process of tractometry, it is sometimes necessary to apply masks to
+the data. By default, pyAFQ can automatically generate these masks from the
+DWI data. However, pyAFQ also has a system for users to specify which mask to
+use, called the Mask API. Specifying a mask, in general, is not as simple as
+just providing a path to a file, because each subject and each session will
+have a different mask. That is why we developed pyAFQ’s Mask API.</p>
+<p>Currently, there are three different masks that pyAFQ uses for tractometry:</p>
+<ol class="arabic simple">
+<li><p>The brain mask. This is used to mask the dwi data and throwout any signal
+that is outside of the brain. It is typicall applied before fitting ODF
+models. By default, it is calculated using <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.B0Mask" title="AFQ.mask.B0Mask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.B0Mask</span></code></a>.</p></li>
+<li><p>The tractography seed mask. This mask determines where tractography is
+seeded. If it is floating point, the mask is thresholded interally after
+interpolation using the seed_threshold parameter. This is reccomended.
+However, the seed mask can aslo be a binary mask. By default, the
+seed mask is <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask" title="AFQ.mask.ScalarMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ScalarMask</span></code></a> (best_scalar) where best_scalar is chosen by the API
+based on valid scalars (typically “dti_fa”).</p></li>
+<li><p>The tractography stop mask. This mask determines where tractography stops.
+If it is floating point, the mask is thresholded interally after
+interpolation using the stop_threshold parameter. This is reccomended.
+However, the stop mask can aslo be a binary mask. By default, the
+stop mask is <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask" title="AFQ.mask.ScalarMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ScalarMask</span></code></a> (best_scalar) where best_scalar is chosen by the API
+based on valid scalars (typically “dti_fa”).</p></li>
+</ol>
+<p>In AFQ/mask.py, there are several mask classes one can use to specify masks.
+As a user, one should initialize mask classes and pass them to the AFQ object,
+or write out the initialization as a string inside of one’s configuration file
+for use with the CLI.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile" title="AFQ.mask.MaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.MaskFile</span></code></a>: The simplest mask class is <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile" title="AFQ.mask.MaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.MaskFile</span></code></a>. If the mask you want to use
+is already generated, use this class. It is initialized using BIDS filters,
+which pyAFQ will use to find masks for each subject in each session.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.FullMask" title="AFQ.mask.FullMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.FullMask</span></code></a>: The <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.FullMask" title="AFQ.mask.FullMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.FullMask</span></code></a> class is used if one does not want to mask at all.
+This mask is True everywhere.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.RoiMask" title="AFQ.mask.RoiMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.RoiMask</span></code></a>: All ROIs are “logically or’d” together in subject space to create
+this mask. This is useful to provide as the seed mask. In segmentation,
+pyAFQ retains only streamlines that pass through the ROIs. So, for
+efficiency, one can choose to only seed in the ROIs in the first place.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.B0Mask" title="AFQ.mask.B0Mask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.B0Mask</span></code></a>: This mask uses dipy’s median_otsu on the subject’s b0 to generate
+a mask. This is the default brain mask.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.LabelledMaskFile" title="AFQ.mask.LabelledMaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.LabelledMaskFile</span></code></a>: This mask is similar to <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile" title="AFQ.mask.MaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.MaskFile</span></code></a>. It is also initialized
+using BIDS filters but instead expects to find a labelled segmentation file.
+In the initialization, the user also provides inclusive and exclusive
+labels. These specify which labels to include and which labels to exclude
+in the mask. If both inclusive and exclusive labels are set, the combine
+parameter is used to specify how to combine the masks generated by the
+inclusive and exclusive labels. A common use of this class would be to pass
+BIDS filters to some segmentation file, and also set exclusive_labels = [0].
+This will mark all labels that are not 0 as a part of the mask, and can
+be used as a brain mask.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ThresholdedMaskFile" title="AFQ.mask.ThresholdedMaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ThresholdedMaskFile</span></code></a>: This mask is similar to <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile" title="AFQ.mask.MaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.MaskFile</span></code></a>. It allows the user to
+also provide a lower and upper bound. The bounds threshold the data from
+the file. Note that for the tractography seed and stop masks, thresholding
+should typically be done using the seed_threshold and stop_threshold
+parameters, not using an already thresholded mask.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask" title="AFQ.mask.ScalarMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ScalarMask</span></code></a>: This mask is initialized only by specifying a scalar. Use this
+mask if you want a mask to be based on a scalar that pyAFQ already
+calculates, like “dti_fa” or “dti_md”.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ThresholdedScalarMask" title="AFQ.mask.ThresholdedScalarMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ThresholdedScalarMask</span></code></a>: This mask is similar to <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask" title="AFQ.mask.ScalarMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.ScalarMask</span></code></a>. It allows the user to
+also provide a lower and upper bound. The bounds threshold the scalar data.
+Note that for the tractography seed and stop masks, thresholding
+should typically be done using the seed_threshold and stop_threshold
+parameters, not using an already thresholded mask.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.PFTMask</span></code>: A mask for specifying the segmentations used in PFT. Should only
+be used as a stop mask. It’s three arguments are three other masks, which
+specify the three segmentations: white matter, gray matter, and
+corticospinal fluid.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.CombinedMask" title="AFQ.mask.CombinedMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.CombinedMask</span></code></a>: This class can be used to combine the other masks. It takes
+a list of masks and allows the user to specify whether they should be
+combined using a logical “and” or “or”.</p></li>
+</ul>
+<p>Here is an example of using the <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.RoiMask" title="AFQ.mask.RoiMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.RoiMask</span></code></a> and <a class="reference internal" href="../autoapi/AFQ/mask/index.html#AFQ.mask.LabelledMaskFile" title="AFQ.mask.LabelledMaskFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.mask.LabelledMaskFile</span></code></a> on the HCP
+data with the AFQ object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AFQ.data</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
+<span class="kn">import</span> <span class="nn">AFQ.api</span> <span class="k">as</span> <span class="nn">api</span>
+<span class="kn">import</span> <span class="nn">AFQ.mask</span> <span class="k">as</span> <span class="nn">afm</span>
+
+<span class="c1"># Download a subject to the AWS Batch machine from s3</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">hcp_bids</span> <span class="o">=</span> <span class="n">fetch_hcp</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">profile_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">study</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;HCP_1200&quot;</span><span class="p">)</span>
+
+<span class="c1"># make 500,000 seeds randomly distributed in the ROIs</span>
+<span class="n">tracking_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;seed_mask&quot;</span><span class="p">:</span> <span class="n">afm</span><span class="o">.</span><span class="n">RoiMask</span><span class="p">(),</span>
+    <span class="s2">&quot;n_seeds&quot;</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span>
+    <span class="s2">&quot;random_seeds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="c1"># use segmentation file from HCP to get a brain mask,</span>
+<span class="c1"># where everything not labelled 0 is considered a part of the brain</span>
+<span class="n">brain_mask</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledMaskFile</span><span class="p">(</span>
+    <span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">},</span> <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># define the api AFQ object</span>
+<span class="n">myafq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
+    <span class="n">hcp_bids</span><span class="p">,</span>
+    <span class="n">brain_mask</span><span class="o">=</span><span class="n">brain_mask</span><span class="p">,</span>
+    <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">)</span>
+
+<span class="c1"># export_all runs the entire pipeline and creates many useful derivates</span>
+<span class="n">myafq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The pyAFQ Mask API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Using pyAFQ</a><ul>
+      <li>Previous: <a href="viz_backend.html" title="previous chapter">Visualization Backends</a></li>
+      <li>Next: <a href="converter.html" title="next chapter">Matlab AFQ to Python AFQ conversion</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/mask.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

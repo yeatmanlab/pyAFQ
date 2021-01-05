@@ -6,21 +6,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Plotting tract profiles using RecoBundles &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Plotting Novel Tract Profiles:" href="plot_callosal_tract_profile.html" />
+    <link rel="next" title="Plotting the Optic Radiations" href="optic_radiations.html" />
     <link rel="prev" title="Plotting tract profiles" href="plot_tract_profile.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -40,7 +40,8 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-recobundles-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-recobundles-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="plotting-tract-profiles-using-recobundles">
 <span id="sphx-glr-auto-examples-plot-recobundles-py"></span><h1>Plotting tract profiles using RecoBundles<a class="headerlink" href="#plotting-tract-profiles-using-recobundles" title="Permalink to this headline">¶</a></h1>
@@ -96,15 +97,27 @@ the AFQ waypoint ROI approach.</p>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
 <span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
+
 <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
     <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
     <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
+    <span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Prealign using affine registration</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">prealign</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">affine_registration</span><span class="p">(</span>
+        <span class="n">b0</span><span class="p">,</span>
+        <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+        <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+        <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+    <span class="c1"># Then register using a non-linear registration using the affine for</span>
+    <span class="c1"># prealignment</span>
     <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
-                                                 <span class="n">template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+                                                 <span class="n">prealign</span><span class="o">=</span><span class="n">prealign</span><span class="p">)</span>
     <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span> <span class="n">img</span><span class="p">,</span>
-                               <span class="n">MNI_T2_img</span><span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
+                               <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
+
 
 <span class="n">bundle_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;UF&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">,</span> <span class="s2">&quot;OR&quot;</span><span class="p">,</span> <span class="s2">&quot;VOF&quot;</span><span class="p">]</span>
 <span class="n">bundles</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">make_bundle_dict</span><span class="p">(</span><span class="n">bundle_names</span><span class="o">=</span><span class="n">bundle_names</span><span class="p">,</span> <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;reco80&quot;</span><span class="p">)</span>
@@ -219,19 +232,36 @@ the AFQ waypoint ROI approach.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Calculating DTI...
 Registering to template...
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
 Tracking...
 16655
 Segmenting fiber groups...
-CST_R 133
-CST_L 48
+/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:607: UserWarning:
+
+Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
+
+/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:730: UserWarning:
+
+Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
+
+CST_R 93
+CST_L 35
 UF_R 36
-UF_L 3
-CC_ForcepsMajor 495
-CC_ForcepsMinor 695
-OR_R 17
-OR_L 36
-VOF_R 28
-VOF_L 117
+UF_L 7
+CC_ForcepsMajor 499
+CC_ForcepsMinor 807
+OR_R 19
+OR_L 26
+VOF_R 27
+VOF_L 119
 Extracting tract profiles...
 </pre></div>
 </div>
@@ -249,7 +279,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
 </dd>
 </dl>
 </div></blockquote>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 9 minutes  1.845 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 18 minutes  9.621 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-recobundles-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/23a22bcd63f859ad6c035e382907c1ff/plot_recobundles.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_recobundles.py</span></code></a></p>
@@ -288,15 +318,22 @@ Clustering.”NeuroImage 170: 283-295.</p>
 <li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optic_radiations.html">Plotting the Optic Radiations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -305,7 +342,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Examples</a><ul>
       <li>Previous: <a href="plot_tract_profile.html" title="previous chapter">Plotting tract profiles</a></li>
-      <li>Next: <a href="plot_callosal_tract_profile.html" title="next chapter">Plotting Novel Tract Profiles:</a></li>
+      <li>Next: <a href="optic_radiations.html" title="next chapter">Plotting the Optic Radiations</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -337,7 +374,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

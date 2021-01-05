@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.viz.plotly_backend &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -110,7 +110,8 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
     <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
     <span class="n">plotting_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -120,9 +121,15 @@
     <span class="n">z_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
         <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
         <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-        <span class="n">color_constant</span> <span class="o">=</span> <span class="p">(</span><span class="n">color</span> <span class="o">/</span> <span class="n">color</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.4</span> <span class="o">/</span> <span class="n">cbv</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">color_constant</span> <span class="o">=</span> <span class="p">(</span><span class="n">color</span> <span class="o">/</span> <span class="n">color</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>\
+            <span class="o">*</span> <span class="p">(</span><span class="mf">1.4</span> <span class="o">/</span> <span class="p">(</span><span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
         <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -162,7 +169,7 @@
 
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">x_pts</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_pts</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y_pts</span><span class="p">,</span>
             <span class="n">z</span><span class="o">=</span><span class="n">z_pts</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -182,7 +189,8 @@
 
 <div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize bundles in 3D</span>
@@ -220,6 +228,19 @@
 <span class="sd">        with Tableau 20 RGB values if bundle_dict is None, or dict from</span>
 <span class="sd">        bundles to Tableau 20 RGB values if bundle_dict is not None.</span>
 
+<span class="sd">    color_by_volume : ndarray or str, optional</span>
+<span class="sd">        3d volume use to shade the bundles. If None, no shading</span>
+<span class="sd">        is performed. Only works when using the plotly backend.</span>
+<span class="sd">        Default: None</span>
+
+<span class="sd">    cbv_lims : ndarray</span>
+<span class="sd">        Of the form (lower bound, upper bound). Shading based on</span>
+<span class="sd">        color_by_volume will only differentiate values within these bounds.</span>
+<span class="sd">        If lower bound is None, will default to 0.</span>
+<span class="sd">        If upper bound is None, will default to the maximum value in</span>
+<span class="sd">        color_by_volume.</span>
+<span class="sd">        Default: [None, None]</span>
+
 <span class="sd">    background : tuple, optional</span>
 <span class="sd">        RGB values for the background. Default: (1, 1, 1), which is white</span>
 <span class="sd">        background.</span>
@@ -249,14 +270,16 @@
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">background</span><span class="p">))</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
             <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
         <span class="n">_draw_streamlines</span><span class="p">(</span>
             <span class="n">figure</span><span class="p">,</span>
             <span class="n">sls</span><span class="p">,</span>
+            <span class="n">dimensions</span><span class="p">,</span>
             <span class="n">color</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
-            <span class="n">cbv</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">)</span>
+            <span class="n">cbv</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
+            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">)</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">itemsizing</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
@@ -308,11 +331,11 @@
                       <span class="n">png_fname</span><span class="o">=</span><span class="s2">&quot;tgif&quot;</span><span class="p">,</span> <span class="n">add_zeros</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_draw_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_roi">[docs]</a><span class="k">def</span> <span class="nf">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">):</span>
+<div class="viewcode-block" id="_draw_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_roi">[docs]</a><span class="k">def</span> <span class="nf">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
     <span class="n">roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">roi</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">y</span><span class="o">=</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">z</span><span class="o">=</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -388,7 +411,7 @@
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
 
-    <span class="n">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+    <span class="n">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
 
@@ -613,6 +636,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -653,7 +677,7 @@
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

@@ -49,7 +49,7 @@ Functions
 .. function:: func_dict_to_arg_dict(func_dict=None, logger=None)
 
 
-.. function:: parse_config_run_afq(toml_file, default_arg_dict, overwrite=False, logger=None, special_args={'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'})
+.. function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, special_args={'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'})
 
 
 .. function:: generate_config(toml_file, default_arg_dict, overwrite=False, logger=None)

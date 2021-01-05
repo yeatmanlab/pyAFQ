@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The pyAFQ configuration file &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Visualization Backends" href="viz_backend.html" />
@@ -91,6 +91,11 @@ See an example configuration file below:</p>
 <span class="c1"># it is considered to be b0. Default: 50.</span>
 <span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
 
+<span class="c1"># Whether to use robust_tensor_fitting when</span>
+<span class="c1"># doing dti. Only applies to dti.</span>
+<span class="c1"># Default: False</span>
+<span class="n">robust_tensor_fitting</span> <span class="o">=</span> <span class="n">false</span>
+
 <span class="c1"># Minimum b value you want to use</span>
 <span class="c1"># from the dataset (other than b0), inclusive.</span>
 <span class="c1"># If None, there is no minimum limit. Default: None</span>
@@ -151,11 +156,6 @@ See an example configuration file below:</p>
 <span class="c1"># Default: False</span>
 <span class="n">dask_it</span> <span class="o">=</span> <span class="n">false</span>
 
-<span class="c1"># Whether to recompute or ignore existing derivatives.</span>
-<span class="c1"># This parameter can be turned on/off dynamically.</span>
-<span class="c1"># Default: False</span>
-<span class="n">force_recompute</span> <span class="o">=</span> <span class="n">false</span>
-
 <span class="p">[</span><span class="n">VIZ</span><span class="p">]</span>
 
 <span class="c1"># Whether to use a virtual fram buffer. This is neccessary if</span>
@@ -168,6 +168,128 @@ See an example configuration file below:</p>
 <span class="c1"># One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
 <span class="c1"># Default: &quot;plotly_no_gif&quot;</span>
 <span class="n">viz_backend</span> <span class="o">=</span> <span class="s1">&#39;plotly_no_gif&#39;</span>
+
+<span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># In endpoint filtering, this overrides use of the AAL atlas, which</span>
+<span class="c1"># is the default behavior.</span>
+<span class="c1"># The format for this should be:</span>
+<span class="c1"># {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
+<span class="c1"># &quot;endpoint&quot;:img1_2},</span>
+<span class="c1"># &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
+<span class="c1"># &quot;endpoint&quot;:img2_2}}</span>
+<span class="c1"># where the images used are binary masks of the desired</span>
+<span class="c1"># endpoints.</span>
+<span class="n">endpoint_info</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># Resample streamlines to nb_points number of points.</span>
+<span class="c1"># If False, no resampling is done. Default: False</span>
+<span class="n">nb_points</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Subsample streamlines to nb_streamlines.</span>
+<span class="c1"># If False, no subsampling is don. Default: False</span>
+<span class="n">nb_streamlines</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Algorithm for segmentation (case-insensitive):</span>
+<span class="c1"># &#39;AFQ&#39;: Segment streamlines into bundles,</span>
+<span class="c1"># based on inclusion/exclusion ROIs.</span>
+<span class="c1"># &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
+<span class="c1"># [Garyfallidis2017].</span>
+<span class="c1"># Default: &#39;AFQ&#39;</span>
+<span class="n">seg_algo</span> <span class="o">=</span> <span class="s1">&#39;AFQ&#39;</span>
+
+<span class="c1"># Algorithm for streamline registration (case-insensitive):</span>
+<span class="c1"># &#39;slr&#39; : Use Streamlinear Registration [Garyfallidis2015]_</span>
+<span class="c1"># &#39;syn&#39; : Use image-based nonlinear registration</span>
+<span class="c1"># If None, will use SyN if a mapping is provided, slr otherwise.</span>
+<span class="c1"># If  seg_algo=&quot;AFQ&quot;, SyN is always used.</span>
+<span class="c1"># Default: None</span>
+<span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># Whether to clip the streamlines to be only in between the ROIs.</span>
+<span class="c1"># Default: False</span>
+<span class="n">clip_edges</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Whether or not to use progressive technique</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: True.</span>
+<span class="n">progressive</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Keep streamlines that have length greater than this value</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: 50.</span>
+<span class="n">greater_than</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Remove clusters that have less than this value</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: 50</span>
+<span class="n">rm_small_clusters</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 5</span>
+<span class="n">model_clust_thr</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 20</span>
+<span class="n">reduction_thr</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: False</span>
+<span class="n">refine</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 5</span>
+<span class="n">pruning_thr</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Using AFQ Algorithm.</span>
+<span class="c1"># All b-values with values less than or equal to `bo_threshold` are</span>
+<span class="c1"># considered as b0s i.e. without diffusion weighting.</span>
+<span class="c1"># Default: 50.</span>
+<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Using AFQ Algorithm.</span>
+<span class="c1"># Initial cleaning of fiber groups is done using probability maps</span>
+<span class="c1"># from [Hua2008]_. Here, we choose an average probability that</span>
+<span class="c1"># needs to be exceeded for an individual streamline to be retained.</span>
+<span class="c1"># Default: 0.</span>
+<span class="n">prob_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># The distance that a streamline node has to be from the waypoint</span>
+<span class="c1"># ROI in order to be included or excluded.</span>
+<span class="c1"># If set to None (default), will be calculated as the</span>
+<span class="c1"># center-to-corner distance of the voxel in the diffusion data.</span>
+<span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># If None, creates RandomState.</span>
+<span class="c1"># If int, creates RandomState with seed rng.</span>
+<span class="c1"># Used in RecoBundles Algorithm.</span>
+<span class="c1"># Default: None.</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># Whether to return the indices in the original streamlines as part</span>
+<span class="c1"># of the output of segmentation.</span>
+<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Whether to filter the bundles based on their endpoints relative</span>
+<span class="c1"># to regions defined in the AAL atlas. Applies only to the waypoint</span>
+<span class="c1"># approach (XXX for now). Default: True.</span>
+<span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># If filter_by_endpoints is True, this is the required distance</span>
+<span class="c1"># from the endpoints to the atlas ROIs.</span>
+<span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># The full path to a folder into which intermediate products</span>
+<span class="c1"># are saved. Default: None, means no saving of intermediates.</span>
+<span class="n">save_intermediates</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
 <span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
 
@@ -242,106 +364,6 @@ See an example configuration file below:</p>
 <span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
 <span class="n">tracker</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
 
-<span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
-
-<span class="c1"># Resample streamlines to nb_points number of points.</span>
-<span class="c1"># If False, no resampling is done. Default: False</span>
-<span class="n">nb_points</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Algorithm for segmentation (case-insensitive):</span>
-<span class="c1"># &#39;AFQ&#39;: Segment streamlines into bundles,</span>
-<span class="c1"># based on inclusion/exclusion ROIs.</span>
-<span class="c1"># &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
-<span class="c1"># [Garyfallidis2017].</span>
-<span class="c1"># Default: &#39;AFQ&#39;</span>
-<span class="n">seg_algo</span> <span class="o">=</span> <span class="s1">&#39;AFQ&#39;</span>
-
-<span class="c1"># Algorithm for streamline registration (case-insensitive):</span>
-<span class="c1"># &#39;slr&#39; : Use Streamlinear Registration [Garyfallidis2015]_</span>
-<span class="c1"># &#39;syn&#39; : Use image-based nonlinear registration</span>
-<span class="c1"># If None, will use SyN if a mapping is provided, slr otherwise.</span>
-<span class="c1"># If  seg_algo=&quot;AFQ&quot;, SyN is always used.</span>
-<span class="c1"># Default: None</span>
-<span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-<span class="c1"># Whether to clip the streamlines to be only in between the ROIs.</span>
-<span class="c1"># Default: False</span>
-<span class="n">clip_edges</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Using RecoBundles Algorithm.</span>
-<span class="c1"># Whether or not to use progressive technique</span>
-<span class="c1"># during whole brain SLR.</span>
-<span class="c1"># Default: True.</span>
-<span class="n">progressive</span> <span class="o">=</span> <span class="n">true</span>
-
-<span class="c1"># Using RecoBundles Algorithm.</span>
-<span class="c1"># Keep streamlines that have length greater than this value</span>
-<span class="c1"># during whole brain SLR.</span>
-<span class="c1"># Default: 50.</span>
-<span class="n">greater_than</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c1"># Using RecoBundles Algorithm.</span>
-<span class="c1"># Remove clusters that have less than this value</span>
-<span class="c1"># during whole brain SLR.</span>
-<span class="c1"># Default: 50</span>
-<span class="n">rm_small_clusters</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
-<span class="c1"># See Recobundles documentation.</span>
-<span class="c1"># Default: 5</span>
-<span class="n">model_clust_thr</span> <span class="o">=</span> <span class="mi">5</span>
-
-<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
-<span class="c1"># See Recobundles documentation.</span>
-<span class="c1"># Default: 20</span>
-<span class="n">reduction_thr</span> <span class="o">=</span> <span class="mi">20</span>
-
-<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
-<span class="c1"># See Recobundles documentation.</span>
-<span class="c1"># Default: False</span>
-<span class="n">refine</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
-<span class="c1"># See Recobundles documentation.</span>
-<span class="c1"># Default: 5</span>
-<span class="n">pruning_thr</span> <span class="o">=</span> <span class="mi">5</span>
-
-<span class="c1"># Using AFQ Algorithm.</span>
-<span class="c1"># All b-values with values less than or equal to `bo_threshold` are</span>
-<span class="c1"># considered as b0s i.e. without diffusion weighting.</span>
-<span class="c1"># Default: 50.</span>
-<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c1"># Using AFQ Algorithm.</span>
-<span class="c1"># Initial cleaning of fiber groups is done using probability maps</span>
-<span class="c1"># from [Hua2008]_. Here, we choose an average probability that</span>
-<span class="c1"># needs to be exceeded for an individual streamline to be retained.</span>
-<span class="c1"># Default: 0.</span>
-<span class="n">prob_threshold</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="c1"># If None, creates RandomState.</span>
-<span class="c1"># If int, creates RandomState with seed rng.</span>
-<span class="c1"># Used in RecoBundles Algorithm.</span>
-<span class="c1"># Default: None.</span>
-<span class="n">rng</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-<span class="c1"># Whether to return the indices in the original streamlines as part</span>
-<span class="c1"># of the output of segmentation.</span>
-<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Whether to filter the bundles based on their endpoints relative</span>
-<span class="c1"># to regions defined in the AAL atlas. Applies only to the waypoint</span>
-<span class="c1"># approach (XXX for now). Default: True.</span>
-<span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">true</span>
-
-<span class="c1"># If filter_by_endpoints is True, this is the distance from the</span>
-<span class="c1"># endpoints to the AAL atlas ROIs that is required.</span>
-<span class="n">dist_to_aal</span> <span class="o">=</span> <span class="mi">4</span>
-
-<span class="c1"># The full path to a folder into which intermediate products</span>
-<span class="c1"># are saved. Default: None, means no saving of intermediates.</span>
-<span class="n">save_intermediates</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
 <span class="p">[</span><span class="n">CLEANING</span><span class="p">]</span>
 
 <span class="c1"># Number of points to resample streamlines to.</span>
@@ -409,6 +431,9 @@ ignore them.</p>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">The pyAFQ configuration file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
 </ul>
 </li>
@@ -416,6 +441,7 @@ ignore them.</p>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -456,7 +482,7 @@ ignore them.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,0 +1,502 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How pyAFQ uses BIDS &#8212; AFQ 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using cloudknot to run pyAFQ on AWS batch:" href="cloudknot_example.html" />
+    <link rel="prev" title="AFQ API" href="plot_afq_api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-bids-layout-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="how-pyafq-uses-bids">
+<span id="sphx-glr-auto-examples-plot-bids-layout-py"></span><h1>How pyAFQ uses BIDS<a class="headerlink" href="#how-pyafq-uses-bids" title="Permalink to this headline">¶</a></h1>
+<p>The pyAFQ API relies heavily on the
+<a class="reference external" href="https://bids-specification.readthedocs.io/en/stable/">Brain Imaging Data Standard (BIDS)</a>. This means that the software assumes that its inputs are organized
+according to the BIDS spec and its outputs conform where possible with the
+BIDS spec.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Derivatives of processing diffusion MRI are not currently fully
+described in the existing BIDS specification, but describing these
+is part of an ongoing effort. Wherever possible, we conform with
+the draft implementation of the BIDS DWI derivatives available
+<a class="reference external" href="https://bids-specification.readthedocs.io/en/derivatives/05-derivatives/06-diffusion-derivatives.html">here</a></p>
+</div>
+<p>In this example, we will explore the use of BIDS in pyAFQ and see
+how BIDS allows us to extend and provide flexibility to the users
+of the software.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+
+<span class="kn">from</span> <span class="nn">AFQ</span> <span class="kn">import</span> <span class="n">api</span>
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>To interact with and query BIDS datasets, we use</dt><dd><p><a class="reference external" href="https://bids-standard.github.io/pybids/">pyBIDS</a>.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">bids</span>
+</pre></div>
+</div>
+<p>We start with some example data. The data we will use here is
+generated from the
+<a class="reference external" href="https://purl.stanford.edu/ng782rw8378">Stanford HARDI dataset</a>.
+The call below fetches
+this dataset and organized it within the <cite>~/AFQ_data</cite> folder in the BIDS
+format.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">(</span><span class="n">clear_previous_afq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After doing that, we should have a folder that looks like this:</p>
+<div class="line-block">
+<div class="line">stanford_hardi</div>
+<div class="line">├── dataset_description.json</div>
+<div class="line">└── derivatives</div>
+<div class="line-block">
+<div class="line">├── freesurfer</div>
+<div class="line">│   ├── dataset_description.json</div>
+<div class="line">│   └── sub-01</div>
+<div class="line">│       └── ses-01</div>
+<div class="line">│           └── anat</div>
+<div class="line">│               ├── sub-01_ses-01_T1w.nii.gz</div>
+<div class="line">│               └── sub-01_ses-01_seg.nii.gz</div>
+<div class="line">└── vistasoft</div>
+<div class="line-block">
+<div class="line">├── dataset_description.json</div>
+<div class="line">└── sub-01</div>
+<div class="line-block">
+<div class="line">└── ses-01</div>
+<div class="line-block">
+<div class="line">└── dwi</div>
+<div class="line-block">
+<div class="line">├── sub-01_ses-01_dwi.bvals</div>
+<div class="line">├── sub-01_ses-01_dwi.bvecs</div>
+<div class="line">└── sub-01_ses-01_dwi.nii.gz</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>The top level directory is our overall bids dataset folder. In most
+cases, this folder will include a <cite>raw</cite> folder that will contain the
+raw data. In this case, we do not include the raw folder and only have
+the derivatives folder that contains the outputs of preprocessing the data.
+In this case, one folder containing Freesurfer derivatives and another
+folder containing the DWI data that has been preprocessed with Vistasoft.
+pyAFQ provides facilities to segment tractography results obtained
+using other software. For example, we often use
+<a class="reference external" href="https://qsiprep.readthedocs.io/en/latest/">qsiprep</a> to preprocess
+our data and reconstruct tractographies with software such as
+<a class="reference external" href="https://www.mrtrix.org/">MRTRIX</a>. Here, we will demonstrate how to use
+these reconstructions in the pyAFQ segmentation and tractometry pipeline
+We fetch this data and add it as a separate derivatives folder</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">afd</span><span class="o">.</span><span class="n">fetch_stanford_hardi_tractography</span><span class="p">()</span>
+
+<span class="n">bids_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">)</span>
+<span class="n">tractography_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;my_tractography&#39;</span><span class="p">)</span>
+<span class="n">sub_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tractography_path</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;ses-01&#39;</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">sub_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;AFQ_data&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;full_segmented_cleaned_tractography.trk&#39;</span><span class="p">),</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">sub_path</span><span class="p">,</span>
+        <span class="s1">&#39;sub-01_ses-01-dwi_tractography.trk&#39;</span><span class="p">))</span>
+
+<span class="n">afd</span><span class="o">.</span><span class="n">to_bids_description</span><span class="p">(</span>
+    <span class="n">tractography_path</span><span class="p">,</span>
+    <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span><span class="p">}})</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/11337 [00:00&lt;?, ? MB/s]
+  0%|          | 3/11337 [00:00&lt;08:36, 21.94 MB/s]
+  0%|          | 13/11337 [00:00&lt;06:49, 27.67 MB/s]
+  0%|          | 56/11337 [00:00&lt;04:56, 38.04 MB/s]
+  2%|1         | 224/11337 [00:00&lt;03:27, 53.61 MB/s]
+  4%|4         | 490/11337 [00:00&lt;02:23, 75.60 MB/s]
+  7%|7         | 799/11337 [00:00&lt;01:39, 106.29 MB/s]
+ 10%|9         | 1108/11337 [00:01&lt;01:08, 148.43 MB/s]
+ 12%|#2        | 1417/11337 [00:01&lt;00:48, 205.55 MB/s]
+ 15%|#5        | 1727/11337 [00:01&lt;00:34, 281.42 MB/s]
+ 18%|#7        | 2037/11337 [00:01&lt;00:24, 379.48 MB/s]
+ 21%|##        | 2346/11337 [00:01&lt;00:17, 501.28 MB/s]
+ 23%|##3       | 2655/11337 [00:01&lt;00:13, 647.89 MB/s]
+ 26%|##6       | 2966/11337 [00:01&lt;00:10, 814.54 MB/s]
+ 29%|##8       | 3276/11337 [00:02&lt;00:08, 993.09 MB/s]
+ 32%|###1      | 3584/11337 [00:02&lt;00:06, 1171.83 MB/s]
+ 34%|###4      | 3894/11337 [00:02&lt;00:05, 1342.41 MB/s]
+ 37%|###7      | 4203/11337 [00:02&lt;00:04, 1490.49 MB/s]
+ 40%|###9      | 4512/11337 [00:02&lt;00:04, 1617.85 MB/s]
+ 43%|####2     | 4823/11337 [00:02&lt;00:03, 1727.50 MB/s]
+ 45%|####5     | 5132/11337 [00:03&lt;00:03, 1812.42 MB/s]
+ 48%|####8     | 5442/11337 [00:03&lt;00:03, 1873.79 MB/s]
+ 51%|#####     | 5751/11337 [00:03&lt;00:02, 1921.87 MB/s]
+ 53%|#####3    | 6061/11337 [00:03&lt;00:02, 1950.52 MB/s]
+ 56%|#####6    | 6370/11337 [00:03&lt;00:02, 1972.31 MB/s]
+ 59%|#####8    | 6679/11337 [00:03&lt;00:02, 1984.66 MB/s]
+ 62%|######1   | 6989/11337 [00:03&lt;00:02, 1997.22 MB/s]
+ 64%|######4   | 7299/11337 [00:04&lt;00:02, 1982.18 MB/s]
+ 67%|######7   | 7609/11337 [00:04&lt;00:01, 1997.85 MB/s]
+ 70%|######9   | 7917/11337 [00:04&lt;00:01, 2006.18 MB/s]
+ 73%|#######2  | 8227/11337 [00:04&lt;00:01, 2019.16 MB/s]
+ 75%|#######5  | 8537/11337 [00:04&lt;00:01, 2026.64 MB/s]
+ 78%|#######8  | 8847/11337 [00:04&lt;00:01, 2029.83 MB/s]
+ 81%|########  | 9155/11337 [00:04&lt;00:01, 2030.40 MB/s]
+ 83%|########3 | 9465/11337 [00:05&lt;00:00, 2026.97 MB/s]
+ 86%|########6 | 9775/11337 [00:05&lt;00:00, 2030.08 MB/s]
+ 89%|########8 | 10084/11337 [00:05&lt;00:00, 2020.59 MB/s]
+ 92%|#########1| 10394/11337 [00:05&lt;00:00, 2019.91 MB/s]
+ 94%|#########4| 10662/11337 [00:05&lt;00:00, 1955.82 MB/s]
+ 97%|#########6| 10972/11337 [00:05&lt;00:00, 1973.29 MB/s]
+100%|#########9| 11285/11337 [00:06&lt;00:00, 1980.99 MB/s]
+100%|##########| 11337/11337 [00:06&lt;00:00, 1867.81 MB/s]
+
+  0%|          | 0/14 [00:00&lt;?, ? MB/s]
+ 21%|##1       | 3/14 [00:00&lt;00:00, 21.44 MB/s]
+ 86%|########5 | 12/14 [00:00&lt;00:00, 26.76 MB/s]
+100%|##########| 14/14 [00:00&lt;00:00, 49.57 MB/s]
+
+  0%|          | 0/1037 [00:00&lt;?, ? MB/s]
+  0%|          | 4/1037 [00:00&lt;00:36, 28.60 MB/s]
+  1%|1         | 14/1037 [00:00&lt;00:29, 34.82 MB/s]
+  4%|4         | 45/1037 [00:00&lt;00:21, 46.58 MB/s]
+ 17%|#6        | 176/1037 [00:00&lt;00:13, 65.14 MB/s]
+ 51%|#####1    | 531/1037 [00:00&lt;00:05, 92.04 MB/s]
+ 87%|########6 | 900/1037 [00:00&lt;00:01, 129.52 MB/s]
+100%|##########| 1037/1037 [00:00&lt;00:00, 1206.60 MB/s]
+</pre></div>
+</div>
+<p>After we do that, our dataset folder should look like this:</p>
+<div class="line-block">
+<div class="line">stanford_hardi</div>
+<div class="line">├── dataset_description.json</div>
+<div class="line">└── derivatives</div>
+<div class="line-block">
+<div class="line">├── freesurfer</div>
+<div class="line">│   ├── dataset_description.json</div>
+<div class="line">│   └── sub-01</div>
+<div class="line">│       └── ses-01</div>
+<div class="line">│           └── anat</div>
+<div class="line">│               ├── sub-01_ses-01_T1w.nii.gz</div>
+<div class="line">│               └── sub-01_ses-01_seg.nii.gz</div>
+<div class="line">├── my_tractography</div>
+<div class="line">|   ├── dataset_description.json</div>
+<div class="line">│   └── sub-01</div>
+<div class="line">│       └── ses-01</div>
+<div class="line">│           └── dwi</div>
+<div class="line">│               └── sub-01_ses-01-dwi_tractography.trk</div>
+<div class="line">└── vistasoft</div>
+<div class="line-block">
+<div class="line">├── dataset_description.json</div>
+<div class="line">└── sub-01</div>
+<div class="line-block">
+<div class="line">└── ses-01</div>
+<div class="line-block">
+<div class="line">└── dwi</div>
+<div class="line-block">
+<div class="line">├── sub-01_ses-01_dwi.bvals</div>
+<div class="line">├── sub-01_ses-01_dwi.bvecs</div>
+<div class="line">└── sub-01_ses-01_dwi.nii.gz</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>To explore the layout of these derivatives, we will initialize a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BIDSLayout</span></code> class instance to help us see what is in this dataset</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">bids</span><span class="o">.</span><span class="n">BIDSLayout</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="n">derivatives</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because there is no raw data in this BIDS layout (only derivatives),
+pybids will report that there are no subjects and sessions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>BIDS Layout: ...runner/AFQ_data/stanford_hardi | Subjects: 0 | Sessions: 0 | Runs: 0
+</pre></div>
+</div>
+<p>But a query on the derivatives will reveal the different derivatives that
+are stored here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;freesurfer&#39;: BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;vistasoft&#39;: BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;my_tractography&#39;: BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0}
+</pre></div>
+</div>
+<p>We can use a <code class="xref py py-class docutils literal notranslate"><span class="pre">bids.BIDSValidator</span></code> object to make sure that the
+files within our data set are BIDS-compliant. For example, we can
+extract the tractography derivatives part of our layout using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tractography</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span><span class="p">[</span><span class="s2">&quot;my_tractography&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This variable is also a BIDS layout object. This object has a <code class="docutils literal notranslate"><span class="pre">get</span></code>
+method, which allows us to query and find specific items within the
+layout. For example, we can ask for files that have a suffix consistent
+with tractography results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_files</span> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;tractography&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or ask for files that have a <code class="docutils literal notranslate"><span class="pre">.trk</span></code> extension:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_files</span> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.trk&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, both of these would produce the same result.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_file</span> <span class="o">=</span> <span class="n">tractography_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tractography_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;BIDSFile filename=&#39;/home/runner/AFQ_data/stanford_hardi/derivatives/my_tractography/sub-01/ses-01/dwi/sub-01_ses-01-dwi_tractography.trk&#39;&gt;
+</pre></div>
+</div>
+<p>We can also get some more structured information about this file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tractography_file</span><span class="o">.</span><span class="n">get_entities</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;datatype&#39;: &#39;dwi&#39;, &#39;extension&#39;: &#39;.trk&#39;, &#39;session&#39;: &#39;01&#39;, &#39;subject&#39;: &#39;01&#39;, &#39;suffix&#39;: &#39;tractography&#39;}
+</pre></div>
+</div>
+<p>We can use a <code class="xref py py-class docutils literal notranslate"><span class="pre">bids.BIDSValidator</span></code> class instance to validate that
+this file is compliant with the specification. Note that the validator
+requires that the filename be provided relative to the root of the BIDS
+dataset, so we have to split the string that contains the full path
+of the tractography to extract only the part that is relative to the
+root of the entire BIDS <code class="docutils literal notranslate"><span class="pre">layout</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_full_path</span> <span class="o">=</span> <span class="n">tractography_file</span><span class="o">.</span><span class="n">path</span>
+<span class="n">tractography_relative_path</span> <span class="o">=</span> <span class="n">tractography_full_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">root</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">validator</span> <span class="o">=</span> <span class="n">bids</span><span class="o">.</span><span class="n">BIDSValidator</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validator</span><span class="o">.</span><span class="n">is_bids</span><span class="p">(</span><span class="n">tractography_relative_path</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+<p>Next, we specify the information we need to define the bundles that we are
+interested in segmenting. In this case, we are going to use a list of
+bundle names for the bundle info. These names refer to bundles for
+which we already have clear definitions of the information
+needed to segment them (e.g., waypoint ROIs and probability maps).
+For an example that includes custom definition of bundle info, see the
+<a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html">plot_callosal_tract_profile example</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle_info</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SLF&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">,</span> <span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now, we can define our AFQ object, pointing to the derivatives of the
+<cite>‘my_tractography’</cite> pipeline as inputs. This is done by setting the
+<cite>custom_tractography_bids_filters</cite> key-word argument. We pass the
+<cite>bundle_info</cite> defined above. We also point to the preprocessed
+data that is in a <cite>‘dmriprep’</cite> derivatives folder. These data were
+preprocessed with ‘vistasoft’, so this is the pipeline we’ll point to
+If we were using <cite>‘qsiprep’</cite>, this is where we would pass that
+string instead. If we did that, AFQ would look for a derivatives
+folder called <cite>‘stanford_hardi/derivatives/qsiprep’</cite> and find the
+preprocessed DWI data within it. Finally, to speed things up
+a bit, we also sub-sample the provided tractography. This is
+done by defining the segmentation_params dictionary input.
+To sub-sample to 10,000 streamlines, we define
+<cite>‘nb_streamlines’ = 10000</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_afq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
+    <span class="n">bids_path</span><span class="p">,</span>
+    <span class="n">dmriprep</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
+    <span class="n">bundle_info</span><span class="o">=</span><span class="n">bundle_info</span><span class="p">,</span>
+    <span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;tractography&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span>
+    <span class="p">},</span>
+    <span class="n">segmentation_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nb_streamlines&#39;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Finally, to run the segmentation and extract tract profiles, we call
+The <cite>export_all</cite> method. This creates all of the derivative outputs of
+AFQ within the ‘stanford_hardi/derivatives/afq’ folder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_afq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+</pre></div>
+</div>
+<p>A few common issues that can hinder BIDS from working properly are:</p>
+<ol class="arabic simple">
+<li><p>Faulty <cite>dataset_description.json</cite> file. You need to make sure that the
+file contains the right names for the pipeline. See above for an example
+of that.</p></li>
+<li><p>File naming convention doesn’t uniquely identify file with bids filters.</p></li>
+</ol>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 17 minutes  33.539 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-bids-layout-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/9bdf3bad98b30ef023e365f728dd0600/plot_bids_layout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_bids_layout.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8c66bf5eff5959786100ed0e3b200d1e/plot_bids_layout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_bids_layout.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optic_radiations.html">Plotting the Optic Radiations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_afq_api.html" title="previous chapter">AFQ API</a></li>
+      <li>Next: <a href="cloudknot_example.html" title="next chapter">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2018, Ariel Rokem.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/plot_bids_layout.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

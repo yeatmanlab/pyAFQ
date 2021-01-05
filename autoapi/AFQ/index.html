@@ -6,18 +6,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="AFQ.models" href="models/index.html" />
@@ -118,7 +118,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.read_stanford_hardi_tractography" title="AFQ.read_stanford_hardi_tractography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_stanford_hardi_tractography</span></code></a>()</p></td>
 <td><p>Reads a minimal tractography from the Stanford dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.organize_stanford_data" title="AFQ.organize_stanford_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_stanford_data</span></code></a>(path=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.organize_stanford_data" title="AFQ.organize_stanford_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_stanford_data</span></code></a>(path=None, clear_previous_afq=False)</p></td>
 <td><p>If necessary, downloads the Stanford HARDI dataset into DIPY directory and</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.make_bundle_dict" title="AFQ.make_bundle_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_bundle_dict</span></code></a>(bundle_names=BUNDLES, seg_algo=’afq’, resample_to=False)</p></td>
@@ -228,7 +228,7 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 
 <dl class="py function">
 <dt id="AFQ.organize_stanford_data">
-<code class="sig-prename descclassname">AFQ.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">AFQ.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clear_previous_afq</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>If necessary, downloads the Stanford HARDI dataset into DIPY directory and
 creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <p>~/AFQ_data/
@@ -250,8 +250,8 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <blockquote>
 <div><dl class="simple">
 <dt>└── ses-01</dt><dd><dl class="simple">
-<dt>└── dwi</dt><dd><p>├── sub-01_ses-01_dwi.bvals
-├── sub-01_ses-01_dwi.bvecs
+<dt>└── dwi</dt><dd><p>├── sub-01_ses-01_dwi.bval
+├── sub-01_ses-01_dwi.bvec
 └── sub-01_ses-01_dwi.nii.gz</p>
 </dd>
 </dl>
@@ -260,11 +260,13 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 </div></blockquote>
 </div></blockquote>
 </div></blockquote>
+<p>If clear_previous_afq is True and there is an afq folder in derivatives,
+it will be removed.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="AFQ.AFQ">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.</code><code class="sig-name descname">AFQ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bids_path</span></em>, <em class="sig-param"><span class="n">bids_filters</span><span class="o">=</span><span class="default_value">{'suffix': 'dwi'}</span></em>, <em class="sig-param"><span class="n">dmriprep</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">min_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">'mni_T1'</span></em>, <em class="sig-param"><span class="n">reg_subject</span><span class="o">=</span><span class="default_value">'power_map'</span></em>, <em class="sig-param"><span class="n">brain_mask</span><span class="o">=</span><span class="default_value">B0Mask()</span></em>, <em class="sig-param"><span class="n">bundle_info</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dask_it</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">force_recompute</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">scalars</span><span class="o">=</span><span class="default_value">['dti_fa', 'dti_md']</span></em>, <em class="sig-param"><span class="n">use_prealign</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">viz_backend</span><span class="o">=</span><span class="default_value">'plotly_no_gif'</span></em>, <em class="sig-param"><span class="n">tracking_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">segmentation_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clean_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.AFQ" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">AFQ.</code><code class="sig-name descname">AFQ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bids_path</span></em>, <em class="sig-param"><span class="n">bids_filters</span><span class="o">=</span><span class="default_value">{'suffix': 'dwi'}</span></em>, <em class="sig-param"><span class="n">dmriprep</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">robust_tensor_fitting</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">min_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">'mni_T1'</span></em>, <em class="sig-param"><span class="n">reg_subject</span><span class="o">=</span><span class="default_value">'power_map'</span></em>, <em class="sig-param"><span class="n">brain_mask</span><span class="o">=</span><span class="default_value">B0Mask()</span></em>, <em class="sig-param"><span class="n">bundle_info</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dask_it</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">scalars</span><span class="o">=</span><span class="default_value">['dti_fa', 'dti_md']</span></em>, <em class="sig-param"><span class="n">use_prealign</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">viz_backend</span><span class="o">=</span><span class="default_value">'plotly_no_gif'</span></em>, <em class="sig-param"><span class="n">tracking_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">segmentation_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">endpoint_info</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clean_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.AFQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="py attribute">
 <dt id="AFQ.AFQ._scalar_dict">
@@ -327,6 +329,11 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="AFQ.AFQ.dki_mk">
+<code class="sig-name descname">dki_mk</code><a class="headerlink" href="#AFQ.AFQ.dki_mk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="AFQ.AFQ.dki_fa">
 <code class="sig-name descname">dki_fa</code><a class="headerlink" href="#AFQ.AFQ.dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -334,6 +341,11 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <dl class="py attribute">
 <dt id="AFQ.AFQ.dki_md">
 <code class="sig-name descname">dki_md</code><a class="headerlink" href="#AFQ.AFQ.dki_md" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="AFQ.AFQ.dki_awf">
+<code class="sig-name descname">dki_awf</code><a class="headerlink" href="#AFQ.AFQ.dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -452,6 +464,16 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="AFQ.AFQ._dki_awf">
+<code class="sig-name descname">_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">'repulsion100'</span></em>, <em class="sig-param"><span class="n">gtol</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._dki_awf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.AFQ._dki_mk">
+<code class="sig-name descname">_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._dki_mk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="AFQ.AFQ._get_best_scalar">
 <code class="sig-name descname">_get_best_scalar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._get_best_scalar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -528,12 +550,12 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 
 <dl class="py method">
 <dt id="AFQ.AFQ._viz_bundles">
-<code class="sig-name descname">_viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._viz_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._viz_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.AFQ._viz_ROIs">
-<code class="sig-name descname">_viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._viz_ROIs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._viz_ROIs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -543,7 +565,7 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 
 <dl class="py method">
 <dt id="AFQ.AFQ._export_timing">
-<code class="sig-name descname">_export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._export_timing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">all_sub_sess</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ._export_timing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -672,6 +694,16 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="AFQ.AFQ.set_dki_mk">
+<code class="sig-name descname">set_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.set_dki_mk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.AFQ.get_dki_mk">
+<code class="sig-name descname">get_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.get_dki_mk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="AFQ.AFQ.set_dki_fa">
 <code class="sig-name descname">set_dki_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.set_dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -689,6 +721,16 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <dl class="py method">
 <dt id="AFQ.AFQ.get_dki_md">
 <code class="sig-name descname">get_dki_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.get_dki_md" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.AFQ.set_dki_awf">
+<code class="sig-name descname">set_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.set_dki_awf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.AFQ.get_dki_awf">
+<code class="sig-name descname">get_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.get_dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -768,12 +810,12 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 
 <dl class="py method">
 <dt id="AFQ.AFQ.viz_bundles">
-<code class="sig-name descname">viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.viz_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.viz_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.AFQ.viz_ROIs">
-<code class="sig-name descname">viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.viz_ROIs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.viz_ROIs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -793,7 +835,7 @@ creates a BIDS compliant file-system structure in AFQ data directory:</p>
 
 <dl class="py method">
 <dt id="AFQ.AFQ.export_timing">
-<code class="sig-name descname">export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.export_timing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">all_sub_sess</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AFQ.AFQ.export_timing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -877,6 +919,7 @@ image.</p>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
 </ul>
 
 <div class="relations">
@@ -917,7 +960,7 @@ image.</p>
       &copy;2018, Ariel Rokem.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
