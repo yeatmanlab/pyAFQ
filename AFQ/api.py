@@ -1169,7 +1169,9 @@ class AFQ(object):
             row,
             '_seed_mask.nii.gz')
         if not op.exists(seed_file):
-            self.log_and_save_nii(seed_mask, seed_file)
+            self.log_and_save_nii(
+                nib.Nifti1Image(seed_mask, row["dwi_affine"]),
+                seed_file)
             afd.write_json(self._get_fname(row, '_seed_mask.json'), seed_mask_desc)
         return seed_file
 
@@ -1184,7 +1186,9 @@ class AFQ(object):
             row,
             '_stop_mask.nii.gz')
         if not op.exists(stop_file):
-            self.log_and_save_nii(stop_mask, stop_file)
+            self.log_and_save_nii(
+                nib.Nifti1Image(stop_mask, row["dwi_affine"]),
+                stop_file)
             afd.write_json(self._get_fname(row, '_stop_mask.json'), stop_mask_desc)
         return stop_file
 
