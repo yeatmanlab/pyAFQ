@@ -4,12 +4,12 @@ import datetime
 import platform
 import os.path as op
 import os
-from ast import literal_eval
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
 from AFQ.mask import *  # interprets masks loaded from toml
+import nibabel as nib # interprets nibabel images for endpoint_info
 
 
 def parse_string(option, opt, value, parser):
@@ -80,7 +80,7 @@ def toml_to_val(t):
     if isinstance(t, str) and len(t) < 1:
         return None
     elif isinstance(t, str) and t[0] == '{':
-        return literal_eval(t)  # interpret as dictionary
+        return eval(t)  # interpret as dictionary
     elif isinstance(t, str) and "Mask" in t:
         try:
             mask = eval(t)
