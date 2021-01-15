@@ -513,15 +513,9 @@ class AFQ(object):
             else:
                 bundle_info = BUNDLES
 
-        # Create the bundle dict after reg_template has been resolved:
+        # set reg_template and bundle_info:
         self.reg_template_img, _ = self._reg_img(self.reg_template, False)
-        if isinstance(bundle_info, list):
-            self.bundle_dict = make_bundle_dict(
-                bundle_names=bundle_info,
-                seg_algo=self.seg_algo,
-                resample_to=self.reg_template_img)
-        else:
-            self.bundle_dict = bundle_info
+        self.bundle_info = bundle_info
 
         self.endpoint_info = endpoint_info
         if isinstance(
@@ -544,7 +538,10 @@ class AFQ(object):
         }
 
         # Initialize dataframe to store sl count information
-        bundle_names = list(self.bundle_dict.keys())
+        if isinstance(bundle_info, dict):
+            bundle_names = list(self.bundle_dict.keys())
+        else:
+            bundle_names = bundle_info
         if "whole_brain" not in bundle_names:
             bundle_names.append("whole_brain")
         sl_count_df = pd.DataFrame(
@@ -2073,6 +2070,21 @@ class AFQ(object):
         return self.data_frame['template_xform_file']
 
     template_xform = property(get_template_xform, set_template_xform)
+
+    def set_bundle_dict(self):
+        if not hasattr(self, '_bundle_dict'):
+            if isinstance(self.bundle_info, list):
+                self._bundle_dict = make_bundle_dict(
+                    bundle_names=self.bundle_info,
+                    seg_algo=self.seg_algo,
+                    resample_to=self.reg_template_img)
+            else:
+                self._bundle_dict = self.bundle_info
+
+    def get_bundle_dict(self):
+        self.set_bundle_dict()
+        return self._bundle_dict
+    bundle_dict = property(get_bundle_dict, set_bundle_dict)
 
     def export_rois(self):
         return self.data_frame.apply(self._export_rois, axis=1)
