@@ -467,6 +467,10 @@ class Segmentation:
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
+        if isinstance(roi, str):
+            roi = nib.load(roi)
+        if isinstance(roi, nib.Nifti1Image):
+            roi = roi.get_fdata()
         prob_map = self.bundle_dict[bundle].get(
             'prob_map', np.ones(roi.shape))
 
