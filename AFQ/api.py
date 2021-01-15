@@ -1158,6 +1158,36 @@ class AFQ(object):
 
         return mapping_file
 
+    def _export_seed_mask(self, row):
+        if check_mask_methods(self.tracking_params['seed_mask']):
+            seed_mask, _, seed_mask_desc =\
+                self.tracking_params['seed_mask'].get_mask(self, row)
+        else:
+            seed_mask = self.tracking_params['seed_mask']
+            seed_mask_desc = dict(source=tracking_params['seed_mask'])
+        seed_file = self._get_fname(
+            row,
+            '_seed_mask.nii.gz')
+        if not op.exists(seed_file):
+            self.log_and_save_nii(seed_mask, seed_file)
+            afd.write_json(self._get_fname(row, '_seed_mask.json'), seed_mask_desc)
+        return seed_file
+
+    def _export_stop_mask(self, row):
+        if check_mask_methods(self.tracking_params['stop_mask']):
+            stop_mask, _, stop_mask_desc =\
+                self.tracking_params['stop_mask'].get_mask(self, row)
+        else:
+            stop_mask = self.tracking_params['stop_mask']
+            stop_mask_desc = dict(source=tracking_params['stop_mask'])
+        stop_file = self._get_fname(
+            row,
+            '_stop_mask.nii.gz')
+        if not op.exists(stop_file):
+            self.log_and_save_nii(stop_mask, stop_file)
+            afd.write_json(self._get_fname(row, '_stop_mask.json'), stop_mask_desc)
+        return stop_file
+
     def _streamlines(self, row):
         if self.custom_tractography_bids_filters is not None:
             return row["custom_tract"]
@@ -2042,6 +2072,12 @@ class AFQ(object):
 
     def export_rois(self):
         return self.data_frame.apply(self._export_rois, axis=1)
+
+    def export_seed_mask(self):
+        return self.data_frame.apply(self._export_seed_mask, axis=1)
+
+    def export_stop_mask(self):
+        return self.data_frame.apply(self._export_stop_mask, axis=1)
 
     def export_bundles(self):
         self.data_frame.apply(self._export_bundles, axis=1)
