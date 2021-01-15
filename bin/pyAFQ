@@ -60,7 +60,6 @@ def parse_cli(help_msg):
         '-c',
         '--call',
         dest='to_call',
-        action="store_true",
         default="export_all",
         help="AFQ.api method to call using the specified config file."
         + " Defaults to 'export_all', which will perform the entire"
