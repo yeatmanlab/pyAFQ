@@ -41,7 +41,7 @@ import AFQ.data as afd
 #
 # The clear_previous_afq is used to remove any previous runs of the afq object
 # stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to false if
-# you want to use the results of previous runs. 
+# you want to use the results of previous runs.
 
 afd.organize_stanford_data(clear_previous_afq=True)
 
@@ -97,6 +97,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
+                use_prealign=2,
                 dmriprep='vistasoft',
                 viz_backend='plotly_no_gif')
 

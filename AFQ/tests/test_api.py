@@ -307,14 +307,14 @@ def test_AFQ_custom_bundle_dict():
         bundle_info=bundle_dict)
 
 
-@pytest.mark.nightly2
+#@pytest.mark.nightly2
 def test_AFQ_data():
     """
-    Test if API can run without prealign
+    Test if API can run without prealign and with only pre-align
     """
     _, bids_path, _ = get_temp_hardi()
 
-    for use_prealign in [True, False]:
+    for use_prealign in [0, 1, 2]:
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',

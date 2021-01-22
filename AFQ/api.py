@@ -227,7 +227,7 @@ class AFQ(object):
                  bundle_info=None,
                  dask_it=False,
                  scalars=["dti_fa", "dti_md"],
-                 use_prealign=True,
+                 use_prealign=1,
                  virtual_frame_buffer=False,
                  viz_backend="plotly_no_gif",
                  tracking_params=None,
@@ -312,9 +312,11 @@ class AFQ(object):
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
-        use_prealign : bool, optional
-            [REGISTRATION] Whether to perform pre-alignment before perforiming
-            the diffeomorphic mapping in registration. Default: True
+        use_prealign : int, optional
+            [REGISTRATION] If 0, do not perform pre-alignment before perforiming
+            the diffeomorphic mapping in registration.
+            If 1, perform pre-alignment. If 2, only perform pre-alignment.
+            Default: 1
         virtual_frame_buffer : bool, optional
             [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
@@ -399,8 +401,8 @@ class AFQ(object):
                 and isinstance(scalars[0], str)):
             raise TypeError(
                 "scalars must be None or a list of strings")
-        if not isinstance(use_prealign, bool):
-            raise TypeError("use_prealign must be a bool")
+        if not isinstance(use_prealign, int):
+            raise TypeError("use_prealign must be a int")
         if not isinstance(virtual_frame_buffer, bool):
             raise TypeError("virtual_frame_buffer must be a bool")
         if "fury" not in viz_backend and "plotly" not in viz_backend:
@@ -452,7 +454,8 @@ class AFQ(object):
             self.reg_algo = 'slr'
         else:
             self.reg_algo = 'syn'
-        self.use_prealign = (use_prealign and (self.reg_algo != 'slr'))
+        self.use_prealign = ((use_prealign == 1) and (self.reg_algo != 'slr'))
+        self.only_prealign = (use_prealign == 2)
         self.b0_threshold = b0_threshold
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
@@ -1055,11 +1058,7 @@ class AFQ(object):
         return prealign_file
 
     def _export_registered_b0(self, row):
-        if self.use_prealign:
-            b0_warped_file = self._get_fname(row, '_b0_in_MNI.nii.gz')
-        else:
-            b0_warped_file = self._get_fname(
-                row, '_b0_in_MNI_without_prealign.nii.gz')
+        b0_warped_file = self._get_fname(row, '_b0_in_MNI.nii.gz')
 
         if not op.exists(b0_warped_file):
             b0_file = self._b0(row)
@@ -1109,7 +1108,9 @@ class AFQ(object):
                 self._reg_img(self.reg_subject, True, row)
 
             start_time = time()
-            if self.reg_algo == "slr":
+            if self.only_prealign:
+                mapping = ConformedAffineMap(np.load(self._reg_prealign(row)))
+            elif self.reg_algo == "slr":
                 mapping = reg.slr_registration(
                     reg_subject_sls, reg_template_sls,
                     moving_affine=reg_subject_img.affine,
