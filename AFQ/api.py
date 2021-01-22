@@ -37,6 +37,7 @@ import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 from AFQ.utils.bin import get_default_args
 from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
+from AFQ._fixes import ConformedAffineMap
 import logging
 
 bids.config.set_option('extension_initial_dot', True)

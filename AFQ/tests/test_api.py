@@ -324,6 +324,9 @@ def test_AFQ_data():
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq.dti[0]).shape[:3])
         myafq.export_rois()
+        shutil.rmtree(op.join(
+            bids_path,
+            'derivatives/afq'))
 
 
 @pytest.mark.nightly5
