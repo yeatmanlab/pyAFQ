@@ -313,7 +313,7 @@ class AFQ(object):
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
         use_prealign : int, optional
-            [REGISTRATION] If 0, do not perform pre-alignment before perforiming
+            [REGISTRATION] If 0, do not perform pre-alignment before
             the diffeomorphic mapping in registration.
             If 1, perform pre-alignment. If 2, only perform pre-alignment.
             Default: 1
