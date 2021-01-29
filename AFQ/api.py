@@ -1088,9 +1088,6 @@ class AFQ(object):
             row,
             '_mapping_from-DWI_to_MNI_xfm')
         meta_fname = self._get_fname(row, '_mapping_reg')
-        if not self.use_prealign:
-            mapping_file = mapping_file + '_without_prealign'
-            meta_fname = meta_fname + '_without_prealign'
         if self.reg_algo == "slr":
             mapping_file = mapping_file + '.npy'
         else:
