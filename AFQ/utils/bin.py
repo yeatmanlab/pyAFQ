@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
 from AFQ.mask import *  # interprets masks loaded from toml
-import nibabel as nib # interprets nibabel images for endpoint_info
+import nibabel as nib  # interprets nibabel images for endpoint_info
 
 
 def parse_string(option, opt, value, parser):
