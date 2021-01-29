@@ -541,7 +541,7 @@ class AFQ(object):
         if isinstance(bundle_info, dict):
             bundle_names = list(self.bundle_dict.keys())
         else:
-            bundle_names = bundle_info
+            bundle_names = bundle_info.copy()
         if "whole_brain" not in bundle_names:
             bundle_names.append("whole_brain")
         sl_count_df = pd.DataFrame(
@@ -1167,9 +1167,11 @@ class AFQ(object):
             '_seed_mask.nii.gz')
         if not op.exists(seed_file):
             self.log_and_save_nii(
-                nib.Nifti1Image(seed_mask.astype(np.float32), row["dwi_affine"]),
+                nib.Nifti1Image(seed_mask.astype(
+                    np.float32), row["dwi_affine"]),
                 seed_file)
-            afd.write_json(self._get_fname(row, '_seed_mask.json'), seed_mask_desc)
+            afd.write_json(self._get_fname(
+                row, '_seed_mask.json'), seed_mask_desc)
         return seed_file
 
     def _export_stop_mask(self, row):
@@ -1184,9 +1186,11 @@ class AFQ(object):
             '_stop_mask.nii.gz')
         if not op.exists(stop_file):
             self.log_and_save_nii(
-                nib.Nifti1Image(stop_mask.astype(np.float32), row["dwi_affine"]),
+                nib.Nifti1Image(stop_mask.astype(
+                    np.float32), row["dwi_affine"]),
                 stop_file)
-            afd.write_json(self._get_fname(row, '_stop_mask.json'), stop_mask_desc)
+            afd.write_json(self._get_fname(
+                row, '_stop_mask.json'), stop_mask_desc)
         return stop_file
 
     def _streamlines(self, row):
