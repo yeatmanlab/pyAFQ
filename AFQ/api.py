@@ -1088,7 +1088,7 @@ class AFQ(object):
             row,
             '_mapping_from-DWI_to_MNI_xfm')
         meta_fname = self._get_fname(row, '_mapping_reg')
-        if self.reg_algo == "slr":
+        if self.reg_algo == "slr" or self.only_prealign:
             mapping_file = mapping_file + '.npy'
         else:
             mapping_file = mapping_file + '.nii.gz'
@@ -1108,7 +1108,7 @@ class AFQ(object):
             start_time = time()
             if self.only_prealign:
                 mapping = ConformedAffineMap(np.load(self._reg_prealign(row)))
-            elif self.reg_algo == "slr":
+            elif self.reg_algo == "slr" or self.only_prealign:
                 mapping = reg.slr_registration(
                     reg_subject_sls, reg_template_sls,
                     moving_affine=reg_subject_img.affine,
