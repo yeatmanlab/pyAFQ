@@ -307,7 +307,7 @@ def test_AFQ_custom_bundle_dict():
         bundle_info=bundle_dict)
 
 
-#@pytest.mark.nightly2
+@pytest.mark.nightly2
 def test_AFQ_data():
     """
     Test if API can run without prealign and with only pre-align
