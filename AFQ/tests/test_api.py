@@ -310,11 +310,11 @@ def test_AFQ_custom_bundle_dict():
 @pytest.mark.nightly2
 def test_AFQ_data():
     """
-    Test if API can run without prealign
+    Test if API can run without prealign and with only pre-align
     """
     _, bids_path, _ = get_temp_hardi()
 
-    for use_prealign in [True, False]:
+    for use_prealign in [0, 1, 2]:
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
@@ -324,6 +324,9 @@ def test_AFQ_data():
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq.dti[0]).shape[:3])
         myafq.export_rois()
+        shutil.rmtree(op.join(
+            bids_path,
+            'derivatives/afq'))
 
 
 @pytest.mark.nightly5
