@@ -651,7 +651,7 @@ class Segmentation:
                     end_p = self.endpoint_info[bundle]['endpoint']
 
                     atlas_idx = []
-                    for pp in [start_p, end_p]:
+                    for ii, pp in enumerate([start_p, end_p]):
                         pp = reg.resample(pp.get_fdata(),
                                           self.reg_template,
                                           pp.affine,
@@ -664,6 +664,22 @@ class Segmentation:
                         warped_roi = self.mapping.transform_inverse(
                             atlas_roi,
                             interpolation='nearest')
+
+                        if self.save_intermediates is not None:
+                            if ii == 0:
+                                point_name = "startpoint"
+                            else:
+                                point_name = "endpoint"
+
+                            nib.save(
+                                nib.Nifti1Image(
+                                    warped_roi,
+                                    self.img_affine),
+                                op.join(self.save_intermediates,
+                                        'endpoint_ROI',
+                                        bundle,
+                                        f'{point_name}_as_used.nii.gz'))
+                            
                         atlas_idx.append(
                             np.array(np.where(warped_roi > 0)).T)
                 else:
