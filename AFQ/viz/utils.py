@@ -559,12 +559,15 @@ class BrainAxes():
         self.temp_fig, self.temp_axis = plt.subplots()
         self.temp_axis_owner = None
 
-    def get_axis(self, bundle):
+    def get_axis(self, bundle, axes_dict={}):
         '''
         Given a bundle, turn on and get an axis.
         If bundle not positioned, will claim the temporary axis.
+        If bundle in axes_dict, onyl return relevant axis.
         '''
-        if bundle in self.positions.keys():
+        if bundle in axes_dict.keys():
+            return axes_dict[bundle]
+        elif bundle in self.positions.keys():
             self.on_grid[self.positions[bundle]] = True
             return self.axes[self.positions[bundle]]
         else:
@@ -943,7 +946,8 @@ class GroupCSVComparison():
                        positions=POSITIONS,
                        out_file=None,
                        n_boot=1000,
-                       plot_subject_lines=True):
+                       plot_subject_lines=True,
+                       axes_dict={}):
         """
         Compare all tract profiles for a scalar from different CSVs.
         Plots tract profiles for all in one plot.
@@ -985,6 +989,10 @@ class GroupCSVComparison():
         plot_subject_lines : bool, optional
             Whether to plot individual subject lines with a smaller width.
             Default: True
+
+        axes_dict : dictionary of axes, optional
+            Plot contrast index for bundles that are keys of
+            axes_dict on the corresponding axis. Default: {}
         """
         if not show_plots:
             plt.ioff()
@@ -1019,7 +1027,8 @@ class GroupCSVComparison():
                     display_string(scalar), ylim, n_boot, self._alpha(
                         0.6 + 0.2 * i),
                     plot_kwargs,
-                    plot_subject_lines=plot_subject_lines)
+                    plot_subject_lines=plot_subject_lines,
+                    ax=axes_dict.get(bundle))
                 if j == 0:
                     line = Line2D(
                         [], [],
@@ -1225,7 +1234,9 @@ class GroupCSVComparison():
                           rotate_y_labels=False,
                           rtype="Reliability",
                           positions=POSITIONS,
-                          fig_axes=None):
+                          fig_axes=None,
+                          prof_axes_dict={},
+                          sub_axes_dict={}):
         """
         Plot the scan-rescan reliability using Pearson's r for 2 scalars.
 
@@ -1268,6 +1279,16 @@ class GroupCSVComparison():
         fig_axes : tuple of matplotlib figure and axes, optional
             If not None, the resulting reliability plots will use this
             figure and axes. Default: None
+
+        prof_axes_dict : dictionary of axes, optional
+            Plot profile reliability histograms for bundles that
+            are keys of prof_axes_dict on the corresponding axis.
+            Default: {}
+
+        sub_axes_dict : dictionary of axes, optional
+            Plot subject reliability scatter plots for bundles that
+            are keys of sub_axes_dict on the corresponding axis.
+            Default: {}
 
         Returns
         -------
@@ -1356,7 +1377,7 @@ class GroupCSVComparison():
         bins = np.linspace(mini, maxi, 10)
         ba = BrainAxes(positions=positions)
         for k, bundle in enumerate(self.bundles):
-            ax = ba.get_axis(bundle)
+            ax = ba.get_axis(bundle, axes_dict=prof_axes_dict)
             for m, scalar in enumerate(scalars):
                 bundle_coefs = all_profile_coef[m, k]
                 bundle_coefs = bundle_coefs[~np.isnan(bundle_coefs)]
@@ -1444,6 +1465,9 @@ class GroupCSVComparison():
             if len(scalars) == 2:
                 twinning_next = (m == 0)
                 twinning = (m == 1)
+            else:
+                twinning = False
+                twinning_next = False
             if twinning:
                 ba = BrainAxes(positions=positions, fig=ba.fig)
             else:
@@ -1455,7 +1479,7 @@ class GroupCSVComparison():
                 else:
                     fc = self.color_dict[bundle]
                     ec = 'w'
-                ax = ba.get_axis(bundle)
+                ax = ba.get_axis(bundle, axes_dict=sub_axes_dict)
                 sns.set(style="whitegrid")
                 ax.scatter(
                     all_sub_means[m, k, 0],
