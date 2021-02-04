@@ -1134,7 +1134,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
             ba.plot_line(
-                bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "ACI", (-1, 1),
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines,
                 ax=axes_dict.get(bundle))
@@ -1206,7 +1206,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
-                bundle, "nodeID", "diff", ci_df, "C.I. * 2", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "ACI", (-1, 1),
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
             ba.save_temp_fig(
