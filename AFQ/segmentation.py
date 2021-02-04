@@ -780,20 +780,20 @@ class Segmentation:
             self.logger.info("Registering tractogram with SLR")
             atlas = self.bundle_dict['whole_brain']
             self.moved_sl, _, _, _ = whole_brain_slr(
-                atlas, self.tg.streamlines, x0='affine', verbose=False,
+                atlas, tg.streamlines, x0='affine', verbose=False,
                 progressive=self.progressive,
                 greater_than=self.greater_than,
                 rm_small_clusters=self.rm_small_clusters,
                 rng=self.rng)
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
-            self.tg.to_rasmm()
+            tg.to_rasmm()
             delta = dts.values_from_volume(
                 self.mapping.forward,
-                self.tg.streamlines, np.eye(4))
+                tg.streamlines, np.eye(4))
             self.moved_sl = dts.Streamlines(
-                [d + s for d, s in zip(delta, self.tg.streamlines)])
-            self.tg.to_vox()
+                [d + s for d, s in zip(delta, tg.streamlines)])
+            tg.to_vox()
 
         if self.save_intermediates is not None:
             moved_sft = StatefulTractogram(
@@ -855,9 +855,9 @@ class Segmentation:
             if self.presegment_bundle_dict is not None:
                 if "return_idx" in self.presegment_kawrgs\
                         and self.presegment_kawrgs["return_idx"]:
-                    indiv_tg = roiseg_fg[bundle]['sl'].streamlines
+                    indiv_tg = roiseg_fg[bundle]['sl']
                 else:
-                    indiv_tg = roiseg_fg[bundle].streamlines
+                    indiv_tg = roiseg_fg[bundle]
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
