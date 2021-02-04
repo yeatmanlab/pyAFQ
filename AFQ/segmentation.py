@@ -752,7 +752,8 @@ class Segmentation:
 
             select_sl = StatefulTractogram(select_sl,
                                            self.img,
-                                           Space.RASMM)
+                                           Space.VOX)
+            select_sl.to_rasmm()
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
@@ -769,7 +770,6 @@ class Segmentation:
         registration_algo : str
             "slr" or "syn"
         """
-        tg = self._read_tg(tg=tg)
         if reg_algo is None:
             if self.mapping is None:
                 reg_algo = 'slr'
@@ -862,12 +862,11 @@ class Segmentation:
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
                 self.move_streamlines(indiv_tg, self.reg_algo)
-
                 rb = RecoBundles(
                     self.moved_sl,
                     verbose=False,
                     rng=self.rng)
-    
+
             if self.save_intermediates is not None:
                 if self.presegment_bundle_dict is not None:
                     moved_fname = f"{bundle}_presegmentation.trk"
@@ -891,6 +890,7 @@ class Segmentation:
                     op.join(self.save_intermediates,
                             f"{bundle}_model.trk"),
                     bbox_valid_check=False)
+
             # Either whole brain tracgtogram or roi presegmented fiber group
             # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
