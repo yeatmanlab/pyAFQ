@@ -902,14 +902,19 @@ class Segmentation:
                                          pruning_distance='mdf')
 
             # Use the streamlines in the original space:
-            recognized_sl = tg.streamlines[rec_labels]
+            if self.presegment_bundle_dict is None:
+                recognized_sl = tg.streamlines[rec_labels]
+            else:
+                recognized_sl = indiv_tg.streamlines[rec_labels]
             if self.refine and len(recognized_sl) > 0:
                 _, rec_labels = rb.refine(model_sl, recognized_sl,
                                           self.model_clust_thr,
                                           reduction_thr=self.reduction_thr,
                                           pruning_thr=self.pruning_thr)
-                recognized_sl = tg.streamlines[rec_labels]
-
+                if self.presegment_bundle_dict is None:
+                    recognized_sl = tg.streamlines[rec_labels]
+                else:
+                    recognized_sl = indiv_tg.streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
             if self.return_idx:
