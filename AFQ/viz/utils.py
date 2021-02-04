@@ -1600,9 +1600,9 @@ class GroupCSVComparison():
         for k, bundle in enumerate(self.bundles):
             if not is_removed_bundle[k]:
                 if bundle == "CC_ForcepsMinor":
-                    updated_bundles.append("CC FMi")
+                    updated_bundles.append("CC_FMi")
                 else:
-                    updated_bundles.append(display_string(bundle))
+                    updated_bundles.append(bundle)
         updated_bundles.append("median")
 
         sns.set(style="whitegrid")
@@ -1676,7 +1676,7 @@ class GroupCSVComparison():
             fontsize=small_font - 8)
         axes[0].set_xticks(x + 0.5)
         axes[0].set_xticklabels(
-            updated_bundles, fontsize=xaxis_font_size)
+            display_string(updated_bundles), fontsize=xaxis_font_size)
         axes[1].set_title("B", fontsize=large_font)
         axes[1].set_ylabel(f'Subject {rtype}',
                            fontsize=medium_font)
@@ -1687,7 +1687,7 @@ class GroupCSVComparison():
             fontsize=small_font - 8)
         axes[1].set_xticks(x + 0.5)
         axes[1].set_xticklabels(
-            updated_bundles, fontsize=xaxis_font_size)
+            display_string(updated_bundles), fontsize=xaxis_font_size)
 
         plt.setp(axes[0].get_xticklabels(),
                  rotation=65,
@@ -1732,7 +1732,8 @@ class GroupCSVComparison():
                             scalars=["FA", "MD"],
                             rtype="Subject Reliability",
                             show_plots=False,
-                            show_legend=True):
+                            show_legend=True,
+                            fig_ax=None):
         """
         Plot a comparison of scan-rescan reliability between two analyses.
 
@@ -1774,12 +1775,20 @@ class GroupCSVComparison():
             Show legend for the plot, off to the right hand side.
             Default: True
 
+        fig_ax : tuple of matplotlib figure and axis, optional
+            If not None, the resulting reliability plots will use this
+            figure and axis. Default: None
+
         Returns
         -------
         Returns a Matplotlib figure and axes.
         """
         show_error = ((errors1 is not None) and (errors2 is not None))
-        fig, ax = plt.subplots()
+        if fig_ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = fig_ax[0]
+            ax = fig_ax[1]
         legend_labels = []
         for i, scalar in enumerate(scalars):
             marker = self.scalar_markers[i]
