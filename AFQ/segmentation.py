@@ -871,25 +871,7 @@ class Segmentation:
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
                 self.move_streamlines(indiv_tg, self.reg_algo)
-                if self.save_intermediates is not None:
-                    moved_sft = StatefulTractogram(
-                        self.moved_sl,
-                        self.reg_template,
-                        Space.RASMM)
-                    save_tractogram(
-                        moved_sft,
-                        op.join(self.save_intermediates,
-                                f"{bundle}_presegmentation.trk"),
-                        bbox_valid_check=False)
-                    model_sft = StatefulTractogram(
-                        model_sl,
-                        self.reg_template,
-                        Space.RASMM)
-                    save_tractogram(
-                        model_sft,
-                        op.join(self.save_intermediates,
-                                f"{bundle}_model.trk"),
-                        bbox_valid_check=False)
+
                 rb = RecoBundles(
                     self.moved_sl,
                     verbose=False,
