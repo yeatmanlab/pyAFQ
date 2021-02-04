@@ -855,9 +855,9 @@ class Segmentation:
             if self.presegment_bundle_dict is not None:
                 if "return_idx" in self.presegment_kawrgs\
                         and self.presegment_kawrgs["return_idx"]:
-                    indiv_tg = roiseg_fg[bundle]['sl'].streamlines
+                    indiv_tg = roiseg_fg[bundle]['sl']
                 else:
-                    indiv_tg = roiseg_fg[bundle].streamlines
+                    indiv_tg = roiseg_fg[bundle]
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
