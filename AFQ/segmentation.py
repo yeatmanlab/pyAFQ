@@ -862,30 +862,35 @@ class Segmentation:
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
                 self.move_streamlines(indiv_tg, self.reg_algo)
-                if self.save_intermediates is not None:
-                    moved_sft = StatefulTractogram(
-                        self.moved_sl,
-                        self.reg_template,
-                        Space.RASMM)
-                    save_tractogram(
-                        moved_sft,
-                        op.join(self.save_intermediates,
-                                f"{bundle}_presegmentation.trk"),
-                        bbox_valid_check=False)
-                    model_sft = StatefulTractogram(
-                        model_sl,
-                        self.reg_template,
-                        Space.RASMM)
-                    save_tractogram(
-                        model_sft,
-                        op.join(self.save_intermediates,
-                                f"{bundle}_model.trk"),
-                        bbox_valid_check=False)
+
                 rb = RecoBundles(
                     self.moved_sl,
                     verbose=False,
                     rng=self.rng)
-
+    
+            if self.save_intermediates is not None:
+                if self.presegment_bundle_dict is not None:
+                    moved_fname = f"{bundle}_presegmentation.trk"
+                else:
+                    moved_fname = f"whole_brain.trk"
+                moved_sft = StatefulTractogram(
+                    self.moved_sl,
+                    self.reg_template,
+                    Space.RASMM)
+                save_tractogram(
+                    moved_sft,
+                    op.join(self.save_intermediates,
+                            moved_fname),
+                    bbox_valid_check=False)
+                model_sft = StatefulTractogram(
+                    model_sl,
+                    self.reg_template,
+                    Space.RASMM)
+                save_tractogram(
+                    model_sft,
+                    op.join(self.save_intermediates,
+                            f"{bundle}_model.trk"),
+                    bbox_valid_check=False)
             # Either whole brain tracgtogram or roi presegmented fiber group
             # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
