@@ -823,7 +823,6 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         fiber_groups = {}
 
-        self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
         # If doing a presegmentation based on ROIs then initialize
@@ -842,6 +841,7 @@ class Segmentation:
                     reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups
         else:
+            self.move_streamlines(tg, self.reg_algo)
             rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
@@ -861,8 +861,9 @@ class Segmentation:
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
+                self.move_streamlines(indiv_tg, self.reg_algo)
                 rb = RecoBundles(
-                    indiv_tg,
+                    self.moved_sl,
                     verbose=False,
                     rng=self.rng)
 
