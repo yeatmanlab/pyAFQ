@@ -862,7 +862,6 @@ class Segmentation:
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
                 self.move_streamlines(indiv_tg, self.reg_algo)
-
                 rb = RecoBundles(
                     self.moved_sl,
                     verbose=False,
@@ -890,6 +889,7 @@ class Segmentation:
                     op.join(self.save_intermediates,
                             f"{bundle}_model.trk"),
                     bbox_valid_check=False)
+
             # Either whole brain tracgtogram or roi presegmented fiber group
             # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
