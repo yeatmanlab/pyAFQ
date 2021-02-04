@@ -871,7 +871,6 @@ class Segmentation:
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
                 self.move_streamlines(indiv_tg, self.reg_algo)
-
                 rb = RecoBundles(
                     self.moved_sl,
                     verbose=False,
