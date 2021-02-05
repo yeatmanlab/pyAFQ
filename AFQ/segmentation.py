@@ -717,7 +717,7 @@ class Segmentation:
                 # We need to check this again:
                 if len(new_select_sl) == 0:
                     self.logger.info("After filtering "
-                                     f"{len(select_sl)} streamlines")
+                                     f"{len(new_select_sl)} streamlines")
                     # There's nothing here, set and move to the next bundle:
                     self._return_empty(bundle)
                     continue
@@ -849,15 +849,24 @@ class Segmentation:
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
+            self.logger.info(f"Finding streamlines for {bundle}")
             model_sl = self.bundle_dict[bundle]['sl']
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
+                afq_bundle_name = afd.BUNDLE_RECO_2_AFQ.get(bundle, bundle)
                 if "return_idx" in self.presegment_kawrgs\
                         and self.presegment_kawrgs["return_idx"]:
-                    indiv_tg = roiseg_fg[bundle]['sl']
+                    indiv_tg = roiseg_fg[afq_bundle_name]['sl']
                 else:
-                    indiv_tg = roiseg_fg[bundle]
+                    indiv_tg = roiseg_fg[afq_bundle_name]
+
+                if len(indiv_tg.streamlines) < 1:
+                    self.logger.warning((
+                        f"No streamlines found by waypoint ROI "
+                        f"pre-segmentation for {bundle}. Using entire"
+                        f" tractography instead."))
+                    indiv_tg = tg
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
@@ -916,6 +925,8 @@ class Segmentation:
                     recognized_sl = indiv_tg.streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+
+            self.logger.info(f"{len(oriented_sl)} streamlines selected with Recobundles")
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels
