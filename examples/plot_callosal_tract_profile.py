@@ -332,7 +332,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
                                      'afq_dti_density_map.nii.gz'))
 else:
     tractogram = load_tractogram(op.join(working_dir, 'dti_streamlines.trk'),
-                                 img)
+                                 img, bbox_valid_check=False)
 
 tractogram.to_vox()
 
@@ -474,7 +474,8 @@ print("Extracting tract profiles...")
 for bundle in bundles:
     print(f"Extracting {bundle}...")
     tractogram = load_tractogram(op.join(working_dir, f'afq_{bundle}.trk'),
-                                 img, to_space=Space.VOX)
+                                 img, to_space=Space.VOX,
+                                 bbox_valid_check=False)
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(tractogram.streamlines)
     profile = afq_profile(FA_data, tractogram.streamlines,

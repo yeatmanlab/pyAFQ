@@ -249,7 +249,8 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
     save_tractogram(sft, op.join(working_dir, 'pft_streamlines.trk'),
                     bbox_valid_check=False)
 else:
-    sft = load_tractogram(op.join(working_dir, 'pft_streamlines.trk'), img)
+    sft = load_tractogram(op.join(working_dir, 'pft_streamlines.trk'), img,
+                          bbox_valid_check=False)
 
 sft.to_vox()
 
@@ -309,7 +310,8 @@ for bundle in bundles:
 print("Extracting tract profiles...")
 for bundle in bundles:
     sft = load_tractogram(op.join(working_dir, f'{bundle}_afq.trk'),
-                          img, to_space=Space.VOX)
+                          img, to_space=Space.VOX,
+                          bbox_valid_check=False)
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(sft.streamlines)
     profile = afq_profile(FA_data, sft.streamlines,

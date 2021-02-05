@@ -124,7 +124,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
                     bbox_valid_check=False)
 else:
     sft = load_tractogram(op.join(working_dir, 'dti_streamlines_reco.trk'),
-                          img)
+                          img, bbox_valid_check=False)
 
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(seg_algo='reco80',
