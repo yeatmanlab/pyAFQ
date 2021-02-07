@@ -265,7 +265,8 @@ class RoiMask(StrInstantiatesMixin):
     api.AFQ(tracking_params={"seed_mask": seed_mask})
     """
 
-    def __init__(self):
+    def __init__(self, use_presegment=False):
+        self.use_presegment = use_presegment
         pass
 
     def find_path(self, bids_layout, from_path, subject, session):
@@ -284,9 +285,15 @@ class RoiMask(StrInstantiatesMixin):
             prealign=reg_prealign_inv)
 
         mask_data = None
-        for bundle_name, bundle_info in afq_object.bundle_dict.items():
+        if self.use_presegment:
+            bundle_dict = afq_object.\
+                segmentation_params["presegment_bundle_dict"]
+        else:
+            bundle_dict = afq_object.bundle_dict
+
+        for bundle_name, bundle_info in bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
-                if afq_object.bundle_dict[bundle_name]['rules'][idx]:
+                if bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.transform_inverse_roi(
                         roi,
                         mapping,
@@ -298,7 +305,6 @@ class RoiMask(StrInstantiatesMixin):
                         mask_data,
                         warped_roi.astype(bool))
         return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
-
 
 class B0Mask(StrInstantiatesMixin):
     """
