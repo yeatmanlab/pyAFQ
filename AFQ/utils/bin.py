@@ -4,6 +4,7 @@ import datetime
 import platform
 import os.path as op
 import os
+import logging
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
@@ -203,6 +204,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
             + " add the argument --generate-config-only")
     f_arg_dict = toml.load(toml_file)
 
+    logger = logging.getLogger('AFQ.CLI')
+
     # extract arguments from file
     kwargs = {}
     bids_path = ''
@@ -226,6 +229,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
             if arg not in default_arg_dict[section]:
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
+
+    logger.info("The following arguments are recognized: " + str(kwargs))
 
     # if overwrite, write new file with updated docs / args
     if overwrite:
