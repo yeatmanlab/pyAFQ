@@ -61,6 +61,7 @@ class Segmentation:
                  presegment_bundle_dict=None,
                  presegment_kawrgs={},
                  filter_by_endpoints=True,
+                 endpoint_info=None,
                  dist_to_atlas=4,
                  save_intermediates=None):
         """
@@ -163,6 +164,15 @@ class Segmentation:
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
+        endpoint_info : dict, optional. This overrides use of the
+            AAL atlas, which is the default behavior.
+            The format for this should be:
+            {"bundle1": {"startpoint":img1_1,
+                         "endpoint":img1_2},
+             "bundle2": {"startpoint":img2_1,
+                          "endpoint":img2_2}}
+            where the images used are binary masks of the desired
+            endpoints.
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance
             from the endpoints to the atlas ROIs.
@@ -206,6 +216,7 @@ class Segmentation:
         self.presegment_bundle_dict = presegment_bundle_dict
         self.presegment_kawrgs = presegment_kawrgs
         self.filter_by_endpoints = filter_by_endpoints
+        self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
 
         if (save_intermediates is not None) and \
@@ -235,7 +246,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_tg_space=False, endpoint_info=None):
+                reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -266,15 +277,6 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
-        endpoint_info : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior.
-            The format for this should be:
-            {"bundle1": {"startpoint":img1_1,
-                         "endpoint":img1_2},
-             "bundle2": {"startpoint":img2_1,
-                          "endpoint":img2_2}}
-            where the images used are binary masks of the desired
-            endpoints.
 
         Returns
         -------
@@ -315,7 +317,6 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.endpoint_info = endpoint_info
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
