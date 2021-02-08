@@ -1305,7 +1305,6 @@ class AFQ(object):
             row['timing']['Segmentation'] =\
                 row['timing']['Segmentation'] + time() - start_time
             for bundle in self.bundle_dict.keys():
-                print(bundles)
                 if bundle != "whole_brain":
                     row["sl_counts"].at[bundle, "n_streamlines"] =\
                         len(bundles[bundle].streamlines)
