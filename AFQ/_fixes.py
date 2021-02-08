@@ -252,7 +252,7 @@ def solve_qp(P, Q, G, H):
     try:
         prob.solve()
         opt = np.array(x.value).reshape((Q.shape[0],))
-    except cvx.error.SolverError:
+    except (cvx.error.SolverError, cvx.error.DCPError) as e:
         opt = np.empty((Q.shape[0],))
         opt[:] = np.NaN
 
