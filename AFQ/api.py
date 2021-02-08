@@ -228,6 +228,7 @@ class AFQ(object):
                  reg_template="mni_T1",
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
+                 reg_prealign_kwargs={},
                  bundle_info=None,
                  dask_it=False,
                  scalars=["dti_fa", "dti_md"],
@@ -302,6 +303,10 @@ class AFQ(object):
             If None, no brain mask will not be applied,
             and no brain mask will be applied to the template.
             Default: B0Mask()
+        reg_prealign_kwargs : dictionary, optional
+            [REGISTRATION] Parameters to pass to affine_registration
+            in AFQ.registration, which does the linear pre-alignment.
+            Default: {}
         bundle_info : list of strings or dict, optional
             [BUNDLES] List of bundle names to include in segmentation,
             or a bundle dictionary (see make_bundle_dict for inspiration).
@@ -492,6 +497,7 @@ class AFQ(object):
                 default_clean_params[k] = clean_params[k]
 
         self.clean_params = default_clean_params
+        self.reg_prealign_kwargs = reg_prealign_kwargs
 
         if bundle_info is None:
             if self.seg_algo == "reco" or self.seg_algo == "reco16":
@@ -1057,7 +1063,8 @@ class AFQ(object):
                 reg_subject_img.get_fdata(),
                 self.reg_template_img.get_fdata(),
                 reg_subject_img.affine,
-                self.reg_template_img.affine)
+                self.reg_template_img.affine,
+                **self.reg_prealign_kwargs)
             np.save(prealign_file, aff)
             meta_fname = self._get_fname(
                 row, '_prealign_from-DWI_to-MNI_xfm.json')
