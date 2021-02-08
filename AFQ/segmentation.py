@@ -676,6 +676,10 @@ class Segmentation:
                                 point_name = "startpoint"
                             else:
                                 point_name = "endpoint"
+                            os.makedirs(op.join(
+                                self.save_intermediates,
+                                'endpoint_ROI',
+                                bundle), exist_ok=True)
 
                             nib.save(
                                 nib.Nifti1Image(
