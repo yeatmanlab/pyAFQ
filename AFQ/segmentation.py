@@ -434,9 +434,11 @@ class Segmentation:
 
             # For debugging purposes, we can save the variable as it is:
             if self.save_intermediates is not None:
-                os.makedirs(op.join(self.save_intermediates,
+                os.makedirs(
+                    op.join(self.save_intermediates,
                             'warpedROI_',
-                            bundle), exist_ok=True)
+                            bundle),
+                    exist_ok=True)
                 nib.save(
                     nib.Nifti1Image(warped_roi.astype(np.float32),
                                     self.img_affine),
@@ -553,9 +555,11 @@ class Segmentation:
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             if self.save_intermediates is not None:
-                os.makedirs(op.join(self.save_intermediates,
+                os.makedirs(
+                    op.join(self.save_intermediates,
                             'warpedprobmap',
-                            bundle), exist_ok=True)
+                            bundle),
+                    exist_ok=True)
                 nib.save(
                     nib.Nifti1Image(warped_prob_map.astype(np.float32),
                                     self.img_affine),
