@@ -1224,7 +1224,8 @@ class AFQ(object):
             streamlines_file = self._streamlines(row)
 
             img = nib.load(row['dwi_file'])
-            tg = load_tractogram(streamlines_file, img, Space.VOX)
+            tg = load_tractogram(
+                streamlines_file, img, Space.VOX, bbox_valid_check=False)
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
@@ -1288,7 +1289,8 @@ class AFQ(object):
 
             sft = load_tractogram(bundles_file,
                                   row['dwi_img'],
-                                  Space.VOX)
+                                  Space.VOX,
+                                  bbox_valid_check=False)
 
             start_time = time()
             tgram = nib.streamlines.Tractogram([], {'bundle': []})
