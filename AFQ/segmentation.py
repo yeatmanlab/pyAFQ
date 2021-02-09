@@ -926,7 +926,8 @@ class Segmentation:
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
-            self.logger.info(f"{len(oriented_sl)} streamlines selected with Recobundles")
+            self.logger.info(
+                f"{len(oriented_sl)} streamlines selected with Recobundles")
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels
