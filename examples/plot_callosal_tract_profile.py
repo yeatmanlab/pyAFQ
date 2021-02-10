@@ -332,7 +332,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
                                      'afq_dti_density_map.nii.gz'))
 else:
     tractogram = load_tractogram(op.join(working_dir, 'dti_streamlines.trk'),
-                                 img, bbox_valid_check=False)
+                                 img)
 
 tractogram.to_vox()
 
@@ -441,8 +441,7 @@ for bundle in bundles:
                                     img,
                                     Space.VOX)
     tractogram.to_rasmm()
-    save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
-                    bbox_valid_check=False)
+    save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'))
 
     tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
     nib.save(tractogram_img, op.join(working_dir,
