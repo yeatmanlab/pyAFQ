@@ -752,8 +752,7 @@ class Segmentation:
 
             select_sl = StatefulTractogram(select_sl,
                                            self.img,
-                                           Space.VOX)
-            select_sl.to_rasmm()
+                                           Space.RASMM)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
@@ -851,6 +850,7 @@ class Segmentation:
         for bundle in bundle_list:
             self.logger.info(f"Finding streamlines for {bundle}")
             model_sl = self.bundle_dict[bundle]['sl']
+
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
@@ -870,6 +870,11 @@ class Segmentation:
 
                 # Now rb should be initialized based on the fiber group coming
                 # out of the roi segmentation
+                indiv_tg = StatefulTractogram(
+                    indiv_tg.streamlines,
+                    self.img,
+                    Space.VOX)
+                indiv_tg.to_rasmm()
                 self.move_streamlines(indiv_tg, self.reg_algo)
                 rb = RecoBundles(
                     self.moved_sl,
