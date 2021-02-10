@@ -441,7 +441,8 @@ for bundle in bundles:
                                     img,
                                     Space.VOX)
     tractogram.to_rasmm()
-    save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'))
+    save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
+                    bbox_valid_check=False)
 
     tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
     nib.save(tractogram_img, op.join(working_dir,
@@ -473,8 +474,7 @@ print("Extracting tract profiles...")
 for bundle in bundles:
     print(f"Extracting {bundle}...")
     tractogram = load_tractogram(op.join(working_dir, f'afq_{bundle}.trk'),
-                                 img, to_space=Space.VOX,
-                                 bbox_valid_check=False)
+                                 img, to_space=Space.VOX)
     fig, ax = plt.subplots(1)
     weights = gaussian_weights(tractogram.streamlines)
     profile = afq_profile(FA_data, tractogram.streamlines,
