@@ -531,18 +531,6 @@ class AFQ(object):
             "Visualization": 0
         }
 
-        # Initialize dataframe to store sl count information
-        if isinstance(bundle_info, dict):
-            bundle_names = list(self.bundle_dict.keys())
-        else:
-            bundle_names = bundle_info.copy()
-        if "whole_brain" not in bundle_names:
-            bundle_names.append("whole_brain")
-        sl_count_df = pd.DataFrame(
-            data=[[0, 0]] * len(bundle_names),
-            index=bundle_names,
-            columns=["n_streamlines", "n_clean_streamlines"])
-
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
 
@@ -586,7 +574,6 @@ class AFQ(object):
         reg_subject_list = []
         timing_list = []
         results_dir_list = []
-        sl_counts_list = []
         for subject in self.subjects:
             for session in self.sessions:
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
@@ -681,7 +668,6 @@ class AFQ(object):
                 sub_list.append(subject)
                 ses_list.append(session)
                 timing_list.append(timing_dict.copy())
-                sl_counts_list.append(sl_count_df.copy())
 
         self.data_frame = pd.DataFrame(dict(subject=sub_list,
                                             dwi_file=dwi_file_list,
@@ -691,7 +677,6 @@ class AFQ(object):
                                             reg_subject=reg_subject_list,
                                             ses=ses_list,
                                             timing=timing_list,
-                                            sl_counts=sl_counts_list,
                                             results_dir=results_dir_list))
 
         if dask_it:
@@ -1311,6 +1296,7 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
             row['timing']['Segmentation'] =\
                 row['timing']['Segmentation'] + time() - start_time
+            self._gen_sl_counts(row)
             for bundle in self.bundle_dict.keys():
                 if bundle != "whole_brain":
                     row["sl_counts"].at[bundle, "n_streamlines"] =\
@@ -1340,6 +1326,7 @@ class AFQ(object):
             if self.clean_params['return_idx']:
                 return_idx = {}
 
+            self._gen_sl_counts(row)
             for b in self.bundle_dict.keys():
                 if b != "whole_brain":
                     idx = np.where(sft.data_per_streamline['bundle']
@@ -1547,7 +1534,26 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
+    def _gen_sl_counts(self, row):
+        if "sl_counts" not in row:
+            sl_count_file = self._get_fname(
+                row,
+                '_sl_count.csv',
+                include_track=True,
+                include_seg=True)
+            if op.exists(sl_count_file):
+                row["sl_counts"] = pd.read_csv(sl_count_file)
+            else:
+                bundle_names = list(self.bundle_dict.keys())
+                if "whole_brain" not in bundle_names:
+                    bundle_names.append("whole_brain")
+                row["sl_counts"] = pd.DataFrame(
+                    data=[[0, 0]] * len(bundle_names),
+                    index=bundle_names,
+                    columns=["n_streamlines", "n_clean_streamlines"])
+
     def _export_sl_counts(self, row):
+        self._gen_sl_counts(row)
         sl_count_file = self._get_fname(
             row,
             '_sl_count.csv',
