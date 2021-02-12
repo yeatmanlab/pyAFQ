@@ -867,7 +867,9 @@ class GroupCSVComparison():
             folder)
         os.makedirs(f_folder, exist_ok=True)
         fig.savefig(op.join(f_folder, f_name))
-        fig.savefig(op.join(f_folder, f_name) + ".svg", format = 'svg', dpi=300)
+        fig.savefig(op.join(f_folder, f_name) + ".svg",
+                    format='svg',
+                    dpi=300)
 
     def _get_profile(self, name, bundle, subject, scalar):
         """
@@ -1041,7 +1043,8 @@ class GroupCSVComparison():
             if ba.is_using_temp_axis():
                 ba.temp_fig.legend(
                     labels_temp, names, fontsize=medium_font)
-                ba.save_temp_fig(o_folder, f"{o_file}_{bundle}", self._save_fig)
+                ba.save_temp_fig(
+                    o_folder, f"{o_file}_{bundle}", self._save_fig)
         if len(names) > 1:
             ba.fig.legend(labels, names, loc='center', fontsize=medium_font)
         ba.format()
