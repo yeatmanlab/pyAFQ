@@ -434,6 +434,11 @@ class Segmentation:
 
             # For debugging purposes, we can save the variable as it is:
             if self.save_intermediates is not None:
+                os.makedirs(
+                    op.join(self.save_intermediates,
+                            'warpedROI_',
+                            bundle),
+                    exist_ok=True)
                 nib.save(
                     nib.Nifti1Image(warped_roi.astype(np.float32),
                                     self.img_affine),
@@ -550,6 +555,11 @@ class Segmentation:
             warped_prob_map, include_roi, exclude_roi = \
                 self._get_bundle_info(bundle_idx, bundle)
             if self.save_intermediates is not None:
+                os.makedirs(
+                    op.join(self.save_intermediates,
+                            'warpedprobmap',
+                            bundle),
+                    exist_ok=True)
                 nib.save(
                     nib.Nifti1Image(warped_prob_map.astype(np.float32),
                                     self.img_affine),
@@ -651,7 +661,7 @@ class Segmentation:
                     end_p = self.endpoint_info[bundle]['endpoint']
 
                     atlas_idx = []
-                    for pp in [start_p, end_p]:
+                    for ii, pp in enumerate([start_p, end_p]):
                         pp = reg.resample(pp.get_fdata(),
                                           self.reg_template,
                                           pp.affine,
@@ -664,6 +674,26 @@ class Segmentation:
                         warped_roi = self.mapping.transform_inverse(
                             atlas_roi,
                             interpolation='nearest')
+
+                        if self.save_intermediates is not None:
+                            if ii == 0:
+                                point_name = "startpoint"
+                            else:
+                                point_name = "endpoint"
+                            os.makedirs(op.join(
+                                self.save_intermediates,
+                                'endpoint_ROI',
+                                bundle), exist_ok=True)
+
+                            nib.save(
+                                nib.Nifti1Image(
+                                    warped_roi,
+                                    self.img_affine),
+                                op.join(self.save_intermediates,
+                                        'endpoint_ROI',
+                                        bundle,
+                                        f'{point_name}_as_used.nii.gz'))
+
                         atlas_idx.append(
                             np.array(np.where(warped_roi > 0)).T)
                 else:
