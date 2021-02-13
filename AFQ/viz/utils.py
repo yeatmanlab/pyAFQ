@@ -693,7 +693,7 @@ class GroupCSVComparison():
 
         Parameters
         ----------
-        out_folder : path, optional
+        out_folder : path
             Folder where outputs of this class's methods will be saved.
 
         csv_fnames : list of filenames
@@ -862,14 +862,28 @@ class GroupCSVComparison():
         """
         Get file to save to, and generate the folder if it does not exist.
         """
-        f_folder = op.join(
-            self.out_folder,
-            folder)
-        os.makedirs(f_folder, exist_ok=True)
-        fig.savefig(op.join(f_folder, f_name))
-        fig.savefig(op.join(f_folder, f_name) + ".svg",
-                    format='svg',
-                    dpi=300)
+        if self.out_folder is None and folder is None:
+            f_folder = None
+        elif self.out_folder is None:
+            f_folder = folder
+        elif folder is None:
+            f_folder = self.out_folder
+        else:
+            f_folder = op.join(
+                self.out_folder,
+                folder)
+
+        if f_folder is None:
+            fig.savefig(f_name)
+            fig.savefig(f_name + ".svg",
+                        format='svg',
+                        dpi=300)
+        else:
+            os.makedirs(f_folder, exist_ok=True)
+            fig.savefig(op.join(f_folder, f_name))
+            fig.savefig(op.join(f_folder, f_name) + ".svg",
+                        format='svg',
+                        dpi=300)
 
     def _get_profile(self, name, bundle, subject, scalar):
         """
@@ -1004,7 +1018,7 @@ class GroupCSVComparison():
             o_folder = f"tract_profiles/{scalar}"
             o_file = f"{'_'.join(names)}"
         else:
-            o_folder = ""
+            o_folder = None
             o_file = out_file
 
         ba = BrainAxes(positions=positions)
