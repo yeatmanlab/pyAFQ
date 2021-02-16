@@ -58,6 +58,8 @@ class Segmentation:
                  dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
+                 presegment_bundle_dict=None,
+                 presegment_kawrgs={},
                  filter_by_endpoints=True,
                  dist_to_atlas=4,
                  save_intermediates=None):
@@ -144,6 +146,19 @@ class Segmentation:
         return_idx : bool
             Whether to return the indices in the original streamlines as part
             of the output of segmentation.
+        presegment_bundle_dict : dict or None
+            If not None, presegment by ROIs before performing
+            RecoBundles. Only used if seg_algo starts with 'Reco'.
+            Meta-data for the segmentation. The format is something like::
+                {'name': {'ROIs':[img1, img2],
+                'rules':[True, True]},
+                'prob_map': img3,
+                'cross_midline': False}
+            Default: None
+        presegment_kawrgs : dict
+            Optional arguments for initializing the segmentation for the
+            presegmentation. Only used if presegment_bundle_dict is not None.
+            Default: {}
         filter_by_endpoints: bool
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
@@ -188,6 +203,8 @@ class Segmentation:
         self.refine = refine
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
+        self.presegment_bundle_dict = presegment_bundle_dict
+        self.presegment_kawrgs = presegment_kawrgs
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_atlas = dist_to_atlas
 
@@ -353,6 +370,7 @@ class Segmentation:
         if reg_template is None:
             reg_template = afd.read_mni_template()
 
+        self.reg_prealign = reg_prealign
         self.reg_template = reg_template
 
         if mapping is None:
@@ -729,7 +747,7 @@ class Segmentation:
                 # We need to check this again:
                 if len(new_select_sl) == 0:
                     self.logger.info("After filtering "
-                                     f"{len(select_sl)} streamlines")
+                                     f"{len(new_select_sl)} streamlines")
                     # There's nothing here, set and move to the next bundle:
                     self._return_empty(bundle)
                     continue
@@ -774,14 +792,13 @@ class Segmentation:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
 
-    def move_streamlines(self, tg=None, reg_algo='slr'):
+    def move_streamlines(self, tg, reg_algo='slr'):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
         registration_algo : str
             "slr" or "syn"
         """
-        tg = self._read_tg(tg=tg)
         if reg_algo is None:
             if self.mapping is None:
                 reg_algo = 'slr'
@@ -792,20 +809,20 @@ class Segmentation:
             self.logger.info("Registering tractogram with SLR")
             atlas = self.bundle_dict['whole_brain']
             self.moved_sl, _, _, _ = whole_brain_slr(
-                atlas, self.tg.streamlines, x0='affine', verbose=False,
+                atlas, tg.streamlines, x0='affine', verbose=False,
                 progressive=self.progressive,
                 greater_than=self.greater_than,
                 rm_small_clusters=self.rm_small_clusters,
                 rng=self.rng)
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
-            self.tg.to_rasmm()
+            tg.to_rasmm()
             delta = dts.values_from_volume(
                 self.mapping.forward,
-                self.tg.streamlines, np.eye(4))
+                tg.streamlines, np.eye(4))
             self.moved_sl = dts.Streamlines(
-                [d + s for d, s in zip(delta, self.tg.streamlines)])
-            self.tg.to_vox()
+                [d + s for d, s in zip(delta, tg.streamlines)])
+            tg.to_vox()
 
         if self.save_intermediates is not None:
             moved_sft = StatefulTractogram(
@@ -835,17 +852,90 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         fiber_groups = {}
 
-        self.move_streamlines(tg, self.reg_algo)
         # We generate our instance of RB with the moved streamlines:
         self.logger.info("Extracting Bundles")
-        rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
+        # If doing a presegmentation based on ROIs then initialize
+        # that segmentation and segment using ROIs, else
+        # RecoBundles based on the whole brain tractogram
+        if self.presegment_bundle_dict is not None:
+            roiseg = Segmentation(**self.presegment_kawrgs)
+            roiseg.segment(
+                    self.presegment_bundle_dict,
+                    self.tg,
+                    self.fdata,
+                    self.fbval,
+                    self.fbvec,
+                    reg_template=self.reg_template,
+                    mapping=self.mapping,
+                    reg_prealign=self.reg_prealign)
+            roiseg_fg = roiseg.fiber_groups
+        else:
+            self.move_streamlines(tg, self.reg_algo)
+            rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         bundle_list.remove('whole_brain')
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
+            self.logger.info(f"Finding streamlines for {bundle}")
             model_sl = self.bundle_dict[bundle]['sl']
+
+            # If doing a presegmentation based on ROIs then initialize rb after
+            # Filtering the whole brain tractogram to pass through ROIs
+            if self.presegment_bundle_dict is not None:
+                afq_bundle_name = afd.BUNDLE_RECO_2_AFQ.get(bundle, bundle)
+                if "return_idx" in self.presegment_kawrgs\
+                        and self.presegment_kawrgs["return_idx"]:
+                    indiv_tg = roiseg_fg[afq_bundle_name]['sl']
+                else:
+                    indiv_tg = roiseg_fg[afq_bundle_name]
+
+                if len(indiv_tg.streamlines) < 1:
+                    self.logger.warning((
+                        f"No streamlines found by waypoint ROI "
+                        f"pre-segmentation for {bundle}. Using entire"
+                        f" tractography instead."))
+                    indiv_tg = tg
+
+                # Now rb should be initialized based on the fiber group coming
+                # out of the roi segmentation
+                indiv_tg = StatefulTractogram(
+                    indiv_tg.streamlines,
+                    self.img,
+                    Space.VOX)
+                indiv_tg.to_rasmm()
+                self.move_streamlines(indiv_tg, self.reg_algo)
+                rb = RecoBundles(
+                    self.moved_sl,
+                    verbose=False,
+                    rng=self.rng)
+            if self.save_intermediates is not None:
+                if self.presegment_bundle_dict is not None:
+                    moved_fname = f"{bundle}_presegmentation.trk"
+                else:
+                    moved_fname = f"whole_brain.trk"
+                moved_sft = StatefulTractogram(
+                    self.moved_sl,
+                    self.reg_template,
+                    Space.RASMM)
+                save_tractogram(
+                    moved_sft,
+                    op.join(self.save_intermediates,
+                            moved_fname),
+                    bbox_valid_check=False)
+                model_sft = StatefulTractogram(
+                    model_sl,
+                    self.reg_template,
+                    Space.RASMM)
+                save_tractogram(
+                    model_sft,
+                    op.join(self.save_intermediates,
+                            f"{bundle}_model.trk"),
+                    bbox_valid_check=False)
+
+            # Either whole brain tracgtogram or roi presegmented fiber group
+            # goes to rb.recognize
             _, rec_labels = rb.recognize(model_bundle=model_sl,
                                          model_clust_thr=self.model_clust_thr,
                                          reduction_thr=self.reduction_thr,
@@ -855,16 +945,24 @@ class Segmentation:
                                          pruning_distance='mdf')
 
             # Use the streamlines in the original space:
-            recognized_sl = tg.streamlines[rec_labels]
+            if self.presegment_bundle_dict is None:
+                recognized_sl = tg.streamlines[rec_labels]
+            else:
+                recognized_sl = indiv_tg.streamlines[rec_labels]
             if self.refine and len(recognized_sl) > 0:
                 _, rec_labels = rb.refine(model_sl, recognized_sl,
                                           self.model_clust_thr,
                                           reduction_thr=self.reduction_thr,
                                           pruning_thr=self.pruning_thr)
-                recognized_sl = tg.streamlines[rec_labels]
-
+                if self.presegment_bundle_dict is None:
+                    recognized_sl = tg.streamlines[rec_labels]
+                else:
+                    recognized_sl = indiv_tg.streamlines[rec_labels]
             standard_sl = self.bundle_dict[bundle]['centroid']
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
+
+            self.logger.info(
+                f"{len(oriented_sl)} streamlines selected with Recobundles")
             if self.return_idx:
                 fiber_groups[bundle] = {}
                 fiber_groups[bundle]['idx'] = rec_labels

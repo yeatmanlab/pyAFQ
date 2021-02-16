@@ -524,6 +524,15 @@ class AFQ(object):
             self.bundle_dict = bundle_info
 
         self.endpoint_info = endpoint_info
+        if isinstance(
+                self.segmentation_params["presegment_bundle_dict"], list):
+            self.segmentation_params["presegment_bundle_dict"] =\
+                make_bundle_dict(
+                    bundle_names=self.segmentation_params[
+                        "presegment_bundle_dict"],
+                    seg_algo="afq",
+                    resample_to=self.reg_template_img)
+
         # Initialize dict to store relevant timing information
         timing_dict = {
             "Tractography": 0,
@@ -1218,7 +1227,8 @@ class AFQ(object):
             streamlines_file = self._streamlines(row)
 
             img = nib.load(row['dwi_file'])
-            tg = load_tractogram(streamlines_file, img, Space.VOX)
+            tg = load_tractogram(
+                streamlines_file, img, Space.VOX)
             if self.use_prealign:
                 reg_prealign = np.load(self._reg_prealign(row))
             else:
@@ -1246,8 +1256,16 @@ class AFQ(object):
 
             tgram = aus.bundles_to_tgram(bundles, self.bundle_dict, img)
             self.log_and_save_trk(tgram, bundles_file)
+
+            segmentation_params_out = {}
+            for arg_name, value in self.segmentation_params.items():
+                if isinstance(value, (int, float, bool, str))\
+                        or (value is None):
+                    segmentation_params_out[arg_name] = value
+                else:
+                    segmentation_params_out[arg_name] = str(value)
             meta = dict(source=streamlines_file,
-                        Parameters=self.segmentation_params)
+                        Parameters=segmentation_params_out)
             meta_fname = bundles_file.split('.')[0] + '.json'
             afd.write_json(meta_fname, meta)
             row['timing']['Segmentation'] =\
