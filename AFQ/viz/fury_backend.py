@@ -254,8 +254,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     return _inline_interact(figure, inline, interact)
 
 
-def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
-                     interact=False):
+def visualize_volume(volume, x=None, y=None, z=None, figure=None,
+                     opacity=0.6, inline=True, interact=False):
     """
     Visualize a volume
 
@@ -267,6 +267,10 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
     figure : fury Scene object, optional
         If provided, the visualization will be added to this Scene. Default:
         Initialize a new Scene.
+
+    opacity : float, optional
+        Initial opacity of slices.
+        Default: 0.6
 
     interact : bool
         Whether to provide an interactive VTK window for interaction.
@@ -287,7 +291,7 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True,
 
     shape = volume.shape
     image_actor_z = actor.slicer(volume)
-    slicer_opacity = 0.6
+    slicer_opacity = opacity
     image_actor_z.opacity(slicer_opacity)
 
     image_actor_x = image_actor_z.copy()
