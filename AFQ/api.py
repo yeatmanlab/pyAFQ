@@ -753,6 +753,19 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return b0_file
 
+    def _b0_mask(self, row):
+        b0_file = self._get_fname(row, '_maskedb0.nii.gz')
+        if not op.exists(b0_file):
+            masked_b0_img = self._reg_img("b0", True, row=row)
+            self.log_and_save_nii(mean_b0_img, b0_file)
+
+            meta = dict(b0_threshold=gtab.b0_threshold,
+                        source=row['dwi_file'],
+                        masked=True)
+            meta_fname = self._get_fname(row, '_maskedb0.json')
+            afd.write_json(meta_fname, meta)
+        return b0_file
+
     def _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False,
                     vol_idx=None, dilate=10):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
@@ -1810,6 +1823,16 @@ class AFQ(object):
     def get_b0(self):
         self.set_b0()
         return self.data_frame['b0_file']
+
+    def set_masked_b0(self):
+        if 'masked_b0_file' not in self.data_frame.columns:
+            self.data_frame['masked_b0_file'] =\
+                self.data_frame.apply(self._b0_mask,
+                                      axis=1)
+
+    def get_masked_b0(self):
+        self.get_masked_b0()
+        return self.data_frame['masked_b0_file']
 
     b0 = property(get_b0, set_b0)
 
