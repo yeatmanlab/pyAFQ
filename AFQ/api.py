@@ -731,7 +731,7 @@ class AFQ(object):
         b0_file = self._get_fname(row, '_maskedb0.nii.gz')
         if not op.exists(b0_file):
             masked_b0_img = self._reg_img("b0", True, row=row)
-            self.log_and_save_nii(mean_b0_img, b0_file)
+            self.log_and_save_nii(masked_b0_img, b0_file)
 
             meta = dict(b0_threshold=gtab.b0_threshold,
                         source=row['dwi_file'],
