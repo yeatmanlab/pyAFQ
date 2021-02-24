@@ -2087,7 +2087,7 @@ class AFQ(object):
                     for ii, roi in enumerate(
                             self._bundle_dict[bundle]['ROIs']):
                         self._bundle_dict[bundle]['ROIs'][ii] =\
-                            reg.read_resample_roi(
+                            afd.read_resample_roi(
                                 roi, resample_to=self.reg_template_img)
 
     def get_bundle_dict(self):
