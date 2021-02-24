@@ -2082,7 +2082,13 @@ class AFQ(object):
                     seg_algo=self.seg_algo,
                     resample_to=self.reg_template_img)
             else:
-                self._bundle_dict = self.bundle_info
+                self._bundle_dict = self.bundle_info.copy()
+                for bundle in self._bundle_dict:
+                    for ii, roi in enumerate(
+                            self._bundle_dict[bundle]['ROIs']):
+                        self._bundle_dict[bundle]['ROIs'][ii] =\
+                            reg.read_resample_roi(
+                                roi, resample_to=self.reg_template_img)
 
     def get_bundle_dict(self):
         self.set_bundle_dict()
