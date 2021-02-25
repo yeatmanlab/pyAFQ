@@ -564,6 +564,7 @@ class Segmentation:
             R = self.img_affine[0:3, 0:3]
             vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
             dist_to_atlas = self.dist_to_atlas / vox_dim
+            dist_to_waypoint = self.dist_to_waypoint / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
@@ -572,7 +573,7 @@ class Segmentation:
         if self.dist_to_waypoint is None:
             tol = dts.dist_to_corner(self.img_affine)**2
         else:
-            tol = self.dist_to_waypoint ** 2
+            tol = dist_to_waypoint ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi = \
