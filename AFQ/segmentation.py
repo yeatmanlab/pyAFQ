@@ -483,7 +483,7 @@ class Segmentation:
             roi = nib.load(roi)
         if isinstance(roi, nib.Nifti1Image):
             roi = roi.get_fdata()
-        prob_map = bundle_entry[bundle].get(
+        prob_map = bundle_entry.get(
             'prob_map', np.ones(roi.shape))
 
         if not isinstance(prob_map, np.ndarray):
