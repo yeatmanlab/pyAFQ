@@ -430,7 +430,7 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle_idx, bundle, vox_dim):
+    def _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
@@ -443,10 +443,10 @@ class Segmentation:
         for rule_idx, rule in enumerate(rules):
             roi = bundle_entry['ROIs'][rule_idx]
             if 'additional_tolerance' in bundle_entry:
-                add_tol = bundle_entry['additional_tolerance'][rule_idx]\
-                    / vox_dim
+                this_tol = (bundle_entry['additional_tolerance'][rule_idx]
+                    / vox_dim + tol)**2
             else:
-                add_tol = False
+                this_tol = tol**2
 
             warped_roi = auv.transform_inverse_roi(
                 roi,
@@ -455,11 +455,11 @@ class Segmentation:
 
             if rule:
                 # include ROI:
-                include_roi_tols.append(add_tol)
+                include_roi_tols.append(this_tol)
                 include_rois.append(np.array(np.where(warped_roi)).T)
             else:
                 # Exclude ROI:
-                exclude_roi_tols.append(add_tol)
+                exclude_roi_tols.append(this_tol)
                 exclude_rois.append(np.array(np.where(warped_roi)).T)
 
             # For debugging purposes, we can save the variable as it is:
@@ -494,36 +494,31 @@ class Segmentation:
         return warped_prob_map, include_rois, exclude_rois,\
             include_roi_tols, exclude_roi_tols
 
-    def _check_sl_with_inclusion(self, sl, include_rois, tol, add_tols):
+    def _check_sl_with_inclusion(self, sl, include_rois, tol,
+                                 include_roi_tols):
         """
         Helper function to check that a streamline is close to a list of
         inclusion ROIS.
         """
         dist = []
         for ii, roi in enumerate(include_rois):
-            if add_tols[ii] is not False:
-                this_tol = tol + add_tols[ii]
-            else:
-                this_tol = tol
+            this_tol =
             # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if np.min(dist[-1]) > this_tol:
+            if np.min(dist[-1]) > include_roi_tols[ii]:
                 # Too far from one of them:
                 return False, []
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
 
-    def _check_sl_with_exclusion(self, sl, exclude_rois, tol, add_tols):
+    def _check_sl_with_exclusion(self, sl, exclude_rois, tol,
+                                 exclude_roi_tols):
         """ Helper function to check that a streamline is not too close to a
         list of exclusion ROIs.
         """
         for ii, roi in enumerate(exclude_rois):
-            if add_tols[ii] is not False:
-                this_tol = tol + add_tols[ii]
-            else:
-                this_tol = tol
             # Use squared Euclidean distance, because it's faster:
-            if np.min(cdist(sl, roi, 'sqeuclidean')) < this_tol:
+            if np.min(cdist(sl, roi, 'sqeuclidean')) < exclude_roi_tols[ii]:
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
@@ -573,6 +568,14 @@ class Segmentation:
         R = self.img_affine[0:3, 0:3]
         vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
 
+        # Tolerance is set to the square of the distance to the corner
+        # because we are using the squared Euclidean distance in calls to
+        # `cdist` to make those calls faster.
+        if self.dist_to_waypoint is None:
+            tol = dts.dist_to_corner(self.img_affine)
+        else:
+            tol = self.dist_to_waypoint / vox_dim
+
         if self.filter_by_endpoints:
             if self.endpoint_info is None:
                 aal_atlas = afd.read_aal_atlas(self.reg_template)
@@ -588,18 +591,11 @@ class Segmentation:
             dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
-        # Tolerance is set to the square of the distance to the corner
-        # because we are using the squared Euclidean distance in calls to
-        # `cdist` to make those calls faster.
-        if self.dist_to_waypoint is None:
-            tol = dts.dist_to_corner(self.img_affine)**2
-        else:
-            tol = (self.dist_to_waypoint / vox_dim) ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
                 include_roi_tols, exclude_roi_tols =\
-                    self._get_bundle_info(bundle_idx, bundle, vox_dim)
+                    self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
