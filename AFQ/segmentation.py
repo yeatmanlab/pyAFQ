@@ -570,7 +570,6 @@ class Segmentation:
         # from mm to voxel units:
         R = self.img_affine[0:3, 0:3]
         vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
-        dist_to_waypoint = self.dist_to_waypoint / vox_dim
 
         if self.filter_by_endpoints:
             if self.endpoint_info is None:
@@ -593,7 +592,7 @@ class Segmentation:
         if self.dist_to_waypoint is None:
             tol = dts.dist_to_corner(self.img_affine)**2
         else:
-            tol = dist_to_waypoint ** 2
+            tol = (self.dist_to_waypoint / vox_dim) ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
