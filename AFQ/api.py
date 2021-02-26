@@ -740,8 +740,7 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
         return b0_file
 
-    def _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False,
-                    vol_idx=None, dilate=10):
+    def _brain_mask(self, row):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if not op.exists(brain_mask_file):
             brain_mask, brain_affine, meta = \
