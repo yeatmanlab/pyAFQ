@@ -436,9 +436,17 @@ class Segmentation:
         """
         rules = self.bundle_dict[bundle]['rules']
         include_rois = []
+        include_roi_tols = []
         exclude_rois = []
+        exclude_roi_tols = []
         for rule_idx, rule in enumerate(rules):
             roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
+            if 'additional_tolerance' in self.bundle_dict[bundle]:
+                add_tol =\
+                    self.bundle_dict[bundle]['additional_tolerance'][rule_idx]
+            else:
+                add_tol = False
+
             warped_roi = auv.transform_inverse_roi(
                 roi,
                 self.mapping,
@@ -446,9 +454,11 @@ class Segmentation:
 
             if rule:
                 # include ROI:
+                include_roi_tols.append(add_tol)
                 include_rois.append(np.array(np.where(warped_roi)).T)
             else:
                 # Exclude ROI:
+                exclude_roi_tols.append(add_tol)
                 exclude_rois.append(np.array(np.where(warped_roi)).T)
 
             # For debugging purposes, we can save the variable as it is:
@@ -480,30 +490,39 @@ class Segmentation:
         warped_prob_map = \
             self.mapping.transform_inverse(prob_map,
                                            interpolation='nearest')
-        return warped_prob_map, include_rois, exclude_rois
+        return warped_prob_map, include_rois, exclude_rois,\
+            include_roi_tols, exclude_roi_tols
 
-    def _check_sl_with_inclusion(self, sl, include_rois, tol):
+    def _check_sl_with_inclusion(self, sl, include_rois, tol, add_tols):
         """
         Helper function to check that a streamline is close to a list of
         inclusion ROIS.
         """
         dist = []
-        for roi in include_rois:
+        for ii, roi in enumerate(include_rois):
+            if add_tols[i] is not False:
+                this_tol = tol + add_tols[i]
+            else:
+                this_tol = tol
             # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if np.min(dist[-1]) > tol:
+            if np.min(dist[-1]) > this_tol:
                 # Too far from one of them:
                 return False, []
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
 
-    def _check_sl_with_exclusion(self, sl, exclude_rois, tol):
+    def _check_sl_with_exclusion(self, sl, exclude_rois, tol, add_tols):
         """ Helper function to check that a streamline is not too close to a
         list of exclusion ROIs.
         """
-        for roi in exclude_rois:
+        for ii, roi in enumerate(exclude_rois):
+            if add_tols[i] is not False:
+                this_tol = tol + add_tols[i]
+            else:
+                this_tol = tol
             # Use squared Euclidean distance, because it's faster:
-            if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
+            if np.min(cdist(sl, roi, 'sqeuclidean')) < this_tol:
                 return False
         # Either there are no exclusion ROIs, or you are not close to any:
         return True
@@ -576,8 +595,9 @@ class Segmentation:
             tol = dist_to_waypoint ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
-            warped_prob_map, include_roi, exclude_roi = \
-                self._get_bundle_info(bundle_idx, bundle)
+            warped_prob_map, include_roi, exclude_roi,\
+                include_roi_tols, exclude_roi_tols =\
+                    self._get_bundle_info(bundle_idx, bundle)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
@@ -619,12 +639,14 @@ class Segmentation:
                     is_close, dist = \
                         self._check_sl_with_inclusion(sl,
                                                       include_roi,
-                                                      tol)
+                                                      tol,
+                                                      include_roi_tols)
                     if is_close:
                         is_far = \
                             self._check_sl_with_exclusion(sl,
                                                           exclude_roi,
-                                                          tol)
+                                                          tol,
+                                                          exclude_roi_tols)
                         if is_far:
                             min_dist_coords[sl_idx, bundle_idx, 0] =\
                                 np.argmin(dist[0], 0)[0]
