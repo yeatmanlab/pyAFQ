@@ -501,7 +501,7 @@ class Segmentation:
         dist = []
         for ii, roi in enumerate(include_rois):
             if add_tols[i] is not False:
-                this_tol = tol + add_tols[i]
+                this_tol = tol + add_tols[ii]
             else:
                 this_tol = tol
             # Use squared Euclidean distance, because it's faster:
@@ -518,7 +518,7 @@ class Segmentation:
         """
         for ii, roi in enumerate(exclude_rois):
             if add_tols[i] is not False:
-                this_tol = tol + add_tols[i]
+                this_tol = tol + add_tols[ii]
             else:
                 this_tol = tol
             # Use squared Euclidean distance, because it's faster:
