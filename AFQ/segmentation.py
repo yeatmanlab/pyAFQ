@@ -434,15 +434,17 @@ class Segmentation:
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
-        rules = self.bundle_dict[bundle]['rules']
+        bundle_entry = self.bundle_dict[bundle]
+        rules = bundle_entry['rules']
         include_rois = []
         include_roi_tols = []
         exclude_rois = []
         exclude_roi_tols = []
         for rule_idx, rule in enumerate(rules):
-            roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
-            if 'additional_tolerance' in self.bundle_dict[bundle]:
-                add_tol = self.bundle_dict[bundle]['additional_tolerance'][rule_idx] / vox_dim
+            roi = bundle_entry['ROIs'][rule_idx]
+            if 'additional_tolerance' in bundle_entry:
+                add_tol = bundle_entry['additional_tolerance'][rule_idx]\
+                    / vox_dim
             else:
                 add_tol = False
 
@@ -481,7 +483,7 @@ class Segmentation:
             roi = nib.load(roi)
         if isinstance(roi, nib.Nifti1Image):
             roi = roi.get_fdata()
-        prob_map = self.bundle_dict[bundle].get(
+        prob_map = bundle_entry[bundle].get(
             'prob_map', np.ones(roi.shape))
 
         if not isinstance(prob_map, np.ndarray):
