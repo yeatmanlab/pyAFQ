@@ -430,7 +430,7 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle_idx, bundle):
+    def _get_bundle_info(self, bundle_idx, bundle, vox_dim):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
@@ -442,8 +442,7 @@ class Segmentation:
         for rule_idx, rule in enumerate(rules):
             roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
             if 'additional_tolerance' in self.bundle_dict[bundle]:
-                add_tol =\
-                    self.bundle_dict[bundle]['additional_tolerance'][rule_idx]
+                add_tol = self.bundle_dict[bundle]['additional_tolerance'][rule_idx] / vox_dim
             else:
                 add_tol = False
 
@@ -567,6 +566,12 @@ class Segmentation:
         if self.return_idx:
             out_idx = np.arange(n_streamlines, dtype=int)
 
+        # We need to calculate the size of a voxel, so we can transform
+        # from mm to voxel units:
+        R = self.img_affine[0:3, 0:3]
+        vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+        dist_to_waypoint = self.dist_to_waypoint / vox_dim
+
         if self.filter_by_endpoints:
             if self.endpoint_info is None:
                 aal_atlas = afd.read_aal_atlas(self.reg_template)
@@ -578,12 +583,8 @@ class Segmentation:
                                 'atlas_registered_to_template.nii.gz'))
 
                 atlas = atlas.get_fdata()
-            # We need to calculate the size of a voxel, so we can transform
-            # from mm to voxel units:
-            R = self.img_affine[0:3, 0:3]
-            vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+
             dist_to_atlas = self.dist_to_atlas / vox_dim
-            dist_to_waypoint = self.dist_to_waypoint / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
         # Tolerance is set to the square of the distance to the corner
@@ -597,7 +598,7 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
                 include_roi_tols, exclude_roi_tols =\
-                    self._get_bundle_info(bundle_idx, bundle)
+                    self._get_bundle_info(bundle_idx, bundle, vox_dim)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
