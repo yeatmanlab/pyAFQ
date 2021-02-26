@@ -502,7 +502,6 @@ class Segmentation:
         """
         dist = []
         for ii, roi in enumerate(include_rois):
-            this_tol =
             # Use squared Euclidean distance, because it's faster:
             dist.append(cdist(sl, roi, 'sqeuclidean'))
             if np.min(dist[-1]) > include_roi_tols[ii]:
