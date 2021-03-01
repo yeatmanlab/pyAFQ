@@ -1,6 +1,7 @@
 import os.path as op
 import os
 import logging
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -8,7 +9,6 @@ from scipy.stats import zscore
 
 import nibabel as nib
 from tqdm.auto import tqdm
-
 
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
@@ -46,6 +46,7 @@ class Segmentation:
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
+                 parallel_segmentation=True,
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -92,6 +93,10 @@ class Segmentation:
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
+        parallel_segmentation : bool
+            Whether to use concurrent.futures to parallelize segmentation
+            across processes when performing waypoint ROI segmentation.
+            Default: True
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
@@ -218,6 +223,7 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
+        self.parallel_segmentation = parallel_segmentation
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -494,7 +500,7 @@ class Segmentation:
         return warped_prob_map, include_rois, exclude_rois,\
             include_roi_tols, exclude_roi_tols
 
-    def _check_sl_with_inclusion(self, sl, include_rois, tol,
+    def _check_sl_with_inclusion(sl, include_rois, tol,
                                  include_roi_tols):
         """
         Helper function to check that a streamline is close to a list of
@@ -510,7 +516,7 @@ class Segmentation:
         # Apparently you checked all the ROIs and it was close to all of them
         return True, dist
 
-    def _check_sl_with_exclusion(self, sl, exclude_rois, tol,
+    def _check_sl_with_exclusion(sl, exclude_rois, tol,
                                  exclude_roi_tols):
         """ Helper function to check that a streamline is not too close to a
         list of exclusion ROIs.
@@ -536,6 +542,41 @@ class Segmentation:
         else:
             self.fiber_groups[bundle] = StatefulTractogram(
                 [], self.img, Space.VOX)
+
+    def _is_streamline_in_ROIs(sl, include_roi, tol,
+                               include_roi_tols, exclude_roi,
+                               exclude_roi_tols, fiber_prob):
+        is_close, dist = \
+            _check_sl_with_inclusion(
+                sl,
+                include_roi,
+                tol,
+                include_roi_tols)
+        if is_close:
+            is_far = \
+                _check_sl_with_exclusion(
+                    sl,
+                    exclude_roi,
+                    tol,
+                    exclude_roi_tols)
+            if is_far:
+                return np.argmin(dist[0], 0)[0],\
+                    np.argmin(dist[1], 0)[0], fiber_prob
+        return 0, 0, 0
+
+    def _is_streamline_in_ROIs_parallel(sl, include_roi, tol,
+                                        include_roi_tols, exclude_roi,
+                                        exclude_roi_tols, fiber_prob,
+                                        sl_idx, bundle_idx):
+        min_dist_coords_0,\
+            min_dist_coords_1,\
+            streamlines_in_bundles = \
+            _is_streamline_in_ROIs(
+                sl, include_roi, tol,
+                include_roi_tols, exclude_roi,
+                exclude_roi_tols, fiber_prob)
+        return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
+            streamlines_in_bundles)
 
     def segment_afq(self, tg=None):
         """
@@ -618,8 +659,12 @@ class Segmentation:
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
+
+            if self.parallel_segmentation:
+                executor = ProcessPoolExecutor()
+                future_ls = []
+
             for sl_idx in tqdm(idx_above_prob[0]):
-                sl = tg.streamlines[sl_idx]
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
@@ -632,25 +677,35 @@ class Segmentation:
                                 # This is not what we want,
                                 # skip to next streamline
                                 continue
+                sl = tg.streamlines[sl_idx]
+                fiber_prob = fiber_probabilities[sl_idx]
 
-                    is_close, dist = \
-                        self._check_sl_with_inclusion(sl,
-                                                      include_roi,
-                                                      tol,
-                                                      include_roi_tols)
-                    if is_close:
-                        is_far = \
-                            self._check_sl_with_exclusion(sl,
-                                                          exclude_roi,
-                                                          tol,
-                                                          exclude_roi_tols)
-                        if is_far:
-                            min_dist_coords[sl_idx, bundle_idx, 0] =\
-                                np.argmin(dist[0], 0)[0]
-                            min_dist_coords[sl_idx, bundle_idx, 1] =\
-                                np.argmin(dist[1], 0)[0]
-                            streamlines_in_bundles[sl_idx, bundle_idx] =\
-                                fiber_probabilities[sl_idx]
+                # if parallel, only submit the streamlines now
+                if self.parallel_segmentation:
+                    future_ls.append(executor.submit(
+                        _is_streamline_in_ROIs_parallel, sl, include_roi,
+                        tol, include_roi_tols, exclude_roi,
+                        exclude_roi_tols, fiber_prob, sl_idx, bundle_idx))
+                else:
+                    min_dist_coords[sl_idx, bundle_idx, 0],\
+                        min_dist_coords[sl_idx, bundle_idx, 1],\
+                        streamlines_in_bundles[sl_idx, bundle_idx] =\
+                        _is_streamline_in_ROIs(
+                            sl, include_roi, tol,
+                            include_roi_tols, exclude_roi,
+                            exclude_roi_tols, fiber_prob)
+
+            # collects results from the submitted streamlines
+            if self.parallel_segmentation:
+                for future in tqdm(future_ls):
+                    sl_idx, bundle_idx, min_dist_coords_0,\
+                        min_dist_coords_1, sl_in_bundles =\
+                            *future.result()
+                    min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
+                    min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
+                    streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
+                executor.close()
+
             self.logger.info(
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
