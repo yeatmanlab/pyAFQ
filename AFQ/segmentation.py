@@ -500,34 +500,6 @@ class Segmentation:
         return warped_prob_map, include_rois, exclude_rois,\
             include_roi_tols, exclude_roi_tols
 
-    def _check_sl_with_inclusion(sl, include_rois, tol,
-                                 include_roi_tols):
-        """
-        Helper function to check that a streamline is close to a list of
-        inclusion ROIS.
-        """
-        dist = []
-        for ii, roi in enumerate(include_rois):
-            # Use squared Euclidean distance, because it's faster:
-            dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if np.min(dist[-1]) > include_roi_tols[ii]:
-                # Too far from one of them:
-                return False, []
-        # Apparently you checked all the ROIs and it was close to all of them
-        return True, dist
-
-    def _check_sl_with_exclusion(sl, exclude_rois, tol,
-                                 exclude_roi_tols):
-        """ Helper function to check that a streamline is not too close to a
-        list of exclusion ROIs.
-        """
-        for ii, roi in enumerate(exclude_rois):
-            # Use squared Euclidean distance, because it's faster:
-            if np.min(cdist(sl, roi, 'sqeuclidean')) < exclude_roi_tols[ii]:
-                return False
-        # Either there are no exclusion ROIs, or you are not close to any:
-        return True
-
     def _return_empty(self, bundle):
         """
         Helper function for segment_afq, to return an empty dict under
@@ -542,41 +514,6 @@ class Segmentation:
         else:
             self.fiber_groups[bundle] = StatefulTractogram(
                 [], self.img, Space.VOX)
-
-    def _is_streamline_in_ROIs(sl, include_roi, tol,
-                               include_roi_tols, exclude_roi,
-                               exclude_roi_tols, fiber_prob):
-        is_close, dist = \
-            _check_sl_with_inclusion(
-                sl,
-                include_roi,
-                tol,
-                include_roi_tols)
-        if is_close:
-            is_far = \
-                _check_sl_with_exclusion(
-                    sl,
-                    exclude_roi,
-                    tol,
-                    exclude_roi_tols)
-            if is_far:
-                return np.argmin(dist[0], 0)[0],\
-                    np.argmin(dist[1], 0)[0], fiber_prob
-        return 0, 0, 0
-
-    def _is_streamline_in_ROIs_parallel(sl, include_roi, tol,
-                                        include_roi_tols, exclude_roi,
-                                        exclude_roi_tols, fiber_prob,
-                                        sl_idx, bundle_idx):
-        min_dist_coords_0,\
-            min_dist_coords_1,\
-            streamlines_in_bundles = \
-            _is_streamline_in_ROIs(
-                sl, include_roi, tol,
-                include_roi_tols, exclude_roi,
-                exclude_roi_tols, fiber_prob)
-        return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
-                streamlines_in_bundles)
 
     def segment_afq(self, tg=None):
         """
@@ -704,7 +641,7 @@ class Segmentation:
                     min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
                     min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
-                executor.close()
+                executor.shutdown()
 
             self.logger.info(
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
@@ -1144,6 +1081,77 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         return out, idx
     else:
         return out
+
+# Helper functions for segmenting using waypoint ROIs
+# they are not a part of the class because we do not want
+# copies of the class to be parallelized
+
+
+def _check_sl_with_inclusion(sl, include_rois, tol,
+                                include_roi_tols):
+    """
+    Helper function to check that a streamline is close to a list of
+    inclusion ROIS.
+    """
+    dist = []
+    for ii, roi in enumerate(include_rois):
+        # Use squared Euclidean distance, because it's faster:
+        dist.append(cdist(sl, roi, 'sqeuclidean'))
+        if np.min(dist[-1]) > include_roi_tols[ii]:
+            # Too far from one of them:
+            return False, []
+    # Apparently you checked all the ROIs and it was close to all of them
+    return True, dist
+
+
+def _check_sl_with_exclusion(sl, exclude_rois, tol,
+                                exclude_roi_tols):
+    """ Helper function to check that a streamline is not too close to a
+    list of exclusion ROIs.
+    """
+    for ii, roi in enumerate(exclude_rois):
+        # Use squared Euclidean distance, because it's faster:
+        if np.min(cdist(sl, roi, 'sqeuclidean')) < exclude_roi_tols[ii]:
+            return False
+    # Either there are no exclusion ROIs, or you are not close to any:
+    return True
+
+
+def _is_streamline_in_ROIs(sl, include_roi, tol,
+                            include_roi_tols, exclude_roi,
+                            exclude_roi_tols, fiber_prob):
+    is_close, dist = \
+        _check_sl_with_inclusion(
+            sl,
+            include_roi,
+            tol,
+            include_roi_tols)
+    if is_close:
+        is_far = \
+            _check_sl_with_exclusion(
+                sl,
+                exclude_roi,
+                tol,
+                exclude_roi_tols)
+        if is_far:
+            return np.argmin(dist[0], 0)[0],\
+                np.argmin(dist[1], 0)[0], fiber_prob
+    return 0, 0, 0
+
+
+def _is_streamline_in_ROIs_parallel(sl, include_roi, tol,
+                                    include_roi_tols, exclude_roi,
+                                    exclude_roi_tols, fiber_prob,
+                                    sl_idx, bundle_idx):
+    min_dist_coords_0,\
+        min_dist_coords_1,\
+        streamlines_in_bundles = \
+        _is_streamline_in_ROIs(
+            sl, include_roi, tol,
+            include_roi_tols, exclude_roi,
+            exclude_roi_tols, fiber_prob)
+    return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
+            streamlines_in_bundles)
 
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
