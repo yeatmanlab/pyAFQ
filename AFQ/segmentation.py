@@ -450,7 +450,7 @@ class Segmentation:
             roi = bundle_entry['ROIs'][rule_idx]
             if 'additional_tolerance' in bundle_entry:
                 this_tol = (bundle_entry['additional_tolerance'][rule_idx]
-                    / vox_dim + tol)**2
+                            / vox_dim + tol)**2
             else:
                 this_tol = tol**2
 
@@ -576,7 +576,7 @@ class Segmentation:
                 include_roi_tols, exclude_roi,
                 exclude_roi_tols, fiber_prob)
         return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
-            streamlines_in_bundles)
+                streamlines_in_bundles)
 
     def segment_afq(self, tg=None):
         """
@@ -635,7 +635,7 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
                 include_roi_tols, exclude_roi_tols =\
-                    self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
+                self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
@@ -700,7 +700,7 @@ class Segmentation:
                 for future in tqdm(future_ls):
                     sl_idx, bundle_idx, min_dist_coords_0,\
                         min_dist_coords_1, sl_in_bundles =\
-                            *future.result()
+                        *future.result()
                     min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
                     min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
