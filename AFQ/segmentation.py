@@ -700,7 +700,7 @@ class Segmentation:
                 for future in tqdm(future_ls):
                     sl_idx, bundle_idx, min_dist_coords_0,\
                         min_dist_coords_1, sl_in_bundles =\
-                        *future.result()
+                        future.result()
                     min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
                     min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
