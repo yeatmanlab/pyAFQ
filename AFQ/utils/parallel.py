@@ -41,10 +41,6 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
     --------
 
     """
-    if n_jobs == -1:
-        n_jobs = multiprocessing.cpu_count()
-        n_jobs = n_jobs - 1
-
     if engine == "joblib":
         p = joblib.Parallel(n_jobs=n_jobs, backend=backend)
         d = joblib.delayed(func)
@@ -54,6 +50,10 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         results = p(d_l)
 
     elif engine == "dask":
+        if n_jobs == -1:
+            n_jobs = multiprocessing.cpu_count()
+            n_jobs = n_jobs - 1
+
         def partial(func, *args, **keywords):
             def newfunc(in_arg):
                 return func(in_arg, *args, **keywords)
