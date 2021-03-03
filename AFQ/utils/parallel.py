@@ -27,7 +27,7 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         The last one is useful for debugging -- runs the code without any
         parallelization.
     backend : str
-        What joblib backend to use. Irrelevant for other engines.
+        What joblib or dask backend to use. Irrelevant for other engines.
     func_args : list, optional
         Positional arguments to `func`.
     func_kwargs : list, optional

@@ -1,7 +1,6 @@
 import os.path as op
 import os
 import logging
-from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -23,6 +22,7 @@ import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ.data as afd
+from AFQ.utils.parallel import parfor
 
 __all__ = ["Segmentation"]
 
@@ -46,7 +46,8 @@ class Segmentation:
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
-                 parallel_segmentation=True,
+                 parallel_segmentation={"n_jobs": -1, "engine": "joblib",
+                      "backend": "threading"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -93,10 +94,13 @@ class Segmentation:
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
-        parallel_segmentation : bool
-            Whether to use concurrent.futures to parallelize segmentation
-            across processes when performing waypoint ROI segmentation.
-            Default: True
+        parallel_segmentation : dict
+            How to parallelize segmentation across processes when performing
+            waypoint ROI segmentation. Set to {"engine": "serial"} to not
+            perform parallelization. See ``AFQ.utils.parallel.pafor`` for
+            details. 
+            Default: {"n_jobs": -1, "engine": "joblib",
+                      "backend": "threading"}
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
@@ -597,11 +601,15 @@ class Segmentation:
                               " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
 
-            if self.parallel_segmentation:
-                executor = ProcessPoolExecutor()
-                future_ls = []
+            # with parallel segmentation, the first for loop will
+            # only collect streamlines and does not need tqdm
+            if self.parallel_segmentation["engine"] != "serial":
+                in_list = []
+                sl_idxs = idx_above_prob[0]
+            else:
+                sl_idxs = tqdm(idx_above_prob[0])
 
-            for sl_idx in tqdm(idx_above_prob[0]):
+            for sl_idx in sl_idxs:
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
@@ -617,31 +625,33 @@ class Segmentation:
                 sl = tg.streamlines[sl_idx]
                 fiber_prob = fiber_probabilities[sl_idx]
 
-                # if parallel, only submit the streamlines now
+                # if parallel, collect the streamlines now
                 if self.parallel_segmentation:
-                    future_ls.append(executor.submit(
-                        _is_streamline_in_ROIs_parallel, sl, include_roi,
-                        tol, include_roi_tols, exclude_roi,
-                        exclude_roi_tols, fiber_prob, sl_idx, bundle_idx))
+                    in_list.append((sl, fiber_prob, sl_idx))
                 else:
                     min_dist_coords[sl_idx, bundle_idx, 0],\
                         min_dist_coords[sl_idx, bundle_idx, 1],\
                         streamlines_in_bundles[sl_idx, bundle_idx] =\
                         _is_streamline_in_ROIs(
-                            sl, include_roi, tol,
+                            sl, tol, include_roi,
                             include_roi_tols, exclude_roi,
                             exclude_roi_tols, fiber_prob)
 
             # collects results from the submitted streamlines
             if self.parallel_segmentation:
-                for future in tqdm(future_ls):
+                results = parfor(
+                    _is_streamline_in_ROIs_parallel, in_list,
+                    func_args=[
+                        tol, include_roi, include_roi_tols, exclude_roi,
+                        exclude_roi_tols, bundle_idx],
+                    **self.parallel_segmentation)
+                for result in tqdm(results):
                     sl_idx, bundle_idx, min_dist_coords_0,\
                         min_dist_coords_1, sl_in_bundles =\
-                        future.result()
+                        result
                     min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
                     min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
-                executor.shutdown()
 
             self.logger.info(
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
@@ -1117,7 +1127,7 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol,
     return True
 
 
-def _is_streamline_in_ROIs(sl, include_roi, tol,
+def _is_streamline_in_ROIs(sl, tol, include_roi,
                             include_roi_tols, exclude_roi,
                             exclude_roi_tols, fiber_prob):
     is_close, dist = \
@@ -1139,15 +1149,15 @@ def _is_streamline_in_ROIs(sl, include_roi, tol,
     return 0, 0, 0
 
 
-def _is_streamline_in_ROIs_parallel(sl, include_roi, tol,
+def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
                                     include_roi_tols, exclude_roi,
-                                    exclude_roi_tols, fiber_prob,
-                                    sl_idx, bundle_idx):
+                                    exclude_roi_tols, bundle_idx):
+    sl, fiber_prob, sl_idx = indiv_args
     min_dist_coords_0,\
         min_dist_coords_1,\
         streamlines_in_bundles = \
         _is_streamline_in_ROIs(
-            sl, include_roi, tol,
+            sl, tol, include_roi,
             include_roi_tols, exclude_roi,
             exclude_roi_tols, fiber_prob)
     return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
