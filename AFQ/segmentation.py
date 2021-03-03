@@ -46,8 +46,8 @@ class Segmentation:
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
-                 parallel_segmentation={"n_jobs": -1, "engine": "loky",
-                      "backend": "threading"},
+                 parallel_segmentation={"n_jobs": -1, "engine": "joblib",
+                      "backend": "loky"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -99,8 +99,8 @@ class Segmentation:
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
             perform parallelization. See ``AFQ.utils.parallel.pafor`` for
             details. 
-            Default: {"n_jobs": -1, "engine": "loky",
-                      "backend": "threading"}
+            Default: {"n_jobs": -1, "engine": "joblib",
+                      "backend": "loky"}
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
