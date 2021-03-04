@@ -646,7 +646,7 @@ class Segmentation:
                         tol, include_roi, include_roi_tols, exclude_roi,
                         exclude_roi_tols, bundle_idx],
                     **self.parallel_segmentation)
-                for result in tqdm(results):
+                for result in results:
                     sl_idx, bundle_idx, min_dist_coords_0,\
                         min_dist_coords_1, sl_in_bundles =\
                         result

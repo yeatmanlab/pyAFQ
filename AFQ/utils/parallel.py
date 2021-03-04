@@ -3,6 +3,7 @@ import multiprocessing
 import joblib
 import dask
 import dask.multiprocessing
+from tqdm import tqdm
 
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
@@ -47,7 +48,7 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         d_l = []
         for in_element in in_list:
             d_l.append(d(in_element, *func_args, **func_kwargs))
-        results = p(d_l)
+        results = p(tqdm(d_l))
 
     elif engine == "dask":
         if n_jobs == -1:
