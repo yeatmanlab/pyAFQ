@@ -22,7 +22,7 @@ usage = \
 Runs full AFQ processing as specified in the configuration file.
 
 For details about configuration, see instructions in:
-https://yeatmanlab.github.io/pyAFQ/usage.html#running-the-pyafq-pipeline
+https://yeatmanlab.github.io/pyAFQ/usage/config.html
 
 The default configuration file looks like:
 
