@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import logging
 from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
-from AFQ.definitions.mapping import SynMap
+from AFQ.definitions.mapping import (SynMap, FnirtMap)
 from AFQ.definitions.utils import check_definition_methods
 from AFQ.utils.bin import get_default_args
 from AFQ.viz.utils import Viz, visualize_tract_profiles
@@ -2073,7 +2073,8 @@ class AFQ(object):
     def export_all(self):
         """ Exports all the possible outputs"""
         start_time = time()
-        self.export_registered_b0()
+        if not isinstance(self.mapping_definition, FnirtMap):
+            self.export_registered_b0()
         self.get_template_xform()
         self.export_bundles()
         self.export_sl_counts()
