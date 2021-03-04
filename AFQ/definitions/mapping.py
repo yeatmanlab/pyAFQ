@@ -101,8 +101,9 @@ class FnirtMapping():
         self.warp = warp
 
     def transform_inverse(self, data, **kwargs):
-        data_img = Image(nib.Nifti1Image(data, self.ref_affine))
-        xform_data = applyDeformation(data_img, self.warp).data
+        data_img = Image(nib.Nifti1Image(
+            data.astype(np.float32), self.ref_affine))
+        xform_data = np.asarray(applyDeformation(data_img, self.warp).data)
         return xform_data
 
     def transform(self, data, **kwargs):
