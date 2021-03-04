@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import logging
-from AFQ._fixes import ConformedAffineMap
-from AFQ.mask import (B0Mask, ScalarMask, FullMask, check_mask_methods)
+from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
+from AFQ.definitions.mapping import SynMap
+from AFQ.definitions.utils import check_definition_methods
 from AFQ.utils.bin import get_default_args
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 import AFQ.utils.volume as auv
@@ -228,11 +229,10 @@ class AFQ(object):
                  reg_template="mni_T1",
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
-                 reg_prealign_kwargs={},
+                 mapping=SynMap(),
                  bundle_info=None,
                  dask_it=False,
                  scalars=["dti_fa", "dti_md"],
-                 use_prealign=1,
                  virtual_frame_buffer=False,
                  viz_backend="plotly_no_gif",
                  tracking_params=None,
@@ -242,8 +242,8 @@ class AFQ(object):
         Initialize an AFQ object.
         Some special notes on parameters:
         In tracking_params, parameters with the suffix mask which are also
-        a mask from AFQ.mask will be handled automatically by the api.
-        You can set additional parameters for a given step of the process
+        a mask from AFQ.definitions.mask will be handled automatically by the
+        api. You can set additional parameters for a given step of the process
         by directly calling the relevant api function. For example,
         to set the sh_order for csd to 4, call:
         myafq._csd(sh_order=4)
@@ -296,17 +296,19 @@ class AFQ(object):
             If "hcp_atlas" is used, slr registration will be used
             and reg_subject should be "subject_sls".
             Default: "mni_T1"
-        brain_mask : instance of a class defined in `AFQ.mask`, optional
+        brain_mask : instance of class from `AFQ.definitions.mask`, optional
             [REGISTRATION] This will be used to create
             the brain mask, which gets applied before registration to a
             template.
             If None, no brain mask will not be applied,
             and no brain mask will be applied to the template.
             Default: B0Mask()
-        reg_prealign_kwargs : dictionary, optional
-            [REGISTRATION] Parameters to pass to affine_registration
-            in AFQ.registration, which does the linear pre-alignment.
-            Default: {}
+        mapping : instance of class from `AFQ.definitions.mapping`, optional
+            [REGISTRATION]  This defines how to either create a mapping from
+            each subject space to template space or load a mapping from
+            another software. If creating a map, will register reg_subject and
+            reg_template.
+            Default: SynMap()
         bundle_info : list of strings or dict, optional
             [BUNDLES] List of bundle names to include in segmentation,
             or a bundle dictionary (see make_bundle_dict for inspiration).
@@ -320,11 +322,6 @@ class AFQ(object):
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md"
             Default: ["dti_fa", "dti_md"]
-        use_prealign : int, optional
-            [REGISTRATION] If 0, do not perform pre-alignment before
-            the diffeomorphic mapping in registration.
-            If 1, perform pre-alignment. If 2, only perform pre-alignment.
-            Default: 1
         virtual_frame_buffer : bool, optional
             [VIZ] Whether to use a virtual fram buffer. This is neccessary if
             generating GIFs in a headless environment. Default: False
@@ -342,9 +339,9 @@ class AFQ(object):
             the aft.track function. Seed mask and seed threshold, if not
             specified, are replaced with scalar masks from scalar[0]
             thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-            this dict may be ``AFQ.mask.MaskFile`` instances. If ``tracker``
+            this dict may be ``AFQ.definitions.mask.MaskFile`` instances. If ``tracker``
             is set to "pft" then ``stop_mask`` should be an instance of
-            ``AFQ.mask.PFTMask``.
+            ``AFQ.definitions.mask.PFTMask``.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -382,9 +379,23 @@ class AFQ(object):
                 and not isinstance(reg_subject, dict):
             raise TypeError(
                 "reg_subject must be a str, dict, or Nifti1Image")
-        if brain_mask is not None and not check_mask_methods(brain_mask):
+        if isinstance(reg_subject, str) and isinstance(reg_template, str)\
+                and (reg_subject.lower() == 'subject_sls'
+                     or reg_template.lower() == 'hcp_atlas'):
+            if reg_template.lower() != 'hcp_atlas':
+                raise TypeError(
+                    "If reg_subject is 'subject_sls',"
+                    + " reg_template must be 'hcp_atlas'")
+            if reg_subject.lower() != 'subject_sls':
+                raise TypeError(
+                    "If reg_template is 'hcp_atlas',"
+                    + " reg_subject must be 'subject_sls'")
+        if brain_mask is not None and not check_definition_methods(brain_mask):
             raise TypeError(
-                "brain_mask must be None or a mask defined in `AFQ.mask`")
+                "brain_mask must be None or a mask defined in `AFQ.definitions.mask`")
+        if not check_definition_methods(mapping):
+            raise TypeError(
+                "mapping must be a mapping defined in `AFQ.definitions.mapping`")
         if bundle_info is not None and not ((
                 isinstance(bundle_info, list)
                 and isinstance(bundle_info[0], str)) or (
@@ -398,8 +409,6 @@ class AFQ(object):
                 and isinstance(scalars[0], str)):
             raise TypeError(
                 "scalars must be None or a list of strings")
-        if not isinstance(use_prealign, int):
-            raise TypeError("use_prealign must be a int")
         if not isinstance(virtual_frame_buffer, bool):
             raise TypeError("virtual_frame_buffer must be a bool")
         if "fury" not in viz_backend and "plotly" not in viz_backend:
@@ -435,24 +444,8 @@ class AFQ(object):
         else:
             self.brain_mask_definition = brain_mask
             self.mask_template = True
+        self.mapping_definition = mapping
 
-        if isinstance(reg_subject, str) and isinstance(reg_template, str)\
-                and (reg_subject.lower() == 'subject_sls'
-                     or reg_template.lower() == 'hcp_atlas'):
-            if reg_template.lower() != 'hcp_atlas':
-                self.logger.error(
-                    "If reg_subject is 'subject_sls',"
-                    + " reg_template must be 'hcp_atlas'")
-            if reg_subject.lower() != 'subject_sls':
-                self.logger.error(
-                    "If reg_template is 'hcp_atlas',"
-                    + " reg_subject must be 'subject_sls'")
-
-            self.reg_algo = 'slr'
-        else:
-            self.reg_algo = 'syn'
-        self.use_prealign = ((use_prealign == 1) and (self.reg_algo != 'slr'))
-        self.only_prealign = (use_prealign == 2)
         self.b0_threshold = b0_threshold
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
@@ -497,7 +490,6 @@ class AFQ(object):
                 default_clean_params[k] = clean_params[k]
 
         self.clean_params = default_clean_params
-        self.reg_prealign_kwargs = reg_prealign_kwargs
 
         if bundle_info is None:
             if self.seg_algo == "reco" or self.seg_algo == "reco16":
@@ -641,7 +633,8 @@ class AFQ(object):
                 else:
                     reg_subject_list.append(None)
 
-                if check_mask_methods(self.tracking_params["seed_mask"]):
+                if check_definition_methods(
+                        self.tracking_params["seed_mask"]):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
                         dwi_data_file,
@@ -649,7 +642,8 @@ class AFQ(object):
                         session
                     )
 
-                if check_mask_methods(self.tracking_params["stop_mask"]):
+                if check_definition_methods(
+                        self.tracking_params["stop_mask"]):
                     self.tracking_params["stop_mask"].find_path(
                         bids_layout,
                         dwi_data_file,
@@ -658,6 +652,13 @@ class AFQ(object):
                     )
 
                 self.brain_mask_definition.find_path(
+                    bids_layout,
+                    dwi_data_file,
+                    subject,
+                    session
+                )
+
+                self.mapping_definition.find_path(
                     bids_layout,
                     dwi_data_file,
                     subject,
@@ -744,7 +745,7 @@ class AFQ(object):
         brain_mask_file = self._get_fname(row, '_brain_mask.nii.gz')
         if not op.exists(brain_mask_file):
             brain_mask, brain_affine, meta = \
-                self.brain_mask_definition.get_mask(self, row)
+                self.brain_mask_definition.get_for_row(self, row)
             brain_mask_img = nib.Nifti1Image(
                 brain_mask.astype(int),
                 brain_affine)
@@ -1036,27 +1037,6 @@ class AFQ(object):
 
         return img, None
 
-    def _reg_prealign(self, row):
-        prealign_file = self._get_fname(
-            row, '_prealign_from-DWI_to-MNI_xfm.npy')
-        if not op.exists(prealign_file):
-            reg_subject_img, _ = self._reg_img(self.reg_subject, True, row)
-            start_time = time()
-            _, aff = reg.affine_registration(
-                reg_subject_img.get_fdata(),
-                self.reg_template_img.get_fdata(),
-                reg_subject_img.affine,
-                self.reg_template_img.affine,
-                **self.reg_prealign_kwargs)
-            np.save(prealign_file, aff)
-            meta_fname = self._get_fname(
-                row, '_prealign_from-DWI_to-MNI_xfm.json')
-            meta = dict(type="rigid")
-            afd.write_json(meta_fname, meta)
-            row['timing']['Registration_pre_align'] =\
-                row['timing']['Registration_pre_align'] + time() - start_time
-        return prealign_file
-
     def _export_registered_b0(self, row):
         b0_warped_file = self._get_fname(row, '_b0_in_MNI.nii.gz')
 
@@ -1064,18 +1044,7 @@ class AFQ(object):
             b0_file = self._b0(row)
             mean_b0 = nib.load(b0_file).get_fdata()
 
-            if self.use_prealign:
-                reg_prealign = np.load(self._reg_prealign(row))
-                reg_prealign_inv = np.linalg.inv(reg_prealign)
-            else:
-                reg_prealign_inv = None
-
-            mapping_file = self._mapping(row)
-            mapping = reg.read_mapping(mapping_file, b0_file,
-                                       self.reg_template_img,
-                                       prealign=reg_prealign_inv)
-
-            warped_b0 = mapping.transform(mean_b0)
+            warped_b0 = self._mapping(row).transform(mean_b0)
 
             self.log_and_save_nii(nib.Nifti1Image(
                 warped_b0, self.reg_template_img.affine), b0_warped_file)
@@ -1083,60 +1052,12 @@ class AFQ(object):
         return b0_warped_file
 
     def _mapping(self, row):
-        mapping_file = self._get_fname(
-            row,
-            '_mapping_from-DWI_to_MNI_xfm')
-        meta_fname = self._get_fname(row, '_mapping_reg')
-        if self.reg_algo == "slr" or self.only_prealign:
-            mapping_file = mapping_file + '.npy'
-        else:
-            mapping_file = mapping_file + '.nii.gz'
-        meta_fname = meta_fname + '.json'
-
-        if not op.exists(mapping_file):
-            if self.use_prealign:
-                reg_prealign = np.load(self._reg_prealign(row))
-            else:
-                reg_prealign = None
-
-            reg_template_img, reg_template_sls = \
-                self._reg_img(self.reg_template, False, row)
-            reg_subject_img, reg_subject_sls = \
-                self._reg_img(self.reg_subject, True, row)
-
-            start_time = time()
-            if self.only_prealign:
-                mapping = ConformedAffineMap(np.load(self._reg_prealign(row)))
-            elif self.reg_algo == "slr" or self.only_prealign:
-                mapping = reg.slr_registration(
-                    reg_subject_sls, reg_template_sls,
-                    moving_affine=reg_subject_img.affine,
-                    moving_shape=reg_subject_img.shape,
-                    static_affine=reg_template_img.affine,
-                    static_shape=reg_template_img.shape)
-            else:
-                _, mapping = reg.syn_registration(
-                    reg_subject_img.get_fdata(),
-                    reg_template_img.get_fdata(),
-                    moving_affine=reg_subject_img.affine,
-                    static_affine=reg_template_img.affine,
-                    prealign=reg_prealign)
-
-            if self.use_prealign:
-                mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
-
-            reg.write_mapping(mapping, mapping_file)
-            meta = dict(type="displacementfield")
-            afd.write_json(meta_fname, meta)
-            row['timing']['Registration'] =\
-                row['timing']['Registration'] + time() - start_time
-
-        return mapping_file
+        return self.mapping_definition.get_for_row(self, row)
 
     def _export_seed_mask(self, row):
-        if check_mask_methods(self.tracking_params['seed_mask']):
+        if check_definition_methods(self.tracking_params['seed_mask']):
             seed_mask, _, seed_mask_desc =\
-                self.tracking_params['seed_mask'].get_mask(self, row)
+                self.tracking_params['seed_mask'].get_for_row(self, row)
         else:
             seed_mask = self.tracking_params['seed_mask']
             seed_mask_desc = dict(source=tracking_params['seed_mask'])
@@ -1153,9 +1074,9 @@ class AFQ(object):
         return seed_file
 
     def _export_stop_mask(self, row):
-        if check_mask_methods(self.tracking_params['stop_mask']):
+        if check_definition_methods(self.tracking_params['stop_mask']):
             stop_mask, _, stop_mask_desc =\
-                self.tracking_params['stop_mask'].get_mask(self, row)
+                self.tracking_params['stop_mask'].get_for_row(self, row)
         else:
             stop_mask = self.tracking_params['stop_mask']
             stop_mask_desc = dict(source=tracking_params['stop_mask'])
@@ -1193,15 +1114,15 @@ class AFQ(object):
                 params_file = self._dki(row)
 
             tracking_params = self.tracking_params.copy()
-            if check_mask_methods(self.tracking_params['seed_mask']):
+            if check_definition_methods(self.tracking_params['seed_mask']):
                 tracking_params['seed_mask'], _, seed_mask_desc =\
-                    self.tracking_params['seed_mask'].get_mask(self, row)
+                    self.tracking_params['seed_mask'].get_for_row(self, row)
             else:
                 seed_mask_desc = dict(source=tracking_params['seed_mask'])
 
-            if check_mask_methods(self.tracking_params['stop_mask']):
+            if check_definition_methods(self.tracking_params['stop_mask']):
                 tracking_params['stop_mask'], _, stop_mask_desc =\
-                    self.tracking_params['stop_mask'].get_mask(self, row)
+                    self.tracking_params['stop_mask'].get_for_row(self, row)
             else:
                 stop_mask_desc = dict(source=tracking_params['stop_mask'])
 
@@ -1254,10 +1175,6 @@ class AFQ(object):
             img = nib.load(row['dwi_file'])
             tg = load_tractogram(
                 streamlines_file, img, Space.VOX)
-            if self.use_prealign:
-                reg_prealign = np.load(self._reg_prealign(row))
-            else:
-                reg_prealign = None
 
             start_time = time()
             segmentation = seg.Segmentation(**self.segmentation_params)
@@ -1267,8 +1184,7 @@ class AFQ(object):
                                            row['bval_file'],
                                            row['bvec_file'],
                                            reg_template=self.reg_template_img,
-                                           mapping=self._mapping(row),
-                                           reg_prealign=reg_prealign)
+                                           mapping=self._mapping(row))
 
             if self.segmentation_params['return_idx']:
                 idx = {bundle: bundles[bundle]['idx'].tolist()
@@ -1432,19 +1348,7 @@ class AFQ(object):
     def _template_xform(self, row):
         template_xform_file = self._get_fname(row, "_template_xform.nii.gz")
         if not op.exists(template_xform_file):
-            if self.use_prealign:
-                reg_prealign_inv = np.linalg.inv(
-                    np.load(self._reg_prealign(row))
-                )
-            else:
-                reg_prealign_inv = None
-
-            mapping = reg.read_mapping(self._mapping(row),
-                                       row['dwi_file'],
-                                       self.reg_template_img,
-                                       prealign=reg_prealign_inv)
-
-            template_xform = mapping.transform_inverse(
+            template_xform = self._mapping(row).transform_inverse(
                 self.reg_template_img.get_fdata())
             self.log_and_save_nii(nib.Nifti1Image(template_xform,
                                                   row['dwi_affine']),
@@ -1453,17 +1357,6 @@ class AFQ(object):
         return template_xform_file
 
     def _export_rois(self, row):
-        if self.use_prealign:
-            reg_prealign = np.load(self._reg_prealign(row))
-            reg_prealign_inv = np.linalg.inv(reg_prealign)
-        else:
-            reg_prealign_inv = None
-
-        mapping = reg.read_mapping(self._mapping(row),
-                                   row['dwi_file'],
-                                   self.reg_template_img,
-                                   prealign=reg_prealign_inv)
-
         rois_dir = op.join(row['results_dir'], 'ROIs')
         os.makedirs(rois_dir, exist_ok=True)
         roi_files = {}
@@ -1485,7 +1378,7 @@ class AFQ(object):
                 if not op.exists(fname):
                     warped_roi = auv.transform_inverse_roi(
                         roi,
-                        mapping,
+                        self._mapping(row),
                         bundle_name=bundle)
 
                     # Cast to float32, so that it can be read in by MI-Brain:
@@ -1581,16 +1474,7 @@ class AFQ(object):
             color_by_volume = self._get_best_scalar()
 
         if xform_volume or xform_color_by_volume:
-            if self.use_prealign:
-                reg_prealign = np.load(self._reg_prealign(row))
-                reg_prealign_inv = np.linalg.inv(reg_prealign)
-            else:
-                reg_prealign_inv = None
-
-            mapping = reg.read_mapping(self._mapping(row),
-                                       row['dwi_file'],
-                                       self.reg_template_img,
-                                       prealign=reg_prealign_inv)
+            mapping = self._mapping(row)
         else:
             mapping = None
 

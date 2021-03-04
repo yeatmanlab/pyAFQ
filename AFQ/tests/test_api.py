@@ -31,7 +31,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
+from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
 
 
 def touch(fname, times=None):
@@ -384,7 +384,7 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="brain_mask must be None or a mask defined in `AFQ.mask`"):
+            match="brain_mask must be None or a mask defined in `AFQ.definitions.mask`"):
         api.AFQ(
             bids_path,
             brain_mask="not a brain mask")

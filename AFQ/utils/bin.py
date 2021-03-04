@@ -9,7 +9,9 @@ import logging
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
-from AFQ.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
+from AFQ.definitions.utils import check_definition_methods
 import nibabel as nib  # interprets nibabel images for endpoint_info
 
 
@@ -84,11 +86,11 @@ def toml_to_val(t):
         return eval(t)  # interpret as dictionary
     elif isinstance(t, str) and "Mask" in t:
         try:
-            mask = eval(t)
+            definition = eval(t)
         except NameError:
             return t
-        if check_mask_methods(mask):
-            return mask
+        if check_definition_methods(definition):
+            return definition
         else:
             return t
     else:
@@ -98,7 +100,7 @@ def toml_to_val(t):
 def val_to_toml(v):
     if v is None:
         return "''"
-    elif check_mask_methods(v):
+    elif check_definition_methods(v):
         return f"'{v.str_for_toml()}'"
     elif isinstance(v, str):
         return f"'{v}'"
@@ -117,7 +119,7 @@ def val_to_toml(v):
 
 def dict_to_toml(dictionary):
     toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
-    toml = toml + '# Wrap mask object instantiations in quotes\n\n'
+    toml = toml + '# Wrap definition object instantiations in quotes\n\n'
     for section, args in dictionary.items():
         if section == "AFQ_desc":
             toml = "# " + dictionary["AFQ_desc"].replace("\n", "\n# ")\

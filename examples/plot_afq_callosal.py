@@ -10,7 +10,7 @@ import os.path as op
 import plotly
 
 from AFQ import api
-from AFQ.mask import RoiMask
+from AFQ.definitions.mask import RoiMask
 import AFQ.data as afd
 
 ##########################################################################

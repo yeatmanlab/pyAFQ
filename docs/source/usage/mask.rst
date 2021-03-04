@@ -11,20 +11,20 @@ Currently, there are three different masks that pyAFQ uses for tractometry:
 
 #. The brain mask. This is used to mask the dwi data and throwout any signal
    that is outside of the brain. It is typicall applied before fitting ODF
-   models. By default, it is calculated using :class:`AFQ.mask.B0Mask`.
+   models. By default, it is calculated using :class:`AFQ.definitions.mask.B0Mask`.
 
 #. The tractography seed mask. This mask determines where tractography is
    seeded. If it is floating point, the mask is thresholded interally after
    interpolation using the seed_threshold parameter. This is reccomended.
    However, the seed mask can aslo be a binary mask. By default, the
-   seed mask is :class:`AFQ.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
+   seed mask is :class:`AFQ.definitions.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 #. The tractography stop mask. This mask determines where tractography stops.
    If it is floating point, the mask is thresholded interally after
    interpolation using the stop_threshold parameter. This is reccomended.
    However, the stop mask can aslo be a binary mask. By default, the
-   stop mask is :class:`AFQ.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
+   stop mask is :class:`AFQ.definitions.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 In AFQ/mask.py, there are several mask classes one can use to specify masks.
@@ -32,22 +32,22 @@ As a user, one should initialize mask classes and pass them to the AFQ object,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
 
-- :class:`AFQ.mask.MaskFile`: The simplest mask class is :class:`AFQ.mask.MaskFile`. If the mask you want to use
+- :class:`AFQ.definitions.mask.MaskFile`: The simplest mask class is :class:`AFQ.definitions.mask.MaskFile`. If the mask you want to use
   is already generated, use this class. It is initialized using BIDS filters,
   which pyAFQ will use to find masks for each subject in each session.
 
-- :class:`AFQ.mask.FullMask`: The :class:`AFQ.mask.FullMask` class is used if one does not want to mask at all.
+- :class:`AFQ.definitions.mask.FullMask`: The :class:`AFQ.definitions.mask.FullMask` class is used if one does not want to mask at all.
   This mask is True everywhere.
 
-- :class:`AFQ.mask.RoiMask`: All ROIs are "logically or'd" together in subject space to create
+- :class:`AFQ.definitions.mask.RoiMask`: All ROIs are "logically or'd" together in subject space to create
   this mask. This is useful to provide as the seed mask. In segmentation,
   pyAFQ retains only streamlines that pass through the ROIs. So, for
   efficiency, one can choose to only seed in the ROIs in the first place.
 
-- :class:`AFQ.mask.B0Mask`: This mask uses dipy's median_otsu on the subject's b0 to generate
+- :class:`AFQ.definitions.mask.B0Mask`: This mask uses dipy's median_otsu on the subject's b0 to generate
   a mask. This is the default brain mask.
 
-- :class:`AFQ.mask.LabelledMaskFile`: This mask is similar to :class:`AFQ.mask.MaskFile`. It is also initialized
+- :class:`AFQ.definitions.mask.LabelledMaskFile`: This mask is similar to :class:`AFQ.definitions.mask.MaskFile`. It is also initialized
   using BIDS filters but instead expects to find a labelled segmentation file.
   In the initialization, the user also provides inclusive and exclusive
   labels. These specify which labels to include and which labels to exclude
@@ -58,37 +58,37 @@ for use with the CLI.
   This will mark all labels that are not 0 as a part of the mask, and can
   be used as a brain mask.
 
-- :class:`AFQ.mask.ThresholdedMaskFile`: This mask is similar to :class:`AFQ.mask.MaskFile`. It allows the user to
+- :class:`AFQ.definitions.mask.ThresholdedMaskFile`: This mask is similar to :class:`AFQ.definitions.mask.MaskFile`. It allows the user to
   also provide a lower and upper bound. The bounds threshold the data from
   the file. Note that for the tractography seed and stop masks, thresholding
   should typically be done using the seed_threshold and stop_threshold
   parameters, not using an already thresholded mask.
 
-- :class:`AFQ.mask.ScalarMask`: This mask is initialized only by specifying a scalar. Use this
+- :class:`AFQ.definitions.mask.ScalarMask`: This mask is initialized only by specifying a scalar. Use this
   mask if you want a mask to be based on a scalar that pyAFQ already
   calculates, like "dti_fa" or "dti_md".
 
-- :class:`AFQ.mask.ThresholdedScalarMask`: This mask is similar to :class:`AFQ.mask.ScalarMask`. It allows the user to
+- :class:`AFQ.definitions.mask.ThresholdedScalarMask`: This mask is similar to :class:`AFQ.definitions.mask.ScalarMask`. It allows the user to
   also provide a lower and upper bound. The bounds threshold the scalar data.
   Note that for the tractography seed and stop masks, thresholding
   should typically be done using the seed_threshold and stop_threshold
   parameters, not using an already thresholded mask.
 
-- :class:`AFQ.mask.PFTMask`: A mask for specifying the segmentations used in PFT. Should only
+- :class:`AFQ.definitions.mask.PFTMask`: A mask for specifying the segmentations used in PFT. Should only
   be used as a stop mask. It's three arguments are three other masks, which
   specify the three segmentations: white matter, gray matter, and
   corticospinal fluid.
 
-- :class:`AFQ.mask.CombinedMask`: This class can be used to combine the other masks. It takes
+- :class:`AFQ.definitions.mask.CombinedMask`: This class can be used to combine the other masks. It takes
   a list of masks and allows the user to specify whether they should be
   combined using a logical "and" or "or".
 
-Here is an example of using the :class:`AFQ.mask.RoiMask` and :class:`AFQ.mask.LabelledMaskFile` on the HCP
+Here is an example of using the :class:`AFQ.definitions.mask.RoiMask` and :class:`AFQ.definitions.mask.LabelledMaskFile` on the HCP
 data with the AFQ object::
 
     from AFQ.data import fetch_hcp
     import AFQ.api as api
-    import AFQ.mask as afm
+    import AFQ.definitions.mask as afm
 
     # Download a subject to the AWS Batch machine from s3
     _, hcp_bids = fetch_hcp(
