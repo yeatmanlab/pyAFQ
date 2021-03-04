@@ -339,9 +339,9 @@ class AFQ(object):
             the aft.track function. Seed mask and seed threshold, if not
             specified, are replaced with scalar masks from scalar[0]
             thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-            this dict may be ``AFQ.definitions.mask.MaskFile`` instances. If ``tracker``
-            is set to "pft" then ``stop_mask`` should be an instance of
-            ``AFQ.definitions.mask.PFTMask``.
+            this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+            If ``tracker`` is set to "pft" then ``stop_mask`` should be
+            an instance of ``AFQ.definitions.mask.PFTMask``.
         clean_params: dict, optional
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
@@ -390,12 +390,15 @@ class AFQ(object):
                 raise TypeError(
                     "If reg_template is 'hcp_atlas',"
                     + " reg_subject must be 'subject_sls'")
-        if brain_mask is not None and not check_definition_methods(brain_mask):
+        if brain_mask is not None and not check_definition_methods(
+                brain_mask):
             raise TypeError(
-                "brain_mask must be None or a mask defined in `AFQ.definitions.mask`")
+                "brain_mask must be None or a mask "
+                "defined in `AFQ.definitions.mask`")
         if not check_definition_methods(mapping):
             raise TypeError(
-                "mapping must be a mapping defined in `AFQ.definitions.mapping`")
+                "mapping must be a mapping defined"
+                + " in `AFQ.definitions.mapping`")
         if bundle_info is not None and not ((
                 isinstance(bundle_info, list)
                 and isinstance(bundle_info[0], str)) or (

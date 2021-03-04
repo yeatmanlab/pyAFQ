@@ -46,8 +46,9 @@ class Segmentation:
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
-                 parallel_segmentation={"n_jobs": -1, "engine": "joblib",
-                      "backend": "loky"},
+                 parallel_segmentation={
+                     "n_jobs": -1, "engine": "joblib",
+                     "backend": "loky"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -98,7 +99,7 @@ class Segmentation:
             How to parallelize segmentation across processes when performing
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
             perform parallelization. See ``AFQ.utils.parallel.pafor`` for
-            details. 
+            details.
             Default: {"n_jobs": -1, "engine": "joblib",
                       "backend": "loky"}
         rm_small_clusters : int
@@ -1098,7 +1099,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
 
 
 def _check_sl_with_inclusion(sl, include_rois, tol,
-                                include_roi_tols):
+                             include_roi_tols):
     """
     Helper function to check that a streamline is close to a list of
     inclusion ROIS.
@@ -1115,7 +1116,7 @@ def _check_sl_with_inclusion(sl, include_rois, tol,
 
 
 def _check_sl_with_exclusion(sl, exclude_rois, tol,
-                                exclude_roi_tols):
+                             exclude_roi_tols):
     """ Helper function to check that a streamline is not too close to a
     list of exclusion ROIs.
     """
@@ -1128,8 +1129,8 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol,
 
 
 def _is_streamline_in_ROIs(sl, tol, include_roi,
-                            include_roi_tols, exclude_roi,
-                            exclude_roi_tols, fiber_prob):
+                           include_roi_tols, exclude_roi,
+                           exclude_roi_tols, fiber_prob):
     is_close, dist = \
         _check_sl_with_inclusion(
             sl,

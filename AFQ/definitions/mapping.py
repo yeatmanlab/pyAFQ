@@ -6,6 +6,7 @@ import os.path as op
 from AFQ.definitions.utils import StrInstantiatesMixin
 from AFQ._fixes import ConformedAffineMap
 import AFQ.registration as reg
+import AFQ.data as afd
 
 try:
     from fsl.data.image import Image
@@ -93,8 +94,9 @@ class FnirtMap(StrInstantiatesMixin):
             return xform_data
 
         def transform(data, **kwargs):
-            raise NotImplementedError("Fnirt based mappings can currently" +
-                " only transform from template to subject space")
+            raise NotImplementedError(
+                "Fnirt based mappings can currently"
+                + " only transform from template to subject space")
 
     def get_for_row(self, afq_object, row):
         nearest_warp, nearest_space = self.fnames[row['ses']][row['subject']]
@@ -152,17 +154,7 @@ class GeneratedMapMixin(object):
             reg_prealign = np.load(self.prealign(afq_object, row))
         else:
             reg_prealign = None
-        if op.exists(mapping_file):
-            if self.use_prealign:
-                reg_prealign_inv = np.linalg.inv(reg_prealign)
-            else:
-                reg_prealign_inv = None
-            mapping = reg.read_mapping(
-                mapping_file,
-                row['dwi_file'],
-                afq_object.reg_template_img,
-                prealign=reg_prealign_inv)
-        else:
+        if not op.exists(mapping_file):
             reg_template_img, reg_template_sls = \
                 afq_object._reg_img(afq_object.reg_template, False, row)
             reg_subject_img, reg_subject_sls = \
@@ -178,7 +170,15 @@ class GeneratedMapMixin(object):
             reg.write_mapping(mapping, mapping_file)
             meta = dict(type="displacementfield")
             afd.write_json(meta_fname, meta)
-
+        if self.use_prealign:
+            reg_prealign_inv = np.linalg.inv(reg_prealign)
+        else:
+            reg_prealign_inv = None
+        mapping = reg.read_mapping(
+            mapping_file,
+            row['dwi_file'],
+            afq_object.reg_template_img,
+            prealign=reg_prealign_inv)
         return mapping
 
 

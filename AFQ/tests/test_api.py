@@ -31,7 +31,9 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
+from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask,\
+    PFTMask, MaskFile
+from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
 
 
 def touch(fname, times=None):
@@ -314,11 +316,11 @@ def test_AFQ_data():
     """
     _, bids_path, _ = get_temp_hardi()
 
-    for use_prealign in [0, 1, 2]:
+    for mapping in [SynMap(use_prealign=False), AffMap()]:
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
-            use_prealign=use_prealign)
+            mapping=mapping)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq['dwi_file'][0]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
@@ -384,7 +386,8 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="brain_mask must be None or a mask defined in `AFQ.definitions.mask`"):
+            match=("brain_mask must be None or a mask defined"
+                   " in `AFQ.definitions.mask`")):
         api.AFQ(
             bids_path,
             brain_mask="not a brain mask")
@@ -410,7 +413,8 @@ def test_AFQ_slr():
         bids_path=bids_path,
         dmriprep='vistasoft',
         reg_subject='subject_sls',
-        reg_template='hcp_atlas')
+        reg_template='hcp_atlas',
+        mapping=SlrMap())
 
     tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])

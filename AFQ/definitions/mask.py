@@ -15,6 +15,7 @@ __all__ = ["MaskFile", "FullMask", "RoiMask", "B0Mask", "LabelledMaskFile",
            "ThresholdedMaskFile", "ScalarMask", "ThresholdedScalarMask",
            "CombinedMask"]
 
+
 def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
     '''
     Helper function
@@ -30,6 +31,7 @@ def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
                                      dwi_affine)).astype(mask_type)
     else:
         return mask_data
+
 
 class CombineMaskMixin(object):
     """
@@ -196,6 +198,7 @@ class RoiMask(StrInstantiatesMixin):
                         mask_data,
                         warped_roi.astype(bool))
         return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
+
 
 class B0Mask(StrInstantiatesMixin):
     """
@@ -525,7 +528,8 @@ class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
         self.mask_draft = None
         metas = []
         for mask in self.mask_list:
-            next_mask, next_affine, next_meta = mask.get_for_row(afq_object, row)
+            next_mask, next_affine, next_meta = mask.get_for_row(
+                afq_object, row)
             if self.mask_draft is None:
                 self.reset_mask_draft(next_mask.shape)
             else:
