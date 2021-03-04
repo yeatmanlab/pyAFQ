@@ -3,7 +3,7 @@ import numpy as np
 from time import time
 import os.path as op
 
-from AFQ.definitions.utils import StrInstantiatesMixin
+from AFQ.definitions.utils import StrInstantiatesMixin, find_file
 from AFQ._fixes import ConformedAffineMap
 import AFQ.registration as reg
 import AFQ.data as afd
@@ -80,24 +80,6 @@ class FnirtMap(StrInstantiatesMixin):
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
-    class FnirtMapping():
-        """
-            FnirtMapping which matches the generic mapping API.
-        """
-        def __init__(warp, ref_affine):
-            self.ref_affine = ref_affine
-            self.warp = warp
-
-        def transform_inverse(data, **kwargs):
-            data_img = Image(nib.Nifti1Image(data, self.ref_affine))
-            xform_data = applyDeformation(data_img, def_field)
-            return xform_data
-
-        def transform(data, **kwargs):
-            raise NotImplementedError(
-                "Fnirt based mappings can currently"
-                + " only transform from template to subject space")
-
     def get_for_row(self, afq_object, row):
         nearest_warp, nearest_space = self.fnames[row['ses']][row['subject']]
 
@@ -107,6 +89,26 @@ class FnirtMap(StrInstantiatesMixin):
         warp = readFnirt(nearest_warp, their_templ, subj)
 
         return FnirtMapping(warp, our_templ.affine)
+
+
+class FnirtMapping():
+    """
+        FnirtMapping which matches the generic mapping API.
+    """
+
+    def __init__(self, warp, ref_affine):
+        self.ref_affine = ref_affine
+        self.warp = warp
+
+    def transform_inverse(self, data, **kwargs):
+        data_img = Image(nib.Nifti1Image(data, self.ref_affine))
+        xform_data = applyDeformation(data_img, self.warp).data
+        return xform_data
+
+    def transform(self, data, **kwargs):
+        raise NotImplementedError(
+            "Fnirt based mappings can currently"
+            + " only transform from template to subject space")
 
 
 class GeneratedMapMixin(object):

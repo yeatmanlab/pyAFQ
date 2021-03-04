@@ -84,7 +84,7 @@ def toml_to_val(t):
         return None
     elif isinstance(t, str) and t[0] == '{':
         return eval(t)  # interpret as dictionary
-    elif isinstance(t, str) and "Mask" in t:
+    elif isinstance(t, str) and ("Mask" in t or "Map" in t):
         try:
             definition = eval(t)
         except NameError:
