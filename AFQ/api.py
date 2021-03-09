@@ -223,6 +223,7 @@ class AFQ(object):
                  dmriprep="all",
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
+                 patch2self=False,
                  robust_tensor_fitting=False,
                  min_bval=None,
                  max_bval=None,
@@ -268,6 +269,10 @@ class AFQ(object):
         b0_threshold : int, optional
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
+        patch2self : bool, optional
+            [REGISTRATION] Whether to use patch2self when
+            to denoise the dwi data.
+            Default: False
         robust_tensor_fitting : bool, optional
             [REGISTRATION] Whether to use robust_tensor_fitting when
             doing dti. Only applies to dti.
@@ -364,6 +369,8 @@ class AFQ(object):
                 + " either a dict or None")
         if not isinstance(b0_threshold, int):
             raise TypeError("b0_threshold must be an int")
+        if not isinstance(patch2self, bool):
+            raise TypeError("patch2self must be a bool")
         if not isinstance(robust_tensor_fitting, bool):
             raise TypeError("robust_tensor_fitting must be a bool")
         if min_bval is not None and not isinstance(min_bval, int):
@@ -450,6 +457,7 @@ class AFQ(object):
         self.mapping_definition = mapping
 
         self.b0_threshold = b0_threshold
+        self.patch2self = patch2self
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
@@ -715,6 +723,9 @@ class AFQ(object):
             bvecs = bvecs[valid_b]
         gtab = dpg.gradient_table(bvals, bvecs,
                                   b0_threshold=self.b0_threshold)
+        if self.patch2self:
+            from dipy.denoise.patch2self import patch2self
+            data = patch2self(data, bvals, b0_threshold=self.b0_threshold)
         return data, gtab, img
 
     def _b0(self, row):
@@ -1600,6 +1611,50 @@ class AFQ(object):
                 self.logger.info("No streamlines found to visualize for "
                                  + bundle_name)
 
+            if self.segmentation_params["filter_by_endpoints"]:
+                warped_rois = []
+                endpoint_info = self.segmentation_params["endpoint_info"]
+                if endpoint_info is not None:
+                    start_p = endpoint_info[bundle_name]['startpoint']
+                    end_p = endpoint_info[bundle_name]['endpoint']
+                    for ii, pp in enumerate([start_p, end_p]):
+                        pp = reg.resample(
+                            pp.get_fdata(),
+                            self.reg_template_img,
+                            pp.affine,
+                            self.reg_template_img.affine)
+
+                        atlas_roi = np.zeros(pp.shape)
+                        atlas_roi[np.where(pp > 0)] = 1
+                        warped_roi = self.mapping.transform_inverse(
+                            atlas_roi,
+                            interpolation='nearest')
+                        warped_rois.append(
+                            np.array(np.where(warped_roi > 0)).T)
+                else:
+                    aal_atlas = afd.read_aal_atlas(self.reg_template_img)
+                    atlas = aal_atlas['atlas'].get_fdata()
+                    aal_targets = afd.bundles_to_aal(
+                        [bundle_name], atlas=atlas)[0]
+                    for targ in aal_targets:
+                        if targ is not None:
+                            aal_roi = np.zeros(atlas.shape[:3])
+                            aal_roi[targ[:, 0],
+                                    targ[:, 1],
+                                    targ[:, 2]] = 1
+                            warped_roi = self.mapping.transform_inverse(
+                                aal_roi,
+                                interpolation='nearest')
+                            warped_rois.append(
+                                np.array(np.where(warped_roi > 0)).T)
+                for i, roi in enumerate(warped_rois):
+                    figure = self.viz.visualize_roi(
+                        roi,
+                        name=f"{bundle_name} endpoint ROI {i}",
+                        inline=False,
+                        interact=False,
+                        figure=figure)
+
             roi_files = self._export_rois(row)
             for i, roi in enumerate(roi_files[bundle_name]):
                 if i == len(roi_files[bundle_name]) - 1:  # show on last ROI
@@ -1608,7 +1663,6 @@ class AFQ(object):
                         name=f"{bundle_name} ROI {i}",
                         inline=inline,
                         interact=interactive,
-                        opacity=0.75,
                         figure=figure)
                 else:
                     figure = self.viz.visualize_roi(
