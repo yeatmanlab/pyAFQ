@@ -27,7 +27,7 @@ from dipy.io.streamline import load_tractogram, load_trk
 
 import AFQ.utils.models as mut
 import AFQ.utils.streamlines as sut
-from AFQ._fixes import ConformedAffineMap
+from AFQ.definitions.mapping import ConformedAffineMapping
 
 syn_metric_dict = {'CC': CCMetric,
                    'EM': EMMetric,
@@ -207,13 +207,14 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
         mapping.backward = disp_data[..., 1]
         mapping.is_inverse = True
     else:
-        mapping = ConformedAffineMap(disp,
-                                     domain_grid_shape=reduce_shape(
-                                         domain_img.shape),
-                                     domain_grid2world=domain_img.affine,
-                                     codomain_grid_shape=reduce_shape(
-                                         codomain_img.shape),
-                                     codomain_grid2world=codomain_img.affine)
+        mapping = ConformedAffineMapping(
+            disp,
+            domain_grid_shape=reduce_shape(
+                domain_img.shape),
+            domain_grid2world=domain_img.affine,
+            codomain_grid_shape=reduce_shape(
+                codomain_img.shape),
+            codomain_grid2world=codomain_img.affine)
 
     return mapping
 
@@ -503,8 +504,9 @@ def slr_registration(moving_data, static_data,
     _, transform, _, _ = whole_brain_slr(
         static_data, moving_data, x0='affine', verbose=False, **kwargs)
 
-    return ConformedAffineMap(transform,
-                              codomain_grid_shape=reduce_shape(static_shape),
-                              codomain_grid2world=static_affine,
-                              domain_grid_shape=reduce_shape(moving_shape),
-                              domain_grid2world=moving_affine)
+    return ConformedAffineMapping(
+        transform,
+        codomain_grid_shape=reduce_shape(static_shape),
+        codomain_grid2world=static_affine,
+        domain_grid_shape=reduce_shape(moving_shape),
+        domain_grid2world=moving_affine)

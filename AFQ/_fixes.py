@@ -6,26 +6,11 @@ from tqdm import tqdm
 from dipy.align import Bunch
 from dipy.tracking.local_tracking import (LocalTracking,
                                           ParticleFilteringTracking)
-from dipy.align.imaffine import AffineMap
 import random
 
 import sys
 import math
 import cvxpy as cvx
-
-
-class ConformedAffineMap(AffineMap):
-    """
-    Modifies AffineMap API to match DiffeomorphicMap API.
-    Important for SLR maps API to be indistinguishable from SYN maps API.
-    """
-    def transform(self, *args, interpolation='linear', **kwargs):
-        kwargs['interp'] = interpolation
-        return super().transform_inverse(*args, **kwargs)
-
-    def transform_inverse(self, *args, interpolation='linear', **kwargs):
-        kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)
 
 
 def spherical_harmonics(m, n, theta, phi):
@@ -97,6 +82,7 @@ class VerboseLocalTracking(LocalTracking):
         self.min_length = min_length
         self.max_length = max_length
     _generate_streamlines = _verbose_generate_streamlines
+
 
 class VerboseParticleFilteringTracking(ParticleFilteringTracking):
     def __init__(self, *args, min_length=10, max_length=1000, **kwargs):

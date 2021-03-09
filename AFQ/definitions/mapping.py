@@ -4,9 +4,10 @@ from time import time
 import os.path as op
 
 from AFQ.definitions.utils import StrInstantiatesMixin, find_file
-from AFQ._fixes import ConformedAffineMap
 import AFQ.registration as reg
 import AFQ.data as afd
+
+from dipy.align.imaffine import AffineMap
 
 try:
     from fsl.data.image import Image
@@ -88,12 +89,12 @@ class FnirtMap(StrInstantiatesMixin):
         their_templ = Image(nearest_space)
         warp = readFnirt(nearest_warp, their_templ, subj)
 
-        return FnirtMapping(warp, our_templ.affine)
+        return ConformedFnirtMapping(warp, our_templ.affine)
 
 
-class FnirtMapping():
+class ConformedFnirtMapping():
     """
-        FnirtMapping which matches the generic mapping API.
+        ConformedFnirtMapping which matches the generic mapping API.
     """
 
     def __init__(self, warp, ref_affine):
@@ -279,4 +280,19 @@ class AffMap(StrInstantiatesMixin, GeneratedMapMixin):
 
     def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
                     reg_subject_img, reg_subject_sls, reg_prealign):
-        return ConformedAffineMap(np.load(self.prealign(afq_object, row)))
+        return ConformedAffineMapping(np.load(self.prealign(afq_object, row)))
+
+
+class ConformedAffineMapping(AffineMap):
+    """
+    Modifies AffineMap API to match DiffeomorphicMap API.
+    Important for SLR maps API to be indistinguishable from SYN maps API.
+    """
+
+    def transform(self, *args, interpolation='linear', **kwargs):
+        kwargs['interp'] = interpolation
+        return super().transform_inverse(*args, **kwargs)
+
+    def transform_inverse(self, *args, interpolation='linear', **kwargs):
+        kwargs['interp'] = interpolation
+        return super().transform(*args, **kwargs)
