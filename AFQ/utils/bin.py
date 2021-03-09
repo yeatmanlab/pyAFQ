@@ -193,6 +193,7 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
 def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
+                         verbose=False,
                          special_args={"CLEANING": "clean_params",
                                        "SEGMENTATION": "segmentation_params",
                                        "TRACTOGRAPHY": "tracking_params"}):
@@ -205,8 +206,6 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
             + "If you want to generate this file,"
             + " add the argument --generate-config-only")
     f_arg_dict = toml.load(toml_file)
-
-    logger = logging.getLogger('AFQ.CLI')
 
     # extract arguments from file
     kwargs = {}
@@ -232,7 +231,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
 
-    logger.info("The following arguments are recognized: " + str(kwargs))
+    if logger is not None and verbose:
+        logger.info("The following arguments are recognized: " + str(kwargs))
 
     # if overwrite, write new file with updated docs / args
     if overwrite:

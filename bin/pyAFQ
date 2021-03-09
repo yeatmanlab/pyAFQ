@@ -57,6 +57,14 @@ def parse_cli(help_msg):
         + " preserving previous defaults when applicable.")
 
     cli_parser.add_argument(
+        '-v',
+        '--verbose',
+        dest='verbose',
+        action="store_true",
+        default=False,
+        help="Verbose when reading TOML file")
+
+    cli_parser.add_argument(
         '-c',
         '--call',
         dest='to_call',
@@ -80,12 +88,13 @@ def parse_cli(help_msg):
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
-    return opts.config, opts.generate_toml, opts.overwrite, opts.to_call
+    return opts.config, opts.generate_toml, opts.overwrite, opts.verbose, opts.to_call
 
 
 if __name__ == '__main__':
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
-    config_file, generate_only, overwrite, to_call = parse_cli(arg_dict)
+    config_file, generate_only, overwrite, verbose, to_call =\
+        parse_cli(arg_dict)
     if generate_only:
         afb.generate_config(config_file, arg_dict, overwrite, logger=logger)
     else:
@@ -94,4 +103,5 @@ if __name__ == '__main__':
             arg_dict,
             to_call=to_call,
             overwrite=overwrite,
+            verbose=verbose,
             logger=logger)
