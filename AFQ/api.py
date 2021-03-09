@@ -1626,11 +1626,11 @@ class AFQ(object):
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1
-                        warped_roi = self._mapping(row).transform_inverse(
+                        warped_roi = auv.transform_inverse_roi(
                             atlas_roi,
-                            interpolation='nearest')
-                        warped_rois.append(
-                            np.array(np.where(warped_roi > 0)).T)
+                            self._mapping(row),
+                            bundle_name=bundle_name)
+                        warped_rois.append(warped_roi)
                 else:
                     aal_atlas = afd.read_aal_atlas(self.reg_template_img)
                     atlas = aal_atlas['atlas'].get_fdata()
@@ -1642,11 +1642,11 @@ class AFQ(object):
                             aal_roi[targ[:, 0],
                                     targ[:, 1],
                                     targ[:, 2]] = 1
-                            warped_roi = self._mapping(row).transform_inverse(
-                                aal_roi,
-                                interpolation='nearest')
-                            warped_rois.append(
-                                np.array(np.where(warped_roi > 0)).T)
+                        warped_roi = auv.transform_inverse_roi(
+                            aal_roi,
+                            self._mapping(row),
+                            bundle_name=bundle_name)
+                        warped_rois.append(warped_roi)
                 for i, roi in enumerate(warped_rois):
                     figure = self.viz.visualize_roi(
                         roi,
