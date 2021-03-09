@@ -5,7 +5,7 @@ from dipy.segment.mask import median_otsu
 
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
-from AFQ.definitions.utils import StrInstantiatesMixin, find_file
+from AFQ.definitions.utils import Definition, find_file
 
 
 # For mask defintions, get_for_row should return:
@@ -64,7 +64,7 @@ class CombineMaskMixin(object):
             f" you set combine to {self.combine}"))
 
 
-class MaskFile(StrInstantiatesMixin):
+class MaskFile(Definition):
     """
     Define a mask based on a file.
     Does not apply any labels or thresholds;
@@ -133,7 +133,7 @@ class MaskFile(StrInstantiatesMixin):
         return mask_data, dwi_img.affine, meta
 
 
-class FullMask(StrInstantiatesMixin):
+class FullMask(Definition):
     """
     Define a mask which covers a full volume.
 
@@ -157,7 +157,7 @@ class FullMask(StrInstantiatesMixin):
             dict(source="Entire Volume")
 
 
-class RoiMask(StrInstantiatesMixin):
+class RoiMask(Definition):
     """
     Define a mask which is all ROIs or'd together.
 
@@ -200,7 +200,7 @@ class RoiMask(StrInstantiatesMixin):
         return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
 
 
-class B0Mask(StrInstantiatesMixin):
+class B0Mask(Definition):
     """
     Define a mask using b0 and dipy's median_otsu.
 
@@ -445,7 +445,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         self.upper_bound = upper_bound
 
 
-class PFTMask(StrInstantiatesMixin):
+class PFTMask(Definition):
     """
     Define a mask for use in PFT tractography. Only use
     if tracker set to 'pft' in tractography.
@@ -488,7 +488,7 @@ class PFTMask(StrInstantiatesMixin):
         return probseg_imgs, None, dict(sources=probseg_metas)
 
 
-class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
+class CombinedMask(Definition, CombineMaskMixin):
     """
     Define a mask by combining other masks.
 

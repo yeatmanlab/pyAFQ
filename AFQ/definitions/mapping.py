@@ -3,7 +3,7 @@ import numpy as np
 from time import time
 import os.path as op
 
-from AFQ.definitions.utils import StrInstantiatesMixin, find_file
+from AFQ.definitions.utils import Definition, find_file
 import AFQ.registration as reg
 import AFQ.data as afd
 
@@ -24,7 +24,7 @@ __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
 # which each accept data, **kwargs
 
 
-class FnirtMap(StrInstantiatesMixin):
+class FnirtMap(Definition):
     """
     Use an existing FNIRT map. Expects a warp file
     and an image file for each subject / session; image file
@@ -186,7 +186,7 @@ class GeneratedMapMixin(object):
         return mapping
 
 
-class SynMap(StrInstantiatesMixin, GeneratedMapMixin):
+class SynMap(Definition, GeneratedMapMixin):
     """
     Calculate a Syn registration for each subject/session
     using reg_subject and reg_template.
@@ -227,7 +227,7 @@ class SynMap(StrInstantiatesMixin, GeneratedMapMixin):
         return mapping
 
 
-class SlrMap(StrInstantiatesMixin, GeneratedMapMixin):
+class SlrMap(Definition, GeneratedMapMixin):
     """
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
@@ -255,7 +255,7 @@ class SlrMap(StrInstantiatesMixin, GeneratedMapMixin):
             static_shape=reg_template_img.shape)
 
 
-class AffMap(StrInstantiatesMixin, GeneratedMapMixin):
+class AffMap(Definition, GeneratedMapMixin):
     """
     Calculate an affine registration for each subject/session
     using reg_subject and reg_template.

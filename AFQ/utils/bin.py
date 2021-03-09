@@ -11,7 +11,7 @@ from funcargparse import FuncArgParser
 
 from AFQ.definitions.mask import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
-from AFQ.definitions.utils import check_definition_methods
+from AFQ.definitions.utils import Definition
 import nibabel as nib  # interprets nibabel images for endpoint_info
 
 
@@ -89,7 +89,7 @@ def toml_to_val(t):
             definition = eval(t)
         except NameError:
             return t
-        if check_definition_methods(definition):
+        if isinstance(definition, Definition):
             return definition
         else:
             return t
@@ -100,7 +100,7 @@ def toml_to_val(t):
 def val_to_toml(v):
     if v is None:
         return "''"
-    elif check_definition_methods(v):
+    elif isinstance(v, Definition):
         return f"'{v.str_for_toml()}'"
     elif isinstance(v, str):
         return f"'{v}'"

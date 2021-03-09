@@ -1,34 +1,40 @@
-__all__ = ["check_definition_methods", "StrInstantiatesMixin", "find_file"]
+__all__ = ["Definition", "find_file"]
 
 
-def check_definition_methods(definition, definition_name=False):
+class Definition():
     '''
-    Helper function
-    Checks if definition is a valid definition.
-    If definition_name is not False, will throw an error stating the method
-    not found and the mask name.
+    All Definitions should inherit this.
+    For a given subject and session within the API, the definition is used
+    to create a given mask, map, etc.
+    Definitions have an init function which the users uses to specify
+    how they want the definition to behave.
+    The find_path and get_for_row functions are called by the AFQ API.
+    The api calls find_path to let the definition find relevant files
+    for the given subject and session. The api calls get_for_row to get the
+    mask, map, etc.
     '''
-    if not hasattr(definition, 'find_path'):
-        if definition_name:
-            raise TypeError(
-                f"find_path method not found in {definition_name}")
-        else:
-            return False
-    elif not hasattr(definition, 'get_for_row'):
-        if definition_name:
-            raise TypeError(
-                f"get_for_row method not found in {definition_name}")
-        else:
-            return False
-    elif not hasattr(definition, '__init__')\
-            or not hasattr(definition.__init__, '__code__'):
-        if definition_name:
-            raise TypeError(
-                f"__init__ method not defined in {definition_name}")
-        else:
-            return False
-    else:
-        return True
+    def __init__():
+        raise NotImplementedError
+
+    def find_path():
+        raise NotImplementedError
+
+    def get_for_row():
+        raise NotImplementedError
+
+    def str_for_toml(self):
+        """
+        Uses __init__ in str_for_toml to make string that will instantiate
+        itself. Assumes object will have attributes of same name as
+        __init__ args. This is important for reading/writing definitions
+        as arguments to config files.
+        """
+        return type(self).__name__\
+            + "("\
+            + _arglist_to_string(
+                self.__init__.__code__.co_varnames,
+                get_attr=self)\
+            + ')'
 
 
 def _arglist_to_string(args, get_attr=None):
@@ -44,7 +50,7 @@ def _arglist_to_string(args, get_attr=None):
             continue
         if get_attr is not None:
             arg = getattr(get_attr, arg)
-        if check_definition_methods(arg):
+        if isinstance(arg, Definition):
             arg = arg.str_for_toml()
         elif isinstance(arg, str):
             arg = f"\"{arg}\""
@@ -54,24 +60,6 @@ def _arglist_to_string(args, get_attr=None):
     if to_string[-2:] == ', ':
         to_string = to_string[:-2]
     return to_string
-
-
-class StrInstantiatesMixin(object):
-    '''
-    Helper class
-    Uses __init__ in str_for_toml to make string that will instantiate itself.
-    Assumes object will have attributes of same name as __init__ args.
-    This is important for reading/writing definitions as arguments
-    to config files.
-    '''
-
-    def str_for_toml(self):
-        return type(self).__name__\
-            + "("\
-            + _arglist_to_string(
-                self.__init__.__code__.co_varnames,
-                get_attr=self)\
-            + ')'
 
 
 def find_file(bids_layout, path, filters, suffix, session, subject):

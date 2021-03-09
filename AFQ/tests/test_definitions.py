@@ -9,7 +9,7 @@ import AFQ.definitions.mask as afm
 import AFQ.definitions.mapping as ama
 from AFQ.definitions.mask import *  # interprets masks from eval
 from AFQ.definitions.mapping import *  # interprets mappings from eval
-from AFQ.definitions.utils import check_definition_methods
+from AFQ.definitions.utils import Definition
 from AFQ.tests.test_api import create_dummy_bids_path
 
 
@@ -26,33 +26,6 @@ def test_str_instantiates_mixin():
                 len(combined_mask_from_str.mask_list))
     for mask in combined_mask.mask_list:
         npt.assert_(mask.__dict__ == mask.__dict__)
-
-
-def test_check_definition_methods():
-    class myDef():
-        def __init__(self):
-            pass
-
-        def find_path(self):
-            pass
-
-        def get_for_row(self):
-            pass
-
-    class myFaultyDef():
-        def find_path(self):
-            pass
-
-        def get_for_row(self):
-            pass
-
-    npt.assert_(check_definition_methods(myDef, definition_name="my def"))
-
-    npt.assert_raises(
-        TypeError,
-        check_definition_methods,
-        myFaultyDef,
-        "my faulty def")
 
 
 def test_resample_mask():

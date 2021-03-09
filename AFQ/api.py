@@ -2,7 +2,7 @@
 import logging
 from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
 from AFQ.definitions.mapping import (SynMap, FnirtMap)
-from AFQ.definitions.utils import check_definition_methods
+from AFQ.definitions.utils import Definition
 from AFQ.utils.bin import get_default_args
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 import AFQ.utils.volume as auv
@@ -390,12 +390,12 @@ class AFQ(object):
                 raise TypeError(
                     "If reg_template is 'hcp_atlas',"
                     + " reg_subject must be 'subject_sls'")
-        if brain_mask is not None and not check_definition_methods(
-                brain_mask):
+        if brain_mask is not None and not isinstance(
+                brain_mask, Definition):
             raise TypeError(
                 "brain_mask must be None or a mask "
                 "defined in `AFQ.definitions.mask`")
-        if not check_definition_methods(mapping):
+        if not isinstance(mapping, Definition):
             raise TypeError(
                 "mapping must be a mapping defined"
                 + " in `AFQ.definitions.mapping`")
@@ -636,8 +636,8 @@ class AFQ(object):
                 else:
                     reg_subject_list.append(None)
 
-                if check_definition_methods(
-                        self.tracking_params["seed_mask"]):
+                if isinstance(
+                        self.tracking_params["seed_mask"], Definition):
                     self.tracking_params["seed_mask"].find_path(
                         bids_layout,
                         dwi_data_file,
@@ -645,8 +645,8 @@ class AFQ(object):
                         session
                     )
 
-                if check_definition_methods(
-                        self.tracking_params["stop_mask"]):
+                if isinstance(
+                        self.tracking_params["stop_mask"], Definition):
                     self.tracking_params["stop_mask"].find_path(
                         bids_layout,
                         dwi_data_file,
@@ -1058,7 +1058,7 @@ class AFQ(object):
         return self.mapping_definition.get_for_row(self, row)
 
     def _export_seed_mask(self, row):
-        if check_definition_methods(self.tracking_params['seed_mask']):
+        if isinstance(self.tracking_params['seed_mask'], Definition):
             seed_mask, _, seed_mask_desc =\
                 self.tracking_params['seed_mask'].get_for_row(self, row)
         else:
@@ -1077,7 +1077,7 @@ class AFQ(object):
         return seed_file
 
     def _export_stop_mask(self, row):
-        if check_definition_methods(self.tracking_params['stop_mask']):
+        if isinstance(self.tracking_params['stop_mask'], Definition):
             stop_mask, _, stop_mask_desc =\
                 self.tracking_params['stop_mask'].get_for_row(self, row)
         else:
@@ -1117,13 +1117,13 @@ class AFQ(object):
                 params_file = self._dki(row)
 
             tracking_params = self.tracking_params.copy()
-            if check_definition_methods(self.tracking_params['seed_mask']):
+            if isinstance(self.tracking_params['seed_mask'], Definition):
                 tracking_params['seed_mask'], _, seed_mask_desc =\
                     self.tracking_params['seed_mask'].get_for_row(self, row)
             else:
                 seed_mask_desc = dict(source=tracking_params['seed_mask'])
 
-            if check_definition_methods(self.tracking_params['stop_mask']):
+            if isinstance(self.tracking_params['stop_mask'], Definition):
                 tracking_params['stop_mask'], _, stop_mask_desc =\
                     self.tracking_params['stop_mask'].get_for_row(self, row)
             else:
