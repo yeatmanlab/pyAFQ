@@ -186,7 +186,7 @@ class GeneratedMapMixin(object):
         return mapping
 
 
-class SynMap(Definition, GeneratedMapMixin):
+class SynMap(GeneratedMapMixin, Definition):
     """
     Calculate a Syn registration for each subject/session
     using reg_subject and reg_template.
@@ -227,7 +227,7 @@ class SynMap(Definition, GeneratedMapMixin):
         return mapping
 
 
-class SlrMap(Definition, GeneratedMapMixin):
+class SlrMap(GeneratedMapMixin, Definition):
     """
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
@@ -255,7 +255,7 @@ class SlrMap(Definition, GeneratedMapMixin):
             static_shape=reg_template_img.shape)
 
 
-class AffMap(Definition, GeneratedMapMixin):
+class AffMap(GeneratedMapMixin, Definition):
     """
     Calculate an affine registration for each subject/session
     using reg_subject and reg_template.

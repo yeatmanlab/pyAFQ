@@ -13,14 +13,15 @@ class Definition():
     for the given subject and session. The api calls get_for_row to get the
     mask, map, etc.
     '''
-    def __init__():
-        raise NotImplementedError
 
-    def find_path():
-        raise NotImplementedError
+    def __init__(self):
+        raise NotImplementedError("Use a definition that inherits this class")
 
-    def get_for_row():
-        raise NotImplementedError
+    def find_path(self, bids_layout, from_path, subject, session):
+        raise NotImplementedError("Use a definition that inherits this class")
+
+    def get_for_row(self, afq_object, row):
+        raise NotImplementedError("Use a definition that inherits this class")
 
     def str_for_toml(self):
         """
