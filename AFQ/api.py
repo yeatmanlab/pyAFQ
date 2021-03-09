@@ -1626,7 +1626,7 @@ class AFQ(object):
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1
-                        warped_roi = self.mapping.transform_inverse(
+                        warped_roi = self._mapping(row).transform_inverse(
                             atlas_roi,
                             interpolation='nearest')
                         warped_rois.append(
@@ -1642,7 +1642,7 @@ class AFQ(object):
                             aal_roi[targ[:, 0],
                                     targ[:, 1],
                                     targ[:, 2]] = 1
-                            warped_roi = self.mapping.transform_inverse(
+                            warped_roi = self._mapping(row).transform_inverse(
                                 aal_roi,
                                 interpolation='nearest')
                             warped_rois.append(
