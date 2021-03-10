@@ -149,6 +149,13 @@ class Segmentation:
             ROI in order to be included or excluded.
             If set to None (default), will be calculated as the
             center-to-corner distance of the voxel in the diffusion data.
+            If a bundle has additional_tolerance in its bundle_dict, that
+            tolerance will be added to this distance.
+            For example, if you wanted to increase tolerance for the right
+            arcuate waypoint ROIs by 3 each, you could make the following
+            modification to your bundle_dict:
+            bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
+            Additional tolerances can also be negative. 
         rng : RandomState or int
             If None, creates RandomState.
             If int, creates RandomState with seed rng.

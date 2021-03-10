@@ -27,7 +27,7 @@ Currently, there are three different masks that pyAFQ uses for tractometry:
    stop mask is :class:`AFQ.definitions.mask.ScalarMask` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
-In AFQ/mask.py, there are several mask classes one can use to specify masks.
+In AFQ/definitions/mask.py, there are several mask classes one can use to specify masks.
 As a user, one should initialize mask classes and pass them to the AFQ object,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
