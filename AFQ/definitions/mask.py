@@ -389,14 +389,14 @@ class ScalarMask(MaskFile):
 
     # overrides MaskFile
     def get_path_data_affine(self, afq_object, row):
-        valid_scalars = list(afq_object._scalar_dict.keys())
+        valid_scalars = list(afq_object.scalar_dict.keys())
         if self.scalar not in valid_scalars:
             raise RuntimeError((
                 f"scalar should be one of"
                 f" {', '.join(valid_scalars)}"
                 f", you input {self.scalar}"))
 
-        scalar_fname = afq_object._scalar_dict[self.scalar](afq_object, row)
+        scalar_fname = afq_object.scalar_dict[self.scalar](afq_object, row)
         scalar_img = nib.load(scalar_fname)
         scalar_data = scalar_img.get_fdata()
 
