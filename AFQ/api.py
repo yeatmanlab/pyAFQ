@@ -270,7 +270,7 @@ class AFQ(object):
             [REGISTRATION] The value of b under which
             it is considered to be b0. Default: 50.
         patch2self : bool, optional
-            [REGISTRATION] Whether to use patch2self when
+            [REGISTRATION] Whether to use patch2self
             to denoise the dwi data.
             Default: False
         robust_tensor_fitting : bool, optional

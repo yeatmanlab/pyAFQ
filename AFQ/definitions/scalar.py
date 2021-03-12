@@ -48,11 +48,11 @@ class ScalarFile(MaskFile):
 
     Examples
     --------
-    seed_mask = MaskFile(
-        "WM_mask",
+    my_scalar = ScalarFile(
+        "my_scalar",
+        "scalarSuffix",
         {"scope"="dmriprep"})
-    api.AFQ(tracking_params={"seed_mask": seed_mask,
-                                "seed_threshold": 0.1})
+    api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
     """
 
     def __init__(self, name, suffix, filters={}):

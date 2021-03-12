@@ -1,7 +1,7 @@
 __all__ = ["Definition", "find_file"]
 
 
-class Definition():
+class Definition(object):
     '''
     All Definitions should inherit this.
     For a given subject and session within the API, the definition is used
@@ -15,13 +15,13 @@ class Definition():
     '''
 
     def __init__(self):
-        raise NotImplementedError("Use a definition that inherits this class")
+        raise NotImplementedError("Please implement an __init__ method")
 
     def find_path(self, bids_layout, from_path, subject, session):
-        raise NotImplementedError("Use a definition that inherits this class")
+        raise NotImplementedError("Please implement a find_path method")
 
     def get_for_row(self, afq_object, row):
-        raise NotImplementedError("Use a definition that inherits this class")
+        raise NotImplementedError("Please implement a get_for_row method")
 
     def str_for_toml(self):
         """
