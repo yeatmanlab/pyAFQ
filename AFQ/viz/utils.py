@@ -1095,7 +1095,7 @@ class GroupCSVComparison():
 
     def contrast_index(self, names=None, scalar="FA",
                        show_plots=False, n_boot=1000,
-                       show_legend=False,
+                       ylim=(-1, 1), show_legend=False,
                        positions=POSITIONS, plot_subject_lines=True,
                        axes_dict={}):
         """
@@ -1120,6 +1120,11 @@ class GroupCSVComparison():
             Number of bootstrap resamples for seaborn to use
             to estimate the ci.
             Default: 1000
+
+        ylim : list of 2 floats, optional
+            Minimum and maximum value used for y-axis bounds.
+            If None, ylim is not set.
+            Default: None
 
         show_legend : bool, optional
             Show legend in center with single entry denoting the scalar used.
@@ -1153,7 +1158,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle], names, scalar)
             ba.plot_line(
-                bundle, "nodeID", "diff", ci_df, "ACI", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "ACI", ylim,
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines,
                 ax=axes_dict.get(bundle))
@@ -1176,6 +1181,7 @@ class GroupCSVComparison():
 
     def lateral_contrast_index(self, name, scalar="FA",
                                show_plots=False, n_boot=1000,
+                               ylim=(-1, 1),
                                positions=POSITIONS, plot_subject_lines=True):
         """
         Calculate the lateral contrast index for each bundle in a given
@@ -1197,6 +1203,11 @@ class GroupCSVComparison():
             Number of bootstrap resamples for seaborn to use
             to estimate the ci.
             Default: 1000
+
+        ylim : list of 2 floats, optional
+            Minimum and maximum value used for y-axis bounds.
+            If None, ylim is not set.
+            Default: None
 
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
@@ -1225,7 +1236,7 @@ class GroupCSVComparison():
             ci_df = self._contrast_index_df_maker(
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
-                bundle, "nodeID", "diff", ci_df, "ACI", (-1, 1),
+                bundle, "nodeID", "diff", ci_df, "ACI", ylim,
                 n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
             ba.save_temp_fig(
