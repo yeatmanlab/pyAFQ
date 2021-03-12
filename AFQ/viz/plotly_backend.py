@@ -72,10 +72,13 @@ def set_layout(figure, color=None):
 
 
 def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=[None, None]):
+                      cbv_lims=[None, None], flip_axial=True):
     color = np.asarray(color)
 
-    plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
+    if len(sls._offsets) > 1:
+        plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
+    else:
+        plotting_shape = sls._data.shape[0]
     # dtype object so None can be stored
     x_pts = np.zeros(plotting_shape)
     y_pts = np.zeros(plotting_shape)
@@ -103,12 +106,14 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
         # add sl to lines
         total_offset = plotting_offset + sl_index
         x_pts[total_offset:total_offset + sl_length] = sl[:, 0]
-        # don't draw between streamlines
-        x_pts[total_offset + sl_length] = np.nan
         y_pts[total_offset:total_offset + sl_length] = sl[:, 1]
-        y_pts[total_offset + sl_length] = np.nan
         z_pts[total_offset:total_offset + sl_length] = sl[:, 2]
-        z_pts[total_offset + sl_length] = np.nan
+
+        # don't draw between streamlines
+        if len(sls._offsets) > 1:
+            x_pts[total_offset + sl_length] = np.nan
+            y_pts[total_offset + sl_length] = np.nan
+            z_pts[total_offset + sl_length] = np.nan
 
         if cbv is not None:
             brightness = cbv[
@@ -125,12 +130,15 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
                 color_constant
             customdata[total_offset:total_offset + sl_length] = 1
 
-            line_color[total_offset + sl_length, :] = [0, 0, 0]
-            customdata[total_offset + sl_length] = 0
+            if len(sls._offsets) > 1:
+                line_color[total_offset + sl_length, :] = [0, 0, 0]
+                customdata[total_offset + sl_length] = 0
 
+    if flip_axial:
+        x_pts = dimensions[0] - x_pts
     figure.add_trace(
         go.Scatter3d(
-            x=dimensions[0] - x_pts,
+            x=x_pts,
             y=y_pts,
             z=z_pts,
             name=name,
@@ -150,8 +158,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], figure=None,
-                      background=(1, 1, 1), interact=False,
+                      cbv_lims=[None, None], flip_axial=True,
+                      figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
     """
     Visualize bundles in 3D
@@ -202,6 +210,12 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         color_by_volume.
         Default: [None, None]
 
+    flip_axial : ndarray
+        If bundles are visualized with a left/right flip, toggle this
+        parameter. This uncertainty comes from a lack of standardiation,
+        where sometimes streamline indices go from right to left,
+        and other times left to right.
+
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
         background.
@@ -240,7 +254,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             color,
             name,
             cbv=color_by_volume,
-            cbv_lims=cbv_lims)
+            cbv_lims=cbv_lims,
+            flip_axial=flip_axial)
 
     figure.update_layout(legend=dict(itemsizing="constant"))
     return _inline_interact(figure, interact, inline)
