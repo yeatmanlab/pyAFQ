@@ -194,7 +194,7 @@ class SynMap(GeneratedMapMixin, Definition):
     Parameters
     ----------
     use_prealign : bool
-        Whether to perform a liner pre-registration.
+        Whether to perform a linear pre-registration.
         Default: True
     affine_kwargs : dictionary, optional
         Parameters to pass to affine_registration
