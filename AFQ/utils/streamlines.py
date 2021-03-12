@@ -28,10 +28,13 @@ def bundles_to_tgram(bundles, bundle_dict, reference):
     Parameters
     ----------
     bundles: dict
-        Each item in the dict is the streamlines of a particular bundle.
+        Each key in the dict is a bundle name and each value in the dict
+        is the stateful tractogram of a particular bundle.
     bundle_dict: dict
-        A bundle specification dictionary. Each item includes in particular a
-        `uid` key that is a unique integer for that bundle.
+        A bundle specification dictionary. Each key is a bundle name, and each
+        value is another dictionary specifying bundle properties. In this
+        value dictionary, there must be one `uid` key whose value is a
+        unique integer for that bundle.
     reference : Nifti
         The affine_to_rasmm input to `nib.streamlines.Tractogram`
     """
