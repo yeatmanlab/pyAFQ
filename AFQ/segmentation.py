@@ -155,7 +155,7 @@ class Segmentation:
             arcuate waypoint ROIs by 3 each, you could make the following
             modification to your bundle_dict:
             bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
-            Additional tolerances can also be negative. 
+            Additional tolerances can also be negative.
         rng : RandomState or int
             If None, creates RandomState.
             If int, creates RandomState with seed rng.
