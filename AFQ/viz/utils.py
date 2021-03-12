@@ -1124,7 +1124,7 @@ class GroupCSVComparison():
         ylim : list of 2 floats, optional
             Minimum and maximum value used for y-axis bounds.
             If None, ylim is not set.
-            Default: None            
+            Default: None
 
         show_legend : bool, optional
             Show legend in center with single entry denoting the scalar used.
@@ -1207,7 +1207,7 @@ class GroupCSVComparison():
         ylim : list of 2 floats, optional
             Minimum and maximum value used for y-axis bounds.
             If None, ylim is not set.
-            Default: None            
+            Default: None
 
         positions : dictionary, optional
             Dictionary that maps bundle names to position in plot.
