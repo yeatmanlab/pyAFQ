@@ -31,7 +31,10 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.registration as reg
 import AFQ.utils.bin as afb
-from AFQ.mask import RoiMask, ThresholdedScalarMask, PFTMask, MaskFile
+from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask,\
+    PFTMask, MaskFile
+from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
+from AFQ.definitions.scalar import TemplateScalar
 
 
 def touch(fname, times=None):
@@ -314,11 +317,11 @@ def test_AFQ_data():
     """
     _, bids_path, _ = get_temp_hardi()
 
-    for use_prealign in [0, 1, 2]:
+    for mapping in [SynMap(use_prealign=False), AffMap()]:
         myafq = api.AFQ(
             bids_path=bids_path,
             dmriprep='vistasoft',
-            use_prealign=use_prealign)
+            mapping=mapping)
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
                          nib.load(myafq['dwi_file'][0]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0[0]).shape,
@@ -384,7 +387,8 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="brain_mask must be None or a mask defined in `AFQ.mask`"):
+            match=("brain_mask must be None or a mask defined"
+                   " in `AFQ.definitions.mask`")):
         api.AFQ(
             bids_path,
             brain_mask="not a brain mask")
@@ -410,7 +414,8 @@ def test_AFQ_slr():
         bids_path=bids_path,
         dmriprep='vistasoft',
         reg_subject='subject_sls',
-        reg_template='hcp_atlas')
+        reg_template='hcp_atlas',
+        mapping=SlrMap())
 
     tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
     bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
@@ -583,6 +588,11 @@ def test_AFQ_data_waypoint():
     Test with some actual data again, this time for track segmentation
     """
     tmpdir, bids_path, _ = get_temp_hardi()
+    t1_path = op.join(tmpdir.name, "T1.nii.gz")
+    nib.save(
+        afd.read_mni_template(mask=True, weight="T1w"),
+        t1_path)
+
     bundle_names = ["SLF", "ARC", "CST", "FP"]
     tracking_params = dict(odf_model="dti",
                            seed_mask=RoiMask(),
@@ -598,7 +608,10 @@ def test_AFQ_data_waypoint():
     myafq = api.AFQ(bids_path=bids_path,
                     dmriprep='vistasoft',
                     bundle_info=bundle_names,
-                    scalars=["dti_FA", "dti_MD"],
+                    scalars=[
+                        "dti_FA",
+                        "dti_MD",
+                        TemplateScalar("T1", t1_path)],
                     robust_tensor_fitting=True,
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
@@ -647,7 +660,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
     tract_profiles = pd.read_csv(myafq.tract_profiles[0])
-    assert tract_profiles.shape == (400, 5)
+    assert tract_profiles.shape == (400, 6)
 
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
@@ -682,7 +695,10 @@ def test_AFQ_data_waypoint():
                       robust_tensor_fitting=True),
                   BUNDLES=dict(
                       bundle_info=bundle_names,
-                      scalars=["dti_fa", "dti_md"]),
+                      scalars=[
+                        "dti_fa",
+                        "dti_md",
+                        f"TemplateScalar('T1', '{t1_path}')"]),
                   VIZ=dict(
                       viz_backend="plotly_no_gif"),
                   TRACTOGRAPHY=tracking_params,
@@ -701,7 +717,7 @@ def test_AFQ_data_waypoint():
         myafq._get_fname(myafq.data_frame.iloc[0], '_profiles.csv'))
     # And should be identical to what we would get by rerunning this:
     combined_profiles = myafq.combine_profiles()
-    assert combined_profiles.shape == (400, 7)
+    assert combined_profiles.shape == (400, 8)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:

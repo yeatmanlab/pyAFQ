@@ -5,8 +5,11 @@ import pytest
 
 from bids.layout import BIDSLayout
 
-import AFQ.mask as afm
-from AFQ.mask import *  # interprets masks from eval
+import AFQ.definitions.mask as afm
+import AFQ.definitions.mapping as ama
+from AFQ.definitions.mask import *  # interprets masks from eval
+from AFQ.definitions.mapping import *  # interprets mappings from eval
+from AFQ.definitions.utils import Definition
 from AFQ.tests.test_api import create_dummy_bids_path
 
 
@@ -23,33 +26,6 @@ def test_str_instantiates_mixin():
                 len(combined_mask_from_str.mask_list))
     for mask in combined_mask.mask_list:
         npt.assert_(mask.__dict__ == mask.__dict__)
-
-
-def test_check_mask_methods():
-    class myMask():
-        def __init__(self):
-            pass
-
-        def find_path(self):
-            pass
-
-        def get_mask(self):
-            pass
-
-    class myFaultyMask():
-        def find_path(self):
-            pass
-
-        def get_mask(self):
-            pass
-
-    npt.assert_(afm.check_mask_methods(myMask, mask_name="my mask"))
-
-    npt.assert_raises(
-        TypeError,
-        afm.check_mask_methods,
-        myFaultyMask,
-        "my faulty mask")
 
 
 def test_resample_mask():

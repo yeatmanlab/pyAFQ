@@ -38,7 +38,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # cloudknot installs the appropriate packages from pip
     from AFQ.data import fetch_hcp
     import AFQ.api as api
-    import AFQ.mask as afm
+    import AFQ.definitions.mask as afm
 
     import numpy as np
     import os.path as op

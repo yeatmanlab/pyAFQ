@@ -5,38 +5,15 @@ from dipy.segment.mask import median_otsu
 
 import AFQ.registration as reg
 import AFQ.utils.volume as auv
+from AFQ.definitions.utils import Definition, find_file
 
+
+# For mask defintions, get_for_row should return:
+# data, affine, meta
 
 __all__ = ["MaskFile", "FullMask", "RoiMask", "B0Mask", "LabelledMaskFile",
            "ThresholdedMaskFile", "ScalarMask", "ThresholdedScalarMask",
-           "CombinedMask", "check_mask_methods"]
-
-
-def check_mask_methods(mask, mask_name=False):
-    '''
-    Helper function
-    Checks if mask is a valid mask.
-    If mask_name is not False, will throw an error stating the method
-    not found and the mask name.
-    '''
-    if not hasattr(mask, 'find_path'):
-        if mask_name:
-            raise TypeError(f"find_path method not found in {mask_name}")
-        else:
-            return False
-    elif not hasattr(mask, 'get_mask'):
-        if mask_name:
-            raise TypeError(f"get_mask method not found in {mask_name}")
-        else:
-            return False
-    elif not hasattr(mask, '__init__')\
-            or not hasattr(mask.__init__, '__code__'):
-        if mask_name:
-            raise TypeError(f"__init__ method not defined in {mask_name}")
-        else:
-            return False
-    else:
-        return True
+           "CombinedMask"]
 
 
 def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
@@ -54,48 +31,6 @@ def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
                                      dwi_affine)).astype(mask_type)
     else:
         return mask_data
-
-
-def _arglist_to_string(args, get_attr=None):
-    '''
-    Helper function
-    Takes a list of arguments and unfolds them into a string.
-    If get_attr is not None, it will be used to get the attribute
-    corresponding to each argument instead.
-    '''
-    to_string = ""
-    for arg in args:
-        if arg == "self":
-            continue
-        if get_attr is not None:
-            arg = getattr(get_attr, arg)
-        if check_mask_methods(arg):
-            arg = arg.str_for_toml()
-        elif isinstance(arg, str):
-            arg = f"\"{arg}\""
-        elif isinstance(arg, list):
-            arg = "[" + _arglist_to_string(arg) + "]"
-        to_string = to_string + str(arg) + ', '
-    if to_string[-2:] == ', ':
-        to_string = to_string[:-2]
-    return to_string
-
-
-class StrInstantiatesMixin(object):
-    '''
-    Helper class
-    Uses __init__ in str_for_toml to make string that will instantiate itself.
-    Assumes object will have attributes of same name as __init__ args.
-    This is important for reading/writing masks as arguments to config files.
-    '''
-
-    def str_for_toml(self):
-        return type(self).__name__\
-            + "("\
-            + _arglist_to_string(
-                self.__init__.__code__.co_varnames,
-                get_attr=self)\
-            + ')'
 
 
 class CombineMaskMixin(object):
@@ -129,7 +64,7 @@ class CombineMaskMixin(object):
             f" you set combine to {self.combine}"))
 
 
-class MaskFile(StrInstantiatesMixin):
+class MaskFile(Definition):
     """
     Define a mask based on a file.
     Does not apply any labels or thresholds;
@@ -164,44 +99,11 @@ class MaskFile(StrInstantiatesMixin):
         if session not in self.fnames:
             self.fnames[session] = {}
 
-        # First, try to match the session.
-        nearest_mask = bids_layout.get_nearest(
-            from_path,
-            **self.filters,
-            extension=".nii.gz",
-            suffix=self.suffix,
-            session=session,
-            subject=subject,
-            full_search=True,
-            strict=False,
-        )
-
-        if nearest_mask is None:
-            # If that fails, loosen session restriction
-            nearest_mask = bids_layout.get_nearest(
-                from_path,
-                **self.filters,
-                extension=".nii.gz",
-                suffix=self.suffix,
-                subject=subject,
-                full_search=True,
-                strict=False,
-            )
+        nearest_mask = find_file(
+            bids_layout, from_path, self.filters, self.suffix, session,
+            subject)
 
         self.fnames[session][subject] = nearest_mask
-        from_path_subject = bids_layout.parse_file_entities(from_path).get(
-            "subject", None
-        )
-        mask_subject = bids_layout.parse_file_entities(nearest_mask).get(
-            "subject", None
-        )
-        if from_path_subject != mask_subject:
-            raise ValueError(
-                f"Expected subject IDs to match for the retrieved mask file "
-                f"and the supplied `from_path` file. Got sub-{mask_subject} "
-                f"from mask file {nearest_mask} and sub-{from_path_subject} "
-                f"from `from_path` file {from_path}."
-            )
 
     def get_path_data_affine(self, afq_object, row):
         mask_file = self.fnames[row['ses']][row['subject']]
@@ -212,7 +114,7 @@ class MaskFile(StrInstantiatesMixin):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask(self, afq_object, row):
+    def get_for_row(self, afq_object, row):
         # Load data
         dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
         mask_file, mask_data_orig, mask_affine = \
@@ -231,7 +133,7 @@ class MaskFile(StrInstantiatesMixin):
         return mask_data, dwi_img.affine, meta
 
 
-class FullMask(StrInstantiatesMixin):
+class FullMask(Definition):
     """
     Define a mask which covers a full volume.
 
@@ -246,7 +148,7 @@ class FullMask(StrInstantiatesMixin):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask(self, afq_object, row):
+    def get_for_row(self, afq_object, row):
         # Load data to get shape, affine
         dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
 
@@ -255,7 +157,7 @@ class FullMask(StrInstantiatesMixin):
             dict(source="Entire Volume")
 
 
-class RoiMask(StrInstantiatesMixin):
+class RoiMask(Definition):
     """
     Define a mask which is all ROIs or'd together.
 
@@ -265,28 +167,26 @@ class RoiMask(StrInstantiatesMixin):
     api.AFQ(tracking_params={"seed_mask": seed_mask})
     """
 
-    def __init__(self):
+    def __init__(self, use_presegment=False):
+        self.use_presegment = use_presegment
         pass
 
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask(self, afq_object, row):
-        if afq_object.use_prealign:
-            reg_prealign = np.load(afq_object._reg_prealign(row))
-            reg_prealign_inv = np.linalg.inv(reg_prealign)
-        else:
-            reg_prealign_inv = None
-        mapping = reg.read_mapping(
-            afq_object._mapping(row),
-            row['dwi_file'],
-            afq_object.reg_template_img,
-            prealign=reg_prealign_inv)
+    def get_for_row(self, afq_object, row):
+        mapping = afq_object._mapping(row)
 
         mask_data = None
-        for bundle_name, bundle_info in afq_object.bundle_dict.items():
+        if self.use_presegment:
+            bundle_dict = afq_object.\
+                segmentation_params["presegment_bundle_dict"]
+        else:
+            bundle_dict = afq_object.bundle_dict
+
+        for bundle_name, bundle_info in bundle_dict.items():
             for idx, roi in enumerate(bundle_info['ROIs']):
-                if afq_object.bundle_dict[bundle_name]['rules'][idx]:
+                if bundle_dict[bundle_name]['rules'][idx]:
                     warped_roi = auv.transform_inverse_roi(
                         roi,
                         mapping,
@@ -300,7 +200,7 @@ class RoiMask(StrInstantiatesMixin):
         return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
 
 
-class B0Mask(StrInstantiatesMixin):
+class B0Mask(Definition):
     """
     Define a mask using b0 and dipy's median_otsu.
 
@@ -322,7 +222,7 @@ class B0Mask(StrInstantiatesMixin):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask(self, afq_object, row):
+    def get_for_row(self, afq_object, row):
         b0_file = afq_object._b0(row)
         mean_b0_img = nib.load(b0_file)
         mean_b0 = mean_b0_img.get_fdata()
@@ -489,14 +389,14 @@ class ScalarMask(MaskFile):
 
     # overrides MaskFile
     def get_path_data_affine(self, afq_object, row):
-        valid_scalars = list(afq_object._scalar_dict.keys())
+        valid_scalars = list(afq_object.scalar_dict.keys())
         if self.scalar not in valid_scalars:
             raise RuntimeError((
                 f"scalar should be one of"
                 f" {', '.join(valid_scalars)}"
                 f", you input {self.scalar}"))
 
-        scalar_fname = afq_object._scalar_dict[self.scalar](afq_object, row)
+        scalar_fname = afq_object.scalar_dict[self.scalar](afq_object, row)
         scalar_img = nib.load(scalar_fname)
         scalar_data = scalar_img.get_fdata()
 
@@ -545,7 +445,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
         self.upper_bound = upper_bound
 
 
-class PFTMask(StrInstantiatesMixin):
+class PFTMask(Definition):
     """
     Define a mask for use in PFT tractography. Only use
     if tracker set to 'pft' in tractography.
@@ -578,26 +478,26 @@ class PFTMask(StrInstantiatesMixin):
         for probseg in self.probsegs:
             probseg.find_path(bids_layout, from_path, subject, session)
 
-    def get_mask(self, afq_object, row):
+    def get_for_row(self, afq_object, row):
         probseg_imgs = []
         probseg_metas = []
         for probseg in self.probsegs:
-            data, affine, meta = probseg.get_mask(afq_object, row)
+            data, affine, meta = probseg.get_for_row(afq_object, row)
             probseg_imgs.append(nib.Nifti1Image(data, affine))
             probseg_metas.append(meta)
         return probseg_imgs, None, dict(sources=probseg_metas)
 
 
-class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
+class CombinedMask(Definition, CombineMaskMixin):
     """
     Define a mask by combining other masks.
 
     Parameters
     ----------
-    mask_list : list of Masks with find_path and get_mask functions
+    mask_list : list of Masks with find_path and get_for_row functions
         List of masks to combine. All find_path methods will be called
-        when this find_path method is called. All get_mask methods will
-        be called and combined when this get_mask method is called.
+        when this find_path method is called. All get_for_row methods will
+        be called and combined when this get_for_row method is called.
     combine : str, optional
         How to combine the boolean masks generated by mask_list.
         If "and", they will be and'd together.
@@ -624,11 +524,12 @@ class CombinedMask(StrInstantiatesMixin, CombineMaskMixin):
         for mask in self.mask_list:
             mask.find_path(bids_layout, from_path, subject, session)
 
-    def get_mask(self, afq_object, row):
+    def get_for_row(self, afq_object, row):
         self.mask_draft = None
         metas = []
         for mask in self.mask_list:
-            next_mask, next_affine, next_meta = mask.get_mask(afq_object, row)
+            next_mask, next_affine, next_meta = mask.get_for_row(
+                afq_object, row)
             if self.mask_draft is None:
                 self.reset_mask_draft(next_mask.shape)
             else:

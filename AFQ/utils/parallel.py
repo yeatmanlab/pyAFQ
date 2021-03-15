@@ -3,6 +3,7 @@ import multiprocessing
 import joblib
 import dask
 import dask.multiprocessing
+from tqdm import tqdm
 
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
@@ -27,7 +28,7 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         The last one is useful for debugging -- runs the code without any
         parallelization.
     backend : str
-        What joblib backend to use. Irrelevant for other engines.
+        What joblib or dask backend to use. Irrelevant for other engines.
     func_args : list, optional
         Positional arguments to `func`.
     func_kwargs : list, optional
@@ -41,19 +42,19 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
     --------
 
     """
-    if n_jobs == -1:
-        n_jobs = multiprocessing.cpu_count()
-        n_jobs = n_jobs - 1
-
     if engine == "joblib":
         p = joblib.Parallel(n_jobs=n_jobs, backend=backend)
         d = joblib.delayed(func)
         d_l = []
         for in_element in in_list:
             d_l.append(d(in_element, *func_args, **func_kwargs))
-        results = p(d_l)
+        results = p(tqdm(d_l))
 
     elif engine == "dask":
+        if n_jobs == -1:
+            n_jobs = multiprocessing.cpu_count()
+            n_jobs = n_jobs - 1
+
         def partial(func, *args, **keywords):
             def newfunc(in_arg):
                 return func(in_arg, *args, **keywords)

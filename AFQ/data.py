@@ -1,3 +1,10 @@
+import AFQ.registration as reg
+from dipy.segment.clustering import QuickBundles
+from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
+                                 ResampleFeature)
+from dipy.io.streamline import load_tractogram, load_trk
+from dipy.data.fetcher import _make_fetcher
+import dipy.data as dpd
 from io import BytesIO
 import gzip
 import os
@@ -46,23 +53,12 @@ finally:
     logging.captureWarnings(False)
     warnings.formatwarning = default_warning_format
 
-import dipy.data as dpd
-from dipy.data.fetcher import _make_fetcher
-from dipy.io.streamline import load_tractogram, load_trk
-from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
-                                 ResampleFeature)
-
-
-from dipy.segment.clustering import QuickBundles
-
-import AFQ.registration as reg
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
            "organize_stanford_data"]
-
 
 
 BUNDLE_RECO_2_AFQ = \
@@ -1922,7 +1918,6 @@ def read_hcp_atlas(n_bundles=16):
     return bundle_dict
 
 
-
 fetch_aal_atlas = _make_fetcher(
     "fetch_aal_atlas",
     op.join(afq_home,
@@ -2228,7 +2223,7 @@ def write_json(fname, data):
     None
     """
     with open(fname, 'w') as ff:
-        json.dump(data, ff)
+        json.dump(data, ff, default=lambda obj: "Not Serializable")
 
 
 def read_json(fname):

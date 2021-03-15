@@ -4,12 +4,16 @@ import datetime
 import platform
 import os.path as op
 import os
-from ast import literal_eval
+import logging
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
-from AFQ.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
+from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
+from AFQ.definitions.utils import Definition
+import nibabel as nib  # interprets nibabel images for endpoint_info
 
 
 def parse_string(option, opt, value, parser):
@@ -80,14 +84,14 @@ def toml_to_val(t):
     if isinstance(t, str) and len(t) < 1:
         return None
     elif isinstance(t, str) and t[0] == '{':
-        return literal_eval(t)  # interpret as dictionary
-    elif isinstance(t, str) and "Mask" in t:
+        return eval(t)  # interpret as dictionary
+    elif isinstance(t, str) and ("Mask" in t or "Map" in t or "Scalar" in t):
         try:
-            mask = eval(t)
+            definition = eval(t)
         except NameError:
             return t
-        if check_mask_methods(mask):
-            return mask
+        if isinstance(definition, Definition):
+            return definition
         else:
             return t
     else:
@@ -97,7 +101,7 @@ def toml_to_val(t):
 def val_to_toml(v):
     if v is None:
         return "''"
-    elif check_mask_methods(v):
+    elif isinstance(v, Definition):
         return f"'{v.str_for_toml()}'"
     elif isinstance(v, str):
         return f"'{v}'"
@@ -116,7 +120,7 @@ def val_to_toml(v):
 
 def dict_to_toml(dictionary):
     toml = '# Use \'\' to indicate None\n# Wrap dictionaries in quotes\n'
-    toml = toml + '# Wrap mask object instantiations in quotes\n\n'
+    toml = toml + '# Wrap definition object instantiations in quotes\n\n'
     for section, args in dictionary.items():
         if section == "AFQ_desc":
             toml = "# " + dictionary["AFQ_desc"].replace("\n", "\n# ")\
@@ -190,6 +194,7 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
 def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
+                         verbose=False,
                          special_args={"CLEANING": "clean_params",
                                        "SEGMENTATION": "segmentation_params",
                                        "TRACTOGRAPHY": "tracking_params"}):
@@ -226,6 +231,9 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
             if arg not in default_arg_dict[section]:
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
+
+    if logger is not None and verbose:
+        logger.info("The following arguments are recognized: " + str(kwargs))
 
     # if overwrite, write new file with updated docs / args
     if overwrite:

@@ -9,7 +9,6 @@ from scipy.stats import zscore
 import nibabel as nib
 from tqdm.auto import tqdm
 
-
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
@@ -23,6 +22,7 @@ import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ.data as afd
+from AFQ.utils.parallel import parfor
 
 __all__ = ["Segmentation"]
 
@@ -46,6 +46,9 @@ class Segmentation:
                  seg_algo='AFQ',
                  reg_algo=None,
                  clip_edges=False,
+                 parallel_segmentation={
+                     "n_jobs": -1, "engine": "joblib",
+                     "backend": "loky"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -61,6 +64,7 @@ class Segmentation:
                  presegment_bundle_dict=None,
                  presegment_kawrgs={},
                  filter_by_endpoints=True,
+                 endpoint_info=None,
                  dist_to_atlas=4,
                  save_intermediates=None):
         """
@@ -91,6 +95,13 @@ class Segmentation:
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
+        parallel_segmentation : dict
+            How to parallelize segmentation across processes when performing
+            waypoint ROI segmentation. Set to {"engine": "serial"} to not
+            perform parallelization. See ``AFQ.utils.parallel.pafor`` for
+            details.
+            Default: {"n_jobs": -1, "engine": "joblib",
+                      "backend": "loky"}
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
@@ -138,6 +149,13 @@ class Segmentation:
             ROI in order to be included or excluded.
             If set to None (default), will be calculated as the
             center-to-corner distance of the voxel in the diffusion data.
+            If a bundle has additional_tolerance in its bundle_dict, that
+            tolerance will be added to this distance.
+            For example, if you wanted to increase tolerance for the right
+            arcuate waypoint ROIs by 3 each, you could make the following
+            modification to your bundle_dict:
+            bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
+            Additional tolerances can also be negative.
         rng : RandomState or int
             If None, creates RandomState.
             If int, creates RandomState with seed rng.
@@ -163,6 +181,15 @@ class Segmentation:
             Whether to filter the bundles based on their endpoints relative
             to regions defined in the AAL atlas. Applies only to the waypoint
             approach (XXX for now). Default: True.
+        endpoint_info : dict, optional. This overrides use of the
+            AAL atlas, which is the default behavior.
+            The format for this should be:
+            {"bundle1": {"startpoint":img1_1,
+                         "endpoint":img1_2},
+             "bundle2": {"startpoint":img2_1,
+                          "endpoint":img2_2}}
+            where the images used are binary masks of the desired
+            endpoints.
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance
             from the endpoints to the atlas ROIs.
@@ -206,7 +233,9 @@ class Segmentation:
         self.presegment_bundle_dict = presegment_bundle_dict
         self.presegment_kawrgs = presegment_kawrgs
         self.filter_by_endpoints = filter_by_endpoints
+        self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
+        self.parallel_segmentation = parallel_segmentation
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -235,7 +264,7 @@ class Segmentation:
     def segment(self, bundle_dict, tg, fdata=None, fbval=None,
                 fbvec=None, mapping=None, reg_prealign=None,
                 reg_template=None, b0_threshold=50, img_affine=None,
-                reset_tg_space=False, endpoint_info=None):
+                reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -266,15 +295,6 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
-        endpoint_info : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior.
-            The format for this should be:
-            {"bundle1": {"startpoint":img1_1,
-                         "endpoint":img1_2},
-             "bundle2": {"startpoint":img2_1,
-                          "endpoint":img2_2}}
-            where the images used are binary masks of the desired
-            endpoints.
 
         Returns
         -------
@@ -315,7 +335,6 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
-        self.endpoint_info = endpoint_info
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
@@ -429,15 +448,24 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle_idx, bundle):
+    def _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
-        rules = self.bundle_dict[bundle]['rules']
+        bundle_entry = self.bundle_dict[bundle]
+        rules = bundle_entry['rules']
         include_rois = []
+        include_roi_tols = []
         exclude_rois = []
+        exclude_roi_tols = []
         for rule_idx, rule in enumerate(rules):
-            roi = self.bundle_dict[bundle]['ROIs'][rule_idx]
+            roi = bundle_entry['ROIs'][rule_idx]
+            if 'additional_tolerance' in bundle_entry:
+                this_tol = (bundle_entry['additional_tolerance'][rule_idx]
+                            / vox_dim + tol)**2
+            else:
+                this_tol = tol**2
+
             warped_roi = auv.transform_inverse_roi(
                 roi,
                 self.mapping,
@@ -445,9 +473,11 @@ class Segmentation:
 
             if rule:
                 # include ROI:
+                include_roi_tols.append(this_tol)
                 include_rois.append(np.array(np.where(warped_roi)).T)
             else:
                 # Exclude ROI:
+                exclude_roi_tols.append(this_tol)
                 exclude_rois.append(np.array(np.where(warped_roi)).T)
 
             # For debugging purposes, we can save the variable as it is:
@@ -467,7 +497,11 @@ class Segmentation:
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
-        prob_map = self.bundle_dict[bundle].get(
+        if isinstance(roi, str):
+            roi = nib.load(roi)
+        if isinstance(roi, nib.Nifti1Image):
+            roi = roi.get_fdata()
+        prob_map = bundle_entry.get(
             'prob_map', np.ones(roi.shape))
 
         if not isinstance(prob_map, np.ndarray):
@@ -475,33 +509,8 @@ class Segmentation:
         warped_prob_map = \
             self.mapping.transform_inverse(prob_map,
                                            interpolation='nearest')
-        return warped_prob_map, include_rois, exclude_rois
-
-    def _check_sl_with_inclusion(self, sl, include_rois, tol):
-        """
-        Helper function to check that a streamline is close to a list of
-        inclusion ROIS.
-        """
-        dist = []
-        for roi in include_rois:
-            # Use squared Euclidean distance, because it's faster:
-            dist.append(cdist(sl, roi, 'sqeuclidean'))
-            if np.min(dist[-1]) > tol:
-                # Too far from one of them:
-                return False, []
-        # Apparently you checked all the ROIs and it was close to all of them
-        return True, dist
-
-    def _check_sl_with_exclusion(self, sl, exclude_rois, tol):
-        """ Helper function to check that a streamline is not too close to a
-        list of exclusion ROIs.
-        """
-        for roi in exclude_rois:
-            # Use squared Euclidean distance, because it's faster:
-            if np.min(cdist(sl, roi, 'sqeuclidean')) < tol:
-                return False
-        # Either there are no exclusion ROIs, or you are not close to any:
-        return True
+        return warped_prob_map, include_rois, exclude_rois,\
+            include_roi_tols, exclude_roi_tols
 
     def _return_empty(self, bundle):
         """
@@ -543,6 +552,19 @@ class Segmentation:
         if self.return_idx:
             out_idx = np.arange(n_streamlines, dtype=int)
 
+        # We need to calculate the size of a voxel, so we can transform
+        # from mm to voxel units:
+        R = self.img_affine[0:3, 0:3]
+        vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+
+        # Tolerance is set to the square of the distance to the corner
+        # because we are using the squared Euclidean distance in calls to
+        # `cdist` to make those calls faster.
+        if self.dist_to_waypoint is None:
+            tol = dts.dist_to_corner(self.img_affine)
+        else:
+            tol = self.dist_to_waypoint / vox_dim
+
         if self.filter_by_endpoints:
             if self.endpoint_info is None:
                 aal_atlas = afd.read_aal_atlas(self.reg_template)
@@ -554,24 +576,15 @@ class Segmentation:
                                 'atlas_registered_to_template.nii.gz'))
 
                 atlas = atlas.get_fdata()
-            # We need to calculate the size of a voxel, so we can transform
-            # from mm to voxel units:
-            R = self.img_affine[0:3, 0:3]
-            vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+
             dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
-        # Tolerance is set to the square of the distance to the corner
-        # because we are using the squared Euclidean distance in calls to
-        # `cdist` to make those calls faster.
-        if self.dist_to_waypoint is None:
-            tol = dts.dist_to_corner(self.img_affine)**2
-        else:
-            tol = self.dist_to_waypoint ** 2
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
-            warped_prob_map, include_roi, exclude_roi = \
-                self._get_bundle_info(bundle_idx, bundle)
+            warped_prob_map, include_roi, exclude_roi,\
+                include_roi_tols, exclude_roi_tols =\
+                self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
@@ -595,8 +608,16 @@ class Segmentation:
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold."))
             crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            for sl_idx in tqdm(idx_above_prob[0]):
-                sl = tg.streamlines[sl_idx]
+
+            # with parallel segmentation, the first for loop will
+            # only collect streamlines and does not need tqdm
+            if self.parallel_segmentation["engine"] != "serial":
+                in_list = []
+                sl_idxs = idx_above_prob[0]
+            else:
+                sl_idxs = tqdm(idx_above_prob[0])
+
+            for sl_idx in sl_idxs:
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
                     if crosses_midline is not None:
                         if self.crosses[sl_idx]:
@@ -609,23 +630,37 @@ class Segmentation:
                                 # This is not what we want,
                                 # skip to next streamline
                                 continue
+                sl = tg.streamlines[sl_idx]
+                fiber_prob = fiber_probabilities[sl_idx]
 
-                    is_close, dist = \
-                        self._check_sl_with_inclusion(sl,
-                                                      include_roi,
-                                                      tol)
-                    if is_close:
-                        is_far = \
-                            self._check_sl_with_exclusion(sl,
-                                                          exclude_roi,
-                                                          tol)
-                        if is_far:
-                            min_dist_coords[sl_idx, bundle_idx, 0] =\
-                                np.argmin(dist[0], 0)[0]
-                            min_dist_coords[sl_idx, bundle_idx, 1] =\
-                                np.argmin(dist[1], 0)[0]
-                            streamlines_in_bundles[sl_idx, bundle_idx] =\
-                                fiber_probabilities[sl_idx]
+                # if parallel, collect the streamlines now
+                if self.parallel_segmentation:
+                    in_list.append((sl, fiber_prob, sl_idx))
+                else:
+                    min_dist_coords[sl_idx, bundle_idx, 0],\
+                        min_dist_coords[sl_idx, bundle_idx, 1],\
+                        streamlines_in_bundles[sl_idx, bundle_idx] =\
+                        _is_streamline_in_ROIs(
+                            sl, tol, include_roi,
+                            include_roi_tols, exclude_roi,
+                            exclude_roi_tols, fiber_prob)
+
+            # collects results from the submitted streamlines
+            if self.parallel_segmentation:
+                results = parfor(
+                    _is_streamline_in_ROIs_parallel, in_list,
+                    func_args=[
+                        tol, include_roi, include_roi_tols, exclude_roi,
+                        exclude_roi_tols, bundle_idx],
+                    **self.parallel_segmentation)
+                for result in results:
+                    sl_idx, bundle_idx, min_dist_coords_0,\
+                        min_dist_coords_1, sl_in_bundles =\
+                        result
+                    min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
+                    min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
+                    streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
+
             self.logger.info(
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
@@ -1064,6 +1099,77 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         return out, idx
     else:
         return out
+
+# Helper functions for segmenting using waypoint ROIs
+# they are not a part of the class because we do not want
+# copies of the class to be parallelized
+
+
+def _check_sl_with_inclusion(sl, include_rois, tol,
+                             include_roi_tols):
+    """
+    Helper function to check that a streamline is close to a list of
+    inclusion ROIS.
+    """
+    dist = []
+    for ii, roi in enumerate(include_rois):
+        # Use squared Euclidean distance, because it's faster:
+        dist.append(cdist(sl, roi, 'sqeuclidean'))
+        if np.min(dist[-1]) > include_roi_tols[ii]:
+            # Too far from one of them:
+            return False, []
+    # Apparently you checked all the ROIs and it was close to all of them
+    return True, dist
+
+
+def _check_sl_with_exclusion(sl, exclude_rois, tol,
+                             exclude_roi_tols):
+    """ Helper function to check that a streamline is not too close to a
+    list of exclusion ROIs.
+    """
+    for ii, roi in enumerate(exclude_rois):
+        # Use squared Euclidean distance, because it's faster:
+        if np.min(cdist(sl, roi, 'sqeuclidean')) < exclude_roi_tols[ii]:
+            return False
+    # Either there are no exclusion ROIs, or you are not close to any:
+    return True
+
+
+def _is_streamline_in_ROIs(sl, tol, include_roi,
+                           include_roi_tols, exclude_roi,
+                           exclude_roi_tols, fiber_prob):
+    is_close, dist = \
+        _check_sl_with_inclusion(
+            sl,
+            include_roi,
+            tol,
+            include_roi_tols)
+    if is_close:
+        is_far = \
+            _check_sl_with_exclusion(
+                sl,
+                exclude_roi,
+                tol,
+                exclude_roi_tols)
+        if is_far:
+            return np.argmin(dist[0], 0)[0],\
+                np.argmin(dist[1], 0)[0], fiber_prob
+    return 0, 0, 0
+
+
+def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
+                                    include_roi_tols, exclude_roi,
+                                    exclude_roi_tols, bundle_idx):
+    sl, fiber_prob, sl_idx = indiv_args
+    min_dist_coords_0,\
+        min_dist_coords_1,\
+        streamlines_in_bundles = \
+        _is_streamline_in_ROIs(
+            sl, tol, include_roi,
+            include_roi_tols, exclude_roi,
+            exclude_roi_tols, fiber_prob)
+    return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
+            streamlines_in_bundles)
 
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
