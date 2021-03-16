@@ -125,44 +125,25 @@ else:
 # For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
 # exclusion ROIs.
 
-
-roi_folder = afd.fetch_or_templates()[-1]
-
-waypoint_roi_fnames = [
-    "left_OR_1.nii.gz",
-    "left_OR_2.nii.gz",
-    "left_OP_MNI.nii.gz",
-    "left_TP_MNI.nii.gz",
-    "left_pos_thal_MNI.nii.gz",
-    "right_OR_1.nii.gz",
-    "right_OR_2.nii.gz",
-    "right_pos_thal_MNI.nii.gz",
-    "right_OP_MNI.nii.gz",
-    "right_TP_MNI.nii.gz"]
-
-waypoint_rois = {}
-
-for fname in waypoint_roi_fnames:
-    waypoint_rois[fname.split('.')[0]] = afd.read_resample_roi(
-        op.join(roi_folder, fname))
+or_rois = afd.read_or_templates()
 
 bundles = {
     "L_OR": {
-        "ROIs": [waypoint_rois["left_OR_1"],
-                 waypoint_rois["left_OR_2"],
-                 waypoint_rois["left_OP_MNI"],
-                 waypoint_rois["left_TP_MNI"],
-                 waypoint_rois["left_pos_thal_MNI"]],
+        "ROIs": [or_rois["left_OR_1"],
+                 or_rois["left_OR_2"],
+                 or_rois["left_OP_MNI"],
+                 or_rois["left_TP_MNI"],
+                 or_rois["left_pos_thal_MNI"]],
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 1
         },
     "R_OR": {
-        "ROIs": [waypoint_rois["right_OR_1"],
-                 waypoint_rois["right_OR_2"],
-                 waypoint_rois["right_OP_MNI"],
-                 waypoint_rois["right_TP_MNI"],
-                 waypoint_rois["right_pos_thal_MNI"]],
+        "ROIs": [or_rois["right_OR_1"],
+                 or_rois["right_OR_2"],
+                 or_rois["right_OP_MNI"],
+                 or_rois["right_TP_MNI"],
+                 or_rois["right_pos_thal_MNI"]],
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 2
@@ -178,15 +159,11 @@ bundles = {
 
 endpoint_spec = {
     "L_OR": {
-        "startpoint": nib.load(op.join(roi_folder,
-                                       'left_thal_MNI.nii.gz')),
-        "endpoint": nib.load(op.join(roi_folder,
-                                     'left_V1_MNI.nii.gz'))},
+        "startpoint": or_rois['left_thal_MNI.nii.gz'],
+        "endpoint": or_rois['left_V1_MNI.nii.gz']},
     "R_OR": {
-        "startpoint": nib.load(op.join(roi_folder,
-                                       'right_thal_MNI.nii.gz')),
-        "endpoint": nib.load(op.join(roi_folder,
-                                     'right_V1_MNI.nii.gz'))}}
+        "startpoint": or_rois['right_thal_MNI.nii.gz'],
+        "endpoint": or_rois['right_V1_MNI.nii.gz']}}
 
 ##########################################################################
 # Tracking
