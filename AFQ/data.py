@@ -480,12 +480,12 @@ or_md5_hashes = [
 ]
 
 fetch_or_templates = _make_fetcher("fetch_or_templates",
-                                    op.join(afq_home,
-                                            'or_templates'),
-                                    baseurl, or_remote_fnames,
-                                    or_fnames,
-                                    md5_list=or_md5_hashes,
-                                    doc="Download AFQ or templates")
+                                   op.join(afq_home,
+                                           'or_templates'),
+                                   baseurl, or_remote_fnames,
+                                   or_fnames,
+                                   md5_list=or_md5_hashes,
+                                   doc="Download AFQ or templates")
 
 
 def read_or_templates(resample_to=False):
