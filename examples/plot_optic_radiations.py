@@ -125,8 +125,8 @@ else:
 # For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
 # exclusion ROIs.
 
-roi_folder = op.join(op.expanduser('~'), "AFQ_Data", "visual")
-waypoint_folder = op.join(roi_folder, "waypoint")
+
+roi_folder = afd.fetch_or_templates()[-1]
 
 waypoint_roi_fnames = [
     "left_OR_1.nii.gz",
@@ -144,7 +144,7 @@ waypoint_rois = {}
 
 for fname in waypoint_roi_fnames:
     waypoint_rois[fname.split('.')[0]] = afd.read_resample_roi(
-        op.join(waypoint_folder, fname))
+        op.join(roi_folder, fname))
 
 bundles = {
     "L_OR": {
@@ -176,18 +176,16 @@ bundles = {
 # used for filtering the streamlines that are selected based on the
 # waypoint ROIs defined above.
 
-endpoint_folder = op.join(roi_folder, "endpoint")
-
 endpoint_spec = {
     "L_OR": {
-        "startpoint": nib.load(op.join(endpoint_folder,
+        "startpoint": nib.load(op.join(roi_folder,
                                        'left_thal_MNI.nii.gz')),
-        "endpoint": nib.load(op.join(endpoint_folder,
+        "endpoint": nib.load(op.join(roi_folder,
                                      'left_V1_MNI.nii.gz'))},
     "R_OR": {
-        "startpoint": nib.load(op.join(endpoint_folder,
+        "startpoint": nib.load(op.join(roi_folder,
                                        'right_thal_MNI.nii.gz')),
-        "endpoint": nib.load(op.join(endpoint_folder,
+        "endpoint": nib.load(op.join(roi_folder,
                                      'right_V1_MNI.nii.gz'))}}
 
 ##########################################################################
@@ -265,15 +263,16 @@ sft.to_vox()
 #
 print("Segmenting fiber groups...")
 segmentation = seg.Segmentation(return_idx=True,
-                                dist_to_atlas=5)
+                                dist_to_atlas=5,
+                                endpoint_info=endpoint_spec)
+
 segmentation.segment(bundles,
                      sft,
                      fdata=hardi_fdata,
                      fbval=hardi_fbval,
                      fbvec=hardi_fbvec,
                      mapping=mapping,
-                     reg_template=MNI_T1w_img,
-                     endpoint_dict=endpoint_spec)
+                     reg_template=MNI_T1w_img)
 
 fiber_groups = segmentation.fiber_groups
 
