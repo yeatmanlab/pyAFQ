@@ -159,11 +159,11 @@ bundles = {
 
 endpoint_spec = {
     "L_OR": {
-        "startpoint": or_rois['left_thal_MNI.nii.gz'],
-        "endpoint": or_rois['left_V1_MNI.nii.gz']},
+        "startpoint": or_rois['left_thal_MNI'],
+        "endpoint": or_rois['left_V1_MNI']},
     "R_OR": {
-        "startpoint": or_rois['right_thal_MNI.nii.gz'],
-        "endpoint": or_rois['right_V1_MNI.nii.gz']}}
+        "startpoint": or_rois['right_thal_MNI'],
+        "endpoint": or_rois['right_V1_MNI']}}
 
 ##########################################################################
 # Tracking
