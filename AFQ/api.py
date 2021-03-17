@@ -1088,16 +1088,16 @@ class AFQ(object):
         return self.mapping_definition.get_for_row(self, row)
 
     def _export_seed_mask(self, row):
-        if isinstance(self.tracking_params['seed_mask'], Definition):
-            seed_mask, _, seed_mask_desc =\
-                self.tracking_params['seed_mask'].get_for_row(self, row)
-        else:
-            seed_mask = self.tracking_params['seed_mask']
-            seed_mask_desc = dict(source=tracking_params['seed_mask'])
         seed_file = self._get_fname(
             row,
             '_seed_mask.nii.gz')
         if not op.exists(seed_file):
+            if isinstance(self.tracking_params['seed_mask'], Definition):
+                seed_mask, _, seed_mask_desc =\
+                    self.tracking_params['seed_mask'].get_for_row(self, row)
+            else:
+                seed_mask = self.tracking_params['seed_mask']
+                seed_mask_desc = dict(source=tracking_params['seed_mask'])
             self.log_and_save_nii(
                 nib.Nifti1Image(seed_mask.astype(
                     np.float32), row["dwi_affine"]),
