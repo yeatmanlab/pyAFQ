@@ -37,6 +37,7 @@ from dipy.io.gradients import read_bvals_bvecs
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
+from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
 import bids
 from bids.layout import BIDSLayout
@@ -231,6 +232,7 @@ class AFQ(object):
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
                  mapping=SynMap(),
+                 profile_weights="gauss",
                  bundle_info=None,
                  dask_it=False,
                  scalars=["dti_fa", "dti_md"],
@@ -314,6 +316,14 @@ class AFQ(object):
             another software. If creating a map, will register reg_subject and
             reg_template.
             Default: SynMap()
+        profile_weights : str, 1D array, 2D array callable, optional
+            How to weight each streamline (1D) or each node (2D)
+            when calculating the tract-profiles. If callable, this is a
+            function that calculates weights. If None, no weighting will
+            be applied. If "gauss", gaussian weights will be used.
+            If "median", the median of values at each node will be used
+            instead of a mean or weighted mean.
+            Default: "gauss"
         bundle_info : list of strings or dict, optional
             [BUNDLES] List of bundle names to include in segmentation,
             or a bundle dictionary (see make_bundle_dict for inspiration).
@@ -407,6 +417,18 @@ class AFQ(object):
             raise TypeError(
                 "mapping must be a mapping defined"
                 + " in `AFQ.definitions.mapping`")
+        if not (profile_weights is None or
+                isinstance(profile_weights, str) or
+                callable(profile_weights) or
+                hasattr(profile_weights, "__len__")):
+            raise TypeError(
+                "profile_weights must be string, None, callable, or"
+                + "a 1D or 2D array")
+        if isinstance(profile_weights, str) and\
+                profile_weights != "gauss" and profile_weights != "median":
+            raise TypeError(
+                "if profile_weights is a string,"
+                + " it must be 'gauss' or 'median'")
         if bundle_info is not None and not ((
                 isinstance(bundle_info, list)
                 and isinstance(bundle_info[0], str)) or (
@@ -519,6 +541,9 @@ class AFQ(object):
                 default_clean_params[k] = clean_params[k]
 
         self.clean_params = default_clean_params
+        self.profile_weights = profile_weights
+        if isinstance(self.profile_weights, str):
+            self.profile_weights = self.profile_weights.lower()
 
         if bundle_info is None:
             if self.seg_algo == "reco" or self.seg_algo == "reco16":
@@ -1353,11 +1378,30 @@ class AFQ(object):
                 for ii, scalar in enumerate(self.scalars):
                     scalar_file = self.scalar_dict[scalar](self, row)
                     scalar_data = nib.load(scalar_file).get_fdata()
+                    if isinstance(self.profile_weights, str):
+                        if self.profile_weights == "gauss":
+                            this_prof_weights = gaussian_weights(this_sl)
+                        elif self.profile_weights == "median":
+                            # weights bundle to only return the mean
+                            def _median_weight(bundle):
+                                fgarray = set_number_of_points(bundle, 100)
+                                values = np.array(
+                                    values_from_volume(
+                                        scalar_data, fgarray, affine))
+                                weights = np.zeros(values.shape)
+                                for ii, jj in enumerate(
+                                    np.argsort(values, axis=0)[
+                                        len(values) // 2, :]):
+                                    weights[ii, jj] = 1
+                                return weights
+                            this_prof_weights = _median_weight
+                    else:
+                        this_prof_weights = self.profile_weights
                     this_profile[ii] = afq_profile(
                         scalar_data,
                         this_sl,
                         row["dwi_affine"],
-                        weights=gaussian_weights(this_sl))
+                        weights=this_prof_weights)
                     profiles[ii].extend(list(this_profile[ii]))
                 nodes = list(np.arange(this_profile[0].shape[0]))
                 bundle_names.extend([bundle_name] * len(nodes))
