@@ -317,7 +317,7 @@ class AFQ(object):
             reg_template.
             Default: SynMap()
         profile_weights : str, 1D array, 2D array callable, optional
-            How to weight each streamline (1D) or each node (2D)
+            [PROFILE] How to weight each streamline (1D) or each node (2D)
             when calculating the tract-profiles. If callable, this is a
             function that calculates weights. If None, no weighting will
             be applied. If "gauss", gaussian weights will be used.
