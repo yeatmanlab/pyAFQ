@@ -417,10 +417,10 @@ class AFQ(object):
             raise TypeError(
                 "mapping must be a mapping defined"
                 + " in `AFQ.definitions.mapping`")
-        if not (profile_weights is None or
-                isinstance(profile_weights, str) or
-                callable(profile_weights) or
-                hasattr(profile_weights, "__len__")):
+        if not (profile_weights is None
+                or isinstance(profile_weights, str)
+                or callable(profile_weights)
+                or hasattr(profile_weights, "__len__")):
             raise TypeError(
                 "profile_weights must be string, None, callable, or"
                 + "a 1D or 2D array")
