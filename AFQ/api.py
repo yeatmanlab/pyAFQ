@@ -1387,12 +1387,14 @@ class AFQ(object):
                                 fgarray = set_number_of_points(bundle, 100)
                                 values = np.array(
                                     values_from_volume(
-                                        scalar_data, fgarray, affine))
+                                        scalar_data,
+                                        fgarray,
+                                        row["dwi_affine"]))
                                 weights = np.zeros(values.shape)
                                 for ii, jj in enumerate(
                                     np.argsort(values, axis=0)[
                                         len(values) // 2, :]):
-                                    weights[ii, jj] = 1
+                                    weights[jj, ii] = 1
                                 return weights
                             this_prof_weights = _median_weight
                     else:
