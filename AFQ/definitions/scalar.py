@@ -51,7 +51,7 @@ class ScalarFile(MaskFile):
     my_scalar = ScalarFile(
         "my_scalar",
         "scalarSuffix",
-        {"scope"="dmriprep"})
+        {"scope": "dmriprep"})
     api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
     """
 

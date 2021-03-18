@@ -85,7 +85,7 @@ class MaskFile(Definition):
     --------
     seed_mask = MaskFile(
         "WM_mask",
-        {"scope"="dmriprep"})
+        {"scope":"dmriprep"})
     api.AFQ(tracking_params={"seed_mask": seed_mask,
                                 "seed_threshold": 0.1})
     """
@@ -329,7 +329,7 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
     --------
     brain_mask = ThresholdedMaskFile(
         "brain_mask",
-        {"scope"="dmriprep"},
+        {"scope":"dmriprep"},
         lower_bound=0.1)
     api.AFQ(brain_mask=brain_mask)
     """
