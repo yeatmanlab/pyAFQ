@@ -432,6 +432,7 @@ def test_AFQ_reco():
         bids_path=bids_path,
         dmriprep='vistasoft',
         viz_backend="plotly",
+        profile_weights="median",
         segmentation_params={
             'seg_algo': 'reco',
             'rng': 42})
