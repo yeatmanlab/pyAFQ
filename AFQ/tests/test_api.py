@@ -422,7 +422,7 @@ def test_AFQ_slr():
     npt.assert_(len(bundles['CST_L']) > 0)
 
 
-#@pytest.mark.nightly2
+@pytest.mark.nightly2
 def test_AFQ_reco():
     """
     Test if API can run segmentation with recobundles
