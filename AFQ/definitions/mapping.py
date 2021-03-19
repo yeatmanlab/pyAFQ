@@ -17,6 +17,12 @@ try:
 except ModuleNotFoundError:
     has_fslpy = False
 
+try:
+    import h5py
+    has_h5py = True
+except ModuleNotFoundError:
+    has_h5py = False
+
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
 
 # For map defintions, get_for_row should return only the mapping
@@ -51,8 +57,8 @@ class FnirtMap(Definition):
     fnirt_map = FnirtMap(
         "warp",
         "MNI",
-        {"scope"="TBSS"},
-        {"scope"="TBSS"})
+        {"scope": "TBSS"},
+        {"scope": "TBSS"})
     api.AFQ(mapping=fnirt_map)
     """
 
@@ -111,6 +117,76 @@ class ConformedFnirtMapping():
         raise NotImplementedError(
             "Fnirt based mappings can currently"
             + " only transform from template to subject space")
+
+
+class ItkMap(Definition):
+    """
+    Use an existing Itk map (e.g., from ANTS). Expects the warp file
+    from MNI to T1.
+
+    Parameters
+    ----------
+    warp_suffix : str
+        suffix to pass to bids_layout.get() to identify the warp file.
+    warp_filters : str
+        Additional filters to pass to bids_layout.get() to identify
+        the warp file.
+        Default: {}
+
+
+    Examples
+    --------
+    itk_map = ItkMap(
+        "xfm",
+        {"scope": "qsiprep",
+        "from": "MNI152NLin2009cAsym",
+        "to": "T1w"})
+    api.AFQ(mapping=itk_map)
+    """
+
+    def __init__(self, warp_suffix, warp_filters={}):
+        if not has_h5py:
+            raise ImportError(
+                "Please install h5py if you want to use ItkMap")
+        self.warp_suffix = warp_suffix
+        self.warp_filters = warp_filters
+        self.fnames = {}
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        if session not in self.fnames:
+            self.fnames[session] = {}
+
+        self.fnames[session][subject] = find_file(
+            bids_layout, from_path, self.warp_filters, self.warp_suffix,
+            session, subject, extension="h5")
+
+    def get_for_row(self, afq_object, row):
+        nearest_warp = self.fnames[row['ses']][row['subject']]
+        warp_f5 = h5py.File(nearest_warp)
+        their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
+            'TransformFixedParameters'], dtype=int)[:3]
+        our_shape = afq_object.reg_template_img.get_fdata().shape
+        if (our_shape != their_shape).any():
+            raise ValueError((
+                f"The shape of your ITK mapping ({their_shape})"
+                f" is not the same as your template for registration"
+                f" ({our_shape})"))
+        their_forward = np.asarray(warp_f5["TransformGroup"]['1'][
+            'TransformParameters']).reshape([*their_shape, 3])
+        their_disp = np.zeros((*their_shape, 3, 2))
+        their_disp[..., 0] = their_forward
+        their_disp = nib.Nifti1Image(
+            their_disp, afq_object.reg_template_img.affine)
+        their_prealign = np.zeros((4, 4))
+        their_prealign[:3, :3] = np.asarray(warp_f5["TransformGroup"]["2"][
+            "TransformParameters"])[:9].reshape((3, 3))
+        their_prealign[:3, 3] = np.asarray(warp_f5["TransformGroup"]["2"][
+            "TransformParameters"])[9:]
+        their_prealign[3, 3] = 1.0
+        warp_f5.close()
+        return reg.read_mapping(
+            their_disp, row['dwi_file'],
+            afq_object.reg_template_img, prealign=their_prealign)
 
 
 class GeneratedMapMixin(object):

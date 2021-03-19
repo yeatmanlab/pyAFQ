@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import logging
 from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
-from AFQ.definitions.mapping import (SynMap, FnirtMap)
+from AFQ.definitions.mapping import (SynMap, FnirtMap, ItkMap)
 from AFQ.definitions.utils import Definition
 from AFQ.utils.bin import get_default_args
 from AFQ.viz.utils import Viz, visualize_tract_profiles
@@ -45,7 +45,6 @@ import bids.config as bids_config
 bids_config.set_option('extension_initial_dot', True)
 
 
-bids.config.set_option('extension_initial_dot', True)
 logging.basicConfig(level=logging.INFO)
 
 
@@ -2186,7 +2185,8 @@ class AFQ(object):
     def export_all(self):
         """ Exports all the possible outputs"""
         start_time = time()
-        if not isinstance(self.mapping_definition, FnirtMap):
+        if not isinstance(self.mapping_definition, FnirtMap)\
+                and not isinstance(self.mapping_definition, ItkMap):
             self.export_registered_b0()
         self.get_template_xform()
         self.export_bundles()

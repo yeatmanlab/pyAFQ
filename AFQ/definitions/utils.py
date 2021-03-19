@@ -63,7 +63,8 @@ def _arglist_to_string(args, get_attr=None):
     return to_string
 
 
-def find_file(bids_layout, path, filters, suffix, session, subject):
+def find_file(bids_layout, path, filters, suffix, session, subject,
+              extension=".nii.gz"):
     """
     Helper function
     Generic calls to get_nearest to find a file
@@ -72,7 +73,7 @@ def find_file(bids_layout, path, filters, suffix, session, subject):
     nearest = bids_layout.get_nearest(
         path,
         **filters,
-        extension=".nii.gz",
+        extension=extension,
         suffix=suffix,
         session=session,
         subject=subject,
@@ -85,7 +86,7 @@ def find_file(bids_layout, path, filters, suffix, session, subject):
         nearest = bids_layout.get_nearest(
             path,
             **filters,
-            extension=".nii.gz",
+            extension=extension,
             suffix=suffix,
             subject=subject,
             full_search=True,
