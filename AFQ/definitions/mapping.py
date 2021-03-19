@@ -121,7 +121,7 @@ class ConformedFnirtMapping():
 
 class ItkMap(Definition):
     """
-    Use an existing Itk map. Expects the warp file
+    Use an existing Itk map (e.g., from ANTS). Expects the warp file
     from MNI to T1.
 
     Parameters
