@@ -240,9 +240,6 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
     return StatefulTractogram(chain.from_iterable(results),
                               params_img, Space.RASMM)
-    #return _tracking(seeds, my_tracker, dg, stopping_criterion, params_img,
-    #                 step_size=step_size, min_length=min_length,
-    #                 max_length=max_length, random_seed=rng_seed)
 
 
 def _tracking(seeds, tracker, dg, stopping_criterion, params_img,
