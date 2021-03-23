@@ -24,6 +24,8 @@ from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.reconst import shm
 from dipy.align import affine_registration, resample
+from dipy.direction import BootDirectionGetter
+import dipy.core.gradients as dpg
 
 import AFQ.data as afd
 import AFQ.tractography as aft
@@ -44,11 +46,21 @@ working_dir = "./optic_radiations"
 # -------------------------
 
 dpd.fetch_stanford_hardi()
-hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
-hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
-hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+# hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
+# hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
+# hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
+# hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+
+hardi_dir = op.join('/Users/arokem/AFQ_data/HCP_1200/derivatives/dmriprep/sub-103818/ses-01/dwi')
+hardi_fdata = op.join(hardi_dir, "sub-103818_dwi.nii.gz")
+hardi_fbval = op.join(hardi_dir, "sub-103818_dwi.bval")
+hardi_fbvec = op.join(hardi_dir, "sub-103818_dwi.bvec")
+
+
 img = nib.load(hardi_fdata)
+dwi_data = img.get_fdata()
+mask = np.ones(dwi_data.shape[:3])
+mask[:, mask.shape[1] // 2:, :] = 0
 
 ##########################################################################
 # Calculate DTI:
@@ -98,7 +110,6 @@ print("Registering to template...")
 MNI_T1w_img = afd.read_mni_template(weight="T1w")
 
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
-    import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     # Prealign using affine registration
     _, prealign = affine_registration(
@@ -168,18 +179,8 @@ endpoint_spec = {
 ##########################################################################
 # Tracking
 # --------
-# We will use PFT and generate a large number of streamlines from seeds
-# placed only within the inclusion ROIs. This allows us to oversample that
-# part of the brain, without having to deal with very large tractograms.
-
-f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
-
-pve_csf = nib.load(f_pve_csf)
-pve_gm = nib.load(f_pve_gm)
-pve_wm = nib.load(f_pve_wm)
-
 print("Tracking...")
-if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
+if not op.exists(op.join(working_dir, 'boot_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
         for idx, roi in enumerate(bundles[bundle]['ROIs']):
@@ -187,7 +188,6 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
                 roi,
                 mapping,
                 bundle_name=bundle)
-            print(roi)
             nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
                      op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
 
@@ -214,19 +214,21 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
     nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
              op.join(working_dir, 'seed_roi.nii.gz'))
 
+    gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
+    model = csd._model(gtab, dwi_data)
+
+    bdg = BootDirectionGetter.from_data(dwi_data, model, max_angle=60)
     sft = aft.track(sh_coeff,
                     seed_mask=seed_roi,
-                    n_seeds=5,
-                    tracker="pft",
-                    stop_mask=(pve_wm, pve_gm, pve_csf),
-                    stop_threshold="ACT",
-                    directions="prob",
+                    stop_mask=mask,
+                    n_seeds=2,
+                    directions=bdg,
                     odf_model="CSD")
 
-    save_tractogram(sft, op.join(working_dir, 'pft_streamlines.trk'),
+    save_tractogram(sft, op.join(working_dir, 'boot_streamlines.trk'),
                     bbox_valid_check=False)
 else:
-    sft = load_tractogram(op.join(working_dir, 'pft_streamlines.trk'), img)
+    sft = load_tractogram(op.join(working_dir, 'boot_streamlines.trk'), img)
 
 sft.to_vox()
 
@@ -266,7 +268,10 @@ for bundle in bundles:
     print(f"Before cleaning: {len(fiber_groups[bundle]['sl'])} streamlines")
     new_fibers, idx_in_bundle = seg.clean_bundle(
         fiber_groups[bundle]['sl'],
-        return_idx=True)
+        return_idx=True,
+        distance_threshold=3,
+        length_threshold=3)
+
     print(f"Afer cleaning: {len(new_fibers)} streamlines")
     new_fibers = fiber_groups[bundle]['sl']
     idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
