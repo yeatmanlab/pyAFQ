@@ -227,7 +227,13 @@ def solve_qp(P, Q, G, H):
     x : array
         Optimal solution to the QP problem.
     """
-    import cvxpy as cvx
+    try:
+        import cvxpy as cvx
+    except ImportError:
+        raise ImportError(
+            "Using MSMT in pyAFQ requires the the cvxpy package. "
+            "You can install it using `pip install cvxpy` or `pip "
+            "install pyAFQ[msmt]`.")
 
     x = cvx.Variable(Q.shape[0])
     P = cvx.Constant(P)
