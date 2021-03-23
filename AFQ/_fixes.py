@@ -10,7 +10,6 @@ import random
 
 import sys
 import math
-import cvxpy as cvx
 
 
 def spherical_harmonics(m, n, theta, phi):
@@ -228,6 +227,14 @@ def solve_qp(P, Q, G, H):
     x : array
         Optimal solution to the QP problem.
     """
+    try:
+        import cvxpy as cvx
+    except ImportError:
+        raise ImportError(
+            "Using MSMT in pyAFQ requires the the cvxpy package. "
+            "You can install it using `pip install cvxpy` or `pip "
+            "install pyAFQ[msmt]`.")
+
     x = cvx.Variable(Q.shape[0])
     P = cvx.Constant(P)
     objective = cvx.Minimize(0.5 * cvx.quad_form(x, P) + Q * x)
