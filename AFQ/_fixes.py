@@ -10,7 +10,6 @@ import random
 
 import sys
 import math
-import cvxpy as cvx
 
 
 def spherical_harmonics(m, n, theta, phi):
@@ -228,6 +227,8 @@ def solve_qp(P, Q, G, H):
     x : array
         Optimal solution to the QP problem.
     """
+    import cvxpy as cvx
+
     x = cvx.Variable(Q.shape[0])
     P = cvx.Constant(P)
     objective = cvx.Minimize(0.5 * cvx.quad_form(x, P) + Q * x)
