@@ -38,7 +38,7 @@ def _inline_interact(scene, inline, interact):
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
                       cbv_lims=[None, None], figure=None, background=(1, 1, 1),
-                      interact=False, inline=False):
+                      interact=False, inline=False, flip_axes=None):
     """
     Visualize bundles in 3D using VTK
 
@@ -103,6 +103,9 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     inline : bool
         Whether to embed the visualization inline in a notebook. Only works
         in the notebook context. Default: False.
+
+    flip_axes : None
+        This parameter is to conform fury and plotly APIs.
 
     Returns
     -------
@@ -187,6 +190,7 @@ def create_gif(figure,
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
                   name='ROI', figure=None, color=np.array([1, 0, 0]),
+                  flip_axes=None,
                   opacity=1.0, inline=False, interact=False):
     """
     Render a region of interest into a VTK viz as a volume
@@ -222,6 +226,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
         RGB color for ROI.
         Default: np.array([1, 0, 0])
 
+    flip_axes : None
+        This parameter is to conform fury and plotly APIs.
+
     opacity : float, optional
         Opacity of ROI.
         Default: 1.0
@@ -255,6 +262,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
 
 def visualize_volume(volume, x=None, y=None, z=None, figure=None,
+                     flip_axes=None,
                      opacity=0.6, inline=True, interact=False):
     """
     Visualize a volume
@@ -267,6 +275,9 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None,
     figure : fury Scene object, optional
         If provided, the visualization will be added to this Scene. Default:
         Initialize a new Scene.
+
+    flip_axes : None
+        This parameter is to conform fury and plotly APIs.
 
     opacity : float, optional
         Initial opacity of slices.
