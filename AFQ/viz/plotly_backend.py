@@ -215,7 +215,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         Default: [None, None]
 
     flip_axes : ndarray
-        Which axes to flip, to orient the image as RAS, which is how we visualize. 
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
 
@@ -374,7 +375,8 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
         Default: 1.0
 
     flip_axes : ndarray
-        Which axes to flip, to orient the image as RAS, which is how we visualize. 
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
 
@@ -534,7 +536,8 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         Default: 1.0
 
     flip_axes : ndarray
-        Which axes to flip, to orient the image as RAS, which is how we visualize. 
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
 
