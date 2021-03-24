@@ -72,7 +72,7 @@ def set_layout(figure, color=None):
 
 
 def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=[None, None], flip_axial=False):
+                      cbv_lims=[None, None], flip_axes=[False, False, False]):
     color = np.asarray(color)
 
     if len(sls._offsets) > 1:
@@ -134,8 +134,12 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
                 line_color[total_offset + sl_length, :] = [0, 0, 0]
                 customdata[total_offset + sl_length] = 0
 
-    if flip_axial:
+    if flip_axes[0]:
         x_pts = dimensions[0] - x_pts
+    if flip_axes[1]:
+        y_pts = dimensions[1] - y_pts
+    if flip_axes[2]:
+        z_pts = dimensions[2] - z_pts
     figure.add_trace(
         go.Scatter3d(
             x=x_pts,
@@ -158,7 +162,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], flip_axial=False,
+                      cbv_lims=[None, None], flip_axes=[False, False, False],
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
     """
@@ -210,8 +214,9 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         color_by_volume.
         Default: [None, None]
 
-    flip_axial : ndarray
-        If data is LAS, toggle this parameter.
+    flip_axes : ndarray
+        Which axes to flip. For example, if LAS, do [True, False, False].
+        Default: [False, False, False]
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
@@ -252,7 +257,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             name,
             cbv=color_by_volume,
             cbv_lims=cbv_lims,
-            flip_axial=flip_axial)
+            flip_axes=flip_axes)
 
     figure.update_layout(legend=dict(itemsizing="constant"))
     return _inline_interact(figure, interact, inline)
@@ -304,17 +309,19 @@ def create_gif(figure,
                       png_fname="tgif", add_zeros=False)
 
 
-def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axial):
+def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes):
     roi = np.where(roi == 1)
-    if flip_axial:
-        x = dimensions[0] - (roi[0] + 1)
-    else:
-        x = roi[0] + 1
+    pts = []
+    for i, flip in enumerate(flip_axes):
+        if flip:
+            pts.append(dimensions[i] - (roi[i] + 1))
+        else:
+            pts.append(roi[i] + 1)
     figure.add_trace(
         go.Scatter3d(
-            x=x,
-            y=roi[1] + 1,
-            z=roi[2] + 1,
+            x=pts[0],
+            y=pts[1],
+            z=pts[2],
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
             line=dict(color=f"rgba(0,0,0,0)")
@@ -324,7 +331,7 @@ def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axial):
 
 def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                   roi_affine=None, static_affine=None, reg_template=None,
-                  name='ROI', figure=None, flip_axial=False,
+                  name='ROI', figure=None, flip_axes=[False, False, False],
                   color=np.array([0.9999, 0, 0]),
                   opacity=1.0, interact=False, inline=False):
     """
@@ -365,8 +372,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
         Opacity of ROI.
         Default: 1.0
 
-    flip_axial : ndarray
-        If data is LAS, toggle this parameter.
+    flip_axes : ndarray
+        Which axes to flip. For example, if LAS, do [True, False, False].
+        Default: [False, False, False]
 
     figure : Plotly Figure object, optional
         If provided, the visualization will be added to this Figure. Default:
@@ -392,7 +400,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
     set_layout(figure)
 
-    _draw_roi(figure, roi, name, color, opacity, roi.shape, flip_axial)
+    _draw_roi(figure, roi, name, color, opacity, roi.shape, flip_axes)
 
     return _inline_interact(figure, interact, inline)
 
@@ -493,7 +501,8 @@ def _draw_slices(figure, axis, volume,
 
 def visualize_volume(volume, figure=None, show_x=True, show_y=True,
                      show_z=True, interact=False, inline=False, opacity=0.3,
-                     flip_axial=False, slider_definition=20, which_plane=None):
+                     flip_axes=[False, False, False],
+                     slider_definition=20, which_plane=None):
     """
     Visualize a volume
 
@@ -522,8 +531,9 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         Opacity of slices.
         Default: 1.0
 
-    flip_axial : ndarray
-        If data is LAS, toggle this parameter.
+    flip_axes : ndarray
+        Which axes to flip. For example, if LAS, do [True, False, False].
+        Default: [False, False, False]
 
     slider_definition : int, optional
         How many discrete positions the slices can take.
@@ -551,8 +561,9 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
     Plotly Figure object
     """
     volume = vut.load_volume(volume)
-    if flip_axial:
-        volume = np.flip(volume, axis=0)
+    for i, flip in enumerate(flip_axes):
+        if flip:
+            volume = np.flip(volume, axis=i)
 
     if figure is None:
         figure = go.Figure()

@@ -1593,11 +1593,13 @@ class AFQ(object):
             xform_color_by_volume=xform_color_by_volume
         )
 
-        flip_axial = (row['dwi_affine'][0, 0] < 0)
+        flip_axes = [False, False, False]
+        for i in range(3):
+            flip_axes[i] = (row['dwi_affine'][i, i] < 0)
 
         figure = self.viz.visualize_volume(volume,
                                            opacity=volume_opacity,
-                                           flip_axial=flip_axial,
+                                           flip_axes=flip_axes,
                                            interact=False,
                                            inline=False)
 
@@ -1606,7 +1608,7 @@ class AFQ(object):
                                             cbv_lims=cbv_lims,
                                             bundle_dict=self.bundle_dict,
                                             n_points=n_points,
-                                            flip_axial=flip_axial,
+                                            flip_axes=flip_axes,
                                             interact=interactive,
                                             inline=inline,
                                             figure=figure)
@@ -1655,7 +1657,9 @@ class AFQ(object):
             xform_color_by_volume=xform_color_by_volume
         )
 
-        flip_axial = (row['dwi_affine'][0, 0] < 0)
+        flip_axes = [False, False, False]
+        for i in range(3):
+            flip_axes[i] = (row['dwi_affine'][i, i] < 0)
 
         if bundle_names is None:
             bundle_names = self.bundle_dict.keys()
@@ -1665,7 +1669,7 @@ class AFQ(object):
             uid = self.bundle_dict[bundle_name]['uid']
             figure = self.viz.visualize_volume(volume,
                                                opacity=volume_opacity,
-                                               flip_axial=flip_axial,
+                                               flip_axes=flip_axes,
                                                interact=False,
                                                inline=False)
             try:
@@ -1676,7 +1680,7 @@ class AFQ(object):
                     bundle_dict=self.bundle_dict,
                     bundle=uid,
                     n_points=n_points,
-                    flip_axial=flip_axial,
+                    flip_axes=flip_axes,
                     interact=False,
                     inline=False,
                     figure=figure)
@@ -1724,7 +1728,7 @@ class AFQ(object):
                     figure = self.viz.visualize_roi(
                         roi,
                         name=f"{bundle_name} endpoint ROI {i}",
-                        flip_axial=flip_axial,
+                        flip_axes=flip_axes,
                         inline=False,
                         interact=False,
                         figure=figure)
@@ -1735,7 +1739,7 @@ class AFQ(object):
                     figure = self.viz.visualize_roi(
                         roi,
                         name=f"{bundle_name} ROI {i}",
-                        flip_axial=flip_axial,
+                        flip_axes=flip_axes,
                         inline=inline,
                         interact=interactive,
                         figure=figure)
@@ -1743,7 +1747,7 @@ class AFQ(object):
                     figure = self.viz.visualize_roi(
                         roi,
                         name=f"{bundle_name} ROI {i}",
-                        flip_axial=flip_axial,
+                        flip_axes=flip_axes,
                         inline=False,
                         interact=False,
                         figure=figure)
