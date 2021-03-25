@@ -269,8 +269,8 @@ for bundle in bundles:
     new_fibers, idx_in_bundle = seg.clean_bundle(
         fiber_groups[bundle]['sl'],
         return_idx=True,
-        distance_threshold=3,
-        length_threshold=3)
+        distance_threshold=2,
+        length_threshold=2)
 
     print(f"Afer cleaning: {len(new_fibers)} streamlines")
     new_fibers = fiber_groups[bundle]['sl']
