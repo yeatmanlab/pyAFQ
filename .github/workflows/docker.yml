@@ -23,17 +23,17 @@ jobs:
       with:
         registry: ghcr.io
         username: nrdg
-        password: ${{ secrets.CR_PAT_NRDG }}
+        password: ${{secrets.CR_PAT_NRDG}}
 
     - name: Checkout repo
       uses: actions/checkout@v1
 
     - name: Build and push pyAFQ docker image
       run: sh ./pyafq_docker/docker-build.sh \
-        "${{ github.sha }}" \
+        "${{github.sha}}" \
         "nrdg"
 
     - name: Build and push AFQsi docker image
       run: sh ./afqsi_docker/docker-build.sh \
-        "${{ github.sha }}" \
+        "${{github.sha}}" \
         "nrdg"

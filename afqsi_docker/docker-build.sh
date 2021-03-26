@@ -1,3 +1,7 @@
-export COMMIT=$1
-docker build --no-cache -t $2/pyafq:$1 .
-docker push $2/afqsi:$1
+COMMIT=${1}
+export COMMIT
+TAG="${2}/afqsi:${COMMIT}"
+TAG="$(echo -e "${TAG}" | tr -d '[:space:]')"
+echo $TAG
+docker build --no-cache -t $TAG .
+docker push $TAG
