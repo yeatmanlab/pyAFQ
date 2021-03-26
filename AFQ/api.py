@@ -1269,15 +1269,7 @@ class AFQ(object):
             afd.write_json(meta_fname, meta)
             row['timing']['Segmentation'] = row['timing']['Segmentation'] + \
                 time() - start_time
-            self._gen_sl_counts(row)
-            for bundle in self.bundle_dict.keys():
-                if bundle != "whole_brain":
-                    row["sl_counts"].at[bundle, "n_streamlines"] = len(
-                        bundles[bundle].streamlines)
-            row["sl_counts"].at[
-                "whole_brain", "n_streamlines"] = len(tg.streamlines)
-            row["sl_counts"].at[
-                "whole_brain", "n_clean_streamlines"] = len(tg.streamlines)
+
         return bundles_file
 
     def _clean_bundles(self, row):
@@ -1299,7 +1291,6 @@ class AFQ(object):
             if self.clean_params['return_idx']:
                 return_idx = {}
 
-            self._gen_sl_counts(row)
             for b in self.bundle_dict.keys():
                 if b != "whole_brain":
                     idx = np.where(sft.data_per_streamline['bundle']
@@ -1323,8 +1314,6 @@ class AFQ(object):
                                        * [self.bundle_dict[b]['uid']])},
                             affine_to_rasmm=row['dwi_affine'])
                     tgram = aus.add_bundles(tgram, this_tgram)
-                    row["sl_counts"].at[b, "n_clean_streamlines"] = len(
-                        this_tg.streamlines)
 
             self.log_and_save_trk(
                 StatefulTractogram(
@@ -1505,33 +1494,44 @@ class AFQ(object):
                     meta_fname = fname.split('.')[0] + '.json'
                     afd.write_json(meta_fname, meta)
 
-    def _gen_sl_counts(self, row):
-        if "sl_counts" not in row:
-            sl_count_file = self._get_fname(
-                row,
-                '_sl_count.csv',
-                include_track=True,
-                include_seg=True)
-            if op.exists(sl_count_file):
-                row["sl_counts"] = pd.read_csv(sl_count_file)
-            else:
-                bundle_names = list(self.bundle_dict.keys())
-                if "whole_brain" not in bundle_names:
-                    bundle_names.append("whole_brain")
-                row["sl_counts"] = pd.DataFrame(
-                    data=[[0, 0]] * len(bundle_names),
-                    index=bundle_names,
-                    columns=["n_streamlines", "n_clean_streamlines"])
-
     def _export_sl_counts(self, row):
-        self._gen_sl_counts(row)
-        sl_count_file = self._get_fname(
+        sl_counts_file = self._get_fname(
             row,
             '_sl_count.csv',
             include_track=True,
             include_seg=True)
 
-        row["sl_counts"].to_csv(sl_count_file)
+        if not op.exists(sl_counts_file):
+            sl_counts_clean = []
+            sl_counts = []
+            bundles = list(self.bundle_dict.keys())
+            if "whole_brain" not in bundles:
+                bundles.append("whole_brain")
+            funcs = [self._clean_bundles, self._segment]
+            lists = [sl_counts_clean, sl_counts]
+
+            for func, count in zip(funcs, lists):
+                bundles_file = func(row)
+                tg = load_tractogram(bundles_file, row["dwi_img"])
+                bundles = aus.tgram_to_bundles(
+                    tg,
+                    self.bundle_dict,
+                    row["dwi_img"])
+
+                for bundle in bundles:
+                    if bundle == "whole_brain":
+                        count.append(len(tg.streamlines))
+                    else:
+                        count.append(len(
+                            bundles[bundle].streamlines))
+            counts_df = pd.DataFrame(
+                data=dict(
+                    n_streamlines=sl_counts,
+                    n_streamlines_clean=sl_counts_clean),
+                index=bundles)
+            counts_df.to_csv(sl_counts_file)
+
+        return sl_counts_file
 
     def _viz_prepare_vol(self, row, vol, xform, mapping):
         if vol in self.scalars:
