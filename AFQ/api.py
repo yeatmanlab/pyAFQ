@@ -1231,7 +1231,9 @@ class AFQ(object):
 
             img = nib.load(row['dwi_file'])
             tg = load_tractogram(
-                streamlines_file, img, Space.VOX)
+                streamlines_file, img, Space.VOX,
+                bbox_valid_check=False)
+            tg.remove_invalid_streamlines()
 
             start_time = time()
             segmentation = seg.Segmentation(**self.segmentation_params)
