@@ -1505,10 +1505,10 @@ class AFQ(object):
             bundles = list(self.bundle_dict.keys())
             if "whole_brain" not in bundles:
                 bundles.append("whole_brain")
+            funcs = [self._clean_bundles, self._segment]
+            lists = [sl_counts_clean, sl_counts]
 
-            for func, folder, count in zip([self._clean_bundles, self._segment],
-                                           ['clean_bundles', 'bundles'],
-                                           [sl_counts_clean, sl_counts]):
+            for func, count in zip(funcs, lists):
                 bundles_file = func(row)
                 tg = load_tractogram(bundles_file, row["dwi_img"])
                 bundles = aus.tgram_to_bundles(
