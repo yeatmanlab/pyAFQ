@@ -42,7 +42,8 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 import bids
 from bids.layout import BIDSLayout
 import bids.config as bids_config
-bids_config.set_option('extension_initial_dot', True)
+try:
+    bids_config.set_option('extension_initial_dot', True)
 
 
 logging.basicConfig(level=logging.INFO)
