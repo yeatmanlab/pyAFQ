@@ -34,11 +34,11 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Build and push pyAFQ docker image
-      run: ./pyafq_docker/docker-build.sh \
+      run: sh ./pyafq_docker/docker-build.sh \
         "${{ steps.vars.outputs.sha_short }}" \
         "nrdg"
 
     - name: Build and push AFQsi docker image
-      run: ./afqsi_docker/docker-build.sh \
+      run: sh ./afqsi_docker/docker-build.sh \
         "${{ steps.vars.outputs.sha_short }}" \
         "nrdg"
