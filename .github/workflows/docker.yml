@@ -1,6 +1,6 @@
 name: Build and Push pyAFQ and AFQsi Docker Image
 
-on: [push, pull_request] # use these while testing
+on: [push] # use these while testing
   # push:
   #   branches:
   #     - 'master'
@@ -25,20 +25,15 @@ jobs:
         username: nrdg
         password: ${{ secrets.CR_PAT_NRDG }}
 
-    - name: Declare sha_short
-      id: vars
-      shell: bash
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
     - name: Checkout repo
       uses: actions/checkout@v1
 
     - name: Build and push pyAFQ docker image
       run: sh ./pyafq_docker/docker-build.sh \
-        "${{ steps.vars.outputs.sha_short }}" \
+        "${{ github.sha }}" \
         "nrdg"
 
     - name: Build and push AFQsi docker image
       run: sh ./afqsi_docker/docker-build.sh \
-        "${{ steps.vars.outputs.sha_short }}" \
+        "${{ github.sha }}" \
         "nrdg"
