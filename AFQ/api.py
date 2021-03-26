@@ -44,6 +44,8 @@ from bids.layout import BIDSLayout
 import bids.config as bids_config
 try:
     bids_config.set_option('extension_initial_dot', True)
+except ValueError:
+    pass
 
 
 logging.basicConfig(level=logging.INFO)

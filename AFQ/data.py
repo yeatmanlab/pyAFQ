@@ -25,7 +25,8 @@ from bids import BIDSLayout
 import bids.config as bids_config
 try:
     bids_config.set_option('extension_initial_dot', True)
-
+except ValueError:
+    pass
 from botocore import UNSIGNED
 from botocore.client import Config
 from dask import compute, delayed
