@@ -5,4 +5,4 @@ TAG="${2}/pyafq:${COMMIT}"
 TAG="$(echo "${TAG}" | tr -d '[:space:]')"
 echo $TAG
 docker build --no-cache -t $TAG --build-arg COMMIT ./pyafq_docker
-docker push $TAG
+docker push ghcr.io/$TAG
