@@ -12,8 +12,6 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from bids.exceptions import BIDSValidationError
-
 import nibabel as nib
 import nibabel.tmpdirs as nbtmp
 
