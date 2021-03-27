@@ -8,5 +8,5 @@ FROM python:3.8
 # Install pyAFQ
 RUN \
     && pip install --no-cache-dir git+https://github.com/yeatmanlab/pyAFQ.git@${COMMIT}\
-    && pip install fslpy
+    && pip install fslpy\
     && pip install h5py
