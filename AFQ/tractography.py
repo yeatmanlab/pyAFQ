@@ -5,6 +5,7 @@ import dipy.reconst.shm as shm
 import logging
 
 import dipy.data as dpd
+from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
@@ -16,8 +17,6 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
 
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
-
-import AFQ.registration as reg
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
@@ -185,15 +184,18 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         average_voxel_size = np.mean(vox_sizes)
         pve_wm_img, pve_gm_img, pve_csf_img = pve_imgs
         pve_wm_data, pve_gm_data, pve_csf_data = pves
-        pve_wm_data = reg.resample(pve_wm_data, model_params[..., 0],
-                                   pve_wm_img.affine,
-                                   params_img.affine)
-        pve_gm_data = reg.resample(pve_gm_data, model_params[..., 0],
-                                   pve_gm_img.affine,
-                                   params_img.affine)
-        pve_csf_data = reg.resample(pve_csf_data, model_params[..., 0],
-                                    pve_csf_img.affine,
-                                    params_img.affine)
+        pve_wm_data = resample(
+            pve_wm_data, model_params[..., 0],
+            pve_wm_img.affine,
+            params_img.affine)
+        pve_gm_data = resample(
+            pve_gm_data, model_params[..., 0],
+            pve_gm_img.affine,
+            params_img.affine)
+        pve_csf_data = resample(
+            pve_csf_data, model_params[..., 0],
+            pve_csf_img.affine,
+            params_img.affine)
 
         vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
 

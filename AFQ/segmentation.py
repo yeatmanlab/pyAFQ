@@ -17,6 +17,7 @@ from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram
+from dipy.align import resample
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -715,10 +716,11 @@ class Segmentation:
 
                     atlas_idx = []
                     for ii, pp in enumerate([start_p, end_p]):
-                        pp = reg.resample(pp.get_fdata(),
-                                          self.reg_template,
-                                          pp.affine,
-                                          self.reg_template.affine)
+                        pp = resample(
+                            pp.get_fdata(),
+                            self.reg_template,
+                            pp.affine,
+                            self.reg_template.affine)
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1

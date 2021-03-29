@@ -1,4 +1,4 @@
-import AFQ.registration as reg
+from dipy.align import resample
 from dipy.segment.clustering import QuickBundles
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
                                  ResampleFeature)
@@ -173,10 +173,10 @@ def read_callosum_templates(resample_to=False):
         if resample_to:
             if isinstance(resample_to, str):
                 resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
-                                               resample_to,
-                                               img.affine,
-                                               resample_to.affine),
+            img = nib.Nifti1Image(resample(img.get_fdata(),
+                                           resample_to,
+                                           img.affine,
+                                           resample_to.affine),
                                   resample_to.affine)
         template_dict[f.split('.')[0]] = img
 
@@ -225,10 +225,11 @@ def read_resample_roi(roi, resample_to=None, threshold=False):
     if np.allclose(resample_to.affine, roi.affine):
         return roi
 
-    as_array = reg.resample(roi.get_fdata(),
-                            resample_to,
-                            roi.affine,
-                            resample_to.affine)
+    as_array = resample(
+        roi.get_fdata(),
+        resample_to,
+        roi.affine,
+        resample_to.affine)
     if threshold:
         as_array = (as_array > threshold).astype(int)
 
@@ -411,11 +412,13 @@ def read_templates(resample_to=False):
         if resample_to:
             if isinstance(resample_to, str):
                 resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
-                                               resample_to,
-                                               img.affine,
-                                               resample_to.affine),
-                                  resample_to.affine)
+            img = nib.Nifti1Image(
+                resample(
+                    img.get_fdata(),
+                    resample_to,
+                    img.affine,
+                    resample_to.affine),
+                resample_to.affine)
         template_dict[f.split('.')[0]] = img
 
     toc = time.perf_counter()
@@ -1964,10 +1967,11 @@ def read_aal_atlas(resample_to=None):
         data = out_dict['atlas'].get_fdata()
         oo = []
         for ii in range(data.shape[-1]):
-            oo.append(reg.resample(data[..., ii],
-                                   resample_to,
-                                   out_dict['atlas'].affine,
-                                   resample_to.affine))
+            oo.append(resample(
+                data[..., ii],
+                resample_to,
+                out_dict['atlas'].affine,
+                resample_to.affine))
         out_dict['atlas'] = nib.Nifti1Image(np.stack(oo, -1),
                                             resample_to.affine)
     return out_dict
@@ -2314,10 +2318,11 @@ def _apply_mask(template_img, resolution=1):
 
     if mask_data.shape != template_data.shape:
         mask_img = nib.Nifti1Image(
-            reg.resample(mask_data,
-                         template_data,
-                         mask_img.affine,
-                         template_img.affine),
+            resample(
+                mask_data,
+                template_data,
+                mask_img.affine,
+                template_img.affine),
             template_img.affine)
         mask_data = mask_img.get_fdata()
 

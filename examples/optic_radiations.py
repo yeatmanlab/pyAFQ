@@ -23,6 +23,7 @@ from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.reconst import shm
+from dipy.align import affine_registration, resample
 
 import AFQ.data as afd
 import AFQ.tractography as aft
@@ -100,7 +101,7 @@ if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     import dipy.core.gradients as dpg
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     # Prealign using affine registration
-    _, prealign = reg.affine_registration(
+    _, prealign = affine_registration(
         apm,
         MNI_T1w_img.get_fdata(),
         img.affine,
@@ -221,10 +222,11 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
 
         for ii, pp in enumerate(endpoint_spec[bundle].keys()):
             roi = endpoint_spec[bundle][pp]
-            roi = reg.resample(roi.get_fdata(),
-                               MNI_T1w_img,
-                               roi.affine,
-                               MNI_T1w_img.affine)
+            roi = resample(
+                roi.get_fdata(),
+                MNI_T1w_img,
+                roi.affine,
+                MNI_T1w_img.affine)
 
             warped_roi = transform_inverse_roi(
                 roi,
