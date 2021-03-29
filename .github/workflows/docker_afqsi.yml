@@ -1,4 +1,4 @@
-name: Build and Push pyAFQ and AFQsi Docker Image
+name: Build and Push AFQsi Docker Image
 
 on: [push] # use these while testing
   # push:
@@ -12,6 +12,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 512
+        swap-size-mb: 1024
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
 
@@ -32,3 +41,10 @@ jobs:
       run: sh ./afqsi_docker/docker-build.sh \
         "${{github.sha}}" \
         "nrdg"
+  # test:
+  #     needs: build
+  #     runs-on: ubuntu-latest
+
+  #     steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v1

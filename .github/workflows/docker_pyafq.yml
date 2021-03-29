@@ -1,4 +1,4 @@
-name: Build and Push pyAFQ and AFQsi Docker Image
+name: Build and Push pyAFQ Docker Image
 
 on: [push] # use these while testing
   # push:
