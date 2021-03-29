@@ -1,12 +1,6 @@
 name: Build and Push pyAFQ Docker Image
 
-on: [push] # use these while testing
-  # push:
-  #   branches:
-  #     - 'master'
-  # pull_request:
-  #   branches:
-  #     - main
+on: [push, pull_request]
 
 jobs:
   build:
