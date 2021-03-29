@@ -383,7 +383,8 @@ def prepare_roi(roi, affine_or_mapping, static_img,
                                  "need to also specify all of the following",
                                  "inputs: `static_img`, `roi_affine`, ",
                                  "`static_affine`")
-            roi = resample(roi, static_img, roi_affine, static_affine)
+            roi = resample(roi, static_img, roi_affine,
+                           static_affine).get_fdata()
         else:
             # Assume it is  a mapping:
             if (isinstance(affine_or_mapping, str)

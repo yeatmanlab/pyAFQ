@@ -98,7 +98,7 @@ class TemplateScalar(ScalarMixin, Definition):
                 self.img.get_fdata(),
                 afq_object.reg_template_img,
                 self.img.affine,
-                afq_object.reg_template_img.affine)
+                afq_object.reg_template_img.affine).get_fdata()
             self.is_resampled = True
 
         mapping = afq_object._mapping(row)

@@ -226,7 +226,7 @@ if not op.exists(op.join(working_dir, 'pft_streamlines.trk')):
                 roi.get_fdata(),
                 MNI_T1w_img,
                 roi.affine,
-                MNI_T1w_img.affine)
+                MNI_T1w_img.affine).get_fdata()
 
             warped_roi = transform_inverse_roi(
                 roi,

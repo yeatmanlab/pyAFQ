@@ -187,15 +187,15 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         pve_wm_data = resample(
             pve_wm_data, model_params[..., 0],
             pve_wm_img.affine,
-            params_img.affine)
+            params_img.affine).get_fdata()
         pve_gm_data = resample(
             pve_gm_data, model_params[..., 0],
             pve_gm_img.affine,
-            params_img.affine)
+            params_img.affine).get_fdata()
         pve_csf_data = resample(
             pve_csf_data, model_params[..., 0],
             pve_csf_img.affine,
-            params_img.affine)
+            params_img.affine).get_fdata()
 
         vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
 

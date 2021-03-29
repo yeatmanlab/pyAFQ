@@ -176,7 +176,7 @@ def read_callosum_templates(resample_to=False):
             img = nib.Nifti1Image(resample(img.get_fdata(),
                                            resample_to,
                                            img.affine,
-                                           resample_to.affine),
+                                           resample_to.affine).get_fdata(),
                                   resample_to.affine)
         template_dict[f.split('.')[0]] = img
 
@@ -229,7 +229,7 @@ def read_resample_roi(roi, resample_to=None, threshold=False):
         roi.get_fdata(),
         resample_to,
         roi.affine,
-        resample_to.affine)
+        resample_to.affine).get_fdata()
     if threshold:
         as_array = (as_array > threshold).astype(int)
 
@@ -417,7 +417,7 @@ def read_templates(resample_to=False):
                     img.get_fdata(),
                     resample_to,
                     img.affine,
-                    resample_to.affine),
+                    resample_to.affine).get_fdata(),
                 resample_to.affine)
         template_dict[f.split('.')[0]] = img
 
@@ -1971,7 +1971,7 @@ def read_aal_atlas(resample_to=None):
                 data[..., ii],
                 resample_to,
                 out_dict['atlas'].affine,
-                resample_to.affine))
+                resample_to.affine).get_fdata())
         out_dict['atlas'] = nib.Nifti1Image(np.stack(oo, -1),
                                             resample_to.affine)
     return out_dict
@@ -2322,7 +2322,7 @@ def _apply_mask(template_img, resolution=1):
                 mask_data,
                 template_data,
                 mask_img.affine,
-                template_img.affine),
+                template_img.affine).get_fdata(),
             template_img.affine)
         mask_data = mask_img.get_fdata()
 

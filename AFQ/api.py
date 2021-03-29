@@ -1703,7 +1703,7 @@ class AFQ(object):
                             pp.get_fdata(),
                             self.reg_template_img,
                             pp.affine,
-                            self.reg_template_img.affine)
+                            self.reg_template_img.affine).get_fdata()
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1

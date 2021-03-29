@@ -720,7 +720,7 @@ class Segmentation:
                             pp.get_fdata(),
                             self.reg_template,
                             pp.affine,
-                            self.reg_template.affine)
+                            self.reg_template.affine).get_fdata()
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1

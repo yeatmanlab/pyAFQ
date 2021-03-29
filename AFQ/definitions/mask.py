@@ -3,7 +3,7 @@ import numpy as np
 import nibabel as nib
 from dipy.segment.mask import median_otsu
 
-import AFQ.registration as reg
+from dipy.align import resample
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file
 
@@ -25,10 +25,11 @@ def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
     if ((dwi_data is not None)
         and (dwi_affine is not None)
             and (dwi_data[..., 0].shape != mask_data.shape)):
-        return np.round(reg.resample(mask_data.astype(float),
-                                     dwi_data[..., 0],
-                                     mask_affine,
-                                     dwi_affine)).astype(mask_type)
+        return np.round(resample(
+            mask_data.astype(float),
+            dwi_data[..., 0],
+            mask_affine,
+            dwi_affine).get_fdata()).astype(mask_type)
     else:
         return mask_data
 
