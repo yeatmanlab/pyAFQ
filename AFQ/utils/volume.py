@@ -13,6 +13,7 @@ from dipy.io.utils import (create_nifti_header, get_reference_info)
 from dipy.tracking.streamline import select_random_set_of_streamlines
 import dipy.tracking.utils as dtu
 
+logger = logging.getLogger('AFQ.utils.volume')
 
 def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
     """
@@ -42,11 +43,16 @@ def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
     if isinstance(roi, nib.Nifti1Image):
         roi = roi.get_fdata()
 
-    roi = binary_dilation(roi)
-    roi = mapping.transform_inverse(roi, interpolation='linear')
-    roi = patch_up_roi(roi > 0, bundle_name=bundle_name).astype(int)
+    _roi = mapping.transform_inverse(roi, interpolation='linear')
+    _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
 
-    return roi
+    if np.sum(_roi) == 0:
+        logger.warning(f'warning lost ROI {bundle_name}, performing automatic binary dialtion')
+        _roi = binary_dilation(roi)
+        _roi = mapping.transform_inverse(_roi, interpolation='linear')
+        _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
+
+    return _roi
 
 
 def patch_up_roi(roi, bundle_name="ROI"):
