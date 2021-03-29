@@ -16,7 +16,6 @@ import dipy.core.gradients as dpg
 from dipy.align.streamlinear import whole_brain_slr
 
 import AFQ.utils.models as mut
-from AFQ.definitions.mapping import ConformedAffineMapping
 
 __all__ = ["syn_register_dwi", "write_mapping", "read_mapping",
            "register_dwi", "slr_registration"]
@@ -140,6 +139,7 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
         mapping.backward = disp_data[..., 1]
         mapping.is_inverse = True
     else:
+        from AFQ.definitions.mapping import ConformedAffineMapping
         mapping = ConformedAffineMapping(
             disp,
             domain_grid_shape=reduce_shape(
@@ -231,6 +231,8 @@ def slr_registration(moving_data, static_data,
     -------
     AffineMap
     """
+    from AFQ.definitions.mapping import ConformedAffineMapping
+
     _, transform, _, _ = whole_brain_slr(
         static_data, moving_data, x0='affine', verbose=False, **kwargs)
 
