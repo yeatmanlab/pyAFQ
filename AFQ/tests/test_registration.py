@@ -16,6 +16,8 @@ import AFQ.data as afd
 
 from dipy.io.streamline import load_tractogram
 from dipy.io.stateful_tractogram import Space
+from dipy.align.imwarp import DiffeomorphicMap
+
 
 MNI_T2 = afd.read_mni_template()
 hardi_img, gtab = dpd.read_stanford_hardi()

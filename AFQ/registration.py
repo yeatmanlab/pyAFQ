@@ -9,7 +9,8 @@ from dipy.align.imwarp import DiffeomorphicMap
 
 from dipy.align.imaffine import AffineMap
 
-from dipy.align import syn_registration
+from dipy.align import (syn_registration, center_of_mass, translation,
+                        rigid, affine, register_series, )
 
 import dipy.core.gradients as dpg
 from dipy.align.streamlinear import whole_brain_slr
@@ -19,6 +20,16 @@ from AFQ.definitions.mapping import ConformedAffineMapping
 
 __all__ = ["syn_register_dwi", "write_mapping", "read_mapping",
            "register_dwi", "slr_registration"]
+
+
+def reduce_shape(shape):
+    """
+    Reduce dimension in shape to 3 if possible
+    """
+    try:
+        return shape[:3]
+    except TypeError:
+        return shape
 
 
 def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
@@ -143,7 +154,7 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
 
 def register_dwi(data_files, bval_files, bvec_files,
                  b0_ref=0,
-                 pipeline=[c_of_mass, translation, rigid, affine],
+                 pipeline=[center_of_mass, translation, rigid, affine],
                  out_dir=None):
     """
     Register a DWI data-set
