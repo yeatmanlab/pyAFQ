@@ -32,8 +32,3 @@ jobs:
       run: sh ./pyafq_docker/docker-build.sh \
         "${{github.sha}}" \
         "nrdg"
-
-    - name: Build and push AFQsi docker image
-      run: sh ./afqsi_docker/docker-build.sh \
-        "${{github.sha}}" \
-        "nrdg"
