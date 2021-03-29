@@ -13,3 +13,4 @@ RUN pip install --no-cache-dir --ignore-installed git+https://github.com/bids-st
 RUN pip install fslpy
 RUN pip install h5py
 RUN pip install pytest==6.0.1
+RUN pip uninstall -y dataclasses
