@@ -12,19 +12,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    # - name: Maximize build space
-    #   uses: easimon/maximize-build-space@master
-    #   with:
-    #     root-reserve-mb: 32768
-    #     remove-dotnet: 'true'
-    #     remove-android: 'true'
-    - name: free disk space
-      run: |
-        sudo swapoff -a
-        sudo rm -f /swapfile
-        sudo apt clean
-        docker rmi $(docker image ls -aq)
-        df -h
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 32768
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+
+    - name: Checkout repo
+      uses: actions/checkout@v1
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
 
@@ -37,9 +35,6 @@ jobs:
         registry: ghcr.io
         username: nrdg
         password: ${{secrets.CR_PAT_NRDG}}
-
-    - name: Checkout repo
-      uses: actions/checkout@v1
 
     - name: Build and push AFQsi docker image
       run: sh ./afqsi_docker/docker-build.sh \
