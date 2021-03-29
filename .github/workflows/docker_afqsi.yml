@@ -36,14 +36,7 @@ jobs:
         username: nrdg
         password: ${{secrets.CR_PAT_NRDG}}
 
-    - name: Build and push AFQsi docker image
+    - name: Build, test, and push AFQsi docker image
       run: sh ./afqsi_docker/docker-build.sh \
         "${{github.sha}}" \
         "nrdg"
-  # test:
-  #     needs: build
-  #     runs-on: ubuntu-latest
-
-  #     steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v1

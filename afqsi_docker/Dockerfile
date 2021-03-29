@@ -12,3 +12,4 @@ RUN pip install --no-cache-dir --ignore-installed git+https://github.com/yeatman
 RUN pip install --no-cache-dir --ignore-installed git+https://github.com/bids-standard/pybids.git@0.9.3
 RUN pip install fslpy
 RUN pip install h5py
+RUN pip install pytest==6.0.1
