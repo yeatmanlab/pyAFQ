@@ -49,3 +49,23 @@ See :ref:`contributing`
 
   It is also recommended that you utilize python virtual environment and
   package mangagement tools and begin with a clean environment.
+
+
+Installing using Docker
+~~~~~~~~~~~~~~~~~~~~~~~
+pyAFQ automatically builds and pushes a Docker image with pyAFQ installed for every commit.
+The images can be found here: https://github.com/orgs/nrdg/packages/container/package/pyafq
+To pull an image, you can either pull the latest::
+
+  docker pull ghcr.io/nrdg/pyafq:latest  
+
+or specify the commit using its hash::
+
+  docker pull ghcr.io/nrdg/pyafq:41c03ce18fa2fd872ece9df72165e7d8d8f58baf
+
+pyAFQ also automatically builds and pushes a Docker image with pyAFQ and
+QSIprep (https://qsiprep.readthedocs.io/en/latest/) installed for every commit to master.
+This image may be useful if you want an all-in-one image for pre-processing and tractometry.
+You can pull the latest of this image or use a specific commit as well::
+
+  docker pull ghcr.io/nrdg/afqsi:latest
