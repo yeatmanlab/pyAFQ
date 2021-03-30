@@ -47,7 +47,7 @@ def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
     _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
 
     if np.sum(_roi) == 0:
-        logger.warning(f'warning lost ROI {bundle_name}, performing automatic binary dialtion')
+        logger.warning(f'Lost ROI {bundle_name}, performing automatic binary dilation)
         _roi = binary_dilation(roi)
         _roi = mapping.transform_inverse(_roi, interpolation='linear')
         _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
