@@ -378,8 +378,8 @@ class ConformedAffineMapping(AffineMap):
 
     def transform(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform_inverse(*args, **kwargs)
+        return super().transform(*args, **kwargs)
 
     def transform_inverse(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)
+        return super().transform_inverse(*args, **kwargs)
