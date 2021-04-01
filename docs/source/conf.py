@@ -12,7 +12,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import sys, os
+from plotly.io._sg_scraper import plotly_sg_scraper
+import sys
+import os
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('sphinxext'))
@@ -88,7 +90,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
+html_theme = 'pydata_sphinx_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -180,10 +183,9 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
-from plotly.io._sg_scraper import plotly_sg_scraper
 image_scrapers = ('matplotlib', plotly_sg_scraper,)
 
-from _progressbars import reset_progressbars
+from _progressbars import reset_progressbars  # noqa
 
 sphinx_gallery_conf = {
      # path to your examples scripts
@@ -198,5 +200,3 @@ sphinx_gallery_conf = {
 autoapi_type = 'python'
 autoapi_dirs = ['../../AFQ']
 autoapi_ignore = ['*test*', '*_fixes*', '*version*', 'pyAFQ', 'License']
-
-
