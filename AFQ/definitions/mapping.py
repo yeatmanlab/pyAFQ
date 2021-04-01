@@ -205,7 +205,7 @@ class GeneratedMapMixin(object):
         meta_fname = meta_fname + '.json'
         return mapping_file, meta_fname
 
-    def prealign(self, afq_object, row):
+    def prealign(self, afq_object, row, save=True):
         prealign_file = afq_object._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if not op.exists(prealign_file):
@@ -216,14 +216,20 @@ class GeneratedMapMixin(object):
                 reg_subject_img,
                 afq_object.reg_template_img,
                 **self.affine_kwargs)
-            np.save(prealign_file, aff)
-            meta_fname = afq_object._get_fname(
-                row, '_prealign_from-DWI_to-MNI_xfm.json')
-            meta = dict(type="rigid")
-            afd.write_json(meta_fname, meta)
             row['timing']['Registration_pre_align'] =\
                 row['timing']['Registration_pre_align'] + time() - start_time
-        return prealign_file
+            if save:
+                np.save(prealign_file, aff)
+                meta_fname = afq_object._get_fname(
+                    row, '_prealign_from-DWI_to-MNI_xfm.json')
+                meta = dict(type="rigid")
+                afd.write_json(meta_fname, meta)
+            else:
+                return aff
+        if save:
+            return prealign_file
+        else:
+            return np.load(prealign_file)
 
     def get_for_row(self, afq_object, row):
         mapping_file, meta_fname = self.get_fnames(
@@ -367,7 +373,7 @@ class AffMap(GeneratedMapMixin, Definition):
 
     def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
                     reg_subject_img, reg_subject_sls, reg_prealign):
-        return ConformedAffineMapping(np.load(self.prealign(afq_object, row)))
+        return ConformedAffineMapping(np.linalg.inv(self.prealign(afq_object, row, save=False)))
 
 
 class ConformedAffineMapping(AffineMap):
@@ -378,8 +384,8 @@ class ConformedAffineMapping(AffineMap):
 
     def transform(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)
+        return super().transform_inverse(*args, **kwargs)
 
     def transform_inverse(self, *args, interpolation='linear', **kwargs):
         kwargs['interp'] = interpolation
-        return super().transform_inverse(*args, **kwargs)
+        return super().transform(*args, **kwargs)
