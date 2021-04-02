@@ -373,7 +373,8 @@ class AffMap(GeneratedMapMixin, Definition):
 
     def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
                     reg_subject_img, reg_subject_sls, reg_prealign):
-        return ConformedAffineMapping(np.linalg.inv(self.prealign(afq_object, row, save=False)))
+        return ConformedAffineMapping(np.linalg.inv(
+            self.prealign(afq_object, row, save=False)))
 
 
 class ConformedAffineMapping(AffineMap):
