@@ -4,6 +4,7 @@ from time import time
 import os.path as op
 
 from AFQ.definitions.utils import Definition, find_file
+from dipy.align import syn_registration, affine_registration
 import AFQ.registration as reg
 import AFQ.data as afd
 
@@ -204,27 +205,31 @@ class GeneratedMapMixin(object):
         meta_fname = meta_fname + '.json'
         return mapping_file, meta_fname
 
-    def prealign(self, afq_object, row):
+    def prealign(self, afq_object, row, save=True):
         prealign_file = afq_object._get_fname(
             row, '_prealign_from-DWI_to-MNI_xfm.npy')
         if not op.exists(prealign_file):
             reg_subject_img, _ = afq_object._reg_img(
                 afq_object.reg_subject, True, row)
             start_time = time()
-            _, aff = reg.affine_registration(
-                reg_subject_img.get_fdata(),
-                afq_object.reg_template_img.get_fdata(),
-                reg_subject_img.affine,
-                afq_object.reg_template_img.affine,
+            _, aff = affine_registration(
+                reg_subject_img,
+                afq_object.reg_template_img,
                 **self.affine_kwargs)
-            np.save(prealign_file, aff)
-            meta_fname = afq_object._get_fname(
-                row, '_prealign_from-DWI_to-MNI_xfm.json')
-            meta = dict(type="rigid")
-            afd.write_json(meta_fname, meta)
             row['timing']['Registration_pre_align'] =\
                 row['timing']['Registration_pre_align'] + time() - start_time
-        return prealign_file
+            if save:
+                np.save(prealign_file, aff)
+                meta_fname = afq_object._get_fname(
+                    row, '_prealign_from-DWI_to-MNI_xfm.json')
+                meta = dict(type="rigid")
+                afd.write_json(meta_fname, meta)
+            else:
+                return aff
+        if save:
+            return prealign_file
+        else:
+            return np.load(prealign_file)
 
     def get_for_row(self, afq_object, row):
         mapping_file, meta_fname = self.get_fnames(
@@ -274,17 +279,22 @@ class SynMap(GeneratedMapMixin, Definition):
         Default: True
     affine_kwargs : dictionary, optional
         Parameters to pass to affine_registration
-        in AFQ.registration, which does the linear pre-alignment.
+        in dipy.align, which does the linear pre-alignment.
         Only used if use_prealign is True.
+        Default: {}
+    syn_kwargs : dictionary, optional
+        Parameters to pass to syn_registration
+        in dipy.align, which does the SyN alignment.
         Default: {}
     Examples
     --------
     api.AFQ(mapping=SynMap())
     """
 
-    def __init__(self, use_prealign=True, affine_kwargs={}):
+    def __init__(self, use_prealign=True, affine_kwargs={}, syn_kwargs={}):
         self.use_prealign = use_prealign
         self.affine_kwargs = affine_kwargs
+        self.syn_kwargs = syn_kwargs
         self.extension = ".nii.gz"
 
     def find_path(self, bids_layout, from_path, subject, session):
@@ -292,12 +302,13 @@ class SynMap(GeneratedMapMixin, Definition):
 
     def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
                     reg_subject_img, reg_subject_sls, reg_prealign):
-        _, mapping = reg.syn_registration(
+        _, mapping = syn_registration(
             reg_subject_img.get_fdata(),
             reg_template_img.get_fdata(),
             moving_affine=reg_subject_img.affine,
             static_affine=reg_template_img.affine,
-            prealign=reg_prealign)
+            prealign=reg_prealign,
+            **self.syn_kwargs)
         if self.use_prealign:
             mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
         return mapping
@@ -308,13 +319,18 @@ class SlrMap(GeneratedMapMixin, Definition):
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
 
+    syn_kwargs : dictionary, optional
+        Parameters to pass to whole_brain_slr
+        in dipy, which does the SLR alignment.
+        Default: {}
 
     Examples
     --------
     api.AFQ(mapping=SlrMap())
     """
 
-    def __init__(self):
+    def __init__(self, syn_kwargs={}):
+        self.syn_kwargs = {}
         self.use_prealign = False
         self.extension = ".npy"
 
@@ -328,7 +344,8 @@ class SlrMap(GeneratedMapMixin, Definition):
             moving_affine=reg_subject_img.affine,
             moving_shape=reg_subject_img.shape,
             static_affine=reg_template_img.affine,
-            static_shape=reg_template_img.shape)
+            static_shape=reg_template_img.shape,
+            **self.slr_kwargs)
 
 
 class AffMap(GeneratedMapMixin, Definition):
@@ -338,7 +355,7 @@ class AffMap(GeneratedMapMixin, Definition):
 
     affine_kwargs : dictionary, optional
         Parameters to pass to affine_registration
-        in AFQ.registration, which does the linear pre-alignment.
+        in dipy.align, which does the linear pre-alignment.
         Default: {}
 
     Examples
@@ -356,7 +373,8 @@ class AffMap(GeneratedMapMixin, Definition):
 
     def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
                     reg_subject_img, reg_subject_sls, reg_prealign):
-        return ConformedAffineMapping(np.load(self.prealign(afq_object, row)))
+        return ConformedAffineMapping(np.linalg.inv(
+            self.prealign(afq_object, row, save=False)))
 
 
 class ConformedAffineMapping(AffineMap):

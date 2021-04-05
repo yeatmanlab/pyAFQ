@@ -1,11 +1,12 @@
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import MaskFile
 
-import AFQ.registration as reg
 import AFQ.data as afd
 
 import nibabel as nib
 import os.path as op
+
+from dipy.align import resample
 
 # For scalar defintions, get_for_row should return:
 # data, affine, meta
@@ -93,11 +94,11 @@ class TemplateScalar(ScalarMixin, Definition):
 
     def get_data(self, afq_object, row):
         if not self.is_resampled:
-            self.img = reg.resample(
+            self.img = resample(
                 self.img.get_fdata(),
                 afq_object.reg_template_img,
                 self.img.affine,
-                afq_object.reg_template_img.affine)
+                afq_object.reg_template_img.affine).get_fdata()
             self.is_resampled = True
 
         mapping = afq_object._mapping(row)

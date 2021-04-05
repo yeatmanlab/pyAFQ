@@ -6,7 +6,6 @@ from AFQ.definitions.utils import Definition
 from AFQ.utils.bin import get_default_args
 from AFQ.viz.utils import Viz, visualize_tract_profiles
 import AFQ.utils.volume as auv
-import AFQ.registration as reg
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import dipy.reconst.dki as dpy_dki
@@ -34,6 +33,7 @@ import dipy.tracking.utils as dtu
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.gradients import read_bvals_bvecs
+from dipy.align import resample
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
@@ -1699,11 +1699,11 @@ class AFQ(object):
                     start_p = endpoint_info[bundle_name]['startpoint']
                     end_p = endpoint_info[bundle_name]['endpoint']
                     for ii, pp in enumerate([start_p, end_p]):
-                        pp = reg.resample(
+                        pp = resample(
                             pp.get_fdata(),
                             self.reg_template_img,
                             pp.affine,
-                            self.reg_template_img.affine)
+                            self.reg_template_img.affine).get_fdata()
 
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1

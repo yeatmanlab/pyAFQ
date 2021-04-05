@@ -3,7 +3,7 @@ import numpy as np
 
 import scipy.ndimage as ndim
 from skimage.filters import gaussian
-from skimage.morphology import convex_hull_image, binary_dilation
+from skimage.morphology import binary_dilation
 from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import dice
 
@@ -14,6 +14,7 @@ from dipy.tracking.streamline import select_random_set_of_streamlines
 import dipy.tracking.utils as dtu
 
 logger = logging.getLogger('AFQ.utils.volume')
+
 
 def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
     """
@@ -44,18 +45,19 @@ def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
         roi = roi.get_fdata()
 
     _roi = mapping.transform_inverse(roi, interpolation='linear')
-    _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
 
     if np.sum(_roi) == 0:
-        logger.warning(f'Lost ROI {bundle_name}, performing automatic binary dilation')
+        logger.warning(
+            f'Lost ROI {bundle_name}, performing automatic binary dilation')
         _roi = binary_dilation(roi)
         _roi = mapping.transform_inverse(_roi, interpolation='linear')
-        _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
+
+    _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
 
     return _roi
 
 
-def patch_up_roi(roi, bundle_name="ROI"):
+def patch_up_roi(roi, bundle_name="ROI", make_convex=True):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
     We perform a couple of computational geometry operations on the ROI to
@@ -86,10 +88,7 @@ def patch_up_roi(roi, bundle_name="ROI"):
         raise ValueError((
             f"{bundle_name} found to be empty after "
             "applying the mapping."))
-    try:
-        return convex_hull_image(hole_filled)
-    except QhullError:
-        return hole_filled
+    return hole_filled
 
 
 def density_map(tractogram, n_sls=None, to_vox=False, normalize=False):

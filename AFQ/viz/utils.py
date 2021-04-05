@@ -20,6 +20,7 @@ from dipy.io.streamline import load_tractogram
 from dipy.tracking.utils import transform_tracking_output
 import dipy.tracking.streamlinespeed as dps
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.align import resample
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
@@ -382,7 +383,8 @@ def prepare_roi(roi, affine_or_mapping, static_img,
                                  "need to also specify all of the following",
                                  "inputs: `static_img`, `roi_affine`, ",
                                  "`static_affine`")
-            roi = reg.resample(roi, static_img, roi_affine, static_affine)
+            roi = resample(roi, static_img, roi_affine,
+                           static_affine).get_fdata()
         else:
             # Assume it is  a mapping:
             if (isinstance(affine_or_mapping, str)

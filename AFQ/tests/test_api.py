@@ -27,7 +27,6 @@ from AFQ import api
 import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
-import AFQ.registration as reg
 import AFQ.utils.bin as afb
 from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask,\
     PFTMask, MaskFile
