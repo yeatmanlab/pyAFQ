@@ -319,7 +319,7 @@ class SlrMap(GeneratedMapMixin, Definition):
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
 
-    syn_kwargs : dictionary, optional
+    slr_kwargs : dictionary, optional
         Parameters to pass to whole_brain_slr
         in dipy, which does the SLR alignment.
         Default: {}
@@ -329,8 +329,8 @@ class SlrMap(GeneratedMapMixin, Definition):
     api.AFQ(mapping=SlrMap())
     """
 
-    def __init__(self, syn_kwargs={}):
-        self.syn_kwargs = {}
+    def __init__(self, slr_kwargs={}):
+        self.slr_kwargs = {}
         self.use_prealign = False
         self.extension = ".npy"
 
