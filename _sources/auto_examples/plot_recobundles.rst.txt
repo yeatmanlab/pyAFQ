@@ -276,26 +276,26 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16653
+    16664
     Segmenting fiber groups...
-    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:685: UserWarning:
+    /opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:684: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
-    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:808: UserWarning:
+    /opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:807: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
-    CST_R 49
-    CST_L 46
-    UF_R 13
-    UF_L 3
-    CC_ForcepsMajor 461
-    CC_ForcepsMinor 896
+    CST_R 72
+    CST_L 50
+    UF_R 40
+    UF_L 5
+    CC_ForcepsMajor 467
+    CC_ForcepsMinor 711
     OR_R 18
-    OR_L 37
-    VOF_R 15
-    VOF_L 125
+    OR_L 28
+    VOF_R 28
+    VOF_L 123
     Extracting tract profiles...
 
 
@@ -315,7 +315,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 19 minutes  44.965 seconds)
+   **Total running time of the script:** ( 19 minutes  59.355 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:
