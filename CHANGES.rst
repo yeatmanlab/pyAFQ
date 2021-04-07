@@ -1,3 +1,44 @@
+0.7 (April 06, 2021)
+====================
+This version includes upgrades and updates to a variety of methods.
+A major new feature in this release is automated builds of docker images for
+both pyAFQ by itself, as well as in tandem with qsiprep.
+
+* [FIX] Minor BF for nightly tests (#665)
+  * [ENH] A variety of registration improvements, primarily for babyAFQ (#661)
+  * [Doc] try new docs layout (#664)
+  * [FIX] Build and push pyAFQ docker image only after merge (#663)
+  * [ENH] docker workflow for pyafq and afqsi (#659)
+  * only run roi dilation if necessary (#662)
+  * BF: Set up bundle dict in cases where a dict is provided, but algo is "reco" (#658)
+  *  [FIX] try to make pyafq play nice with pybids 0.9.3 (#660)
+  * BF: _gen_sl_counts function was failing with more than one subject (#656)
+  * [FIX] remove invalid sls from tractography, which could be custom (#654)
+  * [FIX] Propogate flip axial to export_all (#651)
+  * [ENH] make cvxpy optional (#653)
+  * Allow ItkMap in pyAFQ (#650)
+  * Dipy should be at least 1.4.0 (#643)
+  * Median tract profile (#649)
+  * Some minor bug fixes/improvements from the optic bids PR (#647)
+  * Major changes for processing optic radiations with CLI (#625)
+  * [ENH] Input ylim for CI plots (#642)
+  * [FIX] Plotly Bundle Visualization fixes (#641)
+  * DOC: This page has since moved. (#640)
+  * DOC: When releasing, we need to push the tag upstream. (#639)
+  * Add API method to export masked b0 (#638)
+  * [FIX] opacity argument to make fury API like plotly API (#637)
+  * Add conflict checker; loosen up dependencies (#636)
+  * Allow more flexibility in dask version (#634)
+  * More plotting tweaks, gridspec compat (#627)
+  * Added an ROI pre segmentation as an option for recobundles (#573)
+  * Relax versions to avoid cvxpy/numpy incompatibility (#632)
+  * export endpoint ROI when saving intermediates (#628)
+  * FIX: combine AFQ profiles (#585)
+  * Fixes DCP Error (#630)
+  * Update numpy version (#629)
+  * Allow user to only use prealign in registration (#626)
+
+
 0.6 (January 05, 2021)
 ======================
 This version includes many fixes, documentation enhancements and
