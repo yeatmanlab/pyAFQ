@@ -30,7 +30,7 @@ ROIs of your design.
 For now, this is a hypothetical example, as we do not yet
 provide these ROIs as part of the software.
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-41
+.. GENERATED FROM PYTHON SOURCE LINES 14-42
 
 .. code-block:: default
 
@@ -46,6 +46,7 @@ provide these ROIs as part of the software.
     from dipy.io.stateful_tractogram import StatefulTractogram
     from dipy.io.stateful_tractogram import Space
     from dipy.reconst import shm
+    from dipy.align import affine_registration, resample
 
     import AFQ.data as afd
     import AFQ.tractography as aft
@@ -62,12 +63,12 @@ provide these ROIs as part of the software.
     working_dir = "./optic_radiations"
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-44
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
 
 Get example data:
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-52
+.. GENERATED FROM PYTHON SOURCE LINES 45-53
 
 .. code-block:: default
 
@@ -80,12 +81,12 @@ Get example data:
     img = nib.load(hardi_fdata)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+.. GENERATED FROM PYTHON SOURCE LINES 54-56
 
 Calculate DTI:
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-67
+.. GENERATED FROM PYTHON SOURCE LINES 56-68
 
 .. code-block:: default
 
@@ -102,12 +103,12 @@ Calculate DTI:
     FA_data = FA_img.get_fdata()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-70
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 Calculate CSD:
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-79
+.. GENERATED FROM PYTHON SOURCE LINES 71-80
 
 .. code-block:: default
 
@@ -121,7 +122,7 @@ Calculate CSD:
     apm = shm.anisotropic_power(nib.load(sh_coeff).get_fdata())
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-94
+.. GENERATED FROM PYTHON SOURCE LINES 81-95
 
 Register the individual data to a template:
 -------------------------------------------
@@ -138,7 +139,7 @@ fulfill the segmentation criteria.
     Before calculating this non-linear warping, we perform a pre-alignment
     using an affine transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-119
+.. GENERATED FROM PYTHON SOURCE LINES 95-120
 
 .. code-block:: default
 
@@ -151,7 +152,7 @@ fulfill the segmentation criteria.
         import dipy.core.gradients as dpg
         gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
         # Prealign using affine registration
-        _, prealign = reg.affine_registration(
+        _, prealign = affine_registration(
             apm,
             MNI_T1w_img.get_fdata(),
             img.affine,
@@ -168,7 +169,7 @@ fulfill the segmentation criteria.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-126
+.. GENERATED FROM PYTHON SOURCE LINES 121-127
 
 Bundle specification
 -------------------------------------------
@@ -177,7 +178,7 @@ Here, a bundle specification is defined as a series of waypoint ROIs.
 For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
 exclusion ROIs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-171
+.. GENERATED FROM PYTHON SOURCE LINES 127-172
 
 .. code-block:: default
 
@@ -227,7 +228,7 @@ exclusion ROIs.
         }
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-177
+.. GENERATED FROM PYTHON SOURCE LINES 173-178
 
 Endpoints
 ----------
@@ -235,7 +236,7 @@ In addition to the waypoint ROIs, we will customize the endpoint ROIs
 used for filtering the streamlines that are selected based on the
 waypoint ROIs defined above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-192
+.. GENERATED FROM PYTHON SOURCE LINES 178-193
 
 .. code-block:: default
 
@@ -255,7 +256,7 @@ waypoint ROIs defined above.
                                          'right_V1_MNI.nii.gz'))}}
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-198
+.. GENERATED FROM PYTHON SOURCE LINES 194-199
 
 Tracking
 --------
@@ -263,7 +264,7 @@ We will use PFT and generate a large number of streamlines from seeds
 placed only within the inclusion ROIs. This allows us to oversample that
 part of the brain, without having to deal with very large tractograms.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-256
+.. GENERATED FROM PYTHON SOURCE LINES 199-258
 
 .. code-block:: default
 
@@ -293,10 +294,11 @@ part of the brain, without having to deal with very large tractograms.
 
             for ii, pp in enumerate(endpoint_spec[bundle].keys()):
                 roi = endpoint_spec[bundle][pp]
-                roi = reg.resample(roi.get_fdata(),
-                                   MNI_T1w_img,
-                                   roi.affine,
-                                   MNI_T1w_img.affine)
+                roi = resample(
+                    roi.get_fdata(),
+                    MNI_T1w_img,
+                    roi.affine,
+                    MNI_T1w_img.affine).get_fdata()
 
                 warped_roi = transform_inverse_roi(
                     roi,
@@ -326,7 +328,7 @@ part of the brain, without having to deal with very large tractograms.
     sft.to_vox()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-264
+.. GENERATED FROM PYTHON SOURCE LINES 259-266
 
 Segmentation
 ------------
@@ -336,7 +338,7 @@ rather lenient criterion for endpoint filtering, by changing from the
 default value of ``dist_to_atlas`` (4 mm) to 5 mm.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 264-279
+.. GENERATED FROM PYTHON SOURCE LINES 266-281
 
 .. code-block:: default
 
@@ -356,13 +358,13 @@ default value of ``dist_to_atlas`` (4 mm) to 5 mm.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-283
+.. GENERATED FROM PYTHON SOURCE LINES 282-285
 
 Cleaning
 --------
 We proceed to clean outliers and save out trk files with the bundles.
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-304
+.. GENERATED FROM PYTHON SOURCE LINES 285-306
 
 .. code-block:: default
 
@@ -388,13 +390,13 @@ We proceed to clean outliers and save out trk files with the bundles.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-308
+.. GENERATED FROM PYTHON SOURCE LINES 307-310
 
 Bundle profiles
 ---------------
 Finally, we can extract and plot bundle profiles.
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-322
+.. GENERATED FROM PYTHON SOURCE LINES 310-324
 
 .. code-block:: default
 
@@ -413,7 +415,7 @@ Finally, we can extract and plot bundle profiles.
     plt.show()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 323-333
+.. GENERATED FROM PYTHON SOURCE LINES 325-335
 
 References:
 -------------------------

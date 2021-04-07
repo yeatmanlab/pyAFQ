@@ -6,36 +6,159 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.segmentation &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <h1>Source code for AFQ.segmentation</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -48,7 +171,6 @@
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
 <span class="kn">from</span> <span class="nn">dipy.segment.bundles</span> <span class="kn">import</span> <span class="n">RecoBundles</span>
@@ -57,11 +179,13 @@
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">save_tractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.parallel</span> <span class="kn">import</span> <span class="n">parfor</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Segmentation&quot;</span><span class="p">]</span>
 
@@ -85,6 +209,9 @@
                  <span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;AFQ&#39;</span><span class="p">,</span>
                  <span class="n">reg_algo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">clip_edges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">parallel_segmentation</span><span class="o">=</span><span class="p">{</span>
+                     <span class="s2">&quot;n_jobs&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;engine&quot;</span><span class="p">:</span> <span class="s2">&quot;joblib&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;loky&quot;</span><span class="p">},</span>
                  <span class="n">progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">greater_than</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">rm_small_clusters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
@@ -97,7 +224,10 @@
                  <span class="n">dist_to_waypoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">presegment_bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">presegment_kawrgs</span><span class="o">=</span><span class="p">{},</span>
                  <span class="n">filter_by_endpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">endpoint_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dist_to_atlas</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
                  <span class="n">save_intermediates</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -128,6 +258,13 @@
 <span class="sd">        clip_edges : bool</span>
 <span class="sd">            Whether to clip the streamlines to be only in between the ROIs.</span>
 <span class="sd">            Default: False</span>
+<span class="sd">        parallel_segmentation : dict</span>
+<span class="sd">            How to parallelize segmentation across processes when performing</span>
+<span class="sd">            waypoint ROI segmentation. Set to {&quot;engine&quot;: &quot;serial&quot;} to not</span>
+<span class="sd">            perform parallelization. See ``AFQ.utils.parallel.pafor`` for</span>
+<span class="sd">            details.</span>
+<span class="sd">            Default: {&quot;n_jobs&quot;: -1, &quot;engine&quot;: &quot;joblib&quot;,</span>
+<span class="sd">                      &quot;backend&quot;: &quot;loky&quot;}</span>
 <span class="sd">        rm_small_clusters : int</span>
 <span class="sd">            Using RecoBundles Algorithm.</span>
 <span class="sd">            Remove clusters that have less than this value</span>
@@ -175,6 +312,13 @@
 <span class="sd">            ROI in order to be included or excluded.</span>
 <span class="sd">            If set to None (default), will be calculated as the</span>
 <span class="sd">            center-to-corner distance of the voxel in the diffusion data.</span>
+<span class="sd">            If a bundle has additional_tolerance in its bundle_dict, that</span>
+<span class="sd">            tolerance will be added to this distance.</span>
+<span class="sd">            For example, if you wanted to increase tolerance for the right</span>
+<span class="sd">            arcuate waypoint ROIs by 3 each, you could make the following</span>
+<span class="sd">            modification to your bundle_dict:</span>
+<span class="sd">            bundle_dict[&quot;ARC_R&quot;][&quot;additional_tolerances&quot;] = [3, 3]</span>
+<span class="sd">            Additional tolerances can also be negative.</span>
 <span class="sd">        rng : RandomState or int</span>
 <span class="sd">            If None, creates RandomState.</span>
 <span class="sd">            If int, creates RandomState with seed rng.</span>
@@ -183,10 +327,32 @@
 <span class="sd">        return_idx : bool</span>
 <span class="sd">            Whether to return the indices in the original streamlines as part</span>
 <span class="sd">            of the output of segmentation.</span>
+<span class="sd">        presegment_bundle_dict : dict or None</span>
+<span class="sd">            If not None, presegment by ROIs before performing</span>
+<span class="sd">            RecoBundles. Only used if seg_algo starts with &#39;Reco&#39;.</span>
+<span class="sd">            Meta-data for the segmentation. The format is something like::</span>
+<span class="sd">                {&#39;name&#39;: {&#39;ROIs&#39;:[img1, img2],</span>
+<span class="sd">                &#39;rules&#39;:[True, True]},</span>
+<span class="sd">                &#39;prob_map&#39;: img3,</span>
+<span class="sd">                &#39;cross_midline&#39;: False}</span>
+<span class="sd">            Default: None</span>
+<span class="sd">        presegment_kawrgs : dict</span>
+<span class="sd">            Optional arguments for initializing the segmentation for the</span>
+<span class="sd">            presegmentation. Only used if presegment_bundle_dict is not None.</span>
+<span class="sd">            Default: {}</span>
 <span class="sd">        filter_by_endpoints: bool</span>
 <span class="sd">            Whether to filter the bundles based on their endpoints relative</span>
 <span class="sd">            to regions defined in the AAL atlas. Applies only to the waypoint</span>
 <span class="sd">            approach (XXX for now). Default: True.</span>
+<span class="sd">        endpoint_info : dict, optional. This overrides use of the</span>
+<span class="sd">            AAL atlas, which is the default behavior.</span>
+<span class="sd">            The format for this should be:</span>
+<span class="sd">            {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
+<span class="sd">                         &quot;endpoint&quot;:img1_2},</span>
+<span class="sd">             &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
+<span class="sd">                          &quot;endpoint&quot;:img2_2}}</span>
+<span class="sd">            where the images used are binary masks of the desired</span>
+<span class="sd">            endpoints.</span>
 <span class="sd">        dist_to_atlas : float</span>
 <span class="sd">            If filter_by_endpoints is True, this is the required distance</span>
 <span class="sd">            from the endpoints to the atlas ROIs.</span>
@@ -227,8 +393,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">refine</span> <span class="o">=</span> <span class="n">refine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pruning_thr</span> <span class="o">=</span> <span class="n">pruning_thr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span> <span class="o">=</span> <span class="n">return_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="o">=</span> <span class="n">presegment_bundle_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presegment_kawrgs</span> <span class="o">=</span> <span class="n">presegment_kawrgs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">filter_by_endpoints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">endpoint_info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="n">dist_to_atlas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span> <span class="o">=</span> <span class="n">parallel_segmentation</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_intermediates</span><span class="p">)):</span>
@@ -257,7 +427,7 @@
 <div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">fdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">fbvec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">endpoint_info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles based on either waypoint ROIs</span>
 <span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
@@ -288,15 +458,6 @@
 <span class="sd">        reset_tg_space : bool, optional</span>
 <span class="sd">            Whether to reset the space of the input tractogram after</span>
 <span class="sd">            segmentation is complete. Default: False.</span>
-<span class="sd">        endpoint_info : dict, optional. This overrides use of the</span>
-<span class="sd">            AAL atlas, which is the default behavior.</span>
-<span class="sd">            The format for this should be:</span>
-<span class="sd">            {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
-<span class="sd">                         &quot;endpoint&quot;:img1_2},</span>
-<span class="sd">             &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
-<span class="sd">                          &quot;endpoint&quot;:img2_2}}</span>
-<span class="sd">            where the images used are binary masks of the desired</span>
-<span class="sd">            endpoints.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -337,7 +498,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_map</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">endpoint_info</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
             <span class="c1"># We only care about midline crossing if we use AFQ:</span>
@@ -392,6 +552,7 @@
         <span class="k">if</span> <span class="n">reg_template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">reg_template</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">reg_prealign</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template</span>
 
         <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -450,15 +611,24 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Segmentation._get_bundle_info"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._get_bundle_info">[docs]</a>    <span class="k">def</span> <span class="nf">_get_bundle_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">):</span>
+<div class="viewcode-block" id="Segmentation._get_bundle_info"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._get_bundle_info">[docs]</a>    <span class="k">def</span> <span class="nf">_get_bundle_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">vox_dim</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get fiber probabilites and ROIs for a given bundle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]</span>
+        <span class="n">bundle_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="n">bundle_entry</span><span class="p">[</span><span class="s1">&#39;rules&#39;</span><span class="p">]</span>
         <span class="n">include_rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">include_roi_tols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">exclude_rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">exclude_roi_tols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rule_idx</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
-            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="n">rule_idx</span><span class="p">]</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">bundle_entry</span><span class="p">[</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="n">rule_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;additional_tolerance&#39;</span> <span class="ow">in</span> <span class="n">bundle_entry</span><span class="p">:</span>
+                <span class="n">this_tol</span> <span class="o">=</span> <span class="p">(</span><span class="n">bundle_entry</span><span class="p">[</span><span class="s1">&#39;additional_tolerance&#39;</span><span class="p">][</span><span class="n">rule_idx</span><span class="p">]</span>
+                            <span class="o">/</span> <span class="n">vox_dim</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">this_tol</span> <span class="o">=</span> <span class="n">tol</span><span class="o">**</span><span class="mi">2</span>
+
             <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
                 <span class="n">roi</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
@@ -466,13 +636,20 @@
 
             <span class="k">if</span> <span class="n">rule</span><span class="p">:</span>
                 <span class="c1"># include ROI:</span>
+                <span class="n">include_roi_tols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_tol</span><span class="p">)</span>
                 <span class="n">include_rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Exclude ROI:</span>
+                <span class="n">exclude_roi_tols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_tol</span><span class="p">)</span>
                 <span class="n">exclude_rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
             <span class="c1"># For debugging purposes, we can save the variable as it is:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                            <span class="s1">&#39;warpedROI_&#39;</span><span class="p">,</span>
+                            <span class="n">bundle</span><span class="p">),</span>
+                    <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                     <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">),</span>
@@ -483,7 +660,11 @@
 
         <span class="c1"># The probability map if doesn&#39;t exist is all ones with the same</span>
         <span class="c1"># shape as the ROIs:</span>
-        <span class="n">prob_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">prob_map</span> <span class="o">=</span> <span class="n">bundle_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s1">&#39;prob_map&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -491,33 +672,8 @@
         <span class="n">warped_prob_map</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span>
                                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">exclude_rois</span></div>
-
-<div class="viewcode-block" id="Segmentation._check_sl_with_inclusion"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._check_sl_with_inclusion">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sl_with_inclusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to check that a streamline is close to a list of</span>
-<span class="sd">        inclusion ROIS.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">include_rois</span><span class="p">:</span>
-            <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
-            <span class="n">dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
-                <span class="c1"># Too far from one of them:</span>
-                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
-        <span class="c1"># Apparently you checked all the ROIs and it was close to all of them</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dist</span></div>
-
-<div class="viewcode-block" id="Segmentation._check_sl_with_exclusion"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._check_sl_with_exclusion">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sl_with_exclusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">exclude_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Helper function to check that a streamline is not too close to a</span>
-<span class="sd">        list of exclusion ROIs.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">exclude_rois</span><span class="p">:</span>
-            <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="c1"># Either there are no exclusion ROIs, or you are not close to any:</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">exclude_rois</span><span class="p">,</span>\
+            <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi_tols</span></div>
 
 <div class="viewcode-block" id="Segmentation._return_empty"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._return_empty">[docs]</a>    <span class="k">def</span> <span class="nf">_return_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -559,6 +715,19 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
             <span class="n">out_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_streamlines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
+        <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
+        <span class="c1"># from mm to voxel units:</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">vox_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
+
+        <span class="c1"># Tolerance is set to the square of the distance to the corner</span>
+        <span class="c1"># because we are using the squared Euclidean distance in calls to</span>
+        <span class="c1"># `cdist` to make those calls faster.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="o">/</span> <span class="n">vox_dim</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">aal_atlas</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_aal_atlas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">)</span>
@@ -570,25 +739,21 @@
                                 <span class="s1">&#39;atlas_registered_to_template.nii.gz&#39;</span><span class="p">))</span>
 
                 <span class="n">atlas</span> <span class="o">=</span> <span class="n">atlas</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-            <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
-            <span class="c1"># from mm to voxel units:</span>
-            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-            <span class="n">vox_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
+
             <span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">/</span> <span class="n">vox_dim</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
-        <span class="c1"># Tolerance is set to the square of the distance to the corner</span>
-        <span class="c1"># because we are using the squared Euclidean distance in calls to</span>
-        <span class="c1"># `cdist` to make those calls faster.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">for</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finding Streamlines for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span> <span class="n">exclude_roi</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_bundle_info</span><span class="p">(</span><span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">)</span>
+            <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>\
+                <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi_tols</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_bundle_info</span><span class="p">(</span><span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">vox_dim</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                            <span class="s1">&#39;warpedprobmap&#39;</span><span class="p">,</span>
+                            <span class="n">bundle</span><span class="p">),</span>
+                    <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                     <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_prob_map</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">),</span>
@@ -606,8 +771,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> streamlines exceed&quot;</span>
                               <span class="s2">&quot; the probability threshold.&quot;</span><span class="p">))</span>
             <span class="n">crosses_midline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;cross_midline&#39;</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">sl_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
+
+            <span class="c1"># with parallel segmentation, the first for loop will</span>
+            <span class="c1"># only collect streamlines and does not need tqdm</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">[</span><span class="s2">&quot;engine&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;serial&quot;</span><span class="p">:</span>
+                <span class="n">in_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">sl_idxs</span> <span class="o">=</span> <span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sl_idxs</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">sl_idx</span> <span class="ow">in</span> <span class="n">sl_idxs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">crosses_midline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]:</span>
@@ -620,23 +793,37 @@
                                 <span class="c1"># This is not what we want,</span>
                                 <span class="c1"># skip to next streamline</span>
                                 <span class="k">continue</span>
+                <span class="n">sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
+                <span class="n">fiber_prob</span> <span class="o">=</span> <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
 
-                    <span class="n">is_close</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_check_sl_with_inclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span>
-                                                      <span class="n">include_roi</span><span class="p">,</span>
-                                                      <span class="n">tol</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">is_close</span><span class="p">:</span>
-                        <span class="n">is_far</span> <span class="o">=</span> \
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_check_sl_with_exclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span>
-                                                          <span class="n">exclude_roi</span><span class="p">,</span>
-                                                          <span class="n">tol</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">is_far</span><span class="p">:</span>
-                            <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span>\
-                                <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                            <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span>\
-                                <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                            <span class="n">streamlines_in_bundles</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">]</span> <span class="o">=</span>\
-                                <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
+                <span class="c1"># if parallel, collect the streamlines now</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">:</span>
+                    <span class="n">in_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sl</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">,</span> <span class="n">sl_idx</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>\
+                        <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>\
+                        <span class="n">streamlines_in_bundles</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">]</span> <span class="o">=</span>\
+                        <span class="n">_is_streamline_in_ROIs</span><span class="p">(</span>
+                            <span class="n">sl</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span>
+                            <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>
+                            <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">)</span>
+
+            <span class="c1"># collects results from the submitted streamlines</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">parfor</span><span class="p">(</span>
+                    <span class="n">_is_streamline_in_ROIs_parallel</span><span class="p">,</span> <span class="n">in_list</span><span class="p">,</span>
+                    <span class="n">func_args</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">tol</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span> <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>
+                        <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">],</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                    <span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">min_dist_coords_0</span><span class="p">,</span>\
+                        <span class="n">min_dist_coords_1</span><span class="p">,</span> <span class="n">sl_in_bundles</span> <span class="o">=</span>\
+                        <span class="n">result</span>
+                    <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_dist_coords_0</span>
+                    <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_dist_coords_1</span>
+                    <span class="n">streamlines_in_bundles</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl_in_bundles</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">streamlines_in_bundles</span><span class="p">[:,</span> <span class="n">bundle_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                  <span class="s2">&quot;streamlines selected with waypoint ROIs&quot;</span><span class="p">))</span>
@@ -690,11 +877,12 @@
                     <span class="n">end_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_info</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;endpoint&#39;</span><span class="p">]</span>
 
                     <span class="n">atlas_idx</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="k">for</span> <span class="n">pp</span> <span class="ow">in</span> <span class="p">[</span><span class="n">start_p</span><span class="p">,</span> <span class="n">end_p</span><span class="p">]:</span>
-                        <span class="n">pp</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
-                                          <span class="n">pp</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">pp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">start_p</span><span class="p">,</span> <span class="n">end_p</span><span class="p">]):</span>
+                        <span class="n">pp</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+                            <span class="n">pp</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                            <span class="n">pp</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
                         <span class="n">atlas_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                         <span class="n">atlas_roi</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -703,6 +891,26 @@
                         <span class="n">warped_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
                             <span class="n">atlas_roi</span><span class="p">,</span>
                             <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ii</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">point_name</span> <span class="o">=</span> <span class="s2">&quot;startpoint&quot;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">point_name</span> <span class="o">=</span> <span class="s2">&quot;endpoint&quot;</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                                <span class="s1">&#39;endpoint_ROI&#39;</span><span class="p">,</span>
+                                <span class="n">bundle</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                                <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+                                    <span class="n">warped_roi</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">),</span>
+                                <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                                        <span class="s1">&#39;endpoint_ROI&#39;</span><span class="p">,</span>
+                                        <span class="n">bundle</span><span class="p">,</span>
+                                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">point_name</span><span class="si">}</span><span class="s1">_as_used.nii.gz&#39;</span><span class="p">))</span>
+
                         <span class="n">atlas_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">warped_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -738,7 +946,7 @@
                 <span class="c1"># We need to check this again:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_select_sl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;After filtering &quot;</span>
-                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">select_sl</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_select_sl</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
                     <span class="c1"># There&#39;s nothing here, set and move to the next bundle:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_return_empty</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
                     <span class="k">continue</span>
@@ -783,14 +991,13 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">select_sl</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span></div>
 
-<div class="viewcode-block" id="Segmentation.move_streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.move_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">move_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_algo</span><span class="o">=</span><span class="s1">&#39;slr&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Segmentation.move_streamlines"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.move_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">move_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">reg_algo</span><span class="o">=</span><span class="s1">&#39;slr&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Streamline-based registration of a whole-brain tractogram to</span>
 <span class="sd">        the MNI whole-brain atlas.</span>
 
 <span class="sd">        registration_algo : str</span>
 <span class="sd">            &quot;slr&quot; or &quot;syn&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">reg_algo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;slr&#39;</span>
@@ -801,20 +1008,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering tractogram with SLR&quot;</span><span class="p">)</span>
             <span class="n">atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">whole_brain_slr</span><span class="p">(</span>
-                <span class="n">atlas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">atlas</span><span class="p">,</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="s1">&#39;affine&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">progressive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progressive</span><span class="p">,</span>
                 <span class="n">greater_than</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">greater_than</span><span class="p">,</span>
                 <span class="n">rm_small_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rm_small_clusters</span><span class="p">,</span>
                 <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">reg_algo</span> <span class="o">==</span> <span class="s2">&quot;syn&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering tractogram based on syn&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
+            <span class="n">tg</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
             <span class="n">delta</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+                <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="n">s</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+                <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="n">s</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)])</span>
+            <span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">moved_sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
@@ -844,17 +1051,90 @@
         <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
         <span class="n">fiber_groups</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">move_streamlines</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span><span class="p">)</span>
         <span class="c1"># We generate our instance of RB with the moved streamlines:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting Bundles&quot;</span><span class="p">)</span>
-        <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+        <span class="c1"># If doing a presegmentation based on ROIs then initialize</span>
+        <span class="c1"># that segmentation and segment using ROIs, else</span>
+        <span class="c1"># RecoBundles based on the whole brain tractogram</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roiseg</span> <span class="o">=</span> <span class="n">Segmentation</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">presegment_kawrgs</span><span class="p">)</span>
+            <span class="n">roiseg</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">,</span>
+                    <span class="n">reg_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                    <span class="n">mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
+                    <span class="n">reg_prealign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_prealign</span><span class="p">)</span>
+            <span class="n">roiseg_fg</span> <span class="o">=</span> <span class="n">roiseg</span><span class="o">.</span><span class="n">fiber_groups</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_streamlines</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span><span class="p">)</span>
+            <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="c1"># Next we&#39;ll iterate over bundles, registering each one:</span>
         <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finding streamlines for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">model_sl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span>
+
+            <span class="c1"># If doing a presegmentation based on ROIs then initialize rb after</span>
+            <span class="c1"># Filtering the whole brain tractogram to pass through ROIs</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">afq_bundle_name</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">BUNDLE_RECO_2_AFQ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="n">bundle</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;return_idx&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_kawrgs</span>\
+                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_kawrgs</span><span class="p">[</span><span class="s2">&quot;return_idx&quot;</span><span class="p">]:</span>
+                    <span class="n">indiv_tg</span> <span class="o">=</span> <span class="n">roiseg_fg</span><span class="p">[</span><span class="n">afq_bundle_name</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">indiv_tg</span> <span class="o">=</span> <span class="n">roiseg_fg</span><span class="p">[</span><span class="n">afq_bundle_name</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indiv_tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                        <span class="sa">f</span><span class="s2">&quot;No streamlines found by waypoint ROI &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;pre-segmentation for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">. Using entire&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; tractography instead.&quot;</span><span class="p">))</span>
+                    <span class="n">indiv_tg</span> <span class="o">=</span> <span class="n">tg</span>
+
+                <span class="c1"># Now rb should be initialized based on the fiber group coming</span>
+                <span class="c1"># out of the roi segmentation</span>
+                <span class="n">indiv_tg</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                    <span class="n">indiv_tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                    <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+                <span class="n">indiv_tg</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_streamlines</span><span class="p">(</span><span class="n">indiv_tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span><span class="p">)</span>
+                <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">moved_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_presegmentation.trk&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">moved_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;whole_brain.trk&quot;</span>
+                <span class="n">moved_sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                    <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+                <span class="n">save_tractogram</span><span class="p">(</span>
+                    <span class="n">moved_sft</span><span class="p">,</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                            <span class="n">moved_fname</span><span class="p">),</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">model_sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                    <span class="n">model_sl</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                    <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+                <span class="n">save_tractogram</span><span class="p">(</span>
+                    <span class="n">model_sft</span><span class="p">,</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_intermediates</span><span class="p">,</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_model.trk&quot;</span><span class="p">),</span>
+                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Either whole brain tracgtogram or roi presegmented fiber group</span>
+            <span class="c1"># goes to rb.recognize</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">rec_labels</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">recognize</span><span class="p">(</span><span class="n">model_bundle</span><span class="o">=</span><span class="n">model_sl</span><span class="p">,</span>
                                          <span class="n">model_clust_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span><span class="p">,</span>
                                          <span class="n">reduction_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span><span class="p">,</span>
@@ -864,16 +1144,24 @@
                                          <span class="n">pruning_distance</span><span class="o">=</span><span class="s1">&#39;mdf&#39;</span><span class="p">)</span>
 
             <span class="c1"># Use the streamlines in the original space:</span>
-            <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">indiv_tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">recognized_sl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">rec_labels</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">model_sl</span><span class="p">,</span> <span class="n">recognized_sl</span><span class="p">,</span>
                                           <span class="bp">self</span><span class="o">.</span><span class="n">model_clust_thr</span><span class="p">,</span>
                                           <span class="n">reduction_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction_thr</span><span class="p">,</span>
                                           <span class="n">pruning_thr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pruning_thr</span><span class="p">)</span>
-                <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
-
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">recognized_sl</span> <span class="o">=</span> <span class="n">indiv_tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">rec_labels</span><span class="p">]</span>
             <span class="n">standard_sl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span>
             <span class="n">oriented_sl</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">orient_by_streamline</span><span class="p">(</span><span class="n">recognized_sl</span><span class="p">,</span> <span class="n">standard_sl</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">oriented_sl</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines selected with Recobundles&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_idx</span><span class="p">:</span>
                 <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_labels</span>
@@ -976,6 +1264,77 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">out</span>
 
+<span class="c1"># Helper functions for segmenting using waypoint ROIs</span>
+<span class="c1"># they are not a part of the class because we do not want</span>
+<span class="c1"># copies of the class to be parallelized</span>
+
+
+<span class="k">def</span> <span class="nf">_check_sl_with_inclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span>
+                             <span class="n">include_roi_tols</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to check that a streamline is close to a list of</span>
+<span class="sd">    inclusion ROIS.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">include_rois</span><span class="p">):</span>
+        <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
+        <span class="n">dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">include_roi_tols</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
+            <span class="c1"># Too far from one of them:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
+    <span class="c1"># Apparently you checked all the ROIs and it was close to all of them</span>
+    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dist</span>
+
+
+<span class="k">def</span> <span class="nf">_check_sl_with_exclusion</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">exclude_rois</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span>
+                             <span class="n">exclude_roi_tols</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function to check that a streamline is not too close to a</span>
+<span class="sd">    list of exclusion ROIs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">exclude_rois</span><span class="p">):</span>
+        <span class="c1"># Use squared Euclidean distance, because it&#39;s faster:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">exclude_roi_tols</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="c1"># Either there are no exclusion ROIs, or you are not close to any:</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_is_streamline_in_ROIs</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span>
+                           <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>
+                           <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">):</span>
+    <span class="n">is_close</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> \
+        <span class="n">_check_sl_with_inclusion</span><span class="p">(</span>
+            <span class="n">sl</span><span class="p">,</span>
+            <span class="n">include_roi</span><span class="p">,</span>
+            <span class="n">tol</span><span class="p">,</span>
+            <span class="n">include_roi_tols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_close</span><span class="p">:</span>
+        <span class="n">is_far</span> <span class="o">=</span> \
+            <span class="n">_check_sl_with_exclusion</span><span class="p">(</span>
+                <span class="n">sl</span><span class="p">,</span>
+                <span class="n">exclude_roi</span><span class="p">,</span>
+                <span class="n">tol</span><span class="p">,</span>
+                <span class="n">exclude_roi_tols</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_far</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>\
+                <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fiber_prob</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">_is_streamline_in_ROIs_parallel</span><span class="p">(</span><span class="n">indiv_args</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span>
+                                    <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>
+                                    <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">):</span>
+    <span class="n">sl</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">,</span> <span class="n">sl_idx</span> <span class="o">=</span> <span class="n">indiv_args</span>
+    <span class="n">min_dist_coords_0</span><span class="p">,</span>\
+        <span class="n">min_dist_coords_1</span><span class="p">,</span>\
+        <span class="n">streamlines_in_bundles</span> <span class="o">=</span> \
+        <span class="n">_is_streamline_in_ROIs</span><span class="p">(</span>
+            <span class="n">sl</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">include_roi</span><span class="p">,</span>
+            <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi</span><span class="p">,</span>
+            <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">min_dist_coords_0</span><span class="p">,</span> <span class="n">min_dist_coords_1</span><span class="p">,</span>
+            <span class="n">streamlines_in_bundles</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">clean_by_endpoints</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">targets0</span><span class="p">,</span> <span class="n">targets1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1068,83 +1427,33 @@
                         <span class="k">yield</span> <span class="n">sl</span>
 </pre></div>
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  <li><a href="../AFQ.html">AFQ</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
     </div>
 
     
+  <script src="../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

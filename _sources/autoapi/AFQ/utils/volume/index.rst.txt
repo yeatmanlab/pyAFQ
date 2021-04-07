@@ -19,6 +19,11 @@ Functions
    AFQ.utils.volume.dice_coeff
 
 
+.. data:: logger
+   
+
+   
+
 .. function:: transform_inverse_roi(roi, mapping, bundle_name='ROI')
 
    After being non-linearly transformed, ROIs tend to have holes in them.
@@ -60,7 +65,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: patch_up_roi(roi, bundle_name='ROI')
+.. function:: patch_up_roi(roi, bundle_name='ROI', make_convex=True)
 
    After being non-linearly transformed, ROIs tend to have holes in them.
    We perform a couple of computational geometry operations on the ROI to

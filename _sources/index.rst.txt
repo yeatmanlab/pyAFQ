@@ -48,20 +48,11 @@ Tractometry
    :widths: auto
 
    * - Tractography
-     -
-     -
-     -
-     -
-   * -
-     - |gt| |rArr| Segmentation
+     - |rArr| Registration
+     - |rArr| Segmentation
      - |rArr| Cleaning
      - |rArr| Profiling
      - |rArr| Visualization
-   * - Registration
-     -
-     -
-     -
-     -
 
 .. todo::
   can make this table a pretty graphic

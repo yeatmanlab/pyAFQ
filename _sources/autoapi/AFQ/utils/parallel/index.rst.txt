@@ -42,7 +42,7 @@ Functions
            parallelization.
 
        **backend** : str
-           What joblib backend to use. Irrelevant for other engines.
+           What joblib or dask backend to use. Irrelevant for other engines.
 
        **func_args** : list, optional
            Positional arguments to `func`.

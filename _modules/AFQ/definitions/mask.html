@@ -5,77 +5,177 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.mask &#8212; AFQ 0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <title>AFQ.definitions.mask &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
 
-  </head><body>
-  
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
-  <h1>Source code for AFQ.mask</h1><div class="highlight"><pre>
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for AFQ.definitions.mask</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">from</span> <span class="nn">dipy.segment.mask</span> <span class="kn">import</span> <span class="n">median_otsu</span>
 
-<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span><span class="p">,</span> <span class="n">find_file</span>
 
+
+<span class="c1"># For mask defintions, get_for_row should return:</span>
+<span class="c1"># data, affine, meta</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaskFile&quot;</span><span class="p">,</span> <span class="s2">&quot;FullMask&quot;</span><span class="p">,</span> <span class="s2">&quot;RoiMask&quot;</span><span class="p">,</span> <span class="s2">&quot;B0Mask&quot;</span><span class="p">,</span> <span class="s2">&quot;LabelledMaskFile&quot;</span><span class="p">,</span>
            <span class="s2">&quot;ThresholdedMaskFile&quot;</span><span class="p">,</span> <span class="s2">&quot;ScalarMask&quot;</span><span class="p">,</span> <span class="s2">&quot;ThresholdedScalarMask&quot;</span><span class="p">,</span>
-           <span class="s2">&quot;CombinedMask&quot;</span><span class="p">,</span> <span class="s2">&quot;check_mask_methods&quot;</span><span class="p">]</span>
-
-
-<div class="viewcode-block" id="check_mask_methods"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.check_mask_methods">[docs]</a><span class="k">def</span> <span class="nf">check_mask_methods</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask_name</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Helper function</span>
-<span class="sd">    Checks if mask is a valid mask.</span>
-<span class="sd">    If mask_name is not False, will throw an error stating the method</span>
-<span class="sd">    not found and the mask name.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;find_path&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">mask_name</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;find_path method not found in </span><span class="si">{</span><span class="n">mask_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;get_mask&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">mask_name</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;get_mask method not found in </span><span class="si">{</span><span class="n">mask_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;__init__&#39;</span><span class="p">)</span>\
-            <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="s1">&#39;__code__&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">mask_name</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;__init__ method not defined in </span><span class="si">{</span><span class="n">mask_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+           <span class="s2">&quot;CombinedMask&quot;</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_resample_mask</span><span class="p">(</span><span class="n">mask_data</span><span class="p">,</span> <span class="n">dwi_data</span><span class="p">,</span> <span class="n">mask_affine</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">):</span>
@@ -87,54 +187,13 @@
     <span class="k">if</span> <span class="p">((</span><span class="n">dwi_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
         <span class="ow">and</span> <span class="p">(</span><span class="n">dwi_affine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">(</span><span class="n">dwi_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">mask_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">mask_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
-                                     <span class="n">dwi_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                     <span class="n">mask_affine</span><span class="p">,</span>
-                                     <span class="n">dwi_affine</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">mask_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">resample</span><span class="p">(</span>
+            <span class="n">mask_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+            <span class="n">dwi_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">mask_affine</span><span class="p">,</span>
+            <span class="n">dwi_affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">mask_type</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mask_data</span>
-
-
-<span class="k">def</span> <span class="nf">_arglist_to_string</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">get_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Helper function</span>
-<span class="sd">    Takes a list of arguments and unfolds them into a string.</span>
-<span class="sd">    If get_attr is not None, it will be used to get the attribute</span>
-<span class="sd">    corresponding to each argument instead.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">to_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;self&quot;</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="k">if</span> <span class="n">get_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">arg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">get_attr</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">check_mask_methods</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
-            <span class="n">arg</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">str_for_toml</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">arg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">arg</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="n">_arglist_to_string</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
-        <span class="n">to_string</span> <span class="o">=</span> <span class="n">to_string</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
-    <span class="k">if</span> <span class="n">to_string</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;, &#39;</span><span class="p">:</span>
-        <span class="n">to_string</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">to_string</span>
-
-
-<span class="k">class</span> <span class="nc">StrInstantiatesMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Helper class</span>
-<span class="sd">    Uses __init__ in str_for_toml to make string that will instantiate itself.</span>
-<span class="sd">    Assumes object will have attributes of same name as __init__ args.</span>
-<span class="sd">    This is important for reading/writing masks as arguments to config files.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="k">def</span> <span class="nf">str_for_toml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>\
-            <span class="o">+</span> <span class="s2">&quot;(&quot;</span>\
-            <span class="o">+</span> <span class="n">_arglist_to_string</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">,</span>
-                <span class="n">get_attr</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>\
-            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
 
 
 <span class="k">class</span> <span class="nc">CombineMaskMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -168,7 +227,7 @@
             <span class="sa">f</span><span class="s2">&quot; you set combine to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="MaskFile"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile">[docs]</a><span class="k">class</span> <span class="nc">MaskFile</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="MaskFile"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile">[docs]</a><span class="k">class</span> <span class="nc">MaskFile</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask based on a file.</span>
 <span class="sd">    Does not apply any labels or thresholds;</span>
@@ -189,7 +248,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    seed_mask = MaskFile(</span>
 <span class="sd">        &quot;WM_mask&quot;,</span>
-<span class="sd">        {&quot;scope&quot;=&quot;dmriprep&quot;})</span>
+<span class="sd">        {&quot;scope&quot;:&quot;dmriprep&quot;})</span>
 <span class="sd">    api.AFQ(tracking_params={&quot;seed_mask&quot;: seed_mask,</span>
 <span class="sd">                                &quot;seed_threshold&quot;: 0.1})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -199,59 +258,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">filters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="MaskFile.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="MaskFile.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># First, try to match the session.</span>
-        <span class="n">nearest_mask</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get_nearest</span><span class="p">(</span>
-            <span class="n">from_path</span><span class="p">,</span>
-            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
-            <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.nii.gz&quot;</span><span class="p">,</span>
-            <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-            <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span>
-            <span class="n">full_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">nearest_mask</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span>
+            <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span>
+            <span class="n">subject</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">nearest_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># If that fails, loosen session restriction</span>
-            <span class="n">nearest_mask</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get_nearest</span><span class="p">(</span>
-                <span class="n">from_path</span><span class="p">,</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
-                <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.nii.gz&quot;</span><span class="p">,</span>
-                <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
-                <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span>
-                <span class="n">full_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">nearest_mask</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">nearest_mask</span>
-        <span class="n">from_path_subject</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">parse_file_entities</span><span class="p">(</span><span class="n">from_path</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="kc">None</span>
-        <span class="p">)</span>
-        <span class="n">mask_subject</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">parse_file_entities</span><span class="p">(</span><span class="n">nearest_mask</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="kc">None</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">from_path_subject</span> <span class="o">!=</span> <span class="n">mask_subject</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected subject IDs to match for the retrieved mask file &quot;</span></div>
-                <span class="sa">f</span><span class="s2">&quot;and the supplied `from_path` file. Got sub-</span><span class="si">{</span><span class="n">mask_subject</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;from mask file </span><span class="si">{</span><span class="n">nearest_mask</span><span class="si">}</span><span class="s2"> and sub-</span><span class="si">{</span><span class="n">from_path_subject</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;from `from_path` file </span><span class="si">{</span><span class="n">from_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-
-<div class="viewcode-block" id="MaskFile.get_path_data_affine"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+<div class="viewcode-block" id="MaskFile.get_path_data_affine"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
         <span class="n">mask_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">mask_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mask_file</span><span class="p">,</span> <span class="n">mask_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span> <span class="n">mask_img</span><span class="o">.</span><span class="n">affine</span></div>
 
     <span class="c1"># This function is set up to be overriden by other masks</span>
-<div class="viewcode-block" id="MaskFile.apply_conditions"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
+<div class="viewcode-block" id="MaskFile.apply_conditions"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">mask_file</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MaskFile.get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.MaskFile.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+<div class="viewcode-block" id="MaskFile.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="c1"># Load data</span>
         <span class="n">dwi_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dwi_img</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
         <span class="n">mask_file</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_affine</span> <span class="o">=</span> \
@@ -270,7 +296,7 @@
         <span class="k">return</span> <span class="n">mask_data</span><span class="p">,</span> <span class="n">dwi_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span> <span class="n">meta</span></div></div>
 
 
-<div class="viewcode-block" id="FullMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.FullMask">[docs]</a><span class="k">class</span> <span class="nc">FullMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="FullMask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask">[docs]</a><span class="k">class</span> <span class="nc">FullMask</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask which covers a full volume.</span>
 
@@ -282,10 +308,10 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="FullMask.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.FullMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="FullMask.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="FullMask.get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.FullMask.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+<div class="viewcode-block" id="FullMask.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="c1"># Load data to get shape, affine</span>
         <span class="n">dwi_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dwi_img</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_data_gtab</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
@@ -294,7 +320,7 @@
             <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;Entire Volume&quot;</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="RoiMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.RoiMask">[docs]</a><span class="k">class</span> <span class="nc">RoiMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="RoiMask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.RoiMask">[docs]</a><span class="k">class</span> <span class="nc">RoiMask</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask which is all ROIs or&#39;d together.</span>
 
@@ -304,28 +330,26 @@
 <span class="sd">    api.AFQ(tracking_params={&quot;seed_mask&quot;: seed_mask})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_presegment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_presegment</span> <span class="o">=</span> <span class="n">use_presegment</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="RoiMask.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.RoiMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="RoiMask.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.RoiMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="RoiMask.get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.RoiMask.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
-            <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">afq_object</span><span class="o">.</span><span class="n">_reg_prealign</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-            <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">reg_prealign</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span>
-            <span class="n">afq_object</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
-            <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
-            <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign_inv</span><span class="p">)</span>
+<div class="viewcode-block" id="RoiMask.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.RoiMask.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
         <span class="n">mask_data</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">bundle_info</span> <span class="ow">in</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_presegment</span><span class="p">:</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span>\
+                <span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;presegment_bundle_dict&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">bundle_dict</span>
+
+        <span class="k">for</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">bundle_info</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">[</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
-                <span class="k">if</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
                     <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
                         <span class="n">roi</span><span class="p">,</span>
                         <span class="n">mapping</span><span class="p">,</span>
@@ -339,7 +363,7 @@
         <span class="k">return</span> <span class="n">mask_data</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;ROIs&quot;</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="B0Mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.B0Mask">[docs]</a><span class="k">class</span> <span class="nc">B0Mask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="B0Mask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.B0Mask">[docs]</a><span class="k">class</span> <span class="nc">B0Mask</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask using b0 and dipy&#39;s median_otsu.</span>
 
@@ -358,10 +382,10 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">median_otsu_kwargs</span><span class="o">=</span><span class="p">{}):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">median_otsu_kwargs</span> <span class="o">=</span> <span class="n">median_otsu_kwargs</span>
 
-<div class="viewcode-block" id="B0Mask.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.B0Mask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="B0Mask.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.B0Mask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="B0Mask.get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.B0Mask.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+<div class="viewcode-block" id="B0Mask.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.B0Mask.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">b0_file</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_b0</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
         <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">b0_file</span><span class="p">)</span>
         <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">mean_b0_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
@@ -372,7 +396,7 @@
             <span class="n">median_otsu_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">median_otsu_kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="LabelledMaskFile"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.LabelledMaskFile">[docs]</a><span class="k">class</span> <span class="nc">LabelledMaskFile</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelledMaskFile"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.LabelledMaskFile">[docs]</a><span class="k">class</span> <span class="nc">LabelledMaskFile</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask based on labels in a file.</span>
 
@@ -417,7 +441,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">exclusive_labels</span> <span class="o">=</span> <span class="n">exclusive_labels</span>
 
     <span class="c1"># overrides MaskFile</span>
-<div class="viewcode-block" id="LabelledMaskFile.apply_conditions"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.LabelledMaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelledMaskFile.apply_conditions"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.LabelledMaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
         <span class="c1"># For different sets of labels, extract all the voxels that</span>
         <span class="c1"># have any / all of these values:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_mask_draft</span><span class="p">(</span><span class="n">mask_data_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -435,7 +459,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_draft</span><span class="p">,</span> <span class="n">meta</span></div></div>
 
 
-<div class="viewcode-block" id="ThresholdedMaskFile"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ThresholdedMaskFile">[docs]</a><span class="k">class</span> <span class="nc">ThresholdedMaskFile</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="ThresholdedMaskFile"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedMaskFile">[docs]</a><span class="k">class</span> <span class="nc">ThresholdedMaskFile</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask based on thresholding a file.</span>
 <span class="sd">    Note that this should not be used to directly make a seed mask</span>
@@ -468,7 +492,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    brain_mask = ThresholdedMaskFile(</span>
 <span class="sd">        &quot;brain_mask&quot;,</span>
-<span class="sd">        {&quot;scope&quot;=&quot;dmriprep&quot;},</span>
+<span class="sd">        {&quot;scope&quot;:&quot;dmriprep&quot;},</span>
 <span class="sd">        lower_bound=0.1)</span>
 <span class="sd">    api.AFQ(brain_mask=brain_mask)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -481,7 +505,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span>
 
     <span class="c1"># overrides MaskFile</span>
-<div class="viewcode-block" id="ThresholdedMaskFile.apply_conditions"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ThresholdedMaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
+<div class="viewcode-block" id="ThresholdedMaskFile.apply_conditions"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedMaskFile.apply_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_data_orig</span><span class="p">,</span> <span class="n">mask_file</span><span class="p">):</span>
         <span class="c1"># Apply thresholds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_mask_draft</span><span class="p">(</span><span class="n">mask_data_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -496,7 +520,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_draft</span><span class="p">,</span> <span class="n">meta</span></div></div>
 
 
-<div class="viewcode-block" id="ScalarMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask">[docs]</a><span class="k">class</span> <span class="nc">ScalarMask</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">):</span>
+<div class="viewcode-block" id="ScalarMask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ScalarMask">[docs]</a><span class="k">class</span> <span class="nc">ScalarMask</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask based on a scalar.</span>
 <span class="sd">    Does not apply any labels or thresholds;</span>
@@ -523,26 +547,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="n">scalar</span>
 
     <span class="c1"># overrides MaskFile</span>
-<div class="viewcode-block" id="ScalarMask.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="ScalarMask.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ScalarMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
     <span class="c1"># overrides MaskFile</span>
-<div class="viewcode-block" id="ScalarMask.get_path_data_affine"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ScalarMask.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">valid_scalars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">afq_object</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<div class="viewcode-block" id="ScalarMask.get_path_data_affine"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ScalarMask.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">valid_scalars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">afq_object</span><span class="o">.</span><span class="n">scalar_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_scalars</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span>
                 <span class="sa">f</span><span class="s2">&quot;scalar should be one of&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_scalars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;, you input </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
-        <span class="n">scalar_fname</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_scalar_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">](</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+        <span class="n">scalar_fname</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">scalar_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">](</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
         <span class="n">scalar_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">scalar_fname</span><span class="p">)</span>
         <span class="n">scalar_data</span> <span class="o">=</span> <span class="n">scalar_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">scalar_fname</span><span class="p">,</span> <span class="n">scalar_data</span><span class="p">,</span> <span class="n">scalar_img</span><span class="o">.</span><span class="n">affine</span></div></div>
 
 
-<div class="viewcode-block" id="ThresholdedScalarMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.ThresholdedScalarMask">[docs]</a><span class="k">class</span> <span class="nc">ThresholdedScalarMask</span><span class="p">(</span><span class="n">ThresholdedMaskFile</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">):</span>
+<div class="viewcode-block" id="ThresholdedScalarMask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedScalarMask">[docs]</a><span class="k">class</span> <span class="nc">ThresholdedScalarMask</span><span class="p">(</span><span class="n">ThresholdedMaskFile</span><span class="p">,</span> <span class="n">ScalarMask</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask based on thresholding a scalar mask.</span>
 <span class="sd">    Note that this should not be used to directly make a seed mask</span>
@@ -584,7 +608,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span></div>
 
 
-<span class="k">class</span> <span class="nc">PFTMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">PFTMask</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask for use in PFT tractography. Only use</span>
 <span class="sd">    if tracker set to &#39;pft&#39; in tractography.</span>
@@ -617,26 +641,26 @@
         <span class="k">for</span> <span class="n">probseg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span><span class="p">:</span>
             <span class="n">probseg</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span><span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">probseg_imgs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">probseg_metas</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">probseg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">probseg</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">probseg</span><span class="o">.</span><span class="n">get_for_row</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="n">probseg_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">))</span>
             <span class="n">probseg_metas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">probseg_imgs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sources</span><span class="o">=</span><span class="n">probseg_metas</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CombinedMask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.CombinedMask">[docs]</a><span class="k">class</span> <span class="nc">CombinedMask</span><span class="p">(</span><span class="n">StrInstantiatesMixin</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="CombinedMask"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.CombinedMask">[docs]</a><span class="k">class</span> <span class="nc">CombinedMask</span><span class="p">(</span><span class="n">Definition</span><span class="p">,</span> <span class="n">CombineMaskMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Define a mask by combining other masks.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    mask_list : list of Masks with find_path and get_mask functions</span>
+<span class="sd">    mask_list : list of Masks with find_path and get_for_row functions</span>
 <span class="sd">        List of masks to combine. All find_path methods will be called</span>
-<span class="sd">        when this find_path method is called. All get_mask methods will</span>
-<span class="sd">        be called and combined when this get_mask method is called.</span>
+<span class="sd">        when this find_path method is called. All get_for_row methods will</span>
+<span class="sd">        be called and combined when this get_for_row method is called.</span>
 <span class="sd">    combine : str, optional</span>
 <span class="sd">        How to combine the boolean masks generated by mask_list.</span>
 <span class="sd">        If &quot;and&quot;, they will be and&#39;d together.</span>
@@ -659,15 +683,16 @@
         <span class="n">CombineMaskMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">combine</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask_list</span> <span class="o">=</span> <span class="n">mask_list</span>
 
-<div class="viewcode-block" id="CombinedMask.find_path"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.CombinedMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="CombinedMask.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.CombinedMask.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_list</span><span class="p">:</span>
             <span class="n">mask</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span><span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CombinedMask.get_mask"><a class="viewcode-back" href="../../autoapi/AFQ/mask/index.html#AFQ.mask.CombinedMask.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+<div class="viewcode-block" id="CombinedMask.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.CombinedMask.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask_draft</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">metas</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_list</span><span class="p">:</span>
-            <span class="n">next_mask</span><span class="p">,</span> <span class="n">next_affine</span><span class="p">,</span> <span class="n">next_meta</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">next_mask</span><span class="p">,</span> <span class="n">next_affine</span><span class="p">,</span> <span class="n">next_meta</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">get_for_row</span><span class="p">(</span>
+                <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_draft</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reset_mask_draft</span><span class="p">(</span><span class="n">next_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -680,83 +705,33 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_draft</span><span class="p">,</span> <span class="n">next_affine</span><span class="p">,</span> <span class="n">meta</span></div></div>
 </pre></div>
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  <li><a href="../AFQ.html">AFQ</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

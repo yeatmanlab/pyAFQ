@@ -6,36 +6,159 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.viz.plotly_backend &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <h1>Source code for AFQ.viz.plotly_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -111,10 +234,13 @@
 
 
 <div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]):</span>
     <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
-    <span class="n">plotting_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">plotting_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plotting_shape</span> <span class="o">=</span> <span class="n">sls</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="c1"># dtype object so None can be stored</span>
     <span class="n">x_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
     <span class="n">y_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
@@ -142,12 +268,14 @@
         <span class="c1"># add sl to lines</span>
         <span class="n">total_offset</span> <span class="o">=</span> <span class="n">plotting_offset</span> <span class="o">+</span> <span class="n">sl_index</span>
         <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="c1"># don&#39;t draw between streamlines</span>
-        <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># don&#39;t draw between streamlines</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">brightness</span> <span class="o">=</span> <span class="n">cbv</span><span class="p">[</span>
@@ -164,12 +292,19 @@
                 <span class="n">color_constant</span>
             <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">x_pts</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_pts</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">y_pts</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_pts</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">z_pts</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">z_pts</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_pts</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x_pts</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y_pts</span><span class="p">,</span>
             <span class="n">z</span><span class="o">=</span><span class="n">z_pts</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -189,8 +324,8 @@
 
 <div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize bundles in 3D</span>
@@ -241,6 +376,12 @@
 <span class="sd">        color_by_volume.</span>
 <span class="sd">        Default: [None, None]</span>
 
+<span class="sd">    flip_axes : ndarray</span>
+<span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
+<span class="sd">        visualize.</span>
+<span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
+<span class="sd">        Default: [False, False, False]</span>
+
 <span class="sd">    background : tuple, optional</span>
 <span class="sd">        RGB values for the background. Default: (1, 1, 1), which is white</span>
 <span class="sd">        background.</span>
@@ -279,7 +420,8 @@
             <span class="n">color</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">cbv</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
-            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">)</span>
+            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
+            <span class="n">flip_axes</span><span class="o">=</span><span class="n">flip_axes</span><span class="p">)</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">itemsizing</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
@@ -331,13 +473,19 @@
                       <span class="n">png_fname</span><span class="o">=</span><span class="s2">&quot;tgif&quot;</span><span class="p">,</span> <span class="n">add_zeros</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_draw_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_roi">[docs]</a><span class="k">def</span> <span class="nf">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+<div class="viewcode-block" id="_draw_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_roi">[docs]</a><span class="k">def</span> <span class="nf">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
     <span class="n">roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">roi</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flip_axes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">z</span><span class="o">=</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)),</span>
             <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">)</span></div>
@@ -347,7 +495,8 @@
 
 <div class="viewcode-block" id="visualize_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_roi">[docs]</a><span class="k">def</span> <span class="nf">visualize_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">affine_or_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_img</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">roi_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ROI&#39;</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9999</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ROI&#39;</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                  <span class="n">color</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9999</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
                   <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a region of interest into a volume</span>
@@ -387,6 +536,12 @@
 <span class="sd">        Opacity of ROI.</span>
 <span class="sd">        Default: 1.0</span>
 
+<span class="sd">    flip_axes : ndarray</span>
+<span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
+<span class="sd">        visualize.</span>
+<span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
+<span class="sd">        Default: [False, False, False]</span>
+
 <span class="sd">    figure : Plotly Figure object, optional</span>
 <span class="sd">        If provided, the visualization will be added to this Figure. Default:</span>
 <span class="sd">        Initialize a new Figure.</span>
@@ -411,7 +566,7 @@
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
 
-    <span class="n">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">_draw_roi</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
 
@@ -512,6 +667,7 @@
 
 <div class="viewcode-block" id="visualize_volume"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_volume">[docs]</a><span class="k">def</span> <span class="nf">visualize_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">show_z</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                     <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
                      <span class="n">slider_definition</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">which_plane</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize a volume</span>
@@ -541,6 +697,12 @@
 <span class="sd">        Opacity of slices.</span>
 <span class="sd">        Default: 1.0</span>
 
+<span class="sd">    flip_axes : ndarray</span>
+<span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
+<span class="sd">        visualize.</span>
+<span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
+<span class="sd">        Default: [False, False, False]</span>
+
 <span class="sd">    slider_definition : int, optional</span>
 <span class="sd">        How many discrete positions the slices can take.</span>
 <span class="sd">        If 0, slices are stationary.</span>
@@ -567,6 +729,9 @@
 <span class="sd">    Plotly Figure object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">volume</span> <span class="o">=</span> <span class="n">vut</span><span class="o">.</span><span class="n">load_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flip_axes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">figure</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
@@ -608,83 +773,33 @@
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
 </pre></div>
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">Module code</a><ul>
-  <li><a href="../../AFQ.html">AFQ</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

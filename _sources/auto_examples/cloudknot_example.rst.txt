@@ -73,7 +73,7 @@ what dependencies to install into AWS Batch to run this function.
         # cloudknot installs the appropriate packages from pip
         import AFQ.data as afqd
         import AFQ.api as api
-        import AFQ.mask as afm
+        import AFQ.definitions.mask as afm
 
         # set logging level to your choice
         logging.basicConfig(level=logging.INFO)

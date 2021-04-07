@@ -39,7 +39,7 @@ using waypoint ROIs.
 
     https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-61
+.. GENERATED FROM PYTHON SOURCE LINES 24-62
 
 .. code-block:: default
 
@@ -54,6 +54,7 @@ using waypoint ROIs.
     from dipy.stats.analysis import afq_profile, gaussian_weights
     from dipy.io.stateful_tractogram import StatefulTractogram
     from dipy.io.stateful_tractogram import Space
+    from dipy.align import affine_registration
 
     import AFQ.data as afd
     import AFQ.tractography as aft
@@ -87,7 +88,7 @@ using waypoint ROIs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-71
+.. GENERATED FROM PYTHON SOURCE LINES 63-72
 
 Get example data:
 -----------------
@@ -99,7 +100,7 @@ Get example data:
 
     https://purl.stanford.edu/ng782rw8378
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-100
+.. GENERATED FROM PYTHON SOURCE LINES 72-101
 
 .. code-block:: default
 
@@ -247,7 +248,7 @@ Get example data:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-128
+.. GENERATED FROM PYTHON SOURCE LINES 102-129
 
 Calculate DTI:
 --------------
@@ -277,7 +278,7 @@ In this example we will only use FA.
   The diffusion tensor imaging parameters contain the associated eigenvalues
   and eigenvectors from eigen decomposition on the diffusion tensor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-145
+.. GENERATED FROM PYTHON SOURCE LINES 129-146
 
 .. code-block:: default
 
@@ -318,7 +319,7 @@ In this example we will only use FA.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-158
+.. GENERATED FROM PYTHON SOURCE LINES 147-159
 
 Register the individual data to a template:
 -------------------------------------------
@@ -333,7 +334,7 @@ fulfill the segmentation criteria.
     Before calculating this non-linear warping, we perform a pre-alignment
     using an affine transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-199
+.. GENERATED FROM PYTHON SOURCE LINES 159-200
 
 .. code-block:: default
 
@@ -347,7 +348,7 @@ fulfill the segmentation criteria.
         gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
         b0 = np.mean(img.get_fdata()[..., gtab.b0s_mask], -1)
         # Prealign using affine registration
-        _, prealign = reg.affine_registration(
+        _, prealign = affine_registration(
             b0,
             MNI_T2_img.get_fdata(),
             img.affine,
@@ -417,7 +418,7 @@ fulfill the segmentation criteria.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-248
+.. GENERATED FROM PYTHON SOURCE LINES 201-249
 
 Create novel bundle specification:
 ----------------------------------
@@ -468,7 +469,7 @@ waypoint ROI templates:
 The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-275
+.. GENERATED FROM PYTHON SOURCE LINES 249-276
 
 .. code-block:: default
 
@@ -536,7 +537,7 @@ they are brought into the subject's individual native space.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-295
+.. GENERATED FROM PYTHON SOURCE LINES 277-296
 
 Tracking:
 ---------
@@ -558,7 +559,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
   streamlines for the anterior forceps, but not many streamlines anywhere
   else.
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-339
+.. GENERATED FROM PYTHON SOURCE LINES 296-340
 
 .. code-block:: default
 
@@ -652,7 +653,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-373
+.. GENERATED FROM PYTHON SOURCE LINES 341-374
 
 Segmentation:
 -------------
@@ -688,7 +689,7 @@ contains the following keys:
    segmentation by ignoring endpoint filters. This means that additional
    streamlines may be included that would otherwise be excluded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 373-407
+.. GENERATED FROM PYTHON SOURCE LINES 374-408
 
 .. code-block:: default
 
@@ -756,15 +757,16 @@ contains the following keys:
     Preprocessing Streamlines
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
-    4660 streamlines exceed the probability threshold.
-    752 streamlines selected with waypoint ROIs
+    1016 streamlines exceed the probability threshold.
+      0%|          | 0/1016 [00:00<?, ?it/s]      0%|          | 2/1016 [00:00<02:05,  8.08it/s]      0%|          | 4/1016 [00:06<31:03,  1.84s/it]      1%|1         | 12/1016 [00:06<07:13,  2.31it/s]     20%|##        | 208/1016 [00:06<00:12, 62.64it/s]     52%|#####1    | 528/1016 [00:06<00:02, 190.64it/s]    100%|##########| 1016/1016 [00:06<00:00, 150.26it/s]
+    153 streamlines selected with waypoint ROIs
     Re-orienting streamlines to consistent directions
     Processing AntFrontal
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 408-426
+.. GENERATED FROM PYTHON SOURCE LINES 409-427
 
 Cleaning:
 ---------
@@ -785,7 +787,7 @@ of their trajectory and/or length.
      - greather than 4 standard deviations from the mean length
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 426-453
+.. GENERATED FROM PYTHON SOURCE LINES 427-454
 
 .. code-block:: default
 
@@ -832,18 +834,18 @@ of their trajectory and/or length.
 
     Cleaning fiber groups...
     Cleaning AntFrontal...
-    Before cleaning: 752 streamlines
-    After cleaning: 711 streamlines
+    Before cleaning: 153 streamlines
+    After cleaning: 152 streamlines
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 454-456
+.. GENERATED FROM PYTHON SOURCE LINES 455-457
 
 Visualizing bundles and tract profiles:
 ---------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 456-461
+.. GENERATED FROM PYTHON SOURCE LINES 457-462
 
 .. code-block:: default
 
@@ -862,7 +864,7 @@ Visualizing bundles and tract profiles:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 462-472
+.. GENERATED FROM PYTHON SOURCE LINES 463-473
 
 Bundle profiles:
 ----------------
@@ -875,7 +877,7 @@ to how representative this streamline is of the bundle overall.
   As a sanity check the anterior forceps the tract profile is relatively
   symmetric?
 
-.. GENERATED FROM PYTHON SOURCE LINES 472-488
+.. GENERATED FROM PYTHON SOURCE LINES 473-489
 
 .. code-block:: default
 
@@ -915,7 +917,7 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 489-499
+.. GENERATED FROM PYTHON SOURCE LINES 490-500
 
 References:
 -------------------------
@@ -931,7 +933,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  40.217 seconds)
+   **Total running time of the script:** ( 17 minutes  17.157 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:

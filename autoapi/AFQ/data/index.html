@@ -6,45 +6,329 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="AFQ.mask" href="../mask/index.html" />
+    <link rel="next" title="AFQ.registration" href="../registration/index.html" />
     <link rel="prev" title="AFQ.bundles" href="../bundles/index.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2 current active">
+  <a class="reference internal" href="../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <ul class="current">
+   <li class="toctree-l3">
+    <a class="reference internal" href="../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../utils/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../viz/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../api/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../bundles/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.bundles
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3 current active">
+    <a class="current reference internal" href="#">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../registration/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#functions">
+     Functions
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.fetch_callosum_templates">
+       fetch_callosum_templates
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.read_callosum_templates">
+       read_callosum_templates
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.fetch_templates">
+       fetch_templates
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.read_templates">
+       read_templates
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.fetch_hcp">
+       fetch_hcp
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.fetch_stanford_hardi_tractography">
+       fetch_stanford_hardi_tractography
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.read_stanford_hardi_tractography">
+       read_stanford_hardi_tractography
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.data.organize_stanford_data">
+       organize_stanford_data
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-AFQ.data">
 <span id="afq-data"></span><h1><a class="reference internal" href="#module-AFQ.data" title="AFQ.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><a class="headerlink" href="#module-AFQ.data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -69,12 +353,12 @@
 </table>
 <dl class="py data">
 <dt id="AFQ.data.fetch_callosum_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_callosum_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_callosum_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">fetch_callosum_templates</span></code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_callosum_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.fetch_callosum_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.data.read_callosum_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_callosum_templates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resample_to</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_callosum_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_callosum_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">read_callosum_templates</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_callosum_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.read_callosum_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load AFQ callosum templates from file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -88,12 +372,12 @@
 
 <dl class="py data">
 <dt id="AFQ.data.fetch_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_templates</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">fetch_templates</span></code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.fetch_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.data.read_templates">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_templates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resample_to</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">read_templates</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.read_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load AFQ templates from file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -107,7 +391,7 @@
 
 <dl class="py function">
 <dt id="AFQ.data.fetch_hcp">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_hcp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subjects</span></em>, <em class="sig-param"><span class="n">hcp_bucket</span><span class="o">=</span><span class="default_value">'hcp-openaccess'</span></em>, <em class="sig-param"><span class="n">profile_name</span><span class="o">=</span><span class="default_value">'hcp'</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">study</span><span class="o">=</span><span class="default_value">'HCP_1200'</span></em>, <em class="sig-param"><span class="n">aws_access_key_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aws_secret_access_key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">fetch_hcp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hcp_bucket</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hcp-openaccess'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hcp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HCP_1200'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_access_key_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_secret_access_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_hcp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.fetch_hcp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch HCP diffusion data and arrange it in a manner that resembles the
 BIDS <a class="reference internal" href="../index.html#r8494a6c36190-1" id="id1">[1]</a> specification.</p>
 <dl class="field-list simple">
@@ -158,18 +442,18 @@ experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.</p>
 
 <dl class="py data">
 <dt id="AFQ.data.fetch_stanford_hardi_tractography">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">fetch_stanford_hardi_tractography</code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.fetch_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">fetch_stanford_hardi_tractography</span></code><a class="reference internal" href="../../../_modules/AFQ/data.html#fetch_stanford_hardi_tractography"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.fetch_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.data.read_stanford_hardi_tractography">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">read_stanford_hardi_tractography</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_stanford_hardi_tractography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.read_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">read_stanford_hardi_tractography</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#read_stanford_hardi_tractography"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.read_stanford_hardi_tractography" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a minimal tractography from the Stanford dataset.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.data.organize_stanford_data">
-<code class="sig-prename descclassname">AFQ.data.</code><code class="sig-name descname">organize_stanford_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clear_previous_afq</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.data.</span></code><code class="sig-name descname"><span class="pre">organize_stanford_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_previous_afq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/data.html#organize_stanford_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.data.organize_stanford_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>If necessary, downloads the Stanford HARDI dataset into DIPY directory and
 creates a BIDS compliant file-system structure in AFQ data directory:</p>
 <p>~/AFQ_data/
@@ -210,91 +494,35 @@ it will be removed.</p>
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../bundles/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a>
+    <a class='right-next' id="next-link" href="../registration/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">API Reference</a><ul>
-  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../bundles/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a></li>
-      <li>Next: <a href="../mask/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.mask</span></code></a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../../_sources/autoapi/AFQ/data/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

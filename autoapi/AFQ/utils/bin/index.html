@@ -6,14 +6,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.utils.bin &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
@@ -22,29 +41,360 @@
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="AFQ.utils.models" href="../models/index.html" />
     <link rel="prev" title="AFQ.utils" href="../index.html" />
-   
-  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2 current active">
+  <a class="reference internal" href="../../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <ul class="current">
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3 current active">
+    <a class="reference internal" href="../index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+    <ul class="current">
+     <li class="toctree-l4 current active">
+      <a class="current reference internal" href="#">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.bin
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../models/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.models
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../parallel/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.parallel
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../stats/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.stats
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../streamlines/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.streamlines
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../volume/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.volume
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../viz/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../api/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../bundles/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.bundles
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../registration/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#functions">
+     Functions
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.parse_string">
+       parse_string
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.model_input_parser">
+       model_input_parser
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.model_predict_input_parser">
+       model_predict_input_parser
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.get_default_args">
+       get_default_args
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.toml_to_val">
+       toml_to_val
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.val_to_toml">
+       val_to_toml
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.dict_to_toml">
+       dict_to_toml
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.func_dict_to_arg_dict">
+       func_dict_to_arg_dict
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.parse_config_run_afq">
+       parse_config_run_afq
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.utils.bin.generate_config">
+       generate_config
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-AFQ.utils.bin">
 <span id="afq-utils-bin"></span><h1><a class="reference internal" href="#module-AFQ.utils.bin" title="AFQ.utils.bin"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a><a class="headerlink" href="#module-AFQ.utils.bin" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -74,7 +424,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.func_dict_to_arg_dict" title="AFQ.utils.bin.func_dict_to_arg_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_dict_to_arg_dict</span></code></a>(func_dict=None, logger=None)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.parse_config_run_afq" title="AFQ.utils.bin.parse_config_run_afq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_config_run_afq</span></code></a>(toml_file, default_arg_dict, to_call=’export_all’, overwrite=False, logger=None, special_args={‘CLEANING’: ‘clean_params’, ‘SEGMENTATION’: ‘segmentation_params’, ‘TRACTOGRAPHY’: ‘tracking_params’})</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.bin.parse_config_run_afq" title="AFQ.utils.bin.parse_config_run_afq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_config_run_afq</span></code></a>(toml_file, default_arg_dict, to_call=’export_all’, overwrite=False, logger=None, verbose=False, special_args={‘CLEANING’: ‘clean_params’, ‘SEGMENTATION’: ‘segmentation_params’, ‘TRACTOGRAPHY’: ‘tracking_params’})</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.bin.generate_config" title="AFQ.utils.bin.generate_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_config</span></code></a>(toml_file, default_arg_dict, overwrite=False, logger=None)</p></td>
@@ -84,52 +434,52 @@
 </table>
 <dl class="py function">
 <dt id="AFQ.utils.bin.parse_string">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">parse_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option</span></em>, <em class="sig-param"><span class="n">opt</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">parser</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.parse_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">parse_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.parse_string" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.model_input_parser">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">model_input_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">usage</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#model_input_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.model_input_parser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">model_input_parser</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#model_input_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.model_input_parser" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.model_predict_input_parser">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">model_predict_input_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">usage</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#model_predict_input_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.model_predict_input_parser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">model_predict_input_parser</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#model_predict_input_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.model_predict_input_parser" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.get_default_args">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">get_default_args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#get_default_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.get_default_args" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">get_default_args</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#get_default_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.get_default_args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.toml_to_val">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">toml_to_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#toml_to_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.toml_to_val" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">toml_to_val</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#toml_to_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.toml_to_val" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.val_to_toml">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">val_to_toml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#val_to_toml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.val_to_toml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">val_to_toml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#val_to_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.val_to_toml" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.dict_to_toml">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">dict_to_toml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#dict_to_toml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.dict_to_toml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">dict_to_toml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#dict_to_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.dict_to_toml" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.func_dict_to_arg_dict">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">func_dict_to_arg_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#func_dict_to_arg_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.func_dict_to_arg_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">func_dict_to_arg_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#func_dict_to_arg_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.func_dict_to_arg_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.parse_config_run_afq">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">parse_config_run_afq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">toml_file</span></em>, <em class="sig-param"><span class="n">default_arg_dict</span></em>, <em class="sig-param"><span class="n">to_call</span><span class="o">=</span><span class="default_value">'export_all'</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">special_args</span><span class="o">=</span><span class="default_value">{'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_config_run_afq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.parse_config_run_afq" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">parse_config_run_afq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toml_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_arg_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_call</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'export_all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'CLEANING':</span> <span class="pre">'clean_params',</span> <span class="pre">'SEGMENTATION':</span> <span class="pre">'segmentation_params',</span> <span class="pre">'TRACTOGRAPHY':</span> <span class="pre">'tracking_params'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#parse_config_run_afq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.parse_config_run_afq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.utils.bin.generate_config">
-<code class="sig-prename descclassname">AFQ.utils.bin.</code><code class="sig-name descname">generate_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">toml_file</span></em>, <em class="sig-param"><span class="n">default_arg_dict</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#generate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.utils.bin.generate_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.utils.bin.</span></code><code class="sig-name descname"><span class="pre">generate_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toml_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_arg_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/bin.html#generate_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.bin.generate_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -137,93 +487,35 @@
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a>
+    <a class='right-next' id="next-link" href="../models/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../../index.html">
-    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../../index.html">API Reference</a><ul>
-  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a></li>
-      <li>Next: <a href="../models/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../../../_sources/autoapi/AFQ/utils/bin/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

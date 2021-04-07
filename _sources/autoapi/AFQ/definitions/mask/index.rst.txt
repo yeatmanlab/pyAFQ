@@ -1,7 +1,7 @@
-:mod:`AFQ.mask`
-===============
+:mod:`AFQ.definitions.mask`
+===========================
 
-.. py:module:: AFQ.mask
+.. py:module:: AFQ.definitions.mask
 
 
 Module Contents
@@ -12,55 +12,22 @@ Classes
 
 .. autoapisummary::
 
-   AFQ.mask.MaskFile
-   AFQ.mask.FullMask
-   AFQ.mask.RoiMask
-   AFQ.mask.B0Mask
-   AFQ.mask.LabelledMaskFile
-   AFQ.mask.ThresholdedMaskFile
-   AFQ.mask.ScalarMask
-   AFQ.mask.ThresholdedScalarMask
-   AFQ.mask.CombinedMask
+   AFQ.definitions.mask.MaskFile
+   AFQ.definitions.mask.FullMask
+   AFQ.definitions.mask.RoiMask
+   AFQ.definitions.mask.B0Mask
+   AFQ.definitions.mask.LabelledMaskFile
+   AFQ.definitions.mask.ThresholdedMaskFile
+   AFQ.definitions.mask.ScalarMask
+   AFQ.definitions.mask.ThresholdedScalarMask
+   AFQ.definitions.mask.CombinedMask
 
 
 
-Functions
-~~~~~~~~~
-
-.. autoapisummary::
-
-   AFQ.mask.check_mask_methods
+.. class:: MaskFile(suffix, filters={})
 
 
-.. function:: check_mask_methods(mask, mask_name=False)
-
-   Helper function
-   Checks if mask is a valid mask.
-   If mask_name is not False, will throw an error stating the method
-   not found and the mask name.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. py:class:: MaskFile(suffix, filters={})
-
-   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+   Bases: :class:`AFQ.definitions.utils.Definition`
 
    Define a mask based on a file.
    Does not apply any labels or thresholds;
@@ -93,7 +60,7 @@ Functions
 
    seed_mask = MaskFile(
        "WM_mask",
-       {"scope"="dmriprep"})
+       {"scope":"dmriprep"})
    api.AFQ(tracking_params={"seed_mask": seed_mask,
                                "seed_threshold": 0.1})
 
@@ -111,13 +78,14 @@ Functions
    .. method:: apply_conditions(self, mask_data_orig, mask_file)
 
 
-   .. method:: get_mask(self, afq_object, row)
+   .. method:: get_for_row(self, afq_object, row)
 
 
 
-.. py:class:: FullMask
+.. class:: FullMask
 
-   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Bases: :class:`AFQ.definitions.utils.Definition`
 
    Define a mask which covers a full volume.
 
@@ -145,13 +113,14 @@ Functions
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_mask(self, afq_object, row)
+   .. method:: get_for_row(self, afq_object, row)
 
 
 
-.. py:class:: RoiMask
+.. class:: RoiMask(use_presegment=False)
 
-   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Bases: :class:`AFQ.definitions.utils.Definition`
 
    Define a mask which is all ROIs or'd together.
 
@@ -180,13 +149,14 @@ Functions
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_mask(self, afq_object, row)
+   .. method:: get_for_row(self, afq_object, row)
 
 
 
-.. py:class:: B0Mask(median_otsu_kwargs={})
+.. class:: B0Mask(median_otsu_kwargs={})
 
-   Bases: :class:`AFQ.mask.StrInstantiatesMixin`
+
+   Bases: :class:`AFQ.definitions.utils.Definition`
 
    Define a mask using b0 and dipy's median_otsu.
 
@@ -220,13 +190,14 @@ Functions
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_mask(self, afq_object, row)
+   .. method:: get_for_row(self, afq_object, row)
 
 
 
-.. py:class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
+.. class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
 
-   Bases: :class:`AFQ.mask.MaskFile`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Bases: :class:`AFQ.definitions.mask.MaskFile`, :class:`AFQ.definitions.mask.CombineMaskMixin`
 
    Define a mask based on labels in a file.
 
@@ -286,9 +257,10 @@ Functions
 
 
 
-.. py:class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
+.. class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
 
-   Bases: :class:`AFQ.mask.MaskFile`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Bases: :class:`AFQ.definitions.mask.MaskFile`, :class:`AFQ.definitions.mask.CombineMaskMixin`
 
    Define a mask based on thresholding a file.
    Note that this should not be used to directly make a seed mask
@@ -336,7 +308,7 @@ Functions
 
    brain_mask = ThresholdedMaskFile(
        "brain_mask",
-       {"scope"="dmriprep"},
+       {"scope":"dmriprep"},
        lower_bound=0.1)
    api.AFQ(brain_mask=brain_mask)
 
@@ -349,9 +321,10 @@ Functions
 
 
 
-.. py:class:: ScalarMask(scalar)
+.. class:: ScalarMask(scalar)
 
-   Bases: :class:`AFQ.mask.MaskFile`
+
+   Bases: :class:`AFQ.definitions.mask.MaskFile`
 
    Define a mask based on a scalar.
    Does not apply any labels or thresholds;
@@ -396,9 +369,10 @@ Functions
 
 
 
-.. py:class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
+.. class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
 
-   Bases: :class:`AFQ.mask.ThresholdedMaskFile`, :class:`AFQ.mask.ScalarMask`
+
+   Bases: :class:`AFQ.definitions.mask.ThresholdedMaskFile`, :class:`AFQ.definitions.mask.ScalarMask`
 
    Define a mask based on thresholding a scalar mask.
    Note that this should not be used to directly make a seed mask
@@ -451,19 +425,20 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: CombinedMask(mask_list, combine='and')
+.. class:: CombinedMask(mask_list, combine='and')
 
-   Bases: :class:`AFQ.mask.StrInstantiatesMixin`, :class:`AFQ.mask.CombineMaskMixin`
+
+   Bases: :class:`AFQ.definitions.utils.Definition`, :class:`AFQ.definitions.mask.CombineMaskMixin`
 
    Define a mask by combining other masks.
 
 
    :Parameters:
 
-       **mask_list** : list of Masks with find_path and get_mask functions
+       **mask_list** : list of Masks with find_path and get_for_row functions
            List of masks to combine. All find_path methods will be called
-           when this find_path method is called. All get_mask methods will
-           be called and combined when this get_mask method is called.
+           when this find_path method is called. All get_for_row methods will
+           be called and combined when this get_for_row method is called.
 
        **combine** : str, optional
            How to combine the boolean masks generated by mask_list.
@@ -500,7 +475,7 @@ Functions
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_mask(self, afq_object, row)
+   .. method:: get_for_row(self, afq_object, row)
 
 
 

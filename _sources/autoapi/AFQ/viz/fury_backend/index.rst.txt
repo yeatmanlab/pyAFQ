@@ -49,7 +49,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], figure=None, background=(1, 1, 1), interact=False, inline=False)
+.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], figure=None, background=(1, 1, 1), interact=False, inline=False, flip_axes=None)
 
    Visualize bundles in 3D using VTK
 
@@ -115,6 +115,9 @@ Functions
        **inline** : bool
            Whether to embed the visualization inline in a notebook. Only works
            in the notebook context. Default: False.
+
+       **flip_axes** : None
+           This parameter is to conform fury and plotly APIs.
 
    :Returns:
 
@@ -188,7 +191,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([1, 0, 0]), opacity=1.0, inline=False, interact=False)
+.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([1, 0, 0]), flip_axes=None, opacity=1.0, inline=False, interact=False)
 
    Render a region of interest into a VTK viz as a volume
 
@@ -223,6 +226,9 @@ Functions
        **color** : ndarray, optional
            RGB color for ROI.
            Default: np.array([1, 0, 0])
+
+       **flip_axes** : None
+           This parameter is to conform fury and plotly APIs.
 
        **opacity** : float, optional
            Opacity of ROI.
@@ -261,7 +267,7 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: visualize_volume(volume, x=None, y=None, z=None, figure=None, inline=True, interact=False)
+.. function:: visualize_volume(volume, x=None, y=None, z=None, figure=None, flip_axes=None, opacity=0.6, inline=True, interact=False)
 
    Visualize a volume
 
@@ -274,6 +280,13 @@ Functions
        **figure** : fury Scene object, optional
            If provided, the visualization will be added to this Scene. Default:
            Initialize a new Scene.
+
+       **flip_axes** : None
+           This parameter is to conform fury and plotly APIs.
+
+       **opacity** : float, optional
+           Initial opacity of slices.
+           Default: 0.6
 
        **interact** : bool
            Whether to provide an interactive VTK window for interaction.

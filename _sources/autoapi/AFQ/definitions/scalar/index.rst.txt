@@ -1,0 +1,113 @@
+:mod:`AFQ.definitions.scalar`
+=============================
+
+.. py:module:: AFQ.definitions.scalar
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.definitions.scalar.ScalarFile
+   AFQ.definitions.scalar.TemplateScalar
+
+
+
+.. class:: ScalarFile(name, suffix, filters={})
+
+
+   Bases: :class:`AFQ.definitions.mask.MaskFile`
+
+   Define a scalar based on a file for each subject.
+   Assumes the scalar is already in subject space.
+
+
+   :Parameters:
+
+       **name** : str
+           name of the scalar.
+
+       **suffix** : str
+           suffix to pass to bids_layout.get() to identify the file.
+
+       **filters** : str
+           Additional filters to pass to bids_layout.get() to identify
+           the file.
+           Default: {}
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   my_scalar = ScalarFile(
+       "my_scalar",
+       "scalarSuffix",
+       {"scope": "dmriprep"})
+   api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: get_data(self, afq_object, row)
+
+
+
+.. class:: TemplateScalar(name, path)
+
+
+   Bases: :class:`AFQ.definitions.scalar.ScalarMixin`, :class:`AFQ.definitions.utils.Definition`
+
+   Define a scalar based on a template.
+   This template will be transformed into subject space before use.
+
+
+   :Parameters:
+
+       **name** : str
+           name of the scalar.
+
+       **path** : str
+           path to the template.
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   my_scalar = TemplateScalar(
+       "my_scalar", "path/to/my_scalar_in_MNI.nii.gz")
+   api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, from_path, subject, session)
+
+
+   .. method:: get_data(self, afq_object, row)
+
+
+

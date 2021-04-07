@@ -30,7 +30,7 @@ See `plot_tract_profile` for explanations of each stage here. The main
 difference here is that segmentation uses the RecoBundles algorithm, instead of
 the AFQ waypoint ROI approach.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-171
+.. GENERATED FROM PYTHON SOURCE LINES 15-172
 
 .. code-block:: default
 
@@ -47,6 +47,7 @@ the AFQ waypoint ROI approach.
     from dipy.stats.analysis import afq_profile, gaussian_weights
     from dipy.io.stateful_tractogram import StatefulTractogram
     from dipy.io.stateful_tractogram import Space
+    from dipy.align import affine_registration
 
 
     import AFQ.data as afd
@@ -87,7 +88,7 @@ the AFQ waypoint ROI approach.
         gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
         b0 = np.mean(img.get_fdata()[..., gtab.b0s_mask], -1)
         # Prealign using affine registration
-        _, prealign = reg.affine_registration(
+        _, prealign = affine_registration(
             b0,
             MNI_T2_img.get_fdata(),
             img.affine,
@@ -275,32 +276,32 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16655
+    16653
     Segmenting fiber groups...
-    /opt/hostedtoolcache/Python/3.7.9/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:608: UserWarning:
+    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:685: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
-    /opt/hostedtoolcache/Python/3.7.9/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:731: UserWarning:
+    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:808: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
-    CST_R 93
-    CST_L 35
-    UF_R 36
-    UF_L 7
-    CC_ForcepsMajor 499
-    CC_ForcepsMinor 807
-    OR_R 19
-    OR_L 26
-    VOF_R 27
-    VOF_L 119
+    CST_R 49
+    CST_L 46
+    UF_R 13
+    UF_L 3
+    CC_ForcepsMajor 461
+    CC_ForcepsMinor 896
+    OR_R 18
+    OR_L 37
+    VOF_R 15
+    VOF_L 125
     Extracting tract profiles...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-180
+.. GENERATED FROM PYTHON SOURCE LINES 173-181
 
 References:
 -------------------------
@@ -314,7 +315,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 19 minutes  10.081 seconds)
+   **Total running time of the script:** ( 19 minutes  44.965 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

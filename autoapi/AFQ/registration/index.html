@@ -6,14 +6,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.registration &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -21,23 +40,273 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.segmentation" href="../segmentation/index.html" />
-    <link rel="prev" title="AFQ.mask" href="../mask/index.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="AFQ.data" href="../data/index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2 current active">
+  <a class="reference internal" href="../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <ul class="current">
+   <li class="toctree-l3">
+    <a class="reference internal" href="../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../utils/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../viz/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../api/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../bundles/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.bundles
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3 current active">
+    <a class="current reference internal" href="#">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#functions">
+     Functions
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.registration.syn_register_dwi">
+       syn_register_dwi
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.registration.write_mapping">
+       write_mapping
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.registration.read_mapping">
+       read_mapping
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.registration.register_dwi">
+       register_dwi
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.registration.slr_registration">
+       slr_registration
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-AFQ.registration">
 <span id="afq-registration"></span><h1><a class="reference internal" href="#module-AFQ.registration" title="AFQ.registration"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a><a class="headerlink" href="#module-AFQ.registration" title="Permalink to this headline">¶</a></h1>
 <p>Registration tools</p>
@@ -45,99 +314,32 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_registration</span></code></a>(moving, static, moving_affine=None, static_affine=None, step_length=0.25, metric=’CC’, dim=3, level_iters=[10, 10, 5], sigma_diff=2.0, radius=4, prealign=None)</p></td>
-<td><p>Register a source image (moving) to a target image (static).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.syn_register_dwi" title="AFQ.registration.syn_register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_register_dwi</span></code></a>(dwi, gtab, template=None, **syn_kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.syn_register_dwi" title="AFQ.registration.syn_register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_register_dwi</span></code></a>(dwi, gtab, template=None, **syn_kwargs)</p></td>
 <td><p>Register DWI data to a template.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.write_mapping" title="AFQ.registration.write_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_mapping</span></code></a>(mapping, fname)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.write_mapping" title="AFQ.registration.write_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_mapping</span></code></a>(mapping, fname)</p></td>
 <td><p>Write out a syn registration mapping to file</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.read_mapping" title="AFQ.registration.read_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_mapping</span></code></a>(disp, domain_img, codomain_img, prealign=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.read_mapping" title="AFQ.registration.read_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_mapping</span></code></a>(disp, domain_img, codomain_img, prealign=None)</p></td>
 <td><p>Read a syn registration mapping from a nifti file</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.resample" title="AFQ.registration.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a>(moving, static, moving_affine, static_affine)</p></td>
-<td><p>Resample an image from one space to another.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.c_of_mass" title="AFQ.registration.c_of_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">c_of_mass</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.translation" title="AFQ.registration.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.rigid" title="AFQ.registration.rigid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rigid</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.affine" title="AFQ.registration.affine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine</span></code></a>(moving, static, static_affine, moving_affine, reg, starting_affine, params0=None)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.affine_registration" title="AFQ.registration.affine_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">affine_registration</span></code></a>(moving, static, moving_affine=None, static_affine=None, nbins=32, sampling_prop=None, metric=’MI’, pipeline=[c_of_mass, translation, rigid, affine], level_iters=[10000, 1000, 100], sigmas=[5.0, 2.5, 0.0], factors=[4, 2, 1], params0=None)</p></td>
-<td><p>Find the affine transformation between two 3D images.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.register_series" title="AFQ.registration.register_series"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_series</span></code></a>(series, ref, pipeline)</p></td>
-<td><p>Register a series to a reference image.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.register_dwi" title="AFQ.registration.register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_dwi</span></code></a>(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[c_of_mass, translation, rigid, affine], out_dir=None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.registration.register_dwi" title="AFQ.registration.register_dwi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_dwi</span></code></a>(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[center_of_mass, translation, rigid, affine], out_dir=None)</p></td>
 <td><p>Register a DWI data-set</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.streamline_registration" title="AFQ.registration.streamline_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streamline_registration</span></code></a>(moving, static, n_points=100, native_resampled=False)</p></td>
-<td><p>Register two collections of streamlines (‘bundles’) to each other</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.registration.slr_registration" title="AFQ.registration.slr_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slr_registration</span></code></a>(moving_data, static_data, moving_affine=None, static_affine=None, moving_shape=None, static_shape=None, **kwargs)</p></td>
+<td><p>Register a source image (moving) to a target image (static).</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt id="AFQ.registration.syn_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step_length</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'CC'</span></em>, <em class="sig-param"><span class="n">dim</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">level_iters</span><span class="o">=</span><span class="default_value">[10, 10, 5]</span></em>, <em class="sig-param"><span class="n">sigma_diff</span><span class="o">=</span><span class="default_value">2.0</span></em>, <em class="sig-param"><span class="n">radius</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">prealign</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_registration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a source image (moving) to a target image (static).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>moving</strong><span class="classifier">ndarray</span></dt><dd><p>The source image data to be registered</p>
-</dd>
-<dt><strong>moving_affine</strong><span class="classifier">array, shape (4,4)</span></dt><dd><p>The affine matrix associated with the moving (source) data.</p>
-</dd>
-<dt><strong>static</strong><span class="classifier">ndarray</span></dt><dd><p>The target image data for registration</p>
-</dd>
-<dt><strong>static_affine</strong><span class="classifier">array, shape (4,4)</span></dt><dd><p>The affine matrix associated with the static (target) data</p>
-</dd>
-<dt><strong>metric</strong><span class="classifier">string, optional</span></dt><dd><p>The metric to be optimized. One of <cite>CC</cite>, <cite>EM</cite>, <cite>SSD</cite>,
-Default: CCMetric.</p>
-</dd>
-<dt><strong>dim: int (either 2 or 3), optional</strong></dt><dd><p>The dimensions of the image domain. Default: 3</p>
-</dd>
-<dt><strong>level_iters</strong><span class="classifier">list of int, optional</span></dt><dd><p>the number of iterations at each level of the Gaussian Pyramid (the
-length of the list defines the number of pyramid levels to be
-used).</p>
-</dd>
-<dt><strong>sigma_diff, radius</strong><span class="classifier">float</span></dt><dd><p>Parameters for initialization of the metric.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>warped_moving</strong><span class="classifier">ndarray</span></dt><dd><p>The data in <cite>moving</cite>, warped towards the <cite>static</cite> data.</p>
-</dd>
-<dt><strong>forward</strong><span class="classifier">ndarray (…, 3)</span></dt><dd><p>The vector field describing the forward warping from the source to the
-target.</p>
-</dd>
-<dt><strong>backward</strong><span class="classifier">ndarray (…, 3)</span></dt><dd><p>The vector field describing the backward warping from the target to the
-source.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="AFQ.registration.syn_register_dwi">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">syn_register_dwi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dwi</span></em>, <em class="sig-param"><span class="n">gtab</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">syn_kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.syn_register_dwi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.registration.</span></code><code class="sig-name descname"><span class="pre">syn_register_dwi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">syn_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#syn_register_dwi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.registration.syn_register_dwi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register DWI data to a template.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -147,7 +349,7 @@ source.</p>
 <dt><strong>gtab</strong><span class="classifier">GradientTable or list of strings</span></dt><dd><p>The gradients associated with the DWI data, or a string with [fbcal, ]</p>
 </dd>
 <dt><strong>template</strong><span class="classifier">nifti image or str, optional</span></dt><dd></dd>
-<dt><strong>syn_kwargs</strong><span class="classifier">key-word arguments for <a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></a></span></dt><dd></dd>
+<dt><strong>syn_kwargs</strong><span class="classifier">key-word arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></span></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -160,12 +362,12 @@ source.</p>
 
 <dl class="py function">
 <dt id="AFQ.registration.write_mapping">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">write_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapping</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#write_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.write_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.registration.</span></code><code class="sig-name descname"><span class="pre">write_mapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#write_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.registration.write_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write out a syn registration mapping to file</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>mapping</strong><span class="classifier">a DiffeomorphicMap object derived from <a class="reference internal" href="#AFQ.registration.syn_registration" title="AFQ.registration.syn_registration"><code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></a></span></dt><dd></dd>
+<dt><strong>mapping</strong><span class="classifier">a DiffeomorphicMap object derived from <code class="xref py py-func docutils literal notranslate"><span class="pre">syn_registration()</span></code></span></dt><dd></dd>
 <dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Full path to the nifti file storing the mapping</p>
 </dd>
 </dl>
@@ -175,7 +377,7 @@ source.</p>
 
 <dl class="py function">
 <dt id="AFQ.registration.read_mapping">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">read_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">disp</span></em>, <em class="sig-param"><span class="n">domain_img</span></em>, <em class="sig-param"><span class="n">codomain_img</span></em>, <em class="sig-param"><span class="n">prealign</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#read_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.read_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.registration.</span></code><code class="sig-name descname"><span class="pre">read_mapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codomain_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prealign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#read_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.registration.read_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a syn registration mapping from a nifti file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -198,76 +400,8 @@ If ndarray, contains affine transformation used for mapping</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="AFQ.registration.resample">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">static_affine</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.resample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resample an image from one space to another.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>moving</strong><span class="classifier">array</span></dt><dd><p>The image to be resampled</p>
-</dd>
-<dt><strong>static</strong><span class="classifier">array</span></dt><dd></dd>
-<dt><strong>moving_affine</strong></dt><dd></dd>
-<dt><strong>static_affine</strong></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>resampled</strong><span class="classifier">the moving array resampled into the static array’s space.</span></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.c_of_mass">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">c_of_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#c_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.c_of_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.translation">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">translation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#translation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.translation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.rigid">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">rigid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#rigid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.rigid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.affine">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">static_affine</span></em>, <em class="sig-param"><span class="n">moving_affine</span></em>, <em class="sig-param"><span class="n">reg</span></em>, <em class="sig-param"><span class="n">starting_affine</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.affine_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">affine_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">moving_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbins</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">sampling_prop</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'MI'</span></em>, <em class="sig-param"><span class="n">pipeline</span><span class="o">=</span><span class="default_value">[c_of_mass, translation, rigid, affine]</span></em>, <em class="sig-param"><span class="n">level_iters</span><span class="o">=</span><span class="default_value">[10000, 1000, 100]</span></em>, <em class="sig-param"><span class="n">sigmas</span><span class="o">=</span><span class="default_value">[5.0, 2.5, 0.0]</span></em>, <em class="sig-param"><span class="n">factors</span><span class="o">=</span><span class="default_value">[4, 2, 1]</span></em>, <em class="sig-param"><span class="n">params0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#affine_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.affine_registration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the affine transformation between two 3D images.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="AFQ.registration.register_series">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_series</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series</span></em>, <em class="sig-param"><span class="n">ref</span></em>, <em class="sig-param"><span class="n">pipeline</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_series" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a series to a reference image.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>series</strong><span class="classifier">Nifti1Image object</span></dt><dd><p>The data is 4D with the last dimension separating different 3D volumes</p>
-</dd>
-<dt><strong>ref</strong><span class="classifier">Nifti1Image or integer or iterable</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>transformed_list, affine_list</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="AFQ.registration.register_dwi">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">register_dwi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_files</span></em>, <em class="sig-param"><span class="n">bval_files</span></em>, <em class="sig-param"><span class="n">bvec_files</span></em>, <em class="sig-param"><span class="n">b0_ref</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pipeline</span><span class="o">=</span><span class="default_value">[c_of_mass, translation, rigid, affine]</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_dwi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.register_dwi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.registration.</span></code><code class="sig-name descname"><span class="pre">register_dwi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[center_of_mass,</span> <span class="pre">translation,</span> <span class="pre">rigid,</span> <span class="pre">affine]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#register_dwi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.registration.register_dwi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a DWI data-set</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -285,29 +419,31 @@ single file. If it’s a list, each entry is a full path.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="AFQ.registration.streamline_registration">
-<code class="sig-prename descclassname">AFQ.registration.</code><code class="sig-name descname">streamline_registration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moving</span></em>, <em class="sig-param"><span class="n">static</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">native_resampled</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#streamline_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.registration.streamline_registration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register two collections of streamlines (‘bundles’) to each other</p>
+<dt id="AFQ.registration.slr_registration">
+<code class="sig-prename descclassname"><span class="pre">AFQ.registration.</span></code><code class="sig-name descname"><span class="pre">slr_registration</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moving_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/registration.html#slr_registration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.registration.slr_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a source image (moving) to a target image (static).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>moving, static</strong><span class="classifier">lists of 3 by n, or str</span></dt><dd><p>The two bundles to be registered. Given either as lists of arrays with
-3D coordinates, or strings containing full paths to these files.</p>
+<dt><strong>moving</strong><span class="classifier">ndarray</span></dt><dd><p>The source tractography data to be registered</p>
 </dd>
-<dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>How many points to resample to. Default: 100.</p>
+<dt><strong>moving_affine</strong><span class="classifier">ndarray</span></dt><dd><p>The affine associated with the moving (source) data.</p>
 </dd>
-<dt><strong>native_resampled</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to return the moving bundle in the original space, but
-resampled in the static space to n_points.</p>
+<dt><strong>moving_shape</strong><span class="classifier">ndarray</span></dt><dd><p>The shape of the space associated with the static (target) data.</p>
+</dd>
+<dt><strong>static</strong><span class="classifier">ndarray</span></dt><dd><p>The target tractography data for registration</p>
+</dd>
+<dt><strong>static_affine</strong><span class="classifier">ndarray</span></dt><dd><p>The affine associated with the static (target) data.</p>
+</dd>
+<dt><strong>static_shape</strong><span class="classifier">ndarray</span></dt><dd><p>The shape of the space associated with the static (target) data.</p>
+</dd>
+<dt><strong>**kwargs:</strong></dt><dd><p>kwargs are passed into whole_brain_slr</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>aligned</strong><span class="classifier">list</span></dt><dd><p>Streamlines from the moving group, moved to be closely matched to
-the static group.</p>
-</dd>
-<dt><strong>matrix</strong><span class="classifier">array (4, 4)</span></dt><dd><p>The affine transformation that takes us from ‘moving’ to ‘static’</p>
-</dd>
+<dt>AffineMap</dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -318,91 +454,35 @@ the static group.</p>
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../data/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a>
+    <a class='right-next' id="next-link" href="../segmentation/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">API Reference</a><ul>
-  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../mask/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.mask</span></code></a></li>
-      <li>Next: <a href="../segmentation/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../../_sources/autoapi/AFQ/registration/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

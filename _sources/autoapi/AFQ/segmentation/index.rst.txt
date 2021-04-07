@@ -16,12 +16,13 @@ Classes
 
 
 
-.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
+.. class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kawrgs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
+
 
    .. method:: _read_tg(self, tg=None)
 
 
-   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False, endpoint_info=None)
+   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
 
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -52,15 +53,6 @@ Classes
       reset_tg_space : bool, optional
           Whether to reset the space of the input tractogram after
           segmentation is complete. Default: False.
-      endpoint_info : dict, optional. This overrides use of the
-          AAL atlas, which is the default behavior.
-          The format for this should be:
-          {"bundle1": {"startpoint":img1_1,
-                       "endpoint":img1_2},
-           "bundle2": {"startpoint":img2_1,
-                        "endpoint":img2_2}}
-          where the images used are binary masks of the desired
-          endpoints.
 
 
 
@@ -192,57 +184,9 @@ Classes
           !! processed by numpydoc !!
 
 
-   .. method:: _get_bundle_info(self, bundle_idx, bundle)
+   .. method:: _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol)
 
       Get fiber probabilites and ROIs for a given bundle.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-
-   .. method:: _check_sl_with_inclusion(self, sl, include_rois, tol)
-
-      Helper function to check that a streamline is close to a list of
-      inclusion ROIS.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-
-   .. method:: _check_sl_with_exclusion(self, sl, exclude_rois, tol)
-
-      Helper function to check that a streamline is not too close to a
-      list of exclusion ROIs.
 
 
 
@@ -313,7 +257,7 @@ Classes
           !! processed by numpydoc !!
 
 
-   .. method:: move_streamlines(self, tg=None, reg_algo='slr')
+   .. method:: move_streamlines(self, tg, reg_algo='slr')
 
       Streamline-based registration of a whole-brain tractogram to
       the MNI whole-brain atlas.

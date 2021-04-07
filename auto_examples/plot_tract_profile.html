@@ -6,14 +6,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Plotting tract profiles &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -22,22 +41,227 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Plotting tract profiles using RecoBundles" href="plot_recobundles.html" />
     <link rel="prev" title="AFQ with HCP data" href="cloudknot_hcp_example.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_afq_reco80.html">
+   RecoBundles80 using AFQ API
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_afq_callosal.html">
+   Callosal bundles using AFQ API
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_afq_api.html">
+   AFQ API
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_bids_layout.html">
+   How pyAFQ uses BIDS
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="cloudknot_example.html">
+   Using cloudknot to run pyAFQ on AWS batch:
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="cloudknot_hcp_example.html">
+   AFQ with HCP data
+  </a>
+ </li>
+ <li class="toctree-l2 current active">
+  <a class="current reference internal" href="#">
+   Plotting tract profiles
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_recobundles.html">
+   Plotting tract profiles using RecoBundles
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="optic_radiations.html">
+   Plotting the Optic Radiations
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="plot_callosal_tract_profile.html">
+   Plotting Novel Tract Profiles:
+  </a>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#get-example-data">
+   Get example data:
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#calculate-dti">
+   Calculate DTI:
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#register-the-individual-data-to-a-template">
+   Register the individual data to a template:
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#read-in-bundle-specification">
+   Read in bundle specification
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tracking">
+   Tracking
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#segmentation">
+   Segmentation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cleaning">
+   Cleaning
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bundle-profiles">
+   Bundle profiles
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References:
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-tract-profile-py"><span class="std std-ref">here</span></a>
@@ -59,6 +283,7 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 <span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">affine_registration</span>
 
 <span class="kn">from</span> <span class="nn">AFQ</span> <span class="kn">import</span> <span class="n">api</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
@@ -127,7 +352,7 @@ using an affine transformation.</p>
     <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
     <span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># Prealign using affine registration</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">prealign</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">affine_registration</span><span class="p">(</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">prealign</span> <span class="o">=</span> <span class="n">affine_registration</span><span class="p">(</span>
         <span class="n">b0</span><span class="p">,</span>
         <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
         <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
@@ -148,9 +373,9 @@ using an affine transformation.</p>
 Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz
 
   0%|          | 0.00/13.0k [00:00&lt;?, ?B/s]
- 29%|##8       | 3.75k/13.0k [00:00&lt;00:00, 37.5kB/s]
- 65%|######4   | 8.40k/13.0k [00:00&lt;00:00, 39.8kB/s]
-13.0kB [00:00, 43.6kB/s]
+ 33%|###2      | 4.27k/13.0k [00:00&lt;00:00, 42.7kB/s]
+ 79%|#######9  | 10.3k/13.0k [00:00&lt;00:00, 52.9kB/s]
+13.0kB [00:00, 53.0kB/s]
 Optimizing level 2 [max iter: 10000]
 Optimizing level 1 [max iter: 1000]
 Optimizing level 0 [max iter: 100]
@@ -231,6 +456,24 @@ not pass through exclusion ROIs.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
+
+  0%|          | 0/335 [00:00&lt;?, ?it/s]
+  1%|          | 2/335 [00:00&lt;00:31, 10.56it/s]
+  1%|1         | 4/335 [00:06&lt;09:51,  1.79s/it]
+  5%|4         | 16/335 [00:06&lt;01:36,  3.30it/s]
+ 81%|########1 | 272/335 [00:06&lt;00:00, 84.45it/s]
+100%|##########| 335/335 [00:06&lt;00:00, 52.87it/s]
+
+  0%|          | 0/237 [00:00&lt;?, ?it/s]
+100%|##########| 237/237 [00:00&lt;00:00, 3153.84it/s]
+
+  0%|          | 0/431 [00:00&lt;?, ?it/s]
+ 58%|#####8    | 252/431 [00:00&lt;00:00, 2008.94it/s]
+100%|##########| 431/431 [00:00&lt;00:00, 2880.43it/s]
+
+  0%|          | 0/472 [00:00&lt;?, ?it/s]
+ 81%|########  | 380/472 [00:00&lt;00:00, 2913.36it/s]
+100%|##########| 472/472 [00:00&lt;00:00, 3610.42it/s]
 </pre></div>
 </div>
 </div>
@@ -260,17 +503,17 @@ of their trajector and/or length.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cleaning fiber groups...
 Cleaning CST_R
-Before cleaning: 85 streamlines
-Afer cleaning: 83 streamlines
+Before cleaning: 26 streamlines
+Afer cleaning: 26 streamlines
 Cleaning CST_L
-Before cleaning: 80 streamlines
-Afer cleaning: 77 streamlines
+Before cleaning: 29 streamlines
+Afer cleaning: 29 streamlines
 Cleaning ARC_R
-Before cleaning: 58 streamlines
-Afer cleaning: 57 streamlines
+Before cleaning: 15 streamlines
+Afer cleaning: 15 streamlines
 Cleaning ARC_L
-Before cleaning: 58 streamlines
-Afer cleaning: 58 streamlines
+Before cleaning: 25 streamlines
+Afer cleaning: 25 streamlines
 </pre></div>
 </div>
 </div>
@@ -324,7 +567,7 @@ quantification”, PloS One, 7: e49790</p>
 matter”, Nature Communications 5: 4932</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 17 minutes  14.916 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 17 minutes  44.270 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
@@ -338,98 +581,35 @@ matter”, Nature Communications 5: 4932</p>
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="cloudknot_hcp_example.html" title="previous page">AFQ with HCP data</a>
+    <a class='right-next' id="next-link" href="plot_recobundles.html" title="next page">Plotting tract profiles using RecoBundles</a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../index.html">
-    <img class="logo" src="../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optic_radiations.html">Plotting the Optic Radiations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="index.html">Examples</a><ul>
-      <li>Previous: <a href="cloudknot_hcp_example.html" title="previous chapter">AFQ with HCP data</a></li>
-      <li>Next: <a href="plot_recobundles.html" title="next chapter">Plotting tract profiles using RecoBundles</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../_sources/auto_examples/plot_tract_profile.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

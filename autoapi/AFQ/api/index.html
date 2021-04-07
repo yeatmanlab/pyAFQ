@@ -6,14 +6,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.api &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -22,29 +41,891 @@
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.bundles" href="../bundles/index.html" />
     <link rel="prev" title="AFQ.viz.utils" href="../viz/utils/index.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2 current active">
+  <a class="reference internal" href="../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <ul class="current">
+   <li class="toctree-l3">
+    <a class="reference internal" href="../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../utils/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../viz/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3 current active">
+    <a class="current reference internal" href="#">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../bundles/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.bundles
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../registration/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classes">
+     Classes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#functions">
+     Functions
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.api.make_bundle_dict">
+       make_bundle_dict
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.api.AFQ">
+       AFQ
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.gtab">
+         gtab
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dwi_affine">
+         dwi_affine
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dwi_img">
+         dwi_img
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.b0">
+         b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.brain_mask">
+         brain_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dti">
+         dti
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dti_fa">
+         dti_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dti_cfa">
+         dti_cfa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dti_pdd">
+         dti_pdd
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dti_md">
+         dti_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dki">
+         dki
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dki_mk">
+         dki_mk
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dki_fa">
+         dki_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dki_md">
+         dki_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.dki_awf">
+         dki_awf
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.mapping">
+         mapping
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.streamlines">
+         streamlines
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.bundles">
+         bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.clean_bundles">
+         clean_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.tract_profiles">
+         tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.template_xform">
+         template_xform
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.bundle_dict">
+         bundle_dict
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.log_and_save_nii">
+         log_and_save_nii
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.log_and_save_trk">
+         log_and_save_trk
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._get_data_gtab">
+         _get_data_gtab
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._b0">
+         _b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._b0_mask">
+         _b0_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._brain_mask">
+         _brain_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti_fit">
+         _dti_fit
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti">
+         _dti
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki_fit">
+         _dki_fit
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki">
+         _dki
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._csd">
+         _csd
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._anisotropic_power_map">
+         _anisotropic_power_map
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti_fa">
+         _dti_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti_cfa">
+         _dti_cfa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti_pdd">
+         _dti_pdd
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dti_md">
+         _dti_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki_fa">
+         _dki_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki_md">
+         _dki_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki_awf">
+         _dki_awf
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._dki_mk">
+         _dki_mk
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._get_best_scalar">
+         _get_best_scalar
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._reg_img">
+         _reg_img
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_registered_b0">
+         _export_registered_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._mapping">
+         _mapping
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_seed_mask">
+         _export_seed_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_stop_mask">
+         _export_stop_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._streamlines">
+         _streamlines
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._segment">
+         _segment
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._clean_bundles">
+         _clean_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._tract_profiles">
+         _tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._template_xform">
+         _template_xform
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_rois">
+         _export_rois
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_bundles">
+         _export_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_sl_counts">
+         _export_sl_counts
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._viz_prepare_vol">
+         _viz_prepare_vol
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._viz_prepare_vols">
+         _viz_prepare_vols
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._viz_bundles">
+         _viz_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._viz_ROIs">
+         _viz_ROIs
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._plot_tract_profiles">
+         _plot_tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._export_timing">
+         _export_timing
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._get_affine">
+         _get_affine
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ._get_fname">
+         _get_fname
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_gtab">
+         set_gtab
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_gtab">
+         get_gtab
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dwi_affine">
+         set_dwi_affine
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dwi_affine">
+         get_dwi_affine
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dwi_img">
+         set_dwi_img
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dwi_img">
+         get_dwi_img
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.__getitem__">
+         __getitem__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_b0">
+         set_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_b0">
+         get_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_masked_b0">
+         set_masked_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_masked_b0">
+         get_masked_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_brain_mask">
+         set_brain_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_brain_mask">
+         get_brain_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dti">
+         set_dti
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dti">
+         get_dti
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dti_fa">
+         set_dti_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dti_fa">
+         get_dti_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dti_cfa">
+         set_dti_cfa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dti_cfa">
+         get_dti_cfa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dti_pdd">
+         set_dti_pdd
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dti_pdd">
+         get_dti_pdd
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dti_md">
+         set_dti_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dti_md">
+         get_dti_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dki">
+         set_dki
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dki">
+         get_dki
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dki_mk">
+         set_dki_mk
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dki_mk">
+         get_dki_mk
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dki_fa">
+         set_dki_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dki_fa">
+         get_dki_fa
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dki_md">
+         set_dki_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dki_md">
+         get_dki_md
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_dki_awf">
+         set_dki_awf
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_dki_awf">
+         get_dki_awf
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_mapping">
+         set_mapping
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_mapping">
+         get_mapping
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_streamlines">
+         set_streamlines
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_streamlines">
+         get_streamlines
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_bundles">
+         set_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_bundles">
+         get_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_clean_bundles">
+         set_clean_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_clean_bundles">
+         get_clean_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_tract_profiles">
+         set_tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_tract_profiles">
+         get_tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_template_xform">
+         set_template_xform
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_template_xform">
+         get_template_xform
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.set_bundle_dict">
+         set_bundle_dict
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.get_bundle_dict">
+         get_bundle_dict
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_rois">
+         export_rois
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_seed_mask">
+         export_seed_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_stop_mask">
+         export_stop_mask
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_bundles">
+         export_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_sl_counts">
+         export_sl_counts
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.viz_bundles">
+         viz_bundles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.viz_ROIs">
+         viz_ROIs
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.plot_tract_profiles">
+         plot_tract_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_registered_b0">
+         export_registered_b0
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.combine_profiles">
+         combine_profiles
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_timing">
+         export_timing
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.export_all">
+         export_all
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.AFQ.upload_to_s3">
+         upload_to_s3
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-AFQ.api">
 <span id="afq-api"></span><h1><a class="reference internal" href="#module-AFQ.api" title="AFQ.api"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><a class="headerlink" href="#module-AFQ.api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -58,7 +939,7 @@
 </div>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -71,7 +952,7 @@
 </table>
 <dl class="py function">
 <dt id="AFQ.api.make_bundle_dict">
-<code class="sig-prename descclassname">AFQ.api.</code><code class="sig-name descname">make_bundle_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">BUNDLES</span></em>, <em class="sig-param"><span class="n">seg_algo</span><span class="o">=</span><span class="default_value">'afq'</span></em>, <em class="sig-param"><span class="n">resample_to</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#make_bundle_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.make_bundle_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.api.</span></code><code class="sig-name descname"><span class="pre">make_bundle_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BUNDLES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'afq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#make_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.make_bundle_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a bundle dictionary, needed for the segmentation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -97,587 +978,627 @@ image.</p>
 
 <dl class="py class">
 <dt id="AFQ.api.AFQ">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.api.</code><code class="sig-name descname">AFQ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bids_path</span></em>, <em class="sig-param"><span class="n">bids_filters</span><span class="o">=</span><span class="default_value">{'suffix': 'dwi'}</span></em>, <em class="sig-param"><span class="n">dmriprep</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">b0_threshold</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">robust_tensor_fitting</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">min_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_bval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">'mni_T1'</span></em>, <em class="sig-param"><span class="n">reg_subject</span><span class="o">=</span><span class="default_value">'power_map'</span></em>, <em class="sig-param"><span class="n">brain_mask</span><span class="o">=</span><span class="default_value">B0Mask()</span></em>, <em class="sig-param"><span class="n">bundle_info</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dask_it</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">scalars</span><span class="o">=</span><span class="default_value">['dti_fa', 'dti_md']</span></em>, <em class="sig-param"><span class="n">use_prealign</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">virtual_frame_buffer</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">viz_backend</span><span class="o">=</span><span class="default_value">'plotly_no_gif'</span></em>, <em class="sig-param"><span class="n">tracking_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">segmentation_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">endpoint_info</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clean_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AFQ.api.</span></code><code class="sig-name descname"><span class="pre">AFQ</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bids_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'suffix':</span> <span class="pre">'dwi'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmriprep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_tractography_bids_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch2self</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust_tensor_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mni_T1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'power_map'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">B0Mask()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SynMap()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gauss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dask_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['dti_fa',</span> <span class="pre">'dti_md']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_frame_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viz_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly_no_gif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="py attribute">
-<dt id="AFQ.api.AFQ._scalar_dict">
-<code class="sig-name descname">_scalar_dict</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._scalar_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._scalar_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="AFQ.api.AFQ.gtab">
-<code class="sig-name descname">gtab</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.gtab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.gtab" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">gtab</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.gtab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dwi_affine">
-<code class="sig-name descname">dwi_affine</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dwi_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dwi_affine" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dwi_affine</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dwi_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dwi_affine" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dwi_img">
-<code class="sig-name descname">dwi_img</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dwi_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dwi_img" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dwi_img</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dwi_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dwi_img" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.b0">
-<code class="sig-name descname">b0</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">b0</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.b0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.brain_mask">
-<code class="sig-name descname">brain_mask</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.brain_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.brain_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">brain_mask</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.brain_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dti">
-<code class="sig-name descname">dti</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dti" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dti</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dti" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dti_fa">
-<code class="sig-name descname">dti_fa</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dti_fa</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dti_cfa">
-<code class="sig-name descname">dti_cfa</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_cfa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_cfa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dti_cfa</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_cfa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dti_pdd">
-<code class="sig-name descname">dti_pdd</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_pdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_pdd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dti_pdd</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_pdd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dti_md">
-<code class="sig-name descname">dti_md</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dti_md</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dti_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dki">
-<code class="sig-name descname">dki</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dki" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dki</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dki" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dki_mk">
-<code class="sig-name descname">dki_mk</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_mk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_mk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dki_mk</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_mk" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dki_fa">
-<code class="sig-name descname">dki_fa</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dki_fa</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dki_md">
-<code class="sig-name descname">dki_md</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dki_md</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.dki_awf">
-<code class="sig-name descname">dki_awf</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_awf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_awf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dki_awf</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.mapping">
-<code class="sig-name descname">mapping</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">mapping</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.mapping" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.streamlines">
-<code class="sig-name descname">streamlines</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.streamlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">streamlines</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.streamlines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.bundles">
-<code class="sig-name descname">bundles</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">bundles</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.clean_bundles">
-<code class="sig-name descname">clean_bundles</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.clean_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">clean_bundles</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.clean_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.tract_profiles">
-<code class="sig-name descname">tract_profiles</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">tract_profiles</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.api.AFQ.template_xform">
-<code class="sig-name descname">template_xform</code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.template_xform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">template_xform</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.template_xform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="AFQ.api.AFQ.bundle_dict">
+<code class="sig-name descname"><span class="pre">bundle_dict</span></code><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.bundle_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.log_and_save_nii">
-<code class="sig-name descname">log_and_save_nii</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.log_and_save_nii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.log_and_save_nii" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">log_and_save_nii</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.log_and_save_nii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.log_and_save_nii" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.log_and_save_trk">
-<code class="sig-name descname">log_and_save_trk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">sft</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.log_and_save_trk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.log_and_save_trk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">log_and_save_trk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sft</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.log_and_save_trk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.log_and_save_trk" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._get_data_gtab">
-<code class="sig-name descname">_get_data_gtab</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">filter_b</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_data_gtab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_data_gtab" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_get_data_gtab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_data_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._get_data_gtab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._b0">
-<code class="sig-name descname">_b0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ._b0_mask">
+<code class="sig-name descname"><span class="pre">_b0_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._b0_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._b0_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._brain_mask">
-<code class="sig-name descname">_brain_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">median_radius</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">numpass</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">autocrop</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">vol_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dilate</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._brain_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._brain_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_brain_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._brain_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti_fit">
-<code class="sig-name descname">_dti_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti">
-<code class="sig-name descname">_dti</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki_fit">
-<code class="sig-name descname">_dki_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki">
-<code class="sig-name descname">_dki</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._csd">
-<code class="sig-name descname">_csd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">response</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sh_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lambda_</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">msmt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._csd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._csd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_csd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._csd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._anisotropic_power_map">
-<code class="sig-name descname">_anisotropic_power_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._anisotropic_power_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._anisotropic_power_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_anisotropic_power_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._anisotropic_power_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._anisotropic_power_map" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti_fa">
-<code class="sig-name descname">_dti_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti_cfa">
-<code class="sig-name descname">_dti_cfa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_cfa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_cfa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti_cfa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_cfa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti_pdd">
-<code class="sig-name descname">_dti_pdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_pdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_pdd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti_pdd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_pdd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dti_md">
-<code class="sig-name descname">_dti_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dti_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dti_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki_fa">
-<code class="sig-name descname">_dki_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki_md">
-<code class="sig-name descname">_dki_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki_awf">
-<code class="sig-name descname">_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">sphere</span><span class="o">=</span><span class="default_value">'repulsion100'</span></em>, <em class="sig-param"><span class="n">gtol</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_awf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_awf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki_awf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphere</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'repulsion100'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._dki_mk">
-<code class="sig-name descname">_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_mk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_mk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_dki_mk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._dki_mk" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._get_best_scalar">
-<code class="sig-name descname">_get_best_scalar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_best_scalar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_best_scalar" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_get_best_scalar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_best_scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._get_best_scalar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._reg_img">
-<code class="sig-name descname">_reg_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">mask</span></em>, <em class="sig-param"><span class="n">row</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._reg_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._reg_img" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="AFQ.api.AFQ._reg_prealign">
-<code class="sig-name descname">_reg_prealign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._reg_prealign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._reg_prealign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_reg_img</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._reg_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._reg_img" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._export_registered_b0">
-<code class="sig-name descname">_export_registered_b0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_registered_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_registered_b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_export_registered_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_registered_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_registered_b0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._mapping">
-<code class="sig-name descname">_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_mapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ._export_seed_mask">
+<code class="sig-name descname"><span class="pre">_export_seed_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_seed_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_seed_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ._export_stop_mask">
+<code class="sig-name descname"><span class="pre">_export_stop_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_stop_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_stop_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._streamlines">
-<code class="sig-name descname">_streamlines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._streamlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_streamlines</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._streamlines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._segment">
-<code class="sig-name descname">_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._segment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_segment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._segment" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._clean_bundles">
-<code class="sig-name descname">_clean_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._clean_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_clean_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._clean_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._tract_profiles">
-<code class="sig-name descname">_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_tract_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._template_xform">
-<code class="sig-name descname">_template_xform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._template_xform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_template_xform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._template_xform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._export_rois">
-<code class="sig-name descname">_export_rois</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_rois"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_rois" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_export_rois</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_rois"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_rois" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._export_bundles">
-<code class="sig-name descname">_export_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_export_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._export_sl_counts">
-<code class="sig-name descname">_export_sl_counts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_sl_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_sl_counts" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_export_sl_counts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_sl_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_sl_counts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._viz_prepare_vol">
-<code class="sig-name descname">_viz_prepare_vol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">vol</span></em>, <em class="sig-param"><span class="n">xform</span></em>, <em class="sig-param"><span class="n">mapping</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_prepare_vol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_prepare_vol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_viz_prepare_vol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_prepare_vol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_prepare_vol" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._viz_prepare_vols">
-<code class="sig-name descname">_viz_prepare_vols</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">volume</span></em>, <em class="sig-param"><span class="n">xform_volume</span></em>, <em class="sig-param"><span class="n">color_by_volume</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_prepare_vols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_prepare_vols" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_viz_prepare_vols</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_prepare_vols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_prepare_vols" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._viz_bundles">
-<code class="sig-name descname">_viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_viz_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._viz_ROIs">
-<code class="sig-name descname">_viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_ROIs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_ROIs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_viz_ROIs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._viz_ROIs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._viz_ROIs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._plot_tract_profiles">
-<code class="sig-name descname">_plot_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._plot_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._plot_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_plot_tract_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._plot_tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._plot_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._export_timing">
-<code class="sig-name descname">_export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">all_sub_sess</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_timing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._export_timing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_export_timing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_sub_sess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._export_timing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._export_timing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._get_affine">
-<code class="sig-name descname">_get_affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_affine" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_get_affine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._get_affine" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ._get_fname">
-<code class="sig-name descname">_get_fname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">suffix</span></em>, <em class="sig-param"><span class="n">include_track</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">include_seg</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_fname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ._get_fname" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_get_fname</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_track</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_seg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ._get_fname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ._get_fname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_gtab">
-<code class="sig-name descname">set_gtab</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">b0_threshold</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_gtab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_gtab" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_gtab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_gtab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_gtab">
-<code class="sig-name descname">get_gtab</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_gtab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_gtab" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_gtab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_gtab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dwi_affine">
-<code class="sig-name descname">set_dwi_affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dwi_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dwi_affine" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dwi_affine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dwi_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dwi_affine" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dwi_affine">
-<code class="sig-name descname">get_dwi_affine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dwi_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dwi_affine" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dwi_affine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dwi_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dwi_affine" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dwi_img">
-<code class="sig-name descname">set_dwi_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dwi_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dwi_img" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dwi_img</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dwi_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dwi_img" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dwi_img">
-<code class="sig-name descname">get_dwi_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dwi_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dwi_img" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dwi_img</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dwi_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dwi_img" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_b0">
-<code class="sig-name descname">set_b0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_b0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_b0">
-<code class="sig-name descname">get_b0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.set_masked_b0">
+<code class="sig-name descname"><span class="pre">set_masked_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_masked_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_masked_b0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.get_masked_b0">
+<code class="sig-name descname"><span class="pre">get_masked_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_masked_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_masked_b0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_brain_mask">
-<code class="sig-name descname">set_brain_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_brain_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_brain_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_brain_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_brain_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_brain_mask">
-<code class="sig-name descname">get_brain_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_brain_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_brain_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_brain_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dti">
-<code class="sig-name descname">set_dti</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dti</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dti">
-<code class="sig-name descname">get_dti</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dti</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dti_fa">
-<code class="sig-name descname">set_dti_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dti_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dti_fa">
-<code class="sig-name descname">get_dti_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dti_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dti_cfa">
-<code class="sig-name descname">set_dti_cfa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_cfa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_cfa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dti_cfa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_cfa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dti_cfa">
-<code class="sig-name descname">get_dti_cfa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_cfa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_cfa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dti_cfa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_cfa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dti_pdd">
-<code class="sig-name descname">set_dti_pdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_pdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_pdd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dti_pdd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_pdd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dti_pdd">
-<code class="sig-name descname">get_dti_pdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_pdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_pdd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dti_pdd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_pdd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dti_md">
-<code class="sig-name descname">set_dti_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dti_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dti_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dti_md">
-<code class="sig-name descname">get_dti_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dti_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dti_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dki">
-<code class="sig-name descname">set_dki</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dki</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dki">
-<code class="sig-name descname">get_dki</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dki</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dki_mk">
-<code class="sig-name descname">set_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_mk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_mk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dki_mk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_mk" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dki_mk">
-<code class="sig-name descname">get_dki_mk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_mk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_mk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dki_mk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_mk" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dki_fa">
-<code class="sig-name descname">set_dki_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dki_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dki_fa">
-<code class="sig-name descname">get_dki_fa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_fa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_fa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dki_fa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_fa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dki_md">
-<code class="sig-name descname">set_dki_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dki_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dki_md">
-<code class="sig-name descname">get_dki_md</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_md"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_md" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dki_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_md" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_dki_awf">
-<code class="sig-name descname">set_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_awf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_awf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_dki_awf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_dki_awf">
-<code class="sig-name descname">get_dki_awf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_awf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_awf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dki_awf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_dki_awf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_mapping">
-<code class="sig-name descname">set_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_mapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_mapping" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_mapping">
-<code class="sig-name descname">get_mapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_mapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_mapping" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_streamlines">
-<code class="sig-name descname">set_streamlines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_streamlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_streamlines</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_streamlines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_streamlines">
-<code class="sig-name descname">get_streamlines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_streamlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_streamlines</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_streamlines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_bundles">
-<code class="sig-name descname">set_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_bundles">
-<code class="sig-name descname">get_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_clean_bundles">
-<code class="sig-name descname">set_clean_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_clean_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_clean_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_clean_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_clean_bundles">
-<code class="sig-name descname">get_clean_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_clean_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_clean_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_clean_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_clean_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_tract_profiles">
-<code class="sig-name descname">set_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_tract_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_tract_profiles">
-<code class="sig-name descname">get_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_tract_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.set_template_xform">
-<code class="sig-name descname">set_template_xform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.set_template_xform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_template_xform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_template_xform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.get_template_xform">
-<code class="sig-name descname">get_template_xform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_template_xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.get_template_xform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_template_xform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_template_xform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.set_bundle_dict">
+<code class="sig-name descname"><span class="pre">set_bundle_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.set_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.set_bundle_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.get_bundle_dict">
+<code class="sig-name descname"><span class="pre">get_bundle_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.get_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.get_bundle_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_rois">
-<code class="sig-name descname">export_rois</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_rois"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_rois" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_rois</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_rois"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_rois" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.export_seed_mask">
+<code class="sig-name descname"><span class="pre">export_seed_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_seed_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_seed_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AFQ.api.AFQ.export_stop_mask">
+<code class="sig-name descname"><span class="pre">export_stop_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_stop_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_stop_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_bundles">
-<code class="sig-name descname">export_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_sl_counts">
-<code class="sig-name descname">export_sl_counts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_sl_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_sl_counts" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_sl_counts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_sl_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_sl_counts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.viz_bundles">
-<code class="sig-name descname">viz_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.viz_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.viz_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">viz_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.viz_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.viz_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.viz_ROIs">
-<code class="sig-name descname">viz_ROIs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">bundle_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xform_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">xform_color_by_volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume_opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interactive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.viz_ROIs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.viz_ROIs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">viz_ROIs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.viz_ROIs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.viz_ROIs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.plot_tract_profiles">
-<code class="sig-name descname">plot_tract_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.plot_tract_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.plot_tract_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">plot_tract_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.plot_tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.plot_tract_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_registered_b0">
-<code class="sig-name descname">export_registered_b0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_registered_b0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_registered_b0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_registered_b0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_registered_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_registered_b0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.combine_profiles">
-<code class="sig-name descname">combine_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.combine_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.combine_profiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">combine_profiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.combine_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.combine_profiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_timing">
-<code class="sig-name descname">export_timing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">all_sub_sess</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_timing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_timing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_timing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_sub_sess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_timing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_timing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.export_all">
-<code class="sig-name descname">export_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.export_all" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">export_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.export_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.export_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports all the possible outputs</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="AFQ.api.AFQ.upload_to_s3">
-<code class="sig-name descname">upload_to_s3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">s3fs</span></em>, <em class="sig-param"><span class="n">remote_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.upload_to_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.api.AFQ.upload_to_s3" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">upload_to_s3</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s3fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/api.html#AFQ.upload_to_s3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.AFQ.upload_to_s3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload entire AFQ derivatives folder to S3</p>
 </dd></dl>
 
@@ -688,91 +1609,35 @@ image.</p>
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../viz/utils/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a>
+    <a class='right-next' id="next-link" href="../bundles/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">API Reference</a><ul>
-  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-      <li>Previous: <a href="../viz/utils/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
-      <li>Next: <a href="../bundles/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.bundles</span></code></a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../../_sources/autoapi/AFQ/api/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

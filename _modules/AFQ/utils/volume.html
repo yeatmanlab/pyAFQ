@@ -6,43 +6,166 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.utils.volume &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <h1>Source code for AFQ.utils.volume</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">ndim</span>
 <span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">gaussian</span>
-<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">convex_hull_image</span><span class="p">,</span> <span class="n">binary_dilation</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">binary_dilation</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.qhull</span> <span class="kn">import</span> <span class="n">QhullError</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">dice</span>
 
@@ -51,6 +174,8 @@
 <span class="kn">from</span> <span class="nn">dipy.io.utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">create_nifti_header</span><span class="p">,</span> <span class="n">get_reference_info</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">select_random_set_of_streamlines</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
+
+<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.logger">[docs]</a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.utils.volume&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="transform_inverse_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.transform_inverse_roi">[docs]</a><span class="k">def</span> <span class="nf">transform_inverse_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="s2">&quot;ROI&quot;</span><span class="p">):</span>
@@ -81,14 +206,20 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
         <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
-    <span class="n">roi</span> <span class="o">=</span> <span class="n">binary_dilation</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-    <span class="n">roi</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
-    <span class="n">roi</span> <span class="o">=</span> <span class="n">patch_up_roi</span><span class="p">(</span><span class="n">roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle_name</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">_roi</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">roi</span></div>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">_roi</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Lost ROI </span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s1">, performing automatic binary dilation&#39;</span><span class="p">)</span>
+        <span class="n">_roi</span> <span class="o">=</span> <span class="n">binary_dilation</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+        <span class="n">_roi</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">_roi</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+
+    <span class="n">_roi</span> <span class="o">=</span> <span class="n">patch_up_roi</span><span class="p">(</span><span class="n">_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle_name</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_roi</span></div>
 
 
-<div class="viewcode-block" id="patch_up_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">[docs]</a><span class="k">def</span> <span class="nf">patch_up_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="s2">&quot;ROI&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="patch_up_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">[docs]</a><span class="k">def</span> <span class="nf">patch_up_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">bundle_name</span><span class="o">=</span><span class="s2">&quot;ROI&quot;</span><span class="p">,</span> <span class="n">make_convex</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    After being non-linearly transformed, ROIs tend to have holes in them.</span>
 <span class="sd">    We perform a couple of computational geometry operations on the ROI to</span>
@@ -119,10 +250,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2"> found to be empty after &quot;</span>
             <span class="s2">&quot;applying the mapping.&quot;</span><span class="p">))</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">convex_hull_image</span><span class="p">(</span><span class="n">hole_filled</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">QhullError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">hole_filled</span></div>
+    <span class="k">return</span> <span class="n">hole_filled</span></div>
 
 
 <div class="viewcode-block" id="density_map"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.density_map">[docs]</a><span class="k">def</span> <span class="nf">density_map</span><span class="p">(</span><span class="n">tractogram</span><span class="p">,</span> <span class="n">n_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_vox</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -226,83 +354,33 @@
             <span class="n">arr2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span></div>
 </pre></div>
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">Module code</a><ul>
-  <li><a href="../../AFQ.html">AFQ</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
     </div>
 
     
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

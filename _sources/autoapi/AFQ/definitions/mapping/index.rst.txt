@@ -1,0 +1,218 @@
+:mod:`AFQ.definitions.mapping`
+==============================
+
+.. py:module:: AFQ.definitions.mapping
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.definitions.mapping.FnirtMap
+   AFQ.definitions.mapping.SynMap
+   AFQ.definitions.mapping.SlrMap
+   AFQ.definitions.mapping.AffMap
+
+
+
+.. class:: FnirtMap(warp_suffix, space_suffix, warp_filters={}, space_filters={})
+
+
+   Bases: :class:`AFQ.definitions.utils.Definition`
+
+   Use an existing FNIRT map. Expects a warp file
+   and an image file for each subject / session; image file
+   is used as src space for warp.
+
+
+   :Parameters:
+
+       **warp_suffix** : str
+           suffix to pass to bids_layout.get() to identify the warp file.
+
+       **space_suffix** : str
+           suffix to pass to bids_layout.get() to identify the space file.
+
+       **warp_filters** : str
+           Additional filters to pass to bids_layout.get() to identify
+           the warp file.
+           Default: {}
+
+       **space_filters** : str
+           Additional filters to pass to bids_layout.get() to identify
+           the space file.
+           Default: {}
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   fnirt_map = FnirtMap(
+       "warp",
+       "MNI",
+       {"scope": "TBSS"},
+       {"scope": "TBSS"})
+   api.AFQ(mapping=fnirt_map)
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, from_path, subject, session)
+
+
+   .. method:: get_for_row(self, afq_object, row)
+
+
+
+.. class:: SynMap(use_prealign=True, affine_kwargs={}, syn_kwargs={})
+
+
+   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+
+   Calculate a Syn registration for each subject/session
+   using reg_subject and reg_template.
+
+
+   :Parameters:
+
+       **use_prealign** : bool
+           Whether to perform a linear pre-registration.
+           Default: True
+
+       **affine_kwargs** : dictionary, optional
+           Parameters to pass to affine_registration
+           in dipy.align, which does the linear pre-alignment.
+           Only used if use_prealign is True.
+           Default: {}
+
+       **syn_kwargs** : dictionary, optional
+           Parameters to pass to syn_registration
+           in dipy.align, which does the SyN alignment.
+           Default: {}
+
+       **Examples**
+           ..
+
+       **--------**
+           ..
+
+       **api.AFQ(mapping=SynMap())**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, from_path, subject, session)
+
+
+   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+
+
+
+.. class:: SlrMap(slr_kwargs={})
+
+
+   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+
+   Calculate a SLR registration for each subject/session
+   using reg_subject and reg_template.
+
+   slr_kwargs : dictionary, optional
+       Parameters to pass to whole_brain_slr
+       in dipy, which does the SLR alignment.
+       Default: {}
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   api.AFQ(mapping=SlrMap())
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, from_path, subject, session)
+
+
+   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+
+
+
+.. class:: AffMap(affine_kwargs={})
+
+
+   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+
+   Calculate an affine registration for each subject/session
+   using reg_subject and reg_template.
+
+   affine_kwargs : dictionary, optional
+       Parameters to pass to affine_registration
+       in dipy.align, which does the linear pre-alignment.
+       Default: {}
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   api.AFQ(mapping=AffMap())
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. method:: find_path(self, bids_layout, from_path, subject, session)
+
+
+   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+
+
+

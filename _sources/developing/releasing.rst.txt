@@ -15,7 +15,7 @@ The current release process entails the following steps:
 
 #. Push the tag::
 
-    git push origin 0.5
+    git push upstream 0.5
 
 #. On GitHub:
     - Navigate to the `"Releases" tab <https://github.com/yeatmanlab/pyAFQ/releases>`_

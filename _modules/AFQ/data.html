@@ -6,38 +6,168 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <h1>Source code for AFQ.data</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span></span><span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.clustering</span> <span class="kn">import</span> <span class="n">QuickBundles</span>
+<span class="kn">from</span> <span class="nn">dipy.segment.metric</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AveragePointwiseEuclideanMetric</span><span class="p">,</span>
+                                 <span class="n">ResampleFeature</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
+<span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="kn">import</span> <span class="n">_make_fetcher</span>
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
@@ -54,6 +184,11 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">bids</span> <span class="kn">import</span> <span class="n">BIDSLayout</span>
+<span class="kn">import</span> <span class="nn">bids.config</span> <span class="k">as</span> <span class="nn">bids_config</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">bids_config</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;extension_initial_dot&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">pass</span>
 <span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
 <span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">dask</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">delayed</span>
@@ -82,23 +217,12 @@
     <span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">formatwarning</span> <span class="o">=</span> <span class="n">default_warning_format</span>
 
-<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
-<span class="kn">from</span> <span class="nn">dipy.data.fetcher</span> <span class="kn">import</span> <span class="n">_make_fetcher</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span><span class="p">,</span> <span class="n">load_trk</span>
-<span class="kn">from</span> <span class="nn">dipy.segment.metric</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AveragePointwiseEuclideanMetric</span><span class="p">,</span>
-                                 <span class="n">ResampleFeature</span><span class="p">)</span>
-
-
-<span class="kn">from</span> <span class="nn">dipy.segment.clustering</span> <span class="kn">import</span> <span class="n">QuickBundles</span>
-
-<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fetch_callosum_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_callosum_templates&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch_hcp&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
            <span class="s2">&quot;read_stanford_hardi_tractography&quot;</span><span class="p">,</span>
            <span class="s2">&quot;organize_stanford_data&quot;</span><span class="p">]</span>
-
 
 
 <span class="n">BUNDLE_RECO_2_AFQ</span> <span class="o">=</span> \
@@ -211,10 +335,10 @@
         <span class="k">if</span> <span class="n">resample_to</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                                               <span class="n">resample_to</span><span class="p">,</span>
-                                               <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                               <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                                           <span class="n">resample_to</span><span class="p">,</span>
+                                           <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                           <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
                                   <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
         <span class="n">template_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
 
@@ -263,10 +387,11 @@
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">roi</span>
 
-    <span class="n">as_array</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                            <span class="n">resample_to</span><span class="p">,</span>
-                            <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                            <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+    <span class="n">as_array</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+        <span class="n">roi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+        <span class="n">resample_to</span><span class="p">,</span>
+        <span class="n">roi</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+        <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">threshold</span><span class="p">:</span>
         <span class="n">as_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">as_array</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
@@ -449,11 +574,13 @@
         <span class="k">if</span> <span class="n">resample_to</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                                               <span class="n">resample_to</span><span class="p">,</span>
-                                               <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                               <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-                                  <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+                <span class="n">resample</span><span class="p">(</span>
+                    <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                    <span class="n">resample_to</span><span class="p">,</span>
+                    <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                    <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
         <span class="n">template_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
 
     <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -644,6 +771,8 @@
 <span class="sd">        study : AFQ.data.S3BIDSStudy</span>
 <span class="sd">            The S3BIDSStudy for which this subject was a participant</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;botocore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subject_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;subject_id must be a string.&#39;</span><span class="p">)</span>
 
@@ -1008,6 +1137,8 @@
 <span class="sd">            class that quacks like AFQ.data.S3BIDSSubject. Default:</span>
 <span class="sd">            S3BIDSSubject</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;botocore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`study_id` must be a string.&#39;</span><span class="p">)</span>
 
@@ -1954,7 +2085,6 @@
     <span class="k">return</span> <span class="n">bundle_dict</span>
 
 
-
 <span class="n">fetch_aal_atlas</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
     <span class="s2">&quot;fetch_aal_atlas&quot;</span><span class="p">,</span>
     <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
@@ -1999,10 +2129,11 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
         <span class="n">oo</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">oo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">],</span>
-                                   <span class="n">resample_to</span><span class="p">,</span>
-                                   <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                                   <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">))</span>
+            <span class="n">oo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resample</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">],</span>
+                <span class="n">resample_to</span><span class="p">,</span>
+                <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
         <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">oo</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
                                             <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out_dict</span>
@@ -2260,7 +2391,7 @@
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="s2">&quot;Not Serializable&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
@@ -2349,10 +2480,11 @@
 
     <span class="k">if</span> <span class="n">mask_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">template_data</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">mask_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-            <span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">mask_data</span><span class="p">,</span>
-                         <span class="n">template_data</span><span class="p">,</span>
-                         <span class="n">mask_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                         <span class="n">template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+            <span class="n">resample</span><span class="p">(</span>
+                <span class="n">mask_data</span><span class="p">,</span>
+                <span class="n">template_data</span><span class="p">,</span>
+                <span class="n">mask_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                <span class="n">template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
             <span class="n">template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
         <span class="n">mask_data</span> <span class="o">=</span> <span class="n">mask_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
@@ -2464,83 +2596,33 @@
         <span class="k">return</span> <span class="n">_apply_mask</span><span class="p">(</span><span class="n">template_img</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  <li><a href="../AFQ.html">AFQ</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
     </div>
 
     
+  <script src="../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

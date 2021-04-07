@@ -42,7 +42,7 @@ def afq_process_subject(subject):
     # cloudknot installs the appropriate packages from pip
     import AFQ.data as afqd
     import AFQ.api as api
-    import AFQ.mask as afm
+    import AFQ.definitions.mask as afm
 
     # set logging level to your choice
     logging.basicConfig(level=logging.INFO)

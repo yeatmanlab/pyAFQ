@@ -63,17 +63,13 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), bundle_info=None, dask_it=False, scalars=['dti_fa', 'dti_md'], use_prealign=True, virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, endpoint_info=None, clean_params=None)
+.. class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, dask_it=False, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None)
+
 
    Bases: :class:`object`
 
    ..
        !! processed by numpydoc !!
-
-   .. attribute:: _scalar_dict
-      
-
-      
 
    .. attribute:: gtab
       
@@ -180,6 +176,11 @@ Functions
 
       
 
+   .. attribute:: bundle_dict
+      
+
+      
+
    .. method:: log_and_save_nii(self, img, fname)
 
 
@@ -192,7 +193,10 @@ Functions
    .. method:: _b0(self, row)
 
 
-   .. method:: _brain_mask(self, row, median_radius=4, numpass=1, autocrop=False, vol_idx=None, dilate=10)
+   .. method:: _b0_mask(self, row)
+
+
+   .. method:: _brain_mask(self, row)
 
 
    .. method:: _dti_fit(self, row)
@@ -243,13 +247,16 @@ Functions
    .. method:: _reg_img(self, img, mask, row=None)
 
 
-   .. method:: _reg_prealign(self, row)
-
-
    .. method:: _export_registered_b0(self, row)
 
 
    .. method:: _mapping(self, row)
+
+
+   .. method:: _export_seed_mask(self, row)
+
+
+   .. method:: _export_stop_mask(self, row)
 
 
    .. method:: _streamlines(self, row)
@@ -325,6 +332,12 @@ Functions
 
 
    .. method:: get_b0(self)
+
+
+   .. method:: set_masked_b0(self)
+
+
+   .. method:: get_masked_b0(self)
 
 
    .. method:: set_brain_mask(self)
@@ -429,7 +442,19 @@ Functions
    .. method:: get_template_xform(self)
 
 
+   .. method:: set_bundle_dict(self)
+
+
+   .. method:: get_bundle_dict(self)
+
+
    .. method:: export_rois(self)
+
+
+   .. method:: export_seed_mask(self)
+
+
+   .. method:: export_stop_mask(self)
 
 
    .. method:: export_bundles(self)

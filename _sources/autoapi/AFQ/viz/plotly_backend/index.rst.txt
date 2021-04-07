@@ -78,10 +78,10 @@ Functions
 .. function:: set_layout(figure, color=None)
 
 
-.. function:: _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbv_lims=[None, None])
+.. function:: _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbv_lims=[None, None], flip_axes=[False, False, False])
 
 
-.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], figure=None, background=(1, 1, 1), interact=False, inline=False)
+.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], flip_axes=[False, False, False], figure=None, background=(1, 1, 1), interact=False, inline=False)
 
    Visualize bundles in 3D
 
@@ -131,6 +131,12 @@ Functions
            If upper bound is None, will default to the maximum value in
            color_by_volume.
            Default: [None, None]
+
+       **flip_axes** : ndarray
+           Which axes to flip, to orient the image as RAS, which is how we
+           visualize.
+           For example, if the input image is LAS, use [True, False, False].
+           Default: [False, False, False]
 
        **background** : tuple, optional
            RGB values for the background. Default: (1, 1, 1), which is white
@@ -212,10 +218,10 @@ Functions
        !! processed by numpydoc !!
 
 
-.. function:: _draw_roi(figure, roi, name, color, opacity, dimensions)
+.. function:: _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes)
 
 
-.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
+.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, flip_axes=[False, False, False], color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
 
    Render a region of interest into a volume
 
@@ -255,6 +261,12 @@ Functions
            Opacity of ROI.
            Default: 1.0
 
+       **flip_axes** : ndarray
+           Which axes to flip, to orient the image as RAS, which is how we
+           visualize.
+           For example, if the input image is LAS, use [True, False, False].
+           Default: [False, False, False]
+
        **figure** : Plotly Figure object, optional
            If provided, the visualization will be added to this Figure. Default:
            Initialize a new Figure.
@@ -288,7 +300,8 @@ Functions
        !! processed by numpydoc !!
 
 
-.. py:class:: Axes
+.. class:: Axes
+
 
    Bases: :class:`enum.IntEnum`
 
@@ -337,7 +350,7 @@ Functions
 .. function:: _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0)
 
 
-.. function:: visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, slider_definition=20, which_plane=None)
+.. function:: visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, flip_axes=[False, False, False], slider_definition=20, which_plane=None)
 
    Visualize a volume
 
@@ -366,6 +379,12 @@ Functions
        **opacity** : float, optional
            Opacity of slices.
            Default: 1.0
+
+       **flip_axes** : ndarray
+           Which axes to flip, to orient the image as RAS, which is how we
+           visualize.
+           For example, if the input image is LAS, use [True, False, False].
+           Default: [False, False, False]
 
        **slider_definition** : int, optional
            How many discrete positions the slices can take.

@@ -25,6 +25,7 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
+from dipy.align import affine_registration
 
 
 import AFQ.data as afd
@@ -65,7 +66,7 @@ if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
     b0 = np.mean(img.get_fdata()[..., gtab.b0s_mask], -1)
     # Prealign using affine registration
-    _, prealign = reg.affine_registration(
+    _, prealign = affine_registration(
         b0,
         MNI_T2_img.get_fdata(),
         img.affine,

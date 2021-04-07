@@ -1,0 +1,18 @@
+:mod:`AFQ.definitions`
+======================
+
+.. py:module:: AFQ.definitions
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   mapping/index.rst
+   mask/index.rst
+   scalar/index.rst
+   utils/index.rst
+
+

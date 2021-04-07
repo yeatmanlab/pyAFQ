@@ -6,14 +6,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AFQ.viz.plotly_backend &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../../_static/js/index.1e043a052b0af929e4d8.js">
+
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
@@ -22,29 +41,385 @@
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="AFQ.viz.utils" href="../utils/index.html" />
     <link rel="prev" title="AFQ.viz.fury_backend" href="../fury_backend/index.html" />
-   
-  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <a class="navbar-brand" href="../../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2 current active">
+  <a class="reference internal" href="../../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <ul class="current">
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../utils/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3 current active">
+    <a class="reference internal" href="../index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+    <ul class="current">
+     <li class="toctree-l4">
+      <a class="reference internal" href="../fury_backend/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.fury_backend
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4 current active">
+      <a class="current reference internal" href="#">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.plotly_backend
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l4">
+      <a class="reference internal" href="../utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../api/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../bundles/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.bundles
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../registration/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l3">
+    <a class="reference internal" href="../../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
-          <div class="body" role="main">
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classes">
+     Classes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#functions">
+     Functions
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.scope">
+       scope
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.viz_logger">
+       viz_logger
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._inline_interact">
+       _inline_interact
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._to_color_range">
+       _to_color_range
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._color_arr2str">
+       _color_arr2str
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.set_layout">
+       set_layout
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._draw_streamlines">
+       _draw_streamlines
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.visualize_bundles">
+       visualize_bundles
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.create_gif">
+       create_gif
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._draw_roi">
+       _draw_roi
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.visualize_roi">
+       visualize_roi
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.Axes">
+       Axes
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.Axes.X">
+         X
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.Axes.Y">
+         Y
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.Axes.Z">
+         Z
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._draw_slice">
+       _draw_slice
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._name_from_enum">
+       _name_from_enum
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend._draw_slices">
+       _draw_slices
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.viz.plotly_backend.visualize_volume">
+       visualize_volume
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
             
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-AFQ.viz.plotly_backend">
 <span id="afq-viz-plotly-backend"></span><h1><a class="reference internal" href="#module-AFQ.viz.plotly_backend" title="AFQ.viz.plotly_backend"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a><a class="headerlink" href="#module-AFQ.viz.plotly_backend" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -58,7 +433,7 @@
 </div>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -76,19 +451,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.set_layout" title="AFQ.viz.plotly_backend.set_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_layout</span></code></a>(figure, color=None)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_streamlines" title="AFQ.viz.plotly_backend._draw_streamlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_streamlines</span></code></a>(figure, sls, dimensions, color, name, cbv=None, cbv_lims=[None, None])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_streamlines" title="AFQ.viz.plotly_backend._draw_streamlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_streamlines</span></code></a>(figure, sls, dimensions, color, name, cbv=None, cbv_lims=[None, None], flip_axes=[False, False, False])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_bundles" title="AFQ.viz.plotly_backend.visualize_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_bundles</span></code></a>(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], figure=None, background=(1, 1, 1), interact=False, inline=False)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_bundles" title="AFQ.viz.plotly_backend.visualize_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_bundles</span></code></a>(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], flip_axes=[False, False, False], figure=None, background=(1, 1, 1), interact=False, inline=False)</p></td>
 <td><p>Visualize bundles in 3D</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.create_gif" title="AFQ.viz.plotly_backend.create_gif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_gif</span></code></a>(figure, file_name, n_frames=30, zoom=2.5, z_offset=0.5, size=(600, 600))</p></td>
 <td><p>Convert a Plotly Figure object into a gif</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_roi" title="AFQ.viz.plotly_backend._draw_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_roi</span></code></a>(figure, roi, name, color, opacity, dimensions)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_roi" title="AFQ.viz.plotly_backend._draw_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_roi</span></code></a>(figure, roi, name, color, opacity, dimensions, flip_axes)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_roi" title="AFQ.viz.plotly_backend.visualize_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_roi</span></code></a>(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name=’ROI’, figure=None, color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_roi" title="AFQ.viz.plotly_backend.visualize_roi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_roi</span></code></a>(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name=’ROI’, figure=None, flip_axes=[False, False, False], color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)</p></td>
 <td><p>Render a region of interest into a volume</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_slice" title="AFQ.viz.plotly_backend._draw_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_slice</span></code></a>(figure, axis, volume, opacity=0.3, step=None, n_steps=0)</p></td>
@@ -100,50 +475,50 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend._draw_slices" title="AFQ.viz.plotly_backend._draw_slices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_draw_slices</span></code></a>(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_volume" title="AFQ.viz.plotly_backend.visualize_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_volume</span></code></a>(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, slider_definition=20, which_plane=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.plotly_backend.visualize_volume" title="AFQ.viz.plotly_backend.visualize_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_volume</span></code></a>(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, flip_axes=[False, False, False], slider_definition=20, which_plane=None)</p></td>
 <td><p>Visualize a volume</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py data">
 <dt id="AFQ.viz.plotly_backend.scope">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">scope</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.scope" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">scope</span></code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.scope" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py data">
 <dt id="AFQ.viz.plotly_backend.viz_logger">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">viz_logger</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#viz_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.viz_logger" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">viz_logger</span></code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#viz_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.viz_logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._inline_interact">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_inline_interact</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">show</span></em>, <em class="sig-param"><span class="n">show_inline</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_inline_interact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._inline_interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_inline_interact</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_inline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_inline_interact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._inline_interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to reuse across viz functions</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._to_color_range">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_to_color_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_to_color_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._to_color_range" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_to_color_range</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_to_color_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._to_color_range" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._color_arr2str">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_color_arr2str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">color_arr</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_color_arr2str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._color_arr2str" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_color_arr2str</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_color_arr2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._color_arr2str" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.set_layout">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">set_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#set_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.set_layout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">set_layout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#set_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.set_layout" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._draw_streamlines">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_draw_streamlines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">sls</span></em>, <em class="sig-param"><span class="n">dimensions</span></em>, <em class="sig-param"><span class="n">color</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">cbv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_streamlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_streamlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_draw_streamlines</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">False]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_streamlines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.visualize_bundles">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">visualize_bundles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sft</span></em>, <em class="sig-param"><span class="n">affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bundle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color_by_volume</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cbv_lims</span><span class="o">=</span><span class="default_value">[None, None]</span></em>, <em class="sig-param"><span class="n">figure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">background</span><span class="o">=</span><span class="default_value">(1, 1, 1)</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_bundles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_bundles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">visualize_bundles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sft</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">False]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_bundles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize bundles in 3D</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -184,6 +559,11 @@ If upper bound is None, will default to the maximum value in
 color_by_volume.
 Default: [None, None]</p>
 </dd>
+<dt><strong>flip_axes</strong><span class="classifier">ndarray</span></dt><dd><p>Which axes to flip, to orient the image as RAS, which is how we
+visualize.
+For example, if the input image is LAS, use [True, False, False].
+Default: [False, False, False]</p>
+</dd>
 <dt><strong>background</strong><span class="classifier">tuple, optional</span></dt><dd><p>RGB values for the background. Default: (1, 1, 1), which is white
 background.</p>
 </dd>
@@ -208,7 +588,7 @@ Only works in the notebook context. Default: False.</p>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.create_gif">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">create_gif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">n_frames</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">2.5</span></em>, <em class="sig-param"><span class="n">z_offset</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">(600, 600)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#create_gif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.create_gif" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">create_gif</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(600,</span> <span class="pre">600)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#create_gif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.create_gif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a Plotly Figure object into a gif</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -234,12 +614,12 @@ Default: (600, 600)</p>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._draw_roi">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_draw_roi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">roi</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">color</span></em>, <em class="sig-param"><span class="n">opacity</span></em>, <em class="sig-param"><span class="n">dimensions</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_roi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_draw_roi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_axes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_roi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.visualize_roi">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">visualize_roi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">roi</span></em>, <em class="sig-param"><span class="n">affine_or_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_img</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roi_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">static_affine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reg_template</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'ROI'</span></em>, <em class="sig-param"><span class="n">figure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">np.array([0.9999, 0, 0])</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_roi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">visualize_roi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">affine_or_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ROI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">False]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.array([0.9999,</span> <span class="pre">0,</span> <span class="pre">0])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_roi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a region of interest into a volume</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -268,6 +648,11 @@ Default: np.array([0.9999, 0, 0])</p>
 <dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>Opacity of ROI.
 Default: 1.0</p>
 </dd>
+<dt><strong>flip_axes</strong><span class="classifier">ndarray</span></dt><dd><p>Which axes to flip, to orient the image as RAS, which is how we
+visualize.
+For example, if the input image is LAS, use [True, False, False].
+Default: [False, False, False]</p>
+</dd>
 <dt><strong>figure</strong><span class="classifier">Plotly Figure object, optional</span></dt><dd><p>If provided, the visualization will be added to this Figure. Default:
 Initialize a new Figure.</p>
 </dd>
@@ -289,44 +674,44 @@ Only works in the notebook context. Default: False.</p>
 
 <dl class="py class">
 <dt id="AFQ.viz.plotly_backend.Axes">
-<em class="property">class </em><code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">Axes</code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">Axes</span></code><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
 <p>Enum where members are also (and must be) ints</p>
 <dl class="py attribute">
 <dt id="AFQ.viz.plotly_backend.Axes.X">
-<code class="sig-name descname">X</code><em class="property"> = 0</em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">X</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.X"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.X" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.viz.plotly_backend.Axes.Y">
-<code class="sig-name descname">Y</code><em class="property"> = 1</em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.Y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.Y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">Y</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.Y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.Y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="AFQ.viz.plotly_backend.Axes.Z">
-<code class="sig-name descname">Z</code><em class="property"> = 2</em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.Z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.Z" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">Z</span></code><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#Axes.Z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.Axes.Z" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._draw_slice">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_draw_slice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">volume</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_steps</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_slice" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_draw_slice</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_slice" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._name_from_enum">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_name_from_enum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_name_from_enum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._name_from_enum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_name_from_enum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_name_from_enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._name_from_enum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend._draw_slices">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">_draw_slices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">figure</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">volume</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">sliders</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">n_steps</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">y_loc</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_slices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_slices" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">_draw_slices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#_draw_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend._draw_slices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="AFQ.viz.plotly_backend.visualize_volume">
-<code class="sig-prename descclassname">AFQ.viz.plotly_backend.</code><code class="sig-name descname">visualize_volume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">volume</span></em>, <em class="sig-param"><span class="n">figure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_x</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_y</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_z</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">interact</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">opacity</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">slider_definition</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">which_plane</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_volume" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AFQ.viz.plotly_backend.</span></code><code class="sig-name descname"><span class="pre">visualize_volume</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">False]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slider_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_plane</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/plotly_backend.html#visualize_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.plotly_backend.visualize_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Visualize a volume</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -347,6 +732,11 @@ Default: True</p>
 </dd>
 <dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>Opacity of slices.
 Default: 1.0</p>
+</dd>
+<dt><strong>flip_axes</strong><span class="classifier">ndarray</span></dt><dd><p>Which axes to flip, to orient the image as RAS, which is how we
+visualize.
+For example, if the input image is LAS, use [True, False, False].
+Default: [False, False, False]</p>
 </dd>
 <dt><strong>slider_definition</strong><span class="classifier">int, optional</span></dt><dd><p>How many discrete positions the slices can take.
 If 0, slices are stationary.
@@ -380,93 +770,35 @@ Only works in the notebook context. Default: False.</p>
 </div>
 
 
-          </div>
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../fury_backend/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a>
+    <a class='right-next' id="next-link" href="../utils/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a>
+
+              </div>
+              
+          </main>
           
-        </div>
+
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../../index.html">
-    <img class="logo" src="../../../../_static/escience-logo.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../../index.html">API Reference</a><ul>
-  <li><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><ul>
-  <li><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><ul>
-      <li>Previous: <a href="../fury_backend/index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
-      <li>Next: <a href="../utils/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-
-    <div class="footer">
-      &copy;2018, Ariel Rokem.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../../../_sources/autoapi/AFQ/viz/plotly_backend/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     
+  <script src="../../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
 
     
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

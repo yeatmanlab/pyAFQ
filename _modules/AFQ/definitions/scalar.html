@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.definitions.scalar &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1e043a052b0af929e4d8.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+
+    
+    <a class="navbar-brand" href="../../../index.html">
+      <p class="title">AFQ</p>
+    </a>
+    
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+        
+      </ul>
+
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for AFQ.definitions.scalar</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="n">MaskFile</span>
+
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
+
+<span class="c1"># For scalar defintions, get_for_row should return:</span>
+<span class="c1"># data, affine, meta</span>
+<span class="c1"># additionally, each class should have a name parameter</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ScalarFile&quot;</span><span class="p">,</span> <span class="s2">&quot;TemplateScalar&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">ScalarMixin</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="n">scalar_file</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_model-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.nii.gz&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">scalar_file</span><span class="p">):</span>
+            <span class="n">scalar_data</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+
+            <span class="n">afq_object</span><span class="o">.</span><span class="n">log_and_save_nii</span><span class="p">(</span>
+                <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">scalar_data</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_affine&#39;</span><span class="p">]),</span>
+                <span class="n">scalar_file</span><span class="p">)</span>
+            <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
+                <span class="n">row</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_model-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+            <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scalar_file</span>
+
+
+<div class="viewcode-block" id="ScalarFile"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile">[docs]</a><span class="k">class</span> <span class="nc">ScalarFile</span><span class="p">(</span><span class="n">MaskFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a scalar based on a file for each subject.</span>
+<span class="sd">    Assumes the scalar is already in subject space.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        name of the scalar.</span>
+<span class="sd">    suffix : str</span>
+<span class="sd">        suffix to pass to bids_layout.get() to identify the file.</span>
+<span class="sd">    filters : str</span>
+<span class="sd">        Additional filters to pass to bids_layout.get() to identify</span>
+<span class="sd">        the file.</span>
+<span class="sd">        Default: {}</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    my_scalar = ScalarFile(</span>
+<span class="sd">        &quot;my_scalar&quot;,</span>
+<span class="sd">        &quot;scalarSuffix&quot;,</span>
+<span class="sd">        {&quot;scope&quot;: &quot;dmriprep&quot;})</span>
+<span class="sd">    api.AFQ(scalars=[&quot;dti_fa&quot;, &quot;dti_md&quot;, my_scalar])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="n">MaskFile</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<div class="viewcode-block" id="ScalarFile.get_data"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span></div></div>
+
+
+<div class="viewcode-block" id="TemplateScalar"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.TemplateScalar">[docs]</a><span class="k">class</span> <span class="nc">TemplateScalar</span><span class="p">(</span><span class="n">ScalarMixin</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a scalar based on a template.</span>
+<span class="sd">    This template will be transformed into subject space before use.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        name of the scalar.</span>
+<span class="sd">    path : str</span>
+<span class="sd">        path to the template.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    my_scalar = TemplateScalar(</span>
+<span class="sd">        &quot;my_scalar&quot;, &quot;path/to/my_scalar_in_MNI.nii.gz&quot;)</span>
+<span class="sd">    api.AFQ(scalars=[&quot;dti_fa&quot;, &quot;dti_md&quot;, my_scalar])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_resampled</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="TemplateScalar.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.TemplateScalar.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TemplateScalar.get_data"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.TemplateScalar.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_resampled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_resampled</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">scalar_data</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_mapping</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">scalar_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div></div>
+</pre></div>
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../../_static/js/index.1e043a052b0af929e4d8.js"></script>
+
+
+    
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2018, Ariel Rokem.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+    </p>
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>
