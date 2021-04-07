@@ -292,10 +292,10 @@ def test_AFQ_init():
 
         if n_subjects != n_sessions:
             npt.assert_equal(my_afq.data_frame.shape,
-                             (n_subjects * n_sessions, 13))
+                             (n_subjects * n_sessions, 12))
         else:
             npt.assert_equal(my_afq.data_frame.shape,
-                             (n_subjects, 13))
+                             (n_subjects, 12))
 
 
 def test_AFQ_custom_bundle_dict():

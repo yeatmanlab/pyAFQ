@@ -2216,12 +2216,12 @@ class AFQ(object):
         self.export_bundles()
         self.export_sl_counts()
         self.get_tract_profiles()
+        if len(self.tract_profiles) > 1:
+            self.combine_profiles()
         self.viz_bundles(export=True)
         if self.seg_algo == "afq":
             self.viz_ROIs(export=True)
             self.export_rois()
-        if len(self.tract_profiles) > 1:
-            self.combine_profiles()
         all_sub_sess = time() - start_time
         self.export_timing(all_sub_sess=all_sub_sess)
 
