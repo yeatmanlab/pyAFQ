@@ -635,7 +635,7 @@ class Segmentation:
                 fiber_prob = fiber_probabilities[sl_idx]
 
                 # if parallel, collect the streamlines now
-                if self.parallel_segmentation:
+                if self.parallel_segmentation["engine"] != "serial":
                     in_list.append((sl, fiber_prob, sl_idx))
                 else:
                     min_dist_coords[sl_idx, bundle_idx, 0],\
@@ -647,7 +647,7 @@ class Segmentation:
                             exclude_roi_tols, fiber_prob)
 
             # collects results from the submitted streamlines
-            if self.parallel_segmentation:
+            if self.parallel_segmentation["engine"] != "serial":
                 results = parfor(
                     _is_streamline_in_ROIs_parallel, in_list,
                     func_args=[
