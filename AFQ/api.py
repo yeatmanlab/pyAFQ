@@ -734,6 +734,7 @@ class AFQ(object):
                 timing_list.append(timing_dict.copy())
 
         if modin_it:
+            os.environ["MODIN_ENGINE"] = "dask"
             from modin.pandas import DataFrame
         else:
             from pandas import DataFrame
