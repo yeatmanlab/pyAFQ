@@ -623,61 +623,61 @@ def test_AFQ_data_waypoint():
     streamlines = dts.Streamlines(
         dtu.transform_tracking_output(
             [s for s in streamlines if s.shape[0] > 100],
-            np.linalg.inv(myafq.dwi_affine.compute()[0])))
+            np.linalg.inv(myafq.dwi_affine.loc[0].compute()[0])))
 
     mapping_file = op.join(
-        myafq.data_frame.results_dir.compute()[0],
+        myafq.data_frame.results_dir.loc[0].compute()[0],
         'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
-        myafq.data_frame.results_dir.compute()[0],
+        myafq.data_frame.results_dir.loc[0].compute()[0],
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     tgram = load_tractogram(
-        myafq.bundles.compute()[0], myafq.dwi_img.compute()[0])
+        myafq.bundles.loc[0].compute()[0], myafq.dwi_img.loc[0].compute()[0])
 
     bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.dwi_img.compute()[0])
+        tgram, myafq.bundle_dict, myafq.dwi_img.loc[0].compute()[0])
     npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
     assert op.exists(op.join(
-        myafq.data_frame['results_dir'].compute()[0],
+        myafq.data_frame['results_dir'].loc[0].compute()[0],
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
     myafq.export_bundles()
     assert op.exists(op.join(
-        myafq.data_frame['results_dir'].compute()[0],
+        myafq.data_frame['results_dir'].loc[0].compute()[0],
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
     # Test creation of file with bundle indices:
     assert op.exists(op.join(
-        myafq.data_frame['results_dir'].compute()[0],
+        myafq.data_frame['results_dir'].loc[0].compute()[0],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
 
-    tract_profiles = pd.read_csv(myafq.tract_profiles.compute()[0])
+    tract_profiles = pd.read_csv(myafq.tract_profiles.loc[0].compute()[0])
     assert tract_profiles.shape == (400, 6)
 
     myafq.plot_tract_profiles()
     assert op.exists(op.join(
-        myafq.data_frame['results_dir'].compute()[0],
+        myafq.data_frame['results_dir'].loc[0].compute()[0],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
 
     assert op.exists(op.join(
-        myafq.data_frame['results_dir'].compute()[0],
+        myafq.data_frame['results_dir'].loc[0].compute()[0],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
-    shutil.rmtree(op.join(myafq.data_frame['results_dir'].compute()[0],
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'].loc[0].compute()[0],
                           'bundles'))
 
-    shutil.rmtree(op.join(myafq.data_frame['results_dir'].compute()[0],
+    shutil.rmtree(op.join(myafq.data_frame['results_dir'].loc[0].compute()[0],
                           'ROIs'))
 
     # Test the CLI:
