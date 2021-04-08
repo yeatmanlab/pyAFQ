@@ -611,6 +611,7 @@ def test_AFQ_data_waypoint():
                         "dti_MD",
                         TemplateScalar("T1", t1_path)],
                     robust_tensor_fitting=True,
+                    modin_it=True,
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params,
                     clean_params=clean_params)

@@ -18,7 +18,6 @@ from AFQ.models.dti import _fit as dti_fit
 import AFQ.data as afd
 from .version import version as pyafq_version
 import pandas as pd
-import dask.dataframe as ddf
 import os
 import os.path as op
 import json
@@ -236,7 +235,7 @@ class AFQ(object):
                  mapping=SynMap(),
                  profile_weights="gauss",
                  bundle_info=None,
-                 dask_it=False,
+                 modin_it=False,
                  scalars=["dti_fa", "dti_md"],
                  virtual_frame_buffer=False,
                  viz_backend="plotly_no_gif",
@@ -332,8 +331,8 @@ class AFQ(object):
             If None, will get all appropriate bundles for the chosen
             segmentation algorithm.
             Default: None
-        dask_it : bool, optional
-            [COMPUTE] Whether to use a dask DataFrame object.
+        modin_it : bool, optional
+            [COMPUTE] Whether to use modin to parallelize across subjects.
             Default: False
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
@@ -437,8 +436,8 @@ class AFQ(object):
                     isinstance(bundle_info, dict))):
             raise TypeError(
                 "bundle_info must be None, a list of strings, or a dict")
-        if not isinstance(dask_it, bool):
-            raise TypeError("dask_it must be a bool")
+        if not isinstance(modin_it, bool):
+            raise TypeError("modin_it must be a bool")
         if scalars is not None and not (
                 isinstance(scalars, list)
                 and (
@@ -734,7 +733,7 @@ class AFQ(object):
                 ses_list.append(session)
                 timing_list.append(timing_dict.copy())
 
-        if dask_it:
+        if modin_it:
             from modin.pandas import DataFrame
         else:
             from pandas import DataFrame
