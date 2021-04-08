@@ -734,19 +734,22 @@ class AFQ(object):
                 ses_list.append(session)
                 timing_list.append(timing_dict.copy())
 
-        self.data_frame = pd.DataFrame(dict(subject=sub_list,
-                                            dwi_file=dwi_file_list,
-                                            bvec_file=bvec_file_list,
-                                            bval_file=bval_file_list,
-                                            custom_tract=custom_tract_list,
-                                            reg_subject=reg_subject_list,
-                                            ses=ses_list,
-                                            timing=timing_list,
-                                            results_dir=results_dir_list))
-
         if dask_it:
-            self.data_frame = ddf.from_pandas(self.data_frame,
-                                              npartitions=len(sub_list))
+            from modin.pandas import DataFrame
+        else:
+            from pandas import DataFrame
+
+        self.data_frame = DataFrame(dict(
+            subject=sub_list,
+            dwi_file=dwi_file_list,
+            bvec_file=bvec_file_list,
+            bval_file=bval_file_list,
+            custom_tract=custom_tract_list,
+            reg_subject=reg_subject_list,
+            ses=ses_list,
+            timing=timing_list,
+            results_dir=results_dir_list))
+
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
         self.set_dwi_img()
