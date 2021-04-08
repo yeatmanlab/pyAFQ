@@ -534,6 +534,13 @@ class AFQ(object):
             for k in segmentation_params:
                 default_seg_params[k] = segmentation_params[k]
 
+        # if parallelizing using dask, do not automatically
+        # parallelize segmentation.
+        if dask_it:
+            if "parallel_segmentation" not in segmentation_params:
+                default_seg_params["parallel_segmentation"] =\
+                    {"n_jobs": -1, "engine": "serial"}
+
         self.segmentation_params = default_seg_params
         self.seg_algo = self.segmentation_params["seg_algo"].lower()
 
@@ -747,6 +754,9 @@ class AFQ(object):
         if dask_it:
             self.data_frame = ddf.from_pandas(self.data_frame,
                                               npartitions=len(sub_list))
+            self.apply_args = {"meta": (object)}
+        else:
+            self.apply_args = {}
         self.set_gtab(b0_threshold)
         self.set_dwi_affine()
         self.set_dwi_img()
@@ -1843,6 +1853,7 @@ class AFQ(object):
         self.data_frame['gtab'] = self.data_frame.apply(
             lambda x: dpg.gradient_table(x['bval_file'], x['bvec_file'],
                                          b0_threshold=b0_threshold),
+            **self.apply_args,
             axis=1)
 
     def get_gtab(self):
@@ -1852,7 +1863,8 @@ class AFQ(object):
 
     def set_dwi_affine(self):
         self.data_frame['dwi_affine'] = self.data_frame['dwi_file'].apply(
-            self._get_affine)
+            self._get_affine,
+            **self.apply_args)
 
     def get_dwi_affine(self):
         return self.data_frame['dwi_affine']
@@ -1861,7 +1873,7 @@ class AFQ(object):
 
     def set_dwi_img(self):
         self.data_frame['dwi_img'] = self.data_frame['dwi_file'].apply(
-            nib.load)
+            nib.load, **self.apply_args)
 
     def get_dwi_img(self):
         return self.data_frame['dwi_img']
@@ -1874,7 +1886,7 @@ class AFQ(object):
     def set_b0(self):
         if 'b0_file' not in self.data_frame.columns:
             self.data_frame['b0_file'] = self.data_frame.apply(self._b0,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_b0(self):
         self.set_b0()
@@ -1883,7 +1895,8 @@ class AFQ(object):
     def set_masked_b0(self):
         if 'masked_b0_file' not in self.data_frame.columns:
             self.data_frame['masked_b0_file'] =\
-                self.data_frame.apply(self._b0_mask, axis=1)
+                self.data_frame.apply(
+                    self._b0_mask, axis=1, **self.apply_args)
 
     def get_masked_b0(self):
         self.get_masked_b0()
@@ -1895,7 +1908,7 @@ class AFQ(object):
         if 'brain_mask_file' not in self.data_frame.columns:
             self.data_frame['brain_mask_file'] =\
                 self.data_frame.apply(self._brain_mask,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_brain_mask(self):
         self.set_brain_mask()
@@ -1907,7 +1920,7 @@ class AFQ(object):
         if 'dti_params_file' not in self.data_frame.columns:
             self.data_frame['dti_params_file'] =\
                 self.data_frame.apply(self._dti,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dti(self):
         self.set_dti()
@@ -1919,7 +1932,7 @@ class AFQ(object):
         if 'dti_fa_file' not in self.data_frame.columns:
             self.data_frame['dti_fa_file'] =\
                 self.data_frame.apply(self._dti_fa,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dti_fa(self):
         self.set_dti_fa()
@@ -1931,7 +1944,7 @@ class AFQ(object):
         if 'dti_cfa_file' not in self.data_frame.columns:
             self.data_frame['dti_cfa_file'] =\
                 self.data_frame.apply(self._dti_cfa,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dti_cfa(self):
         self.set_dti_cfa()
@@ -1943,7 +1956,7 @@ class AFQ(object):
         if 'dti_pdd_file' not in self.data_frame.columns:
             self.data_frame['dti_pdd_file'] =\
                 self.data_frame.apply(self._dti_pdd,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dti_pdd(self):
         self.set_dti_pdd()
@@ -1955,7 +1968,7 @@ class AFQ(object):
         if 'dti_md_file' not in self.data_frame.columns:
             self.data_frame['dti_md_file'] =\
                 self.data_frame.apply(self._dti_md,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dti_md(self):
         self.set_dti_md()
@@ -1967,7 +1980,7 @@ class AFQ(object):
         if 'dki_params_file' not in self.data_frame.columns:
             self.data_frame['dki_params_file'] =\
                 self.data_frame.apply(self._dki,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dki(self):
         self.set_dki()
@@ -1978,7 +1991,8 @@ class AFQ(object):
     def set_dki_mk(self):
         if 'dki_mk_file' not in self.data_frame.columns:
             self.data_frame['dki_mk_file'] =\
-                self.data_frame.apply(self._dki_mk, axis=1)
+                self.data_frame.apply(
+                    self._dki_mk, axis=1, **self.apply_args)
 
     def get_dki_mk(self):
         self.set_dki_mk()
@@ -1990,7 +2004,7 @@ class AFQ(object):
         if 'dki_fa_file' not in self.data_frame.columns:
             self.data_frame['dki_fa_file'] =\
                 self.data_frame.apply(self._dki_fa,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dki_fa(self):
         self.set_dki_fa()
@@ -2002,7 +2016,7 @@ class AFQ(object):
         if 'dki_md_file' not in self.data_frame.columns:
             self.data_frame['dki_md_file'] =\
                 self.data_frame.apply(self._dki_md,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_dki_md(self):
         self.set_dki_md()
@@ -2013,7 +2027,7 @@ class AFQ(object):
     def set_dki_awf(self):
         if 'dki_awf_file' not in self.data_frame.columns:
             self.data_frame['dki_awf_file'] = self.data_frame.apply(
-                self._dki_awf, axis=1)
+                self._dki_awf, axis=1, **self.apply_args)
 
     def get_dki_awf(self):
         self.set_dki_awf()
@@ -2024,7 +2038,7 @@ class AFQ(object):
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
             self.data_frame['mapping'] = self.data_frame.apply(self._mapping,
-                                      axis=1)
+                                      axis=1, **self.apply_args)
 
     def get_mapping(self):
         self.set_mapping()
@@ -2035,7 +2049,7 @@ class AFQ(object):
     def set_streamlines(self):
         if 'streamlines_file' not in self.data_frame.columns:
             self.data_frame['streamlines_file'] = self.data_frame.apply(
-                self._streamlines, axis=1)
+                self._streamlines, axis=1, **self.apply_args)
 
     def get_streamlines(self):
         self.set_streamlines()
@@ -2046,7 +2060,7 @@ class AFQ(object):
     def set_bundles(self):
         if 'bundles_file' not in self.data_frame.columns:
             self.data_frame['bundles_file'] = self.data_frame.apply(
-                self._segment, axis=1)
+                self._segment, axis=1, **self.apply_args)
 
     def get_bundles(self):
         self.set_bundles()
@@ -2062,7 +2076,7 @@ class AFQ(object):
                     self.data_frame['bundles_file']
             else:
                 self.data_frame['clean_bundles_file'] = self.data_frame.apply(
-                    self._clean_bundles, axis=1)
+                    self._clean_bundles, axis=1, **self.apply_args)
 
     def get_clean_bundles(self):
         self.set_clean_bundles()
@@ -2073,7 +2087,7 @@ class AFQ(object):
     def set_tract_profiles(self):
         if 'tract_profiles_file' not in self.data_frame.columns:
             self.data_frame['tract_profiles_file'] = self.data_frame.apply(
-                self._tract_profiles, axis=1)
+                self._tract_profiles, axis=1, **self.apply_args)
 
     def get_tract_profiles(self):
         self.set_tract_profiles()
@@ -2084,7 +2098,7 @@ class AFQ(object):
     def set_template_xform(self):
         if 'template_xform_file' not in self.data_frame.columns:
             self.data_frame['template_xform_file'] = self.data_frame.apply(
-                self._template_xform, axis=1)
+                self._template_xform, axis=1, **self.apply_args)
 
     def get_template_xform(self):
         self.set_template_xform()
@@ -2118,19 +2132,24 @@ class AFQ(object):
     bundle_dict = property(get_bundle_dict, set_bundle_dict)
 
     def export_rois(self):
-        return self.data_frame.apply(self._export_rois, axis=1)
+        return self.data_frame.apply(
+            self._export_rois, axis=1, **self.apply_args)
 
     def export_seed_mask(self):
-        return self.data_frame.apply(self._export_seed_mask, axis=1)
+        return self.data_frame.apply(
+            self._export_seed_mask, axis=1, **self.apply_args)
 
     def export_stop_mask(self):
-        return self.data_frame.apply(self._export_stop_mask, axis=1)
+        return self.data_frame.apply(
+            self._export_stop_mask, axis=1, **self.apply_args)
 
     def export_bundles(self):
-        self.data_frame.apply(self._export_bundles, axis=1)
+        self.data_frame.apply(
+            self._export_bundles, axis=1, **self.apply_args)
 
     def export_sl_counts(self):
-        self.data_frame.apply(self._export_sl_counts, axis=1)
+        self.data_frame.apply(
+            self._export_sl_counts, axis=1, **self.apply_args)
 
     def viz_bundles(self,
                     export=False,
@@ -2154,7 +2173,8 @@ class AFQ(object):
             volume_opacity=volume_opacity,
             n_points=n_points,
             inline=inline,
-            interactive=interactive)
+            interactive=interactive,
+            **self.apply_args)
 
     def viz_ROIs(self,
                  bundle_names=None,
@@ -2181,15 +2201,17 @@ class AFQ(object):
             cbv_lims=cbv_lims,
             xform_color_by_volume=xform_color_by_volume,
             volume_opacity=volume_opacity,
-            n_points=n_points)
+            n_points=n_points,
+            **self.apply_args)
 
     def plot_tract_profiles(self):
         if 'tract_profiles_viz' not in self.data_frame.columns:
             self.data_frame['tract_profiles_viz'] = self.data_frame.apply(
-                self._plot_tract_profiles, axis=1)
+                self._plot_tract_profiles, axis=1, **self.apply_args)
 
     def export_registered_b0(self):
-        self.data_frame.apply(self._export_registered_b0, axis=1)
+        self.data_frame.apply(
+            self._export_registered_b0, axis=1, **self.apply_args)
 
     def combine_profiles(self):
         _df = combine_list_of_profiles(self.tract_profiles)
@@ -2204,7 +2226,8 @@ class AFQ(object):
         self.data_frame.apply(
             self._export_timing,
             axis=1,
-            all_sub_sess=all_sub_sess)
+            all_sub_sess=all_sub_sess,
+            **self.apply_args)
 
     def export_all(self):
         """ Exports all the possible outputs"""
