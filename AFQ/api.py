@@ -1885,8 +1885,8 @@ class AFQ(object):
 
     def set_b0(self):
         if 'b0_file' not in self.data_frame.columns:
-            self.data_frame['b0_file'] = self.data_frame.apply(self._b0,
-                                      axis=1, **self.apply_args)
+            self.data_frame['b0_file'] = self.data_frame.apply(
+                self._b0, axis=1, **self.apply_args)
 
     def get_b0(self):
         self.set_b0()
@@ -2037,8 +2037,8 @@ class AFQ(object):
 
     def set_mapping(self):
         if 'mapping' not in self.data_frame.columns:
-            self.data_frame['mapping'] = self.data_frame.apply(self._mapping,
-                                      axis=1, **self.apply_args)
+            self.data_frame['mapping'] = self.data_frame.apply(
+                self._mapping, axis=1, **self.apply_args)
 
     def get_mapping(self):
         self.set_mapping()
