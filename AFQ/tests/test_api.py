@@ -623,7 +623,7 @@ def test_AFQ_data_waypoint():
     streamlines = dts.Streamlines(
         dtu.transform_tracking_output(
             [s for s in streamlines if s.shape[0] > 100],
-            np.linalg.inv(myafq.dwi_affine[0])))
+            np.linalg.inv(list(myafq.dwi_affine)[0])))
 
     mapping_file = op.join(
         myafq.data_frame.results_dir[0],
