@@ -65,8 +65,8 @@ and by a grant from the
 `Gordon & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
 `Alfred P. Sloan Foundation <http://www.sloan.org/>`_ to the
 `University of Washington eScience Institute <http://escience.washington.edu/>`_, by a `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
-R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by an
-NSF grant (1551330) to Jason Yeatman.
+R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `
+NSF grant 1551330 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330>`_ to Jason Yeatman.
 
 .. figure:: _static/eScience_Logo_HR.png
    :align: center
