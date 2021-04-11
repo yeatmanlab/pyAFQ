@@ -57,7 +57,7 @@ pyAFQ automatically builds and pushes a Docker image with pyAFQ installed for ev
 The images can be found here: https://github.com/orgs/nrdg/packages/container/package/pyafq
 To pull an image, you can either pull the latest::
 
-  docker pull ghcr.io/nrdg/pyafq:latest  
+  docker pull ghcr.io/nrdg/pyafq:latest
 
 or specify the commit using its hash::
 
