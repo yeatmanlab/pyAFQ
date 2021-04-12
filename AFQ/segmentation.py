@@ -53,10 +53,10 @@ class Segmentation:
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
-                 model_clust_thr=5,
-                 reduction_thr=20,
+                 model_clust_thr=1.25,
+                 reduction_thr=25,
                  refine=False,
-                 pruning_thr=5,
+                 pruning_thr=12,
                  b0_threshold=50,
                  prob_threshold=0,
                  dist_to_waypoint=None,
@@ -111,11 +111,11 @@ class Segmentation:
         model_clust_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 5
+            Default: 1.25
         reduction_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 20
+            Default: 25
         refine : bool
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
@@ -123,7 +123,7 @@ class Segmentation:
         pruning_thr : int
             Parameter passed on to recognize for Recobundles.
             See Recobundles documentation.
-            Default: 5
+            Default: 12
         progressive : boolean, optional
             Using RecoBundles Algorithm.
             Whether or not to use progressive technique
