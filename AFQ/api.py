@@ -10,6 +10,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
+import dipy.reconst.fwdti as dpy_fwdti
 import AFQ.tractography as aft
 from AFQ.models.csd import _fit as csd_fit
 from AFQ.models.dki import _fit as dki_fit
@@ -877,12 +878,19 @@ class AFQ(object):
             meta_fname = self._get_fname(row, '_model-FWDTI_diffmodel.json')
             meta = dict(
                 Parameters=dict(
-                    FitMethod="WLS"),
+                    FitMethod="NLS"),
                 OutlierRejection=False,
                 ModelURL=f"{DIPY_GH}reconst/fwdti.py")
             afd.write_json(meta_fname, meta)
             row['timing']['FWDTI'] = time() - start_time
         return fwdti_params_file
+
+    def _fwdti_fit(self, row):
+        fwdti_params_file = self._fwdti(row)
+        fwdti_params = nib.load(fwdti_params_file).get_fdata()
+        fwmodel = dpy_fwdti.FreeWaterTensorModel(row['gtab'])
+        fwfit = dpy_fwdti.FreeWaterTensorFit(fwmodel, fwdti_params)
+        return fwfit
 
     def _dki_fit(self, row):
         dki_params_file = self._dki(row)

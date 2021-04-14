@@ -139,7 +139,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
 
-    if odf_model == "DTI" or odf_model == "DKI":
+    if odf_model == "DTI" or odf_model == "DKI" or odf_model == "FWDTI":
         evals = model_params[..., :3]
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
