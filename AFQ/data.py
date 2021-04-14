@@ -1843,6 +1843,92 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     to_bids_description(freesurfer_folder,
                         **{"Name": "Stanford HARDI",
                            "PipelineDescription": {"Name": "freesurfer"}})
+                           
+def organize_abcd_data(path=None, clear_previous_afq=False, identifier=None,
+                            subjects=None, ABCD_home=None):
+    """
+    Creates a BIDS compliant file-system structure in AFQ data directory
+    for ABCD DWI data (downloaded by Pierre and unzipped):
+
+    ~/AFQ_data/
+    ├── ABCD_${identifier}
+    ├── dataset_description.json
+    └── derivatives
+        └── ABCD
+            ├── dataset_description.json
+            └── sub-01
+                └── ses-01
+                    └── dwi
+                        ├── sub-01_ses-01_dwi.bval
+                        ├── sub-01_ses-01_dwi.bvec
+                        ├── sub-01_ses-01_dwi.nii.gz
+                        └── sub-01_ses-01_dwi.json
+
+    If clear_previous_afq is True and there is an afq folder in derivatives,
+    it will be removed.
+    """
+
+    if ABCD_home is None:
+        ABCD_home = '/data/rauschecker1/dweiss/AFQ/AFQ_data/ABCD_100'
+    if subjects is None:
+        subjects = os.listdir(ABCD_home)
+    logger = logging.getLogger('AFQ.data')
+
+    if path is None:
+        if not op.exists(afq_home):
+            logger.info(f'creating AFQ home directory: {afq_home}')
+        os.makedirs(afq_home, exist_ok=True)
+        path = afq_home
+
+    if identifier is not None:
+        bids_path = op.join(path, 'abcd_%s' % identifier)
+    else:
+        bids_path = op.join(path, 'abcd' % identifier)
+    derivatives_path = op.join(bids_path, 'derivatives')
+    dmriprep_folder = op.join(derivatives_path, 'abcd')
+    #freesurfer_folder = op.join(derivatives_path, 'freesurfer')
+
+    if clear_previous_afq:
+        afq_folder = op.join(derivatives_path, 'afq')
+        if op.exists(afq_folder):
+            shutil.rmtree(afq_folder)
+
+    if not op.exists(derivatives_path):
+        logger.info(f'creating derivatives directory: {derivatives_path}')
+
+        for subj in subjects:
+            for sess in os.listdir(op.join(ABCD_home,subj)):
+                if op.exists(op.join(ABCD_home,subj,sess,'dwi')):
+                    # diffusion-weighted imaging data
+                    os.makedirs(op.join(dmriprep_folder,subj,sess), exist_ok=True)
+                    dwi_folder = op.join(dmriprep_folder, subj, sess, 'dwi')
+                    #os.makedirs(dwi_folder, exist_ok=True)
+                    
+                    srcdir = op.join(ABCD_home,subj,sess,'dwi')
+                    shutil.copytree(srcdir, dwi_folder)
+                    for fn in os.listdir(dwi_folder):
+                        if '.nii' in fn:
+                            dwisrc = op.join(dwi_folder,fn)
+                    
+                    dwi_img = nib.load(dwisrc)
+                    nib.save(dwi_img, op.join(dwi_folder, op.basename(dwisrc) + '.gz'))
+    else:
+        logger.info('Dataset is already in place. If you want to fetch it '
+                    + 'again please first remove the folder '
+                    + derivatives_path)
+
+    # Dump out the description of the dataset
+    to_bids_description(bids_path,
+                        **{"Name": "ABCD %s" % identifier, "Subjects": [s for s in subjects]})
+
+    # And descriptions of the pipelines in the derivatives:
+    to_bids_description(dmriprep_folder,
+                        **{"Name": "ABCD %s" % identifier,
+                           "PipelineDescription": {"Name": "ABCD"}})
+    # to_bids_description(freesurfer_folder,
+    #                     **{"Name": "Stanford HARDI",
+    #                        "PipelineDescription": {"Name": "freesurfer"}})
+
 
 
 fetch_hcp_atlas_16_bundles = _make_fetcher(
