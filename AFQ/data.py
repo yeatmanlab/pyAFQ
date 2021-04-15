@@ -97,7 +97,8 @@ BUNDLE_MAT_2_PYTHON = \
      'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L',
      'RightSLF': 'SLF_R', 'LeftSLF': 'SLF_L'}
 
-afq_home = op.join(op.expanduser('~'), 'AFQ_data')
+#afq_home = op.join(op.expanduser('~'), 'AFQ_data')
+afq_home = op.join('/data/rauschecker1/dweiss/AFQ', 'AFQ_data')
 
 baseurl = "https://ndownloader.figshare.com/files/"
 
@@ -1843,7 +1844,7 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     to_bids_description(freesurfer_folder,
                         **{"Name": "Stanford HARDI",
                            "PipelineDescription": {"Name": "freesurfer"}})
-                           
+
 def organize_abcd_data(path=None, clear_previous_afq=False, identifier=None,
                             subjects=None, ABCD_home=None):
     """
