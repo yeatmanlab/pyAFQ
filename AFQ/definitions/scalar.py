@@ -2,13 +2,14 @@ from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import MaskFile
 
 import AFQ.data as afd
+from AFQ.tasks.utils import get_fname
 
 import nibabel as nib
 import os.path as op
 
 from dipy.align import resample
 
-# For scalar defintions, get_for_row should return:
+# For scalar defintions, get_for_subses should return:
 # data, affine, meta
 # additionally, each class should have a name parameter
 
@@ -16,17 +17,20 @@ __all__ = ["ScalarFile", "TemplateScalar"]
 
 
 class ScalarMixin():
-    def get_for_row(self, afq_object, row):
-        scalar_file = afq_object._get_fname(
-            row, f'_model-{self.name}.nii.gz')
+    def get_for_subses(self, subses_dict, dwi_affine, reg_template, mapping):
+        scalar_file = get_fname(
+            subses_dict,
+            f'_model-{self.name}.nii.gz')
         if not op.exists(scalar_file):
-            scalar_data, meta = self.get_data(afq_object, row)
+            scalar_data, meta = self.get_data(
+                subses_dict, dwi_affine, reg_template, mapping)
 
-            afq_object.log_and_save_nii(
-                nib.Nifti1Image(scalar_data, row['dwi_affine']),
+            nib.save(
+                nib.Nifti1Image(scalar_data, dwi_affine),
                 scalar_file)
-            meta_fname = afq_object._get_fname(
-                row, f'_model-{self.name}.json')
+            meta_fname = get_fname(
+                subses_dict,
+                f'_model-{self.name}.json')
             afd.write_json(meta_fname, meta)
         return scalar_file
 
@@ -60,8 +64,8 @@ class ScalarFile(MaskFile):
         MaskFile.__init__(self, suffix, filters)
         self.name = name
 
-    def get_data(self, afq_object, row):
-        return self.fnames[row['ses']][row['subject']]
+    def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
+        return self.fnames[subses_dict['ses']][subses_dict['subject']]
 
 
 class TemplateScalar(ScalarMixin, Definition):
@@ -92,17 +96,15 @@ class TemplateScalar(ScalarMixin, Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_data(self, afq_object, row):
+    def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
         if not self.is_resampled:
             self.img = resample(
                 self.img.get_fdata(),
-                afq_object.reg_template_img,
+                reg_template,
                 self.img.affine,
-                afq_object.reg_template_img.affine).get_fdata()
+                reg_template.affine).get_fdata()
             self.is_resampled = True
 
-        mapping = afq_object._mapping(row)
-
-        scalar_data = afq_object._mapping(row).transform_inverse(self.img)
+        scalar_data = mapping.transform_inverse(self.img)
 
         return scalar_data, dict(source=self.path)

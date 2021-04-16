@@ -1,6 +1,6 @@
 import nibabel as nib
 
-from pydra import mark
+import pimms
 
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
@@ -8,7 +8,7 @@ from dipy.io.gradients import read_bvals_bvecs
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
-from AFQ.tasks.utils import *
+from AFQ.tasks.utils import as_file, as_model, as_tf_deriv
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
 from AFQ.models.dki import _fit as dki_fit_model
@@ -17,10 +17,7 @@ from AFQ.models.dti import _fit as dti_fit_model
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_tf": object}}
-)
+@pimms.calc("dti_tf")
 def dti_fit(dti_params_file, gtab):
     dti_params = nib.load(dti_params_file).get_fdata()
     tm = dpy_dti.TensorModel(gtab)
@@ -28,13 +25,9 @@ def dti_fit(dti_params_file, gtab):
     return dti_tf
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_params_file": str}}
-)
 @as_file(suffix='_model-DTI_diffmodel.nii.gz')
 @as_model
-def dti(subses_tuple, dwi_affine, brain_mask_file, data, gtab,
+def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
          bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False):
     if robust_tensor_fitting:
         bvals, _ = read_bvals_bvecs(
@@ -53,10 +46,10 @@ def dti(subses_tuple, dwi_affine, brain_mask_file, data, gtab,
     return dtf.model_params, meta
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_tf": object}}
-)
+dti_params = pimms.calc("dti_params_file")(dti)
+
+
+@pimms.calc("dki_tf")
 def dki_fit(dki_params_file, gtab):
     dki_params = nib.load(dki_params_file).get_fdata()
     tm = dpy_dki.DiffusionKurtosisModel(gtab)
@@ -64,13 +57,9 @@ def dki_fit(dki_params_file, gtab):
     return dki_tf
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_params_file": str}}
-)
 @as_file(suffix='_model-DKI_diffmodel.nii.gz')
 @as_model
-def dki(subses_tuple, dwi_affine, brain_mask_file, data, gtab):
+def dki(subses_dict, dwi_affine, brain_mask_file, data, gtab):
     dkf = dki_fit_model(gtab, data, mask=brain_mask_file)
     meta = dict(
         Parameters=dict(
@@ -80,14 +69,13 @@ def dki(subses_tuple, dwi_affine, brain_mask_file, data, gtab):
     return dkf.model_params, meta
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"csd_params_file": str}}
-)
+dki_params = pimms.calc("dki_params_file")(dki)
+
+
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
 @as_model
-def csd(subses_tuple, dwi_affine, brain_mask_file,
-         data, gtab, csd_fit_kwargs, msmt=False):
+def csd(subses_dict, dwi_affine, brain_mask_file,
+         data, gtab, csd_fit_kwargs={}, msmt=False):
     csdf = csd_fit_model(
         gtab, data, mask=brain_mask_file,
         msmt=msmt, **csd_fit_kwargs)
@@ -101,99 +89,81 @@ def csd(subses_tuple, dwi_affine, brain_mask_file,
     return csdf.shm_coeff, meta
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"pmap_file": str}}
-)
+csd_params = pimms.calc("csd_params_file")(csd)
+
+
+@pimms.calc("pmap_file")
 @as_file(suffix='_model-CSD_APM.nii.gz')
-def anisotropic_power_map(subses_tuple, csd_params_file):
+def anisotropic_power_map(subses_dict, csd_params_file):
     sh_coeff = nib.load(csd_params_file)
     pmap = shm.anisotropic_power(sh_coeff.get_fdata())
     pmap = nib.Nifti1Image(pmap, sh_coeff.affine)
     return pmap, dict(CSDParamsFile=csd_params_file)
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_fa_file": str}}
-)
+@pimms.calc("dti_fa_file")
 @as_file(suffix='_model-DTI_FA.nii.gz')
 @as_tf_deriv(tf_name='DTI')
-def dti_fa(subses_tuple, dwi_affine, dti_params_file, dti_tf):
+def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.fa
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_cfa_file": str}}
-)
+@pimms.calc("dti_cfa_file")
 @as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
 @as_tf_deriv(tf_name='DTI')
-def dti_cfa(subses_tuple, dwi_affine, dti_params_file, dti_tf):
+def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.color_fa
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_pdd_file": str}}
-)
+@pimms.calc("dti_pdd_file")
 @as_file(suffix='_model-DTI_PDD.nii.gz')
 @as_tf_deriv(tf_name='DTI')
-def dti_pdd(subses_tuple, dwi_affine, dti_params_file, dti_tf):
+def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
     pdd = dti_tf.directions.squeeze()
     # Invert the x coordinates:
     pdd[..., 0] = pdd[..., 0] * -1
     return pdd
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dti_md_file": str}}
-)
+@pimms.calc("dti_md_file")
 @as_file('_model-DTI_MD.nii.gz')
 @as_tf_deriv('DTI')
-def dti_md(subses_tuple, dwi_affine, dti_params_file, dti_tf):
+def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.md
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_fa_file": str}}
-)
+@pimms.calc("dki_fa_file")
 @as_file('_model-DKI_FA.nii.gz')
 @as_tf_deriv('DKI')
-def dki_fa(subses_tuple, dwi_affine, dki_params_file, dki_tf):
+def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.fa
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_md_file": str}}
-)
+@pimms.calc("dki_md_file")
 @as_file('_model-DKI_MD.nii.gz')
 @as_tf_deriv('DKI')
-def dki_md(subses_tuple, dwi_affine, dki_params_file, dki_tf):
+def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.md
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_awf_file": str}}
-)
+@pimms.calc("dki_awf_file")
 @as_file('_model-DKI_AWF.nii.gz')
 @as_tf_deriv('DKI')
-def dki_awf(subses_tuple, dwi_affine, dki_params_file, dki_tf,
+def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
              sphere='repulsion100', gtol=1e-2):
     dki_params = nib.load(dki_params_file).get_fdata()
     awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
     return awf
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"dki_mk_file": str}}
-)
+@pimms.calc("dki_mk_file")
 @as_file('_model-DKI_MK.nii.gz')
 @as_tf_deriv('DKI')
-def dki_mk(subses_tuple, dwi_affine, dki_params_file, dki_tf):
+def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.mk()
+
+
+model_tasks = [
+    dti_fit, dki_fit, anisotropic_power_map,
+    dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
+    dti_params, dki_params, csd_params]

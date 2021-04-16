@@ -2,42 +2,38 @@ import nibabel as nib
 import os.path as op
 import os
 import numpy as np
+import logging
 
-from pydra import mark
-from AFQ.tasks.utils import *
+import pimms
+from AFQ.tasks.utils import as_file, get_fname
 import AFQ.data as afd
 import AFQ.utils.volume as auv
+from dipy.io.streamline import load_tractogram
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"b0_warped_file": str}}
-)
+logger = logging.getLogger('AFQ.api.mapping')
+
+
+@pimms.calc("b0_warped_file")
 @as_file('_b0_in_MNI.nii.gz')
-def export_registered_b0(subses_tuple, b0_file, mapping, reg_template):
+def export_registered_b0(subses_dict, b0_file, mapping, reg_template):
     mean_b0 = nib.load(b0_file).get_fdata()
     warped_b0 = mapping.transform(mean_b0)
     warped_b0 = nib.Nifti1Image(warped_b0, reg_template.affine)
     return warped_b0, dict(b0InSubject=b0_file)
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"template_xform_file": str}}
-)
+@pimms.calc("template_xform_file")
 @as_file('_template_xform.nii.gz')
-def template_xform(subses_tuple, dwi_affine, mapping, reg_template):
+def template_xform(subses_dict, dwi_affine, mapping, reg_template):
     template_xform = mapping.transform_inverse(reg_template.get_fdata())
     template_xform = nib.Nifti1Image(template_xform, dwi_affine)
     return template_xform, dict()
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"roi_files": list}}
-)
-def export_rois(subses_tuple, bundle_dict, mapping, dwi_affine):
-    rois_dir = op.join(subses_tuple['results_dir'], 'ROIs')
+@pimms.calc("roi_files")
+def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
+    rois_dir = op.join(subses_dict['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
     for bundle in bundle_dict:
@@ -50,7 +46,7 @@ def export_rois(subses_tuple, bundle_dict, mapping, dwi_affine):
 
             fname = op.split(
                 get_fname(
-                    subses_tuple,
+                    subses_dict,
                     f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
 
             fname = op.join(rois_dir, fname[1])
@@ -70,12 +66,43 @@ def export_rois(subses_tuple, bundle_dict, mapping, dwi_affine):
                 meta_fname = fname.split('.')[0] + '.json'
                 afd.write_json(meta_fname, meta)
             roi_files[bundle].append(fname)
-    return roi_files
+    return {'roi_files': roi_files}
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"mapping": object}}
-)
-def mapping(subses_tuple, mapping_definition):
-    return mapping_definition.get_for_subses(subses_tuple)
+@pimms.calc("mapping")
+def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
+    return mapping_definition.get_for_subses(
+        subses_dict, reg_subject, reg_template)
+
+
+def gen_reg_subject_func(reg_subject):
+    filename_dict = {
+        "b0": "b0_file",
+        "power_map": "pmap_file",
+        "dti_fa_subject": "dti_fa_file",
+        "subject_sls": "b0_file",
+    }
+    if reg_subject in filename_dict:
+        path = filename_dict.get(reg_subject)
+        header = (
+            f"def reg_subject({path}, brain_mask_file):\n"
+            f"    img = nib.load({path})\n")
+    else:
+        header = (
+            f"def reg_subject(reg_subject_spec, brain_mask_file):\n"
+            f"    img = nib.load(reg_subject_spec)\n")
+
+    func = (
+        f"    bm = nib.load(brain_mask_file).get_fdata().astype(bool)\n"
+        f"    masked_data = img.get_fdata()\n"
+        f"    masked_data[~bm] = 0\n"
+        f"    img = nib.Nifti1Image(masked_data, img.affine)\n"
+        f"    return img")
+    scope = globals()
+    exec(header + func, scope)
+    scope["reg_subject"].__module__ = "mapping"
+    return pimms.calc("reg_subject")(scope["reg_subject"])
+
+
+mapping_tasks = [
+    export_registered_b0, template_xform, export_rois, mapping]

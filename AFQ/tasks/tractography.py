@@ -1,67 +1,45 @@
 import nibabel as nib
 import numpy as np
+from time import time
 
-from pydra import mark
+import pimms
 
-from AFQ.tasks.utils import *
+from AFQ.tasks.utils import as_file, as_img
 from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"seed_file": str}}
-)
+@pimms.calc("seed_file")
 @as_file('_seed_mask.nii.gz')
-def export_seed_mask(subses_tuple, tracking_params, dwi_affine):
-    if isinstance(tracking_params['seed_mask'], Definition):
-        seed_mask, _, seed_mask_desc =\
-            tracking_params['seed_mask'].get_for_subses(subses_tuple)
-    else:
-        seed_mask = tracking_params['seed_mask']
-        seed_mask_desc = dict(source=tracking_params['seed_mask'])
-    seed_mask = nib.Nifti1Image(
-        seed_mask.astype(np.float32),
-        dwi_affine)
+@as_img
+def export_seed_mask(subses_dict, dwi_affine, tracking_params):
+    seed_mask = tracking_params['seed_mask']
+    seed_mask_desc = dict(source=tracking_params['seed_mask'])
     return seed_mask, seed_mask_desc
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"stop_file": str}}
-)
+@pimms.calc("stop_file")
 @as_file('_stop_mask.nii.gz')
-def export_stop_mask(subses_tuple, tracking_params, dwi_affine):
-    if isinstance(tracking_params['stop_mask'], Definition):
-        stop_mask, _, stop_mask_desc =\
-            tracking_params['stop_mask'].get_for_subses(subses_tuple)
-    else:
-        stop_mask = tracking_params['stop_mask']
-        stop_mask_desc = dict(source=tracking_params['stop_mask'])
-    stop_mask = nib.Nifti1Image(
-        stop_mask.astype(np.float32),
-        dwi_affine)
+@as_img
+def export_stop_mask(subses_dict, dwi_affine, tracking_params):
+    stop_mask = tracking_params['stop_mask']
+    stop_mask_desc = dict(source=tracking_params['stop_mask'])
     return stop_mask, stop_mask_desc
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"streamlines_file": str}}
-)
-@as_file('_tractography.trk')
-def _streamlines(subses_tuple, params_file, tracking_params={}):
-    this_tracking_params = tracking_params.copy()
-    if isinstance(tracking_params['seed_mask'], Definition):
-        this_tracking_params['seed_mask'], _, seed_mask_desc =\
-            tracking_params['seed_mask'].get_for_subses(subses_tuple)
-    else:
-        seed_mask_desc = dict(source=tracking_params['seed_mask'])
+@pimms.calc("stop_file")
+def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
+    return {"stop_file": [pve_wm, pve_gm, pve_csf]}
 
-    if isinstance(tracking_params['stop_mask'], Definition):
-        this_tracking_params['stop_mask'], _, stop_mask_desc =\
-            tracking_params['stop_mask'].get_for_subses(subses_tuple)
-    else:
-        stop_mask_desc = dict(source=tracking_params['stop_mask'])
+
+@pimms.calc("streamlines_file")
+@as_file('_tractography.trk', include_track=True)
+def streamlines(subses_dict, params_file, seed_file, stop_file,
+                tracking_params):
+    this_tracking_params = tracking_params.copy()
+    this_tracking_params['seed_mask'] = nib.load(seed_file).get_fdata()
+    if isinstance(this_tracking_params['stop_mask'], str):
+        this_tracking_params['stop_mask'] = nib.load(stop_file).get_fdata()
 
     start_time = time()
     sft = aft.track(params_file, **this_tracking_params)
@@ -74,10 +52,10 @@ def _streamlines(subses_tuple, params_file, tracking_params={}):
             tracking_params["directions"]],
         Count=len(sft.streamlines),
         Seeding=dict(
-            ROI=seed_mask_desc,
+            ROI=seed_file,
             n_seeds=tracking_params["n_seeds"],
             random_seeds=tracking_params["random_seeds"]),
-        Constraints=dict(ROI=stop_mask_desc),
+        Constraints=dict(ROI=stop_file),
         Parameters=dict(
             Units="mm",
             StepSize=tracking_params["step_size"],
@@ -87,3 +65,12 @@ def _streamlines(subses_tuple, params_file, tracking_params={}):
         Timing=time() - start_time)
 
     return sft, meta
+
+
+@pimms.calc("streamlines_file")
+def custom_tractography(custom_tract_file):
+    return custom_tract_file
+
+
+tractography_tasks = [
+    export_seed_mask, export_stop_mask, streamlines]

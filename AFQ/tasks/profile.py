@@ -2,23 +2,20 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 
-from pydra import mark
+import pimms
 
-from AFQ.tasks.utils import *
+from AFQ.tasks.utils import as_file
 from AFQ.utils.bin import get_default_args
 
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"profiles_file": str}}
-)
-@as_file('_profiles.csv')
-def tract_profiles(subses_tuple, clean_bundles_file, bundle_dict,
+@pimms.calc("profiles_file")
+@as_file('_profiles.csv', include_track=True, include_seg=True)
+def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
                    scalar_dict, profile_weights, dwi_affine,
-                   tracking_params={}, segmentation_params={}):
+                   tracking_params, segmentation_params):
     keys = []
     vals = []
     for k in bundle_dict.keys():
@@ -83,3 +80,35 @@ def tract_profiles(subses_tuple, clean_bundles_file, bundle_dict,
                 parameters=get_default_args(afq_profile))
 
     return profile_dframe, meta
+
+
+def gen_scalar_func(scalars):
+    header = "def gen_scalars(scalars, "
+    content = "    scalar_dict = {}\n"
+    has_custom_scalar = False
+    for ii, scalar in enumerate(scalars):
+        if isinstance(scalar, str):
+            sc = scalar.lower()
+            header = header + f"{sc}_file, "
+            content = content + f"    scalar_dict['{sc}'] = {sc}_file\n"
+        else:
+            if not has_custom_scalar:
+                has_custom_scalar = True
+                header = header + (
+                    "subses_dict, dwi_affine, "
+                    "reg_template, mapping, ")
+            content = content + (
+                f"    scalar_dict['{scalar.name}'] = "
+                f"scalars[{ii}].get_for_subses(subses_dict, dwi_affine,"
+                f" reg_template, mapping)\n")
+    header = header[:-2]
+    header = header + "):\n"
+    content = content + "    return {'scalar_dict': scalar_dict}"
+
+    scope = {}
+    exec(header + content, scope)
+    scope["gen_scalars"].__module__ = "profile"
+    return pimms.calc("scalar_dict")(scope["gen_scalars"])
+
+
+profile_tasks = [tract_profiles]

@@ -8,9 +8,9 @@ class Definition(object):
     to create a given mask, map, etc.
     Definitions have an init function which the users uses to specify
     how they want the definition to behave.
-    The find_path and get_for_row functions are called by the AFQ API.
+    The find_path and get_for_subses functions are called by the AFQ API.
     The api calls find_path to let the definition find relevant files
-    for the given subject and session. The api calls get_for_row to get the
+    for the given subject and session. The api calls get_for_subses to get the
     mask, map, etc.
     '''
 
@@ -19,9 +19,6 @@ class Definition(object):
 
     def find_path(self, bids_layout, from_path, subject, session):
         raise NotImplementedError("Please implement a find_path method")
-
-    def get_for_row(self, afq_object, row):
-        raise NotImplementedError("Please implement a get_for_row method")
 
     def str_for_toml(self):
         """

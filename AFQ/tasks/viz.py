@@ -2,13 +2,17 @@ import nibabel as nib
 import logging
 import numpy as np
 import os
+import os.path as op
+from time import time
 
-from pydra import mark
+import pimms
 
 from dipy.align import resample
 
-from AFQ.tasks.utils import *
+from AFQ.tasks.utils import as_file, get_fname
 import AFQ.utils.volume as auv
+import AFQ.data as afd
+from AFQ.viz.utils import visualize_tract_profiles
 
 logger = logging.getLogger('AFQ.api.viz')
 
@@ -23,11 +27,8 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
     return vol
 
 
-@mark.task
-@mark.annotate(
-    {"return": {"all_bundles_figure_fname": str}}
-)
-def viz_bundles(subses_tuple,
+@pimms.calc("all_bundles_figure_fname")
+def viz_bundles(subses_dict,
                 dwi_affine,
                 viz_backend,
                 bundle_dict,
@@ -72,20 +73,20 @@ def viz_bundles(subses_tuple,
 
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(
-            subses_tuple, '_viz.gif',
+            subses_dict, '_viz.gif',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         viz_backend.create_gif(figure, fname)
     if "plotly" in viz_backend.backend:
         fname = get_fname(
-            subses_tuple, '_viz.html',
+            subses_dict, '_viz.html',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         figure.write_html(fname)
     meta_fname = get_fname(
-        subses_tuple, '_viz.json',
+        subses_dict, '_viz.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
@@ -93,8 +94,8 @@ def viz_bundles(subses_tuple,
     return fname
 
 
-@mark.task
-def viz_indivBundle(subses_tuple,
+@pimms.calc("indiv_bundles_exported")
+def viz_indivBundle(subses_dict,
                     dwi_affine,
                     viz_backend,
                     bundle_dict,
@@ -155,7 +156,7 @@ def viz_indivBundle(subses_tuple,
             if endpoint_info is not None:
                 start_p = endpoint_info[bundle_name]['startpoint']
                 end_p = endpoint_info[bundle_name]['endpoint']
-                for ii, pp in enumerate([start_p, end_p]):
+                for pp in [start_p, end_p]:
                     pp = resample(
                         pp.get_fdata(),
                         reg_template,
@@ -203,12 +204,12 @@ def viz_indivBundle(subses_tuple,
                 interact=False,
                 figure=figure)
 
-        roi_dir = op.join(subses_tuple['results_dir'], 'viz_bundles')
+        roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
         if "no_gif" not in viz_backend.backend:
             fname = op.split(
                 get_fname(
-                    subses_tuple,
+                    subses_dict,
                     f'_{bundle_name}'
                     f'_viz.gif',
                     tracking_params=tracking_params,
@@ -217,11 +218,11 @@ def viz_indivBundle(subses_tuple,
             fname = op.join(roi_dir, fname[1])
             viz_backend.create_gif(figure, fname)
         if "plotly" in viz_backend.backend:
-            roi_dir = op.join(subses_tuple['results_dir'], 'viz_bundles')
+            roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.split(
                 get_fname(
-                    subses_tuple,
+                    subses_dict,
                     f'_{bundle_name}'
                     f'_viz.html',
                     tracking_params=tracking_params,
@@ -230,8 +231,38 @@ def viz_indivBundle(subses_tuple,
             fname = op.join(roi_dir, fname[1])
             figure.write_html(fname)
     meta_fname = get_fname(
-        subses_tuple, '_indiv_viz.json',
+        subses_dict, '_vizIndiv.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
     afd.write_json(meta_fname, meta)
+    return True
+
+
+@pimms.calc("tract_profiles_files")
+def plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, profiles_file):
+    start_time = time()
+    fnames = []
+    for scalar in scalars:
+        fname = get_fname(
+            subses_dict, f'_{scalar}_profile_plots',
+            tracking_params=tracking_params,
+            segmentation_params=segmentation_params)
+
+        visualize_tract_profiles(
+            profiles_file,
+            scalar=scalar,
+            file_name=fname,
+            n_boot=100)
+        fnames.append(fname)
+    meta_fname = get_fname(
+        subses_dict, f'_profile_plots.json',
+        tracking_params=tracking_params,
+        segmentation_params=segmentation_params)
+    meta = dict(Timing=time() - start_time)
+    afd.write_json(meta_fname, meta)
+
+    return fnames
+
+
+viz_tasks = [viz_bundles, viz_indivBundle, plot_tract_profiles]
