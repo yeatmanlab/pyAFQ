@@ -656,11 +656,6 @@ def test_AFQ_data_waypoint():
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
-    # Test creation of file with bundle indices:
-    assert op.exists(op.join(
-        myafq.results_dir["01"],
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-clean_tractography_idx.json'))  # noqa
-
     tract_profiles = pd.read_csv(myafq.tract_profiles["01"])
     assert tract_profiles.shape == (400, 6)
 

@@ -38,8 +38,10 @@ def streamlines(subses_dict, params_file, seed_file, stop_file,
                 tracking_params):
     this_tracking_params = tracking_params.copy()
     this_tracking_params['seed_mask'] = nib.load(seed_file).get_fdata()
-    if isinstance(this_tracking_params['stop_mask'], str):
+    if isinstance(stop_file, str):
         this_tracking_params['stop_mask'] = nib.load(stop_file).get_fdata()
+    else:
+        this_tracking_params['stop_mask'] = stop_file
 
     start_time = time()
     sft = aft.track(params_file, **this_tracking_params)
