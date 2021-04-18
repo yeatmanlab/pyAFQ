@@ -25,7 +25,7 @@ import AFQ.utils.volume as auv
 import AFQ.data as afd
 from AFQ.utils.parallel import parfor
 
-__all__ = ["Segmentation"]
+__all__ = ["Segmentation", "clean_bundles", "clean_by_endpoints"]
 
 
 def _resample_tg(tg, n_points):
