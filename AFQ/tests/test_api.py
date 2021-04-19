@@ -668,6 +668,9 @@ def test_AFQ_data_waypoint():
         myafq.results_dir["01"],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
+    # Grab combined profiles for comparison later:
+    combined_profiles = myafq.combine_profiles()
+
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
     shutil.rmtree(op.join(myafq.results_dir["01"],
@@ -675,6 +678,7 @@ def test_AFQ_data_waypoint():
 
     shutil.rmtree(op.join(myafq.results_dir["01"],
                           'ROIs'))
+    os.remove(op.abspath(op.join(myafq.afq_path, "tract_profiles.csv")))
 
     # Test the CLI:
     print("Running the CLI:")
@@ -706,14 +710,13 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
-    cmd = "pyAFQ " + config_file
+    cmd = "pyAFQ " + config_file + " --call combine_profiles"
     out = os.system(cmd)
     assert out == 0
     # The combined tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(
         op.abspath(op.join(myafq.afq_path, "tract_profiles.csv")))
-    # And should be identical to what we would get by rerunning this:
-    combined_profiles = myafq.combine_profiles()
+
     assert combined_profiles.shape == (500, 8)
     assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
 

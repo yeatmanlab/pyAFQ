@@ -1063,17 +1063,9 @@ class AFQ(object):
         pass
 
     def combine_profiles(self):
-        tract_profiles_dict = self.tract_profiles
-        if self.sessions > 1:
-            tract_profiles_list = []
-            for _, subject_dict in tract_profiles_dict.items():
-                tract_profiles_list.extend(subject_dict.values())
-        else:
-            tract_profiles_list = list(tract_profiles_dict.values())
-        _df = combine_list_of_profiles(tract_profiles_list)
+        _df = combine_list_of_profiles(self.tract_profiles)
         out_file = op.abspath(op.join(
-            self.afq_path, "tract_profiles.csv"
-        ))
+            self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)
         _df.to_csv(out_file, index=False)
         return _df
