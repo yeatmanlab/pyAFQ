@@ -9,9 +9,7 @@ import os.path as op
 
 from dipy.align import resample
 
-# For scalar defintions, get_for_subses should return:
-# data, affine, meta
-# additionally, each class should have a name parameter
+# For scalar defintions, each class should have a name parameter
 
 __all__ = ["ScalarFile", "TemplateScalar"]
 

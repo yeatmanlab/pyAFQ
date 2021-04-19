@@ -46,8 +46,9 @@ def streamlines(subses_dict, params_file, seed_file, stop_file,
     start_time = time()
     sft = aft.track(params_file, **this_tracking_params)
     sft.to_vox()
-    meta_directions = {"det": "deterministic",
-                        "prob": "probabilistic"}
+    meta_directions = {
+        "det": "deterministic",
+        "prob": "probabilistic"}
     meta = dict(
         TractographyClass="local",
         TractographyMethod=meta_directions[

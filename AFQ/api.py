@@ -25,7 +25,7 @@ from AFQ.tasks.tractography import (
     tractography_tasks, custom_tractography, export_stop_mask_pft)
 from AFQ.tasks.segmentation import segmentation_tasks
 from AFQ.tasks.profile import profile_tasks, gen_scalar_func
-from AFQ.tasks.viz import viz_tasks
+from AFQ.tasks.viz import viz_tasks, viz_bundles, viz_indivBundle
 from AFQ.tasks.utils import as_file
 
 from .version import version as pyafq_version
@@ -37,6 +37,7 @@ import json
 import s3fs
 from time import time
 import pimms
+from pimms.calculation import calc_tr
 
 import numpy as np
 import nibabel as nib
@@ -547,11 +548,12 @@ class AFQ(object):
             self.vdisplay.start()
         self.viz = Viz(backend=viz_backend.lower())
 
+        best_scalar = self._get_best_scalar()
         default_tracking_params = get_default_args(aft.track)
         default_tracking_params["seed_mask"] = ScalarMask(
-            self._get_best_scalar())
+            best_scalar)
         default_tracking_params["stop_mask"] = ScalarMask(
-            self._get_best_scalar())
+            best_scalar)
         default_tracking_params["seed_threshold"] = 0.2
         default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value
@@ -671,6 +673,15 @@ class AFQ(object):
                 f"The ODF model you gave ({odf_model}) was not recognized"))
         all_tasks["params_file_res"] = params_task
 
+        all_tasks["viz_bundles_res"] =\
+            viz_bundles.tr({
+                "volume": "b0_file",
+                "color_by_volume": best_scalar + "_file"})
+        all_tasks["viz_indivBundle_res"] =\
+            viz_indivBundle.tr({
+                "volume": "b0_file",
+                "color_by_volume": best_scalar + "_file"})
+
         all_tasks["reg_subject_res"] = \
             gen_reg_subject_func(self.reg_subject)
 
@@ -695,7 +706,7 @@ class AFQ(object):
 
         all_tasks["brain_mask_res"] = \
             pimms.calc("brain_mask_file")(as_file('_brain_mask.nii.gz')(
-            self.brain_mask_definition.get_mask_getter()))
+                self.brain_mask_definition.get_mask_getter()))
 
         self.wf_dict = {}
         for session in self.sessions:
@@ -1005,7 +1016,7 @@ class AFQ(object):
         pass
     clean_bundles = property(get_clean_bundles, get_clean_bundles)
 
-    @_getter("tract_profiles_file")
+    @_getter("profiles_file")
     def get_tract_profiles(self):
         pass
     tract_profiles = property(get_tract_profiles, get_tract_profiles)

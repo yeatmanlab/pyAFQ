@@ -240,18 +240,23 @@ def viz_indivBundle(subses_dict,
 
 
 @pimms.calc("tract_profiles_files")
-def plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, profiles_file):
+def plot_tract_profiles(subses_dict, scalars, tracking_params,
+                        segmentation_params, profiles_file):
     start_time = time()
     fnames = []
     for scalar in scalars:
+        if not isinstance(scalar, str):
+            this_scalar = scalar.name
+        else:
+            this_scalar = scalar
         fname = get_fname(
-            subses_dict, f'_{scalar}_profile_plots',
+            subses_dict, f'_{this_scalar}_profile_plots',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         visualize_tract_profiles(
             profiles_file,
-            scalar=scalar,
+            scalar=this_scalar,
             file_name=fname,
             n_boot=100)
         fnames.append(fname)
@@ -265,4 +270,4 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_para
     return fnames
 
 
-viz_tasks = [viz_bundles, viz_indivBundle, plot_tract_profiles]
+viz_tasks = [plot_tract_profiles]

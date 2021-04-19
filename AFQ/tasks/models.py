@@ -28,7 +28,7 @@ def dti_fit(dti_params_file, gtab):
 @as_file(suffix='_model-DTI_diffmodel.nii.gz')
 @as_model
 def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
-         bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False):
+        bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False):
     if robust_tensor_fitting:
         bvals, _ = read_bvals_bvecs(
             bval_file, bvec_file)
@@ -75,7 +75,7 @@ dki_params = pimms.calc("dki_params_file")(dki)
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
 @as_model
 def csd(subses_dict, dwi_affine, brain_mask_file,
-         data, gtab, csd_fit_kwargs={}, msmt=False):
+        data, gtab, csd_fit_kwargs={}, msmt=False):
     csdf = csd_fit_model(
         gtab, data, mask=brain_mask_file,
         msmt=msmt, **csd_fit_kwargs)
@@ -150,7 +150,7 @@ def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file('_model-DKI_AWF.nii.gz')
 @as_tf_deriv('DKI')
 def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
-             sphere='repulsion100', gtol=1e-2):
+            sphere='repulsion100', gtol=1e-2):
     dki_params = nib.load(dki_params_file).get_fdata()
     awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
     return awf

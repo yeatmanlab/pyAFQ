@@ -19,10 +19,10 @@ def test_str_instantiates_mixin():
     thresh_mask_from_str = eval(thresh_mask_str)
 
     npt.assert_(thresh_mask.combine == thresh_mask_from_str.combine)
-    npt.assert_(len(thresh_mask_from_str.mask_list) ==
-                len(thresh_mask_from_str.mask_list))
-    for mask in thresh_mask_from_str.mask_list:
-        npt.assert_(mask.__dict__ == mask.__dict__)
+    npt.assert_(thresh_mask.lower_bound ==
+                thresh_mask_from_str.lower_bound)
+    npt.assert_(thresh_mask.upper_bound ==
+                thresh_mask_from_str.upper_bound)
 
 
 def test_resample_mask():

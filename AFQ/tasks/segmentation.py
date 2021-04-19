@@ -49,9 +49,9 @@ def segment(subses_dict, streamlines_file, bundle_dict,
 
     if segmentation_params['return_idx']:
         idx = {bundle: bundles[bundle]['idx'].tolist()
-                for bundle in bundle_dict}
+               for bundle in bundle_dict}
         bundles = {bundle: bundles[bundle]['sl']
-                    for bundle in bundle_dict}
+                   for bundle in bundle_dict}
 
     tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
 
@@ -88,8 +88,8 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
 
     for b in bundle_dict.keys():
         if b != "whole_brain":
-            idx = np.where(sft.data_per_streamline['bundle']
-                            == bundle_dict[b]['uid'])[0]
+            idx = np.where(
+                sft.data_per_streamline['bundle'] == bundle_dict[b]['uid'])[0]
             this_tg = StatefulTractogram(
                 sft.streamlines[idx],
                 img,
@@ -105,8 +105,8 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
             this_tgram = nib.streamlines.Tractogram(
                 this_tg.streamlines,
                 data_per_streamline={
-                    'bundle': (len(this_tg)
-                                * [bundle_dict[b]['uid']])},
+                    'bundle': (
+                        len(this_tg) * [bundle_dict[b]['uid']])},
                     affine_to_rasmm=img.affine)
             tgram = aus.add_bundles(tgram, this_tgram)
 
