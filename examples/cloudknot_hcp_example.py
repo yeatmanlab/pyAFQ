@@ -100,7 +100,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
 
 ##########################################################################
 # In this example, we will process the data from the following subjects
-subjects = [103818, 105923, 111312]
+subjects = ["103818", "105923", "111312"]
 
 ##########################################################################
 # We will test combinations of different conditions:
@@ -150,7 +150,7 @@ args = attach_keys(args)
 # `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
 # details about the arguments to the object.
 knot = ck.Knot(
-    name='afq_hcp_tractography-201110-0',
+    name='afq-hcp-tractography-201110-0',
     func=afq_process_subject,
     base_image='python:3.8',
     image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
