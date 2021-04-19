@@ -75,34 +75,16 @@ def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
         subses_dict, reg_subject, reg_template)
 
 
-def gen_reg_subject_func(reg_subject):
-    filename_dict = {
-        "b0": "b0_file",
-        "power_map": "pmap_file",
-        "dti_fa_subject": "dti_fa_file",
-        "subject_sls": "b0_file",
-    }
-    if reg_subject in filename_dict:
-        path = filename_dict.get(reg_subject)
-        header = (
-            f"def reg_subject({path}, brain_mask_file):\n"
-            f"    img = nib.load({path})\n")
-    else:
-        header = (
-            f"def reg_subject(reg_subject_spec, brain_mask_file):\n"
-            f"    img = nib.load(reg_subject_spec)\n")
-
-    func = (
-        f"    bm = nib.load(brain_mask_file).get_fdata().astype(bool)\n"
-        f"    masked_data = img.get_fdata()\n"
-        f"    masked_data[~bm] = 0\n"
-        f"    img = nib.Nifti1Image(masked_data, img.affine)\n"
-        f"    return img")
-    scope = globals()
-    exec(header + func, scope)
-    scope["reg_subject"].__module__ = "mapping"
-    return pimms.calc("reg_subject")(scope["reg_subject"])
+@pimms.calc("reg_subject")
+def get_reg_subject(reg_subject_spec, brain_mask_file):
+    img = nib.load(reg_subject_spec)
+    bm = nib.load(brain_mask_file).get_fdata().astype(bool)
+    masked_data = img.get_fdata()
+    masked_data[~bm] = 0
+    img = nib.Nifti1Image(masked_data, img.affine)
+    return img
 
 
 mapping_tasks = [
-    export_registered_b0, template_xform, export_rois, mapping]
+    export_registered_b0, template_xform, export_rois, mapping,
+    get_reg_subject]

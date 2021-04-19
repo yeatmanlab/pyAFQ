@@ -20,7 +20,7 @@ import AFQ.data as afd
 
 from AFQ.tasks.data import data_tasks
 from AFQ.tasks.models import model_tasks, dti, dki, csd
-from AFQ.tasks.mapping import mapping_tasks, gen_reg_subject_func
+from AFQ.tasks.mapping import mapping_tasks, get_reg_subject
 from AFQ.tasks.tractography import (
     tractography_tasks, custom_tractography, export_stop_mask_pft)
 from AFQ.tasks.segmentation import segmentation_tasks
@@ -682,8 +682,16 @@ class AFQ(object):
                 "volume": "b0_file",
                 "color_by_volume": best_scalar + "_file"})
 
-        all_tasks["reg_subject_res"] = \
-            gen_reg_subject_func(self.reg_subject)
+        filename_dict = {
+            "b0": "b0_file",
+            "power_map": "pmap_file",
+            "dti_fa_subject": "dti_fa_file",
+            "subject_sls": "b0_file",
+        }
+        if self.reg_subject in filename_dict:
+            all_tasks["get_reg_subject_res"] =\
+                get_reg_subject.tr({
+                    "reg_subject_spec": filename_dict[self.reg_subject]})
 
         stop_mask = self.tracking_params['stop_mask']
         if self.tracking_params["tracker"] == "pft":
@@ -1063,7 +1071,14 @@ class AFQ(object):
         pass
 
     def combine_profiles(self):
-        _df = combine_list_of_profiles(self.tract_profiles)
+        tract_profiles_dict = self.tract_profiles
+        if len(self.sessions) > 1:
+            tract_profiles_list = []
+            for _, subject_dict in tract_profiles_dict.items():
+                tract_profiles_list.extend(subject_dict.values())
+        else:
+            tract_profiles_list = list(tract_profiles_dict.values())
+        _df = combine_list_of_profiles(tract_profiles_list)
         out_file = op.abspath(op.join(
             self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)

@@ -656,7 +656,8 @@ def test_AFQ_data_waypoint():
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
-    tract_profiles = pd.read_csv(myafq.tract_profiles["01"])
+    tract_profile_fname = myafq.tract_profiles["01"]
+    tract_profiles = pd.read_csv(tract_profile_fname)
     assert tract_profiles.shape == (500, 6)
 
     myafq.plot_tract_profiles()
@@ -668,9 +669,6 @@ def test_AFQ_data_waypoint():
         myafq.results_dir["01"],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
-    # Grab combined profiles for comparison later:
-    combined_profiles = myafq.combine_profiles()
-
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
     shutil.rmtree(op.join(myafq.results_dir["01"],
@@ -678,7 +676,7 @@ def test_AFQ_data_waypoint():
 
     shutil.rmtree(op.join(myafq.results_dir["01"],
                           'ROIs'))
-    os.remove(op.abspath(op.join(myafq.afq_path, "tract_profiles.csv")))
+    os.remove(tract_profile_fname)
 
     # Test the CLI:
     print("Running the CLI:")
@@ -710,15 +708,14 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
-    cmd = "pyAFQ " + config_file + " --call combine_profiles"
+    cmd = "pyAFQ " + config_file
     out = os.system(cmd)
     assert out == 0
-    # The combined tract profiles should already exist from the CLI Run:
-    from_file = pd.read_csv(
-        op.abspath(op.join(myafq.afq_path, "tract_profiles.csv")))
+    # The tract profiles should already exist from the CLI Run:
+    from_file = pd.read_csv(tract_profile_fname)
 
-    assert combined_profiles.shape == (500, 8)
-    assert_series_equal(combined_profiles['dti_fa'], from_file['dti_fa'])
+    assert from_file.shape == (500, 6)
+    assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     myafq.export_rois()
