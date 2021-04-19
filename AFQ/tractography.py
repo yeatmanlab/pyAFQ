@@ -15,6 +15,21 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               ActStoppingCriterion)
 
 
+class PklDeterministicDG(DeterministicMaximumDirectionGetter):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
+class PklProbabilisticDG(ProbabilisticDirectionGetter):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
+class PklThresholdStoppingCriterion(ThresholdStoppingCriterion):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
 
@@ -28,7 +43,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
           tracker="local",
           parallel_kwargs={"n_jobs": -1,
                            "engine": "joblib",
-                           "backend": "threading"}):
+                           "backend": "loky"}):
     """
     Tractography
 
@@ -141,9 +156,9 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     if isinstance(directions, str):
         directions = directions.lower()
         if directions == "det":
-            dg = DeterministicMaximumDirectionGetter
+            dg = PklDeterministicDG
         elif directions == "prob":
-            dg = ProbabilisticDirectionGetter
+            dg = PklProbabilisticDG
 
         if odf_model == "DTI" or odf_model == "DKI":
             evals = model_params[..., :3]
@@ -164,10 +179,12 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
             stop_mask = np.ones(params_img.shape[:3])
 
         if stop_mask.dtype == 'bool':
-            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
-                                                            0.5)
+            stopping_criterion = PklThresholdStoppingCriterion(
+                                                        stop_mask,
+                                                        0.5)
         else:
-            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+            stopping_criterion = PklThresholdStoppingCriterion(
+                stop_mask,
                                                             stop_threshold)
 
         my_tracker = VerboseLocalTracking
