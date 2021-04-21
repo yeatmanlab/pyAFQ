@@ -16,7 +16,7 @@ from AFQ.models.csd import _fit as csd_fit
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.dti import _fit as dti_fit
-import AFQ.data as afd
+import AFQ.data as afd  # TODO: clean up these imports
 
 from AFQ.tasks.data import data_tasks
 from AFQ.tasks.models import model_tasks, dti, dki, csd
@@ -657,6 +657,7 @@ class AFQ(object):
                 *viz_tasks]:
             all_tasks[task.function.__name__ + "_res"] = task
 
+        # TODO: put these in their own functions before class definition
         all_tasks["scalar_func_res"] = gen_scalar_func(self.scalars)
         if custom_tractography_bids_filters is not None:
             all_tasks["streamlines_res"] = custom_tractography
@@ -862,8 +863,8 @@ class AFQ(object):
                     tracking_params=self.tracking_params,
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params)
-
                 if len(self.sessions) > 1:
+                    # TODO: subject then session
                     self.wf_dict[session][subject] = subses_data
                 else:
                     self.wf_dict[subject] = subses_data

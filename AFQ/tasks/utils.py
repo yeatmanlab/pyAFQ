@@ -11,6 +11,8 @@ from dipy.io.stateful_tractogram import StatefulTractogram
 import AFQ.data as afd
 
 
+# TODO: move decorators to decorator file
+
 __all__ = ["as_file", "as_model", "as_tf_deriv", "as_img", "get_fname"]
 
 logger = logging.getLogger('AFQ.api')
@@ -63,6 +65,7 @@ def has_args(og_func):
     return _has_args
 
 
+# TODO: use introspection to get argument list names
 # first arg must be the subses_dict
 # to include tracking or segmentation params,
 # they must be last and in that order.

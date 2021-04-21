@@ -73,7 +73,7 @@ dki_params = pimms.calc("dki_params_file")(dki)
 
 
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
-@as_model
+@as_model  # TODO: expose csd_fit_kwargs at api.AFQ level
 def csd(subses_dict, dwi_affine, brain_mask_file,
         data, gtab, csd_fit_kwargs={}, msmt=False):
     csdf = csd_fit_model(
