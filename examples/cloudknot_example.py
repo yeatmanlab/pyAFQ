@@ -148,7 +148,7 @@ knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 def afq_combine_profiles(dummy_argument):
     from AFQ.api import download_and_combine_afq_profiles
     download_and_combine_afq_profiles(
-        "temp", "my_study_bucket", "my_study_prefix/derivatives/afq")
+        "my_study_bucket", "my_study_prefix")
 
 
 knot2 = ck.Knot(
