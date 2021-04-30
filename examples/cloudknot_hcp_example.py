@@ -94,8 +94,8 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # upload the results to some location on s3
     myafq.upload_to_s3(
         s3fs.S3FileSystem(),
-        (f"my_study_bucket/my_study_prefix/derivatives_afq_"
-        f"{seed_mask}_{n_seeds}"))
+        (f"my_study_bucket/my_study_prefix_{seed_mask}_{n_seeds}"
+        f"/derivatives/afq"))
 
 
 ##########################################################################
@@ -187,8 +187,7 @@ knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 def afq_combine_profiles(seed_mask, n_seeds):
     from AFQ.api import download_and_combine_afq_profiles
     download_and_combine_afq_profiles(
-        "temp", "my_study_bucket",
-        f"my_study_prefix/derivatives/afq_{seed_mask}_{n_seeds}")
+        "my_study_bucket", f"my_study_prefix_{seed_mask}_{n_seeds}")
 
 
 knot2 = ck.Knot(

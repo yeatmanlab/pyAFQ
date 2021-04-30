@@ -2230,8 +2230,10 @@ class AFQ(object):
         s3fs.put(self.afq_path, remote_path, recursive=True)
 
 
-def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
-                                      upload=False, session=None):
+def download_and_combine_afq_profiles(bucket,
+                                      study_s3_prefix="", out_file=None,
+                                      upload=False, session=None,
+                                      **kwargs):
     """
     Download and combine tract profiles from different subjects / sessions
     on an s3 bucket into one CSV.
@@ -2251,17 +2253,23 @@ def download_and_combine_afq_profiles(bucket, study_s3_prefix, out_file=None,
     session : str, optional
         Session to get CSVs from. If None, all sessions are used.
         Default: None
+    kwargs : optional
+        Optional arguments to pass to S3BIDSStudy.
     Returns
     -------
     Ouput CSV's pandas dataframe.
     """
+    if "subjects" not in kwargs:
+        kwargs["subjects"] = "all"
+    if "anon" not in kwargs:
+        kwargs["anon"] = False
+
     with nib.tmpdirs.InTemporaryDirectory() as t_dir:
         remote_study = afd.S3BIDSStudy(
             "get_profiles",
             bucket,
             study_s3_prefix,
-            subjects="all",
-            anon=False)
+            **kwargs)
         remote_study.download(
             t_dir,
             include_modality_agnostic=False,
