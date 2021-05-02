@@ -74,7 +74,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # The top level directory is our overall bids dataset folder. In most
 # cases, this folder will include a `raw` folder that will contain the
 # raw data. In this case, we do not include the raw folder and only have
-# the derivatives folder that contains the outputs of preprocessing the data.
+# the pipelines that contains the outputs of preprocessing the data.
 # In this case, one folder containing Freesurfer derivatives and another
 # folder containing the DWI data that has been preprocessed with Vistasoft.
 # pyAFQ provides facilities to segment tractography results obtained
@@ -83,7 +83,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # our data and reconstruct tractographies with software such as
 # `MRTRIX <https://www.mrtrix.org/>`_. Here, we will demonstrate how to use
 # these reconstructions in the pyAFQ segmentation and tractometry pipeline
-# We fetch this data and add it as a separate derivatives folder
+# We fetch this data and add it as a separate pipeline
 
 afd.fetch_stanford_hardi_tractography()
 
@@ -215,7 +215,9 @@ bundle_info = ["SLF", "ARC", "CST", "FP"]
 # `'my_tractography'` pipeline as inputs. This is done by setting the
 # `custom_tractography_bids_filters` key-word argument. We pass the
 # `bundle_info` defined above. We also point to the preprocessed
-# data that is in a `'dmriprep'` derivatives folder. These data were
+# data that is in a `'dmriprep'` pipeline. Note that the pipeline name
+# is not necessarily the name of the folder it is in; the pipeline name is
+# defined in each pipeline's `dataset_description.json`. These data were
 # preprocessed with 'vistasoft', so this is the pipeline we'll point to
 # If we were using `'qsiprep'`, this is where we would pass that
 # string instead. If we did that, AFQ would look for a derivatives
