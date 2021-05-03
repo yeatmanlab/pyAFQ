@@ -5,6 +5,8 @@ import inspect
 from time import time
 import numpy as np
 
+import pimms
+
 import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
@@ -13,7 +15,8 @@ import AFQ.data as afd
 
 # TODO: move decorators to decorator file
 
-__all__ = ["as_file", "as_model", "as_tf_deriv", "as_img", "get_fname"]
+__all__ = ["as_file", "as_model", "as_tf_deriv", "as_img", "get_fname",
+           "with_name"]
 
 logger = logging.getLogger('AFQ.api')
 
@@ -35,6 +38,14 @@ def get_fname(subses_dict, suffix,
         fname = fname + f'-{seg_algo}'
 
     return fname + suffix
+
+
+# Turn list of tasks into dictionary with names for each task
+def with_name(task_list):
+    task_dict = {}
+    for task in task_list:
+        task_dict[task.function.__name__ + "_res"] = task
+    return task_dict
 
 
 # replaces *args and **kwargs with specific parameters from og_func

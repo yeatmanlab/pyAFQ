@@ -15,22 +15,24 @@ __all__ = ["ScalarFile", "TemplateScalar"]
 
 
 class ScalarMixin():
-    def get_for_subses(self, subses_dict, dwi_affine, reg_template, mapping):
-        scalar_file = get_fname(
-            subses_dict,
-            f'_model-{self.name}.nii.gz')
-        if not op.exists(scalar_file):
-            scalar_data, meta = self.get_data(
-                subses_dict, dwi_affine, reg_template, mapping)
-
-            nib.save(
-                nib.Nifti1Image(scalar_data, dwi_affine),
-                scalar_file)
-            meta_fname = get_fname(
+    def get_for_subses(self):
+        def get_for_subses_getter(subses_dict, dwi_affine, reg_template, mapping):
+            scalar_file = get_fname(
                 subses_dict,
-                f'_model-{self.name}.json')
-            afd.write_json(meta_fname, meta)
-        return scalar_file
+                f'_model-{self.name}.nii.gz')
+            if not op.exists(scalar_file):
+                scalar_data, meta = self.get_data(
+                    subses_dict, dwi_affine, reg_template, mapping)
+
+                nib.save(
+                    nib.Nifti1Image(scalar_data, dwi_affine),
+                    scalar_file)
+                meta_fname = get_fname(
+                    subses_dict,
+                    f'_model-{self.name}.json')
+                afd.write_json(meta_fname, meta)
+            return scalar_file
+        return get_for_subses_getter
 
 
 class ScalarFile(MaskFile):

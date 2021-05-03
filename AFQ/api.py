@@ -16,17 +16,14 @@ from AFQ.models.csd import _fit as csd_fit
 from AFQ.models.dki import _fit as dki_fit
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.dti import _fit as dti_fit
-import AFQ.data as afd  # TODO: clean up these imports
+import AFQ.data as afd
 
-from AFQ.tasks.data import data_tasks
-from AFQ.tasks.models import model_tasks, dti, dki, csd
-from AFQ.tasks.mapping import mapping_tasks, get_reg_subject
-from AFQ.tasks.tractography import (
-    tractography_tasks, custom_tractography, export_stop_mask_pft)
-from AFQ.tasks.segmentation import segmentation_tasks
-from AFQ.tasks.profile import profile_tasks, gen_scalar_func
-from AFQ.tasks.viz import viz_tasks, viz_bundles, viz_indivBundle
-from AFQ.tasks.utils import as_file
+from AFQ.tasks.data import get_data_plan
+from AFQ.tasks.models import get_model_plan
+from AFQ.tasks.mapping import get_mapping_plan
+from AFQ.tasks.tractography import get_tractography_plan
+from AFQ.tasks.segmentation import get_segmentation_plan
+from AFQ.tasks.viz import get_viz_plan
 
 from .version import version as pyafq_version
 import pandas as pd
@@ -640,83 +637,21 @@ class AFQ(object):
         else:
             self.sessions = [None]
 
+        # construct pimms plans
+        plans = {
+            "data": get_data_plan(self.brain_mask_definition),
+            "model": get_model_plan(),
+            "tractography": get_tractography_plan(
+                self.custom_tractography_bids_filters, self.tracking_params),
+            "mapping": get_mapping_plan(self.reg_subject, self.scalars),
+            "segmentation": get_segmentation_plan(),
+            "viz": get_viz_plan()
+        }
+
         self.sub_list = []
         self.ses_list = []
         self.dwi_file_list = []
         self.results_dir_list = []
-
-        all_tasks = {}
-
-        for task in [
-                *data_tasks,
-                *model_tasks,
-                *mapping_tasks,
-                *tractography_tasks,
-                *segmentation_tasks,
-                *profile_tasks,
-                *viz_tasks]:
-            all_tasks[task.function.__name__ + "_res"] = task
-
-        # TODO: put these in their own functions before class definition
-        all_tasks["scalar_func_res"] = gen_scalar_func(self.scalars)
-        if custom_tractography_bids_filters is not None:
-            all_tasks["streamlines_res"] = custom_tractography
-
-        odf_model = self.tracking_params["odf_model"]
-        if odf_model == "DTI":
-            params_task = pimms.calc("params_file")(dti)
-        elif odf_model == "CSD":
-            params_task = pimms.calc("params_file")(csd)
-        elif odf_model == "DKI":
-            params_task = pimms.calc("params_file")(dki)
-        else:
-            raise TypeError((
-                f"The ODF model you gave ({odf_model}) was not recognized"))
-        all_tasks["params_file_res"] = params_task
-
-        all_tasks["viz_bundles_res"] =\
-            viz_bundles.tr({
-                "volume": "b0_file",
-                "color_by_volume": best_scalar + "_file"})
-        all_tasks["viz_indivBundle_res"] =\
-            viz_indivBundle.tr({
-                "volume": "b0_file",
-                "color_by_volume": best_scalar + "_file"})
-
-        filename_dict = {
-            "b0": "b0_file",
-            "power_map": "pmap_file",
-            "dti_fa_subject": "dti_fa_file",
-            "subject_sls": "b0_file",
-        }
-        if self.reg_subject in filename_dict:
-            all_tasks["get_reg_subject_res"] =\
-                get_reg_subject.tr({
-                    "reg_subject_spec": filename_dict[self.reg_subject]})
-
-        stop_mask = self.tracking_params['stop_mask']
-        if self.tracking_params["tracker"] == "pft":
-            probseg_funcs = stop_mask.get_mask_getter()
-            all_tasks["wm_res"] = pimms.calc("pve_wm")(probseg_funcs[0])
-            all_tasks["gm_res"] = pimms.calc("pve_gm")(probseg_funcs[1])
-            all_tasks["csf_res"] = pimms.calc("pve_csf")(probseg_funcs[2])
-            all_tasks["export_stop_mask_res"] = \
-                export_stop_mask_pft
-        else:
-            if isinstance(stop_mask, Definition):
-                all_tasks["export_stop_mask_res"] = pimms.calc("stop_file")(
-                    as_file('_stop_mask.nii.gz')(
-                        stop_mask.get_mask_getter()))
-
-        if isinstance(self.tracking_params['seed_mask'], Definition):
-            all_tasks["export_seed_mask_res"] = pimms.calc("seed_file")(
-                as_file('_seed_mask.nii.gz')(
-                    self.tracking_params['seed_mask'].get_mask_getter()))
-
-        all_tasks["brain_mask_res"] = \
-            pimms.calc("brain_mask_file")(as_file('_brain_mask.nii.gz')(
-                self.brain_mask_definition.get_mask_getter()))
-
         self.wf_dict = {}
         for session in self.sessions:
             if len(self.sessions) > 1:
@@ -834,16 +769,17 @@ class AFQ(object):
                 self.sub_list.append(subject)
                 self.ses_list.append(session)
 
+                img = nib.load(dwi_data_file)
                 subses_dict = {
                     "ses": session,
                     "subject": subject,
                     "dwi_file": dwi_data_file,
                     "results_dir": results_dir}
 
-                subses_plan = pimms.plan(**all_tasks)
-
-                subses_data = subses_plan(
+                input_data = dict(
                     subses_dict=subses_dict,
+                    dwi_img=img,
+                    dwi_affine=img.affine,
                     bval_file=bval_file,
                     bvec_file=bvec_file,
                     b0_threshold=self.b0_threshold,
@@ -860,14 +796,23 @@ class AFQ(object):
                     robust_tensor_fitting=self.robust_tensor_fitting,
                     profile_weights=self.profile_weights,
                     viz_backend=self.viz,
+                    best_scalar=best_scalar,
                     tracking_params=self.tracking_params,
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params)
+
+                # chain together a complete plan from individual plans
+                previous_data = {}
+                for name, plan in plans.items():
+                    previous_data[f"{name}_data"] = plan(
+                        **input_data,
+                        **previous_data)
+
                 if len(self.sessions) > 1:
                     # TODO: subject then session
-                    self.wf_dict[session][subject] = subses_data
+                    self.wf_dict[session][subject] = previous_data["viz_data"]
                 else:
-                    self.wf_dict[subject] = subses_data
+                    self.wf_dict[subject] = previous_data["viz_data"]
 
     def _get_best_scalar(self):
         for scalar in self.scalars:

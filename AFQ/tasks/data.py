@@ -5,7 +5,7 @@ from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
 
 import pimms
-from AFQ.tasks.utils import as_file, get_fname, has_args
+from AFQ.tasks.utils import as_file, get_fname, has_args, with_name
 
 
 @pimms.calc("data", "gtab", "img")
@@ -61,10 +61,9 @@ def b0_mask(subses_dict, b0_file, brain_mask_file):
     return masked_b0_img, meta
 
 
-@pimms.calc("dwi_img", "dwi_affine")
-def load_dwi(subses_dict):
-    img = nib.load(subses_dict["dwi_file"])
-    return img, img.affine
-
-
-data_tasks = [get_data_gtab, b0, b0_mask, load_dwi]
+def get_data_plan(brain_mask_definition):
+    data_tasks = with_name([get_data_gtab, b0, b0_mask])
+    data_tasks["brain_mask_res"] = \
+        pimms.calc("brain_mask_file")(as_file('_brain_mask.nii.gz')(
+            brain_mask_definition.get_mask_getter()))
+    return pimms.plan(**data_tasks)

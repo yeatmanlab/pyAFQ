@@ -9,7 +9,7 @@ import pimms
 
 from dipy.align import resample
 
-from AFQ.tasks.utils import as_file, get_fname
+from AFQ.tasks.utils import as_file, get_fname, with_name
 import AFQ.utils.volume as auv
 import AFQ.data as afd
 from AFQ.viz.utils import visualize_tract_profiles
@@ -32,18 +32,22 @@ def viz_bundles(subses_dict,
                 dwi_affine,
                 viz_backend,
                 bundle_dict,
-                clean_bundles_file,
-                mapping,
-                scalar_dict,
+                data_data,
+                models_data,
+                mapping_data,
+                segmentation_data,
                 tracking_params,
                 segmentation_params,
-                volume,
-                color_by_volume,
+                best_scalar,
                 xform_volume=False,
                 cbv_lims=[None, None],
                 xform_color_by_volume=False,
                 volume_opacity=0.3,
                 n_points=40):
+    mapping = mapping_data["mapping"]
+    scalar_dict = mapping_data["scalar_dict"]
+    volume = data_data["b0_file"]
+    color_by_volume = models_data[best_scalar]
     start_time = time()
     volume = _viz_prepare_vol(volume, xform_volume, mapping, scalar_dict)
     color_by_volume = _viz_prepare_vol(
@@ -61,7 +65,7 @@ def viz_bundles(subses_dict,
         inline=False)
 
     figure = viz_backend.visualize_bundles(
-        clean_bundles_file,
+        segmentation_data["clean_bundles_file"],
         color_by_volume=color_by_volume,
         cbv_lims=cbv_lims,
         bundle_dict=bundle_dict,
@@ -99,20 +103,24 @@ def viz_indivBundle(subses_dict,
                     dwi_affine,
                     viz_backend,
                     bundle_dict,
-                    clean_bundles_file,
-                    roi_files,
-                    mapping,
-                    scalar_dict,
+                    data_data,
+                    models_data,
+                    mapping_data,
+                    segmentation_data,
                     tracking_params,
                     segmentation_params,
                     reg_template,
-                    volume,
-                    color_by_volume,
+                    best_scalar,
                     xform_volume=False,
                     cbv_lims=[None, None],
                     xform_color_by_volume=False,
                     volume_opacity=0.3,
                     n_points=40):
+    mapping = mapping_data["mapping"]
+    scalar_dict = mapping_data["scalar_dict"]
+    volume = data_data["b0_file"]
+    color_by_volume = models_data[best_scalar]
+
     start_time = time()
     volume = _viz_prepare_vol(volume, xform_volume, mapping, scalar_dict)
     color_by_volume = _viz_prepare_vol(
@@ -135,7 +143,7 @@ def viz_indivBundle(subses_dict,
             inline=False)
         try:
             figure = viz_backend.visualize_bundles(
-                clean_bundles_file,
+                segmentation_data["clean_bundles_file"],
                 color_by_volume=color_by_volume,
                 cbv_lims=cbv_lims,
                 bundle_dict=bundle_dict,
@@ -195,7 +203,7 @@ def viz_indivBundle(subses_dict,
                     interact=False,
                     figure=figure)
 
-        for i, roi in enumerate(roi_files[bundle_name]):
+        for i, roi in enumerate(mapping_data["roi_files"][bundle_name]):
             figure = viz_backend.visualize_roi(
                 roi,
                 name=f"{bundle_name} ROI {i}",
@@ -241,7 +249,7 @@ def viz_indivBundle(subses_dict,
 
 @pimms.calc("tract_profiles_files")
 def plot_tract_profiles(subses_dict, scalars, tracking_params,
-                        segmentation_params, profiles_file):
+                        segmentation_params, segmentation_data):
     start_time = time()
     fnames = []
     for scalar in scalars:
@@ -255,7 +263,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
             segmentation_params=segmentation_params)
 
         visualize_tract_profiles(
-            profiles_file,
+            segmentation_data["profiles_file"],
             scalar=this_scalar,
             file_name=fname,
             n_boot=100)
@@ -270,4 +278,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     return fnames
 
 
-viz_tasks = [plot_tract_profiles]
+def get_viz_plan():
+    viz_tasks = with_name([
+        plot_tract_profiles, viz_bundles, viz_indivBundle])
+    return pimms.plan(**viz_tasks)

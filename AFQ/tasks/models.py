@@ -8,7 +8,7 @@ from dipy.io.gradients import read_bvals_bvecs
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
-from AFQ.tasks.utils import as_file, as_model, as_tf_deriv
+from AFQ.tasks.utils import as_file, as_model, as_tf_deriv, with_name
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
 from AFQ.models.dki import _fit as dki_fit_model
@@ -18,26 +18,28 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 @pimms.calc("dti_tf")
-def dti_fit(dti_params_file, gtab):
+def dti_fit(dti_params_file, data_data):
     dti_params = nib.load(dti_params_file).get_fdata()
-    tm = dpy_dti.TensorModel(gtab)
+    tm = dpy_dti.TensorModel(data_data["gtab"])
     dti_tf = dpy_dti.TensorFit(tm, dti_params)
     return dti_tf
 
 
 @as_file(suffix='_model-DTI_diffmodel.nii.gz')
 @as_model
-def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
+def dti(subses_dict, data_data,
         bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False):
     if robust_tensor_fitting:
         bvals, _ = read_bvals_bvecs(
             bval_file, bvec_file)
         sigma = noise_from_b0(
-            data, gtab, bvals, mask=brain_mask_file,
-            b0_threshold=b0_threshold)
+            data_data["data"], data_data["gtab"], bvals,
+            mask=data_data["brain_mask_file"], b0_threshold=b0_threshold)
     else:
         sigma = None
-    dtf = dti_fit_model(gtab, data, mask=brain_mask_file, sigma=sigma)
+    dtf = dti_fit_model(
+        data_data["gtab"], data_data["data"],
+        mask=data_data["brain_mask_file"], sigma=sigma)
     meta = dict(
         Parameters=dict(
             FitMethod="WLS"),
@@ -50,17 +52,19 @@ dti_params = pimms.calc("dti_params_file")(dti)
 
 
 @pimms.calc("dki_tf")
-def dki_fit(dki_params_file, gtab):
+def dki_fit(dki_params_file, data_data):
     dki_params = nib.load(dki_params_file).get_fdata()
-    tm = dpy_dki.DiffusionKurtosisModel(gtab)
+    tm = dpy_dki.DiffusionKurtosisModel(data_data["gtab"])
     dki_tf = dpy_dki.DiffusionKurtosisFit(tm, dki_params)
     return dki_tf
 
 
 @as_file(suffix='_model-DKI_diffmodel.nii.gz')
 @as_model
-def dki(subses_dict, dwi_affine, brain_mask_file, data, gtab):
-    dkf = dki_fit_model(gtab, data, mask=brain_mask_file)
+def dki(subses_dict, dwi_affine, data_data):
+    dkf = dki_fit_model(
+        data_data["gtab"], data_data["data"],
+        mask=data_data["brain_mask_file"])
     meta = dict(
         Parameters=dict(
             FitMethod="WLS"),
@@ -74,10 +78,11 @@ dki_params = pimms.calc("dki_params_file")(dki)
 
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
 @as_model  # TODO: expose csd_fit_kwargs at api.AFQ level
-def csd(subses_dict, dwi_affine, brain_mask_file,
-        data, gtab, csd_fit_kwargs={}, msmt=False):
+def csd(subses_dict, dwi_affine,
+        data_data, csd_fit_kwargs={}, msmt=False):
     csdf = csd_fit_model(
-        gtab, data, mask=brain_mask_file,
+        data_data["gtab"], data_data["data"],
+        mask=data_data["brain_mask_file"],
         msmt=msmt, **csd_fit_kwargs)
     meta = csd_fit_kwargs.copy()
     meta["SphericalHarmonicBasis"] = "DESCOTEAUX"
@@ -163,7 +168,9 @@ def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.mk()
 
 
-model_tasks = [
-    dti_fit, dki_fit, anisotropic_power_map,
-    dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
-    dti_params, dki_params, csd_params]
+def get_model_plan():
+    model_tasks = with_name([
+        dti_fit, dki_fit, anisotropic_power_map,
+        dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
+        dti_params, dki_params, csd_params])
+    return pimms.plan(**model_tasks)

@@ -5,7 +5,7 @@ import numpy as np
 import logging
 
 import pimms
-from AFQ.tasks.utils import as_file, get_fname
+from AFQ.tasks.utils import as_file, get_fname, with_name
 import AFQ.data as afd
 import AFQ.utils.volume as auv
 from dipy.io.streamline import load_tractogram
@@ -16,11 +16,11 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 @pimms.calc("b0_warped_file")
 @as_file('_b0_in_MNI.nii.gz')
-def export_registered_b0(subses_dict, b0_file, mapping, reg_template):
-    mean_b0 = nib.load(b0_file).get_fdata()
+def export_registered_b0(subses_dict, data_data, mapping, reg_template):
+    mean_b0 = nib.load(data_data["b0_file"]).get_fdata()
     warped_b0 = mapping.transform(mean_b0)
     warped_b0 = nib.Nifti1Image(warped_b0, reg_template.affine)
-    return warped_b0, dict(b0InSubject=b0_file)
+    return warped_b0, dict(b0InSubject=data_data["b0_file"])
 
 
 @pimms.calc("template_xform_file")
@@ -76,15 +76,32 @@ def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(reg_subject_spec, brain_mask_file):
+def get_reg_subject(reg_subject_spec, data_data, model_data):
+    filename_dict = {
+        "b0": data_data["b0_file"],
+        "power_map": model_data["pmap_file"],
+        "dti_fa_subject": model_data["dti_fa_file"],
+        "subject_sls": data_data["b0_file"],
+    }
+    if reg_subject_spec in filename_dict:
+        reg_subject_spec = filename_dict[reg_subject_spec]
     img = nib.load(reg_subject_spec)
-    bm = nib.load(brain_mask_file).get_fdata().astype(bool)
+    bm = nib.load(data_data["brain_mask_file"]).get_fdata().astype(bool)
     masked_data = img.get_fdata()
     masked_data[~bm] = 0
     img = nib.Nifti1Image(masked_data, img.affine)
     return img
 
 
-mapping_tasks = [
-    export_registered_b0, template_xform, export_rois, mapping,
-    get_reg_subject]
+def get_mapping_plan(reg_subject, scalars):
+    mapping_tasks = with_name([
+        export_registered_b0, template_xform, export_rois, mapping,
+        get_reg_subject])
+
+    # add custom scalars
+    for scalar in scalars:
+        if not isinstance(scalar, str):
+            mapping_tasks["{scalar.name}_file_res"] =\
+                pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
+
+    return pimms.plan(**mapping_tasks)

@@ -9,7 +9,7 @@ import logging
 
 import pimms
 
-from AFQ.tasks.utils import as_file, get_fname
+from AFQ.tasks.utils import as_file, get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 from AFQ.utils.bin import get_default_args
@@ -18,6 +18,8 @@ import AFQ.data as afd
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import dipy.tracking.utils as dtu
+from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
 
 logger = logging.getLogger('AFQ.api.seg')
@@ -25,9 +27,9 @@ logger = logging.getLogger('AFQ.api.seg')
 
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, streamlines_file, bundle_dict,
-            bval_file, bvec_file, reg_template, mapping,
-            tracking_params, segmentation_params):
+def segment(subses_dict, bundle_dict, data_data, reg_template, mapping,
+            tractography_data, tracking_params, segmentation_params):
+    streamlines_file = tractography_data["streamlines_file"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
     img = nib.load(subses_dict['dwi_file'])
@@ -42,8 +44,8 @@ def segment(subses_dict, streamlines_file, bundle_dict,
         bundle_dict,
         tg,
         subses_dict['dwi_file'],
-        bval_file,
-        bvec_file,
+        data_data["bval_file"],
+        data_data["bvec_file"],
         reg_template=reg_template,
         mapping=mapping)
 
@@ -203,8 +205,95 @@ def export_sl_counts(subses_dict, bundle_dict,
     return counts_df, dict(sources=bundles_files)
 
 
-segmentation_tasks = [
-    export_sl_counts,
-    export_bundles,
-    clean_bundles,
-    segment]
+@pimms.calc("profiles_file")
+@as_file('_profiles.csv', include_track=True, include_seg=True)
+def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
+                   scalar_dict, profile_weights, dwi_affine,
+                   tracking_params, segmentation_params):
+    keys = []
+    vals = []
+    for k in bundle_dict.keys():
+        if k != "whole_brain":
+            keys.append(bundle_dict[k]['uid'])
+            vals.append(k)
+    reverse_dict = dict(zip(keys, vals))
+
+    bundle_names = []
+    node_numbers = []
+    profiles = np.empty((len(scalar_dict), 0)).tolist()
+    this_profile = np.zeros((len(scalar_dict), 100))
+
+    trk = nib.streamlines.load(clean_bundles_file)
+    for b in np.unique(
+            trk.tractogram.data_per_streamline['bundle']):
+        idx = np.where(
+            trk.tractogram.data_per_streamline['bundle'] == b)[0]
+        this_sl = trk.streamlines[idx]
+        bundle_name = reverse_dict[b]
+        for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
+            scalar_data = nib.load(scalar_file).get_fdata()
+            if isinstance(profile_weights, str):
+                if profile_weights == "gauss":
+                    this_prof_weights = gaussian_weights(this_sl)
+                elif profile_weights == "median":
+                    # weights bundle to only return the mean
+                    def _median_weight(bundle):
+                        fgarray = set_number_of_points(bundle, 100)
+                        values = np.array(
+                            values_from_volume(
+                                scalar_data,
+                                fgarray,
+                                dwi_affine))
+                        weights = np.zeros(values.shape)
+                        for ii, jj in enumerate(
+                            np.argsort(values, axis=0)[
+                                len(values) // 2, :]):
+                            weights[jj, ii] = 1
+                        return weights
+                    this_prof_weights = _median_weight
+            else:
+                this_prof_weights = profile_weights
+            this_profile[ii] = afq_profile(
+                scalar_data,
+                this_sl,
+                dwi_affine,
+                weights=this_prof_weights)
+            profiles[ii].extend(list(this_profile[ii]))
+        nodes = list(np.arange(this_profile[0].shape[0]))
+        bundle_names.extend([bundle_name] * len(nodes))
+        node_numbers.extend(nodes)
+
+    profile_dict = dict()
+    profile_dict["tractID"] = bundle_names
+    profile_dict["nodeID"] = node_numbers
+    for ii, scalar in enumerate(scalar_dict.keys()):
+        profile_dict[scalar] = profiles[ii]
+
+    profile_dframe = pd.DataFrame(profile_dict)
+    meta = dict(source=clean_bundles_file,
+                parameters=get_default_args(afq_profile))
+
+    return profile_dframe, meta
+
+
+@pimms.calc("scalar_dict")
+def get_scalar_dict(scalars, models_data, mapping_data):
+    scalar_dict = {}
+    for scalar in scalars:
+        if isinstance(scalar, str):
+            sc = scalar.lower()
+            scalar_dict[sc] = models_data[f"{sc}_file"]
+        else:
+            scalar_dict[scalar.name] = mapping_data[f"{scalar.name}_file"]
+    return scalar_dict
+
+
+def get_segmentation_plan():
+    segmentation_tasks = with_name([
+        get_scalar_dict,
+        export_sl_counts,
+        export_bundles,
+        clean_bundles,
+        segment,
+        tract_profiles])
+    return pimms.plan(**segmentation_tasks)
