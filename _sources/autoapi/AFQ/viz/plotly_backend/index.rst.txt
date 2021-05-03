@@ -36,6 +36,16 @@ Functions
    AFQ.viz.plotly_backend.visualize_volume
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.plotly_backend.scope
+   AFQ.viz.plotly_backend.viz_logger
+
+
 .. data:: scope
    
 
@@ -303,7 +313,7 @@ Functions
 .. class:: Axes
 
 
-   Bases: :class:`enum.IntEnum`
+   Bases: :py:obj:`enum.IntEnum`
 
    Enum where members are also (and must be) ints
 

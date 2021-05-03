@@ -55,3 +55,8 @@ data set in a directory called `stanford_hardi`::
                 ├── sub-01_ses-01_dwi.bval
                 ├── sub-01_ses-01_dwi.bvec
                 └── sub-01_ses-01_dwi.nii.gz
+
+.. note::
+
+    The name of the pipeline is specified in the dataset_description.json,
+    it is not based on the folder name.

@@ -28,6 +28,7 @@ Functions
    AFQ.registration.slr_registration
 
 
+
 .. function:: syn_register_dwi(dwi, gtab, template=None, **syn_kwargs)
 
    Register DWI data to a template.

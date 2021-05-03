@@ -25,6 +25,7 @@ Functions
    AFQ.viz.utils.visualize_gif_inline
 
 
+
 .. class:: Viz(backend='fury')
 
 

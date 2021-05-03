@@ -21,6 +21,15 @@ Functions
    AFQ.viz.fury_backend.visualize_volume
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.fury_backend.viz_logger
+
+
 .. data:: viz_logger
    
 

@@ -24,10 +24,11 @@ Functions
    AFQ.definitions.utils.find_file
 
 
+
 .. class:: Definition
 
 
-   Bases: :class:`object`
+   Bases: :py:obj:`object`
 
    All Definitions should inherit this.
    For a given subject and session within the API, the definition is used

@@ -19,10 +19,11 @@ Classes
 
 
 
+
 .. class:: FnirtMap(warp_suffix, space_suffix, warp_filters={}, space_filters={})
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    Use an existing FNIRT map. Expects a warp file
    and an image file for each subject / session; image file
@@ -81,7 +82,7 @@ Classes
 .. class:: SynMap(use_prealign=True, affine_kwargs={}, syn_kwargs={})
 
 
-   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
    Calculate a Syn registration for each subject/session
    using reg_subject and reg_template.
@@ -139,7 +140,7 @@ Classes
 .. class:: SlrMap(slr_kwargs={})
 
 
-   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
    Calculate a SLR registration for each subject/session
    using reg_subject and reg_template.
@@ -179,7 +180,7 @@ Classes
 .. class:: AffMap(affine_kwargs={})
 
 
-   Bases: :class:`AFQ.definitions.mapping.GeneratedMapMixin`, :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
    Calculate an affine registration for each subject/session
    using reg_subject and reg_template.

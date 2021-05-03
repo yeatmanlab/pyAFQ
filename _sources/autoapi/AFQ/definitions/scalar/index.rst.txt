@@ -17,10 +17,11 @@ Classes
 
 
 
+
 .. class:: ScalarFile(name, suffix, filters={})
 
 
-   Bases: :class:`AFQ.definitions.mask.MaskFile`
+   Bases: :py:obj:`AFQ.definitions.mask.MaskFile`
 
    Define a scalar based on a file for each subject.
    Assumes the scalar is already in subject space.
@@ -69,7 +70,7 @@ Classes
 .. class:: TemplateScalar(name, path)
 
 
-   Bases: :class:`AFQ.definitions.scalar.ScalarMixin`, :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`ScalarMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
    Define a scalar based on a template.
    This template will be transformed into subject space before use.

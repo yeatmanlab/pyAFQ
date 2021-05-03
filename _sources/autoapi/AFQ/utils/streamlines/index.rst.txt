@@ -19,6 +19,7 @@ Functions
    AFQ.utils.streamlines.split_streamline
 
 
+
 .. function:: add_bundles(t1, t2)
 
    Combine two bundles, using the second bundles' affine and

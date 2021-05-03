@@ -16,7 +16,16 @@ Classes
 
 
 
-.. class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=5, reduction_thr=20, refine=False, pruning_thr=5, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kawrgs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.segmentation.clean_by_endpoints
+
+
+
+.. class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kawrgs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
 
 
    .. method:: _read_tg(self, tg=None)
@@ -315,5 +324,49 @@ Classes
       ..
           !! processed by numpydoc !!
 
+
+
+.. function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)
+
+   Clean a collection of streamlines based on their two endpoints
+   Filters down to only include items that have their starting points close to
+   the targets0 and ending points close to targets1
+   Parameters
+   ----------
+   streamlines : sequence of 3XN_i arrays The collection of streamlines to
+       filter down to.
+   targets0, target1: sequences or Nx3 arrays or None.
+       The targets. Numerical values in the atlas array for targets for the
+       first and last node in each streamline respectively, or NX3 arrays with
+       each row containing the indices for these locations in the atlas.
+       If provided a None, this means no restriction on that end.
+   tol : float, optional A distance tolerance (in units that the coordinates
+       of the streamlines are represented in). Default: 0, which means that
+       the endpoint is exactly in the coordinate of the target ROI.
+   atlas : 3D array or Nifti1Image class instance with a 3D array, optional.
+       Contains numerical values for ROIs. Default: if not provided, assume
+       that targets0 and targets1 are both arrays of indices, and this
+       information is not needed.
+   Yields
+   -------
+   Generator of the filtered collection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 

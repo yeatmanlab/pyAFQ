@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ: Automated Fiber Quantification &#8212; AFQ 0.1 documentation</title>
+    <title>Automated Fiber Quantification &#8212; AFQ 0.1 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet" />
-  <link href="_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
 
     
   <link rel="stylesheet"
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.1e043a052b0af929e4d8.js">
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
 
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -42,26 +42,38 @@
     <link rel="next" title="Installing pyAFQ" href="installation_guide.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
+    
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
+    <div class="container-fluid" id="banner"></div>
+
+    
     <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-
+  <div id="navbar-start">
     
-    <a class="navbar-brand" href="#">
-      <p class="title">AFQ</p>
-    </a>
     
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<a class="navbar-brand" href="#">
+  <img src="_static/logo.png" class="logo" alt="logo">
+</a>
+
 
     
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        <li class="toctree-l1 nav-item">
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="installation_guide.html">
   Installing
   <code class="docutils literal notranslate">
@@ -111,12 +123,27 @@
  </a>
 </li>
 
-        
-      </ul>
-
-      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-      </ul>
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -129,19 +156,32 @@
             <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
-<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
     
   </div>
 </nav>
+<h3><a href="#">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
             </div>
             
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
@@ -150,7 +190,7 @@
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#">
-   AFQ: Automated Fiber Quantification
+   Automated Fiber Quantification
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
@@ -166,9 +206,20 @@
 </ul>
 
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/index.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
           </div>
           
 
@@ -180,11 +231,8 @@
               
               <div>
                 
-  <span class="target" id="home"></span><div class="align-center figure">
-<a class="reference external image-reference" href="http://brainandeducation.com"><img alt="_images/BDE_Banner_revised20160211-01.jpg" src="_images/BDE_Banner_revised20160211-01.jpg" /></a>
-</div>
-<div class="section" id="afq-automated-fiber-quantification">
-<h1>AFQ: Automated Fiber Quantification<a class="headerlink" href="#afq-automated-fiber-quantification" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="home"></span><div class="section" id="automated-fiber-quantification">
+<h1>Automated Fiber Quantification<a class="headerlink" href="#automated-fiber-quantification" title="Permalink to this headline">¶</a></h1>
 <p>Tractography based on diffusion weighted MRI (dMRI) is used to find the major
 white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
@@ -210,11 +258,11 @@ obvious from mean measures of that tract (<a class="reference internal" href="#y
 <caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p>Tractography</p></td>
-<td><p>→ Registration</p></td>
-<td><p>→ Segmentation</p></td>
-<td><p>→ Cleaning</p></td>
-<td><p>→ Profiling</p></td>
-<td><p>→ Visualization</p></td>
+<td><p>→ <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/registration/index.html">Registration</a></p></td>
+<td><p>→ <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html">Segmentation</a></p></td>
+<td><p>→ <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles">Cleaning</a></p></td>
+<td><p>→ <a class="reference external" href="https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile">Profiling</a></p></td>
+<td><p>→ <a class="reference external" href="file:///Users/arokem/source/pyAFQ/docs/build/html/autoapi/AFQ/viz/index.html">Visualization</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -226,12 +274,34 @@ and by a grant from the
 <a class="reference external" href="https://www.moore.org/">Gordon &amp; Betty Moore Foundation</a>,  and from the
 <a class="reference external" href="http://www.sloan.org/">Alfred P. Sloan Foundation</a> to the
 <a class="reference external" href="http://escience.washington.edu/">University of Washington eScience Institute</a>, by a <a class="reference external" href="https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147">CRCNS</a> grant (NIH
-R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by an
-NSF grant (1551330) to Jason Yeatman.</p>
+R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `
+NSF grant 1551330 &lt;<a class="reference external" href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330">https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330</a>&gt;`_ to Jason Yeatman.</p>
 <div class="align-center figure">
 <a class="reference external image-reference" href="http://escience.washington.edu"><img alt="_images/eScience_Logo_HR.png" src="_images/eScience_Logo_HR.png" /></a>
 </div>
+<div class="align-center figure">
+<a class="reference external image-reference" href="http://brainandeducation.com"><img alt="_images/BDE_Banner_revised20160211-01.jpg" src="_images/BDE_Banner_revised20160211-01.jpg" /></a>
+</div>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation_guide.html#installing-the-release-version">Installing the release version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_guide.html#installing-the-development-version">Installing the development version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_guide.html#installing-using-docker">Installing using Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a><ul>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/AFQ/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
 </div>
 </div>
 
@@ -250,18 +320,25 @@ NSF grant (1551330) to Jason Yeatman.</p>
 
       </div>
     </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
 
-    
-  <script src="_static/js/index.1e043a052b0af929e4d8.js"></script>
-
-
-    
+  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright 2018, Ariel Rokem.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+</p>
+    </div>
+    
   </div>
 </footer>
 <script type="text/javascript">

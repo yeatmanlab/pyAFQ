@@ -94,13 +94,13 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # upload the results to some location on s3
     myafq.upload_to_s3(
         s3fs.S3FileSystem(),
-        (f"my_study_bucket/my_study_prefix/derivatives_afq_"
-        f"{seed_mask}_{n_seeds}"))
+        (f"my_study_bucket/my_study_prefix_{seed_mask}_{n_seeds}"
+        f"/derivatives/afq"))
 
 
 ##########################################################################
 # In this example, we will process the data from the following subjects
-subjects = [103818, 105923, 111312]
+subjects = ["103818", "105923", "111312"]
 
 ##########################################################################
 # We will test combinations of different conditions:
@@ -150,7 +150,7 @@ args = attach_keys(args)
 # `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
 # details about the arguments to the object.
 knot = ck.Knot(
-    name='afq_hcp_tractography-201110-0',
+    name='afq-hcp-tractography-201110-0',
     func=afq_process_subject,
     base_image='python:3.8',
     image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
@@ -187,8 +187,7 @@ knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 def afq_combine_profiles(seed_mask, n_seeds):
     from AFQ.api import download_and_combine_afq_profiles
     download_and_combine_afq_profiles(
-        "temp", "my_study_bucket",
-        f"my_study_prefix/derivatives/afq_{seed_mask}_{n_seeds}")
+        "my_study_bucket", f"my_study_prefix_{seed_mask}_{n_seeds}")
 
 
 knot2 = ck.Knot(

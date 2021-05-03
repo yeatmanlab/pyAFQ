@@ -49,11 +49,14 @@ def afq_process_subject(subject):
     log = logging.getLogger(__name__)
 
     # Download the given subject to your local machine from s3
+    # Can find subjects more easily if they are specified in a
+    # BIDS participants.tsv file, even if it is sparse
     study_ixi = afqd.S3BIDSStudy(
         "my_study",
         "my_study_bucket",
         "my_study_prefix",
         subjects=[subject],
+        use_participants_tsv=True,
         anon=False)
     study_ixi.download(
         "local_bids_dir",
@@ -68,7 +71,7 @@ def afq_process_subject(subject):
 
     # define the api AFQ object
     myafq = api.AFQ(
-        local_bids_dir,
+        "local_bids_dir",
         dmriprep="pipeline_name",
         brain_mask=brain_mask,
         viz_backend='plotly',  # this will generate both interactive html and GIFs
@@ -88,7 +91,7 @@ def afq_process_subject(subject):
 # to randomly select 3 subjects without replacement, instead do:
 # subjects = [[1], [2], [3]]
 # see the docstring for S3BIDSStudy.__init__ for more information
-subjects = [123456, 123457, 123458]
+subjects = ["123456", "123457", "123458"]
 
 ##########################################################################
 # Defining a ``Knot`` instance
@@ -105,7 +108,7 @@ subjects = [123456, 123457, 123458]
 # install pyAFQ from GitHub. You can also specify other forks and branches to
 # install from.
 knot = ck.Knot(
-    name='afq_process_subject-201009-0',
+    name='afq-process-subject-201009-0',
     func=afq_process_subject,
     base_image='python:3.8',
     image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
@@ -145,7 +148,7 @@ knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 def afq_combine_profiles(dummy_argument):
     from AFQ.api import download_and_combine_afq_profiles
     download_and_combine_afq_profiles(
-        "temp", "my_study_bucket", "my_study_prefix/derivatives/afq")
+        "my_study_bucket", "my_study_prefix")
 
 
 knot2 = ck.Knot(

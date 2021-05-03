@@ -19,6 +19,15 @@ Functions
    AFQ.utils.volume.dice_coeff
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.volume.logger
+
+
 .. data:: logger
    
 

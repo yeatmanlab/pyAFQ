@@ -20,6 +20,17 @@ Functions
    AFQ.data.organize_stanford_data
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.data.fetch_callosum_templates
+   AFQ.data.fetch_templates
+   AFQ.data.fetch_stanford_hardi_tractography
+
+
 .. data:: fetch_callosum_templates
    
 

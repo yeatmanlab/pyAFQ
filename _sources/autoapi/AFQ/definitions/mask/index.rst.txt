@@ -24,10 +24,11 @@ Classes
 
 
 
+
 .. class:: MaskFile(suffix, filters={})
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    Define a mask based on a file.
    Does not apply any labels or thresholds;
@@ -85,7 +86,7 @@ Classes
 .. class:: FullMask
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    Define a mask which covers a full volume.
 
@@ -120,7 +121,7 @@ Classes
 .. class:: RoiMask(use_presegment=False)
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    Define a mask which is all ROIs or'd together.
 
@@ -156,7 +157,7 @@ Classes
 .. class:: B0Mask(median_otsu_kwargs={})
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    Define a mask using b0 and dipy's median_otsu.
 
@@ -197,7 +198,7 @@ Classes
 .. class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
 
 
-   Bases: :class:`AFQ.definitions.mask.MaskFile`, :class:`AFQ.definitions.mask.CombineMaskMixin`
+   Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
    Define a mask based on labels in a file.
 
@@ -260,7 +261,7 @@ Classes
 .. class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
 
 
-   Bases: :class:`AFQ.definitions.mask.MaskFile`, :class:`AFQ.definitions.mask.CombineMaskMixin`
+   Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
    Define a mask based on thresholding a file.
    Note that this should not be used to directly make a seed mask
@@ -324,7 +325,7 @@ Classes
 .. class:: ScalarMask(scalar)
 
 
-   Bases: :class:`AFQ.definitions.mask.MaskFile`
+   Bases: :py:obj:`MaskFile`
 
    Define a mask based on a scalar.
    Does not apply any labels or thresholds;
@@ -372,7 +373,7 @@ Classes
 .. class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
 
 
-   Bases: :class:`AFQ.definitions.mask.ThresholdedMaskFile`, :class:`AFQ.definitions.mask.ScalarMask`
+   Bases: :py:obj:`ThresholdedMaskFile`, :py:obj:`ScalarMask`
 
    Define a mask based on thresholding a scalar mask.
    Note that this should not be used to directly make a seed mask
@@ -428,7 +429,7 @@ Classes
 .. class:: CombinedMask(mask_list, combine='and')
 
 
-   Bases: :class:`AFQ.definitions.utils.Definition`, :class:`AFQ.definitions.mask.CombineMaskMixin`
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`, :py:obj:`CombineMaskMixin`
 
    Define a mask by combining other masks.
 

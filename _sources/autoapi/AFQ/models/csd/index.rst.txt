@@ -16,6 +16,7 @@ Functions
    AFQ.models.csd.fit_csd
 
 
+
 .. function:: fit_csd(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None, msmt=False)
 
    Fit the CSD model and save file with SH coefficients.

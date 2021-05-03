@@ -24,6 +24,7 @@ Functions
    AFQ.api.make_bundle_dict
 
 
+
 .. function:: make_bundle_dict(bundle_names=BUNDLES, seg_algo='afq', resample_to=False)
 
    Create a bundle dictionary, needed for the segmentation
@@ -66,7 +67,7 @@ Functions
 .. class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, dask_it=False, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None)
 
 
-   Bases: :class:`object`
+   Bases: :py:obj:`object`
 
    ..
        !! processed by numpydoc !!

@@ -25,6 +25,7 @@ Functions
    AFQ.utils.bin.generate_config
 
 
+
 .. function:: parse_string(option, opt, value, parser)
 
 

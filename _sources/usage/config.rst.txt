@@ -284,13 +284,13 @@ See an example configuration file below::
     
     # Parameter passed on to recognize for Recobundles.
     # See Recobundles documentation.
-    # Default: 5
-    model_clust_thr = 5
+    # Default: 1.25
+    model_clust_thr = 1.25
     
     # Parameter passed on to recognize for Recobundles.
     # See Recobundles documentation.
-    # Default: 20
-    reduction_thr = 20
+    # Default: 25
+    reduction_thr = 25
     
     # Parameter passed on to recognize for Recobundles.
     # See Recobundles documentation.
@@ -299,8 +299,8 @@ See an example configuration file below::
     
     # Parameter passed on to recognize for Recobundles.
     # See Recobundles documentation.
-    # Default: 5
-    pruning_thr = 5
+    # Default: 12
+    pruning_thr = 12
     
     # Using AFQ Algorithm.
     # All b-values with values less than or equal to `bo_threshold` are

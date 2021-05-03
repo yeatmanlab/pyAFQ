@@ -16,6 +16,7 @@ Functions
    AFQ.utils.stats.contrast_index
 
 
+
 .. function:: contrast_index(x1, x2, double=True)
 
    Calculate the contrast index between two arrays.
