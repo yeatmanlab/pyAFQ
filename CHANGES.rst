@@ -1,3 +1,18 @@
+0.7.1 (May 03, 2021)
+====================
+This micro release improves the look and feel of the documentation.
+Also, provides tagged docker images.
+
+  * [RF] Builds a tagged image when a tag is pushed. (#677)
+  * [DOC] Update docs to clarify where pipeline name comes from (#686)
+  * [FIX] download and combine profile fixes and improvements (#685)
+  * [FIX] cloudknot example fixes (#682)
+  * [WIP] [FIX] Attempt to get doc examples to run again (#683)
+  * [DOC]: Overhauls docs front page. (#673)
+  * [BF]: Update s3fs version. (#678)
+  * [FIX] More lenient reco defaults (#657)
+
+
 0.7 (April 06, 2021)
 ====================
 This version includes upgrades and updates to a variety of methods.
