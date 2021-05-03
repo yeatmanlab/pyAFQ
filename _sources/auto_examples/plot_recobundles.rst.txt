@@ -278,11 +278,11 @@ the AFQ waypoint ROI approach.
     Tracking...
     16664
     Segmenting fiber groups...
-    /opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:684: UserWarning:
+    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:685: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
-    /opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/dipy/segment/bundles.py:807: UserWarning:
+    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:808: UserWarning:
 
     Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
 
@@ -315,7 +315,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 18 minutes  59.745 seconds)
+   **Total running time of the script:** ( 21 minutes  16.436 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:
