@@ -327,7 +327,7 @@ def test_AFQ_data():
                          nib.load(myafq.dwi_file["01"]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
                          nib.load(myafq.dti["01"]).shape[:3])
-        myafq.export_rois()
+        myafq.rois
         shutil.rmtree(op.join(
             bids_path,
             'derivatives/afq'))
@@ -364,7 +364,7 @@ def test_AFQ_anisotropic():
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
     # check that the apm map was made
-    myafq.get_mapping()
+    myafq.mapping
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
@@ -417,8 +417,9 @@ def test_AFQ_slr():
         reg_template='hcp_atlas',
         mapping=SlrMap())
 
-    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
+    bundles = aus.tgram_to_bundles(
+        tgram, myafq.bundle_dict, myafq.img["01"])
     npt.assert_(len(bundles['CST_L']) > 0)
 
 
@@ -437,8 +438,8 @@ def test_AFQ_reco():
             'seg_algo': 'reco',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
     myafq.export_all()
 
@@ -456,8 +457,8 @@ def test_AFQ_reco80():
             'seg_algo': 'reco80',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.get_clean_bundles()[0], myafq.dwi_img[0])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.dwi_img[0])
+    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
 
 
@@ -535,7 +536,7 @@ def test_AFQ_FA():
         dmriprep='vistasoft',
         reg_template='dti_fa_template',
         reg_subject='dti_fa_subject')
-    myafq.export_rois()
+    myafq.rois
 
 
 @pytest.mark.nightly
@@ -547,8 +548,8 @@ def test_DKI_profile():
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     dmriprep='dipy')
-    myafq.get_dki_fa()
-    myafq.get_dki_md()
+    myafq.dki_fa
+    myafq.dki_md
 
 
 def test_auto_cli():
@@ -636,31 +637,31 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    tgram = load_tractogram(myafq.bundles["01"], myafq.dwi_img["01"])
+    tgram = load_tractogram(myafq.bundles["01"], myafq.img["01"])
 
     bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.dwi_img["01"])
+        tgram, myafq.bundle_dict, myafq.img["01"])
     npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
-    myafq.export_rois()
+    myafq.rois
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
-    myafq.export_bundles()
+    myafq.export_bundles
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
-    tract_profile_fname = myafq.tract_profiles["01"]
+    tract_profile_fname = myafq.profiles["01"]
     tract_profiles = pd.read_csv(tract_profile_fname)
     assert tract_profiles.shape == (500, 6)
 
-    myafq.plot_tract_profiles()
+    myafq.tract_profile_plots
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
@@ -690,7 +691,7 @@ def test_AFQ_data_waypoint():
                            rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
                             dmriprep='vistasoft'),
-                  REGISTRATION=dict(
+                  DATA=dict(
                       robust_tensor_fitting=True),
                   BUNDLES=dict(
                       bundle_info=bundle_names,
@@ -718,13 +719,13 @@ def test_AFQ_data_waypoint():
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
-    myafq.export_rois()
+    myafq.rois
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    myafq.export_bundles()
+    myafq.export_bundles
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'bundles',

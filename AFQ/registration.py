@@ -86,8 +86,8 @@ def write_mapping(mapping, fname):
 
     """
     if isinstance(mapping, DiffeomorphicMap):
-        mapping_data = np.array([mapping.forward.T, mapping.backward.T]).T
-        nib.save(nib.Nifti1Image(mapping_data, mapping.codomain_world2grid),
+        mapping_imap = np.array([mapping.forward.T, mapping.backward.T]).T
+        nib.save(nib.Nifti1Image(mapping_imap, mapping.codomain_world2grid),
                  fname)
     else:
         np.save(fname, mapping.affine)

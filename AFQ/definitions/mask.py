@@ -6,7 +6,7 @@ from dipy.segment.mask import median_otsu
 from dipy.align import resample
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file
-from AFQ.tasks.utils import as_img
+from AFQ.tasks.decorators import as_img
 
 
 __all__ = ["MaskFile", "FullMask", "RoiMask", "B0Mask", "LabelledMaskFile",
@@ -173,7 +173,7 @@ class RoiMask(Definition):
 
     def get_mask_getter(self):
         @as_img
-        def mask_getter(subses_dict, dwi_affine, mapping,
+        def mask_getter(subses_dict, dwi_affine, mapping_imap,
                         bundle_dict, segmentation_params):
             mask_data = None
             if self.use_presegment:
@@ -187,7 +187,7 @@ class RoiMask(Definition):
                     if bundle_dict[bundle_name]['rules'][idx]:
                         warped_roi = auv.transform_inverse_roi(
                             roi,
-                            mapping,
+                            mapping_imap["mapping"],
                             bundle_name=bundle_name)
 
                         if mask_data is None:
@@ -389,16 +389,8 @@ class ScalarMask(Definition):
 
     # overrides MaskFile
     def get_mask_getter(self):
-        def mask_getter(subses_dict, dwi_affine, scalar_dict):
-            valid_scalars = list(scalar_dict.keys())
-            if self.scalar not in valid_scalars:
-                raise RuntimeError((
-                    f"scalar should be one of"
-                    f" {', '.join(valid_scalars)}"
-                    f", you input {self.scalar}"))
-
-            scalar_file = scalar_dict[self.scalar]
-
+        def mask_getter(subses_dict, dwi_affine, data_imap):
+            scalar_file = data_imap[self.scalar + "_file"]
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
         return mask_getter
 
@@ -485,7 +477,7 @@ class PFTMask(Definition):
         return probseg_funcs
 
 
-# class CombinedMask(Definition, CombineMaskMixin):  # TODO: redo this
+# class CombinedMask(Definition, CombineMaskMixin):  # TODO
 #     """
 #     Define a mask by combining other masks.
 

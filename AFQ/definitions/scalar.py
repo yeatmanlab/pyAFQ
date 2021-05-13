@@ -16,7 +16,8 @@ __all__ = ["ScalarFile", "TemplateScalar"]
 
 class ScalarMixin():
     def get_for_subses(self):
-        def get_for_subses_getter(subses_dict, dwi_affine, reg_template, mapping):
+        def get_for_subses_getter(
+                subses_dict, dwi_affine, reg_template, mapping):
             scalar_file = get_fname(
                 subses_dict,
                 f'_model-{self.name}.nii.gz')

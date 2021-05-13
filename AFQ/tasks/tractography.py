@@ -1,10 +1,10 @@
 import nibabel as nib
-import numpy as np
 from time import time
 
 import pimms
 
-from AFQ.tasks.utils import as_file, as_img, with_name
+from AFQ.tasks.decorators import as_file, as_img
+from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 
@@ -34,18 +34,18 @@ def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
 
 @pimms.calc("streamlines_file")
 @as_file('_tractography.trk', include_track=True)
-def streamlines(subses_dict, model_data, seed_file, stop_file,
+def streamlines(subses_dict, data_imap, seed_file, stop_file,
                 tracking_params):
     this_tracking_params = tracking_params.copy()
 
     # get odf_model
     odf_model = this_tracking_params["odf_model"]
     if odf_model == "DTI":
-        params_file = model_data["dti_file"]
+        params_file = data_imap["dti_params_file"]
     elif odf_model == "CSD":
-        params_file = model_data["csd_file"]
+        params_file = data_imap["csd_params_file"]
     elif odf_model == "DKI":
-        params_file = model_data["dki_file"]
+        params_file = data_imap["dki_params_file"]
     else:
         raise TypeError((
             f"The ODF model you gave ({odf_model}) was not recognized"))

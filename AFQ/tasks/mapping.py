@@ -5,10 +5,10 @@ import numpy as np
 import logging
 
 import pimms
-from AFQ.tasks.utils import as_file, get_fname, with_name
+from AFQ.tasks.decorators import as_file
+from AFQ.tasks.utils import get_fname, with_name
 import AFQ.data as afd
 import AFQ.utils.volume as auv
-from dipy.io.streamline import load_tractogram
 
 
 logger = logging.getLogger('AFQ.api.mapping')
@@ -16,11 +16,11 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 @pimms.calc("b0_warped_file")
 @as_file('_b0_in_MNI.nii.gz')
-def export_registered_b0(subses_dict, data_data, mapping, reg_template):
-    mean_b0 = nib.load(data_data["b0_file"]).get_fdata()
+def export_registered_b0(subses_dict, data_imap, mapping, reg_template):
+    mean_b0 = nib.load(data_imap["b0_file"]).get_fdata()
     warped_b0 = mapping.transform(mean_b0)
     warped_b0 = nib.Nifti1Image(warped_b0, reg_template.affine)
-    return warped_b0, dict(b0InSubject=data_data["b0_file"])
+    return warped_b0, dict(b0InSubject=data_imap["b0_file"])
 
 
 @pimms.calc("template_xform_file")
@@ -31,7 +31,7 @@ def template_xform(subses_dict, dwi_affine, mapping, reg_template):
     return template_xform, dict()
 
 
-@pimms.calc("roi_files")
+@pimms.calc("rois_file")
 def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
     rois_dir = op.join(subses_dict['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
@@ -66,7 +66,7 @@ def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
                 meta_fname = fname.split('.')[0] + '.json'
                 afd.write_json(meta_fname, meta)
             roi_files[bundle].append(fname)
-    return {'roi_files': roi_files}
+    return {'rois_file': roi_files}
 
 
 @pimms.calc("mapping")
@@ -76,17 +76,17 @@ def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(reg_subject_spec, data_data, model_data):
+def get_reg_subject(reg_subject_spec, data_imap):
     filename_dict = {
-        "b0": data_data["b0_file"],
-        "power_map": model_data["pmap_file"],
-        "dti_fa_subject": model_data["dti_fa_file"],
-        "subject_sls": data_data["b0_file"],
+        "b0": data_imap["b0_file"],
+        "power_map": data_imap["pmap_file"],
+        "dti_fa_subject": data_imap["dti_fa_file"],
+        "subject_sls": data_imap["b0_file"],
     }
     if reg_subject_spec in filename_dict:
         reg_subject_spec = filename_dict[reg_subject_spec]
     img = nib.load(reg_subject_spec)
-    bm = nib.load(data_data["brain_mask_file"]).get_fdata().astype(bool)
+    bm = nib.load(data_imap["brain_mask_file"]).get_fdata().astype(bool)
     masked_data = img.get_fdata()
     masked_data[~bm] = 0
     img = nib.Nifti1Image(masked_data, img.affine)

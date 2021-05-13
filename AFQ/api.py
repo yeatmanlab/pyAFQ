@@ -1,25 +1,15 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import logging
-import functools
 from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
-from AFQ.definitions.mapping import (SynMap, FnirtMap, ItkMap)
+from AFQ.definitions.mapping import (SynMap, FnirtMap, ItkMap, SlrMap)
 from AFQ.definitions.utils import Definition
 from AFQ.utils.bin import get_default_args
-from AFQ.viz.utils import Viz, visualize_tract_profiles
-import AFQ.utils.volume as auv
 import AFQ.segmentation as seg
-import AFQ.utils.streamlines as aus
-import dipy.reconst.dki as dpy_dki
-import dipy.reconst.dti as dpy_dti
 import AFQ.tractography as aft
-from AFQ.models.csd import _fit as csd_fit
-from AFQ.models.dki import _fit as dki_fit
-from AFQ.models.dti import noise_from_b0
-from AFQ.models.dti import _fit as dti_fit
 import AFQ.data as afd
+from AFQ.viz.utils import Viz
 
 from AFQ.tasks.data import get_data_plan
-from AFQ.tasks.models import get_model_plan
 from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
@@ -27,30 +17,13 @@ from AFQ.tasks.viz import get_viz_plan
 
 from .version import version as pyafq_version
 import pandas as pd
-import dask.dataframe as ddf
 import os
 import os.path as op
 import json
 import s3fs
 from time import time
-import pimms
-from pimms.calculation import calc_tr
-
-import numpy as np
 import nibabel as nib
 
-import dipy.core.gradients as dpg
-import dipy.tracking.utils as dtu
-from dipy.io.streamline import save_tractogram, load_tractogram
-from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.gradients import read_bvals_bvecs
-from dipy.align import resample
-from dipy.stats.analysis import afq_profile, gaussian_weights
-from dipy.reconst import shm
-from dipy.reconst.dki_micro import axonal_water_fraction
-from dipy.tracking.streamline import set_number_of_points, values_from_volume
-
-import bids
 from bids.layout import BIDSLayout
 import bids.config as bids_config
 try:
@@ -123,21 +96,21 @@ def make_bundle_dict(bundle_names=BUNDLES,
     if seg_algo == "afq":
         if "FP" in bundle_names and "Occipital" in bundle_names:
             logger.warning((
-                f"FP and Occipital bundles are co-located, and AFQ"
-                f" assigns each streamline to only one bundle."
-                f" Only Occipital will be used."))
+                "FP and Occipital bundles are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only Occipital will be used."))
             bundle_names.remove("FP")
         if "FA" in bundle_names and "Orbital" in bundle_names:
             logger.warning((
-                f"FA and Orbital bundles are co-located, and AFQ"
-                f" assigns each streamline to only one bundle."
-                f" Only Orbital will be used."))
+                "FA and Orbital bundles are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only Orbital will be used."))
             bundle_names.remove("FA")
         if "FA" in bundle_names and "AntFrontal" in bundle_names:
             logger.warning((
-                f"FA and AntFrontal bundles are co-located, and AFQ"
-                f" assigns each streamline to only one bundle."
-                f" Only AntFrontal will be used."))
+                "FA and AntFrontal bundles are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only AntFrontal will be used."))
             bundle_names.remove("FA")
         templates = afd.read_templates(resample_to=resample_to)
         callosal_templates = afd.read_callosum_templates(
@@ -227,37 +200,6 @@ def make_bundle_dict(bundle_names=BUNDLES,
     return afq_bundles
 
 
-def _getter(attr, subses_dict=False):
-    def _getter_helper(self, wf_dict, results, attr):
-        for subject in self.subjects:
-            if subses_dict:
-                results[subject] = wf_dict[subject]['subses_dict'][attr]
-            else:
-                results[subject] = wf_dict[subject][attr]
-
-    def _this_getter(func):
-        @functools.wraps(func)
-        def wrapper_getter(self):
-            results = {}
-            if len(self.sessions) > 1:
-                for session in self.sessions:
-                    results[session] = {}
-                    _getter_helper(
-                        self,
-                        self.wf_dict[session],
-                        results[session],
-                        attr)
-            else:
-                _getter_helper(
-                    self,
-                    self.wf_dict,
-                    results,
-                    attr)
-            return results
-        return wrapper_getter
-    return _this_getter
-
-
 class AFQ(object):
     """
     """
@@ -276,6 +218,7 @@ class AFQ(object):
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
                  mapping=SynMap(),
+                 csd_fit_kwargs={},
                  profile_weights="gauss",
                  bundle_info=None,
                  dask_it=False,
@@ -313,22 +256,22 @@ class AFQ(object):
             If None, tractography will be performed automatically.
             Default: None
         b0_threshold : int, optional
-            [REGISTRATION] The value of b under which
+            [DATA] The value of b under which
             it is considered to be b0. Default: 50.
         patch2self : bool, optional
-            [REGISTRATION] Whether to use patch2self
+            [DATA] Whether to use patch2self
             to denoise the dwi data.
             Default: False
         robust_tensor_fitting : bool, optional
-            [REGISTRATION] Whether to use robust_tensor_fitting when
+            [DATA] Whether to use robust_tensor_fitting when
             doing dti. Only applies to dti.
             Default: False
         min_bval : float, optional
-            [REGISTRATION] Minimum b value you want to use
+            [DATA] Minimum b value you want to use
             from the dataset (other than b0), inclusive.
             If None, there is no minimum limit. Default: None
         max_bval : float, optional
-            [REGISTRATION] Maximum b value you want to use
+            [DATA] Maximum b value you want to use
             from the dataset (other than b0), inclusive.
             If None, there is no maximum limit. Default: None
         reg_subject : str, Nifti1Image, dict, optional
@@ -355,11 +298,15 @@ class AFQ(object):
             and no brain mask will be applied to the template.
             Default: B0Mask()
         mapping : instance of class from `AFQ.definitions.mapping`, optional
-            [REGISTRATION]  This defines how to either create a mapping from
+            [REGISTRATION] This defines how to either create a mapping from
             each subject space to template space or load a mapping from
             another software. If creating a map, will register reg_subject and
             reg_template.
             Default: SynMap()
+        csd_fit_kwargs : dict
+            [DATA] Additional parameters to pass to csd_fit_model in
+            AFQ.models.csd.
+            Default : {}
         profile_weights : str, 1D array, 2D array callable, optional
             [PROFILE] How to weight each streamline (1D) or each node (2D)
             when calculating the tract-profiles. If callable, this is a
@@ -528,6 +475,7 @@ class AFQ(object):
 
         self.b0_threshold = b0_threshold
         self.patch2self = patch2self
+        self.csd_fit_kwargs = csd_fit_kwargs
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
@@ -638,25 +586,32 @@ class AFQ(object):
             self.sessions = [None]
 
         # construct pimms plans
-        plans = {
-            "data": get_data_plan(self.brain_mask_definition),
-            "model": get_model_plan(),
-            "tractography": get_tractography_plan(
-                self.custom_tractography_bids_filters, self.tracking_params),
-            "mapping": get_mapping_plan(self.reg_subject, self.scalars),
-            "segmentation": get_segmentation_plan(),
-            "viz": get_viz_plan()
-        }
+        if isinstance(mapping, SlrMap):
+            plans = {  # if using SLR map, do tractography first
+                "data": get_data_plan(self.brain_mask_definition),
+                "tractography": get_tractography_plan(
+                    self.custom_tractography_bids_filters,
+                    self.tracking_params),
+                "mapping": get_mapping_plan(self.reg_subject, self.scalars),
+                "segmentation": get_segmentation_plan(),
+                "viz": get_viz_plan()}
+        else:
+            plans = {
+                "data": get_data_plan(self.brain_mask_definition),
+                "mapping": get_mapping_plan(self.reg_subject, self.scalars),
+                "tractography": get_tractography_plan(
+                    self.custom_tractography_bids_filters,
+                    self.tracking_params),
+                "segmentation": get_segmentation_plan(),
+                "viz": get_viz_plan()}
 
         self.sub_list = []
         self.ses_list = []
         self.dwi_file_list = []
         self.results_dir_list = []
         self.wf_dict = {}
-        for session in self.sessions:
-            if len(self.sessions) > 1:
-                self.wf_dict[session] = {}
-            for subject in self.subjects:
+        for subject in self.subjects:
+            for session in self.sessions:
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
 
                 if session is not None:
@@ -797,6 +752,7 @@ class AFQ(object):
                     profile_weights=self.profile_weights,
                     viz_backend=self.viz,
                     best_scalar=best_scalar,
+                    csd_fit_kwargs=self.csd_fit_kwargs,
                     tracking_params=self.tracking_params,
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params)
@@ -804,15 +760,16 @@ class AFQ(object):
                 # chain together a complete plan from individual plans
                 previous_data = {}
                 for name, plan in plans.items():
-                    previous_data[f"{name}_data"] = plan(
+                    previous_data[f"{name}_imap"] = plan(
                         **input_data,
                         **previous_data)
 
                 if len(self.sessions) > 1:
-                    # TODO: subject then session
-                    self.wf_dict[session][subject] = previous_data["viz_data"]
+                    if subject not in self.wf_dict:
+                        self.wf_dict[subject] = {}
+                    self.wf_dict[subject][session] = previous_data["viz_imap"]
                 else:
-                    self.wf_dict[subject] = previous_data["viz_data"]
+                    self.wf_dict[subject] = previous_data["viz_imap"]
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
@@ -860,164 +817,52 @@ class AFQ(object):
             else:
                 return self.bundle_info.copy()
 
-    @_getter("results_dir", subses_dict=True)
-    def get_results_dir(self):
-        pass
-    results_dir = property(get_results_dir, get_results_dir)
+    def __getattribute__(self, attr):
+        try:
+            return object.__getattribute__(self, attr)
+        except AttributeError:
+            pass
 
-    @_getter("dwi_file", subses_dict=True)
-    def get_dwi_file(self):
-        pass
-    dwi_file = property(get_dwi_file, get_dwi_file)
+        _sub_attrs = [
+            "data_imap", "mapping_imap",
+            "tractography_imap", "segmentation_imap",
+            "subses_dict"]
 
-    @_getter("gtab")
-    def get_gtab(self):
-        pass
-    gtab = property(get_gtab, get_gtab)
+        def _getter_helper(wf_dict, attr):
+            attr_file = attr + "_file"
+            results = {}
+            if attr in wf_dict:
+                results = wf_dict[attr]
+            elif attr_file in wf_dict:
+                results = wf_dict[attr_file]
+            else:
+                for sub_attr in _sub_attrs:
+                    if attr in wf_dict[sub_attr]:
+                        results = wf_dict[sub_attr][attr]
+                        break
+                    elif attr_file in wf_dict[sub_attr]:
+                        results = wf_dict[sub_attr][attr_file]
+                        break
+            return results
 
-    @_getter("dwi_affine")
-    def get_dwi_affine(self):
-        pass
-    dwi_affine = property(get_dwi_affine, get_dwi_affine)
-
-    @_getter("dwi_img")
-    def get_dwi_img(self):
-        pass
-    dwi_img = property(get_dwi_img, get_dwi_img)
-
-    @_getter("b0_file")
-    def get_b0(self):
-        pass
-    b0 = property(get_b0, get_b0)
-
-    @_getter("masked_b0_file")
-    def get_masked_b0(self):
-        pass
-    masked_b0_file = property(get_masked_b0, get_masked_b0)
-
-    @_getter("brain_mask_file")
-    def get_brain_mask(self):
-        pass
-    brain_mask = property(get_brain_mask, get_brain_mask)
-
-    @_getter("dti_params_file")
-    def get_dti(self):
-        pass
-    dti = property(get_dti, get_dti)
-
-    @_getter("dti_fa_file")
-    def get_dti_fa(self):
-        pass
-    dti_fa = property(get_dti_fa, get_dti_fa)
-
-    @_getter("dti_cfa_file")
-    def get_dti_cfa(self):
-        pass
-    dti_cfa = property(get_dti_cfa, get_dti_cfa)
-
-    @_getter("dti_pdd_file")
-    def get_dti_pdd(self):
-        pass
-    dti_pdd = property(get_dti_pdd, get_dti_pdd)
-
-    @_getter("dti_md_file")
-    def get_dti_md(self):
-        pass
-    dti_md = property(get_dti_md, get_dti_md)
-
-    @_getter("dki_params_file")
-    def get_dki(self):
-        pass
-    dki = property(get_dki, get_dki)
-
-    @_getter("dki_mk_file")
-    def get_dki_mk(self):
-        pass
-    dki_mk = property(get_dki_mk, get_dki_mk)
-
-    @_getter("dki_fa_file")
-    def get_dki_fa(self):
-        pass
-    dki_fa = property(get_dki_fa, get_dki_fa)
-
-    @_getter("dki_md_file")
-    def get_dki_md(self):
-        pass
-    dki_md = property(get_dki_md, get_dki_md)
-
-    @_getter("dki_awf_file")
-    def get_dki_awf(self):
-        pass
-    dki_awf = property(get_dki_awf, get_dki_awf)
-
-    @_getter("mapping")
-    def get_mapping(self):
-        pass
-    mapping = property(get_mapping, get_mapping)
-
-    @_getter("streamlines_file")
-    def get_streamlines(self):
-        pass
-    streamlines = property(get_streamlines, get_streamlines)
-
-    @_getter("bundles_file")
-    def get_bundles(self):
-        pass
-    bundles = property(get_bundles, get_bundles)
-
-    @_getter("clean_bundles_file")
-    def get_clean_bundles(self):
-        pass
-    clean_bundles = property(get_clean_bundles, get_clean_bundles)
-
-    @_getter("profiles_file")
-    def get_tract_profiles(self):
-        pass
-    tract_profiles = property(get_tract_profiles, get_tract_profiles)
-
-    @_getter("template_xform_file")
-    def get_template_xform(self):
-        pass
-    template_xform = property(get_template_xform, get_template_xform)
-
-    @_getter("roi_files")
-    def export_rois(self):
-        pass
-
-    @_getter("seed_file")
-    def export_seed_mask(self):
-        pass
-
-    @_getter("stop_file")
-    def export_stop_mask(self):
-        pass
-
-    @_getter("is_bundles_exported")
-    def export_bundles(self):
-        pass
-
-    @_getter("sl_counts_file")
-    def export_sl_counts(self):
-        pass
-
-    @_getter("all_bundles_figure_fname")
-    def viz_bundles(self):
-        pass
-
-    @_getter("indiv_bundles_exported")
-    def viz_ROIs(self):
-        pass
-
-    @_getter("tract_profiles_files")
-    def plot_tract_profiles(self):
-        pass
-
-    @_getter("b0_warped_file")
-    def export_registered_b0(self):
-        pass
+        results = {}
+        for subject in self.subjects:
+            if len(self.sessions) > 1:
+                results[subject] = {}
+                for session in self.sessions:
+                    results[subject][session] = \
+                        _getter_helper(
+                            self.wf_dict[subject][session],
+                            attr)
+            else:
+                results[subject] = \
+                    _getter_helper(
+                        self.wf_dict[subject],
+                        attr)
+        return results
 
     def combine_profiles(self):
-        tract_profiles_dict = self.tract_profiles
+        tract_profiles_dict = self.profiles
         if len(self.sessions) > 1:
             tract_profiles_list = []
             for _, subject_dict in tract_profiles_dict.items():
@@ -1036,17 +881,18 @@ class AFQ(object):
         start_time = time()
         if not isinstance(self.mapping_definition, FnirtMap)\
                 and not isinstance(self.mapping_definition, ItkMap):
-            self.export_registered_b0()
-        self.get_template_xform()
-        self.export_bundles()
-        self.export_sl_counts()
-        self.get_tract_profiles()
-        if len(self.tract_profiles) > 1:
+            self.b0_warped
+        self.template_xform
+        self.export_bundles
+        self.sl_counts
+        self.tract_profile_plots
+        self.profiles
+        if len(self.sessions) * len(self.subjects) > 1:
             self.combine_profiles()
-        self.viz_bundles()
+        self.all_bundles_figure
         if self.seg_algo == "afq":
-            self.viz_ROIs()
-            self.export_rois()
+            self.export_indiv_bundles
+            self.rois
         self.logger.info(
             "Time taken for export all: " + str(time() - start_time))
 

@@ -9,7 +9,8 @@ import logging
 
 import pimms
 
-from AFQ.tasks.utils import as_file, get_fname, with_name
+from AFQ.tasks.decorators import as_file
+from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 from AFQ.utils.bin import get_default_args
@@ -27,9 +28,9 @@ logger = logging.getLogger('AFQ.api.seg')
 
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, bundle_dict, data_data, reg_template, mapping,
-            tractography_data, tracking_params, segmentation_params):
-    streamlines_file = tractography_data["streamlines_file"]
+def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
+            tractography_imap, tracking_params, segmentation_params):
+    streamlines_file = tractography_imap["streamlines_file"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
     img = nib.load(subses_dict['dwi_file'])
@@ -44,10 +45,10 @@ def segment(subses_dict, bundle_dict, data_data, reg_template, mapping,
         bundle_dict,
         tg,
         subses_dict['dwi_file'],
-        data_data["bval_file"],
-        data_data["bvec_file"],
+        data_imap["bval_file"],
+        data_imap["bvec_file"],
         reg_template=reg_template,
-        mapping=mapping)
+        mapping=mapping_imap["mapping"])
 
     if segmentation_params['return_idx']:
         idx = {bundle: bundles[bundle]['idx'].tolist()
@@ -134,7 +135,7 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
     return sft, meta
 
 
-@pimms.calc("is_bundles_exported")
+@pimms.calc("export_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                    bundle_dict, tracking_params, segmentation_params):
     img = nib.load(subses_dict['dwi_file'])
@@ -277,15 +278,15 @@ def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
 
 
 @pimms.calc("scalar_dict")
-def get_scalar_dict(scalars, models_data, mapping_data):
+def get_scalar_dict(scalars, data_imap, mapping_imap):
     scalar_dict = {}
     for scalar in scalars:
         if isinstance(scalar, str):
             sc = scalar.lower()
-            scalar_dict[sc] = models_data[f"{sc}_file"]
+            scalar_dict[sc] = data_imap[f"{sc}_file"]
         else:
-            scalar_dict[scalar.name] = mapping_data[f"{scalar.name}_file"]
-    return scalar_dict
+            scalar_dict[scalar.name] = mapping_imap[f"{scalar.name}_file"]
+    return {"scalar_dict": scalar_dict}
 
 
 def get_segmentation_plan():
