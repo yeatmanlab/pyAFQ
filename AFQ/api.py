@@ -218,7 +218,6 @@ class AFQ(object):
                  reg_subject="power_map",
                  brain_mask=B0Mask(),
                  mapping=SynMap(),
-                 csd_fit_kwargs={},
                  profile_weights="gauss",
                  bundle_info=None,
                  dask_it=False,
@@ -227,17 +226,14 @@ class AFQ(object):
                  viz_backend="plotly_no_gif",
                  tracking_params=None,
                  segmentation_params=None,
-                 clean_params=None):
+                 clean_params=None,
+                 **kwargs):
         '''
         Initialize an AFQ object.
         Some special notes on parameters:
         In tracking_params, parameters with the suffix mask which are also
         a mask from AFQ.definitions.mask will be handled automatically by the
-        api. You can set additional parameters for a given step of the process
-        by directly calling the relevant api function. For example,
-        to set the sh_order for csd to 4, call:
-        myafq._csd(sh_order=4)
-        before otherwise generating the csd file.
+        api. 
 
         Parameters
         ----------
@@ -303,10 +299,6 @@ class AFQ(object):
             another software. If creating a map, will register reg_subject and
             reg_template.
             Default: SynMap()
-        csd_fit_kwargs : dict
-            [DATA] Additional parameters to pass to csd_fit_model in
-            AFQ.models.csd.
-            Default : {}
         profile_weights : str, 1D array, 2D array callable, optional
             [PROFILE] How to weight each streamline (1D) or each node (2D)
             when calculating the tract-profiles. If callable, this is a
@@ -353,6 +345,11 @@ class AFQ(object):
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
             function.
+        kwargs : additional optional parameters
+            [KWARGS] You can set additional parameters for a given step
+            of the process.
+            For example, to set the sh_order for csd to 4, do:
+            api.AFQ(my_path, sh_order=4)
         '''
         if not isinstance(bids_path, str):
             raise TypeError("bids_path must be a string")
@@ -475,7 +472,6 @@ class AFQ(object):
 
         self.b0_threshold = b0_threshold
         self.patch2self = patch2self
-        self.csd_fit_kwargs = csd_fit_kwargs
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
@@ -756,7 +752,8 @@ class AFQ(object):
                     csd_fit_kwargs=self.csd_fit_kwargs,
                     tracking_params=self.tracking_params,
                     segmentation_params=self.segmentation_params,
-                    clean_params=self.clean_params)
+                    clean_params=self.clean_params,
+                    **kwargs)
 
                 # chain together a complete plan from individual plans
                 previous_data = {}

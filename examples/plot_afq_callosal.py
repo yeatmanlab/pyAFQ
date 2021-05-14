@@ -56,5 +56,5 @@ myafq = api.AFQ(bids_path=op.join(afd.afq_home,
 # This would run the script and visualize the bundles using the plotly
 # interactive visualization, which should automatically open in a
 # new browser window.
-bundle_html = myafq.viz_bundles(export=True, n_points=50)
-plotly.io.show(bundle_html[0])
+bundle_html = myafq.all_bundles_figure
+plotly.io.show(bundle_html["01"])

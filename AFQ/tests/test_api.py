@@ -276,7 +276,7 @@ def test_AFQ_fury():
         bids_path=bids_path,
         dmriprep='vistasoft',
         viz_backend="fury")
-    myafq.viz_bundles()
+    myafq.all_bundles_figure
 
 
 @pytest.mark.nightly3
