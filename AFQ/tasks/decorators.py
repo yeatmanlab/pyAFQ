@@ -48,30 +48,52 @@ def has_args(og_func):
     return _has_args
 
 
-# TODO: use introspection to get argument list names
-# first arg must be the subses_dict
-# to include tracking or segmentation params,
-# they must be last and in that order.
+# get argument values, given names, from list of args
+def get_args(func, names, args, inside=False):
+    vals = []
+    for name in names:
+        for ii, arg_name in enumerate(list(
+                inspect.signature(func).parameters.keys())):
+            if inside:
+                if name in arg_name:
+                    vals.append(args[ii])
+                    break
+            else:
+                if arg_name == name:
+                    vals.append(args[ii])
+                    break
+
+    if len(vals) < len(names):
+        raise NameError(f"{names} requested but {vals} found in get_args")
+    return vals
+
+
+# subses_dict must be in arguments
+# if including tracking or segmentation params in fname,
+# also include them in args
 def as_file(suffix, include_track=False, include_seg=False):
     def _as_file(func):
         @functools.wraps(func)
         @has_args(func)
-        def wrapper_as_file(subses_dict, *args, **kwargs):
-            tracking_params = None
-            segmentation_params = None
-            if include_track and include_seg:
-                tracking_params = args[-2]
-                segmentation_params = args[-1]
-            elif include_track:
-                tracking_params = args[-1]
-            elif include_seg:
-                segmentation_params = args[-1]
+        def wrapper_as_file(*args, **kwargs):
+            subses_dict = get_args(
+                func, ["subses_dict"], args)[0]
+            if include_track:
+                tracking_params = get_args(
+                    func, ["tracking_params"], args)[0]
+            else:
+                tracking_params = None
+            if include_seg:
+                segmentation_params = get_args(
+                    func, ["segmentation_params"], args)[0]
+            else:
+                segmentation_params = None
             this_file = get_fname(
                 subses_dict, suffix,
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
             if not op.exists(this_file):
-                img_trk_or_csv, meta = func(subses_dict, *args, **kwargs)
+                img_trk_or_csv, meta = func(*args, **kwargs)
 
                 logger.info(f"Saving {this_file}")
                 if isinstance(img_trk_or_csv, nib.Nifti1Image):
@@ -91,15 +113,15 @@ def as_file(suffix, include_track=False, include_seg=False):
     return _as_file
 
 
-# second arg must be dwi_affine
-# third arg must be a mask to load
+# args must include dwi_affine
 def as_model(func):
     @functools.wraps(func)
     @has_args(func)
-    def wrapper_as_model(farg, dwi_affine,
-                         *args, **kwargs):
+    def wrapper_as_model(*args, **kwargs):
+        dwi_affine = get_args(
+            func, ["dwi_affine"], args)[0]
         start_time = time()
-        model, meta = func(farg, dwi_affine, *args, **kwargs)
+        model, meta = func(*args, **kwargs)
         meta['timing'] = time() - start_time
         model_img = nib.Nifti1Image(
             model,
@@ -108,28 +130,31 @@ def as_model(func):
     return wrapper_as_model
 
 
-# second arg must be dwi_affine
-# third arg must be params file
+# args must include dwi_affine
+# args must include arg with name that contains "param"
 def as_tf_deriv(tf_name):
     def _as_tf_deriv(func):
         @functools.wraps(func)
         @has_args(func)
-        def wrapper_as_tf_deriv(farg, dwi_affine, params,
-                                *args, **kwargs):
-            img = nib.Nifti1Image(func(
-                farg, dwi_affine, params, *args, **kwargs), dwi_affine)
+        def wrapper_as_tf_deriv(*args, **kwargs):
+            dwi_affine = get_args(
+                func, ["dwi_affine"], args)[0]
+            params = get_args(
+                func, ["param"], args, inside=True)[0]
+            img = nib.Nifti1Image(func(*args, **kwargs), dwi_affine)
             return img, {f"{tf_name}ParamsFile": params}
         return wrapper_as_tf_deriv
     return _as_tf_deriv
 
 
-# second arg must be affine
+# args must include arg with name that contains affine
 def as_img(func):
     @functools.wraps(func)
     @has_args(func)
-    def wrapper_as_img(farg, affine, *args, **kwargs):
-        data, meta = func(
-            farg, affine, *args, **kwargs)
+    def wrapper_as_img(*args, **kwargs):
+        affine = get_args(
+            func, ["affine"], args, inside=True)[0]
+        data, meta = func(*args, **kwargs)
         img = nib.Nifti1Image(data.astype(np.float32), affine)
         return img, meta
     return wrapper_as_img
