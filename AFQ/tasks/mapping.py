@@ -10,6 +10,9 @@ from AFQ.tasks.utils import get_fname, with_name
 import AFQ.data as afd
 import AFQ.utils.volume as auv
 
+from dipy.io.streamline import load_tractogram
+from dipy.io.stateful_tractogram import Space
+
 
 logger = logging.getLogger('AFQ.api.mapping')
 
@@ -75,6 +78,31 @@ def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
         subses_dict, reg_subject, reg_template)
 
 
+@pimms.calc("mapping")
+def sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template,
+                streamlines_file):
+    tg = load_tractogram(
+        streamlines_file, reg_subject,
+        Space.VOX, bbox_valid_check=False)
+    tg.to_rasmm()
+
+    atlas_fname = op.join(
+        afd.afq_home,
+        'hcp_atlas_16_bundles',
+        'Atlas_in_MNI_Space_16_bundles',
+        'whole_brain',
+        'whole_brain_MNI.trk')
+    if not op.exists(atlas_fname):
+        afd.fetch_hcp_atlas_16_bundles()
+    hcp_atlas = load_tractogram(
+        atlas_fname,
+        'same', bbox_valid_check=False)
+    return mapping_definition.get_for_subses(
+        subses_dict, reg_subject, reg_template,
+        subject_sls=tg.streamlines,
+        template_sls=hcp_atlas)
+
+
 @pimms.calc("reg_subject")
 def get_reg_subject(reg_subject_spec, data_imap):
     filename_dict = {
@@ -93,7 +121,7 @@ def get_reg_subject(reg_subject_spec, data_imap):
     return img
 
 
-def get_mapping_plan(reg_subject, scalars):
+def get_mapping_plan(reg_subject, scalars, use_sls=False):
     mapping_tasks = with_name([
         export_registered_b0, template_xform, export_rois, mapping,
         get_reg_subject])
@@ -103,5 +131,8 @@ def get_mapping_plan(reg_subject, scalars):
         if not isinstance(scalar, str):
             mapping_tasks["{scalar.name}_file_res"] =\
                 pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
+
+    if use_sls:
+        mapping_tasks["mapping_res"] = sls_mapping
 
     return pimms.plan(**mapping_tasks)

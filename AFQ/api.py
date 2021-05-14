@@ -592,11 +592,12 @@ class AFQ(object):
                 "tractography": get_tractography_plan(
                     self.custom_tractography_bids_filters,
                     self.tracking_params),
-                "mapping": get_mapping_plan(self.reg_subject, self.scalars),
+                "mapping": get_mapping_plan(
+                    self.reg_subject, self.scalars, use_sls=True),
                 "segmentation": get_segmentation_plan(),
                 "viz": get_viz_plan()}
         else:
-            plans = {
+            plans = {  # Otherwise, do mapping first
                 "data": get_data_plan(self.brain_mask_definition),
                 "mapping": get_mapping_plan(self.reg_subject, self.scalars),
                 "tractography": get_tractography_plan(

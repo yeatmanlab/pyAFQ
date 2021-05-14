@@ -477,8 +477,8 @@ class PFTMask(Definition):
         return probseg_funcs
 
 
-# class CombinedMask(Definition, CombineMaskMixin):  # TODO
-#     """
+# class CombinedMask(Definition, CombineMaskMixin):
+#     """  # TODO: can this be done in current system?
 #     Define a mask by combining other masks.
 
 #     Parameters

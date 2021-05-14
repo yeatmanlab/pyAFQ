@@ -231,7 +231,8 @@ class GeneratedMapMixin(object):
         else:
             return np.load(prealign_file)
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+    def get_for_subses(self, subses_dict, reg_subject, reg_template,
+                       subject_sls=None, template_sls=None):
         mapping_file, meta_fname = self.get_fnames(
             self.extension, subses_dict)
 
@@ -243,7 +244,9 @@ class GeneratedMapMixin(object):
         if not op.exists(mapping_file):
             start_time = time()
             mapping = self.gen_mapping(
-                subses_dict, reg_subject, reg_template, reg_prealign)
+                subses_dict, reg_subject, reg_template,
+                subject_sls, template_sls,
+                reg_prealign)
             total_time = time() - start_time
 
             reg.write_mapping(mapping, mapping_file)
@@ -297,6 +300,7 @@ class SynMap(GeneratedMapMixin, Definition):
         pass
 
     def gen_mapping(self, subses_dict, reg_subject, reg_template,
+                    subject_sls, template_sls,
                     reg_prealign):
         _, mapping = syn_registration(
             reg_subject.get_fdata(),
@@ -310,7 +314,7 @@ class SynMap(GeneratedMapMixin, Definition):
         return mapping
 
 
-class SlrMap(GeneratedMapMixin, Definition):  # TODO
+class SlrMap(GeneratedMapMixin, Definition):
     """
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
@@ -333,14 +337,14 @@ class SlrMap(GeneratedMapMixin, Definition):  # TODO
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls,
-                    reg_subject_img, reg_subject_sls, reg_prealign):
+    def gen_mapping(self, subses_dict, reg_template, reg_subject,
+                    subject_sls, template_sls, reg_prealign):
         return reg.slr_registration(
-            reg_subject_sls, reg_template_sls,
-            moving_affine=reg_subject_img.affine,
-            moving_shape=reg_subject_img.shape,
-            static_affine=reg_template_img.affine,
-            static_shape=reg_template_img.shape,
+            subject_sls, template_sls,
+            moving_affine=reg_subject.affine,
+            moving_shape=reg_subject.shape,
+            static_affine=reg_template.affine,
+            static_shape=reg_template.shape,
             **self.slr_kwargs)
 
 
@@ -368,6 +372,7 @@ class AffMap(GeneratedMapMixin, Definition):
         pass
 
     def gen_mapping(self, subses_dict, reg_subject, reg_template,
+                    subject_sls, template_sls,
                     reg_prealign):
         return ConformedAffineMapping(np.linalg.inv(self.prealign(
             subses_dict, reg_subject, reg_template, save=False)))
