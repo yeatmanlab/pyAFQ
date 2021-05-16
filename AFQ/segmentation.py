@@ -615,8 +615,10 @@ class Segmentation:
             if self.parallel_segmentation["engine"] != "serial":
                 in_list = []
                 sl_idxs = idx_above_prob[0]
+                parallelizing = True
             else:
                 sl_idxs = tqdm(idx_above_prob[0])
+                parallelizing = False
 
             for sl_idx in sl_idxs:
                 if fiber_probabilities[sl_idx] > self.prob_threshold:
@@ -635,7 +637,7 @@ class Segmentation:
                 fiber_prob = fiber_probabilities[sl_idx]
 
                 # if parallel, collect the streamlines now
-                if self.parallel_segmentation:
+                if parallelizing:
                     in_list.append((sl, fiber_prob, sl_idx))
                 else:
                     min_dist_coords[sl_idx, bundle_idx, 0],\
@@ -647,7 +649,7 @@ class Segmentation:
                             exclude_roi_tols, fiber_prob)
 
             # collects results from the submitted streamlines
-            if self.parallel_segmentation:
+            if parallelizing:
                 results = parfor(
                     _is_streamline_in_ROIs_parallel, in_list,
                     func_args=[
@@ -897,14 +899,14 @@ class Segmentation:
         if self.presegment_bundle_dict is not None:
             roiseg = Segmentation(**self.presegment_kawrgs)
             roiseg.segment(
-                    self.presegment_bundle_dict,
-                    self.tg,
-                    self.fdata,
-                    self.fbval,
-                    self.fbvec,
-                    reg_template=self.reg_template,
-                    mapping=self.mapping,
-                    reg_prealign=self.reg_prealign)
+                self.presegment_bundle_dict,
+                self.tg,
+                self.fdata,
+                self.fbval,
+                self.fbvec,
+                reg_template=self.reg_template,
+                mapping=self.mapping,
+                reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups
         else:
             self.move_streamlines(tg, self.reg_algo)
@@ -951,7 +953,7 @@ class Segmentation:
                 if self.presegment_bundle_dict is not None:
                     moved_fname = f"{bundle}_presegmentation.trk"
                 else:
-                    moved_fname = f"whole_brain.trk"
+                    moved_fname = "whole_brain.trk"
                 moved_sft = StatefulTractogram(
                     self.moved_sl,
                     self.reg_template,
@@ -1210,7 +1212,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
     # Check whether it's already in the right format:
     sp_is_idx = (targets0 is None
                  or (isinstance(targets0, np.ndarray)
-                    and targets0.shape[1] == 3))
+                     and targets0.shape[1] == 3))
 
     ep_is_idx = (targets1 is None
                  or (isinstance(targets1, np.ndarray)
