@@ -142,14 +142,22 @@ dki_params = pimms.calc("dki_params_file")(dki)
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
 @as_model
 def csd(subses_dict, dwi_affine,
-        brain_mask_file, gtab, data, csd_fit_kwargs, msmt=False):
+        brain_mask_file, gtab, data,
+        csd_response=None, csd_sh_order=None,
+        csd_lambda_=1, csd_tau=0.1, msmt=False):
     mask =\
         nib.load(brain_mask_file).get_fdata()
     csdf = csd_fit_model(
         gtab, data,
         mask=mask,
-        msmt=msmt, **csd_fit_kwargs)
-    meta = csd_fit_kwargs.copy()
+        response=csd_response, sh_order=csd_sh_order,
+        lambda_=csd_lambda_, tau=csd_tau,
+        msmt=msmt)
+    meta = dict(
+        SphericalHarmonicDegree=csd_sh_order,
+        ResponseFunctionTensor=csd_response,
+        lambda_=csd_lambda_,
+        tau=csd_tau)
     meta["SphericalHarmonicBasis"] = "DESCOTEAUX"
     if msmt:
         model_file = "mcsd.py"

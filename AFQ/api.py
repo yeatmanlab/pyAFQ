@@ -201,28 +201,8 @@ def make_bundle_dict(bundle_names=BUNDLES,
     return afq_bundles
 
 
-_sub_attrs = [
-    "data_imap", "mapping_imap",
-    "tractography_imap", "segmentation_imap",
-    "subses_dict"]
-
-
-def _getter_helper(wf_dict, attr):
-    attr_file = attr + "_file"
-    results = {}
-    if attr in wf_dict:
-        results = wf_dict[attr]
-    elif attr_file in wf_dict:
-        results = wf_dict[attr_file]
-    else:
-        for sub_attr in _sub_attrs:
-            if attr in wf_dict[sub_attr]:
-                results = wf_dict[sub_attr][attr]
-                break
-            elif attr_file in wf_dict[sub_attr]:
-                results = wf_dict[sub_attr][attr_file]
-                break
-    return results
+def _getter_helper(wf_dict, attr_name):
+    return wf_dict[attr_name]
 
 
 class AFQ(object):
@@ -245,7 +225,9 @@ class AFQ(object):
                  mapping=SynMap(),
                  profile_weights="gauss",
                  bundle_info=None,
-                 dask_it=False,
+                 parallel_params={
+                     "n_jobs": -1, "engine": "joblib",
+                     "backend": "loky"},
                  scalars=["dti_fa", "dti_md"],
                  virtual_frame_buffer=False,
                  viz_backend="plotly_no_gif",
@@ -338,9 +320,10 @@ class AFQ(object):
             If None, will get all appropriate bundles for the chosen
             segmentation algorithm.
             Default: None
-        dask_it : bool, optional
-            [COMPUTE] Whether to use a dask DataFrame object.
-            Default: False
+        parallel_params : dict, optional
+            [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
+            to parallelize computations across subjects and sessions.
+            Default: {"n_jobs": -1, "engine": "joblib", "backend": "loky"}
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
@@ -448,8 +431,8 @@ class AFQ(object):
                     isinstance(bundle_info, dict))):
             raise TypeError(
                 "bundle_info must be None, a list of strings, or a dict")
-        if not isinstance(dask_it, bool):
-            raise TypeError("dask_it must be a bool")
+        if not isinstance(parallel_params, dict):
+            raise TypeError("parallel_params must be a dict")
         if scalars is not None and not (
                 isinstance(scalars, list)
                 and (
@@ -477,6 +460,7 @@ class AFQ(object):
                 "clean_params must be None or a dict")
 
         self.logger = logging.getLogger('AFQ.api')
+        self.parallel_params = parallel_params
         self.wf_dict = {}
 
         # validate input and fail early
@@ -607,6 +591,16 @@ class AFQ(object):
         else:
             self.sessions = [None]
 
+        # do not bother to parallelize if less than 2 subject-sessions
+        if len(self.sessions) * len(self.subjects) < 2:
+            self.parallel_params["engine"] = "serial"
+
+        # do not parallelize segmentation if parallelizing across
+        # subject-sessions
+        if self.parallel_params["engine"] != "serial":
+            self.segmentation_params["parallel_segmentation"]["engine"] =\
+                "serial"
+
         # construct pimms plans
         if isinstance(mapping, SlrMap):
             plans = {  # if using SLR map, do tractography first
@@ -628,11 +622,18 @@ class AFQ(object):
                 "segmentation": get_segmentation_plan(),
                 "viz": get_viz_plan()}
 
+        # define sections in workflow dictionary
+        self._sub_attrs = [
+            "data_imap", "mapping_imap",
+            "tractography_imap", "segmentation_imap",
+            "subses_dict"]
+
         self.sub_list = []
         self.ses_list = []
         self.dwi_file_list = []
         self.results_dir_list = []
         for subject in self.subjects:
+            self.wf_dict[subject] = {}
             for session in self.sessions:
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
 
@@ -786,12 +787,7 @@ class AFQ(object):
                         **input_data,
                         **previous_data)
 
-                if len(self.sessions) > 1:
-                    if subject not in self.wf_dict:
-                        self.wf_dict[subject] = {}
-                    self.wf_dict[subject][session] = previous_data["viz_imap"]
-                else:
-                    self.wf_dict[subject] = previous_data["viz_imap"]
+                self.wf_dict[subject][session] = previous_data["viz_imap"]
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
@@ -840,38 +836,73 @@ class AFQ(object):
                 return self.bundle_info.copy()
 
     def __getattribute__(self, attr):
-        if len(self.wf_dict) < 1:
+        # check if normal attr exists first
+        try:
             return object.__getattribute__(self, attr)
+        except AttributeError:
+            pass
+
+        # find what name to use
+        first_dict = self.wf_dict[self.subjects[0]][self.sessions[0]]
+        attr_file = attr + "_file"
+        attr_name = None
+        if attr in first_dict:
+            attr_name = attr
+            section = None
+        elif attr_file in first_dict:
+            attr_name = attr_file
+            section = None
         else:
-            try:
-                return object.__getattribute__(self, attr)
-            except AttributeError:
-                pass
+            for sub_attr in self._sub_attrs:
+                if attr in first_dict[sub_attr]:
+                    attr_name = attr
+                    section = sub_attr
+                    break
+                elif attr_file in first_dict[sub_attr]:
+                    attr_name = attr_file
+                    section = sub_attr
+                    break
 
+        # attr not found, force default behaviour
+        if attr_name is None:
+            return object.__getattribute__(self, attr)
+
+        # iterate over subjects / sessions,
+        # decide if they need to be calculated or not
         in_list = []
-        for subject in self.subjects:
-            if len(self.sessions) > 1:
-                for session in self.sessions:
-                    in_list.append((self.wf_dict[subject][session]))
-            else:
-                in_list.append((self.wf_dict[subject]))
-
-        par_results = parfor(  # TODO: only parfor if not calc'd
-            _getter_helper, in_list,
-            func_args=[attr],
-            **self.parallel_params)
-        i = 0
-
+        to_calc_list = []
         results = {}
         for subject in self.subjects:
-            if len(self.sessions) > 1:
-                results[subject] = {}
-                for session in self.sessions:
-                    results[subject][session] = par_results[i]
-                    i = i + 1
-            else:
-                results[subject] = par_results[i]
-                i = i + 1
+            results[subject] = {}
+            for session in self.sessions:
+                wf_dict = self.wf_dict[subject][session]
+                if section is not None:
+                    wf_dict = wf_dict[section]
+                if ((self.parallel_params.get("engine", False) != "serial")
+                        and (hasattr(wf_dict, "efferents"))
+                        and (attr_name not in wf_dict.efferents)):
+                    in_list.append((wf_dict))
+                    to_calc_list.append((subject, session))
+                else:
+                    results[subject][session] =\
+                        _getter_helper(wf_dict, attr_name)
+
+        # if some need to be calculated, do those in parallel
+        if len(to_calc_list) > 0:
+            par_results = parfor(
+                _getter_helper, in_list,
+                func_args=[attr_name],
+                **self.parallel_params)
+
+            for i, subses in enumerate(to_calc_list):
+                subject, session = subses
+                results[subject][session] = par_results[i]
+
+        # If only one session, collapse session dimension
+        if len(self.sessions) == 1:
+            for subject in self.subjects:
+                results[subject] = results[subject][self.sessions[0]]
+
         return results
 
     def combine_profiles(self):

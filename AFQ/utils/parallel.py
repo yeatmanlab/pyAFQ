@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 
 def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
-           backend="threading", func_args=[], func_kwargs={}):
+           backend="threading", func_args=[], func_kwargs={},
+           **kwargs):
     """
     Parallel for loop for numpy arrays
 
@@ -33,6 +34,10 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         Positional arguments to `func`.
     func_kwargs : list, optional
         Keyword arguments to `func`.
+    kwargs : dict, optional
+        Additional arguments to pass to either joblib.Parallel
+        or dask.compute depending on the engine used.
+        Default: {}
 
     Returns
     -------
@@ -43,7 +48,9 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
 
     """
     if engine == "joblib":
-        p = joblib.Parallel(n_jobs=n_jobs, backend=backend)
+        p = joblib.Parallel(
+            n_jobs=n_jobs, backend=backend,
+            **kwargs)
         d = joblib.delayed(func)
         d_l = []
         for in_element in in_list:
@@ -63,10 +70,10 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
         d = [dask.delayed(p)(i) for i in in_list]
         if backend == "multiprocessing":
             results = dask.compute(*d, scheduler="processes",
-                                   workers=n_jobs)
+                                   workers=n_jobs, **kwargs)
         elif backend == "threading":
             results = dask.compute(*d, scheduler="threads",
-                                   workers=n_jobs)
+                                   workers=n_jobs, **kwargs)
         else:
             raise ValueError("%s is not a backend for dask" % backend)
 
