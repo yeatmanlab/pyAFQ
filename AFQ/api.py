@@ -8,6 +8,7 @@ import AFQ.segmentation as seg
 import AFQ.tractography as aft
 import AFQ.data as afd
 from AFQ.viz.utils import Viz
+from AFQ.utils.parallel import parfor
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -200,6 +201,30 @@ def make_bundle_dict(bundle_names=BUNDLES,
     return afq_bundles
 
 
+_sub_attrs = [
+    "data_imap", "mapping_imap",
+    "tractography_imap", "segmentation_imap",
+    "subses_dict"]
+
+
+def _getter_helper(wf_dict, attr):
+    attr_file = attr + "_file"
+    results = {}
+    if attr in wf_dict:
+        results = wf_dict[attr]
+    elif attr_file in wf_dict:
+        results = wf_dict[attr_file]
+    else:
+        for sub_attr in _sub_attrs:
+            if attr in wf_dict[sub_attr]:
+                results = wf_dict[sub_attr][attr]
+                break
+            elif attr_file in wf_dict[sub_attr]:
+                results = wf_dict[sub_attr][attr_file]
+                break
+    return results
+
+
 class AFQ(object):
     """
     """
@@ -233,7 +258,7 @@ class AFQ(object):
         Some special notes on parameters:
         In tracking_params, parameters with the suffix mask which are also
         a mask from AFQ.definitions.mask will be handled automatically by the
-        api. 
+        api.
 
         Parameters
         ----------
@@ -452,6 +477,7 @@ class AFQ(object):
                 "clean_params must be None or a dict")
 
         self.logger = logging.getLogger('AFQ.api')
+        self.wf_dict = {}
 
         # validate input and fail early
         if not op.exists(bids_path):
@@ -606,7 +632,6 @@ class AFQ(object):
         self.ses_list = []
         self.dwi_file_list = []
         self.results_dir_list = []
-        self.wf_dict = {}
         for subject in self.subjects:
             for session in self.sessions:
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
@@ -749,7 +774,6 @@ class AFQ(object):
                     profile_weights=self.profile_weights,
                     viz_backend=self.viz,
                     best_scalar=best_scalar,
-                    csd_fit_kwargs=self.csd_fit_kwargs,
                     tracking_params=self.tracking_params,
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params,
@@ -816,47 +840,38 @@ class AFQ(object):
                 return self.bundle_info.copy()
 
     def __getattribute__(self, attr):
-        try:
+        if len(self.wf_dict) < 1:
             return object.__getattribute__(self, attr)
-        except AttributeError:
-            pass
+        else:
+            try:
+                return object.__getattribute__(self, attr)
+            except AttributeError:
+                pass
 
-        _sub_attrs = [
-            "data_imap", "mapping_imap",
-            "tractography_imap", "segmentation_imap",
-            "subses_dict"]
-
-        def _getter_helper(wf_dict, attr):
-            attr_file = attr + "_file"
-            results = {}
-            if attr in wf_dict:
-                results = wf_dict[attr]
-            elif attr_file in wf_dict:
-                results = wf_dict[attr_file]
+        in_list = []
+        for subject in self.subjects:
+            if len(self.sessions) > 1:
+                for session in self.sessions:
+                    in_list.append((self.wf_dict[subject][session]))
             else:
-                for sub_attr in _sub_attrs:
-                    if attr in wf_dict[sub_attr]:
-                        results = wf_dict[sub_attr][attr]
-                        break
-                    elif attr_file in wf_dict[sub_attr]:
-                        results = wf_dict[sub_attr][attr_file]
-                        break
-            return results
+                in_list.append((self.wf_dict[subject]))
+
+        par_results = parfor(  # TODO: only parfor if not calc'd
+            _getter_helper, in_list,
+            func_args=[attr],
+            **self.parallel_params)
+        i = 0
 
         results = {}
         for subject in self.subjects:
             if len(self.sessions) > 1:
                 results[subject] = {}
                 for session in self.sessions:
-                    results[subject][session] = \
-                        _getter_helper(
-                            self.wf_dict[subject][session],
-                            attr)
+                    results[subject][session] = par_results[i]
+                    i = i + 1
             else:
-                results[subject] = \
-                    _getter_helper(
-                        self.wf_dict[subject],
-                        attr)
+                results[subject] = par_results[i]
+                i = i + 1
         return results
 
     def combine_profiles(self):
