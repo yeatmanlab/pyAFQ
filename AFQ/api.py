@@ -57,7 +57,7 @@ RECO_BUNDLES_16 = [
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
 
 RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
-                   "CC_ForcepsMinor", "CC", "CCMid", "CNII", "CNII", "CNIII",
+                   "CC_ForcepsMinor", "CC", "CCMid", "CNII", "CNIII",
                    "CNIV", "CNV", "CNVII", "CNVIII", "CS", "CST", "CT",
                    "CTT", "DLF", "EMC", "F_L_R", "FPT", "ICP", "IFOF", "ILF",
                    "LL", "MCP", "MdLF", "ML", "MLF", "OPT", "OR", "PC", "PPT",
