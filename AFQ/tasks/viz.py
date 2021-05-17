@@ -27,7 +27,7 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
     return vol
 
 
-@pimms.calc("all_bundles_figure_file")
+@pimms.calc("all_bundles_figure")
 def viz_bundles(subses_dict,
                 dwi_affine,
                 viz_backend,
@@ -94,7 +94,7 @@ def viz_bundles(subses_dict,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
     afd.write_json(meta_fname, meta)
-    return fname
+    return figure
 
 
 @pimms.calc("export_indiv_bundles")
@@ -109,20 +109,21 @@ def viz_indivBundle(subses_dict,
                     segmentation_params,
                     reg_template,
                     best_scalar,
-                    xform_volume=False,
-                    cbv_lims=[None, None],
-                    xform_color_by_volume=False,
-                    volume_opacity=0.3,
-                    n_points=40):
+                    xform_volume_indiv=False,
+                    cbv_lims_indiv=[None, None],
+                    xform_color_by_volume_indiv=False,
+                    volume_opacity_indiv=0.3,
+                    n_points_indiv=40):
     mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
     color_by_volume = data_imap[best_scalar + "_file"]
 
     start_time = time()
-    volume = _viz_prepare_vol(volume, xform_volume, mapping, scalar_dict)
+    volume = _viz_prepare_vol(
+        volume, xform_volume_indiv, mapping, scalar_dict)
     color_by_volume = _viz_prepare_vol(
-        color_by_volume, xform_color_by_volume, mapping, scalar_dict)
+        color_by_volume, xform_color_by_volume_indiv, mapping, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -135,7 +136,7 @@ def viz_indivBundle(subses_dict,
         uid = bundle_dict[bundle_name]['uid']
         figure = viz_backend.visualize_volume(
             volume,
-            opacity=volume_opacity,
+            opacity=volume_opacity_indiv,
             flip_axes=flip_axes,
             interact=False,
             inline=False)
@@ -143,10 +144,10 @@ def viz_indivBundle(subses_dict,
             figure = viz_backend.visualize_bundles(
                 segmentation_imap["clean_bundles_file"],
                 color_by_volume=color_by_volume,
-                cbv_lims=cbv_lims,
+                cbv_lims=cbv_lims_indiv,
                 bundle_dict=bundle_dict,
                 bundle=uid,
-                n_points=n_points,
+                n_points=n_points_indiv,
                 flip_axes=flip_axes,
                 interact=False,
                 inline=False,
