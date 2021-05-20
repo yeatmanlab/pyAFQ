@@ -2231,7 +2231,8 @@ class AFQ(object):
 
 
 def download_and_combine_afq_profiles(bucket,
-                                      study_s3_prefix="", out_file=None,
+                                      study_s3_prefix="", deriv_name=None,
+                                      out_file=None,
                                       upload=False, session=None,
                                       **kwargs):
     """
@@ -2245,6 +2246,9 @@ def download_and_combine_afq_profiles(bucket,
         The S3 prefix common to all of the study objects on S3.
     out_file : filename, optional
         Filename for the combined output CSV.
+    deriv_name : str, optional
+        If deriv_name is not None, it should be a string that specifies
+        which derivatives folder to download and combine profiles from.
     upload : bool or str, optional
         If True, upload the combined CSV to Amazon S3 at
         bucket/study_s3_prefix/derivatives/afq. If a string,
@@ -2263,6 +2267,8 @@ def download_and_combine_afq_profiles(bucket,
         kwargs["subjects"] = "all"
     if "anon" not in kwargs:
         kwargs["anon"] = False
+    if deriv_name is None:
+        deriv_name = True
 
     with nib.tmpdirs.InTemporaryDirectory() as t_dir:
         remote_study = afd.S3BIDSStudy(
@@ -2273,7 +2279,7 @@ def download_and_combine_afq_profiles(bucket,
         remote_study.download(
             t_dir,
             include_modality_agnostic=False,
-            include_derivs="afq",
+            include_derivs=deriv_name,
             include_derivs_dataset_description=True,
             suffix="profiles.csv")
         temp_study = BIDSLayout(t_dir, validate=False, derivatives=True)
