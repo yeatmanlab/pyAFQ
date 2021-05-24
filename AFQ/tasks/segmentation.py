@@ -140,7 +140,7 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
     return sft, meta
 
 
-@pimms.calc("bundles")
+@pimms.calc("indiv_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                    bundle_dict, tracking_params, segmentation_params):
     img = nib.load(subses_dict['dwi_file'])
