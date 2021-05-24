@@ -521,7 +521,7 @@ def test_AFQ_custom_subject_reg():
         reg_subject={
             "suffix": "customb0",
             "scope": "vistasoft"})
-    my_afq.export_rois()
+    my_afq.rois()
 
 
 # Requires large download
@@ -644,14 +644,14 @@ def test_AFQ_data_waypoint():
     npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
-    myafq.rois
+    myafq.export_rois()
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
-    myafq.export_bundles
+    myafq.export_bundles()
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'bundles',
@@ -725,7 +725,7 @@ def test_AFQ_data_waypoint():
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    myafq.export_bundles
+    myafq.bundles
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'bundles',

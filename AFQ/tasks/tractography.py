@@ -9,6 +9,9 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 
 
+outputs = ["seed_file", "stop_file", "streamlines_file"]
+
+
 @pimms.calc("seed_file")
 @as_file('_seed_mask.nii.gz')
 @as_img

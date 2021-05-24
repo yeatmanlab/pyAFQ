@@ -24,6 +24,7 @@ import json
 import s3fs
 from time import time
 import nibabel as nib
+from importlib import import_module
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -201,8 +202,20 @@ def make_bundle_dict(bundle_names=BUNDLES,
     return afq_bundles
 
 
+# this is parallelized below
 def _getter_helper(wf_dict, attr_name):
     return wf_dict[attr_name]
+
+
+# define sections in workflow dictionary
+_sub_attrs = [
+    "data_imap", "mapping_imap",
+    "tractography_imap", "segmentation_imap",
+    "subses_dict"]
+
+task_outputs = []
+for task_module in ["data", "mapping", "segmentation", "tractography", "viz"]:
+    task_outputs.extend(import_module(f"AFQ.tasks.{task_module}").outputs)
 
 
 class AFQ(object):
@@ -622,12 +635,6 @@ class AFQ(object):
                 "segmentation": get_segmentation_plan(),
                 "viz": get_viz_plan()}
 
-        # define sections in workflow dictionary
-        self._sub_attrs = [
-            "data_imap", "mapping_imap",
-            "tractography_imap", "segmentation_imap",
-            "subses_dict"]
-
         self.sub_list = []
         self.ses_list = []
         self.dwi_file_list = []
@@ -812,7 +819,7 @@ class AFQ(object):
         elif img_l == "hcp_atlas":
             img = afd.read_mni_template(mask=self.mask_template)
         else:
-            img = nib.load(img)
+            img = nib.load(self.reg_template)
 
         return img
 
@@ -853,7 +860,7 @@ class AFQ(object):
             attr_name = attr_file
             section = None
         else:
-            for sub_attr in self._sub_attrs:
+            for sub_attr in _sub_attrs:
                 if attr in first_dict[sub_attr]:
                     attr_name = attr
                     section = sub_attr
@@ -927,7 +934,7 @@ class AFQ(object):
                 and not isinstance(self.mapping_definition, ItkMap):
             self.b0_warped
         self.template_xform
-        self.export_bundles
+        self.bundles
         self.sl_counts
         self.tract_profile_plots
         self.profiles
@@ -935,7 +942,7 @@ class AFQ(object):
             self.combine_profiles()
         self.all_bundles_figure
         if self.seg_algo == "afq":
-            self.export_indiv_bundles
+            self.indiv_bundles_figures
             self.rois
         self.logger.info(
             "Time taken for export all: " + str(time() - start_time))
@@ -943,6 +950,16 @@ class AFQ(object):
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
         s3fs.put(self.afq_path, remote_path, recursive=True)
+
+
+# iterate through all attributes, setting methods for each one
+for output in task_outputs:
+    exec(f"def export_{output}(self):\n    return self.{output}")
+    fn = locals()[f"export_{output}"]
+    if output[-5:] == "_file":
+        setattr(AFQ, f"export_{output[:-5]}", fn)
+    else:
+        setattr(AFQ, f"export_{output}", fn)
 
 
 def download_and_combine_afq_profiles(bucket,

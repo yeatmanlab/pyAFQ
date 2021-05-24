@@ -23,6 +23,14 @@ from AFQ.models.dti import _fit as dti_fit_model
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
+outputs = [
+    "data", "gtab", "img", "b0_file", "masked_b0_file", "dti_tf",
+    "dti_params_file", "dki_tf", "dki_params_file", "csd_params_file",
+    "pmap_file", "dti_fa_file", "dti_cfa_file", "dti_pdd_file",
+    "dti_md_file", "dki_fa_file", "dki_md_file", "dki_awf_file",
+    "dki_mk_file", "brain_mask_file"]
+
+
 @pimms.calc("data", "gtab", "img")
 def get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval,
                   max_bval, filter_b=True, patch2self=False):

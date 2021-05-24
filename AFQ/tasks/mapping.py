@@ -17,6 +17,11 @@ from dipy.io.stateful_tractogram import Space
 logger = logging.getLogger('AFQ.api.mapping')
 
 
+outputs = [
+    "b0_warped_file", "template_xform_file", "rois_file", "mapping",
+    "reg_subject"]
+
+
 @pimms.calc("b0_warped_file")
 @as_file('_b0_in_MNI.nii.gz')
 def export_registered_b0(subses_dict, data_imap, mapping, reg_template):

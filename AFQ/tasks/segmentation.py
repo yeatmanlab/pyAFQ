@@ -26,6 +26,11 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 logger = logging.getLogger('AFQ.api.seg')
 
 
+outputs = [
+    "bundles_file", "clean_bundles_file", "bundles", "sl_counts_file",
+    "profiles_file", "scalar_dict"]
+
+
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
 def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
@@ -135,7 +140,7 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
     return sft, meta
 
 
-@pimms.calc("export_bundles")
+@pimms.calc("bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                    bundle_dict, tracking_params, segmentation_params):
     img = nib.load(subses_dict['dwi_file'])

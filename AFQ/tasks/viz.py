@@ -17,6 +17,9 @@ from AFQ.viz.utils import visualize_tract_profiles
 logger = logging.getLogger('AFQ.api.viz')
 
 
+outputs = ["all_bundles_figure", "indiv_bundles_figures"]
+
+
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
     if vol in scalar_dict.keys():
         vol = nib.load(scalar_dict[vol]).get_fdata()
@@ -97,7 +100,7 @@ def viz_bundles(subses_dict,
     return figure
 
 
-@pimms.calc("export_indiv_bundles")
+@pimms.calc("indiv_bundles_figures")
 def viz_indivBundle(subses_dict,
                     dwi_affine,
                     viz_backend,
