@@ -651,7 +651,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
-    myafq.export_bundles()
+    myafq.export_indiv_bundles()
     assert op.exists(op.join(
         myafq.results_dir["01"],
         'bundles',
