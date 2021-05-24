@@ -27,7 +27,7 @@ logger = logging.getLogger('AFQ.api.seg')
 
 
 outputs = [
-    "bundles_file", "clean_bundles_file", "bundles", "sl_counts_file",
+    "bundles_file", "clean_bundles_file", "indiv_bundles", "sl_counts_file",
     "profiles_file", "scalar_dict"]
 
 
@@ -144,11 +144,11 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                    bundle_dict, tracking_params, segmentation_params):
     img = nib.load(subses_dict['dwi_file'])
-    for bundles_file, folder in zip([clean_bundles_file, bundles_file],
-                                    ['clean_bundles', 'bundles']):
+    for this_bundles_file, folder in zip([clean_bundles_file, bundles_file],
+                                         ['clean_bundles', 'bundles']):
         bundles_dir = op.join(subses_dict['results_dir'], folder)
         os.makedirs(bundles_dir, exist_ok=True)
-        trk = nib.streamlines.load(bundles_file)
+        trk = nib.streamlines.load(this_bundles_file)
         tg = trk.tractogram
         streamlines = tg.streamlines
         for bundle in bundle_dict:
@@ -172,7 +172,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                 logger.info(f"Saving {fname}")
                 save_tractogram(
                     this_tgm, fname, bbox_valid_check=False)
-                meta = dict(source=bundles_file)
+                meta = dict(source=this_bundles_file)
                 meta_fname = fname.split('.')[0] + '.json'
                 afd.write_json(meta_fname, meta)
     return True

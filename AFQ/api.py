@@ -934,7 +934,7 @@ class AFQ(object):
                 and not isinstance(self.mapping_definition, ItkMap):
             self.b0_warped
         self.template_xform
-        self.bundles
+        self.indiv_bundles
         self.sl_counts
         self.tract_profile_plots
         self.profiles
