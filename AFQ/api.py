@@ -239,7 +239,7 @@ class AFQ(object):
                  profile_weights="gauss",
                  bundle_info=None,
                  parallel_params={
-                     "n_jobs": -1, "engine": "joblib",
+                     "n_jobs": 4, "engine": "joblib",
                      "backend": "loky"},
                  scalars=["dti_fa", "dti_md"],
                  virtual_frame_buffer=False,
@@ -336,7 +336,8 @@ class AFQ(object):
         parallel_params : dict, optional
             [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
-            Default: {"n_jobs": -1, "engine": "joblib", "backend": "loky"}
+            Set "n_jobs" to -1 to automatically determine the number of jobs.
+            Default: {"n_jobs": 4, "engine": "joblib", "backend": "loky"}
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
