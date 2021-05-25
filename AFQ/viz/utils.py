@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from tqdm.auto import tqdm
+from pingouin import intraclass_corr, corr
 
 import nibabel as nib
 from dipy.io.streamline import load_tractogram
@@ -591,17 +592,14 @@ class BrainAxes():
         '''
         if ax is None:
             ax = self.get_axis(bundle)
+        lineplot_kwargs_mean = lineplot_kwargs.copy()
+        sns.set(style="whitegrid", rc={"lines.linewidth": 1})
+        ax.hlines(0, 0, 95, linestyles='dashed', color='red')
         if plot_subject_lines:
-            sns.set(style="whitegrid", rc={"lines.linewidth": 1})
-        else:
-            sns.set(style="whitegrid", rc={"lines.linewidth": 6})
-        sns.lineplot(
-            x=x, y=y,
-            data=data,
-            estimator='mean', ci=95, n_boot=n_boot,
-            legend=False, ax=ax, alpha=alpha,
-            style=[True] * len(data.index), **lineplot_kwargs)
-        if plot_subject_lines:
+            lineplot_kwargs_mean["hue"] = None
+            lineplot_kwargs_mean["palette"] = None
+            lineplot_kwargs_mean["color"] = "lightgray"
+
             sns.set(style="whitegrid", rc={"lines.linewidth": 0.5})
             sns.lineplot(
                 x=x, y=y,
@@ -609,6 +607,14 @@ class BrainAxes():
                 ci=None, estimator=None, units='subjectID',
                 legend=False, ax=ax, alpha=alpha - 0.2,
                 style=[True] * len(data.index), **lineplot_kwargs)
+
+        sns.set(style="whitegrid", rc={"lines.linewidth": 3})
+        sns.lineplot(
+            x=x, y=y,
+            data=data,
+            estimator='mean', ci=95, n_boot=n_boot,
+            legend=False, ax=ax, alpha=alpha,
+            style=[True] * len(data.index), **lineplot_kwargs_mean)
 
         ax.set_title(display_string(bundle), fontsize=large_font)
         ax.set_ylabel(ylabel, fontsize=medium_font)
@@ -677,7 +683,7 @@ class GroupCSVComparison():
     """
     Compare different CSVs, using:
     tract profiles, contrast indices,
-    scan-rescan reliability using Pearson's r.
+    scan-rescan reliability using ICC.
     """
 
     def __init__(self, out_folder, csv_fnames, names, is_special="",
@@ -691,7 +697,8 @@ class GroupCSVComparison():
                  mat_bundle_converter=BUNDLE_MAT_2_PYTHON,
                  mat_column_converter=CSV_MAT_2_PYTHON,
                  mat_scale_converter=SCALE_MAT_2_PYTHON,
-                 bundle_converter=BUNDLE_RECO_2_AFQ):
+                 bundle_converter=BUNDLE_RECO_2_AFQ,
+                 ICC_func="ICC2"):
         """
         Load in csv files, converting from matlab if necessary.
 
@@ -768,8 +775,18 @@ class GroupCSVComparison():
             Dictionary that maps bundle names to more standard bundle names.
             Unlike mat_bundle_converter, this converter is applied to all CSVs
             Default: BUNDLE_RECO_2_AFQ
+
+        ICC_func : string, optional
+            ICC function to use to calculate correlations.
+            Can be 'ICC1, 'ICC2', 'ICC3', 'ICC1k', 'ICC2k', 'ICC3k'.
+            Default: "ICC2"
         """
         self.logger = logging.getLogger('AFQ.csv')
+        self.ICC_func = ICC_func
+        if "k" in self.ICC_func:
+            self.ICC_func_name = f"ICC({self.ICC_func[3]},k)"
+        else:
+            self.ICC_func_name = f"ICC({self.ICC_func[3]},1)"
         self.out_folder = out_folder
         self.percent_nan_tol = percent_nan_tol
 
@@ -948,7 +965,7 @@ class GroupCSVComparison():
         df['y'] = arr[1]
         return df
 
-    def masked_corr(self, arr):
+    def masked_corr(self, arr, corrtype):
         '''
         Mask arr for NaNs before calling np.corrcoef
         '''
@@ -957,8 +974,34 @@ class GroupCSVComparison():
                 np.isnan(arr[0, ...]),
                 np.isnan(arr[1, ...])))
         if np.sum(mask) < 2:
-            return np.nan
-        return np.corrcoef(arr[:, mask])[0][1]
+            return np.nan, np.nan, np.nan
+        arr = arr[:, mask]
+        if corrtype == "ICC":
+            data = pd.DataFrame({
+                "targets": np.concatenate(
+                    (np.arange(arr.shape[1]), np.arange(arr.shape[1]))),
+                "raters": np.concatenate(
+                    (np.zeros(arr.shape[1]), np.ones(arr.shape[1]))),
+                "ratings": np.concatenate(
+                    (arr[0], arr[1]))})
+            stats = intraclass_corr(
+                data=data,
+                targets="targets",
+                raters="raters",
+                ratings="ratings")
+            row = stats[stats["Type"] == self.ICC_func].iloc[0]
+            return row["ICC"], row["ICC"]-row["CI95%"][0],\
+                row["CI95%"][1]-row["ICC"]
+        elif corrtype == "Srho":
+            stats = corr(
+                x=arr[0],
+                y=arr[1],
+                method="spearman")
+            row = stats.iloc[0]
+            return row["r"], row["r"]-row["CI95%"][0],\
+                row["CI95%"][1]-row["r"]
+        else:
+            raise ValueError("corrtype not recognized")
 
     def tract_profiles(self, names=None, scalar="FA",
                        ylim=[0.0, 1.0],
@@ -1097,7 +1140,7 @@ class GroupCSVComparison():
 
     def contrast_index(self, names=None, scalar="FA",
                        show_plots=False, n_boot=1000,
-                       ylim=(-1, 1), show_legend=False,
+                       ylim=(-0.5, 0.5), show_legend=False,
                        positions=POSITIONS, plot_subject_lines=True,
                        axes_dict={}):
         """
@@ -1270,7 +1313,7 @@ class GroupCSVComparison():
                           prof_axes_dict={},
                           sub_axes_dict={}):
         """
-        Plot the scan-rescan reliability using Pearson's r for 2 scalars.
+        Plot the scan-rescan reliability using ICC for 2 scalars.
 
         Parameters
         ----------
@@ -1361,7 +1404,7 @@ class GroupCSVComparison():
         miss_counts = pd.DataFrame(0, index=self.bundles, columns=[
             f"miss_count{names[0]}", f"miss_count{names[1]}"])
         for m, scalar in enumerate(scalars):
-            for k, bundle in enumerate(self.bundles):
+            for k, bundle in enumerate(tqdm(self.bundles)):
                 bundle_profiles =\
                     np.zeros((2, N, self.prof_len))
                 for j, name in enumerate(names):
@@ -1377,33 +1420,28 @@ class GroupCSVComparison():
                             bundle_profiles[j, i] = single_profile
 
                 all_sub_means[m, k] = np.nanmean(bundle_profiles, axis=2)
-                N_not_nan = N - np.sum(np.isnan(
-                    all_sub_means[m, k, 0] + all_sub_means[m, k, 1]))
-                all_sub_coef[m, k] = self.masked_corr(all_sub_means[m, k])
-                if np.isnan(all_sub_coef[m, k]).all() or N_not_nan < 4:
-                    raise ValueError((
+                all_sub_coef[m, k], all_sub_coef_err[m, k, 0],\
+                    all_sub_coef_err[m, k, 1] =\
+                        self.masked_corr(all_sub_means[m, k], "Srho")
+                if np.isnan(all_sub_coef[m, k]).all():
+                    self.logger.error((
                         f"Not enough non-nan profiles"
                         f"for scalar {scalar} for bundle {bundle}"))
-                # use Fisher Transformation
-                err_prime = 1.95 / np.sqrt(N_not_nan - 3)
-                corr_prime = np.arctanh(all_sub_coef[m, k])
-                all_sub_coef_err[m, k, 1] = np.tanh(corr_prime + err_prime)\
-                    - all_sub_coef[m, k]
-                all_sub_coef_err[m, k, 0] = all_sub_coef[m, k]\
-                    - np.tanh(corr_prime - err_prime)
+                    all_sub_coef[m, k] = 0
 
                 bundle_coefs = np.zeros(N)
                 for i in range(N):
-                    bundle_coefs[i] = \
-                        self.masked_corr(bundle_profiles[:, i, :])
+                    bundle_coefs[i], _, _ = \
+                        self.masked_corr(bundle_profiles[:, i, :], "ICC")
                 all_profile_coef[m, k] = bundle_coefs
 
                 node_coefs = np.zeros(self.prof_len)
                 for i in range(self.prof_len):
-                    node_coefs[i] = self.masked_corr(bundle_profiles[:, :, i])
+                    node_coefs[i], _, _ =\
+                        self.masked_corr(bundle_profiles[:, :, i], "ICC")
                 all_node_coef[m, k] = node_coefs
 
-        # plot histograms of subject pearson r's
+        # plot histograms of subject ICC
         maxi = np.nanmax(all_profile_coef)
         mini = np.nanmin(all_profile_coef)
         bins = np.linspace(mini, maxi, 10)
@@ -1423,8 +1461,8 @@ class GroupCSVComparison():
                     label=scalar,
                     ax=ax)
             ax.set_title(display_string(bundle), fontsize=large_font)
-            ax.set_xlabel("Pearson's r", fontsize=medium_font)
-            ax.set_ylabel("Count", fontsize=medium_font)
+            ax.set_xlabel(self.ICC_func_name, fontsize=medium_font)
+            ax.set_ylabel("Subject count", fontsize=medium_font)
             ba.temp_fig.legend(display_string(scalars), fontsize=medium_font)
             ba.save_temp_fig(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
@@ -1471,7 +1509,7 @@ class GroupCSVComparison():
                     ci=None, estimator=None)
             ax.set_ylim([mini, maxi])
             ax.set_title(display_string(bundle), fontsize=large_font)
-            ax.set_ylabel("Pearson's r", fontsize=medium_font)
+            ax.set_ylabel(self.ICC_func_name, fontsize=medium_font)
             ba.temp_fig.legend(display_string(scalars), fontsize=medium_font)
             ba.save_temp_fig(
                 f"rel_plots/{'_'.join(scalars)}/verbose",
@@ -1513,6 +1551,10 @@ class GroupCSVComparison():
                     ec = 'w'
                 ax = ba.get_axis(bundle, axes_dict=sub_axes_dict)
                 sns.set(style="whitegrid")
+                if not twinning:
+                    ax.plot(
+                        [[0, 0], [1, 1]], [[0, 0], [1, 1]],
+                        '--', color='red')
                 ax.scatter(
                     all_sub_means[m, k, 0],
                     all_sub_means[m, k, 1],
@@ -1580,7 +1622,7 @@ class GroupCSVComparison():
             if not (show_plots or twinning_next):
                 ba.close_all()
 
-        # plot bar plots of pearson's r
+        # plot bar plots of ICC
         if fig_axes is None:
             fig, axes = plt.subplots(2, 1)
             fig.set_size_inches((8, 8))
