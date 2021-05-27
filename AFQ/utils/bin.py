@@ -83,6 +83,11 @@ def get_default_args(func):
 def toml_to_val(t):
     if isinstance(t, str) and len(t) < 1:
         return None
+    elif isinstance(t, list):
+        ls = []
+        for e in t:
+            ls.append(toml_to_val(e))
+        return ls
     elif isinstance(t, str) and t[0] == '{':
         return eval(t)  # interpret as dictionary
     elif isinstance(t, str) and ("Mask" in t or "Map" in t or "Scalar" in t):

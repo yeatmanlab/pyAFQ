@@ -14,18 +14,15 @@ from AFQ.tests.test_api import create_dummy_bids_path
 
 
 def test_str_instantiates_mixin():
-    combined_mask = afm.CombinedMask([
-        afm.RoiMask(),
-        afm.ThresholdedScalarMask("dti_fa", lower_bound=0.2),
-        afm.FullMask()], combine="and")
-    combined_mask_str = combined_mask.str_for_toml()
-    combined_mask_from_str = eval(combined_mask_str)
+    thresh_mask = afm.ThresholdedScalarMask("dti_fa", lower_bound=0.2)
+    thresh_mask_str = thresh_mask.str_for_toml()
+    thresh_mask_from_str = eval(thresh_mask_str)
 
-    npt.assert_(combined_mask.combine == combined_mask_from_str.combine)
-    npt.assert_(len(combined_mask.mask_list) ==
-                len(combined_mask_from_str.mask_list))
-    for mask in combined_mask.mask_list:
-        npt.assert_(mask.__dict__ == mask.__dict__)
+    npt.assert_(thresh_mask.combine == thresh_mask_from_str.combine)
+    npt.assert_(thresh_mask.lower_bound ==
+                thresh_mask_from_str.lower_bound)
+    npt.assert_(thresh_mask.upper_bound ==
+                thresh_mask_from_str.upper_bound)
 
 
 def test_resample_mask():

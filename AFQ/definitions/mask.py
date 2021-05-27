@@ -6,14 +6,11 @@ from dipy.segment.mask import median_otsu
 from dipy.align import resample
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file
+from AFQ.tasks.decorators import as_img
 
-
-# For mask defintions, get_for_row should return:
-# data, affine, meta
 
 __all__ = ["MaskFile", "FullMask", "RoiMask", "B0Mask", "LabelledMaskFile",
-           "ThresholdedMaskFile", "ScalarMask", "ThresholdedScalarMask",
-           "CombinedMask"]
+           "ThresholdedMaskFile", "ScalarMask", "ThresholdedScalarMask"]
 
 
 def _resample_mask(mask_data, dwi_data, mask_affine, dwi_affine):
@@ -106,8 +103,8 @@ class MaskFile(Definition):
 
         self.fnames[session][subject] = nearest_mask
 
-    def get_path_data_affine(self, afq_object, row):
-        mask_file = self.fnames[row['ses']][row['subject']]
+    def get_path_data_affine(self, subses_dict):
+        mask_file = self.fnames[subses_dict['ses']][subses_dict['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
@@ -115,23 +112,24 @@ class MaskFile(Definition):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_for_row(self, afq_object, row):
-        # Load data
-        dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
-        mask_file, mask_data_orig, mask_affine = \
-            self.get_path_data_affine(afq_object, row)
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, data):
+            # Load data
+            mask_file, mask_data_orig, mask_affine = \
+                self.get_path_data_affine(subses_dict)
 
-        # Apply any conditions on the data
-        mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
+            # Apply any conditions on the data
+            mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
 
-        # Resample to DWI data:
-        mask_data = _resample_mask(
-            mask_data,
-            dwi_data,
-            mask_affine,
-            dwi_img.affine)
-
-        return mask_data, dwi_img.affine, meta
+            # Resample to DWI data:
+            mask_data = _resample_mask(
+                mask_data,
+                data,
+                mask_affine,
+                dwi_affine)
+            return mask_data, meta
+        return mask_getter
 
 
 class FullMask(Definition):
@@ -149,13 +147,11 @@ class FullMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_row(self, afq_object, row):
-        # Load data to get shape, affine
-        dwi_data, _, dwi_img = afq_object._get_data_gtab(row)
-
-        return np.ones(dwi_data.shape),\
-            dwi_img.affine,\
-            dict(source="Entire Volume")
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, data):
+            return np.ones(data.shape), dict(source="Entire Volume")
+        return mask_getter
 
 
 class RoiMask(Definition):
@@ -175,30 +171,32 @@ class RoiMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_row(self, afq_object, row):
-        mapping = afq_object._mapping(row)
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, mapping_imap,
+                        bundle_dict, segmentation_params):
+            mask_data = None
+            if self.use_presegment:
+                bundle_dict = \
+                    segmentation_params["presegment_bundle_dict"]
+            else:
+                bundle_dict = bundle_dict
 
-        mask_data = None
-        if self.use_presegment:
-            bundle_dict = afq_object.\
-                segmentation_params["presegment_bundle_dict"]
-        else:
-            bundle_dict = afq_object.bundle_dict
+            for bundle_name, bundle_info in bundle_dict.items():
+                for idx, roi in enumerate(bundle_info['ROIs']):
+                    if bundle_dict[bundle_name]['rules'][idx]:
+                        warped_roi = auv.transform_inverse_roi(
+                            roi,
+                            mapping_imap["mapping"],
+                            bundle_name=bundle_name)
 
-        for bundle_name, bundle_info in bundle_dict.items():
-            for idx, roi in enumerate(bundle_info['ROIs']):
-                if bundle_dict[bundle_name]['rules'][idx]:
-                    warped_roi = auv.transform_inverse_roi(
-                        roi,
-                        mapping,
-                        bundle_name=bundle_name)
-
-                    if mask_data is None:
-                        mask_data = np.zeros(warped_roi.shape)
-                    mask_data = np.logical_or(
-                        mask_data,
-                        warped_roi.astype(bool))
-        return mask_data, afq_object["dwi_affine"], dict(source="ROIs")
+                        if mask_data is None:
+                            mask_data = np.zeros(warped_roi.shape)
+                        mask_data = np.logical_or(
+                            mask_data,
+                            warped_roi.astype(bool))
+            return mask_data, dict(source="ROIs")
+        return mask_getter
 
 
 class B0Mask(Definition):
@@ -223,15 +221,17 @@ class B0Mask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_row(self, afq_object, row):
-        b0_file = afq_object._b0(row)
-        mean_b0_img = nib.load(b0_file)
-        mean_b0 = mean_b0_img.get_fdata()
-        _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-        return mask_data, mean_b0_img.affine, dict(
-            source=b0_file,
-            technique="median_otsu applied to b0",
-            median_otsu_kwargs=self.median_otsu_kwargs)
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, b0_file):
+            mean_b0_img = nib.load(b0_file)
+            mean_b0 = mean_b0_img.get_fdata()
+            _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+            return mask_data, dict(
+                source=b0_file,
+                technique="median_otsu applied to b0",
+                median_otsu_kwargs=self.median_otsu_kwargs)
+        return mask_getter
 
 
 class LabelledMaskFile(MaskFile, CombineMaskMixin):
@@ -358,7 +358,7 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
         return self.mask_draft, meta
 
 
-class ScalarMask(MaskFile):
+class ScalarMask(Definition):
     """
     Define a mask based on a scalar.
     Does not apply any labels or thresholds;
@@ -384,24 +384,15 @@ class ScalarMask(MaskFile):
     def __init__(self, scalar):
         self.scalar = scalar
 
-    # overrides MaskFile
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     # overrides MaskFile
-    def get_path_data_affine(self, afq_object, row):
-        valid_scalars = list(afq_object.scalar_dict.keys())
-        if self.scalar not in valid_scalars:
-            raise RuntimeError((
-                f"scalar should be one of"
-                f" {', '.join(valid_scalars)}"
-                f", you input {self.scalar}"))
-
-        scalar_fname = afq_object.scalar_dict[self.scalar](afq_object, row)
-        scalar_img = nib.load(scalar_fname)
-        scalar_data = scalar_img.get_fdata()
-
-        return scalar_fname, scalar_data, scalar_img.affine
+    def get_mask_getter(self):
+        def mask_getter(subses_dict, dwi_affine, data_imap):
+            scalar_file = data_imap[self.scalar + "_file"]
+            return nib.load(scalar_file), dict(FromScalar=self.scalar)
+        return mask_getter
 
 
 class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
@@ -479,65 +470,62 @@ class PFTMask(Definition):
         for probseg in self.probsegs:
             probseg.find_path(bids_layout, from_path, subject, session)
 
-    def get_for_row(self, afq_object, row):
-        probseg_imgs = []
-        probseg_metas = []
+    def get_mask_getter(self):
+        probseg_funcs = []
         for probseg in self.probsegs:
-            data, affine, meta = probseg.get_for_row(afq_object, row)
-            probseg_imgs.append(nib.Nifti1Image(data, affine))
-            probseg_metas.append(meta)
-        return probseg_imgs, None, dict(sources=probseg_metas)
+            probseg_funcs.append(probseg.get_mask_getter())
+        return probseg_funcs
 
 
-class CombinedMask(Definition, CombineMaskMixin):
-    """
-    Define a mask by combining other masks.
+# class CombinedMask(Definition, CombineMaskMixin):
+#     """  # TODO: can this be done in current system?
+#     Define a mask by combining other masks.
 
-    Parameters
-    ----------
-    mask_list : list of Masks with find_path and get_for_row functions
-        List of masks to combine. All find_path methods will be called
-        when this find_path method is called. All get_for_row methods will
-        be called and combined when this get_for_row method is called.
-    combine : str, optional
-        How to combine the boolean masks generated by mask_list.
-        If "and", they will be and'd together.
-        If "or", they will be or'd.
-        Default: "and"
+#     Parameters
+#     ----------
+#     mask_list : list of Masks with find_path and get_for_subses functions
+#         List of masks to combine. All find_path methods will be called
+#         when this find_path method is called. All get_for_subses methods will
+#         be called and combined when this get_for_subses method is called.
+#     combine : str, optional
+#         How to combine the boolean masks generated by mask_list.
+#         If "and", they will be and'd together.
+#         If "or", they will be or'd.
+#         Default: "and"
 
-    Examples
-    --------
-    seed_mask = CombinedMask(
-        [ThresholdedScalarMask(
-            "dti_fa",
-            lower_bound=0.2),
-        ThresholdedScalarMask(
-            "dti_md",
-            upper_bound=0.002)])
-    api.AFQ(tracking_params={"seed_mask": seed_mask})
-    """
+#     Examples
+#     --------
+#     seed_mask = CombinedMask(
+#         [ThresholdedScalarMask(
+#             "dti_fa",
+#             lower_bound=0.2),
+#         ThresholdedScalarMask(
+#             "dti_md",
+#             upper_bound=0.002)])
+#     api.AFQ(tracking_params={"seed_mask": seed_mask})
+#     """
 
-    def __init__(self, mask_list, combine="and"):
-        CombineMaskMixin.__init__(self, combine)
-        self.mask_list = mask_list
+#     def __init__(self, mask_list, combine="and"):
+#         CombineMaskMixin.__init__(self, combine)
+#         self.mask_list = mask_list
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        for mask in self.mask_list:
-            mask.find_path(bids_layout, from_path, subject, session)
+#     def find_path(self, bids_layout, from_path, subject, session):
+#         for mask in self.mask_list:
+#             mask.find_path(bids_layout, from_path, subject, session)
 
-    def get_for_row(self, afq_object, row):
-        self.mask_draft = None
-        metas = []
-        for mask in self.mask_list:
-            next_mask, next_affine, next_meta = mask.get_for_row(
-                afq_object, row)
-            if self.mask_draft is None:
-                self.reset_mask_draft(next_mask.shape)
-            else:
-                self.mask_draft = self * (next_mask)
-            metas.append(next_meta)
+#     def get_for_subses(self):
+#         self.mask_draft = None
+#         metas = []
+#         for mask in self.mask_list:
+#             next_mask, next_affine, next_meta = mask.get_for_subses(
+#                 afq_object, row)
+#             if self.mask_draft is None:
+#                 self.reset_mask_draft(next_mask.shape)
+#             else:
+#                 self.mask_draft = self * (next_mask)
+#             metas.append(next_meta)
 
-        meta = dict(sources=metas,
-                    combined_with=self.combine)
+#         meta = dict(sources=metas,
+#                     combined_with=self.combine)
 
-        return self.mask_draft, next_affine, meta
+#         return self.mask_draft, next_affine, meta
