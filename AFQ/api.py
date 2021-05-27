@@ -874,7 +874,7 @@ class AFQ(object):
                     section = sub_attr
                     break
 
-        # attr not found, force default behaviour
+        # attr not found, allow typical AttributeError
         if attr_name is None:
             return object.__getattribute__(self, attr)
 
