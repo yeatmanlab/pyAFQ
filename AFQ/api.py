@@ -336,7 +336,8 @@ class AFQ(object):
         parallel_params : dict, optional
             [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
-            Set "n_jobs" to -1 to automatically determine the number of jobs.
+            Set "n_jobs" to -1 to automatically parallelize as
+            the number of cpus.
             Default: {"n_jobs": -1, "engine": "joblib", "backend": "loky"}
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
