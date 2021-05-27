@@ -11,7 +11,7 @@ import dipy.reconst.dti as dpy_dti
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
-from AFQ.tasks.decorators import as_file, as_model, as_tf_deriv
+from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
 
 from AFQ.models.dti import noise_from_b0
@@ -189,21 +189,21 @@ def anisotropic_power_map(subses_dict, csd_params_file):
 
 @pimms.calc("dti_fa_file")
 @as_file(suffix='_model-DTI_FA.nii.gz')
-@as_tf_deriv(tf_name='DTI')
+@as_dt_deriv(tf_name='DTI')
 def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.fa
 
 
 @pimms.calc("dti_cfa_file")
 @as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
-@as_tf_deriv(tf_name='DTI')
+@as_dt_deriv(tf_name='DTI')
 def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.color_fa
 
 
 @pimms.calc("dti_pdd_file")
 @as_file(suffix='_model-DTI_PDD.nii.gz')
-@as_tf_deriv(tf_name='DTI')
+@as_dt_deriv(tf_name='DTI')
 def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
     pdd = dti_tf.directions.squeeze()
     # Invert the x coordinates:
@@ -213,28 +213,28 @@ def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
 
 @pimms.calc("dti_md_file")
 @as_file('_model-DTI_MD.nii.gz')
-@as_tf_deriv('DTI')
+@as_dt_deriv('DTI')
 def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.md
 
 
 @pimms.calc("dki_fa_file")
 @as_file('_model-DKI_FA.nii.gz')
-@as_tf_deriv('DKI')
+@as_dt_deriv('DKI')
 def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.fa
 
 
 @pimms.calc("dki_md_file")
 @as_file('_model-DKI_MD.nii.gz')
-@as_tf_deriv('DKI')
+@as_dt_deriv('DKI')
 def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.md
 
 
 @pimms.calc("dki_awf_file")
 @as_file('_model-DKI_AWF.nii.gz')
-@as_tf_deriv('DKI')
+@as_dt_deriv('DKI')
 def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
             sphere='repulsion100', gtol=1e-2):
     dki_params = nib.load(dki_params_file).get_fdata()
@@ -244,7 +244,7 @@ def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
 
 @pimms.calc("dki_mk_file")
 @as_file('_model-DKI_MK.nii.gz')
-@as_tf_deriv('DKI')
+@as_dt_deriv('DKI')
 def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.mk()
 

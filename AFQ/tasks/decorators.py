@@ -14,7 +14,7 @@ import numpy as np
 from AFQ.tasks.utils import get_fname
 
 
-__all__ = ["as_file", "as_model", "as_tf_deriv", "as_img"]
+__all__ = ["as_file", "as_model", "as_dt_deriv", "as_img"]
 
 
 logger = logging.getLogger('AFQ.api')
@@ -132,19 +132,19 @@ def as_model(func):
 
 # args must include dwi_affine
 # args must include arg with name that contains "param"
-def as_tf_deriv(tf_name):
-    def _as_tf_deriv(func):
+def as_dt_deriv(tf_name):
+    def _as_dt_deriv(func):
         @functools.wraps(func)
         @has_args(func)
-        def wrapper_as_tf_deriv(*args, **kwargs):
+        def wrapper_as_dt_deriv(*args, **kwargs):
             dwi_affine = get_args(
                 func, ["dwi_affine"], args)[0]
             params = get_args(
                 func, ["param"], args, inside=True)[0]
             img = nib.Nifti1Image(func(*args, **kwargs), dwi_affine)
             return img, {f"{tf_name}ParamsFile": params}
-        return wrapper_as_tf_deriv
-    return _as_tf_deriv
+        return wrapper_as_dt_deriv
+    return _as_dt_deriv
 
 
 # args must include arg with name that contains affine

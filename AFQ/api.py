@@ -239,7 +239,7 @@ class AFQ(object):
                  profile_weights="gauss",
                  bundle_info=None,
                  parallel_params={
-                     "n_jobs": 4, "engine": "joblib",
+                     "n_jobs": -1, "engine": "joblib",
                      "backend": "loky"},
                  scalars=["dti_fa", "dti_md"],
                  virtual_frame_buffer=False,
@@ -337,7 +337,7 @@ class AFQ(object):
             [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
             Set "n_jobs" to -1 to automatically determine the number of jobs.
-            Default: {"n_jobs": 4, "engine": "joblib", "backend": "loky"}
+            Default: {"n_jobs": -1, "engine": "joblib", "backend": "loky"}
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
@@ -368,7 +368,7 @@ class AFQ(object):
             Default: use the default behavior of the seg.clean_bundle
             function.
         kwargs : additional optional parameters
-            [KWARGS] You can set additional parameters for a given step
+            [KWARGS] You can set additional parameters for any step
             of the process.
             For example, to set the sh_order for csd to 4, do:
             api.AFQ(my_path, sh_order=4)
@@ -794,8 +794,10 @@ class AFQ(object):
                     previous_data[f"{name}_imap"] = plan(
                         **input_data,
                         **previous_data)
+                    last_name = name
 
-                self.wf_dict[subject][session] = previous_data["viz_imap"]
+                self.wf_dict[subject][session] =\
+                    previous_data[f"{last_name}_imap"]
 
     def _get_best_scalar(self):
         for scalar in self.scalars:
