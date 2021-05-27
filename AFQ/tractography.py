@@ -1,7 +1,7 @@
 from collections.abc import Iterable
+from itertools import chain
 import numpy as np
 import nibabel as nib
-import dipy.reconst.shm as shm
 import logging
 
 import dipy.data as dpd
@@ -15,15 +15,35 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               ActStoppingCriterion)
 
 
+class PklDeterministicDG(DeterministicMaximumDirectionGetter):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
+class PklProbabilisticDG(ProbabilisticDirectionGetter):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
+class PklThresholdStoppingCriterion(ThresholdStoppingCriterion):
+    def __reduce__(self):
+        return (self.__init__, ())
+
+
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
+
+from AFQ.utils.parallel import parfor
 
 
 def track(params_file, directions="det", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
           min_length=10, max_length=1000, odf_model="DTI",
-          tracker="local"):
+          tracker="local",
+          parallel_kwargs={"n_jobs": -1,
+                           "engine": "joblib",
+                           "backend": "loky"}):
     """
     Tractography
 
@@ -32,7 +52,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     params_file : str, nibabel img.
         Full path to a nifti file containing CSD spherical harmonic
         coefficients, or nibabel img with model params.
-    directions : str
+    directions : str or initialized direction-getter object
         How tracking directions are determined.
         One of: {"det" | "prob"}
     max_angle : float, optional.
@@ -110,7 +130,6 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
     model_params = params_img.get_fdata()
     affine = params_img.affine
     odf_model = odf_model.upper()
-    directions = directions.lower()
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
@@ -134,28 +153,38 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
         sphere = dpd.default_sphere
 
     logger.info("Getting Directions...")
-    if directions == "det":
-        dg = DeterministicMaximumDirectionGetter
-    elif directions == "prob":
-        dg = ProbabilisticDirectionGetter
+    if isinstance(directions, str):
+        directions = directions.lower()
+        if directions == "det":
+            dg = PklDeterministicDG
+        elif directions == "prob":
+            dg = PklProbabilisticDG
 
-    if odf_model == "DTI" or odf_model == "DKI":
-        evals = model_params[..., :3]
-        evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
-        odf = tensor_odf(evals, evecs, sphere)
-        dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
-    elif odf_model == "CSD" or "MSMT":
-        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
+        if odf_model == "DTI" or odf_model == "DKI":
+            evals = model_params[..., :3]
+            evecs = model_params[..., 3:12].reshape(
+                params_img.shape[:3] + (3, 3))
+            odf = tensor_odf(evals, evecs, sphere)
+            dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
+        elif odf_model == "CSD" or "MSMT":
+            dg = dg.from_shcoeff(model_params,
+                                 max_angle=max_angle,
+                                 sphere=sphere)
+    else:
+        # Assume it's an already-initialized dg
+        dg = directions
 
     if tracker == "local":
         if stop_mask is None:
             stop_mask = np.ones(params_img.shape[:3])
 
         if stop_mask.dtype == 'bool':
-            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
-                                                            0.5)
+            stopping_criterion = PklThresholdStoppingCriterion(
+                                                        stop_mask,
+                                                        0.5)
         else:
-            stopping_criterion = ThresholdStoppingCriterion(stop_mask,
+            stopping_criterion = PklThresholdStoppingCriterion(
+                stop_mask,
                                                             stop_threshold)
 
         my_tracker = VerboseLocalTracking
@@ -213,14 +242,24 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
                 pve_gm_data,
                 pve_csf_data)
 
-    logger.info("Tracking...")
+    logger.info("Tracking!")
+    seeds_list = [seeds[ss * 100:(ss + 1) * 100] for ss in
+                  range((seeds.shape[0] // 100) + 1)]
 
-    return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
-                     step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed)
+    results = parfor(
+        _tracking, seeds_list,
+        func_args=[
+            my_tracker, dg, stopping_criterion, params_img],
+        func_kwargs=dict(
+            step_size=step_size, min_length=min_length,
+            max_length=max_length, random_seed=rng_seed),
+        **parallel_kwargs)
+
+    return StatefulTractogram(chain.from_iterable(results),
+                              params_img, Space.RASMM)
 
 
-def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
+def _tracking(seeds, tracker, dg, stopping_criterion, params_img,
               step_size=0.5, min_length=10, max_length=1000,
               random_seed=None):
     """
@@ -239,4 +278,4 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    return StatefulTractogram(tracker, params_img, Space.RASMM)
+    return tracker

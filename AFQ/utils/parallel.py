@@ -43,12 +43,14 @@ def parfor(func, in_list, out_shape=None, n_jobs=-1, engine="joblib",
 
     """
     if engine == "joblib":
+        from joblib.externals.loky import set_loky_pickler
+
         p = joblib.Parallel(n_jobs=n_jobs, backend=backend)
         d = joblib.delayed(func)
         d_l = []
         for in_element in in_list:
             d_l.append(d(in_element, *func_args, **func_kwargs))
-        results = p(tqdm(d_l))
+        results = p(d_l)
 
     elif engine == "dask":
         if n_jobs == -1:

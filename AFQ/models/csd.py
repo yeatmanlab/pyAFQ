@@ -7,7 +7,6 @@ import nibabel as nib
 from dipy.reconst import csdeconv as csd
 from dipy.reconst import mcsd
 from dipy.reconst import shm
-import dipy.data as dpd
 import AFQ.utils.models as ut
 
 # Monkey patch fixed spherical harmonics for conda and fixed solve_qp from
@@ -112,7 +111,8 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     fname : the full path to the file containing the SH coefficients.
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files,
-                                            b0_threshold=b0_threshold)
+                                            b0_threshold=b0_threshold,
+                                            mask=mask)
 
     csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
                   lambda_=lambda_, tau=tau, msmt=msmt)

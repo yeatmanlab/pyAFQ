@@ -82,6 +82,9 @@ class VerboseLocalTracking(LocalTracking):
         self.max_length = max_length
     _generate_streamlines = _verbose_generate_streamlines
 
+    def __reduce__(self):
+        return (self.__init__, ())
+
 
 class VerboseParticleFilteringTracking(ParticleFilteringTracking):
     def __init__(self, *args, min_length=10, max_length=1000, **kwargs):
@@ -89,6 +92,9 @@ class VerboseParticleFilteringTracking(ParticleFilteringTracking):
         self.min_length = min_length
         self.max_length = max_length
     _generate_streamlines = _verbose_generate_streamlines
+
+    def __reduce__(self):
+        return (self.__init__, ())
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):

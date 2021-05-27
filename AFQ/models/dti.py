@@ -120,7 +120,7 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
                                             b0_threshold=b0_threshold)
 
     # In this case, we dump the fit object
-    dtf = _fit(gtab, data, mask=None)
+    dtf = _fit(gtab, data, mask=mask)
     FA, MD, AD, RD, params = dtf.fa, dtf.md, dtf.ad, dtf.rd, dtf.model_params
 
     maps = [FA, MD, AD, RD, params]
