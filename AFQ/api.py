@@ -581,6 +581,20 @@ class AFQ(object):
         bids_layout = BIDSLayout(bids_path, derivatives=True)
         bids_description = bids_layout.description
 
+        # check that any files exist in the derivatives folder,
+        # not including the dataset_description.json files
+        # the second check may be particularly useful in checking
+        # that the derivatives folder is well-defined
+        if len(bids_layout.get())\
+                - len(bids_layout.get(extension="json")) < 1:
+            raise ValueError(
+                f"No non-json files recognized by pyBIDS in {bids_path}")
+        if len(bids_layout.get(scope=dmriprep))\
+                - len(bids_layout.get(scope=dmriprep, extension="json")) < 1:
+            raise ValueError((
+                f"No non-json files recognized by "
+                f"pyBIDS in the pipeline: {dmriprep}"))
+
         # Add required metadata file at top level (inheriting as needed):
         pipeline_description = {
             "Name": bids_description["Name"],

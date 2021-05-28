@@ -215,6 +215,60 @@ def test_make_bundle_dict():
     assert len(afq_bundles) == 0
 
 
+def test_AFQ_missing_files():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    bids_path = tmpdir.name
+
+    with pytest.raises(
+            ValueError,
+            match="There must be a dataset_description.json in bids_path"):
+        api.AFQ(bids_path)
+    afd.to_bids_description(
+        bids_path,
+        **{"Name": "Missing", "Subjects": ["sub-01"]})
+
+    with pytest.raises(
+            ValueError,
+            match=f"No non-json files recognized by pyBIDS in {bids_path}"):
+        api.AFQ(bids_path)
+
+    subses_folder = op.join(
+        bids_path,
+        "derivatives",
+        "otherDeriv",
+        'sub-01',
+        'ses-01')
+    os.makedirs(subses_folder, exist_ok=True)
+    afd.to_bids_description(
+        op.join(
+            bids_path,
+            "derivatives",
+            "otherDeriv"),
+        **{
+            "Name": "Missing",
+            "PipelineDescription": {"Name": "otherDeriv"}})
+    touch(op.join(subses_folder, "sub-01_ses-01_dwi.nii.gz"))
+
+    with pytest.raises(
+            ValueError,
+            match=\
+                "No non-json files recognized by pyBIDS"
+                + " in the pipeline: missingPipe"):
+        api.AFQ(bids_path, dmriprep="missingPipe")
+
+    os.mkdir(op.join(bids_path, "missingPipe"))
+    afd.to_bids_description(
+        op.join(bids_path, "missingPipe"), **{
+            "Name": "Missing",
+            "PipelineDescription": {"Name": "missingPipe"}})
+    with pytest.raises(
+            ValueError,
+            match=\
+                "No non-json files recognized by pyBIDS"
+                + " in the pipeline: missingPipe"):
+        api.AFQ(bids_path, dmriprep="missingPipe")
+
+
 @pytest.mark.nightly_custom
 def test_AFQ_custom_tract():
     """
