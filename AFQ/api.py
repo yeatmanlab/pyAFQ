@@ -396,9 +396,10 @@ class AFQ(object):
             If "median", the median of values at each node will be used
             instead of a mean or weighted mean.
             Default: "gauss"
-        bundle_info : list of strings or dict, optional
+        bundle_info : list of strings, dict, or BundleDict, optional
             [BUNDLES] List of bundle names to include in segmentation,
-            or a bundle dictionary (see BundleDict for inspiration).
+            or a bundle dictionary (see BundleDict for inspiration),
+            or a BundleDict.
             If None, will get all appropriate bundles for the chosen
             segmentation algorithm.
             Default: None
@@ -512,9 +513,11 @@ class AFQ(object):
         if bundle_info is not None and not ((
                 isinstance(bundle_info, list)
                 and isinstance(bundle_info[0], str)) or (
-                    isinstance(bundle_info, dict))):
-            raise TypeError(
-                "bundle_info must be None, a list of strings, or a dict")
+                    isinstance(bundle_info, dict)) or (
+                        isinstance(bundle_info, BundleDict))):
+            raise TypeError((
+                "bundle_info must be None, a list of strings,"
+                " a dict, or a BundleDict"))
         if not isinstance(parallel_params, dict):
             raise TypeError("parallel_params must be a dict")
         if scalars is not None and not (
@@ -630,10 +633,13 @@ class AFQ(object):
         # set reg_template and bundle_info:
         self.reg_template_img = self.get_reg_template()
         self.bundle_info = bundle_info
-        self.bundle_dict = BundleDict(
-            bundle_info,
-            seg_algo=self.seg_algo,
-            resample_to=self.reg_template_img)
+        if isinstance(bundle_info, BundleDict):
+            self.bundle_dict = bundle_info
+        else:
+            self.bundle_dict = BundleDict(
+                bundle_info,
+                seg_algo=self.seg_algo,
+                resample_to=self.reg_template_img)
 
         if not (isinstance(
                 self.segmentation_params["presegment_bundle_dict"],
