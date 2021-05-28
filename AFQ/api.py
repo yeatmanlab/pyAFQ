@@ -25,6 +25,7 @@ import s3fs
 from time import time
 import nibabel as nib
 from importlib import import_module
+from collections.abc import MutableMapping
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -71,7 +72,7 @@ RECO_UNIQUE = [
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-class BundleDict(dict):
+class BundleDict(MutableMapping):
     def __init__(self,
                  bundle_info=BUNDLES,
                  seg_algo="afq",
@@ -236,7 +237,7 @@ class BundleDict(dict):
             self._list_to_dict()
 
         if self.seg_algo == "afq" and self.resample_to:
-            self.bundle_dict_resampled = {}
+            self.bundle_dict_resampled = self.bundle_dict_unresampled.copy()
             for bundle in self.bundle_dict_unresampled:
                 rois = self.bundle_dict_unresampled[bundle]['ROIs']
                 for ii, roi in enumerate(rois):
@@ -265,21 +266,6 @@ class BundleDict(dict):
 
     def __delitem__(self, key):
         del self._dict[key]
-
-    def has_key(self, k):
-        return k in self._dict
-
-    def keys(self):
-        return self._dict.keys()
-
-    def values(self):
-        return self._dict.values()
-
-    def items(self):
-        return self._dict.items()
-
-    def __contains__(self, item):
-        return item in self._dict
 
     def __iter__(self):
         return iter(self._dict)

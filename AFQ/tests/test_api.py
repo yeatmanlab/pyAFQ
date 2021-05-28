@@ -193,24 +193,24 @@ def test_BundleDict():
     assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
 
     # Arcuate Fasciculus
-    afq_bundles = api.BundleDict(bundle_names=["ARC"])
+    afq_bundles = api.BundleDict(["ARC"])
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = api.BundleDict(bundle_names=["FA"])
+    afq_bundles = api.BundleDict(["FA"])
 
     assert len(afq_bundles) == 1
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = api.BundleDict(bundle_names=["HCC"])
+    afq_bundles = api.BundleDict(["HCC"])
 
     assert len(afq_bundles) == 2
 
     # Vertical Occipital Fasciculus
     # not included and does not exist in templates
-    afq_bundles = api.BundleDict(bundle_names=["VOF"])
+    afq_bundles = api.BundleDict(["VOF"])
 
     assert len(afq_bundles) == 0
 
@@ -362,7 +362,7 @@ def test_AFQ_init():
 
 def test_AFQ_custom_bundle_dict():
     bids_path = create_dummy_bids_path(3, 1)
-    bundle_dict = api.BundleDict()()
+    bundle_dict = api.BundleDict()
     api.AFQ(
         bids_path,
         dmriprep="synthetic",
