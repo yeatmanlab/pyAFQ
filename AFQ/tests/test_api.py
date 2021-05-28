@@ -251,9 +251,8 @@ def test_AFQ_missing_files():
 
     with pytest.raises(
             ValueError,
-            match=\
-                "No non-json files recognized by pyBIDS"
-                + " in the pipeline: missingPipe"):
+            match="No non-json files recognized by pyBIDS"
+            + " in the pipeline: missingPipe"):
         api.AFQ(bids_path, dmriprep="missingPipe")
 
     os.mkdir(op.join(bids_path, "missingPipe"))
@@ -263,9 +262,8 @@ def test_AFQ_missing_files():
             "PipelineDescription": {"Name": "missingPipe"}})
     with pytest.raises(
             ValueError,
-            match=\
-                "No non-json files recognized by pyBIDS"
-                + " in the pipeline: missingPipe"):
+            match="No non-json files recognized by pyBIDS"
+            + " in the pipeline: missingPipe"):
         api.AFQ(bids_path, dmriprep="missingPipe")
 
 
