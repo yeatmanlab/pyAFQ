@@ -270,6 +270,9 @@ class BundleDict(MutableMapping):
     def __iter__(self):
         return iter(self._dict)
 
+    def copy(self):
+        return self._dict.copy()
+
 
 # this is parallelized below
 def _getter_helper(wf_dict, attr_name):
