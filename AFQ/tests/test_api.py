@@ -458,7 +458,9 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="bundle_info must be None, a list of strings, or a dict"):
+            match=(
+                "bundle_info must be None, a list of strings,"
+                " a dict, or a BundleDict")):
         api.AFQ(bids_path, bundle_info=[2, 3])
 
 
