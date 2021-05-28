@@ -109,9 +109,7 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = api.BundleDict(
-    bundle_names=["CST", "ARC"],
-    resample_to=MNI_T2_img)
+bundles = api.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
 
 
 ##########################################################################

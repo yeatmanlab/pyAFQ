@@ -83,7 +83,7 @@ else:
 
 
 bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
-bundles = api.BundleDict(bundle_names=bundle_names, seg_algo="reco80")
+bundles = api.BundleDict(bundle_names, seg_algo="reco80")
 
 print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
