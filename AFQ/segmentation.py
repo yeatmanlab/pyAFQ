@@ -25,7 +25,7 @@ import AFQ.utils.volume as auv
 import AFQ.data as afd
 from AFQ.utils.parallel import parfor
 
-__all__ = ["Segmentation", "clean_bundles", "clean_by_endpoints"]
+__all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
 
 def _resample_tg(tg, n_points):
@@ -96,7 +96,7 @@ class Segmentation:
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
-        parallel_segmentation : dict
+        parallel_segmentation : dict or AFQ.api.BundleDict
             How to parallelize segmentation across processes when performing
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
             perform parallelization. See ``AFQ.utils.parallel.pafor`` for
@@ -271,7 +271,7 @@ class Segmentation:
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
         Parameters
         ----------
-        bundle_dict: dict
+        bundle_dict: dict or AFQ.api.BundleDict
             Meta-data for the segmentation. The format is something like::
                 {'name': {'ROIs':[img1, img2],
                 'rules':[True, True]},

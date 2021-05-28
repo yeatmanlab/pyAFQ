@@ -109,8 +109,9 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = api.make_bundle_dict(bundle_names=["CST", "ARC"],
-                               resample_to=MNI_T2_img)
+bundles = api.BundleDict(
+    bundle_names=["CST", "ARC"],
+    resample_to=MNI_T2_img)
 
 
 ##########################################################################
@@ -134,8 +135,9 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
                          op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
                 # Add voxels that aren't there yet:
                 seed_roi = np.logical_or(seed_roi, warped_roi)
-    nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
-                             op.join(working_dir, 'seed_roi.nii.gz'))
+    nib.save(nib.Nifti1Image(
+        seed_roi.astype(float), img.affine),
+        op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     stop_mask=FA_data, stop_threshold=0.1)
     save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
