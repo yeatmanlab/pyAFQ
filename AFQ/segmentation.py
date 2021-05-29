@@ -24,6 +24,7 @@ import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ.data as afd
 from AFQ.utils.parallel import parfor
+from AFQ.definitions.mapping import ConformedFnirtMapping
 
 __all__ = ["Segmentation", "clean_bundles", "clean_by_endpoints"]
 
@@ -856,11 +857,15 @@ class Segmentation:
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
             tg.to_rasmm()
-            delta = dts.values_from_volume(
-                self.mapping.forward,
-                tg.streamlines, np.eye(4))
-            self.moved_sl = dts.Streamlines(
-                [d + s for d, s in zip(delta, tg.streamlines)])
+            if isinstance(self.mapping, ConformedFnirtMapping):
+                self.moved_sl = dts.Streamlines(
+                    [self.mapping.transform(s) for s in tg.streamlines])
+            else:
+                delta = dts.values_from_volume(
+                    self.mapping.forward,
+                    tg.streamlines, np.eye(4))
+                self.moved_sl = dts.Streamlines(
+                    [d + s for d, s in zip(delta, tg.streamlines)])
             tg.to_vox()
 
         if self.save_intermediates is not None:
