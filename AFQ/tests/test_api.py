@@ -3,6 +3,7 @@ import os
 import os.path as op
 import shutil
 import subprocess
+import gc
 
 import toml
 
@@ -773,6 +774,7 @@ def test_AFQ_data_waypoint():
     # save memory
     results_dir = myafq.results_dir["01"]
     del myafq
+    gc.collect()
 
     cmd = "pyAFQ " + config_file
     out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
