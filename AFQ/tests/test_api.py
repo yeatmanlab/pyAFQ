@@ -770,6 +770,10 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
+    # save memory
+    results_dir = myafq.results_dir["01"]
+    del myafq
+
     cmd = "pyAFQ " + config_file
     out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
     assert out == 0
@@ -780,15 +784,13 @@ def test_AFQ_data_waypoint():
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
-    myafq.rois
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        results_dir,
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    myafq.indiv_bundles
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        results_dir,
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
