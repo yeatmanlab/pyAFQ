@@ -122,7 +122,8 @@ class BundleDict(MutableMapping):
                     expanded_bundle_names.append(bundle_name + "_R")
                     expanded_bundle_names.append(bundle_name + "_L")
             elif self.seg_algo.startswith("reco"):
-                if bundle_name in RECO_UNIQUE:
+                if bundle_name in RECO_UNIQUE\
+                        or bundle_name == "whole_brain":
                     expanded_bundle_names.append(bundle_name)
                 else:
                     expanded_bundle_names.append(bundle_name + "_R")

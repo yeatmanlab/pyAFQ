@@ -913,7 +913,8 @@ class Segmentation:
             rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
-        bundle_list.remove('whole_brain')
+        if 'whole_brain' in bundle_list:
+            bundle_list.remove('whole_brain')
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:

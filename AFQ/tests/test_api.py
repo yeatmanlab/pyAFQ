@@ -211,10 +211,17 @@ def test_BundleDict():
     assert len(afq_bundles) == 2
 
     # Vertical Occipital Fasciculus
-    # not included and does not exist in templates
-    afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
+    # not included and does not exist in afq templates
+    with pytest.raises(
+            ValueError,
+            match="VOF_R is not in AFQ templates"):
+        api.BundleDict(["VOF"])
 
-    assert len(afq_bundles) == 0
+    afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
+    assert len(afq_bundles) == 2
+
+    afq_bundles = api.BundleDict(["whole_brain"], seg_algo="reco80")
+    assert len(afq_bundles) == 1
 
 
 def test_AFQ_missing_files():
