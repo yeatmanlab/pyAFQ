@@ -212,7 +212,7 @@ def test_BundleDict():
 
     # Vertical Occipital Fasciculus
     # not included and does not exist in templates
-    afq_bundles = api.BundleDict(["VOF"])
+    afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
 
     assert len(afq_bundles) == 0
 
@@ -777,8 +777,12 @@ def test_AFQ_data_waypoint():
     gc.collect()
 
     cmd = "pyAFQ " + config_file
-    out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
-    assert out == 0
+    completed_process = subprocess.run(
+        cmd, shell=True, capture_output=True)
+    if completed_process.returncode != 0:
+        print(completed_process.stdout)
+    print(completed_process.stderr)
+    assert completed_process.returncode == 0
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
