@@ -2,6 +2,7 @@ import tempfile
 import os
 import os.path as op
 import shutil
+import subprocess
 
 import toml
 
@@ -770,7 +771,7 @@ def test_AFQ_data_waypoint():
         toml.dump(config, ff)
 
     cmd = "pyAFQ " + config_file
-    out = os.system(cmd)
+    out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
     assert out == 0
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
