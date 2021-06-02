@@ -274,8 +274,7 @@ class BundleDict(MutableMapping):
         return self._dict[key]
 
     def __len__(self):
-        self.gen_all()
-        return len(self._dict)
+        return len(self.bundle_names)
 
     def __delitem__(self, key):
         if key in self._dict:

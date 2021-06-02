@@ -215,7 +215,8 @@ def test_BundleDict():
     with pytest.raises(
             ValueError,
             match="VOF_R is not in AFQ templates"):
-        api.BundleDict(["VOF"])
+        afq_bundles = api.BundleDict(["VOF"])
+        afq_bundles["VOF_R"]
 
     afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
     assert len(afq_bundles) == 2
