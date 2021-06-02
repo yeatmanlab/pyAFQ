@@ -246,7 +246,7 @@ def test_AFQ_custom_tract():
             "suffix": "tractography",
             "scope": "vistasoft"
         })
-    my_afq.get_streamlines()
+    my_afq.export_streamlines()
 
 
 @pytest.mark.nightly2
@@ -291,15 +291,21 @@ def test_AFQ_init():
         my_afq = api.AFQ(bids_path,
                          dmriprep="synthetic")
 
-        if n_subjects != n_sessions:
-            for session in range(n_sessions):
-                sess = f"0{session+1}"
+        for subject in range(n_subjects):
+            sub = f"0{subject+1}"
+            if n_subjects == n_sessions:
                 npt.assert_equal(
-                    len(my_afq.wf_dict[sess]),
-                    (n_subjects, 12))
-        else:
-            npt.assert_equal(len(my_afq.wf_dict),
-                             (n_subjects, 12))
+                    len(my_afq.wf_dict[sub][sub]),
+                    40)
+            else:
+                for session in range(n_sessions):
+                    if n_sessions == 1:
+                        sess = "None"
+                    else:
+                        sess = f"0{session+1}"
+                    npt.assert_equal(
+                        len(my_afq.wf_dict[sub][sess]),
+                        40)
 
 
 def test_AFQ_custom_bundle_dict():
@@ -326,7 +332,7 @@ def test_AFQ_data():
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
                          nib.load(myafq.dwi_file["01"]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
-                         nib.load(myafq.dti["01"]).shape[:3])
+                         nib.load(myafq.dti_params["01"]).shape[:3])
         myafq.rois
         shutil.rmtree(op.join(
             bids_path,
@@ -490,7 +496,7 @@ def test_AFQ_pft():
             "stop_threshold": "CMC",
             "tracker": "pft"
         })
-    my_afq.get_streamlines()
+    my_afq.export_streamlines()
 
 
 @pytest.mark.nightly4
@@ -506,7 +512,7 @@ def test_AFQ_custom_subject_reg():
     b0_file = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_info=bundle_names).get_b0()[0]
+        bundle_info=bundle_names).b0["01"]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()

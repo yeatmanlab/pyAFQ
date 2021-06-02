@@ -85,7 +85,8 @@ def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
 
 @pimms.calc("mapping")
 def sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template,
-                streamlines_file):
+                tractography_imap):
+    streamlines_file = tractography_imap["streamlines_file"]
     tg = load_tractogram(
         streamlines_file, reg_subject,
         Space.VOX, bbox_valid_check=False)
