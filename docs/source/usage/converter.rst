@@ -1,5 +1,5 @@
-Matlab AFQ to Python AFQ conversion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tractography conversion
+~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ provides tools to convert between the results of the original Matlab
 based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.
 
