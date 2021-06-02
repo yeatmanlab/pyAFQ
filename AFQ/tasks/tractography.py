@@ -45,7 +45,7 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
     odf_model = this_tracking_params["odf_model"]
     if odf_model == "DTI":
         params_file = data_imap["dti_params_file"]
-    elif odf_model == "CSD":
+    elif odf_model == "CSD" or odf_model == "MSMT":
         params_file = data_imap["csd_params_file"]
     elif odf_model == "DKI":
         params_file = data_imap["dki_params_file"]
