@@ -859,7 +859,7 @@ class Segmentation:
             tg.to_rasmm()
             if isinstance(self.mapping, ConformedFnirtMapping):
                 self.moved_sl = dts.Streamlines(
-                    [self.mapping.transform(s) for s in tg.streamlines])
+                    [self.mapping.warp.transform(s) for s in tg.streamlines])
             else:
                 delta = dts.values_from_volume(
                     self.mapping.forward,
