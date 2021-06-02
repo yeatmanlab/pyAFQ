@@ -106,7 +106,7 @@ def sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template,
     return mapping_definition.get_for_subses(
         subses_dict, reg_subject, reg_template,
         subject_sls=tg.streamlines,
-        template_sls=hcp_atlas)
+        template_sls=hcp_atlas.streamlines)
 
 
 @pimms.calc("reg_subject")
