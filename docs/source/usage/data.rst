@@ -45,7 +45,8 @@ run::
     afd.organize_stanford_data()
 
 This should create a folder in your home directory with a properly-formatted
-data set in a directory called `stanford_hardi`::
+data set in a directory called `stanford_hardi`. Only the preprocessed
+diffusion data is required for pyAFQ::
 
     ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
     ├── dataset_description.json
@@ -55,6 +56,8 @@ data set in a directory called `stanford_hardi`::
                 ├── sub-01_ses-01_dwi.bval
                 ├── sub-01_ses-01_dwi.bvec
                 └── sub-01_ses-01_dwi.nii.gz
+
+See :ref:`examples/plot_bids_layout` for a more extensive example.
 
 .. note::
 
