@@ -506,7 +506,7 @@ def test_AFQ_custom_subject_reg():
     b0_file = api.AFQ(
         bids_path,
         dmriprep='vistasoft',
-        bundle_info=bundle_names).get_b0()[0]
+        bundle_info=bundle_names).b0["01"]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()
