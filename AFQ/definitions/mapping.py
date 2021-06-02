@@ -117,13 +117,14 @@ class FnirtMap(Definition):
             nearest_warp, their_templ, subj).asDeformationField().data
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ).asDeformationField().data
-        backwarp = resample(
-            backwarp, warp, their_templ.affine, subj.affine).get_fdata()
+        warp = resample(
+            warp, backwarp, subj.affine, their_templ.affine).get_fdata()
 
         their_disp = np.zeros((*warp.shape, 2))
         their_disp[:, :, :, :, 0] = warp
         their_disp[:, :, :, :, 1] = backwarp
-
+        their_disp = nib.Nifti1Image(
+            their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
             reg_template, prealign=None)
