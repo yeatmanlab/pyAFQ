@@ -223,6 +223,8 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                 default_arg_dict[section] = {}
             if arg == 'bids_path':
                 bids_path = default
+            elif section == "KWARGS":
+                kwargs[arg] = toml_to_val(default)
             elif arg in default_arg_dict[section]:
                 val = toml_to_val(default)
                 is_special = False
