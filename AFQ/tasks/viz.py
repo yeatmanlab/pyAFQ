@@ -191,11 +191,11 @@ def viz_indivBundle(subses_dict,
                         aal_roi[targ[:, 0],
                                 targ[:, 1],
                                 targ[:, 2]] = 1
-                    warped_roi = auv.transform_inverse_roi(
-                        aal_roi,
-                        mapping,
-                        bundle_name=bundle_name)
-                    warped_rois.append(warped_roi)
+                        warped_roi = auv.transform_inverse_roi(
+                            aal_roi,
+                            mapping,
+                            bundle_name=bundle_name)
+                        warped_rois.append(warped_roi)
             for i, roi in enumerate(warped_rois):
                 figure = viz_backend.visualize_roi(
                     roi,

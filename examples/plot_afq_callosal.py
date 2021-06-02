@@ -40,15 +40,23 @@ tracking_params = dict(seed_mask=RoiMask(),
 # Initialize an AFQ object:
 # -------------------------
 #
-# We specify bundle_info as the default bundles list (api.BUNDLES) plus the
-# callosal bundle list. This tells the AFQ object to use bundles from both
+# We specify bundle_info as the callosal bundles only
+# (`api.CALLOSUM_BUNDLES`). If we want to segment both the callosum
+# and the other bundles, we would pass `api.CALLOSUM_BUNDLES + api.BUNDLES`
+# instead. This would tell the AFQ object to use bundles from both
 # the standard and callosal templates.
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 dmriprep='vistasoft',
-                bundle_info=api.BUNDLES + api.CALLOSUM_BUNDLES,
-                tracking_params=tracking_params)
+                bundle_info=api.CALLOSUM_BUNDLES,
+                tracking_params=tracking_params,
+                viz_backend='plotly_no_gif')
+
+# Calling export all produces all of the outputs of processing, including
+# tractography, scalar maps, tract profiles and visualizations:
+myafq.export_all()
+
 
 ##########################################################################
 # Visualizing bundles and tract profiles:
