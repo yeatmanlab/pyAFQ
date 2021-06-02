@@ -7,6 +7,7 @@ import logging
 import pimms
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
+from AFQ.definitions.mapping import GeneratedMapMixin
 import AFQ.data as afd
 import AFQ.utils.volume as auv
 
@@ -78,9 +79,15 @@ def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
 
 
 @pimms.calc("mapping")
-def mapping(subses_dict, mapping_definition, reg_subject, reg_template):
+def gen_mapping(subses_dict, mapping_definition, reg_subject, reg_template):
     return mapping_definition.get_for_subses(
         subses_dict, reg_subject, reg_template)
+
+
+@pimms.calc("mapping")
+def custom_mapping(subses_dict, mapping_definition, reg_template):
+    return mapping_definition.get_for_subses(
+        subses_dict, reg_template)
 
 
 @pimms.calc("mapping")
@@ -126,9 +133,9 @@ def get_reg_subject(reg_subject_spec, data_imap):
     return img
 
 
-def get_mapping_plan(reg_subject, scalars, use_sls=False):
+def get_mapping_plan(mapping_definition, scalars, use_sls=False):
     mapping_tasks = with_name([
-        export_registered_b0, template_xform, export_rois, mapping,
+        export_registered_b0, template_xform, export_rois,
         get_reg_subject])
 
     # add custom scalars
@@ -139,5 +146,9 @@ def get_mapping_plan(reg_subject, scalars, use_sls=False):
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping
+    elif isinstance(mapping_definition, GeneratedMapMixin):
+        mapping_tasks["mapping_res"] = gen_mapping
+    else:
+        mapping_tasks["mapping_res"] = custom_mapping
 
     return pimms.plan(**mapping_tasks)
