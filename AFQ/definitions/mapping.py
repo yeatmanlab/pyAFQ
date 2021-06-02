@@ -9,12 +9,12 @@ import AFQ.registration as reg
 import AFQ.data as afd
 from AFQ.tasks.utils import get_fname
 
+from dipy.align import resample
 from dipy.align.imaffine import AffineMap
 
 try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
-    from fsl.transform.nonlinear import applyDeformation
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -41,9 +41,13 @@ class FnirtMap(Definition):
     Parameters
     ----------
     warp_suffix : str
-        suffix to pass to bids_layout.get() to identify the warp file.
+        suffix to pass to bids_layout.get() to identify the warp file
+        (subject to template).
     space_suffix : str
         suffix to pass to bids_layout.get() to identify the space file.
+    backwarp_suffix : str
+        suffix to pass to bids_layout.get() to identify the inverse warp file
+        (template to subject).
     warp_filters : str
         Additional filters to pass to bids_layout.get() to identify
         the warp file.
@@ -52,6 +56,10 @@ class FnirtMap(Definition):
         Additional filters to pass to bids_layout.get() to identify
         the space file.
         Default: {}
+    backwarp_filters : str
+        Additional filters to pass to bids_layout.get() to identify
+        the inverse warp file.
+        Default: {}
 
 
     Examples
@@ -59,20 +67,24 @@ class FnirtMap(Definition):
     fnirt_map = FnirtMap(
         "warp",
         "MNI",
+        "backwarp",
+        {"scope": "TBSS"},
         {"scope": "TBSS"},
         {"scope": "TBSS"})
     api.AFQ(mapping=fnirt_map)
     """
 
-    def __init__(self, warp_suffix, space_suffix,
-                 warp_filters={}, space_filters={}):
+    def __init__(self, warp_suffix, space_suffix, backwarp_suffix,
+                 warp_filters={}, space_filters={}, backwarp_filters={}):
         if not has_fslpy:
             raise ImportError(
                 "Please install fslpy if you want to use FnirtMap")
         self.warp_suffix = warp_suffix
         self.space_suffix = space_suffix
+        self.backwarp_suffix = backwarp_suffix
         self.warp_filters = warp_filters
         self.space_filters = space_filters
+        self.backwarp_filters = backwarp_filters
         self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
@@ -87,39 +99,34 @@ class FnirtMap(Definition):
             bids_layout, from_path, self.space_filters, self.space_suffix,
             session, subject)
 
-        self.fnames[session][subject] = (nearest_warp, nearest_space)
+        nearest_backwarp = find_file(
+            bids_layout, from_path, self.backwarp_filters,
+            self.backwarp_suffix,
+            session, subject)
+
+        self.fnames[session][subject] = (
+            nearest_warp, nearest_space, nearest_backwarp)
 
     def get_for_subses(self, subses_dict, reg_template):
-        nearest_warp, nearest_space = self.fnames[
+        nearest_warp, nearest_space, nearest_backwarp = self.fnames[
             subses_dict['ses']][subses_dict['subject']]
 
-        our_templ = reg_template
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
-        warp = readFnirt(nearest_warp, their_templ, subj)
+        warp = readFnirt(
+            nearest_warp, their_templ, subj).asDeformationField().data
+        backwarp = readFnirt(
+            nearest_backwarp, subj, their_templ).asDeformationField().data
+        backwarp = resample(
+            backwarp, warp, their_templ.affine, subj.affine).get_fdata()
 
-        return ConformedFnirtMapping(warp, our_templ.affine)
+        their_disp = np.zeros((*warp.shape, 2))
+        their_disp[:, :, :, :, 0] = warp
+        their_disp[:, :, :, :, 1] = backwarp
 
-
-class ConformedFnirtMapping():
-    """
-        ConformedFnirtMapping which matches the generic mapping API.
-    """
-
-    def __init__(self, warp, ref_affine):
-        self.ref_affine = ref_affine
-        self.warp = warp
-
-    def transform_inverse(self, data, **kwargs):
-        data_img = Image(nib.Nifti1Image(
-            data.astype(np.float32), self.ref_affine))
-        xform_data = np.asarray(applyDeformation(data_img, self.warp).data)
-        return xform_data
-
-    def transform(self, data, **kwargs):
-        raise NotImplementedError(
-            "Fnirt based mappings can currently"
-            + " only transform from template to subject space")
+        return reg.read_mapping(
+            their_disp, subses_dict['dwi_file'],
+            reg_template, prealign=None)
 
 
 class ItkMap(Definition):
