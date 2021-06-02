@@ -89,7 +89,7 @@ class FnirtMap(Definition):
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
-    def get_for_subses(self, subses_dict, reg_template, reg_subject):
+    def get_for_subses(self, subses_dict, reg_template):
         nearest_warp, nearest_space = self.fnames[
             subses_dict['ses']][subses_dict['subject']]
 
@@ -163,7 +163,7 @@ class ItkMap(Definition):
             bids_layout, from_path, self.warp_filters, self.warp_suffix,
             session, subject, extension="h5")
 
-    def get_for_subses(self, subses_dict, reg_template, reg_subject):
+    def get_for_subses(self, subses_dict, reg_template):
         nearest_warp = self.fnames[subses_dict['ses']][subses_dict['subject']]
         warp_f5 = h5py.File(nearest_warp)
         their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
