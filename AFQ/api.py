@@ -637,10 +637,8 @@ class AFQ(object):
                 "segmentation": get_segmentation_plan(),
                 "viz": get_viz_plan()}
 
-        self.sub_list = []
-        self.ses_list = []
-        self.dwi_file_list = []
-        self.results_dir_list = []
+        self.valid_sub_list = []
+        self.valid_ses_list = []
         for subject in self.subjects:
             self.wf_dict[subject] = {}
             for session in self.sessions:
@@ -666,11 +664,8 @@ class AFQ(object):
                         f"{session}. Skipping.")
                     continue
 
-                self.results_dir_list.append(results_dir)
                 os.makedirs(results_dir, exist_ok=True)
-
                 dwi_data_file = dwi_files[0]
-                self.dwi_file_list.append(dwi_data_file)
 
                 # For bvals and bvecs, use ``get_bval()`` and ``get_bvec()`` to
                 # walk up the file tree and inherit the closest bval and bvec
@@ -753,8 +748,8 @@ class AFQ(object):
                     session
                 )
 
-                self.sub_list.append(subject)
-                self.ses_list.append(session)
+                self.valid_sub_list.append(subject)
+                self.valid_ses_list.append(session)
 
                 img = nib.load(dwi_data_file)
                 subses_dict = {
@@ -797,7 +792,7 @@ class AFQ(object):
                         **previous_data)
                     last_name = name
 
-                self.wf_dict[subject][session] =\
+                self.wf_dict[subject][str(session)] =\
                     previous_data[f"{last_name}_imap"]
 
     def _get_best_scalar(self):
@@ -854,7 +849,8 @@ class AFQ(object):
             pass
 
         # find what name to use
-        first_dict = self.wf_dict[self.subjects[0]][self.sessions[0]]
+        first_dict =\
+            self.wf_dict[self.valid_sub_list[0]][str(self.valid_ses_list[0])]
         attr_file = attr + "_file"
         attr_name = None
         if attr in first_dict:
@@ -883,10 +879,10 @@ class AFQ(object):
         in_list = []
         to_calc_list = []
         results = {}
-        for subject in self.subjects:
+        for subject in self.valid_sub_list:
             results[subject] = {}
-            for session in self.sessions:
-                wf_dict = self.wf_dict[subject][session]
+            for session in self.valid_ses_list:
+                wf_dict = self.wf_dict[subject][str(session)]
                 if section is not None:
                     wf_dict = wf_dict[section]
                 if ((self.parallel_params.get("engine", False) != "serial")
@@ -911,8 +907,8 @@ class AFQ(object):
 
         # If only one session, collapse session dimension
         if len(self.sessions) == 1:
-            for subject in self.subjects:
-                results[subject] = results[subject][self.sessions[0]]
+            for subject in self.valid_sub_list:
+                results[subject] = results[subject][self.valid_ses_list[0]]
 
         return results
 
