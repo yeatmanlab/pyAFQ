@@ -4,7 +4,6 @@ import datetime
 import platform
 import os.path as op
 import os
-import logging
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
@@ -13,7 +12,6 @@ from AFQ.definitions.mask import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
 from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
-import nibabel as nib  # interprets nibabel images for endpoint_info
 
 
 def parse_string(option, opt, value, parser):
@@ -165,7 +163,10 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
         for arg, info in docstr_parser.unfinished_arguments.items():
             try:
                 if name == "AFQ":
-                    if '_params' in arg:
+                    if arg in [
+                            "tracking_params",
+                            "segmentation_params",
+                            "clean_params"]:
                         continue
                     section, desc = info['help'].split('[')[1].split(']')
                 else:
