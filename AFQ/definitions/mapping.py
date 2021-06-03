@@ -159,8 +159,11 @@ class FnirtMap(Definition):
             their_disp, subses_dict['dwi_file'],
             reg_template,
             prealign=fslconcat(
-                Image(nearest_warp).getAffine('world', 'fsl'),
-                their_templ.getAffine('fsl', 'world'))
+                np.linalg.inv(nib.load(nearest_backwarp).affine),
+                fslconcat(
+                    their_templ.getAffine('fsl', 'world'),
+                    Image(nearest_warp).getAffine('world', 'fsl'))
+            )
         )
 
 
