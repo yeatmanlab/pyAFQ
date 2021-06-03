@@ -117,10 +117,14 @@ class FnirtMap(Definition):
             nearest_warp, their_templ, subj).data
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
-        backwarp = resample(
-            backwarp.data, warp,
-            their_templ.getAffine(backwarp.refSpace, 'world'),
-            reg_template.affine).get_fdata()
+
+        backwarp_resampled = np.zeros(backwarp.data.shape)
+        for i in range(3):
+            backwarp_resampled[..., i] = resample(
+                backwarp.data[..., i], warp[..., i],
+                their_templ.getAffine(backwarp.refSpace, 'world'),
+                reg_template.affine).get_fdata()
+        backwarp = backwarp_resampled
 
         their_disp = np.zeros((*warp.shape, 2))
         their_disp[:, :, :, :, 0] = warp
