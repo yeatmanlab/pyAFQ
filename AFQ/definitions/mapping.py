@@ -15,7 +15,7 @@ from dipy.align.imaffine import AffineMap
 try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
-    from fsl.transform.nonlinear import applyDeformation
+    from fsl.transform.affine import concat as fslconcat
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -118,99 +118,101 @@ class FnirtMap(Definition):
         warp = readFnirt(
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
-            nearest_backwarp, subj, their_templ).asDeformationField()
+            nearest_backwarp, subj, their_templ)
 
-        return ConformedFnirtMapping(
-            warp, backwarp,
-            nib.load(subses_dict['dwi_file']),
+        # make flattened coords numpy structure for warp
+        def gen_displacements(this_warp, coeff):
+            l1, l2, l3 = (
+                this_warp.data.shape[0],
+                this_warp.data.shape[1],
+                this_warp.data.shape[2])
+            coords = np.meshgrid(
+                np.arange(l1),
+                np.arange(l2),
+                np.arange(l3),
+                indexing='ij')  # returns 3 lists of coordinates
+            flattened_coords = np.zeros((l1 * l2 * l3, 3))
+            for ii, axis in enumerate(coords):
+                flattened_coords[:, ii] = axis.flatten()
+            if coeff:
+                this_warp_disp = this_warp.displacements(
+                    flattened_coords).reshape(this_warp.shape)
+            else:
+                this_warp_disp = this_warp.data\
+                    - flattened_coords.reshape(this_warp.shape)
+
+            this_warp_resampled = np.zeros(
+                (*reg_template.get_fdata().shape, 3))
+            for i in range(3):
+                this_warp_resampled[..., i] = resample(
+                    this_warp_disp[..., i], reg_template.get_fdata(),
+                    this_warp.src.getAffine('fsl', 'world'),
+                    reg_template.affine).get_fdata()
+            return this_warp_resampled
+
+        their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
+        their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
+        their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
+        their_disp = nib.Nifti1Image(
+            their_disp, reg_template.affine)
+        return reg.read_mapping(
+            their_disp, subses_dict['dwi_file'],
             reg_template,
-            nib.load(nearest_backwarp).affine)
+            prealign=fslconcat(
+                fslconcat(
+                    Image(nearest_warp).getAffine('world', 'fsl'),
+                    their_templ.getAffine('fsl', 'world')),
+                Image(nearest_backwarp).getAffine('fsl', 'world')))
+
+#     def get_for_subses(self, subses_dict, reg_template):
+#         nearest_warp, nearest_space, nearest_backwarp = self.fnames[
+#             subses_dict['ses']][subses_dict['subject']]
+
+#         subj = Image(subses_dict['dwi_file'])
+#         their_templ = Image(nearest_space)
+
+#         warp = readFnirt(
+#             nearest_warp, their_templ, subj)
+#         backwarp = readFnirt(
+#             nearest_backwarp, subj, their_templ).asDeformationField()
+
+#         return ConformedFnirtMapping(
+#             warp, backwarp,
+#             nib.load(subses_dict['dwi_file']).affine,
+#             reg_template,
+#             nib.load(nearest_backwarp).affine)
 
 
-class ConformedFnirtMapping():
-    """
-        ConformedFnirtMapping which matches the generic mapping API.
-    """
+# class ConformedFnirtMapping():
+#     """
+#         ConformedFnirtMapping which matches the generic mapping API.
+#     """
 
-    def __init__(self, warp, backwarp, subject_affine,
-                 our_template, their_template_affine):
-        self.warp = warp
-        self.backwarp = backwarp
-        self.subject_affine = subject_affine
-        self.our_template = our_template
-        self.their_template_affine = their_template_affine
+#     def __init__(self, warp, backwarp, subject_affine,
+#                  our_template, their_template_affine):
+#         self.warp = warp
+#         self.backwarp = backwarp
+#         self.subject_affine = subject_affine
+#         self.our_template = our_template
+#         self.their_template_affine = their_template_affine
 
-    def transform_inverse(self, data, **kwargs):
-        data_img = Image(nib.Nifti1Image(
-            data.astype(np.float32), self.our_template.affine))
-        xform_data = np.asarray(applyDeformation(
-            data_img, self.warp).data)
-        return xform_data
+#     def transform_inverse(self, data, **kwargs):
+#         data_img = Image(nib.Nifti1Image(
+#             data.astype(np.float32), self.our_template.affine))
+#         xform_data = np.asarray(applyDeformation(
+#             data_img, self.warp).data)
+#         return xform_data
 
-    def transform(self, data, **kwargs):
-        data_img = Image(nib.Nifti1Image(
-            data.astype(np.float32), self.subject_affine))
-        xform_data = np.asarray(applyDeformation(
-            data_img, self.backwarp).data)
-        xform_data = resample(
-            xform_data, self.our_template.get_fdata(),
-            self.their_template_affine,
-            self.our_template.affine).get_fdata()
-        return xform_data
-
-    # def get_for_subses(self, subses_dict, reg_template):
-    #     nearest_warp, nearest_space, nearest_backwarp = self.fnames[
-    #         subses_dict['ses']][subses_dict['subject']]
-
-    #     subj = Image(subses_dict['dwi_file'])
-    #     their_templ = Image(nearest_space)
-
-    #     warp = readFnirt(
-    #         nearest_warp, their_templ, subj)
-    #     backwarp = readFnirt(
-    #         nearest_backwarp, subj, their_templ)
-
-    #     # make flattened coords numpy structure for warp
-    #     def gen_displacements(this_warp, coeff):
-    #         l1, l2, l3 = (
-    #             this_warp.data.shape[0],
-    #             this_warp.data.shape[1],
-    #             this_warp.data.shape[2])
-    #         coords = np.meshgrid(
-    #             np.arange(l1),
-    #             np.arange(l2),
-    #             np.arange(l3),
-    #             indexing='ij')  # returns 3 lists of coordinates
-    #         flattened_coords = np.zeros((l1 * l2 * l3, 3))
-    #         for ii, axis in enumerate(coords):
-    #             flattened_coords[:, ii] = axis.flatten()
-    #         if coeff:
-    #             this_warp_disp = this_warp.displacements(
-    #                 flattened_coords).reshape(this_warp.shape)
-    #         else:
-    #             this_warp_disp = this_warp.data\
-    #                 - flattened_coords.reshape(this_warp.shape)
-
-    #         this_warp_resampled = np.zeros(
-    #             (*reg_template.get_fdata().shape, 3))
-    #         for i in range(3):
-    #             this_warp_resampled[..., i] = resample(
-    #                 this_warp_disp[..., i], reg_template.get_fdata(),
-    #                 this_warp.src.getAffine('fsl', 'world'),
-    #                 reg_template.affine).get_fdata()
-    #         return this_warp_resampled
-
-    #     their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
-    #     their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
-    #     their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
-    #     their_disp = nib.Nifti1Image(
-    #         their_disp, reg_template.affine)
-    #     return reg.read_mapping(
-    #         their_disp, subses_dict['dwi_file'],
-    #         reg_template,
-    #         prealign=fslconcat(
-    #             their_templ.getAffine('fsl', 'world'),
-    #             Image(nearest_warp).getAffine('world', 'fsl')))
+#     def transform(self, data, **kwargs):
+#         data_img = Image(nib.Nifti1Image(
+#             data.astype(np.float32), self.subject_affine))
+#         xform_data = np.asarray(applyDeformation(
+#             data_img, self.backwarp).data)
+#         xform_data = resample(
+#             xform_data, self.our_template.get_fdata(),
+#             self.their_template_affine,
+#             self.our_template.affine).get_fdata()
+#         return xform_data
 
 
 class ItkMap(Definition):
