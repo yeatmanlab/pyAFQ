@@ -118,7 +118,6 @@ class FnirtMap(Definition):
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
-        prealign = warp.getAffine('fsl', 'world')
 
         # make flattened coords numpy structure for warp
         def gen_displacements(this_warp, coeff):
@@ -145,7 +144,7 @@ class FnirtMap(Definition):
             for i in range(3):
                 this_warp_resampled[..., i] = resample(
                     this_warp_disp[..., i], reg_template.get_fdata(),
-                    this_warp.src.getAffine('fsl', 'world'),
+                    this_warp.src.getAffine('voxel', 'world'),
                     reg_template.affine).get_fdata()
             return this_warp_resampled
 
