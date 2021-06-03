@@ -114,9 +114,9 @@ class FnirtMap(Definition):
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
         warp = readFnirt(
-            nearest_warp, their_templ, subj).asDeformationField().data
+            nearest_warp, their_templ, subj).data
         backwarp = readFnirt(
-            nearest_backwarp, subj, their_templ).asDeformationField().data
+            nearest_backwarp, subj, their_templ).data
         warp = resample(
             warp, backwarp, subj.affine, their_templ.affine).get_fdata()
 
