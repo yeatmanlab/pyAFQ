@@ -122,8 +122,6 @@ class FnirtMap(Definition):
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
-        print(type(warp))
-        print(type(backwarp))
 
         # make flattened coords numpy structure for warp
         def gen_displacements(this_warp):
@@ -142,7 +140,7 @@ class FnirtMap(Definition):
             return this_warp.displacements(
                 flattened_coords).reshape(this_warp.shape)
 
-        warp = gen_displacements(warp)
+        warp = warp.data
         backwarp = gen_displacements(backwarp)
 
         backwarp_resampled = np.zeros(warp.shape)
@@ -154,8 +152,8 @@ class FnirtMap(Definition):
         backwarp = backwarp_resampled
 
         their_disp = np.zeros((*warp.shape, 2))
-        their_disp[:, :, :, :, 0] = warp
-        their_disp[:, :, :, :, 1] = backwarp
+        their_disp[:, :, :, :, 1] = warp
+        their_disp[:, :, :, :, 0] = backwarp
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
