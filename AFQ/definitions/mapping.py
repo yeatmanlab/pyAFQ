@@ -135,22 +135,22 @@ class FnirtMap(Definition):
             for ii, axis in enumerate(coords):
                 flattened_coords[:, ii] = axis.flatten()
             if coeff:
-                return this_warp.displacements(
+                this_warp_disp = this_warp.displacements(
                     flattened_coords).reshape(this_warp.shape)
             else:
-                return this_warp.data\
+                this_warp_disp = this_warp.data\
                     - flattened_coords.reshape(this_warp.shape)
+
+            this_warp_resampled = np.zeros(reg_template.get_fdata().shape)
+            for i in range(3):
+                this_warp_resampled[..., i] = resample(
+                    this_warp_disp[..., i], reg_template.get_fdata(),
+                    this_warp.src.getAffine('fsl', 'world'),
+                    reg_template.affine).get_fdata()
+            return this_warp_resampled
 
         warp = gen_displacements(warp, False)
         backwarp = gen_displacements(backwarp, True)
-
-        backwarp_resampled = np.zeros(warp.shape)
-        for i in range(3):
-            backwarp_resampled[..., i] = resample(
-                backwarp[..., i], warp[..., i],
-                their_templ.getAffine('voxel', 'world'),
-                reg_template.affine).get_fdata()
-        backwarp = backwarp_resampled
 
         their_disp = np.zeros((*warp.shape, 2))
         their_disp[:, :, :, :, 1] = warp
@@ -159,7 +159,7 @@ class FnirtMap(Definition):
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
-            reg_template, prealign=prealign)
+            reg_template, prealign=None)
 
 
 class ItkMap(Definition):
