@@ -145,7 +145,7 @@ class FnirtMap(Definition):
             for i in range(3):
                 this_warp_resampled[..., i] = resample(
                     this_warp_disp[..., i], reg_template.get_fdata(),
-                    this_warp.src.getAffine('voxel', 'world'),
+                    this_warp.src.getAffine('fsl', 'world'),
                     reg_template.affine).get_fdata()
             return this_warp_resampled
 
