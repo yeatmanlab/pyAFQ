@@ -15,6 +15,7 @@ from dipy.align.imaffine import AffineMap
 try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
+    from fsl.transform.affine import concat as fslconcat
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -157,9 +158,9 @@ class FnirtMap(Definition):
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
             reg_template,
-            prealign=Image(nearest_backwarp).getAffine('fsl', 'world'))
-        # prealign=np.linalg.inv(
-        #     Image(nearest_warp).getAffine('fsl', 'world')))
+            prealign=fslconcat(
+                their_templ.getAffine('fsl', 'world'),
+                Image(nearest_warp).getAffine('world', 'fsl')))
 
 
 class ItkMap(Definition):
