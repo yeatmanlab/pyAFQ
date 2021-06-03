@@ -15,6 +15,7 @@ from dipy.align.imaffine import AffineMap
 try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
+    from fsl.transform.affine import concat as fslconcat
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -113,7 +114,10 @@ class FnirtMap(Definition):
 
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
-        their_affine = their_templ.getAffine('world', 'voxel')
+        their_affine = fslconcat(
+            subses_dict["dwi_affine"],
+            their_templ.getAffine('voxel', 'world'))
+
         warp = readFnirt(
             nearest_warp, their_templ, subj).data
         backwarp = readFnirt(
@@ -123,7 +127,7 @@ class FnirtMap(Definition):
         for i in range(3):
             backwarp_resampled[..., i] = resample(
                 backwarp.data[..., i], warp[..., i],
-                their_affine,
+                their_templ.getAffine('voxel', 'world'),
                 reg_template.affine).get_fdata()
         backwarp = backwarp_resampled
 
