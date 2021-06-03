@@ -136,7 +136,7 @@ class FnirtMap(Definition):
                 indexing='ij')  # returns 3 lists of coordinates
             flattened_coords = np.zeros((l1 * l2 * l3, 3))
             for ii, axis in enumerate(coords):
-                flattened_coords[:, ii] = axis[ii].flatten()
+                flattened_coords[:, ii] = axis.flatten()
             return this_warp.displacements(
                 flattened_coords).reshape(this_warp.shape)
 
