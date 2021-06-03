@@ -151,19 +151,21 @@ class FnirtMap(Definition):
             return this_warp_resampled
 
         their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
-        their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
-        their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
+        # their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
+        # their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
             reg_template,
             prealign=fslconcat(
-                their_templ.getAffine('fsl', 'world'),
-                nib.load(nearest_warp).affine / 2))
-        # prealign=fslconcat(
-        #     their_templ.getAffine('fsl', 'world'),
-        #     Image(nearest_warp).getAffine('world', 'fsl')))
+                np.linalg.inv(nib.load(nearest_backwarp).affine),
+                fslconcat(
+                    their_templ.getAffine('fsl', 'world'),
+                    Image(nearest_warp).getAffine('world', 'fsl')
+                )
+            )
+        )
 
 
 class ItkMap(Definition):
