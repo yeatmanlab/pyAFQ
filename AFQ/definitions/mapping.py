@@ -118,7 +118,7 @@ class FnirtMap(Definition):
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
 
-        backwarp_resampled = np.zeros(backwarp.data.shape)
+        backwarp_resampled = np.zeros(warp.shape)
         for i in range(3):
             backwarp_resampled[..., i] = resample(
                 backwarp.data[..., i], warp[..., i],
