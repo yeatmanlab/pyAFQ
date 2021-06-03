@@ -156,11 +156,8 @@ class FnirtMap(Definition):
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
-            their_disp, np.eye(4),  # subses_dict['dwi_file'],
+            their_disp, subses_dict['dwi_file'],
             reg_template,
-            # prealign=fslconcat(
-            #     their_templ.getAffine('fsl', 'world'),
-            #     np.linalg.inv(nib.load(nearest_warp).affine / 2)))
             prealign=fslconcat(
                 their_templ.getAffine('fsl', 'world'),
                 Image(nearest_warp).getAffine('world', 'fsl')))
