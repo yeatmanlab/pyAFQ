@@ -156,7 +156,8 @@ class FnirtMap(Definition):
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
-            reg_template, prealign=nib.load(nearest_warp).affine)
+            reg_template,
+            prealign=np.linalg.inv(nib.load(nearest_warp).affine))
 
 
 class ItkMap(Definition):
