@@ -15,7 +15,6 @@ from dipy.align.imaffine import AffineMap
 try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
-    from fsl.transform.affine import concat as fslconcat
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -114,14 +113,12 @@ class FnirtMap(Definition):
 
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
-        their_affine = fslconcat(
-            subj.getAffine('world', 'voxel'),
-            their_templ.getAffine('voxel', 'world'))
 
         warp = readFnirt(
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
+        prealign = warp.getAffine('fsl', 'world')
 
         # make flattened coords numpy structure for warp
         def gen_displacements(this_warp, coeff):
@@ -162,7 +159,7 @@ class FnirtMap(Definition):
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
-            reg_template, prealign=np.linalg.inv(their_affine))
+            reg_template, prealign=prealign)
 
 
 class ItkMap(Definition):
