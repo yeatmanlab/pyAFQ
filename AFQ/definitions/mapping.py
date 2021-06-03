@@ -113,6 +113,7 @@ class FnirtMap(Definition):
 
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
+        their_affine = their_templ.getAffine('voxel', 'world')
         warp = readFnirt(
             nearest_warp, their_templ, subj).data
         backwarp = readFnirt(
@@ -122,18 +123,18 @@ class FnirtMap(Definition):
         for i in range(3):
             backwarp_resampled[..., i] = resample(
                 backwarp.data[..., i], warp[..., i],
-                their_templ.getAffine(backwarp.refSpace, 'world'),
+                their_affine,
                 reg_template.affine).get_fdata()
         backwarp = backwarp_resampled
 
         their_disp = np.zeros((*warp.shape, 2))
-        their_disp[:, :, :, :, 1] = warp
-        their_disp[:, :, :, :, 0] = backwarp
+        their_disp[:, :, :, :, 0] = warp
+        their_disp[:, :, :, :, 1] = backwarp
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
-            reg_template, prealign=None)
+            reg_template, prealign=their_affine)
 
 
 class ItkMap(Definition):
