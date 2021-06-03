@@ -124,7 +124,7 @@ class FnirtMap(Definition):
             nearest_backwarp, subj, their_templ)
 
         # make flattened coords numpy structure for warp
-        def gen_displacements(this_warp):
+        def gen_displacements(this_warp, coeff):
             l1, l2, l3 = (
                 this_warp.data.shape[0],
                 this_warp.data.shape[1],
@@ -137,11 +137,15 @@ class FnirtMap(Definition):
             flattened_coords = np.zeros((l1 * l2 * l3, 3))
             for ii, axis in enumerate(coords):
                 flattened_coords[:, ii] = axis.flatten()
-            return this_warp.displacements(
-                flattened_coords).reshape(this_warp.shape)
+            if coeff:
+                return this_warp.displacements(
+                    flattened_coords).reshape(this_warp.shape)
+            else:
+                return this_warp.data\
+                    - flattened_coords.reshape(this_warp.shape)
 
-        warp = warp.data
-        backwarp = gen_displacements(backwarp)
+        warp = gen_displacements(warp, False)
+        backwarp = gen_displacements(backwarp, True)
 
         backwarp_resampled = np.zeros(warp.shape)
         for i in range(3):
@@ -158,7 +162,7 @@ class FnirtMap(Definition):
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
-            reg_template, prealign=their_affine)
+            reg_template, prealign=np.linalg.inv(their_affine))
 
 
 class ItkMap(Definition):
