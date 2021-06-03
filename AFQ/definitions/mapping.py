@@ -160,7 +160,10 @@ class FnirtMap(Definition):
             reg_template,
             prealign=fslconcat(
                 their_templ.getAffine('fsl', 'world'),
-                Image(nearest_warp).getAffine('world', 'fsl')))
+                nib.load(nearest_warp).affine / 2))
+        # prealign=fslconcat(
+        #     their_templ.getAffine('fsl', 'world'),
+        #     Image(nearest_warp).getAffine('world', 'fsl')))
 
 
 class ItkMap(Definition):
