@@ -13,6 +13,8 @@ from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
 from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
 
+import nibabel as nib  # allows users to input nibabel objects
+
 
 def parse_string(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
