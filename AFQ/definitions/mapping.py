@@ -114,12 +114,14 @@ class FnirtMap(Definition):
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
         warp = readFnirt(
-            nearest_warp, their_templ, subj).data
+            nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ).data
+        print(warp.data.shape)
+        print(backwarp.shape)
         warp = resample(
-            warp, backwarp,
-            their_templ.getAffine(backwarp.srcSpace, 'world'),
+            warp.data, backwarp,
+            their_templ.getAffine(warp.srcSpace, 'world'),
             reg_template.affine).get_fdata()
 
         their_disp = np.zeros((*warp.shape, 2))
