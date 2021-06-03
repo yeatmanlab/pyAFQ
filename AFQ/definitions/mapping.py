@@ -127,8 +127,8 @@ class FnirtMap(Definition):
         backwarp = backwarp_resampled
 
         their_disp = np.zeros((*warp.shape, 2))
-        their_disp[:, :, :, :, 0] = warp
-        their_disp[:, :, :, :, 1] = backwarp
+        their_disp[:, :, :, :, 1] = warp
+        their_disp[:, :, :, :, 0] = backwarp
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
