@@ -118,7 +118,9 @@ class FnirtMap(Definition):
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ).data
         warp = resample(
-            warp, backwarp, subj.affine, their_templ.affine).get_fdata()
+            warp, backwarp,
+            subses_dict['dwi_file'].affine,
+            their_templ.getAffine(warp.srcSpace, 'world')).get_fdata()
 
         their_disp = np.zeros((*warp.shape, 2))
         their_disp[:, :, :, :, 0] = warp
