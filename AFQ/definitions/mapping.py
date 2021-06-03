@@ -122,6 +122,8 @@ class FnirtMap(Definition):
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
+        print(type(warp))
+        print(type(backwarp))
 
         # make flattened coords numpy structure for warp
         def gen_displacements(this_warp):
