@@ -149,7 +149,7 @@ class FnirtMap(Definition):
                     reg_template.affine).get_fdata()
             return this_warp_resampled
 
-        their_disp = np.zeros((*warp.shape, 2))
+        their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
         their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
         their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
         their_disp = nib.Nifti1Image(
