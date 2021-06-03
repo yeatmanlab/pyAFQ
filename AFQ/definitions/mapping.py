@@ -115,7 +115,7 @@ class FnirtMap(Definition):
         subj = Image(subses_dict['dwi_file'])
         their_templ = Image(nearest_space)
         their_affine = fslconcat(
-            subses_dict["dwi_affine"],
+            subj.getAffine('world', 'voxel'),
             their_templ.getAffine('voxel', 'world'))
 
         warp = readFnirt(
