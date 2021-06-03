@@ -140,7 +140,8 @@ class FnirtMap(Definition):
                 this_warp_disp = this_warp.data\
                     - flattened_coords.reshape(this_warp.shape)
 
-            this_warp_resampled = np.zeros(reg_template.get_fdata().shape)
+            this_warp_resampled = np.zeros(
+                (*reg_template.get_fdata().shape, 3))
             for i in range(3):
                 this_warp_resampled[..., i] = resample(
                     this_warp_disp[..., i], reg_template.get_fdata(),
