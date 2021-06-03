@@ -119,15 +119,34 @@ class FnirtMap(Definition):
             their_templ.getAffine('voxel', 'world'))
 
         warp = readFnirt(
-            nearest_warp, their_templ, subj).data
+            nearest_warp, their_templ, subj)
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
-        print(backwarp.__defType)
+
+        # make flattened coords numpy structure for warp
+        def gen_displacements(this_warp):
+            l1, l2, l3 = (
+                this_warp.data.shape[0],
+                this_warp.data.shape[1],
+                this_warp.data.shape[2])
+            coords = np.meshgrid(
+                np.arange(l1),
+                np.arange(l2),
+                np.arange(l3),
+                indexing='ij')  # returns 3 lists of coordinates
+            flattened_coords = np.zeros((l1 * l2 * l3, 3))
+            for ii, axis in enumerate(coords):
+                flattened_coords[:, ii] = axis[ii].flatten()
+            return this_warp.displacements(
+                flattened_coords).reshape(this_warp.shape)
+
+        warp = gen_displacements(warp)
+        backwarp = gen_displacements(backwarp)
 
         backwarp_resampled = np.zeros(warp.shape)
         for i in range(3):
             backwarp_resampled[..., i] = resample(
-                backwarp.data[..., i], warp[..., i],
+                backwarp[..., i], warp[..., i],
                 their_templ.getAffine('voxel', 'world'),
                 reg_template.affine).get_fdata()
         backwarp = backwarp_resampled
