@@ -157,7 +157,7 @@ class FnirtMap(Definition):
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
             reg_template,
-            prealign=nib.load(nearest_backwarp).affine)
+            prealign=Image(nearest_warp).getAffine('voxel', 'world'))
 
 
 class ItkMap(Definition):
