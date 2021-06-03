@@ -159,11 +159,9 @@ class FnirtMap(Definition):
             their_disp, subses_dict['dwi_file'],
             reg_template,
             prealign=fslconcat(
-                fslconcat(
-                    their_templ.getAffine('fsl', 'world'),
-                    Image(nearest_warp).getAffine('world', 'fsl')),
-                np.linalg.inv(nib.load(nearest_backwarp).affine)
-            ))
+                Image(nearest_warp).getAffine('world', 'fsl'),
+                their_templ.getAffine('fsl', 'world'))
+        )
 
 
 class ItkMap(Definition):
