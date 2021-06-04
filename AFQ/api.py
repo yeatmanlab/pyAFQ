@@ -16,8 +16,12 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.streamline import load_tractogram, load_trk
+
 from .version import version as pyafq_version
 import pandas as pd
+import numpy as np
 import os
 import os.path as op
 import json
@@ -1033,6 +1037,34 @@ class AFQ(object):
         _df.to_csv(out_file, index=False)
         return _df
 
+    def get_streamlines_json(self):
+        sls_json_fname = op.abspath(op.join(
+            self.afq_path, "tract_profiles.csv"))
+        if not op.exists(sls_json_fname):
+            first_sub = self.clean_bundles.keys()[0]
+            first_ses = self.clean_bundles[first_sub].keys()[0]
+            first_bundles_file = self.clean_bundles[first_sub][first_ses]
+            img = nib.load(self.dwi[first_sub][first_ses])
+            sft = load_tractogram(
+                first_bundles_file,
+                img,
+                Space.VOX)
+            for b in self.bundle_dict.keys():
+                if b != "whole_brain":
+                    idx = np.where(
+                        sft.data_per_streamline['bundle']
+                        == self.bundle_dict[b]['uid'])[0]
+                    # TODO: subsample idx
+                    this_tg = StatefulTractogram(
+                        sft.streamlines[idx],
+                        img,
+                        Space.VOX)
+                    # TODO: transform this_tg to MNI and rasmm
+                    # TODO: calculate core fiber
+                    # TODO: output json file
+
+        return sls_json_fname
+
     def export_all(self):
         """ Exports all the possible outputs"""
         start_time = time()
@@ -1068,7 +1100,10 @@ class AFQ(object):
         generated. This includes running the full AFQ pipeline if it has not
         already run. The combined tract profile is one of the outputs of
         export_all.
-        Second, we generate a streamlines.json file by TODO.
+        Second, we generate a streamlines.json file from the bundle
+        recognized in the first subject's first session.
+        Third, we call AFQ-Browser's assemble to assemble an AFQ-Browser
+        instance in output_path.
 
         Parameters
         ----------
@@ -1099,12 +1134,17 @@ class AFQ(object):
         if output_path is None:
             output_path = op.join(self.bids_path, "derivatives/afq_browser")
 
+        # generate combined profiles csv
         self.combine_profiles()
+
+        # generate streamlines.json file
+        sls_json_fname = self.get_streamlines_json()
 
         afqb.assemble(
             op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
             target=output_path,
             metadata=metadata,
+            # sls_json=sls_json_fname,
             title=page_title,
             subtitle=page_subtitle,
             link=page_title_link,
