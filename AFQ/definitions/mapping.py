@@ -1,4 +1,5 @@
 import nibabel as nib
+from nibabel.streamlines.trk import get_affine_rasmm_to_trackvis
 import numpy as np
 from time import time
 import os.path as op
@@ -160,10 +161,13 @@ class FnirtMap(Definition):
             reg_template,
             prealign=fslconcat(
                 fslconcat(
-                    Image(nearest_warp).getAffine('world', 'fsl'),
-                    their_templ.getAffine('fsl', 'world')
+                    Image(nearest_warp).getAffine('world', 'voxel'),
+                    their_templ.getAffine('voxel', 'world')
                 ),
-                nib.load(nearest_backwarp).affine
+                fslconcat(
+                    nib.load(nearest_backwarp).affine,
+                    Image(nearest_backwarp).getAffine('voxel', 'world')
+                )
             ))
         # prealign=fslconcat(
         #     their_templ.getAffine('fsl', 'world'),
