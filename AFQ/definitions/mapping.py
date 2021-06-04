@@ -16,7 +16,6 @@ try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
     from fsl.transform.affine import concat as fslconcat
-    from fsl.utils.image import resampleToReference
     from fsl.transform.nonlinear import (
         applyDeformation,
         DeformationField,
