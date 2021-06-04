@@ -856,18 +856,18 @@ class Segmentation:
                 rng=self.rng)
         elif reg_algo == "syn":
             self.logger.info("Registering tractogram based on syn")
-            tg.to_rasmm()
             if isinstance(self.mapping, ConformedFnirtMapping):
                 self.moved_sl = dts.Streamlines(
                     [self.mapping.transform_coords(s)
                         for s in tg.streamlines])
             else:
+                tg.to_rasmm()
                 delta = dts.values_from_volume(
                     self.mapping.forward,
                     tg.streamlines, np.eye(4))
                 self.moved_sl = dts.Streamlines(
                     [d + s for d, s in zip(delta, tg.streamlines)])
-            tg.to_vox()
+                tg.to_vox()
 
         if self.save_intermediates is not None:
             moved_sft = StatefulTractogram(
