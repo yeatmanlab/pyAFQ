@@ -161,8 +161,13 @@ class FnirtMap(Definition):
             prealign=fslconcat(
                 fslconcat(
                     Image(nearest_warp).getAffine('world', 'fsl'),
-                    their_templ.getAffine('fsl', 'world')),
-                Image(nearest_backwarp).getAffine('world', 'fsl')))
+                    their_templ.getAffine('fsl', 'world')
+                ),
+                nib.load(nearest_backwarp).affine
+            ))
+        # prealign=fslconcat(
+        #     their_templ.getAffine('fsl', 'world'),
+        #     Image(nearest_warp).getAffine('world', 'fsl')))
 
 #     def get_for_subses(self, subses_dict, reg_template):
 #         nearest_warp, nearest_space, nearest_backwarp = self.fnames[
