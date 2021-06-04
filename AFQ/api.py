@@ -1083,7 +1083,7 @@ class AFQ(object):
             "subjectID" column to work.
             Default: None
         page_title : str
-            Page title.
+            Page title. If None, "AFQ Browser" is used.
             Default: None
         page_subtitle : str
             Page subtitle.
