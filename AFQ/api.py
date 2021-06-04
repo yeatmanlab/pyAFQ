@@ -1028,6 +1028,7 @@ class AFQ(object):
         out_file = op.abspath(op.join(
             self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)
+        _df.reset_index(drop=True, inplace=True)
         _df.to_csv(out_file, index=False)
         return _df
 
@@ -1132,7 +1133,7 @@ def download_and_combine_afq_profiles(bucket,
                 return_type='filename')
 
         df = combine_list_of_profiles(profiles)
-        df.to_csv("tmp.csv")
+        df.to_csv("tmp.csv", index=False)
         if upload is True:
             bids_prefix = "/".join([bucket, study_s3_prefix]).rstrip("/")
             fs = s3fs.S3FileSystem()
@@ -1181,4 +1182,4 @@ def combine_list_of_profiles(profile_fnames):
         profiles['sessionID'] = session_name
         dfs.append(profiles)
 
-    return pd.concat(dfs)
+    return pd.concat(dfs).reset_index(drop=True)
