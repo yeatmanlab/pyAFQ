@@ -183,7 +183,12 @@ class FnirtMap(Definition):
         warp = readFnirt(
             nearest_warp, their_templ, subj)
         backwarp = readFnirt(
-            nearest_backwarp, subj, their_templ).asDeformationField()
+            nearest_backwarp, subj, their_templ)
+
+        if not isinstance(warp, DeformationField):
+            warp = warp.asDeformationField()
+        if not isinstance(backwarp, DeformationField):
+            backwarp = backwarp.asDeformationField()
 
         return ConformedFnirtMapping(
             warp, backwarp,
