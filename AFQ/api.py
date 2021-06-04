@@ -26,6 +26,7 @@ from time import time
 import nibabel as nib
 from importlib import import_module
 from collections.abc import MutableMapping
+import afqbrowser as afqb
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -1043,8 +1044,10 @@ class AFQ(object):
         self.sl_counts
         self.tract_profile_plots
         self.profiles
-        if len(self.sessions) * len(self.subjects) > 1:
-            self.combine_profiles()
+        # We combine profiles even if there is only 1 subject / session,
+        # as the combined profiles format may still be useful
+        # i.e., for AFQ Browser
+        self.combine_profiles()
         self.all_bundles_figure
         if self.seg_algo == "afq":
             self.indiv_bundles_figures
@@ -1055,6 +1058,56 @@ class AFQ(object):
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
         s3fs.put(self.afq_path, remote_path, recursive=True)
+
+    def assemble_AFQ_browser(self, output_path=None, metadata=None,
+                             page_title=None, page_subtitle=None,
+                             page_title_link=None, page_subtitle_link=None):
+        """
+        Assembles an instance of the AFQ-Browser from this AFQ instance.
+        First, we generate the combined tract profile if it is not already
+        generated. This includes running the full AFQ pipeline if it has not
+        already run. The combined tract profile is one of the outputs of
+        export_all.
+        Second, we generate a streamlines.json file by TODO.
+
+        Parameters
+        ----------
+        output_path : str
+            Path to location to create this instance of the browser in.
+            Called "target" in AFQ Browser API. If None,
+            bids_path/derivatives/afq_browser is used.
+            Default: None
+        metadata : str
+            Path to subject metadata csv file. If None, an metadata file
+            containing only subject ID is created.
+            Default: None
+        page_title : str
+            Page title.
+            Default: None
+        page_subtitle : str
+            Page subtitle.
+            Default: None
+        page_title_link : str
+            Title hyperlink (including http(s)://).
+            Default: None
+        page_subtitle_link : str
+            Subtitle hyperlink (including http(s)://)
+            Default: None
+        """
+
+        if output_path is None:
+            output_path = op.join(self.bids_path, "derivatives/afq_browser")
+
+        self.combine_profiles()
+
+        afqb.assemble(
+            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
+            target=output_path,
+            metadata=metadata,
+            title=page_title,
+            subtitle=page_subtitle,
+            link=page_title_link,
+            sublink=page_subtitle_link)
 
 
 # iterate through all attributes, setting methods for each one
