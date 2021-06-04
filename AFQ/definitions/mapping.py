@@ -17,6 +17,9 @@ try:
     from fsl.data.image import Image
     from fsl.transform.fnirt import readFnirt
     from fsl.transform.affine import concat as fslconcat
+    from fsl.transform.nonlinear import (
+        convertDeformationSpace,
+        convertDeformationType)
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
@@ -121,53 +124,53 @@ class FnirtMap(Definition):
         backwarp = readFnirt(
             nearest_backwarp, subj, their_templ)
 
-        # make flattened coords numpy structure for warp
-        def gen_displacements(this_warp, coeff):
-            l1, l2, l3 = (
-                this_warp.data.shape[0],
-                this_warp.data.shape[1],
-                this_warp.data.shape[2])
-            coords = np.meshgrid(
-                np.arange(l1),
-                np.arange(l2),
-                np.arange(l3),
-                indexing='ij')  # returns 3 lists of coordinates
-            flattened_coords = np.zeros((l1 * l2 * l3, 3))
-            for ii, axis in enumerate(coords):
-                flattened_coords[:, ii] = axis.flatten()
-            if coeff:
-                this_warp_disp = this_warp.displacements(
-                    flattened_coords).reshape(this_warp.shape)
-            else:
-                this_warp_disp = this_warp.data\
-                    - flattened_coords.reshape(this_warp.shape)
+        backwarp = backwarp.asDeformationField()
+        warp = convertDeformationSpace(warp, 'voxel', 'voxel')
+        backwarp = convertDeformationSpace(backwarp, 'voxel', 'voxel')
 
-            this_warp_resampled = np.zeros(
-                (*reg_template.get_fdata().shape, 3))
-            for i in range(3):
-                this_warp_resampled[..., i] = resample(
-                    this_warp_disp[..., i], reg_template.get_fdata(),
-                    this_warp.src.getAffine('fsl', 'world'),
-                    reg_template.affine).get_fdata()
-            return this_warp_resampled
+        # # make flattened coords numpy structure for warp
+        # def gen_displacements(this_warp, coeff):
+        #     l1, l2, l3 = (
+        #         this_warp.data.shape[0],
+        #         this_warp.data.shape[1],
+        #         this_warp.data.shape[2])
+        #     coords = np.meshgrid(
+        #         np.arange(l1),
+        #         np.arange(l2),
+        #         np.arange(l3),
+        #         indexing='ij')  # returns 3 lists of coordinates
+        #     flattened_coords = np.zeros((l1 * l2 * l3, 3))
+        #     for ii, axis in enumerate(coords):
+        #         flattened_coords[:, ii] = axis.flatten()
+        #     if coeff:
+        #         this_warp_disp = this_warp.displacements(
+        #             flattened_coords).reshape(this_warp.shape)
+        #     else:
+        #         this_warp_disp = this_warp.data\
+        #             - flattened_coords.reshape(this_warp.shape)
+
+        #     this_warp_resampled = np.zeros(
+        #         (*reg_template.get_fdata().shape, 3))
+        #     for i in range(3):
+        #         this_warp_resampled[..., i] = resample(
+        #             this_warp_disp[..., i], reg_template.get_fdata(),
+        #             this_warp.src.getAffine('fsl', 'world'),
+        #             reg_template.affine).get_fdata()
+        #     return this_warp_resampled
 
         their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
-        their_disp[:, :, :, :, 1] = gen_displacements(warp, False)
-        their_disp[:, :, :, :, 0] = gen_displacements(backwarp, True)
+        their_disp[:, :, :, :, 1] = convertDeformationType(
+            warp, "relative")
+        their_disp[:, :, :, :, 0] = convertDeformationType(
+            backwarp, "relative")
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
             their_disp, subses_dict['dwi_file'],
             reg_template,
             prealign=fslconcat(
-                fslconcat(
-                    Image(nearest_warp).getAffine('world', 'voxel'),
-                    their_templ.getAffine('voxel', 'world')
-                ),
-                fslconcat(
-                    nib.load(nearest_backwarp).affine,
-                    Image(nearest_backwarp).getAffine('voxel', 'world')
-                )
+                Image(reg_template).getAffine('world', 'voxel'),
+                warp.src.getAffine('voxel', 'world')
             ))
         # prealign=fslconcat(
         #     their_templ.getAffine('fsl', 'world'),
