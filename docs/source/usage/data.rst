@@ -59,6 +59,18 @@ diffusion data is required for pyAFQ::
 
 See :ref:`examples/plot_bids_layout` for a more extensive example.
 
+
+Preprocessing
+-------------
+pyAFQ does not perform preprocessing. Instead, pyAFQ expects the outputs of
+a preprocessing pipeline in BIDS format. In the above example, the dataset
+was preprocessed using the `VISTASOFT <https://github.com/vistalab/vistasoft>`_ software.
+The outputs of VISTASOFT are stored in its own pipeline folder,
+`derivatives/vistasoft`. Other examples may use other common preprocessing
+software tools, such as `dMRIPrep <https://github.com/nipreps/dmriprep>`_
+or `QSIprep <https://qsiprep.readthedocs.io/en/latest/>`_.
+
+
 .. note::
 
     The name of the pipeline is specified in the dataset_description.json,
