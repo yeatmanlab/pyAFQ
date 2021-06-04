@@ -228,10 +228,7 @@ class ConformedFnirtMapping():
         return xform_data
 
     def transform_coords(self, coords):
-        return self.backwarp.transform(
-            coords,
-            from_=Image(self.subject),
-            to=Image(self.our_template))
+        return self.backwarp.transform(coords)
 
 
 class ItkMap(Definition):
