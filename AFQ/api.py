@@ -1079,7 +1079,8 @@ class AFQ(object):
             Default: None
         metadata : str
             Path to subject metadata csv file. If None, an metadata file
-            containing only subject ID is created.
+            containing only subject ID is created. This file requires a
+            "subjectID" column to work.
             Default: None
         page_title : str
             Page title.
@@ -1091,7 +1092,7 @@ class AFQ(object):
             Title hyperlink (including http(s)://).
             Default: None
         page_subtitle_link : str
-            Subtitle hyperlink (including http(s)://)
+            Subtitle hyperlink (including http(s)://).
             Default: None
         """
 
