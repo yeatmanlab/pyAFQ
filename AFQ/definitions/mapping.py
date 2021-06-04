@@ -1,5 +1,4 @@
 import nibabel as nib
-from nibabel.streamlines.trk import get_affine_rasmm_to_trackvis
 import numpy as np
 from time import time
 import os.path as op
@@ -128,41 +127,22 @@ class FnirtMap(Definition):
         warp = convertDeformationSpace(warp, 'voxel', 'voxel')
         backwarp = convertDeformationSpace(backwarp, 'voxel', 'voxel')
 
-        # # make flattened coords numpy structure for warp
-        # def gen_displacements(this_warp, coeff):
-        #     l1, l2, l3 = (
-        #         this_warp.data.shape[0],
-        #         this_warp.data.shape[1],
-        #         this_warp.data.shape[2])
-        #     coords = np.meshgrid(
-        #         np.arange(l1),
-        #         np.arange(l2),
-        #         np.arange(l3),
-        #         indexing='ij')  # returns 3 lists of coordinates
-        #     flattened_coords = np.zeros((l1 * l2 * l3, 3))
-        #     for ii, axis in enumerate(coords):
-        #         flattened_coords[:, ii] = axis.flatten()
-        #     if coeff:
-        #         this_warp_disp = this_warp.displacements(
-        #             flattened_coords).reshape(this_warp.shape)
-        #     else:
-        #         this_warp_disp = this_warp.data\
-        #             - flattened_coords.reshape(this_warp.shape)
+        # make flattened coords numpy structure for warp
+        def gen_displacements(this_warp):
+            this_warp_disp = convertDeformationType(this_warp, "relative")
 
-        #     this_warp_resampled = np.zeros(
-        #         (*reg_template.get_fdata().shape, 3))
-        #     for i in range(3):
-        #         this_warp_resampled[..., i] = resample(
-        #             this_warp_disp[..., i], reg_template.get_fdata(),
-        #             this_warp.src.getAffine('fsl', 'world'),
-        #             reg_template.affine).get_fdata()
-        #     return this_warp_resampled
+            this_warp_resampled = np.zeros(
+                (*reg_template.get_fdata().shape, 3))
+            for i in range(3):
+                this_warp_resampled[..., i] = resample(
+                    this_warp_disp[..., i], reg_template.get_fdata(),
+                    this_warp.src.getAffine('voxel', 'world'),
+                    reg_template.affine).get_fdata()
+            return this_warp_resampled
 
         their_disp = np.zeros((*reg_template.get_fdata().shape, 3, 2))
-        their_disp[:, :, :, :, 1] = convertDeformationType(
-            warp, "relative")
-        their_disp[:, :, :, :, 0] = convertDeformationType(
-            backwarp, "relative")
+        their_disp[:, :, :, :, 1] = gen_displacements(warp)
+        their_disp[:, :, :, :, 0] = gen_displacements(backwarp)
         their_disp = nib.Nifti1Image(
             their_disp, reg_template.affine)
         return reg.read_mapping(
