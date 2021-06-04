@@ -76,7 +76,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # raw data. In this case, we do not include the raw folder and only have
 # the pipelines that contains the outputs of preprocessing the data.
 # In general, only the preprocessed diffusion data is required.
-# See :ref:`usage/data` for more details.
+# See the "Organizing your data" section of "Using pyAFQ" for more details.
 # In this case, one folder containing Freesurfer derivatives and another
 # folder containing the DWI data that has been preprocessed with Vistasoft.
 # pyAFQ provides facilities to segment tractography results obtained
