@@ -65,13 +65,20 @@ Preprocessing
 pyAFQ does not perform preprocessing. Instead, pyAFQ expects the outputs of
 a preprocessing pipeline in BIDS format. In the above example, the dataset
 was preprocessed using the `VISTASOFT <https://github.com/vistalab/vistasoft>`_ software.
-The outputs of VISTASOFT are stored in its own pipeline folder,
-`derivatives/vistasoft`. Other examples may use other common preprocessing
+Other examples may use other common preprocessing
 software tools, such as `dMRIPrep <https://github.com/nipreps/dmriprep>`_
 or `QSIprep <https://qsiprep.readthedocs.io/en/latest/>`_.
 
+.. note::
+
+    The outputs of VISTASOFT are stored in its own pipeline folder, which we
+    chose to call `derivatives/vistasoft`. In general, any folder name is
+    valid, as long as the folder is inside of the `derivatives` folder.
 
 .. note::
 
+    By default, pyAFQ will check all folders in `derivatives` for data.
+    If you want to specify which pipeline pyAFQ should check for preprocessed
+    data, pass that pipeline's name to the `dmriprep` parameter.
     The name of the pipeline is specified in the dataset_description.json,
     it is not based on the folder name.
