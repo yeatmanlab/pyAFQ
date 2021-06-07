@@ -17,7 +17,9 @@ from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import load_tractogram, load_trk
+from dipy.io.streamline import load_tractogram
+import dipy.tracking.streamlinespeed as dps
+import dipy.tracking.streamline as dts
 
 from .version import version as pyafq_version
 import pandas as pd
@@ -688,6 +690,7 @@ class AFQ(object):
 
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
+        self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
@@ -1039,57 +1042,88 @@ class AFQ(object):
 
     def get_streamlines_json(self):
         sls_json_fname = op.abspath(op.join(
-            self.afq_path, "tract_profiles.csv"))
+            self.afq_path, "afqb_streamlines.json"))
         if not op.exists(sls_json_fname):
-            first_sub = self.clean_bundles.keys()[0]
-            first_ses = self.clean_bundles[first_sub].keys()[0]
-            first_bundles_file = self.clean_bundles[first_sub][first_ses]
-            img = nib.load(self.dwi[first_sub][first_ses])
+            first_sub = list(self.clean_bundles.keys())[0]
+            if len(self.sessions) > 1:
+                first_ses = list(self.clean_bundles[first_sub].keys())[0]
+                first_bundles_file = self.clean_bundles[first_sub][first_ses]
+                first_mapping = self.mapping[first_sub][first_ses]
+                first_img = nib.load(self.dwi[first_sub][first_ses])
+            else:
+                first_bundles_file = self.clean_bundles[first_sub]
+                first_mapping = self.mapping[first_sub]
+                first_img = nib.load(self.dwi[first_sub])
             sft = load_tractogram(
                 first_bundles_file,
-                img,
+                first_img,
                 Space.VOX)
+            sls_dict = {}
             for b in self.bundle_dict.keys():
                 if b != "whole_brain":
                     idx = np.where(
                         sft.data_per_streamline['bundle']
                         == self.bundle_dict[b]['uid'])[0]
-                    # TODO: subsample idx
-                    this_tg = StatefulTractogram(
-                        sft.streamlines[idx],
-                        img,
+                    if len(idx) == 0:
+                        sls_dict[b] = {
+                            "coreFiber": [[0, 0, 0]],
+                            "0": [[0, 0, 0]]}
+                        continue
+                    if len(idx) > 100:
+                        idx = np.random.choice(
+                            idx, size=100, replace=False)
+                    these_sls = sft.streamlines[idx]
+                    these_sls = dps.set_number_of_points(these_sls, 30)
+                    tg = StatefulTractogram(
+                        these_sls,
+                        first_img,
                         Space.VOX)
-                    # TODO: transform this_tg to MNI and rasmm
-                    # TODO: calculate core fiber
-                    # TODO: output json file
-
+                    tg.to_rasmm()
+                    delta = dts.values_from_volume(
+                        first_mapping.forward,
+                        tg.streamlines, np.eye(4))
+                    moved_sl = dts.Streamlines(
+                        [d + s for d, s in zip(delta, tg.streamlines)])
+                    moved_sl = np.asarray(moved_sl)
+                    median_sl = np.median(moved_sl, axis=0)
+                    sls_dict[b] = {"coreFiber": median_sl.tolist()}
+                    for ii, sl_idx in enumerate(idx):
+                        sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
+            with open(sls_json_fname, 'w') as fp:
+                json.dump(sls_dict, fp)
         return sls_json_fname
 
-    def export_all(self):
+    def export_all(self, viz=True, afqbrowser=True, xforms=True):
         """ Exports all the possible outputs"""
         start_time = time()
-        if not isinstance(self.mapping_definition, FnirtMap)\
-                and not isinstance(self.mapping_definition, ItkMap):
-            self.b0_warped
-        self.template_xform
-        self.indiv_bundles
+        if xforms:
+            if not isinstance(self.mapping_definition, FnirtMap)\
+                    and not isinstance(self.mapping_definition, ItkMap):
+                self.b0_warped
+            self.template_xform
+            self.indiv_bundles
         self.sl_counts
-        self.tract_profile_plots
         self.profiles
         # We combine profiles even if there is only 1 subject / session,
         # as the combined profiles format may still be useful
         # i.e., for AFQ Browser
         self.combine_profiles()
-        self.all_bundles_figure
-        if self.seg_algo == "afq":
-            self.indiv_bundles_figures
-            self.rois
+        if viz:
+            self.tract_profile_plots
+            self.all_bundles_figure
+            if self.seg_algo == "afq":
+                self.indiv_bundles_figures
+                self.rois
+        if afqbrowser:
+            self.assemble_AFQ_browser()
         self.logger.info(
             "Time taken for export all: " + str(time() - start_time))
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
         s3fs.put(self.afq_path, remote_path, recursive=True)
+        if op.exists(self.afqb_path):
+            s3fs.put(self.afqb_path, remote_path, recursive=True)
 
     def assemble_AFQ_browser(self, output_path=None, metadata=None,
                              page_title=None, page_subtitle=None,
@@ -1132,7 +1166,8 @@ class AFQ(object):
         """
 
         if output_path is None:
-            output_path = op.join(self.bids_path, "derivatives/afq_browser")
+            output_path = self.afqb_path
+        os.makedirs(self.afqb_path, exist_ok=True)
 
         # generate combined profiles csv
         self.combine_profiles()
@@ -1140,15 +1175,16 @@ class AFQ(object):
         # generate streamlines.json file
         sls_json_fname = self.get_streamlines_json()
 
-        afqb.assemble(
-            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
-            target=output_path,
-            metadata=metadata,
-            # sls_json=sls_json_fname,
-            title=page_title,
-            subtitle=page_subtitle,
-            link=page_title_link,
-            sublink=page_subtitle_link)
+        # afqb.assemble(
+        #     op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
+        #     target=output_path,
+        #     metadata=metadata,
+        #     # sls_json=sls_json_fname,
+        #     # mode="custom",
+        #     title=page_title,
+        #     subtitle=page_subtitle,
+        #     link=page_title_link,
+        #     sublink=page_subtitle_link)
 
 
 # iterate through all attributes, setting methods for each one
