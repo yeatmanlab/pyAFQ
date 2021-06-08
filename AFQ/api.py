@@ -307,6 +307,13 @@ class BundleDict(MutableMapping):
         return self._dict.copy()
 
 
+# get rid of unnecessary columns in df
+def clean_pandas_df(df):
+    df = df.reset_index(drop=True)
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+    return df
+
+
 # this is parallelized below
 def _getter_helper(wf_dict, attr_name):
     return wf_dict[attr_name]
@@ -1036,7 +1043,7 @@ class AFQ(object):
         out_file = op.abspath(op.join(
             self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)
-        _df.reset_index(drop=True, inplace=True)
+        _df = clean_pandas_df(_df)
         _df.to_csv(out_file, index=False)
         return _df
 
@@ -1282,6 +1289,7 @@ def download_and_combine_afq_profiles(bucket,
     if out_file is not None:
         out_file = op.abspath(out_file)
         os.makedirs(op.dirname(out_file), exist_ok=True)
+        df = clean_pandas_df(df)
         df.to_csv(out_file, index=False)
 
     return df
@@ -1312,4 +1320,4 @@ def combine_list_of_profiles(profile_fnames):
         profiles['sessionID'] = session_name
         dfs.append(profiles)
 
-    return pd.concat(dfs).reset_index(drop=True)
+    return clean_pandas_df(pd.concat(dfs))
