@@ -143,6 +143,7 @@ class BundleDict(MutableMapping):
 
         self.logger = logging.getLogger('AFQ.api')
         self.resample_to = resample_to
+        self.all_gen = False
 
         if self.seg_algo == "afq":
             if "FP" in self.bundle_names\
@@ -167,101 +168,93 @@ class BundleDict(MutableMapping):
                     " Only AntFrontal will be used."))
                 self.bundle_names.remove("FA")
 
-        self.templates = None
-        self.callosal_templates = None
-        self.reco_bundle_dict = None
-
-    def _gen_bundle(self, key):
-        if key in self._dict:
+    def gen_all(self):
+        if self.all_gen:
             return
-        if key not in self.bundle_names:
-            raise ValueError(f"{key} not in BundleDict")
-
         if self.seg_algo == "afq":
-            if self.templates is None:
-                self.templates =\
-                    afd.read_templates(resample_to=self.resample_to)
-                # For the arcuate, we need to rename a few of these
-                # and duplicate the SLF ROI:
-                self.templates['ARC_roi1_L'] = self.templates['SLF_roi1_L']
-                self.templates['ARC_roi1_R'] = self.templates['SLF_roi1_R']
-                self.templates['ARC_roi2_L'] = self.templates['SLFt_roi2_L']
-                self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
-            if self.callosal_templates is None:
-                self.callosal_templates =\
-                    afd.read_callosum_templates(resample_to=self.resample_to)
+            templates =\
+                afd.read_templates(resample_to=self.resample_to)
+            # For the arcuate, we need to rename a few of these
+            # and duplicate the SLF ROI:
+            templates['ARC_roi1_L'] = templates['SLF_roi1_L']
+            templates['ARC_roi1_R'] = templates['SLF_roi1_R']
+            templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
+            templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
+            callosal_templates =\
+                afd.read_callosum_templates(resample_to=self.resample_to)
 
-            # Consider hard coding since we might have different rules for
-            # some tracts
-            if key in ["FA", "FP"]:
-                bundle = {
-                    'ROIs': [self.templates[key + "_L"],
-                             self.templates[key + "_R"],
-                             self.callosal_templates["Callosum_midsag"]],
-                    'rules': [True, True, True],
-                    'prob_map': self.templates[key + "_prob_map"],
-                    'cross_midline': True,
-                    'uid': self.uid_dict[key]}
-            elif key in CALLOSUM_BUNDLES:
-                bundle = {
-                    'ROIs': [self.callosal_templates["L_" + key],
-                             self.callosal_templates["R_" + key],
-                             self.callosal_templates["Callosum_midsag"]],
-                    'rules': [True, True, True],
-                    'cross_midline': True,
-                    'uid': self.uid_dict[key]}
-
-            # SLF is a special case, because it has an exclusion ROI:
-            elif key in ["SLF_L", "SLF_R"]:
-                name = key[:-2]
-                hemi = key[-2:]
-                bundle = {
-                    'ROIs': [self.templates[name + '_roi1' + hemi],
-                             self.templates[name + '_roi2' + hemi],
-                             self.templates["SLFt_roi2" + hemi]],
-                    'rules': [True, True, False],
-                    'prob_map': self.templates[name + hemi + '_prob_map'],
-                    'cross_midline': False,
-                    'uid': self.uid_dict[key]}
-            else:
-                name = key[:-2]
-                hemi = key[-2:]
-                if (self.templates.get(name + '_roi1' + hemi)
-                        and self.templates.get(name + '_roi2' + hemi)
-                        and self.templates.get(name + hemi + '_prob_map')):
+            for key in self.bundle_names:
+                # Consider hard coding since we might have different rules
+                # for some tracts
+                if key in ["FA", "FP"]:
                     bundle = {
-                        'ROIs': [self.templates[name + '_roi1' + hemi],
-                                 self.templates[name + '_roi2' + hemi]],
-                        'rules': [True, True],
-                        'prob_map': self.templates[
-                            name + hemi + '_prob_map'],
+                        'ROIs': [
+                            templates[key + "_L"],
+                            templates[key + "_R"],
+                            callosal_templates["Callosum_midsag"]],
+                        'rules': [True, True, True],
+                        'prob_map': templates[key + "_prob_map"],
+                        'cross_midline': True,
+                        'uid': self.uid_dict[key]}
+                elif key in CALLOSUM_BUNDLES:
+                    bundle = {
+                        'ROIs': [
+                            callosal_templates["L_" + key],
+                            callosal_templates["R_" + key],
+                            callosal_templates["Callosum_midsag"]],
+                        'rules': [True, True, True],
+                        'cross_midline': True,
+                        'uid': self.uid_dict[key]}
+
+                # SLF is a special case, because it has an exclusion ROI:
+                elif key in ["SLF_L", "SLF_R"]:
+                    name = key[:-2]
+                    hemi = key[-2:]
+                    bundle = {
+                        'ROIs': [
+                            templates[name + '_roi1' + hemi],
+                            templates[name + '_roi2' + hemi],
+                            templates["SLFt_roi2" + hemi]],
+                        'rules': [True, True, False],
+                        'prob_map': templates[name + hemi + '_prob_map'],
                         'cross_midline': False,
                         'uid': self.uid_dict[key]}
                 else:
-                    raise ValueError(f"{key} is not in AFQ templates")
-            if self.resample_to:
-                for ii, roi in enumerate(bundle['ROIs']):
-                    bundle['ROIs'][ii] =\
-                        afd.read_resample_roi(
-                            roi, resample_to=self.resample_to)
+                    name = key[:-2]
+                    hemi = key[-2:]
+                    if (templates.get(name + '_roi1' + hemi)
+                            and templates.get(name + '_roi2' + hemi)
+                            and templates.get(name + hemi + '_prob_map')):
+                        bundle = {
+                            'ROIs': [
+                                templates[name + '_roi1' + hemi],
+                                templates[name + '_roi2' + hemi]],
+                            'rules': [True, True],
+                            'prob_map': templates[
+                                name + hemi + '_prob_map'],
+                            'cross_midline': False,
+                            'uid': self.uid_dict[key]}
+                    else:
+                        raise ValueError(f"{key} is not in AFQ templates")
+                if self.resample_to:
+                    for ii, roi in enumerate(bundle['ROIs']):
+                        bundle['ROIs'][ii] =\
+                            afd.read_resample_roi(
+                                roi, resample_to=self.resample_to)
+                self._dict[key] = bundle
         elif self.seg_algo.startswith("reco"):
-            if self.reco_bundle_dict is None:
-                if self.seg_algo.endswith("80"):
-                    self.reco_bundle_dict = afd.read_hcp_atlas(80)
-                else:
-                    self.reco_bundle_dict = afd.read_hcp_atlas(16)
-            if key == "whole_brain":
-                bundle = self.reco_bundle_dict["whole_brain"]
-            bundle = self.reco_bundle_dict[key]
-            bundle['uid'] = self.uid_dict[key]
+            if self.seg_algo.endswith("80"):
+                reco_bundle_dict = afd.read_hcp_atlas(80)
+            else:
+                reco_bundle_dict = afd.read_hcp_atlas(16)
+            for key in self.bundle_names:
+                bundle = reco_bundle_dict[key]
+                bundle['uid'] = self.uid_dict[key]
+                self._dict[key] = bundle
         else:
             raise ValueError(
                 "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
-        self._dict[key] = bundle
-
-    def gen_all(self):
-        for bundle_name in self.bundle_names:
-            self._gen_bundle(bundle_name)
+        self.all_gen = True
 
     def __setitem__(self, key, item):
         self._dict[key] = item
@@ -270,7 +263,7 @@ class BundleDict(MutableMapping):
         self.bundle_names.append(key)
 
     def __getitem__(self, key):
-        self._gen_bundle(key)
+        self.gen_all()
         return self._dict[key]
 
     def __len__(self):
