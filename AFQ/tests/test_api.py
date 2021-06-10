@@ -215,7 +215,7 @@ def test_make_bundle_dict():
     assert len(afq_bundles) == 0
 
 
-@pytest.mark.nightly4
+@pytest.mark.nightly_custom
 def test_AFQ_custom_tract():
     """
     Test whether AFQ can use tractography from
@@ -249,7 +249,7 @@ def test_AFQ_custom_tract():
     my_afq.export_streamlines()
 
 
-@pytest.mark.nightly2
+@pytest.mark.nightly_basic
 def test_AFQ_no_derivs():
     """
     Test the initialization of the AFQ object
@@ -267,7 +267,7 @@ def test_AFQ_no_derivs():
             dmriprep="synthetic")
 
 
-@pytest.mark.nightly4
+@pytest.mark.nightly_custom
 @xvfb_it
 def test_AFQ_fury():
     _, bids_path, _ = get_temp_hardi()
@@ -279,7 +279,7 @@ def test_AFQ_fury():
     myafq.all_bundles_figure
 
 
-@pytest.mark.nightly3
+@pytest.mark.nightly_msmt_and_init
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
@@ -317,7 +317,7 @@ def test_AFQ_custom_bundle_dict():
         bundle_info=bundle_dict)
 
 
-@pytest.mark.nightly2
+@pytest.mark.nightly_basic
 def test_AFQ_data():
     """
     Test if API can run without prealign and with only pre-align
@@ -339,7 +339,7 @@ def test_AFQ_data():
             'derivatives/afq'))
 
 
-@pytest.mark.nightly5
+@pytest.mark.nightly_anisotropic
 def test_AFQ_anisotropic():
     """
     Test if API can run using anisotropic registration
@@ -410,7 +410,7 @@ def test_API_type_checking():
         api.AFQ(bids_path, bundle_info=[2, 3])
 
 
-@pytest.mark.nightly6
+@pytest.mark.nightly_slr
 def test_AFQ_slr():
     """
     Test if API can run using slr map
@@ -429,7 +429,7 @@ def test_AFQ_slr():
     npt.assert_(len(bundles['CST_L']) > 0)
 
 
-@pytest.mark.nightly2
+@pytest.mark.nightly_basic
 def test_AFQ_reco():
     """
     Test if API can run segmentation with recobundles
@@ -450,7 +450,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
-@pytest.mark.nightly4
+@pytest.mark.nightly_custom
 def test_AFQ_reco80():
     """
     Test API segmentation with the 80-bundle atlas
@@ -468,7 +468,7 @@ def test_AFQ_reco80():
     npt.assert_(len(bundles['CCMid']) > 0)
 
 
-@pytest.mark.nightly2
+@pytest.mark.nightly_pft
 def test_AFQ_pft():
     """
     Test pft interface for AFQ
@@ -499,7 +499,7 @@ def test_AFQ_pft():
     my_afq.export_streamlines()
 
 
-@pytest.mark.nightly4
+@pytest.mark.nightly_custom
 def test_AFQ_custom_subject_reg():
     """
     Test custom subject registration using AFQ object
@@ -738,7 +738,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
 
-@pytest.mark.nightly3
+@pytest.mark.nightly_msmt_and_init
 def test_afq_msmt():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
