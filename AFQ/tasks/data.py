@@ -260,5 +260,5 @@ def get_data_plan(brain_mask_definition):
     data_tasks["brain_mask_res"] = \
         pimms.calc("brain_mask_file")(
             as_file('_brain_mask.nii.gz')(
-                brain_mask_definition.get_mask_getter()))
+                brain_mask_definition.get_mask_getter(in_data=True)))
     return pimms.plan(**data_tasks)

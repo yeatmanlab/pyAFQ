@@ -112,9 +112,9 @@ class MaskFile(Definition):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask_getter(self):
+    def get_mask_getter(self, in_data=False):
         @as_img
-        def mask_getter(subses_dict, dwi_affine, data):
+        def mask_getter(subses_dict, dwi_affine):
             # Load data
             mask_file, mask_data_orig, mask_affine = \
                 self.get_path_data_affine(subses_dict)
@@ -125,7 +125,7 @@ class MaskFile(Definition):
             # Resample to DWI data:
             mask_data = _resample_mask(
                 mask_data,
-                data,
+                nib.load(subses_dict["dwi_file"]).get_fdata(),
                 mask_affine,
                 dwi_affine)
             return mask_data, meta
@@ -147,10 +147,12 @@ class FullMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self):
+    def get_mask_getter(self, in_data=False):
         @as_img
-        def mask_getter(subses_dict, dwi_affine, data):
-            return np.ones(data.shape), dict(source="Entire Volume")
+        def mask_getter(subses_dict, dwi_affine):
+            return np.ones(nib.load(
+                subses_dict["dwi_file"]).get_fdata()[..., 0].shape),\
+                dict(source="Entire Volume")
         return mask_getter
 
 
@@ -171,7 +173,7 @@ class RoiMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self):
+    def get_mask_getter(self, in_data=False):
         @as_img
         def mask_getter(subses_dict, dwi_affine, mapping_imap,
                         bundle_dict, segmentation_params):
@@ -221,16 +223,27 @@ class B0Mask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self):
-        @as_img
-        def mask_getter(subses_dict, dwi_affine, b0_file):
-            mean_b0_img = nib.load(b0_file)
-            mean_b0 = mean_b0_img.get_fdata()
-            _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-            return mask_data, dict(
-                source=b0_file,
-                technique="median_otsu applied to b0",
-                median_otsu_kwargs=self.median_otsu_kwargs)
+    def get_mask_getter(self, in_data=False):
+        if in_data:
+            @as_img
+            def mask_getter(subses_dict, dwi_affine, b0_file):
+                mean_b0_img = nib.load(b0_file)
+                mean_b0 = mean_b0_img.get_fdata()
+                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+                return mask_data, dict(
+                    source=b0_file,
+                    technique="median_otsu applied to b0",
+                    median_otsu_kwargs=self.median_otsu_kwargs)
+        else:
+            @as_img
+            def mask_getter(subses_dict, dwi_affine, data_imap):
+                mean_b0_img = nib.load(data_imap["b0_file"])
+                mean_b0 = mean_b0_img.get_fdata()
+                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+                return mask_data, dict(
+                    source=data_imap["b0_file"],
+                    technique="median_otsu applied to b0",
+                    median_otsu_kwargs=self.median_otsu_kwargs)
         return mask_getter
 
 
@@ -377,8 +390,9 @@ class ScalarMask(Definition):
     seed_mask = ScalarMask(
         "dti_fa",
         scope="dmriprep")
-    api.AFQ(tracking_params={"seed_mask": seed_mask,
-                                "seed_threshold": 0.2})
+    api.AFQ(tracking_params={
+        "seed_mask": seed_mask,
+        "seed_threshold": 0.2})
     """
 
     def __init__(self, scalar):
@@ -388,7 +402,12 @@ class ScalarMask(Definition):
         pass
 
     # overrides MaskFile
-    def get_mask_getter(self):
+    def get_mask_getter(self, in_data=False):
+        if in_data:
+            raise ValueError(
+                "Brain mask cannot be a built-in scalar, "
+                + "because the brain mask is used to calculate scalars")
+
         def mask_getter(subses_dict, dwi_affine, data_imap):
             scalar_file = data_imap[self.scalar + "_file"]
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
@@ -470,7 +489,7 @@ class PFTMask(Definition):
         for probseg in self.probsegs:
             probseg.find_path(bids_layout, from_path, subject, session)
 
-    def get_mask_getter(self):
+    def get_mask_getter(self, in_data=False):
         probseg_funcs = []
         for probseg in self.probsegs:
             probseg_funcs.append(probseg.get_mask_getter())
