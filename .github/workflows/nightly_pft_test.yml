@@ -2,7 +2,7 @@ name: Nightly test suite
 
 on:
   schedule:
-    - cron: '0 11 * * *'  # every day at 4 AM, PST
+    - cron: '0 7 * * *'  # every day at midnight, PST
 
 jobs:
   build:
@@ -29,4 +29,4 @@ jobs:
         flake8 --ignore N802,N806,W503 --select W504 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py | grep -v /docs/`
     - name: Test
       run: |
-        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "nightly5" --durations=0
+        cd && mkdir for_test && cd for_test && pytest --pyargs AFQ --cov-report term-missing --cov=AFQ -m "nightly_pft" --durations=0
