@@ -1080,10 +1080,13 @@ class AFQ(object):
                         idx = np.where(
                             sft.data_per_streamline['bundle']
                             == self.bundle_dict[b]['uid'])[0]
+                        # use the first subses that works
+                        # otherwise try each successive subses
                         if len(idx) == 0:
-                            # use the first subses that works
-                            # otherwise try each successive subses
-                            # loading if not already loaded
+                            # break if we run out of subses
+                            if i + 1 >= len(self.valid_sub_list):
+                                break
+                            # load subses if not already loaded
                             if i + 1 >= len(subses_info):
                                 load_next_subject()
                             continue
@@ -1091,7 +1094,7 @@ class AFQ(object):
                             idx = np.random.choice(
                                 idx, size=100, replace=False)
                         these_sls = sft.streamlines[idx]
-                        these_sls = dps.set_number_of_points(these_sls, 30)
+                        these_sls = dps.set_number_of_points(these_sls, 100)
                         tg = StatefulTractogram(
                             these_sls,
                             img,
@@ -1146,8 +1149,8 @@ class AFQ(object):
             s3fs.put(self.afqb_path, remote_path, recursive=True)
 
     def assemble_AFQ_browser(self, output_path=None, metadata=None,
-                             page_title=None, page_subtitle=None,
-                             page_title_link=None, page_subtitle_link=None):
+                             page_title="AFQ Browser", page_subtitle="",
+                             page_title_link="", page_subtitle_link=""):
         """
         Assembles an instance of the AFQ-Browser from this AFQ instance.
         First, we generate the combined tract profile if it is not already
@@ -1172,17 +1175,19 @@ class AFQ(object):
             "subjectID" column to work.
             Default: None
         page_title : str
-            Page title. If None, "AFQ Browser" is used.
-            Default: None
+            Page title. If None, prompt is sent to command line.
+            Default: "AFQ Browser"
         page_subtitle : str
-            Page subtitle.
-            Default: None
+            Page subtitle. If None, prompt is sent to command line.
+            Default: ""
         page_title_link : str
             Title hyperlink (including http(s)://).
-            Default: None
+            If None, prompt is sent to command line.
+            Default: ""
         page_subtitle_link : str
             Subtitle hyperlink (including http(s)://).
-            Default: None
+            If None, prompt is sent to command line.
+            Default: ""
         """
 
         if output_path is None:
@@ -1196,11 +1201,12 @@ class AFQ(object):
         sls_json_fname = self.get_streamlines_json()
 
         # remove bundles not in sls file from nodes.csv
-        sls = json.load(sls_json_fname)
+        with open(sls_json_fname, "r") as f:
+            sls = json.load(f)
         profiles_path = op.abspath(op.join(
             self.afq_path, "tract_profiles.csv"))
         profiles = pd.read_csv(profiles_path)
-        profiles_bundle_list = list(profiles["subjectID"].unique())
+        profiles_bundle_list = list(profiles["tractID"].unique())
         sls_bundle_list = list(sls.keys())
         bundles_to_remove = []
         for p_bundle in profiles_bundle_list:
