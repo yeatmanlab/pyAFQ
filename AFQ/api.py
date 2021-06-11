@@ -108,38 +108,38 @@ class BundleDict(MutableMapping):
             self.bundle_names = list(bundle_info.keys())
             self._dict = bundle_info.copy()
         else:
-            self.bundle_names = bundle_info.copy()
+            expanded_bundle_names = []
+            for bundle_name in bundle_info:
+                if self.seg_algo == "afq":
+                    if bundle_name in ["FA", "FP"]\
+                            or bundle_name in CALLOSUM_BUNDLES:
+                        expanded_bundle_names.append(bundle_name)
+                    else:
+                        expanded_bundle_names.append(bundle_name + "_R")
+                        expanded_bundle_names.append(bundle_name + "_L")
+                elif self.seg_algo.startswith("reco"):
+                    if bundle_name in RECO_UNIQUE\
+                            or bundle_name == "whole_brain":
+                        expanded_bundle_names.append(bundle_name)
+                    else:
+                        expanded_bundle_names.append(bundle_name + "_R")
+                        expanded_bundle_names.append(bundle_name + "_L")
+                else:
+                    raise ValueError(
+                        "Input: %s is not a valid input`seg_algo`"
+                        % self.seg_algo)
+            self.bundle_names = expanded_bundle_names
             self._dict = {}
         self.seg_algo = seg_algo.lower()
 
-        expanded_bundle_names = []
-        for bundle_name in self.bundle_names:
-            if self.seg_algo == "afq":
-                if bundle_name in ["FA", "FP"]\
-                        or bundle_name in CALLOSUM_BUNDLES:
-                    expanded_bundle_names.append(bundle_name)
-                else:
-                    expanded_bundle_names.append(bundle_name + "_R")
-                    expanded_bundle_names.append(bundle_name + "_L")
-            elif self.seg_algo.startswith("reco"):
-                if bundle_name in RECO_UNIQUE\
-                        or bundle_name == "whole_brain":
-                    expanded_bundle_names.append(bundle_name)
-                else:
-                    expanded_bundle_names.append(bundle_name + "_R")
-                    expanded_bundle_names.append(bundle_name + "_L")
-            else:
-                raise ValueError(
-                    "Input: %s is not a valid input`seg_algo`"
-                    % self.seg_algo)
-        self.bundle_names = expanded_bundle_names
-
         # Each bundles gets a digit identifier
         # (to be stored in the tractogram)
-        self.uid_dict = {}
+        # we keep track of this for when bundles are added
+        # with set item
+        self._uid_dict = {}
         for ii, b_name in enumerate(self.bundle_names):
-            self.uid_dict[b_name] = ii + 1
-            self.c_uid = ii + 2
+            self._uid_dict[b_name] = ii + 1
+            self._c_uid = ii + 2
 
         self.logger = logging.getLogger('AFQ.api')
         self.resample_to = resample_to
@@ -195,7 +195,7 @@ class BundleDict(MutableMapping):
                         'rules': [True, True, True],
                         'prob_map': templates[key + "_prob_map"],
                         'cross_midline': True,
-                        'uid': self.uid_dict[key]}
+                        'uid': self._uid_dict[key]}
                 elif key in CALLOSUM_BUNDLES:
                     bundle = {
                         'ROIs': [
@@ -204,7 +204,7 @@ class BundleDict(MutableMapping):
                             callosal_templates["Callosum_midsag"]],
                         'rules': [True, True, True],
                         'cross_midline': True,
-                        'uid': self.uid_dict[key]}
+                        'uid': self._uid_dict[key]}
 
                 # SLF is a special case, because it has an exclusion ROI:
                 elif key in ["SLF_L", "SLF_R"]:
@@ -218,7 +218,7 @@ class BundleDict(MutableMapping):
                         'rules': [True, True, False],
                         'prob_map': templates[name + hemi + '_prob_map'],
                         'cross_midline': False,
-                        'uid': self.uid_dict[key]}
+                        'uid': self._uid_dict[key]}
                 else:
                     name = key[:-2]
                     hemi = key[-2:]
@@ -233,7 +233,7 @@ class BundleDict(MutableMapping):
                             'prob_map': templates[
                                 name + hemi + '_prob_map'],
                             'cross_midline': False,
-                            'uid': self.uid_dict[key]}
+                            'uid': self._uid_dict[key]}
                     else:
                         raise ValueError(f"{key} is not in AFQ templates")
                 if self.resample_to:
@@ -249,7 +249,7 @@ class BundleDict(MutableMapping):
                 reco_bundle_dict = afd.read_hcp_atlas(16)
             for key in self.bundle_names:
                 bundle = reco_bundle_dict[key]
-                bundle['uid'] = self.uid_dict[key]
+                bundle['uid'] = self._uid_dict[key]
                 self._dict[key] = bundle
         else:
             raise ValueError(
@@ -257,9 +257,15 @@ class BundleDict(MutableMapping):
         self.all_gen = True
 
     def __setitem__(self, key, item):
+        if not isinstance(item, dict):
+            raise ValueError((
+                "After BundleDict initialization, additional"
+                " bundles can only be added as dictionaries "
+                "(see BundleDict.gen_all for examples)"))
         self._dict[key] = item
-        self.uid_dict[key] = self.c_uid
-        self.c_uid += 1
+        self._uid_dict[key] = self._c_uid
+        self._dict[key]["uid"] = self._c_uid
+        self._c_uid += 1
         self.bundle_names.append(key)
 
     def __getitem__(self, key):
@@ -270,10 +276,20 @@ class BundleDict(MutableMapping):
         return len(self.bundle_names)
 
     def __delitem__(self, key):
+        if key not in self._dict and key not in self.bundle_names:
+            raise KeyError(f"{key} not found")
         if key in self._dict:
             del self._dict[key]
+        else:
+            raise RuntimeError((
+                f"{key} not found in internal dictionary, "
+                f"but found in bundle_names"))
         if key in self.bundle_names:
             self.bundle_names.remove(key)
+        else:
+            raise RuntimeError((
+                f"{key} not found in bundle_names, "
+                f"but found in internal dictionary"))
 
     def __iter__(self):
         self.gen_all()
