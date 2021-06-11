@@ -1182,16 +1182,15 @@ class AFQ(object):
         # generate streamlines.json file
         sls_json_fname = self.get_streamlines_json()
 
-        # afqb.assemble(
-        #     op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
-        #     target=output_path,
-        #     metadata=metadata,
-        #     # sls_json=sls_json_fname,
-        #     # mode="custom",
-        #     title=page_title,
-        #     subtitle=page_subtitle,
-        #     link=page_title_link,
-        #     sublink=page_subtitle_link)
+        afqb.assemble(
+            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
+            target=output_path,
+            metadata=metadata,
+            streamlines=sls_json_fname,
+            title=page_title,
+            subtitle=page_subtitle,
+            link=page_title_link,
+            sublink=page_subtitle_link)
 
 
 # iterate through all attributes, setting methods for each one
