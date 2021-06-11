@@ -103,6 +103,7 @@ class BundleDict(MutableMapping):
             raise TypeError((
                 f"bundle_info must be a dict or a list,"
                 f" currently a {type(bundle_info)}"))
+        self.seg_algo = seg_algo.lower()
 
         if isinstance(bundle_info, dict):
             self.bundle_names = list(bundle_info.keys())
@@ -130,7 +131,6 @@ class BundleDict(MutableMapping):
                         % self.seg_algo)
             self.bundle_names = expanded_bundle_names
             self._dict = {}
-        self.seg_algo = seg_algo.lower()
 
         # Each bundles gets a digit identifier
         # (to be stored in the tractogram)
