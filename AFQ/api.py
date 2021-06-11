@@ -1051,51 +1051,64 @@ class AFQ(object):
         sls_json_fname = op.abspath(op.join(
             self.afq_path, "afqb_streamlines.json"))
         if not op.exists(sls_json_fname):
-            first_sub = list(self.clean_bundles.keys())[0]
-            if len(self.sessions) > 1:
-                first_ses = list(self.clean_bundles[first_sub].keys())[0]
-                first_bundles_file = self.clean_bundles[first_sub][first_ses]
-                first_mapping = self.mapping[first_sub][first_ses]
-                first_img = nib.load(self.dwi[first_sub][first_ses])
-            else:
-                first_bundles_file = self.clean_bundles[first_sub]
-                first_mapping = self.mapping[first_sub]
-                first_img = nib.load(self.dwi[first_sub])
-            sft = load_tractogram(
-                first_bundles_file,
-                first_img,
-                Space.VOX)
+            subses_info = []
+
+            def load_next_subject():
+                subses_idx = len(subses_info)
+                sub = self.valid_sub_list[subses_idx]
+                ses = self.valid_ses_list[subses_idx]
+                if len(self.sessions) > 1:
+                    this_bundles_file = self.clean_bundles[sub][ses]
+                    this_mapping = self.mapping[sub][ses]
+                    this_img = nib.load(self.dwi[sub][ses])
+                else:
+                    this_bundles_file = self.clean_bundles[sub]
+                    this_mapping = self.mapping[sub]
+                    this_img = nib.load(self.dwi[sub])
+                this_sft = load_tractogram(
+                    this_bundles_file,
+                    this_img,
+                    Space.VOX)
+                subses_info.append((this_sft, this_img, this_mapping))
+
             sls_dict = {}
+            load_next_subject()  # load first subject
             for b in self.bundle_dict.keys():
                 if b != "whole_brain":
-                    idx = np.where(
-                        sft.data_per_streamline['bundle']
-                        == self.bundle_dict[b]['uid'])[0]
-                    if len(idx) == 0:
-                        sls_dict[b] = {
-                            "coreFiber": [[0, 0, 0]],
-                            "0": [[0, 0, 0]]}
-                        continue
-                    if len(idx) > 100:
-                        idx = np.random.choice(
-                            idx, size=100, replace=False)
-                    these_sls = sft.streamlines[idx]
-                    these_sls = dps.set_number_of_points(these_sls, 30)
-                    tg = StatefulTractogram(
-                        these_sls,
-                        first_img,
-                        Space.VOX)
-                    tg.to_rasmm()
-                    delta = dts.values_from_volume(
-                        first_mapping.forward,
-                        tg.streamlines, np.eye(4))
-                    moved_sl = dts.Streamlines(
-                        [d + s for d, s in zip(delta, tg.streamlines)])
-                    moved_sl = np.asarray(moved_sl)
-                    median_sl = np.median(moved_sl, axis=0)
-                    sls_dict[b] = {"coreFiber": median_sl.tolist()}
-                    for ii, sl_idx in enumerate(idx):
-                        sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
+                    for i in range(len(self.valid_sub_list)):
+                        sft, img, mapping = subses_info[i]
+                        idx = np.where(
+                            sft.data_per_streamline['bundle']
+                            == self.bundle_dict[b]['uid'])[0]
+                        if len(idx) == 0:
+                            # use the first subses that works
+                            # otherwise try each successive subses
+                            # loading if not already loaded
+                            if i + 1 >= len(subses_info):
+                                load_next_subject()
+                            continue
+                        if len(idx) > 100:
+                            idx = np.random.choice(
+                                idx, size=100, replace=False)
+                        these_sls = sft.streamlines[idx]
+                        these_sls = dps.set_number_of_points(these_sls, 30)
+                        tg = StatefulTractogram(
+                            these_sls,
+                            img,
+                            Space.VOX)
+                        tg.to_rasmm()
+                        delta = dts.values_from_volume(
+                            mapping.forward,
+                            tg.streamlines, np.eye(4))
+                        moved_sl = dts.Streamlines(
+                            [d + s for d, s in zip(delta, tg.streamlines)])
+                        moved_sl = np.asarray(moved_sl)
+                        median_sl = np.median(moved_sl, axis=0)
+                        sls_dict[b] = {"coreFiber": median_sl.tolist()}
+                        for ii, sl_idx in enumerate(idx):
+                            sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
+                        break
+
             with open(sls_json_fname, 'w') as fp:
                 json.dump(sls_dict, fp)
         return sls_json_fname
@@ -1182,8 +1195,33 @@ class AFQ(object):
         # generate streamlines.json file
         sls_json_fname = self.get_streamlines_json()
 
+        # remove bundles not in sls file from nodes.csv
+        sls = json.load(sls_json_fname)
+        profiles_path = op.abspath(op.join(
+            self.afq_path, "tract_profiles.csv"))
+        profiles = pd.read_csv(profiles_path)
+        profiles_bundle_list = list(profiles["subjectID"].unique())
+        sls_bundle_list = list(sls.keys())
+        bundles_to_remove = []
+        for p_bundle in profiles_bundle_list:
+            bundle_found = False
+            for s_bundle in sls_bundle_list:
+                if p_bundle == s_bundle:
+                    bundle_found = True
+                    break
+            if not bundle_found:
+                bundles_to_remove.append(p_bundle)
+        if len(bundles_to_remove) > 0:
+            profiles_pruned_path = op.abspath(op.join(
+                self.afq_path, "tract_profiles_pruned.csv"))
+            profiles = profiles[profiles['tractID'].isin(bundles_to_remove)]
+            profiles = clean_pandas_df(profiles)
+            profiles.to_csv(profiles_pruned_path, index=False)
+        else:
+            profiles_pruned_path = profiles_path
+
         afqb.assemble(
-            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
+            profiles_pruned_path,
             target=output_path,
             metadata=metadata,
             streamlines=sls_json_fname,
