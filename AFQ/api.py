@@ -1200,34 +1200,8 @@ class AFQ(object):
         # generate streamlines.json file
         sls_json_fname = self.get_streamlines_json()
 
-        # remove bundles not in sls file from nodes.csv
-        with open(sls_json_fname, "r") as f:
-            sls = json.load(f)
-        profiles_path = op.abspath(op.join(
-            self.afq_path, "tract_profiles.csv"))
-        profiles = pd.read_csv(profiles_path)
-        profiles_bundle_list = list(profiles["tractID"].unique())
-        sls_bundle_list = list(sls.keys())
-        bundles_to_remove = []
-        for p_bundle in profiles_bundle_list:
-            bundle_found = False
-            for s_bundle in sls_bundle_list:
-                if p_bundle == s_bundle:
-                    bundle_found = True
-                    break
-            if not bundle_found:
-                bundles_to_remove.append(p_bundle)
-        if len(bundles_to_remove) > 0:
-            profiles_pruned_path = op.abspath(op.join(
-                self.afq_path, "tract_profiles_pruned.csv"))
-            profiles = profiles[profiles['tractID'].isin(bundles_to_remove)]
-            profiles = clean_pandas_df(profiles)
-            profiles.to_csv(profiles_pruned_path, index=False)
-        else:
-            profiles_pruned_path = profiles_path
-
         afqb.assemble(
-            profiles_pruned_path,
+            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
             target=output_path,
             metadata=metadata,
             streamlines=sls_json_fname,
