@@ -83,7 +83,7 @@ else:
 
 
 bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
-bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco80")
+bundles = api.BundleDict(bundle_names, seg_algo="reco80")
 
 print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
@@ -99,15 +99,17 @@ if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
             sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
 
             sl_xform = dts.Streamlines(
-                dtu.transform_tracking_output(sl_xform,
-                np.linalg.inv(MNI_T2_img.affine)))
+                dtu.transform_tracking_output(
+                    sl_xform,
+                    np.linalg.inv(MNI_T2_img.affine)))
 
             sft = StatefulTractogram(sl_xform, img, Space.RASMM)
             save_tractogram(sft, op.join(working_dir, f'{bundle}_atlas.trk'))
 
             sl_xform = dts.Streamlines(
-                dtu.transform_tracking_output(sl_xform,
-                                        np.linalg.inv(img.affine)))
+                dtu.transform_tracking_output(
+                    sl_xform,
+                    np.linalg.inv(img.affine)))
 
             for sl in sl_xform:
                 sl_as_idx = sl.astype(int)

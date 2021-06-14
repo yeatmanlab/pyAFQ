@@ -2,6 +2,8 @@ import tempfile
 import os
 import os.path as op
 import shutil
+import subprocess
+import gc
 
 import toml
 
@@ -174,13 +176,13 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
     return bids_dir
 
 
-def test_make_bundle_dict():
+def test_BundleDict():
     """
     Tests bundle dict
     """
 
     # test defaults
-    afq_bundles = api.make_bundle_dict()
+    afq_bundles = api.BundleDict()
 
     # bundles restricted within hemisphere
     # NOTE: FA and FP cross midline so are removed
@@ -193,26 +195,86 @@ def test_make_bundle_dict():
     assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
 
     # Arcuate Fasciculus
-    afq_bundles = api.make_bundle_dict(bundle_names=["ARC"])
+    afq_bundles = api.BundleDict(["ARC"])
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = api.make_bundle_dict(bundle_names=["FA"])
+    afq_bundles = api.BundleDict(["FA"])
 
     assert len(afq_bundles) == 1
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = api.make_bundle_dict(bundle_names=["HCC"])
+    afq_bundles = api.BundleDict(["HCC"])
 
     assert len(afq_bundles) == 2
 
     # Vertical Occipital Fasciculus
-    # not included and does not exist in templates
-    afq_bundles = api.make_bundle_dict(bundle_names=["VOF"])
+    # not included and does not exist in afq templates
+    with pytest.raises(
+            ValueError,
+            match="VOF_R is not in AFQ templates"):
+        afq_bundles = api.BundleDict(["VOF"])
+        afq_bundles["VOF_R"]
 
-    assert len(afq_bundles) == 0
+    afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
+    assert len(afq_bundles) == 2
+
+    afq_bundles = api.BundleDict(["whole_brain"], seg_algo="reco80")
+    assert len(afq_bundles) == 1
+
+
+def test_AFQ_missing_files():
+    tmpdir = nbtmp.InTemporaryDirectory()
+    bids_path = tmpdir.name
+
+    with pytest.raises(
+            ValueError,
+            match="There must be a dataset_description.json in bids_path"):
+        api.AFQ(bids_path)
+    afd.to_bids_description(
+        bids_path,
+        **{"Name": "Missing", "Subjects": ["sub-01"]})
+
+    with pytest.raises(
+            ValueError,
+            match=f"No non-json files recognized by pyBIDS in {bids_path}"):
+        api.AFQ(bids_path)
+
+    subses_folder = op.join(
+        bids_path,
+        "derivatives",
+        "otherDeriv",
+        'sub-01',
+        'ses-01')
+    os.makedirs(subses_folder, exist_ok=True)
+    afd.to_bids_description(
+        op.join(
+            bids_path,
+            "derivatives",
+            "otherDeriv"),
+        **{
+            "Name": "Missing",
+            "PipelineDescription": {"Name": "otherDeriv"}})
+    touch(op.join(subses_folder, "sub-01_ses-01_dwi.nii.gz"))
+
+    with pytest.raises(
+            ValueError,
+            match="No non-json files recognized by pyBIDS"
+            + " in the pipeline: missingPipe"):
+        api.AFQ(bids_path, dmriprep="missingPipe")
+
+    os.mkdir(op.join(bids_path, "missingPipe"))
+    afd.to_bids_description(
+        op.join(bids_path, "missingPipe"), **{
+            "Name": "Missing",
+            "PipelineDescription": {"Name": "missingPipe"}})
+    with pytest.raises(
+            ValueError,
+            match="No non-json files recognized by pyBIDS"
+            + " in the pipeline: missingPipe"):
+        api.AFQ(bids_path, dmriprep="missingPipe")
 
 
 @pytest.mark.nightly_custom
@@ -310,7 +372,7 @@ def test_AFQ_init():
 
 def test_AFQ_custom_bundle_dict():
     bids_path = create_dummy_bids_path(3, 1)
-    bundle_dict = api.make_bundle_dict()
+    bundle_dict = api.BundleDict()
     api.AFQ(
         bids_path,
         dmriprep="synthetic",
@@ -406,7 +468,9 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="bundle_info must be None, a list of strings, or a dict"):
+            match=(
+                "bundle_info must be None, a list of strings,"
+                " a dict, or a BundleDict")):
         api.AFQ(bids_path, bundle_info=[2, 3])
 
 
@@ -715,9 +779,18 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
+    # save memory
+    results_dir = myafq.results_dir["01"]
+    del myafq
+    gc.collect()
+
     cmd = "pyAFQ " + config_file
-    out = os.system(cmd)
-    assert out == 0
+    completed_process = subprocess.run(
+        cmd, shell=True, capture_output=True)
+    if completed_process.returncode != 0:
+        print(completed_process.stdout)
+    print(completed_process.stderr)
+    assert completed_process.returncode == 0
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
@@ -725,15 +798,13 @@ def test_AFQ_data_waypoint():
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
-    myafq.rois
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        results_dir,
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
-    myafq.indiv_bundles
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        results_dir,
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
