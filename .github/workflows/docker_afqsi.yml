@@ -44,5 +44,4 @@ jobs:
     - name: Build and push a tagged image
       if: startsWith(github.event.ref, 'refs/tags')
       run: |
-        echo "TAG=$(echo ${GITHUB_REF#refs/*/})" >> $GITHUB_ENV
-        sh ./afqsi_docker/docker-build.sh ${{TAG}} nrdg
+        sh ./afqsi_docker/docker-build.sh ${{ github.event.release.tag_name }} nrdg
