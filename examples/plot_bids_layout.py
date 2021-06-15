@@ -14,7 +14,7 @@ BIDS spec.
     described in the existing BIDS specification, but describing these
     is part of an ongoing effort. Wherever possible, we conform with
     the draft implementation of the BIDS DWI derivatives available
-    `here <https://bids-specification.readthedocs.io/en/derivatives/05-derivatives/06-diffusion-derivatives.html>`_
+    `here <https://bids-specification.readthedocs.io/en/wip-derivatives/05-derivatives/05-diffusion-derivatives.html>`_
 
 In this example, we will explore the use of BIDS in pyAFQ and see
 how BIDS allows us to extend and provide flexibility to the users
