@@ -1927,10 +1927,9 @@ fetch_aal_atlas = _make_fetcher(
     "fetch_aal_atlas",
     op.join(afq_home,
             'aal_atlas'),
-    'https://digital.lib.washington.edu' + '/researchworks'
-    + '/bitstream/handle/1773/44951/',
-    ["MNI_AAL_AndMore.nii.gz",
-     "MNI_AAL.txt"],
+    'https://ndownloader.figshare.com/files/',
+    ["28416852",
+     "28416855"],
     ["MNI_AAL_AndMore.nii.gz",
      "MNI_AAL.txt"],
     md5_list=["69395b75a16f00294a80eb9428bf7855",
