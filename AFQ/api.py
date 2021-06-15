@@ -16,8 +16,14 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 
+from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.streamline import load_tractogram
+import dipy.tracking.streamlinespeed as dps
+import dipy.tracking.streamline as dts
+
 from .version import version as pyafq_version
 import pandas as pd
+import numpy as np
 import os
 import os.path as op
 import json
@@ -26,6 +32,7 @@ from time import time
 import nibabel as nib
 from importlib import import_module
 from collections.abc import MutableMapping
+import afqbrowser as afqb
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -298,6 +305,13 @@ class BundleDict(MutableMapping):
     def copy(self):
         self.gen_all()
         return self._dict.copy()
+
+
+# get rid of unnecessary columns in df
+def clean_pandas_df(df):
+    df = df.reset_index(drop=True)
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+    return df
 
 
 # this is parallelized below
@@ -683,6 +697,7 @@ class AFQ(object):
 
         # This is where all the outputs will go:
         self.afq_path = op.join(bids_path, 'derivatives', 'afq')
+        self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
@@ -1028,32 +1043,172 @@ class AFQ(object):
         out_file = op.abspath(op.join(
             self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)
+        _df = clean_pandas_df(_df)
         _df.to_csv(out_file, index=False)
         return _df
 
-    def export_all(self):
+    def get_streamlines_json(self):
+        sls_json_fname = op.abspath(op.join(
+            self.afq_path, "afqb_streamlines.json"))
+        if not op.exists(sls_json_fname):
+            subses_info = []
+
+            def load_next_subject():
+                subses_idx = len(subses_info)
+                sub = self.valid_sub_list[subses_idx]
+                ses = self.valid_ses_list[subses_idx]
+                if len(self.sessions) > 1:
+                    this_bundles_file = self.clean_bundles[sub][ses]
+                    this_mapping = self.mapping[sub][ses]
+                    this_img = nib.load(self.dwi[sub][ses])
+                else:
+                    this_bundles_file = self.clean_bundles[sub]
+                    this_mapping = self.mapping[sub]
+                    this_img = nib.load(self.dwi[sub])
+                this_sft = load_tractogram(
+                    this_bundles_file,
+                    this_img,
+                    Space.VOX)
+                subses_info.append((this_sft, this_img, this_mapping))
+
+            sls_dict = {}
+            load_next_subject()  # load first subject
+            for b in self.bundle_dict.keys():
+                if b != "whole_brain":
+                    for i in range(len(self.valid_sub_list)):
+                        sft, img, mapping = subses_info[i]
+                        idx = np.where(
+                            sft.data_per_streamline['bundle']
+                            == self.bundle_dict[b]['uid'])[0]
+                        # use the first subses that works
+                        # otherwise try each successive subses
+                        if len(idx) == 0:
+                            # break if we run out of subses
+                            if i + 1 >= len(self.valid_sub_list):
+                                break
+                            # load subses if not already loaded
+                            if i + 1 >= len(subses_info):
+                                load_next_subject()
+                            continue
+                        if len(idx) > 100:
+                            idx = np.random.choice(
+                                idx, size=100, replace=False)
+                        these_sls = sft.streamlines[idx]
+                        these_sls = dps.set_number_of_points(these_sls, 100)
+                        tg = StatefulTractogram(
+                            these_sls,
+                            img,
+                            Space.VOX)
+                        tg.to_rasmm()
+                        delta = dts.values_from_volume(
+                            mapping.forward,
+                            tg.streamlines, np.eye(4))
+                        moved_sl = dts.Streamlines(
+                            [d + s for d, s in zip(delta, tg.streamlines)])
+                        moved_sl = np.asarray(moved_sl)
+                        median_sl = np.median(moved_sl, axis=0)
+                        sls_dict[b] = {"coreFiber": median_sl.tolist()}
+                        for ii, sl_idx in enumerate(idx):
+                            sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
+                        break
+
+            with open(sls_json_fname, 'w') as fp:
+                json.dump(sls_dict, fp)
+        return sls_json_fname
+
+    def export_all(self, viz=True, afqbrowser=True, xforms=True):
         """ Exports all the possible outputs"""
         start_time = time()
-        if not isinstance(self.mapping_definition, FnirtMap)\
-                and not isinstance(self.mapping_definition, ItkMap):
-            self.b0_warped
-        self.template_xform
-        self.indiv_bundles
+        if xforms:
+            if not isinstance(self.mapping_definition, FnirtMap)\
+                    and not isinstance(self.mapping_definition, ItkMap):
+                self.b0_warped
+            self.template_xform
+            self.indiv_bundles
         self.sl_counts
-        self.tract_profile_plots
         self.profiles
-        if len(self.sessions) * len(self.subjects) > 1:
-            self.combine_profiles()
-        self.all_bundles_figure
-        if self.seg_algo == "afq":
-            self.indiv_bundles_figures
-            self.rois
+        # We combine profiles even if there is only 1 subject / session,
+        # as the combined profiles format may still be useful
+        # i.e., for AFQ Browser
+        self.combine_profiles()
+        if viz:
+            self.tract_profile_plots
+            self.all_bundles_figure
+            if self.seg_algo == "afq":
+                self.indiv_bundles_figures
+                self.rois
+        if afqbrowser:
+            self.assemble_AFQ_browser()
         self.logger.info(
             "Time taken for export all: " + str(time() - start_time))
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
         s3fs.put(self.afq_path, remote_path, recursive=True)
+        if op.exists(self.afqb_path):
+            s3fs.put(self.afqb_path, remote_path, recursive=True)
+
+    def assemble_AFQ_browser(self, output_path=None, metadata=None,
+                             page_title="AFQ Browser", page_subtitle="",
+                             page_title_link="", page_subtitle_link=""):
+        """
+        Assembles an instance of the AFQ-Browser from this AFQ instance.
+        First, we generate the combined tract profile if it is not already
+        generated. This includes running the full AFQ pipeline if it has not
+        already run. The combined tract profile is one of the outputs of
+        export_all.
+        Second, we generate a streamlines.json file from the bundle
+        recognized in the first subject's first session.
+        Third, we call AFQ-Browser's assemble to assemble an AFQ-Browser
+        instance in output_path.
+
+        Parameters
+        ----------
+        output_path : str
+            Path to location to create this instance of the browser in.
+            Called "target" in AFQ Browser API. If None,
+            bids_path/derivatives/afq_browser is used.
+            Default: None
+        metadata : str
+            Path to subject metadata csv file. If None, an metadata file
+            containing only subject ID is created. This file requires a
+            "subjectID" column to work.
+            Default: None
+        page_title : str
+            Page title. If None, prompt is sent to command line.
+            Default: "AFQ Browser"
+        page_subtitle : str
+            Page subtitle. If None, prompt is sent to command line.
+            Default: ""
+        page_title_link : str
+            Title hyperlink (including http(s)://).
+            If None, prompt is sent to command line.
+            Default: ""
+        page_subtitle_link : str
+            Subtitle hyperlink (including http(s)://).
+            If None, prompt is sent to command line.
+            Default: ""
+        """
+
+        if output_path is None:
+            output_path = self.afqb_path
+        os.makedirs(self.afqb_path, exist_ok=True)
+
+        # generate combined profiles csv
+        self.combine_profiles()
+
+        # generate streamlines.json file
+        sls_json_fname = self.get_streamlines_json()
+
+        afqb.assemble(
+            op.abspath(op.join(self.afq_path, "tract_profiles.csv")),
+            target=output_path,
+            metadata=metadata,
+            streamlines=sls_json_fname,
+            title=page_title,
+            subtitle=page_subtitle,
+            link=page_title_link,
+            sublink=page_subtitle_link)
 
 
 # iterate through all attributes, setting methods for each one
@@ -1132,7 +1287,7 @@ def download_and_combine_afq_profiles(bucket,
                 return_type='filename')
 
         df = combine_list_of_profiles(profiles)
-        df.to_csv("tmp.csv")
+        df.to_csv("tmp.csv", index=False)
         if upload is True:
             bids_prefix = "/".join([bucket, study_s3_prefix]).rstrip("/")
             fs = s3fs.S3FileSystem()
@@ -1151,6 +1306,7 @@ def download_and_combine_afq_profiles(bucket,
     if out_file is not None:
         out_file = op.abspath(out_file)
         os.makedirs(op.dirname(out_file), exist_ok=True)
+        df = clean_pandas_df(df)
         df.to_csv(out_file, index=False)
 
     return df
@@ -1181,4 +1337,4 @@ def combine_list_of_profiles(profile_fnames):
         profiles['sessionID'] = session_name
         dfs.append(profiles)
 
-    return pd.concat(dfs)
+    return clean_pandas_df(pd.concat(dfs))
