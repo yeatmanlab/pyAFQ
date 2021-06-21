@@ -998,20 +998,21 @@ class AFQ(object):
         in_list = []
         to_calc_list = []
         results = {}
-        for subject in self.valid_sub_list:
-            results[subject] = {}
-            for session in self.valid_ses_list:
-                wf_dict = self.wf_dict[subject][str(session)]
-                if section is not None:
-                    wf_dict = wf_dict[section]
-                if ((self.parallel_params.get("engine", False) != "serial")
-                        and (hasattr(wf_dict, "efferents"))
-                        and (attr_name not in wf_dict.efferents)):
-                    in_list.append((wf_dict))
-                    to_calc_list.append((subject, session))
-                else:
-                    results[subject][session] =\
-                        _getter_helper(wf_dict, attr_name)
+        for ii, subject in enumerate(self.valid_sub_list):
+            if subject not in results:
+                results[subject] = {}
+            session = self.valid_ses_list[ii]
+            wf_dict = self.wf_dict[subject][str(session)]
+            if section is not None:
+                wf_dict = wf_dict[section]
+            if ((self.parallel_params.get("engine", False) != "serial")
+                    and (hasattr(wf_dict, "efferents"))
+                    and (attr_name not in wf_dict.efferents)):
+                in_list.append((wf_dict))
+                to_calc_list.append((subject, session))
+            else:
+                results[subject][session] =\
+                    _getter_helper(wf_dict, attr_name)
 
         # if some need to be calculated, do those in parallel
         if len(to_calc_list) > 0:
