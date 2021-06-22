@@ -8,4 +8,6 @@ We are glad that you are here! That probably means that you are interested in co
     :hidden:
     :maxdepth: 2
 
+    tasks
+    definitions
     releasing
