@@ -83,6 +83,7 @@ Checklist for Adding Tasks to the pyAFQ Workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is what you must do each time you add a task to the workflow: 
+
 #. Add your task to the relevant tasks file with the pimms.calc decorator.
 
 #. Check AFQ.tasks.decorators for useful decorators that may simplify the code.
