@@ -8,8 +8,9 @@ CLI) for running part or all of the tractometry pipeline on a given dataset.
 
 This UI uses `Pimms <http://bids.neuroimaging.io/>`_ (a Python immutable
 data structures library) as its workflow engine. Individual tasks in this workflow
-are specified in the AFQ.tasks folder. The tasks are split up into 5 files:
-data, mapping, tractography, segmentation, and visualization (viz). If you want
+are specified in the AFQ/tasks folder. The tasks are split up into 5 files in the
+AFQ/tasks folder:
+`data.py`, `mapping.py`, `tractography.py`, `segmentation.py`, and `viz.py`. If you want
 to add new functionality to the pyAFQ workflow, first decide which file to
 put it in. Try to keep similar functionality in the same file. All tasks are
 decorated with `@pimms.calc("output_name")`, where `output_name` is used as
@@ -26,12 +27,15 @@ from the tasks in the file. In most cases, new tasks can simply be added to
 the list of tasks being passed to `with_name`. These tasks are always added
 to the plan; however they will only be called if the user needs them. In a few
 cases, additional logic is required, like when two different tasks compute the
-same output, or if the task is from an AFQ.definition.
+same output, or if the task being provided by a `Definition`-inherited object
+(see the source of :func:`AFQ.tasks.mapping.get_mapping_plan` for an example
+of both).
 
 The outputs of each task can be accessed by the user through the
 AFQ object, either as an attribute or using a `export_` method,
 such as `export_b0`. In each of the 5 tasks files, there is a variable called
-`outputs`. Add your task output(s) to that variable for them to be attached to
+`outputs <https://github.com/yeatmanlab/pyAFQ/blob/7204682b22af1c8c89766dacfd25ec01bcce9442/AFQ/tasks/data.py#L26>`_.
+Add your task output(s) to that variable for them to be attached to
 the AFQ class. Note that when an output is attached to the AFQ class either as
 an attribute or method, if that output name ends in '_file',
 the '_file' is removed from the name automatically. 
