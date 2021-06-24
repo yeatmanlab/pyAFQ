@@ -115,6 +115,7 @@ class BundleDict(MutableMapping):
         if isinstance(bundle_info, dict):
             self.bundle_names = list(bundle_info.keys())
             self._dict = bundle_info.copy()
+            self.all_gen = True
         else:
             expanded_bundle_names = []
             for bundle_name in bundle_info:
@@ -138,6 +139,7 @@ class BundleDict(MutableMapping):
                         % self.seg_algo)
             self.bundle_names = expanded_bundle_names
             self._dict = {}
+            self.all_gen = False
 
         # Each bundles gets a digit identifier
         # (to be stored in the tractogram)
@@ -150,7 +152,6 @@ class BundleDict(MutableMapping):
 
         self.logger = logging.getLogger('AFQ.api')
         self.resample_to = resample_to
-        self.all_gen = False
 
         if self.seg_algo == "afq":
             if "FP" in self.bundle_names\

@@ -210,6 +210,19 @@ def test_BundleDict():
 
     assert len(afq_bundles) == 2
 
+    # Test "custom" bundle
+    afq_templates = afd.read_templates()
+    afq_bundles = api.BundleDict({
+        "custom_bundle": {
+            "ROIs": [afq_templates["FA_L"],
+                     afq_templates["FP_R"]],
+            "rules": [True, True],
+            "cross_midline": False,
+            "uid": 1}})
+    afq_bundles.get("custom_bundle")
+
+    assert len(afq_bundles) == 1
+
     # Vertical Occipital Fasciculus
     # not included and does not exist in afq templates
     with pytest.raises(
