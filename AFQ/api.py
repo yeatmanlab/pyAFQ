@@ -351,9 +351,7 @@ class AFQ(object):
                  mapping=SynMap(),
                  profile_weights="gauss",
                  bundle_info=None,
-                 parallel_params={
-                     "n_jobs": -1, "engine": "joblib",
-                     "backend": "loky"},
+                 parallel_params={"engine": "serial"},
                  scalars=["dti_fa", "dti_md"],
                  virtual_frame_buffer=False,
                  viz_backend="plotly_no_gif",
@@ -451,8 +449,10 @@ class AFQ(object):
             [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
             Set "n_jobs" to -1 to automatically parallelize as
-            the number of cpus.
-            Default: {"n_jobs": -1, "engine": "joblib", "backend": "loky"}
+            the number of cpus. Here is an example for how to do
+            multiprocessing with 4 cpus:
+            {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
+            Default: {"engine": "serial"}
         scalars : list of strings and/or scalar definitions, optional
             [BUNDLES] List of scalars to use.
             Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
