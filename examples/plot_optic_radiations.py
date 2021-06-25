@@ -11,134 +11,17 @@ ROIs of your design.
 For now, this is a hypothetical example, as we do not yet
 provide these ROIs as part of the software.
 """
-from dipy.data import get_fnames
+
 import os.path as op
-import matplotlib.pyplot as plt
-import numpy as np
-import nibabel as nib
-import dipy.data as dpd
-from dipy.data import fetcher
-from dipy.io.streamline import save_tractogram, load_tractogram
-from dipy.stats.analysis import afq_profile, gaussian_weights
-from dipy.io.stateful_tractogram import StatefulTractogram
-from dipy.io.stateful_tractogram import Space
-from dipy.reconst import shm
-from dipy.align import affine_registration, resample
-from dipy.direction import BootDirectionGetter
-import dipy.core.gradients as dpg
-
+from AFQ import api
 import AFQ.data as afd
-import AFQ.tractography as aft
-import AFQ.registration as reg
-import AFQ.models.dti as dti
-import AFQ.models.csd as csd
-import AFQ.segmentation as seg
-from AFQ.utils.volume import transform_inverse_roi
+from AFQ.definitions.mask import LabelledMaskFile, RoiMask
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
-# Target directory for this example's output files
-working_dir = "./optic_radiations"
-
-##########################################################################
-# Get example data:
-# -------------------------
-
-dpd.fetch_stanford_hardi()
-# hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-# hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
-# hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
-# hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
-
-hardi_dir = op.join('/Users/arokem/AFQ_data/HCP_1200/derivatives/dmriprep/sub-103818/ses-01/dwi')
-hardi_fdata = op.join(hardi_dir, "sub-103818_dwi.nii.gz")
-hardi_fbval = op.join(hardi_dir, "sub-103818_dwi.bval")
-hardi_fbvec = op.join(hardi_dir, "sub-103818_dwi.bvec")
-
-
-img = nib.load(hardi_fdata)
-dwi_data = img.get_fdata()
-mask = np.ones(dwi_data.shape[:3])
-mask[:, mask.shape[1] // 2:, :] = 0
-
-##########################################################################
-# Calculate DTI:
-# -------------------------
-
-print("Calculating DTI...")
-if not op.exists(op.join(working_dir, 'dti_FA.nii.gz')):
-    dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
-                             out_dir=working_dir)
-else:
-    dti_params = {'FA': op.join(working_dir, 'dti_FA.nii.gz'),
-                  'params': op.join(working_dir, 'dti_params.nii.gz')}
-
-FA_img = nib.load(dti_params['FA'])
-FA_data = FA_img.get_fdata()
-
-##########################################################################
-# Calculate CSD:
-# -------------------------
-print("Calculating CSD...")
-if not op.exists(op.join(working_dir, 'csd_sh_coeff.nii.gz')):
-    sh_coeff = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
-                           sh_order=4, out_dir=working_dir)
-else:
-    sh_coeff = op.join(working_dir, "csd_sh_coeff.nii.gz")
-
-apm = shm.anisotropic_power(nib.load(sh_coeff).get_fdata())
-
-##########################################################################
-# Register the individual data to a template:
-# -------------------------------------------
-# For the purpose of bundle segmentation, the individual brain is registered to
-# the MNI T1 template. The waypoint ROIs used in segmentation are then each
-# brought into each subject's native space to test streamlines for whether they
-# fulfill the segmentation criteria.
-#
-# .. note::
-#
-#     To find the right place for the waypoint ROIs, we calculate a non-linear
-#     transformation between the individual's brain DWI measurement (the b0
-#     measurements) and the MNI T1 template.
-#     Before calculating this non-linear warping, we perform a pre-alignment
-#     using an affine transformation.
-
-print("Registering to template...")
-
-MNI_T1w_img = afd.read_mni_template(weight="T1w")
-
-if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
-    gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
-    # Prealign using affine registration
-    _, prealign = affine_registration(
-        apm,
-        MNI_T1w_img.get_fdata(),
-        img.affine,
-        MNI_T1w_img.affine)
-
-    # Then register using a non-linear registration using the affine for
-    # prealignment
-    warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab,
-                                                 prealign=prealign)
-    reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
-else:
-    mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
-                               img, MNI_T1w_img)
-
-
-##########################################################################
-# Bundle specification
-# -------------------------------------------
-#
-# Here, a bundle specification is defined as a series of waypoint ROIs.
-# For each hemisphere, two ROIs are inclusion ROIs and three ROIs are
-# exclusion ROIs.
+afd.organize_stanford_data(clear_previous_afq=True)
 
 or_rois = afd.read_or_templates()
 
-bundles = {
+bundles = api.BundleDict({
     "L_OR": {
         "ROIs": [or_rois["left_OR_1"],
                  or_rois["left_OR_2"],
@@ -160,13 +43,7 @@ bundles = {
         "uid": 2
         }
     }
-
-##########################################################################
-# Endpoints
-# ----------
-# In addition to the waypoint ROIs, we will customize the endpoint ROIs
-# used for filtering the streamlines that are selected based on the
-# waypoint ROIs defined above.
+)
 
 endpoint_spec = {
     "L_OR": {
@@ -176,140 +53,34 @@ endpoint_spec = {
         "startpoint": or_rois['right_thal_MNI'],
         "endpoint": or_rois['right_V1_MNI']}}
 
-##########################################################################
-# Tracking
-# --------
-print("Tracking...")
-if not op.exists(op.join(working_dir, 'boot_streamlines.trk')):
-    seed_roi = np.zeros(img.shape[:-1])
-    for bundle in bundles:
-        for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            warped_roi = transform_inverse_roi(
-                roi,
-                mapping,
-                bundle_name=bundle)
-            nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                     op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+brain_mask = LabelledMaskFile("seg",
+                              {"scope": "freesurfer"},
+                              exclusive_labels=[0])
 
-            # Add voxels that aren't there yet:
-            if bundles[bundle]['rules'][idx]:
-                seed_roi = np.logical_or(seed_roi, warped_roi)
+tractography_afq = api.AFQ(
+    bids_path=op.join(afd.afq_home,
+                     'stanford_hardi'),
+    brain_mask=brain_mask,
+    tracking_params={"n_seeds": 3,
+                     "directions": "prob",
+                     "odf_model": "CSD",
+                     "seed_mask": RoiMask()},
+    bundle_info=bundles)
 
-        for ii, pp in enumerate(endpoint_spec[bundle].keys()):
-            roi = endpoint_spec[bundle][pp]
-            roi = resample(
-                roi.get_fdata(),
-                MNI_T1w_img,
-                roi.affine,
-                MNI_T1w_img.affine).get_fdata()
+# Use this one just to define the streamlines, oversampling around OR:
+tractography_afq.export_streamlines()
 
-            warped_roi = transform_inverse_roi(
-                roi,
-                mapping,
-                bundle_name=bundle)
+segmentation_afq = api.AFQ(
+    bids_path=op.join(afd.afq_home,
+                     'stanford_hardi'),
+    brain_mask=brain_mask,
+    viz_backend='plotly_no_gif',
+    bundle_info=bundles,
+    tracking_params={"n_seeds": 3,
+                     "directions": "prob",
+                     "odf_model": "CSD",
+                     "seed_mask": RoiMask()},
+    scalars=["dti_fa"])
 
-            nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                     op.join(working_dir, f"{bundle}_{pp}.nii.gz"))
-
-    nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
-             op.join(working_dir, 'seed_roi.nii.gz'))
-
-    gtab = dpg.gradient_table(hardi_fbval, hardi_fbvec)
-    model = csd._model(gtab, dwi_data)
-
-    bdg = BootDirectionGetter.from_data(dwi_data, model, max_angle=60)
-    sft = aft.track(sh_coeff,
-                    seed_mask=seed_roi,
-                    stop_mask=mask,
-                    n_seeds=2,
-                    directions=bdg,
-                    odf_model="CSD")
-
-    save_tractogram(sft, op.join(working_dir, 'boot_streamlines.trk'),
-                    bbox_valid_check=False)
-else:
-    sft = load_tractogram(op.join(working_dir, 'boot_streamlines.trk'), img)
-
-sft.to_vox()
-
-##########################################################################
-# Segmentation
-# ------------
-# We run the segmentation using both the ``bundles`` and the
-# ``endpoint_spec`` we defined above. In this particular case, we set a
-# rather lenient criterion for endpoint filtering, by changing from the
-# default value of ``dist_to_atlas`` (4 mm) to 5 mm.
-#
-print("Segmenting fiber groups...")
-segmentation = seg.Segmentation(return_idx=True,
-                                dist_to_atlas=5,
-                                endpoint_info=endpoint_spec)
-
-segmentation.segment(bundles,
-                     sft,
-                     fdata=hardi_fdata,
-                     fbval=hardi_fbval,
-                     fbvec=hardi_fbvec,
-                     mapping=mapping,
-                     reg_template=MNI_T1w_img)
-
-fiber_groups = segmentation.fiber_groups
-
-
-##########################################################################
-# Cleaning
-# --------
-# We proceed to clean outliers and save out trk files with the bundles.
-
-
-print("Cleaning fiber groups...")
-for bundle in bundles:
-    print(f"Cleaning {bundle}")
-    print(f"Before cleaning: {len(fiber_groups[bundle]['sl'])} streamlines")
-    new_fibers, idx_in_bundle = seg.clean_bundle(
-        fiber_groups[bundle]['sl'],
-        return_idx=True,
-        distance_threshold=2,
-        length_threshold=2)
-
-    print(f"Afer cleaning: {len(new_fibers)} streamlines")
-    new_fibers = fiber_groups[bundle]['sl']
-    idx_in_global = fiber_groups[bundle]['idx'][idx_in_bundle]
-    np.save(op.join(working_dir, f'{bundle}_idx.npy'), idx_in_global)
-    sft = StatefulTractogram(new_fibers.streamlines,
-                             img,
-                             Space.VOX)
-    sft.to_rasmm()
-    save_tractogram(sft, op.join(working_dir, f'{bundle}_afq.trk'),
-                    bbox_valid_check=False)
-
-
-##########################################################################
-# Bundle profiles
-# ---------------
-# Finally, we can extract and plot bundle profiles.
-
-print("Extracting tract profiles...")
-for bundle in bundles:
-    sft = load_tractogram(op.join(working_dir, f'{bundle}_afq.trk'),
-                          img, to_space=Space.VOX)
-    fig, ax = plt.subplots(1)
-    weights = gaussian_weights(sft.streamlines)
-    profile = afq_profile(FA_data, sft.streamlines,
-                          np.eye(4), weights=weights)
-    ax.plot(profile)
-    ax.set_title(bundle)
-
-plt.show()
-
-##########################################################################
-# References:
-# -------------------------
-# .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
-#                  Brian A Wandell, Heidi M Feldman, "Tract profiles of
-#                  white matter properties: automating fiber-tract
-#                  quantification", PloS One, 7: e49790
-#
-# .. [Yeatman2014] Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
-#                  "Lifespan maturation and degeneration of human brain white
-#                  matter", Nature Communications 5: 4932
+# Use this one to segment with Recobundles
+rb_afq.export_all()
