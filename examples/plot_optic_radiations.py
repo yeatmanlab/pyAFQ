@@ -57,30 +57,14 @@ brain_mask = LabelledMaskFile("seg",
                               {"scope": "freesurfer"},
                               exclusive_labels=[0])
 
-tractography_afq = api.AFQ(
+my_afq = api.AFQ(
     bids_path=op.join(afd.afq_home,
                      'stanford_hardi'),
-    brain_mask=brain_mask,
-    tracking_params={"n_seeds": 3,
-                     "directions": "prob",
-                     "odf_model": "CSD",
-                     "seed_mask": RoiMask()},
-    bundle_info=bundles)
-
-# Use this one just to define the streamlines, oversampling around OR:
-tractography_afq.export_streamlines()
-
-segmentation_afq = api.AFQ(
-    bids_path=op.join(afd.afq_home,
-                     'stanford_hardi'),
-    brain_mask=brain_mask,
-    viz_backend='plotly_no_gif',
     bundle_info=bundles,
+    brain_mask=brain_mask,
     tracking_params={"n_seeds": 3,
                      "directions": "prob",
                      "odf_model": "CSD",
-                     "seed_mask": RoiMask()},
-    scalars=["dti_fa"])
+                     "seed_mask": RoiMask()})
 
-# Use this one to segment with Recobundles
-rb_afq.export_all()
+my_afq.export_all()
