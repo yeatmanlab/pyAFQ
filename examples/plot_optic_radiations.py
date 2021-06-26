@@ -45,7 +45,7 @@ bundles = api.BundleDict({
     }
 )
 
-endpoint_spec = {
+endpoint_info = {
     "L_OR": {
         "startpoint": or_rois['left_thal_MNI'],
         "endpoint": or_rois['left_V1_MNI']},
@@ -60,11 +60,12 @@ brain_mask = LabelledMaskFile("seg",
 my_afq = api.AFQ(
     bids_path=op.join(afd.afq_home,
                      'stanford_hardi'),
-    bundle_info=bundles,
     brain_mask=brain_mask,
     tracking_params={"n_seeds": 3,
                      "directions": "prob",
                      "odf_model": "CSD",
-                     "seed_mask": RoiMask()})
+                     "seed_mask": RoiMask()},
+    segmentation_params=dict(endpoint_info=endpoint_info),
+    bundle_info=bundles)
 
 my_afq.export_all()
