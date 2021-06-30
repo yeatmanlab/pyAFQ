@@ -334,9 +334,7 @@ def test_AFQ_no_derivs():
         bids_path, "derivatives", "dmriprep", "dataset_description.json"))
     with pytest.raises(
             ValueError,
-            match="`bids_path` contains no subjects in derivatives folders."
-                  + " This could be caused by derivatives folders not"
-                  + " following the BIDS format."):
+            match=f"No non-json files recognized by pyBIDS in {bids_path}"):
         api.AFQ(
             bids_path,
             dmriprep="synthetic")
