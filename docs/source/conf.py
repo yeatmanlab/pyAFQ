@@ -201,7 +201,7 @@ texinfo_documents = [
 intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'numpy': ('https://docs.scipy.org/doc/numpy/', None),
                        'dipy': ('https://dipy.org/documentation/latest',
-                                'https://dipy.org/documentation/1.1.1./objects.inv/')
+                                'https://dipy.org/documentation/1.4.1./objects.inv/')
                         }
 
 image_scrapers = ('matplotlib', plotly_sg_scraper,)
