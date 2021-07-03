@@ -745,10 +745,12 @@ def test_AFQ_data_waypoint():
     myafq.tract_profile_plots
     assert op.exists(op.join(
         myafq.results_dir["01"],
+        "tract_profile_plots",
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_fa_profile_plots.png'))  # noqa
 
     assert op.exists(op.join(
         myafq.results_dir["01"],
+        "tract_profile_plots",
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_dti_md_profile_plots.png'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see

@@ -263,6 +263,13 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
             subses_dict, f'_{this_scalar}_profile_plots',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
+        tract_profiles_folder = op.join(
+            op.dirname(fname),
+            "tract_profile_plots")
+        fname = op.join(
+            tract_profiles_folder,
+            op.basename(fname))
+        os.makedirs(op.abspath(tract_profiles_folder), exist_ok=True)
 
         visualize_tract_profiles(
             segmentation_imap["profiles_file"],

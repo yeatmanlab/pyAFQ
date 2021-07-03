@@ -1118,15 +1118,42 @@ class AFQ(object):
                 json.dump(sls_dict, fp)
         return sls_json_fname
 
-    def export_all(self, viz=True, afqbrowser=True, xforms=True):
-        """ Exports all the possible outputs"""
+    def export_all(self, viz=True, afqbrowser=True, xforms=True,
+                   indiv=True):
+        """ Exports all the possible outputs
+
+        Parameters
+        ----------
+        viz : bool
+            Whether to output visualizations. This includes tract profile
+            plots, a figure containing all bundles, and, if using the AFQ
+            segmentation algorithm, individual bundle figures.
+            Default: True
+        afqbrowser : bool
+            Whether to output an AFQ-Browser from this AFQ instance.
+            Default: True
+        xforms : bool
+            Whether to output the reg_template image in subject space and,
+            depending on if it is possible based on the mapping used, to
+            output the b0 in template space.
+            Default: True
+        indiv : bool
+            Whether to output individual bundles in their own files, in
+            addition to the one file containing all bundles. If using
+            the AFQ segmentation algorithm, individual ROIs are also
+            output.
+            Default: True
+        """
         start_time = time()
         if xforms:
             if not isinstance(self.mapping_definition, FnirtMap)\
                     and not isinstance(self.mapping_definition, ItkMap):
                 self.b0_warped
             self.template_xform
+        if indiv:
             self.indiv_bundles
+            if self.seg_algo == "afq":
+                self.rois
         self.sl_counts
         self.profiles
         # We combine profiles even if there is only 1 subject / session,
@@ -1138,7 +1165,6 @@ class AFQ(object):
             self.all_bundles_figure
             if self.seg_algo == "afq":
                 self.indiv_bundles_figures
-                self.rois
         if afqbrowser:
             self.assemble_AFQ_browser()
         self.logger.info(
