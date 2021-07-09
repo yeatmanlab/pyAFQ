@@ -57,6 +57,7 @@ finally:
 
 
 __all__ = ["fetch_callosum_templates", "read_callosum_templates",
+           "fetch_or_templates", "read_or_templates",
            "fetch_templates", "read_templates", "fetch_hcp",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
@@ -425,6 +426,101 @@ def read_templates(resample_to=False):
     logger.debug(f'AFQ templates loaded in {toc - tic:0.4f} seconds')
 
     return template_dict
+
+
+or_fnames = [
+    "left_thal_MNI.nii.gz",
+    "left_V1_MNI.nii.gz",
+    "right_thal_MNI.nii.gz",
+    "right_V1_MNI.nii.gz",
+    "left_OP_MNI.nii.gz",
+    "left_OR_1.nii.gz",
+    "left_OR_2.nii.gz",
+    "left_pos_thal_MNI.nii.gz",
+    "left_TP_MNI.nii.gz",
+    "right_OP_MNI.nii.gz",
+    "right_OR_1.nii.gz",
+    "right_OR_2.nii.gz",
+    "right_pos_thal_MNI.nii.gz",
+    "right_TP_MNI.nii.gz",
+]
+
+or_remote_fnames = [
+    "26831630",
+    "26831633",
+    "26831636",
+    "26831639",
+    "26831642",
+    "26831645",
+    "26831648",
+    "26831651",
+    "26831654",
+    "26831657",
+    "26831660",
+    "26831663",
+    "26831666",
+    "26831669",
+]
+
+or_md5_hashes = [
+    "c18f3f82c26f334dc26b96d21f026dd1",
+    "ad996c67bf5cc59fc3a7b60255873b67",
+    "786fb4ba915599f746950acd980e5b03",
+    "cc88fb4671311404eb9dfa8fa11a59e0",
+    "9cff03af586d9dd880750cef3e0bf63f",
+    "ff728ba3ffa5d1600bcd19fdef8182c4",
+    "4f1978e418a3169609375c28b3eba0fd",
+    "fd163893081b520f4594171aeea04f39",
+    "bf795d197912b5e074d248d2763c6930",
+    "13efde1efe0de52683cbf352ecba457e",
+    "75c7bd2092950578e599a2dcb218909f",
+    "8f3890fa8c26a568503226757f7e7d6c",
+    "f239aa3140809152da8884ff879dde1b",
+    "60a748567e4dd81b40ad8967a14cb09e",
+]
+
+fetch_or_templates = _make_fetcher("fetch_or_templates",
+                                   op.join(afq_home,
+                                           'or_templates'),
+                                   baseurl, or_remote_fnames,
+                                   or_fnames,
+                                   md5_list=or_md5_hashes,
+                                   doc="Download AFQ or templates")
+
+
+def read_or_templates(resample_to=False):
+    """Load AFQ OR templates from file
+
+    Returns
+    -------
+    dict with: keys: names of template ROIs and values: nibabel Nifti1Image
+    objects from each of the ROI nifti files.
+    """
+    logger = logging.getLogger('AFQ.data')
+
+    files, folder = fetch_or_templates()
+
+    logger.debug('loading or templates')
+    tic = time.perf_counter()
+
+    template_dict = {}
+    for f in files:
+        img = nib.load(op.join(folder, f))
+        if resample_to:
+            if isinstance(resample_to, str):
+                resample_to = nib.load(resample_to)
+            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
+                                               resample_to,
+                                               img.affine,
+                                               resample_to.affine),
+                                  resample_to.affine)
+        template_dict[f.split('.')[0]] = img
+
+    toc = time.perf_counter()
+    logger.debug(f'or templates loaded in {toc - tic:0.4f} seconds')
+
+    return template_dict
+
 
 
 # +----------------------------------------------------+

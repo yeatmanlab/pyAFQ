@@ -171,7 +171,7 @@ def viz_indivBundle(subses_dict,
                         pp.get_fdata(),
                         reg_template,
                         pp.affine,
-                        reg_template).get_fdata()
+                        reg_template.affine).get_fdata()
 
                     atlas_roi = np.zeros(pp.shape)
                     atlas_roi[np.where(pp > 0)] = 1
