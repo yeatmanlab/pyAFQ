@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adding Definitions &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to create a release" href="releasing.html" />
+    <link rel="prev" title="Adding Tasks to the pyAFQ Workflow" href="tasks.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="tasks.html">
+   Adding Tasks to the pyAFQ Workflow
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Adding Definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="releasing.html">
+   How to create a release
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developing <cite>pyAFQ</cite></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tasks.html">Adding Tasks to the pyAFQ Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tasks.html#task-decorators">Task Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tasks.html#checklist-for-adding-tasks-to-the-pyafq-workflow">Checklist for Adding Tasks to the pyAFQ Workflow</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding Definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">How to create a release</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/developing/definitions.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="adding-definitions">
+<h1>Adding Definitions<a class="headerlink" href="#adding-definitions" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ uses definitions to allow users to customize the mappings, masks,
+etc. used by the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object. All definitions ultimately
+inherit from <a class="reference internal" href="../autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a>. For a given subject and
+session within the API, a definition is used to create a given mask, map, etc.
+<cite>Definition</cite>-inherited classes must have three methods: <cite>__init__</cite>, <cite>find_path</cite>, and <cite>get_for_subses</cite>.
+The requirements of each of these methods are described below:</p>
+<ul class="simple">
+<li><p><cite>Definition</cite>-inherited classes have an <cite>__init__</cite> method which the users uses to configure
+the the definition for a given instance of the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object.
+These <cite>__init__</cite> methods must be thoroughly
+documented as they are what the user interacts with. The class must have attributes
+of same name as the <cite>__init__</cite> args. This is important for reading/writing
+<cite>Definition</cite>-inherited classes as arguments to config files.
+For scalar definitions, each class should have a <cite>name</cite> parameter (see
+<a class="reference internal" href="../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile" title="AFQ.definitions.scalar.ScalarFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.scalar.ScalarFile</span></code></a> source for an example).</p></li>
+<li><p>The api calls <cite>find_path</cite> during the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object initialization to
+let the definition find relevant files for the given subject and session. All <cite>find_path</cite>
+methods have the same input: <cite>bids_layout</cite>, <cite>from_path</cite>, <cite>subject</cite>, <cite>session</cite>. See
+<a class="reference internal" href="../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.find_path" title="AFQ.definitions.mask.MaskFile.find_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.definitions.mask.MaskFile.find_path()</span></code></a> for a basic example.
+If your definition does not need to run anything during <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a>
+object initialization, simply override this method with a method that only
+passes (see <a class="reference internal" href="../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask.find_path" title="AFQ.definitions.mask.FullMask.find_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.definitions.mask.FullMask.find_path()</span></code></a> source for an example.)</p></li>
+<li><p>The <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object calls <cite>get_for_subses</cite> to get the mask, map,
+etc. during workflow construction or execution. The form of this method varies significantly
+between mapping, scalar, and mask <cite>Definition</cite>-inherited classes. In
+mask <cite>Definition</cite>-inherited classes, <cite>get_mask_getter</cite> takes two arguments:
+<cite>self</cite> and <cite>in_data</cite>. The <cite>in_data</cite> argument specifies whether this mask is being
+called from the data Pimms plan (i.e., the brain mask) or not (i.e., the tractography
+seed and stop masks). <cite>get_for_subses</cite> then must return a task which can be called
+to generate the mask. In scalar <cite>Definition</cite>-inherited classes, <cite>get_for_subses</cite> only takes the <cite>self</cite>
+argument and similarly returns a task which generates the mask. In mapping
+<cite>Definition</cite>-inherited classes, <cite>get_for_subses</cite> should return a “mapping”. The “mapping” must have
+<cite>transform</cite> and <cite>transform_inverse</cite> functions which each accept two arguments: (1)
+an ndarray called <cite>data</cite> and (2) <cite>**kwargs</cite>. In mapping <cite>Definition</cite>-inherited classes, get_for_subses
+takes as input self, subses_dict, reg_template, and reg_subject.</p></li>
+</ul>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="tasks.html" title="previous page">Adding Tasks to the pyAFQ Workflow</a>
+    <a class='right-next' id="next-link" href="releasing.html" title="next page">How to create a release</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

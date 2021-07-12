@@ -1,0 +1,26 @@
+:mod:`AFQ.tasks.utils`
+======================
+
+.. py:module:: AFQ.tasks.utils
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.utils.get_fname
+   AFQ.tasks.utils.with_name
+
+
+
+.. function:: get_fname(subses_dict, suffix, tracking_params=None, segmentation_params=None)
+
+
+.. function:: with_name(task_list)
+
+

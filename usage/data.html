@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -57,7 +57,7 @@
     
 
 <a class="navbar-brand" href="../index.html">
-  <img src="../_static/logo.png" class="logo" alt="logo">
+  <img src="../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -192,7 +192,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="converter.html">
-   Matlab AFQ to Python AFQ conversion
+   Tractography from other pipelines
   </a>
  </li>
  <li class="toctree-l1">
@@ -215,8 +215,8 @@
 <li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="scalars.html">The pyAFQ Custom Scalars API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html">Matlab AFQ to Python AFQ conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#matlab-afq-to-python-afq-conversion">Matlab AFQ to Python AFQ conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
 </ul>
 </li>
@@ -246,6 +246,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#example-data">
    Example data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#preprocessing">
+   Preprocessing
   </a>
  </li>
 </ul>
@@ -318,7 +323,8 @@ run:</p>
 </pre></div>
 </div>
 <p>This should create a folder in your home directory with a properly-formatted
-data set in a directory called <cite>stanford_hardi</cite>:</p>
+data set in a directory called <cite>stanford_hardi</cite>. Only the preprocessed
+diffusion data is required for pyAFQ:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~/AFQ_data/stanford_hardi/derivatives/vistasoft/
 ├── dataset_description.json
 └── sub-01
@@ -329,9 +335,28 @@ data set in a directory called <cite>stanford_hardi</cite>:</p>
             └── sub-01_ses-01_dwi.nii.gz
 </pre></div>
 </div>
+<p>See <span class="xref std std-ref">examples/plot_bids_layout</span> for a more extensive example.</p>
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>pyAFQ does not perform preprocessing. Instead, pyAFQ expects the outputs of
+a preprocessing pipeline in BIDS format. In the above example, the dataset
+was preprocessed using the <a class="reference external" href="https://github.com/vistalab/vistasoft">VISTASOFT</a> software.
+Other examples may use other common preprocessing
+software tools, such as <a class="reference external" href="https://github.com/nipreps/dmriprep">dMRIPrep</a>
+or <a class="reference external" href="https://qsiprep.readthedocs.io/en/latest/">QSIprep</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The name of the pipeline is specified in the dataset_description.json,
+<p>The outputs of VISTASOFT are stored in its own pipeline folder, which we
+chose to call <cite>derivatives/vistasoft</cite>. In general, any folder name is
+valid, as long as the folder is inside of the <cite>derivatives</cite> folder.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, pyAFQ will check all folders in <cite>derivatives</cite> for data.
+If you want to specify which pipeline pyAFQ should check for preprocessed
+data, pass that pipeline’s name to the <cite>dmriprep</cite> parameter.
+The name of the pipeline is specified in the dataset_description.json,
 it is not based on the folder name.</p>
 </div>
 </div>
@@ -368,7 +393,7 @@ it is not based on the folder name.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

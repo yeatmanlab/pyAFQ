@@ -17,7 +17,7 @@ Functions
 
 
 
-.. function:: parfor(func, in_list, out_shape=None, n_jobs=-1, engine='joblib', backend='threading', func_args=[], func_kwargs={})
+.. function:: parfor(func, in_list, out_shape=None, n_jobs=-1, engine='joblib', backend='threading', func_args=[], func_kwargs={}, **kwargs)
 
    Parallel for loop for numpy arrays
 
@@ -50,6 +50,11 @@ Functions
 
        **func_kwargs** : list, optional
            Keyword arguments to `func`.
+
+       **kwargs** : dict, optional
+           Additional arguments to pass to either joblib.Parallel
+           or dask.compute depending on the engine used.
+           Default: {}
 
    :Returns:
 

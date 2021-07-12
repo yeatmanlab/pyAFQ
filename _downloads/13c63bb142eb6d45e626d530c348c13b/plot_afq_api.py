@@ -119,7 +119,7 @@ myafq = api.AFQ(bids_path=op.join(afd.afq_home,
 # We will then use `nibabel` to load the deriviative file and retrieve the
 # data array.
 
-FA_fname = myafq.dti_fa[0]
+FA_fname = myafq.dti_fa["01"]
 FA_img = nib.load(FA_fname)
 FA = FA_img.get_fdata()
 
@@ -165,16 +165,15 @@ ax.axis("off")
 #    single bundle by double clicking the legend. The interactive
 #    visualization will also all you to pan, zoom, and rotate.
 
-bundle_html = myafq.viz_bundles(export=True, n_points=50)
-plotly.io.show(bundle_html[0])
+bundle_html = myafq.all_bundles_figure
+plotly.io.show(bundle_html["01"])
 
 ##########################################################################
 # We can also visualize the tract profiles in all of the bundles. These
 # plots show both FA (left) and MD (right) layed out anatomically.
 #
 
-myafq.plot_tract_profiles()
-fig_files = myafq.data_frame['tract_profiles_viz'][0]
+fig_files = myafq.tract_profile_plots["01"]
 
 ##########################################################################
 # .. figure:: {{ fig_files[0] }}

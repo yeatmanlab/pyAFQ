@@ -75,7 +75,7 @@ Classes
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_for_row(self, afq_object, row)
+   .. method:: get_for_subses(self, subses_dict, reg_template, reg_subject)
 
 
 
@@ -133,7 +133,7 @@ Classes
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+   .. method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
 
 
@@ -173,7 +173,7 @@ Classes
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+   .. method:: gen_mapping(self, subses_dict, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
 
 
 
@@ -213,7 +213,7 @@ Classes
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: gen_mapping(self, afq_object, row, reg_template_img, reg_template_sls, reg_subject_img, reg_subject_sls, reg_prealign)
+   .. method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
 
 

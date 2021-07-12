@@ -182,7 +182,7 @@ fulfill the segmentation criteria.
 
     Registering to template...
     Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz
-      0%|          | 0.00/13.0k [00:00<?, ?B/s]     30%|###       | 3.93k/13.0k [00:00<00:00, 39.3kB/s]     69%|######8   | 8.89k/13.0k [00:00<00:00, 45.3kB/s]    13.0kB [00:00, 45.7kB/s]                            
+      0%|          | 0.00/13.0k [00:00<?, ?B/s]     36%|###5      | 4.62k/13.0k [00:00<00:00, 46.2kB/s]     71%|#######1  | 9.25k/13.0k [00:00<00:00, 45.9kB/s]    13.0kB [00:00, 46.6kB/s]                            
     Optimizing level 2 [max iter: 10000]
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
@@ -205,13 +205,12 @@ data structure. The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 For speed, we only segment two bundles here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-116
+.. GENERATED FROM PYTHON SOURCE LINES 111-115
 
 .. code-block:: default
 
 
-    bundles = api.make_bundle_dict(bundle_names=["CST", "ARC"],
-                                   resample_to=MNI_T2_img)
+    bundles = api.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
 
 
 
@@ -221,14 +220,14 @@ For speed, we only segment two bundles here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-121
+.. GENERATED FROM PYTHON SOURCE LINES 116-120
 
 Tracking
 --------
 Streamlines are generate using DTI and a deterministic tractography
 algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-148
+.. GENERATED FROM PYTHON SOURCE LINES 120-148
 
 .. code-block:: default
 
@@ -248,8 +247,9 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
                              op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
                     # Add voxels that aren't there yet:
                     seed_roi = np.logical_or(seed_roi, warped_roi)
-        nib.save(nib.Nifti1Image(seed_roi.astype(float), img.affine),
-                                 op.join(working_dir, 'seed_roi.nii.gz'))
+        nib.save(nib.Nifti1Image(
+            seed_roi.astype(float), img.affine),
+            op.join(working_dir, 'seed_roi.nii.gz'))
         sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                         stop_mask=FA_data, stop_threshold=0.1)
         save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
@@ -312,10 +312,10 @@ not pass through exclusion ROIs.
  .. code-block:: none
 
     Segmenting fiber groups...
-      0%|          | 0/335 [00:00<?, ?it/s]      1%|          | 2/335 [00:00<00:30, 10.88it/s]      1%|1         | 4/335 [00:06<10:17,  1.86s/it]      2%|1         | 6/335 [00:06<05:41,  1.04s/it]     81%|########1 | 272/335 [00:06<00:00, 81.73it/s]    100%|##########| 335/335 [00:06<00:00, 50.67it/s]
-      0%|          | 0/237 [00:00<?, ?it/s]    100%|##########| 237/237 [00:00<00:00, 3005.93it/s]
-      0%|          | 0/431 [00:00<?, ?it/s]     44%|####3     | 188/431 [00:00<00:00, 1731.47it/s]    100%|##########| 431/431 [00:00<00:00, 2566.49it/s]
-      0%|          | 0/472 [00:00<?, ?it/s]     53%|#####3    | 252/472 [00:00<00:00, 1927.55it/s]    100%|##########| 472/472 [00:00<00:00, 2918.96it/s]
+      0%|          | 0/335 [00:00<?, ?it/s]      1%|1         | 4/335 [00:04<06:42,  1.22s/it]      2%|1         | 6/335 [00:04<04:02,  1.36it/s]    100%|##########| 335/335 [00:05<00:00, 66.31it/s]
+      0%|          | 0/237 [00:00<?, ?it/s]    100%|##########| 237/237 [00:00<00:00, 4980.29it/s]
+      0%|          | 0/431 [00:00<?, ?it/s]     88%|########8 | 380/431 [00:00<00:00, 3265.55it/s]    100%|##########| 431/431 [00:00<00:00, 3693.16it/s]
+      0%|          | 0/472 [00:00<?, ?it/s]    100%|##########| 472/472 [00:00<00:00, 5597.15it/s]
 
 
 
@@ -463,7 +463,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 18 minutes  13.050 seconds)
+   **Total running time of the script:** ( 15 minutes  57.269 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tract_profile.py:

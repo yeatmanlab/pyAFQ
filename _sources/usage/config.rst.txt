@@ -19,11 +19,7 @@ See an example configuration file below::
     # Some special notes on parameters:
     # In tracking_params, parameters with the suffix mask which are also
     # a mask from AFQ.definitions.mask will be handled automatically by the
-    # api. You can set additional parameters for a given step of the process
-    # by directly calling the relevant api function. For example,
-    # to set the sh_order for csd to 4, call:
-    # myafq._csd(sh_order=4)
-    # before otherwise generating the csd file.
+    # api.
     
     # Use '' to indicate None
     # Wrap dictionaries in quotes
@@ -49,7 +45,7 @@ See an example configuration file below::
     # Default: None
     custom_tractography_bids_filters = ''
     
-    [REGISTRATION]
+    [DATA]
     
     # The value of b under which
     # it is considered to be b0. Default: 50.
@@ -74,6 +70,8 @@ See an example configuration file below::
     # from the dataset (other than b0), inclusive.
     # If None, there is no maximum limit. Default: None
     max_bval = ''
+    
+    [REGISTRATION]
     
     # The target image data for registration.
     # Can either be a Nifti1Image, a path to a Nifti1Image, or
@@ -122,7 +120,8 @@ See an example configuration file below::
     [BUNDLES]
     
     # List of bundle names to include in segmentation,
-    # or a bundle dictionary (see make_bundle_dict for inspiration).
+    # or a bundle dictionary (see BundleDict for inspiration),
+    # or a BundleDict.
     # If None, will get all appropriate bundles for the chosen
     # segmentation algorithm.
     # Default: None
@@ -136,9 +135,14 @@ See an example configuration file below::
     
     [COMPUTE]
     
-    # Whether to use a dask DataFrame object.
-    # Default: False
-    dask_it = false
+    # Parameters to pass to parfor in AFQ.utils.parallel,
+    # to parallelize computations across subjects and sessions.
+    # Set "n_jobs" to -1 to automatically parallelize as
+    # the number of cpus. Here is an example for how to do
+    # multiprocessing with 4 cpus:
+    # {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
+    # Default: {"engine": "serial"}
+    parallel_params = "{'engine': 'serial'}"
     
     [VIZ]
     

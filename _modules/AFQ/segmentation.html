@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +55,7 @@
     
 
 <a class="navbar-brand" href="../../index.html">
-  <img src="../../_static/logo.png" class="logo" alt="logo">
+  <img src="../../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -217,7 +217,7 @@
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
 <span class="kn">from</span> <span class="nn">AFQ.utils.parallel</span> <span class="kn">import</span> <span class="n">parfor</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Segmentation&quot;</span><span class="p">,</span> <span class="s2">&quot;clean_bundles&quot;</span><span class="p">,</span> <span class="s2">&quot;clean_by_endpoints&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Segmentation&quot;</span><span class="p">,</span> <span class="s2">&quot;clean_bundle&quot;</span><span class="p">,</span> <span class="s2">&quot;clean_by_endpoints&quot;</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_resample_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
@@ -288,7 +288,7 @@
 <span class="sd">        clip_edges : bool</span>
 <span class="sd">            Whether to clip the streamlines to be only in between the ROIs.</span>
 <span class="sd">            Default: False</span>
-<span class="sd">        parallel_segmentation : dict</span>
+<span class="sd">        parallel_segmentation : dict or AFQ.api.BundleDict</span>
 <span class="sd">            How to parallelize segmentation across processes when performing</span>
 <span class="sd">            waypoint ROI segmentation. Set to {&quot;engine&quot;: &quot;serial&quot;} to not</span>
 <span class="sd">            perform parallelization. See ``AFQ.utils.parallel.pafor`` for</span>
@@ -463,7 +463,7 @@
 <span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        bundle_dict: dict</span>
+<span class="sd">        bundle_dict: dict or AFQ.api.BundleDict</span>
 <span class="sd">            Meta-data for the segmentation. The format is something like::</span>
 <span class="sd">                {&#39;name&#39;: {&#39;ROIs&#39;:[img1, img2],</span>
 <span class="sd">                &#39;rules&#39;:[True, True]},</span>
@@ -700,7 +700,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">prob_map</span> <span class="o">=</span> <span class="n">prob_map</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
         <span class="n">warped_prob_map</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">prob_map</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">prob_map</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
                                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">warped_prob_map</span><span class="p">,</span> <span class="n">include_rois</span><span class="p">,</span> <span class="n">exclude_rois</span><span class="p">,</span>\
             <span class="n">include_roi_tols</span><span class="p">,</span> <span class="n">exclude_roi_tols</span></div>
@@ -807,8 +807,10 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">[</span><span class="s2">&quot;engine&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;serial&quot;</span><span class="p">:</span>
                 <span class="n">in_list</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">sl_idxs</span> <span class="o">=</span> <span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">parallelizing</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sl_idxs</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">idx_above_prob</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">parallelizing</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">for</span> <span class="n">sl_idx</span> <span class="ow">in</span> <span class="n">sl_idxs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob_threshold</span><span class="p">:</span>
@@ -827,7 +829,7 @@
                 <span class="n">fiber_prob</span> <span class="o">=</span> <span class="n">fiber_probabilities</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">]</span>
 
                 <span class="c1"># if parallel, collect the streamlines now</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parallelizing</span><span class="p">:</span>
                     <span class="n">in_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sl</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">,</span> <span class="n">sl_idx</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">min_dist_coords</span><span class="p">[</span><span class="n">sl_idx</span><span class="p">,</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>\
@@ -839,7 +841,7 @@
                             <span class="n">exclude_roi_tols</span><span class="p">,</span> <span class="n">fiber_prob</span><span class="p">)</span>
 
             <span class="c1"># collects results from the submitted streamlines</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parallelizing</span><span class="p">:</span>
                 <span class="n">results</span> <span class="o">=</span> <span class="n">parfor</span><span class="p">(</span>
                     <span class="n">_is_streamline_in_ROIs_parallel</span><span class="p">,</span> <span class="n">in_list</span><span class="p">,</span>
                     <span class="n">func_args</span><span class="o">=</span><span class="p">[</span>
@@ -1089,21 +1091,22 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">roiseg</span> <span class="o">=</span> <span class="n">Segmentation</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">presegment_kawrgs</span><span class="p">)</span>
             <span class="n">roiseg</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">,</span>
-                    <span class="n">reg_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
-                    <span class="n">mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
-                    <span class="n">reg_prealign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_prealign</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">,</span>
+                <span class="n">reg_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
+                <span class="n">mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
+                <span class="n">reg_prealign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_prealign</span><span class="p">)</span>
             <span class="n">roiseg_fg</span> <span class="o">=</span> <span class="n">roiseg</span><span class="o">.</span><span class="n">fiber_groups</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">move_streamlines</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_algo</span><span class="p">)</span>
             <span class="n">rb</span> <span class="o">=</span> <span class="n">RecoBundles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="c1"># Next we&#39;ll iterate over bundles, registering each one:</span>
         <span class="n">bundle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;whole_brain&#39;</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
+            <span class="n">bundle_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundle_list</span><span class="p">:</span>
@@ -1143,7 +1146,7 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">moved_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_presegmentation.trk&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">moved_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;whole_brain.trk&quot;</span>
+                    <span class="n">moved_fname</span> <span class="o">=</span> <span class="s2">&quot;whole_brain.trk&quot;</span>
                 <span class="n">moved_sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">moved_sl</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
@@ -1206,7 +1209,7 @@
         <span class="k">return</span> <span class="n">fiber_groups</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">clean_bundle</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">clean_rounds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<div class="viewcode-block" id="clean_bundle"><a class="viewcode-back" href="../../autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundle">[docs]</a><span class="k">def</span> <span class="nf">clean_bundle</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">clean_rounds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                  <span class="n">length_threshold</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">min_sl</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
                  <span class="n">return_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1292,7 +1295,7 @@
     <span class="k">if</span> <span class="n">return_idx</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">idx</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <span class="c1"># Helper functions for segmenting using waypoint ROIs</span>
 <span class="c1"># they are not a part of the class because we do not want</span>
@@ -1402,7 +1405,7 @@
     <span class="c1"># Check whether it&#39;s already in the right format:</span>
     <span class="n">sp_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets0</span> <span class="ow">is</span> <span class="kc">None</span>
                  <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="n">targets0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
+                     <span class="ow">and</span> <span class="n">targets0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
 
     <span class="n">ep_is_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets1</span> <span class="ow">is</span> <span class="kc">None</span>
                  <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">targets1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
@@ -1485,7 +1488,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

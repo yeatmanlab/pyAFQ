@@ -21,6 +21,7 @@ Functions
 
 .. autoapisummary::
 
+   AFQ.segmentation.clean_bundle
    AFQ.segmentation.clean_by_endpoints
 
 
@@ -37,7 +38,7 @@ Functions
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
       Parameters
       ----------
-      bundle_dict: dict
+      bundle_dict: dict or AFQ.api.BundleDict
           Meta-data for the segmentation. The format is something like::
               {'name': {'ROIs':[img1, img2],
               'rules':[True, True]},
@@ -324,6 +325,78 @@ Functions
       ..
           !! processed by numpydoc !!
 
+
+
+.. function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
+
+   Clean a segmented fiber group based on the Mahalnobis distance of
+   each streamline
+
+
+   :Parameters:
+
+       **tg** : StatefulTractogram class instance
+           A whole-brain tractogram to be segmented.
+
+       **n_points** : int, optional
+           Number of points to resample streamlines to.
+           Default: 100
+
+       **clean_rounds** : int, optional.
+           Number of rounds of cleaning based on the Mahalanobis distance from
+           the mean of extracted bundles. Default: 5
+
+       **distance_threshold** : float, optional.
+           Threshold of cleaning based on the Mahalanobis distance (the units are
+           standard deviations). Default: 5.
+
+       **length_threshold: float, optional**
+           Threshold for cleaning based on length (in standard deviations). Length
+           of any streamline should not be *more* than this number of stdevs from
+           the mean length.
+
+       **min_sl** : int, optional.
+           Number of streamlines in a bundle under which we will
+           not bother with cleaning outliers. Default: 20.
+
+       **stat** : callable or str, optional.
+           The statistic of each node relative to which the Mahalanobis is
+           calculated. Default: `np.mean` (but can also use median, etc.)
+
+       **return_idx** : bool
+           Whether to return indices in the original streamlines.
+           Default: False.
+
+       **Returns**
+           ..
+
+       **-------**
+           ..
+
+       **A StatefulTractogram class instance containing only the streamlines**
+           ..
+
+       **that have a Mahalanobis distance smaller than `clean_threshold` from**
+           ..
+
+       **the mean of each one of the nodes.**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 .. function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)

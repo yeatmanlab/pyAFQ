@@ -15,6 +15,7 @@ Functions
 
    AFQ.data.read_callosum_templates
    AFQ.data.read_templates
+   AFQ.data.read_or_templates
    AFQ.data.fetch_hcp
    AFQ.data.read_stanford_hardi_tractography
    AFQ.data.organize_stanford_data
@@ -28,6 +29,7 @@ Attributes
 
    AFQ.data.fetch_callosum_templates
    AFQ.data.fetch_templates
+   AFQ.data.fetch_or_templates
    AFQ.data.fetch_stanford_hardi_tractography
 
 
@@ -74,6 +76,41 @@ Attributes
 .. function:: read_templates(resample_to=False)
 
    Load AFQ templates from file
+
+
+
+   :Returns:
+
+       dict with: keys: names of template ROIs and values: nibabel Nifti1Image
+           ..
+
+       objects from each of the ROI nifti files.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. data:: fetch_or_templates
+   
+
+   
+
+.. function:: read_or_templates(resample_to=False)
+
+   Load AFQ OR templates from file
 
 
 

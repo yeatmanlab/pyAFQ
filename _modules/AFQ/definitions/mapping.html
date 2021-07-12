@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -55,7 +55,7 @@
     
 
 <a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/logo.png" class="logo" alt="logo">
+  <img src="../../../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -199,6 +199,7 @@
 <span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">syn_registration</span><span class="p">,</span> <span class="n">affine_registration</span>
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span>
 
 <span class="kn">from</span> <span class="nn">dipy.align.imaffine</span> <span class="kn">import</span> <span class="n">AffineMap</span>
 
@@ -218,7 +219,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FnirtMap&quot;</span><span class="p">,</span> <span class="s2">&quot;SynMap&quot;</span><span class="p">,</span> <span class="s2">&quot;SlrMap&quot;</span><span class="p">,</span> <span class="s2">&quot;AffMap&quot;</span><span class="p">]</span>
 
-<span class="c1"># For map defintions, get_for_row should return only the mapping</span>
+<span class="c1"># For map defintions, get_for_subses should return only the mapping</span>
 <span class="c1"># Where the mapping has transform and transform_inverse functions</span>
 <span class="c1"># which each accept data, **kwargs</span>
 
@@ -280,11 +281,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FnirtMap.get_for_row"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.get_for_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
+<div class="viewcode-block" id="FnirtMap.get_for_subses"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.get_for_subses">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">):</span>
+        <span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
 
-        <span class="n">our_templ</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span>
-        <span class="n">subj</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">])</span>
+        <span class="n">our_templ</span> <span class="o">=</span> <span class="n">reg_template</span>
+        <span class="n">subj</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">])</span>
         <span class="n">their_templ</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">nearest_space</span><span class="p">)</span>
         <span class="n">warp</span> <span class="o">=</span> <span class="n">readFnirt</span><span class="p">(</span><span class="n">nearest_warp</span><span class="p">,</span> <span class="n">their_templ</span><span class="p">,</span> <span class="n">subj</span><span class="p">)</span>
 
@@ -353,12 +355,12 @@
             <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_suffix</span><span class="p">,</span>
             <span class="n">session</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;h5&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">nearest_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">):</span>
+        <span class="n">nearest_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
         <span class="n">warp_f5</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nearest_warp</span><span class="p">)</span>
         <span class="n">their_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">warp_f5</span><span class="p">[</span><span class="s2">&quot;TransformGroup&quot;</span><span class="p">][</span><span class="s1">&#39;1&#39;</span><span class="p">][</span>
             <span class="s1">&#39;TransformFixedParameters&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
-        <span class="n">our_shape</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">our_shape</span> <span class="o">=</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">our_shape</span> <span class="o">!=</span> <span class="n">their_shape</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
                 <span class="sa">f</span><span class="s2">&quot;The shape of your ITK mapping (</span><span class="si">{</span><span class="n">their_shape</span><span class="si">}</span><span class="s2">)&quot;</span>
@@ -369,7 +371,7 @@
         <span class="n">their_disp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="o">*</span><span class="n">their_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">their_disp</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">their_forward</span>
         <span class="n">their_disp</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-            <span class="n">their_disp</span><span class="p">,</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+            <span class="n">their_disp</span><span class="p">,</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
         <span class="n">their_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
         <span class="n">their_prealign</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">warp_f5</span><span class="p">[</span><span class="s2">&quot;TransformGroup&quot;</span><span class="p">][</span><span class="s2">&quot;2&quot;</span><span class="p">][</span>
             <span class="s2">&quot;TransformParameters&quot;</span><span class="p">])[:</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -378,8 +380,8 @@
         <span class="n">their_prealign</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="n">warp_f5</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span>
-            <span class="n">their_disp</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
-            <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span> <span class="n">prealign</span><span class="o">=</span><span class="n">their_prealign</span><span class="p">)</span>
+            <span class="n">their_disp</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
+            <span class="n">reg_template</span><span class="p">,</span> <span class="n">prealign</span><span class="o">=</span><span class="n">their_prealign</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">GeneratedMapMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -388,33 +390,31 @@
 <span class="sd">    Useful for maps that are generated by pyAFQ</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_fnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="n">mapping_file</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
-            <span class="n">row</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">get_fnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">):</span>
+        <span class="n">mapping_file</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
+            <span class="n">subses_dict</span><span class="p">,</span>
             <span class="s1">&#39;_mapping_from-DWI_to_MNI_xfm&#39;</span><span class="p">)</span>
-        <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_mapping_reg&#39;</span><span class="p">)</span>
+        <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_mapping_reg&#39;</span><span class="p">)</span>
         <span class="n">mapping_file</span> <span class="o">=</span> <span class="n">mapping_file</span> <span class="o">+</span> <span class="n">extension</span>
         <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">meta_fname</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
         <span class="k">return</span> <span class="n">mapping_file</span><span class="p">,</span> <span class="n">meta_fname</span>
 
-    <span class="k">def</span> <span class="nf">prealign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">prealign_file</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
-            <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.npy&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">prealign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">prealign_file</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
+            <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.npy&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">):</span>
-            <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span>
-                <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">aff</span> <span class="o">=</span> <span class="n">affine_registration</span><span class="p">(</span>
-                <span class="n">reg_subject_img</span><span class="p">,</span>
-                <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
+                <span class="n">reg_subject</span><span class="p">,</span>
+                <span class="n">reg_template</span><span class="p">,</span>
                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">affine_kwargs</span><span class="p">)</span>
-            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration_pre_align&#39;</span><span class="p">]</span> <span class="o">=</span>\
-                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration_pre_align&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;rigid&quot;</span><span class="p">,</span>
+                <span class="n">timing</span><span class="o">=</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">,</span> <span class="n">aff</span><span class="p">)</span>
-                <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">afq_object</span><span class="o">.</span><span class="n">_get_fname</span><span class="p">(</span>
-                    <span class="n">row</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.json&#39;</span><span class="p">)</span>
-                <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;rigid&quot;</span><span class="p">)</span>
+                <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
+                    <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_prealign_from-DWI_to-MNI_xfm.json&#39;</span><span class="p">)</span>
                 <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">aff</span>
@@ -423,29 +423,28 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+                       <span class="n">subject_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">mapping_file</span><span class="p">,</span> <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fnames</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extension</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extension</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
-            <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+            <span class="n">reg_prealign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span>
+                <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">reg_prealign</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mapping_file</span><span class="p">):</span>
-            <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span> <span class="o">=</span> \
-                <span class="n">afq_object</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
-            <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span> <span class="o">=</span> \
-                <span class="n">afq_object</span><span class="o">.</span><span class="n">_reg_img</span><span class="p">(</span><span class="n">afq_object</span><span class="o">.</span><span class="n">reg_subject</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
-
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_mapping</span><span class="p">(</span>
-                <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
-                <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">)</span>
-            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration&#39;</span><span class="p">]</span> <span class="o">=</span>\
-                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Registration&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+                <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+                <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span>
+                <span class="n">reg_prealign</span><span class="p">)</span>
+            <span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
             <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">mapping_file</span><span class="p">)</span>
-            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;displacementfield&quot;</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;displacementfield&quot;</span><span class="p">,</span>
+                <span class="n">timing</span><span class="o">=</span><span class="n">total_time</span><span class="p">)</span>
             <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
             <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">reg_prealign</span><span class="p">)</span>
@@ -453,8 +452,8 @@
             <span class="n">reg_prealign_inv</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span>
             <span class="n">mapping_file</span><span class="p">,</span>
-            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
-            <span class="n">afq_object</span><span class="o">.</span><span class="n">reg_template_img</span><span class="p">,</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">],</span>
+            <span class="n">reg_template</span><span class="p">,</span>
             <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign_inv</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mapping</span>
 
@@ -492,13 +491,14 @@
 <div class="viewcode-block" id="SynMap.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SynMap.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="SynMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SynMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
-                    <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">):</span>
+<div class="viewcode-block" id="SynMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SynMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+                    <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span>
+                    <span class="n">reg_prealign</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">syn_registration</span><span class="p">(</span>
-            <span class="n">reg_subject_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-            <span class="n">reg_template_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-            <span class="n">moving_affine</span><span class="o">=</span><span class="n">reg_subject_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-            <span class="n">static_affine</span><span class="o">=</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">reg_subject</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+            <span class="n">reg_template</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+            <span class="n">moving_affine</span><span class="o">=</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">static_affine</span><span class="o">=</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
             <span class="n">prealign</span><span class="o">=</span><span class="n">reg_prealign</span><span class="p">,</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">syn_kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_prealign</span><span class="p">:</span>
@@ -529,14 +529,14 @@
 <div class="viewcode-block" id="SlrMap.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SlrMap.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="SlrMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SlrMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
-                    <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">):</span>
+<div class="viewcode-block" id="SlrMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SlrMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
+                    <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">reg</span><span class="o">.</span><span class="n">slr_registration</span><span class="p">(</span>
-            <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
-            <span class="n">moving_affine</span><span class="o">=</span><span class="n">reg_subject_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-            <span class="n">moving_shape</span><span class="o">=</span><span class="n">reg_subject_img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-            <span class="n">static_affine</span><span class="o">=</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-            <span class="n">static_shape</span><span class="o">=</span><span class="n">reg_template_img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span>
+            <span class="n">moving_affine</span><span class="o">=</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">moving_shape</span><span class="o">=</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">static_affine</span><span class="o">=</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">static_shape</span><span class="o">=</span><span class="n">reg_template</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">slr_kwargs</span><span class="p">)</span></div></div>
 
 
@@ -563,10 +563,11 @@
 <div class="viewcode-block" id="AffMap.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AffMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">reg_template_img</span><span class="p">,</span> <span class="n">reg_template_sls</span><span class="p">,</span>
-                    <span class="n">reg_subject_img</span><span class="p">,</span> <span class="n">reg_subject_sls</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span><span class="n">afq_object</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span></div></div>
+<div class="viewcode-block" id="AffMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+                    <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span>
+                    <span class="n">reg_prealign</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span>
+            <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">ConformedAffineMapping</span><span class="p">(</span><span class="n">AffineMap</span><span class="p">):</span>
@@ -612,7 +613,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

@@ -1,0 +1,65 @@
+:mod:`AFQ.tasks.mapping`
+========================
+
+.. py:module:: AFQ.tasks.mapping
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.mapping.export_registered_b0
+   AFQ.tasks.mapping.template_xform
+   AFQ.tasks.mapping.export_rois
+   AFQ.tasks.mapping.mapping
+   AFQ.tasks.mapping.sls_mapping
+   AFQ.tasks.mapping.get_reg_subject
+   AFQ.tasks.mapping.get_mapping_plan
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.mapping.logger
+   AFQ.tasks.mapping.outputs
+
+
+.. data:: logger
+   
+
+   
+
+.. data:: outputs
+   :annotation: = ['b0_warped_file', 'template_xform_file', 'rois_file', 'mapping', 'reg_subject']
+
+   
+
+.. function:: export_registered_b0(subses_dict, data_imap, mapping, reg_template)
+
+
+.. function:: template_xform(subses_dict, dwi_affine, mapping, reg_template)
+
+
+.. function:: export_rois(subses_dict, bundle_dict, mapping, dwi_affine)
+
+
+.. function:: mapping(subses_dict, mapping_definition, reg_subject, reg_template)
+
+
+.. function:: sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template, tractography_imap)
+
+
+.. function:: get_reg_subject(reg_subject_spec, data_imap)
+
+
+.. function:: get_mapping_plan(reg_subject, scalars, use_sls=False)
+
+

@@ -1,0 +1,57 @@
+:mod:`AFQ.tasks.viz`
+====================
+
+.. py:module:: AFQ.tasks.viz
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.viz._viz_prepare_vol
+   AFQ.tasks.viz.viz_bundles
+   AFQ.tasks.viz.viz_indivBundle
+   AFQ.tasks.viz.plot_tract_profiles
+   AFQ.tasks.viz.get_viz_plan
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.viz.logger
+   AFQ.tasks.viz.outputs
+
+
+.. data:: logger
+   
+
+   
+
+.. data:: outputs
+   :annotation: = ['all_bundles_figure', 'indiv_bundles_figures']
+
+   
+
+.. function:: _viz_prepare_vol(vol, xform, mapping, scalar_dict)
+
+
+.. function:: viz_bundles(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
+
+
+.. function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, cbv_lims_indiv=[None, None], xform_color_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)
+
+
+.. function:: plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)
+
+
+.. function:: get_viz_plan()
+
+

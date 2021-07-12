@@ -45,7 +45,8 @@ run::
     afd.organize_stanford_data()
 
 This should create a folder in your home directory with a properly-formatted
-data set in a directory called `stanford_hardi`::
+data set in a directory called `stanford_hardi`. Only the preprocessed
+diffusion data is required for pyAFQ::
 
     ~/AFQ_data/stanford_hardi/derivatives/vistasoft/
     ├── dataset_description.json
@@ -56,7 +57,28 @@ data set in a directory called `stanford_hardi`::
                 ├── sub-01_ses-01_dwi.bvec
                 └── sub-01_ses-01_dwi.nii.gz
 
+See :ref:`examples/plot_bids_layout` for a more extensive example.
+
+
+Preprocessing
+-------------
+pyAFQ does not perform preprocessing. Instead, pyAFQ expects the outputs of
+a preprocessing pipeline in BIDS format. In the above example, the dataset
+was preprocessed using the `VISTASOFT <https://github.com/vistalab/vistasoft>`_ software.
+Other examples may use other common preprocessing
+software tools, such as `dMRIPrep <https://github.com/nipreps/dmriprep>`_
+or `QSIprep <https://qsiprep.readthedocs.io/en/latest/>`_.
+
 .. note::
 
+    The outputs of VISTASOFT are stored in its own pipeline folder, which we
+    chose to call `derivatives/vistasoft`. In general, any folder name is
+    valid, as long as the folder is inside of the `derivatives` folder.
+
+.. note::
+
+    By default, pyAFQ will check all folders in `derivatives` for data.
+    If you want to specify which pipeline pyAFQ should check for preprocessed
+    data, pass that pipeline's name to the `dmriprep` parameter.
     The name of the pipeline is specified in the dataset_description.json,
     it is not based on the folder name.

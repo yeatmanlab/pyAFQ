@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +55,7 @@
     
 
 <a class="navbar-brand" href="../../index.html">
-  <img src="../../_static/logo.png" class="logo" alt="logo">
+  <img src="../../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -249,6 +249,7 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fetch_callosum_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_callosum_templates&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;fetch_or_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_or_templates&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;read_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch_hcp&quot;</span><span class="p">,</span>
            <span class="s2">&quot;fetch_stanford_hardi_tractography&quot;</span><span class="p">,</span>
            <span class="s2">&quot;read_stanford_hardi_tractography&quot;</span><span class="p">,</span>
@@ -617,6 +618,101 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;AFQ templates loaded in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">template_dict</span></div>
+
+
+<span class="n">or_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;left_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_V1_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_V1_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_OP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_OR_1.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_OR_2.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_pos_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;left_TP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OP_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OR_1.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_OR_2.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_pos_thal_MNI.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;right_TP_MNI.nii.gz&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">or_remote_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;26831630&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831633&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831636&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831639&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831642&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831645&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831648&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831651&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831654&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831657&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831660&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831663&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831666&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;26831669&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">or_md5_hashes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;c18f3f82c26f334dc26b96d21f026dd1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ad996c67bf5cc59fc3a7b60255873b67&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;786fb4ba915599f746950acd980e5b03&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cc88fb4671311404eb9dfa8fa11a59e0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;9cff03af586d9dd880750cef3e0bf63f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ff728ba3ffa5d1600bcd19fdef8182c4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;4f1978e418a3169609375c28b3eba0fd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fd163893081b520f4594171aeea04f39&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bf795d197912b5e074d248d2763c6930&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;13efde1efe0de52683cbf352ecba457e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;75c7bd2092950578e599a2dcb218909f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;8f3890fa8c26a568503226757f7e7d6c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f239aa3140809152da8884ff879dde1b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;60a748567e4dd81b40ad8967a14cb09e&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<div class="viewcode-block" id="fetch_or_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.fetch_or_templates">[docs]</a><span class="n">fetch_or_templates</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span><span class="s2">&quot;fetch_or_templates&quot;</span><span class="p">,</span>
+                                   <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+                                           <span class="s1">&#39;or_templates&#39;</span><span class="p">),</span>
+                                   <span class="n">baseurl</span><span class="p">,</span> <span class="n">or_remote_fnames</span><span class="p">,</span>
+                                   <span class="n">or_fnames</span><span class="p">,</span>
+                                   <span class="n">md5_list</span><span class="o">=</span><span class="n">or_md5_hashes</span><span class="p">,</span>
+                                   <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download AFQ or templates&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_or_templates"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_or_templates">[docs]</a><span class="k">def</span> <span class="nf">read_or_templates</span><span class="p">(</span><span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load AFQ OR templates from file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict with: keys: names of template ROIs and values: nibabel Nifti1Image</span>
+<span class="sd">    objects from each of the ROI nifti files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.data&#39;</span><span class="p">)</span>
+
+    <span class="n">files</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_or_templates</span><span class="p">()</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading or templates&#39;</span><span class="p">)</span>
+    <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+    <span class="n">template_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">resample_to</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample_to</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">resample_to</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resample_to</span><span class="p">)</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                                               <span class="n">resample_to</span><span class="p">,</span>
+                                               <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                                               <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                                  <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+        <span class="n">template_dict</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
+
+    <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;or templates loaded in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">template_dict</span></div>
+
 
 
 <span class="c1"># +----------------------------------------------------+</span>
@@ -1862,8 +1958,8 @@
     <span class="n">stanford_hardi_tractography_remote_fnames</span><span class="p">,</span>
     <span class="n">stanford_hardi_tractography_fnames</span><span class="p">,</span>
     <span class="n">md5_list</span><span class="o">=</span><span class="n">stanford_hardi_tractography_hashes</span><span class="p">,</span>
-    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Download Stanford HARDI tractography and mapping. For testing</span>
-<span class="s2">           purposes&quot;&quot;&quot;</span><span class="p">)</span></div>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Download Stanford HARDI tractography and mapping. For testing</span></div>
+<span class="s2">           purposes&quot;&quot;&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="read_stanford_hardi_tractography"><a class="viewcode-back" href="../../autoapi/AFQ/index.html#AFQ.data.read_stanford_hardi_tractography">[docs]</a><span class="k">def</span> <span class="nf">read_stanford_hardi_tractography</span><span class="p">():</span>
@@ -2119,10 +2215,9 @@
     <span class="s2">&quot;fetch_aal_atlas&quot;</span><span class="p">,</span>
     <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
             <span class="s1">&#39;aal_atlas&#39;</span><span class="p">),</span>
-    <span class="s1">&#39;https://digital.lib.washington.edu&#39;</span> <span class="o">+</span> <span class="s1">&#39;/researchworks&#39;</span>
-    <span class="o">+</span> <span class="s1">&#39;/bitstream/handle/1773/44951/&#39;</span><span class="p">,</span>
-    <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
-     <span class="s2">&quot;MNI_AAL.txt&quot;</span><span class="p">],</span>
+    <span class="s1">&#39;https://ndownloader.figshare.com/files/&#39;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;28416852&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;28416855&quot;</span><span class="p">],</span>
     <span class="p">[</span><span class="s2">&quot;MNI_AAL_AndMore.nii.gz&quot;</span><span class="p">,</span>
      <span class="s2">&quot;MNI_AAL.txt&quot;</span><span class="p">],</span>
     <span class="n">md5_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;69395b75a16f00294a80eb9428bf7855&quot;</span><span class="p">,</span>
@@ -2654,7 +2749,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

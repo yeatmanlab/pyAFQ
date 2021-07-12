@@ -36,6 +36,27 @@ Introductory examples.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
+     :alt: AFQ API
+
+     :ref:`sphx_glr_auto_examples_plot_afq_api.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_afq_api
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Callosal bundles using AFQ API">
 
 .. only:: html
@@ -57,14 +78,14 @@ Introductory examples.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API">
+    <div class="sphx-glr-thumbcontainer" tooltip="pyAFQ is designed to be customizable. This example shows how you can customize it to define a n...">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
-     :alt: AFQ API
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_optic_radiations_thumb.png
+     :alt: Plotting the Optic Radiations
 
-     :ref:`sphx_glr_auto_examples_plot_afq_api.py`
+     :ref:`sphx_glr_auto_examples_plot_optic_radiations.py`
 
 .. raw:: html
 
@@ -74,7 +95,7 @@ Introductory examples.
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_afq_api
+   /auto_examples/plot_optic_radiations
 
 .. raw:: html
 
@@ -180,27 +201,6 @@ Introductory examples.
    :hidden:
 
    /auto_examples/plot_recobundles
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="pyAFQ is designed to be customizable. This example shows how you can customize it to define a n...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_optic_radiations_thumb.png
-     :alt: Plotting the Optic Radiations
-
-     :ref:`sphx_glr_auto_examples_optic_radiations.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/optic_radiations
 
 .. raw:: html
 

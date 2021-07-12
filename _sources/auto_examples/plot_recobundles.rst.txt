@@ -30,7 +30,7 @@ See `plot_tract_profile` for explanations of each stage here. The main
 difference here is that segmentation uses the RecoBundles algorithm, instead of
 the AFQ waypoint ROI approach.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-172
+.. GENERATED FROM PYTHON SOURCE LINES 15-174
 
 .. code-block:: default
 
@@ -105,7 +105,7 @@ the AFQ waypoint ROI approach.
 
 
     bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
-    bundles = api.make_bundle_dict(bundle_names=bundle_names, seg_algo="reco80")
+    bundles = api.BundleDict(bundle_names, seg_algo="reco80")
 
     print("Tracking...")
     if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
@@ -121,15 +121,17 @@ the AFQ waypoint ROI approach.
                 sl_xform = [sum(d, s) for d, s in zip(delta, sl_xform)]
 
                 sl_xform = dts.Streamlines(
-                    dtu.transform_tracking_output(sl_xform,
-                    np.linalg.inv(MNI_T2_img.affine)))
+                    dtu.transform_tracking_output(
+                        sl_xform,
+                        np.linalg.inv(MNI_T2_img.affine)))
 
                 sft = StatefulTractogram(sl_xform, img, Space.RASMM)
                 save_tractogram(sft, op.join(working_dir, f'{bundle}_atlas.trk'))
 
                 sl_xform = dts.Streamlines(
-                    dtu.transform_tracking_output(sl_xform,
-                                            np.linalg.inv(img.affine)))
+                    dtu.transform_tracking_output(
+                        sl_xform,
+                        np.linalg.inv(img.affine)))
 
                 for sl in sl_xform:
                     sl_as_idx = sl.astype(int)
@@ -276,32 +278,24 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16664
+    16653
     Segmenting fiber groups...
-    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:685: UserWarning:
-
-    Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
-
-    /opt/hostedtoolcache/Python/3.7.10/x64/lib/python3.7/site-packages/dipy/segment/bundles.py:808: UserWarning:
-
-    Streamlines do not have the same number of points. All streamlines need to have the same number of points. Use dipy.tracking.streamline.set_number_of_points to adjust your streamlines
-
-    CST_R 165
-    CST_L 46
-    UF_R 51
-    UF_L 76
-    CC_ForcepsMajor 525
-    CC_ForcepsMinor 1030
-    OR_R 19
-    OR_L 37
-    VOF_R 103
-    VOF_L 135
+    CST_R 180
+    CST_L 52
+    UF_R 52
+    UF_L 77
+    CC_ForcepsMajor 443
+    CC_ForcepsMinor 1016
+    OR_R 18
+    OR_L 42
+    VOF_R 99
+    VOF_L 132
     Extracting tract profiles...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-181
+.. GENERATED FROM PYTHON SOURCE LINES 175-183
 
 References:
 -------------------------
@@ -315,7 +309,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 21 minutes  16.436 seconds)
+   **Total running time of the script:** ( 17 minutes  57.663 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

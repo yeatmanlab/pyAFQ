@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting the Optic Radiations &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How pyAFQ uses BIDS" href="plot_bids_layout.html" />
+    <link rel="prev" title="Callosal bundles using AFQ API" href="plot_afq_callosal.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_afq_reco80.html">
+   RecoBundles80 using AFQ API
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_afq_api.html">
+   AFQ API
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_afq_callosal.html">
+   Callosal bundles using AFQ API
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Plotting the Optic Radiations
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_bids_layout.html">
+   How pyAFQ uses BIDS
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="cloudknot_example.html">
+   Using cloudknot to run pyAFQ on AWS batch:
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="cloudknot_hcp_example.html">
+   AFQ with HCP data
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_tract_profile.html">
+   Plotting tract profiles
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_recobundles.html">
+   Plotting tract profiles using RecoBundles
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot_callosal_tract_profile.html">
+   Plotting Novel Tract Profiles:
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting the Optic Radiations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/auto_examples/plot_optic_radiations.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-optic-radiations-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="plotting-the-optic-radiations">
+<span id="sphx-glr-auto-examples-plot-optic-radiations-py"></span><h1>Plotting the Optic Radiations<a class="headerlink" href="#plotting-the-optic-radiations" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ is designed to be customizable. This example shows how
+you can customize it to define a new bundle based
+on both waypoint ROIs of your design, as well as endpoint
+ROIs of your design.</p>
+<p>For now, this is a hypothetical example, as we do not yet
+provide these ROIs as part of the software.</p>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2786.91 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2704.26 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2649.59 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2908.67 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 3050.40 MB/s]
+
+  0%|          | 0/19 [00:00&lt;?, ? MB/s]
+ 21%|##1       | 4/19 [00:00&lt;00:00, 28.71 MB/s]
+ 74%|#######3  | 14/19 [00:00&lt;00:00, 53.89 MB/s]
+100%|##########| 19/19 [00:00&lt;00:00, 67.81 MB/s]
+
+  0%|          | 0/19 [00:00&lt;?, ? MB/s]
+ 21%|##1       | 4/19 [00:00&lt;00:00, 28.64 MB/s]
+ 47%|####7     | 9/19 [00:00&lt;00:00, 32.66 MB/s]
+100%|##########| 19/19 [00:00&lt;00:00, 54.10 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2730.67 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2796.20 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 3034.95 MB/s]
+
+  0%|          | 0/19 [00:00&lt;?, ? MB/s]
+ 21%|##1       | 4/19 [00:00&lt;00:00, 28.48 MB/s]
+ 58%|#####7    | 11/19 [00:00&lt;00:00, 40.89 MB/s]
+100%|##########| 19/19 [00:00&lt;00:00, 67.16 MB/s]
+
+  0%|          | 0/19 [00:00&lt;?, ? MB/s]
+ 21%|##1       | 4/19 [00:00&lt;00:00, 28.57 MB/s]
+ 53%|#####2    | 10/19 [00:00&lt;00:00, 36.82 MB/s]
+100%|##########| 19/19 [00:00&lt;00:00, 54.05 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2783.21 MB/s]
+
+  0%|          | 0/1 [00:00&lt;?, ? MB/s]
+100%|##########| 1/1 [00:00&lt;00:00, 2730.67 MB/s]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+
+  0%|          | 0/16900 [00:00&lt;?, ?it/s]
+  0%|          | 4/16900 [00:03&lt;3:59:28,  1.18it/s]
+  0%|          | 6/16900 [00:03&lt;2:27:50,  1.90it/s]
+  5%|4         | 780/16900 [00:03&lt;00:39, 405.79it/s]
+  9%|9         | 1548/16900 [00:03&lt;00:16, 906.23it/s]
+ 12%|#2        | 2060/16900 [00:04&lt;00:12, 1142.26it/s]
+ 18%|#8        | 3084/16900 [00:04&lt;00:08, 1691.53it/s]
+ 21%|##1       | 3596/16900 [00:04&lt;00:07, 1893.49it/s]
+ 24%|##4       | 4108/16900 [00:04&lt;00:06, 2110.96it/s]
+ 27%|##7       | 4620/16900 [00:04&lt;00:05, 2423.03it/s]
+ 30%|###       | 5132/16900 [00:04&lt;00:04, 2705.02it/s]
+ 36%|###6      | 6156/16900 [00:05&lt;00:03, 3351.90it/s]
+ 42%|####2     | 7180/16900 [00:05&lt;00:02, 4089.67it/s]
+ 52%|#####1    | 8716/16900 [00:05&lt;00:01, 5223.96it/s]
+ 70%|######9   | 11788/16900 [00:05&lt;00:00, 9263.73it/s]
+ 82%|########1 | 13836/16900 [00:05&lt;00:00, 10034.38it/s]
+ 94%|#########3| 15884/16900 [00:05&lt;00:00, 11461.89it/s]
+100%|##########| 16900/16900 [00:05&lt;00:00, 2821.77it/s]
+
+  0%|          | 0/16900 [00:00&lt;?, ?it/s]
+  9%|9         | 1532/16900 [00:00&lt;00:01, 13632.23it/s]
+ 24%|##4       | 4092/16900 [00:00&lt;00:00, 13887.53it/s]
+ 48%|####8     | 8188/16900 [00:00&lt;00:00, 15846.83it/s]
+ 61%|######    | 10236/16900 [00:00&lt;00:00, 15659.96it/s]
+ 73%|#######2  | 12284/16900 [00:00&lt;00:00, 11517.75it/s]
+ 85%|########4 | 14332/16900 [00:01&lt;00:00, 6595.37it/s]
+ 97%|#########6| 16380/16900 [00:02&lt;00:00, 5221.33it/s]
+100%|##########| 16900/16900 [00:02&lt;00:00, 7866.35it/s]
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">AFQ</span> <span class="kn">import</span> <span class="n">api</span>
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="n">LabelledMaskFile</span><span class="p">,</span> <span class="n">RoiMask</span>
+
+<span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">(</span><span class="n">clear_previous_afq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">or_rois</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_or_templates</span><span class="p">()</span>
+
+<span class="n">bundles</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">({</span>
+    <span class="s2">&quot;L_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ROIs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;left_OR_1&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;left_OR_2&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;left_OP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;left_TP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;left_pos_thal_MNI&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;rules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="s2">&quot;cross_midline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">},</span>
+    <span class="s2">&quot;R_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ROIs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;right_OR_1&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;right_OR_2&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;right_OP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;right_TP_MNI&quot;</span><span class="p">],</span>
+                 <span class="n">or_rois</span><span class="p">[</span><span class="s2">&quot;right_pos_thal_MNI&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;rules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="s2">&quot;cross_midline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">endpoint_info</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;L_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;startpoint&quot;</span><span class="p">:</span> <span class="n">or_rois</span><span class="p">[</span><span class="s1">&#39;left_thal_MNI&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="n">or_rois</span><span class="p">[</span><span class="s1">&#39;left_V1_MNI&#39;</span><span class="p">]},</span>
+    <span class="s2">&quot;R_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;startpoint&quot;</span><span class="p">:</span> <span class="n">or_rois</span><span class="p">[</span><span class="s1">&#39;right_thal_MNI&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="n">or_rois</span><span class="p">[</span><span class="s1">&#39;right_V1_MNI&#39;</span><span class="p">]}}</span>
+
+<span class="n">brain_mask</span> <span class="o">=</span> <span class="n">LabelledMaskFile</span><span class="p">(</span><span class="s2">&quot;seg&quot;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">},</span>
+                              <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">my_afq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
+    <span class="n">bids_path</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afd</span><span class="o">.</span><span class="n">afq_home</span><span class="p">,</span>
+                     <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">),</span>
+    <span class="n">brain_mask</span><span class="o">=</span><span class="n">brain_mask</span><span class="p">,</span>
+    <span class="n">tracking_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_seeds&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                     <span class="s2">&quot;directions&quot;</span><span class="p">:</span> <span class="s2">&quot;prob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;odf_model&quot;</span><span class="p">:</span> <span class="s2">&quot;CSD&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;seed_mask&quot;</span><span class="p">:</span> <span class="n">RoiMask</span><span class="p">()},</span>
+    <span class="n">segmentation_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">endpoint_info</span><span class="o">=</span><span class="n">endpoint_info</span><span class="p">),</span>
+    <span class="n">bundle_info</span><span class="o">=</span><span class="n">bundles</span><span class="p">)</span>
+
+<span class="n">my_afq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 15 minutes  52.745 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-optic-radiations-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/56d99327daaa8a92cc2f7ba6767a3122/plot_optic_radiations.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_optic_radiations.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/e563302e939f341ec77aff281738b6fc/plot_optic_radiations.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_optic_radiations.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="plot_afq_callosal.html" title="previous page">Callosal bundles using AFQ API</a>
+    <a class='right-next' id="next-link" href="plot_bids_layout.html" title="next page">How pyAFQ uses BIDS</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -1,0 +1,34 @@
+:mod:`AFQ.tasks.decorators`
+===========================
+
+.. py:module:: AFQ.tasks.decorators
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.decorators.as_file
+   AFQ.tasks.decorators.as_model
+   AFQ.tasks.decorators.as_dt_deriv
+   AFQ.tasks.decorators.as_img
+
+
+
+.. function:: as_file(suffix, include_track=False, include_seg=False)
+
+
+.. function:: as_model(func)
+
+
+.. function:: as_dt_deriv(tf_name)
+
+
+.. function:: as_img(func)
+
+

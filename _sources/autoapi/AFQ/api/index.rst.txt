@@ -12,59 +12,40 @@ Classes
 
 .. autoapisummary::
 
+   AFQ.api.BundleDict
    AFQ.api.AFQ
 
 
 
-Functions
-~~~~~~~~~
 
-.. autoapisummary::
-
-   AFQ.api.make_bundle_dict
+.. class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=False)
 
 
+   Bases: :py:obj:`collections.abc.MutableMapping`
 
-.. function:: make_bundle_dict(bundle_names=BUNDLES, seg_algo='afq', resample_to=False)
-
-   Create a bundle dictionary, needed for the segmentation
+   .. method:: gen_all(self)
 
 
-   :Parameters:
+   .. method:: __setitem__(self, key, item)
 
-       **bundle_names** : list, optional
-           A list of the bundles to be used in this case. Default: all of them
 
-       **seg_algo: One of {"afq", "reco", "reco16", "reco80"}**
-           The bundle segmentation algorithm to use.
-               "afq" : Use waypoint ROIs + probability maps, as described
-               in [Yeatman2012]_
-               "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
-               with a 16-bundle set.
-               "reco80": Use Recobundles with an 80-bundle set.
+   .. method:: __getitem__(self, key)
 
-       **resample_to** : Nifti1Image, optional
-           If set, templates will be resampled to the affine and shape of this
-           image.
+
+   .. method:: __len__(self)
+
+
+   .. method:: __delitem__(self, key)
+
+
+   .. method:: __iter__(self)
+
+
+   .. method:: copy(self)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, dask_it=False, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None)
+.. class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, parallel_params={'engine': 'serial'}, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None, **kwargs)
 
 
    Bases: :py:obj:`object`
@@ -72,421 +53,70 @@ Functions
    ..
        !! processed by numpydoc !!
 
-   .. attribute:: gtab
-      
-
-      
-
-   .. attribute:: dwi_affine
-      
-
-      
-
-   .. attribute:: dwi_img
-      
-
-      
-
-   .. attribute:: b0
-      
-
-      
-
-   .. attribute:: brain_mask
-      
-
-      
-
-   .. attribute:: dti
-      
-
-      
-
-   .. attribute:: dti_fa
-      
-
-      
-
-   .. attribute:: dti_cfa
-      
-
-      
-
-   .. attribute:: dti_pdd
-      
-
-      
-
-   .. attribute:: dti_md
-      
-
-      
-
-   .. attribute:: dki
-      
-
-      
-
-   .. attribute:: dki_mk
-      
-
-      
-
-   .. attribute:: dki_fa
-      
-
-      
-
-   .. attribute:: dki_md
-      
-
-      
-
-   .. attribute:: dki_awf
-      
-
-      
-
-   .. attribute:: mapping
-      
-
-      
-
-   .. attribute:: streamlines
-      
-
-      
-
-   .. attribute:: bundles
-      
-
-      
-
-   .. attribute:: clean_bundles
-      
-
-      
-
-   .. attribute:: tract_profiles
-      
-
-      
-
-   .. attribute:: template_xform
-      
-
-      
-
-   .. attribute:: bundle_dict
-      
-
-      
-
-   .. method:: log_and_save_nii(self, img, fname)
-
-
-   .. method:: log_and_save_trk(self, sft, fname)
-
-
-   .. method:: _get_data_gtab(self, row, filter_b=True)
-
-
-   .. method:: _b0(self, row)
-
-
-   .. method:: _b0_mask(self, row)
-
-
-   .. method:: _brain_mask(self, row)
-
-
-   .. method:: _dti_fit(self, row)
-
-
-   .. method:: _dti(self, row)
-
-
-   .. method:: _dki_fit(self, row)
-
-
-   .. method:: _dki(self, row)
-
-
-   .. method:: _csd(self, row, response=None, sh_order=None, lambda_=1, tau=0.1, msmt=False)
-
-
-   .. method:: _anisotropic_power_map(self, row)
-
-
-   .. method:: _dti_fa(self, row)
-
-
-   .. method:: _dti_cfa(self, row)
-
-
-   .. method:: _dti_pdd(self, row)
-
-
-   .. method:: _dti_md(self, row)
-
-
-   .. method:: _dki_fa(self, row)
-
-
-   .. method:: _dki_md(self, row)
-
-
-   .. method:: _dki_awf(self, row, sphere='repulsion100', gtol=0.01)
-
-
-   .. method:: _dki_mk(self, row)
-
-
    .. method:: _get_best_scalar(self)
 
 
-   .. method:: _reg_img(self, img, mask, row=None)
+   .. method:: get_reg_template(self)
 
 
-   .. method:: _export_registered_b0(self, row)
+   .. method:: __getattribute__(self, attr)
 
+      Return getattr(self, name).
 
-   .. method:: _mapping(self, row)
 
 
-   .. method:: _export_seed_mask(self, row)
 
 
-   .. method:: _export_stop_mask(self, row)
 
 
-   .. method:: _streamlines(self, row)
 
 
-   .. method:: _segment(self, row)
 
 
-   .. method:: _clean_bundles(self, row)
 
 
-   .. method:: _tract_profiles(self, row)
 
 
-   .. method:: _template_xform(self, row)
 
-
-   .. method:: _export_rois(self, row)
-
-
-   .. method:: _export_bundles(self, row)
-
-
-   .. method:: _export_sl_counts(self, row)
-
-
-   .. method:: _viz_prepare_vol(self, row, vol, xform, mapping)
-
-
-   .. method:: _viz_prepare_vols(self, row, volume, xform_volume, color_by_volume, xform_color_by_volume)
-
-
-   .. method:: _viz_bundles(self, row, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
-
-
-   .. method:: _viz_ROIs(self, row, bundle_names=None, export=False, inline=False, interactive=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
-
-
-   .. method:: _plot_tract_profiles(self, row)
-
-
-   .. method:: _export_timing(self, row, all_sub_sess=None)
-
-
-   .. method:: _get_affine(self, fname)
-
-
-   .. method:: _get_fname(self, row, suffix, include_track=False, include_seg=False)
-
-
-   .. method:: set_gtab(self, b0_threshold)
-
-
-   .. method:: get_gtab(self)
-
-
-   .. method:: set_dwi_affine(self)
-
-
-   .. method:: get_dwi_affine(self)
-
-
-   .. method:: set_dwi_img(self)
-
-
-   .. method:: get_dwi_img(self)
-
-
-   .. method:: __getitem__(self, k)
-
-
-   .. method:: set_b0(self)
-
-
-   .. method:: get_b0(self)
-
-
-   .. method:: set_masked_b0(self)
-
-
-   .. method:: get_masked_b0(self)
-
-
-   .. method:: set_brain_mask(self)
-
-
-   .. method:: get_brain_mask(self)
-
-
-   .. method:: set_dti(self)
-
-
-   .. method:: get_dti(self)
-
-
-   .. method:: set_dti_fa(self)
-
-
-   .. method:: get_dti_fa(self)
-
-
-   .. method:: set_dti_cfa(self)
-
-
-   .. method:: get_dti_cfa(self)
-
-
-   .. method:: set_dti_pdd(self)
-
-
-   .. method:: get_dti_pdd(self)
-
-
-   .. method:: set_dti_md(self)
-
-
-   .. method:: get_dti_md(self)
-
-
-   .. method:: set_dki(self)
-
-
-   .. method:: get_dki(self)
-
-
-   .. method:: set_dki_mk(self)
-
-
-   .. method:: get_dki_mk(self)
-
-
-   .. method:: set_dki_fa(self)
-
-
-   .. method:: get_dki_fa(self)
-
-
-   .. method:: set_dki_md(self)
-
-
-   .. method:: get_dki_md(self)
-
-
-   .. method:: set_dki_awf(self)
-
-
-   .. method:: get_dki_awf(self)
-
-
-   .. method:: set_mapping(self)
-
-
-   .. method:: get_mapping(self)
-
-
-   .. method:: set_streamlines(self)
-
-
-   .. method:: get_streamlines(self)
-
-
-   .. method:: set_bundles(self)
-
-
-   .. method:: get_bundles(self)
-
-
-   .. method:: set_clean_bundles(self)
-
-
-   .. method:: get_clean_bundles(self)
-
-
-   .. method:: set_tract_profiles(self)
-
-
-   .. method:: get_tract_profiles(self)
-
-
-   .. method:: set_template_xform(self)
-
-
-   .. method:: get_template_xform(self)
-
-
-   .. method:: set_bundle_dict(self)
-
-
-   .. method:: get_bundle_dict(self)
-
-
-   .. method:: export_rois(self)
-
-
-   .. method:: export_seed_mask(self)
-
-
-   .. method:: export_stop_mask(self)
-
-
-   .. method:: export_bundles(self)
-
-
-   .. method:: export_sl_counts(self)
-
-
-   .. method:: viz_bundles(self, export=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40, inline=False, interactive=False)
-
-
-   .. method:: viz_ROIs(self, bundle_names=None, export=False, volume=None, xform_volume=False, color_by_volume=None, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40, inline=False, interactive=False)
-
-
-   .. method:: plot_tract_profiles(self)
-
-
-   .. method:: export_registered_b0(self)
+      ..
+          !! processed by numpydoc !!
 
 
    .. method:: combine_profiles(self)
 
 
-   .. method:: export_timing(self, all_sub_sess=None)
+   .. method:: get_streamlines_json(self)
 
 
-   .. method:: export_all(self)
+   .. method:: export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True)
 
       Exports all the possible outputs
 
 
+      :Parameters:
+
+          **viz** : bool
+              Whether to output visualizations. This includes tract profile
+              plots, a figure containing all bundles, and, if using the AFQ
+              segmentation algorithm, individual bundle figures.
+              Default: True
+
+          **afqbrowser** : bool
+              Whether to output an AFQ-Browser from this AFQ instance.
+              Default: True
+
+          **xforms** : bool
+              Whether to output the reg_template image in subject space and,
+              depending on if it is possible based on the mapping used, to
+              output the b0 in template space.
+              Default: True
+
+          **indiv** : bool
+              Whether to output individual bundles in their own files, in
+              addition to the one file containing all bundles. If using
+              the AFQ segmentation algorithm, individual ROIs are also
+              output.
+              Default: True
 
 
 
@@ -510,6 +140,68 @@ Functions
       Upload entire AFQ derivatives folder to S3
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: assemble_AFQ_browser(self, output_path=None, metadata=None, page_title='AFQ Browser', page_subtitle='', page_title_link='', page_subtitle_link='')
+
+      Assembles an instance of the AFQ-Browser from this AFQ instance.
+      First, we generate the combined tract profile if it is not already
+      generated. This includes running the full AFQ pipeline if it has not
+      already run. The combined tract profile is one of the outputs of
+      export_all.
+      Second, we generate a streamlines.json file from the bundle
+      recognized in the first subject's first session.
+      Third, we call AFQ-Browser's assemble to assemble an AFQ-Browser
+      instance in output_path.
+
+
+      :Parameters:
+
+          **output_path** : str
+              Path to location to create this instance of the browser in.
+              Called "target" in AFQ Browser API. If None,
+              bids_path/derivatives/afq_browser is used.
+              Default: None
+
+          **metadata** : str
+              Path to subject metadata csv file. If None, an metadata file
+              containing only subject ID is created. This file requires a
+              "subjectID" column to work.
+              Default: None
+
+          **page_title** : str
+              Page title. If None, prompt is sent to command line.
+              Default: "AFQ Browser"
+
+          **page_subtitle** : str
+              Page subtitle. If None, prompt is sent to command line.
+              Default: ""
+
+          **page_title_link** : str
+              Title hyperlink (including http(s)://).
+              If None, prompt is sent to command line.
+              Default: ""
+
+          **page_subtitle_link** : str
+              Subtitle hyperlink (including http(s)://).
+              If None, prompt is sent to command line.
+              Default: ""
 
 
 

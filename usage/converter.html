@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Matlab AFQ to Python AFQ conversion &#8212; AFQ 0.1 documentation</title>
+    <title>Tractography from other pipelines &#8212; AFQ 0.1 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -57,7 +57,7 @@
     
 
 <a class="navbar-brand" href="../index.html">
-  <img src="../_static/logo.png" class="logo" alt="logo">
+  <img src="../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -192,7 +192,7 @@
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Matlab AFQ to Python AFQ conversion
+   Tractography from other pipelines
   </a>
  </li>
  <li class="toctree-l1">
@@ -215,8 +215,8 @@
 <li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="scalars.html">The pyAFQ Custom Scalars API</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Matlab AFQ to Python AFQ conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tractography-from-other-pipelines">Tractography from other pipelines</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#matlab-afq-to-python-afq-conversion">Matlab AFQ to Python AFQ conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
 </ul>
 </li>
@@ -245,12 +245,12 @@
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#">
-   Matlab AFQ to Python AFQ conversion
+   Tractography from other pipelines
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#tractography-from-other-pipelines">
-   Tractography from other pipelines
+  <a class="reference internal nav-link" href="#matlab-afq-to-python-afq-conversion">
+   Matlab AFQ to Python AFQ conversion
   </a>
  </li>
 </ul>
@@ -281,7 +281,24 @@
               
               <div>
                 
-  <div class="section" id="matlab-afq-to-python-afq-conversion">
+  <div class="section" id="tractography-from-other-pipelines">
+<h1>Tractography from other pipelines<a class="headerlink" href="#tractography-from-other-pipelines" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
+tractography from another pipeline, use the custom_tractography_bids_filters
+argument in the AFQ object or in the configuration file. This argument expects
+a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
+tractography for each subject in each session.
+Here is an example custom_tractography_bids_filters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">,</span> <span class="s1">&#39;suffix&#39;</span><span class="p">:</span> <span class="s1">&#39;tractography&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>This would look for a file with the suffix ‘tractography’ inside of the
+‘qsiprep’ pipeline. The name of the pipeline (in this case, ‘qsiprep’) should be
+specified in its dataset_description.json.</p>
+<p>There is an example usage of custom_tractography_bids_filters with the
+<a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object in the ‘How pyAFQ uses BIDS’ example in <span class="xref std std-ref">examples</span>.</p>
+</div>
+<div class="section" id="matlab-afq-to-python-afq-conversion">
 <h1>Matlab AFQ to Python AFQ conversion<a class="headerlink" href="#matlab-afq-to-python-afq-conversion" title="Permalink to this headline">¶</a></h1>
 <p>pyAFQ provides tools to convert between the results of the original Matlab
 based AFQ (which we call mAFQ) and pyAFQ at various stages in the pipeline.</p>
@@ -308,23 +325,6 @@ convert this ‘fg’ dictionary to a single <code class="xref py py-class docut
 use <code class="xref py py-func docutils literal notranslate"><span class="pre">bundles_to_tgram()</span></code>.</p>
 <p>Matlab tract profiles in the .csv format should already be compatible
 with pyAFQ, so there is no need for conversion.</p>
-</div>
-<div class="section" id="tractography-from-other-pipelines">
-<h1>Tractography from other pipelines<a class="headerlink" href="#tractography-from-other-pipelines" title="Permalink to this headline">¶</a></h1>
-<p>pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
-tractography from another pipeline, use the custom_tractography_bids_filters
-argument in the AFQ object or in the configuration file. This argument expects
-a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
-tractography for each subject in each session.
-Here is an example custom_tractography_bids_filters:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">,</span> <span class="s1">&#39;suffix&#39;</span><span class="p">:</span> <span class="s1">&#39;tractography&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>This would look for a file with the suffix ‘tractography’ inside of the
-‘qsiprep’ pipeline. The name of the pipeline (in this case, ‘qsiprep’) should be
-specified in its dataset_description.json.</p>
-<p>There is an example usage of custom_tractography_bids_filters with the
-<a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object in the ‘How pyAFQ uses BIDS’ example in <span class="xref std std-ref">examples</span>.</p>
 </div>
 
 
@@ -358,7 +358,7 @@ specified in its dataset_description.json.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

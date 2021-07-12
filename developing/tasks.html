@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adding Tasks to the pyAFQ Workflow &#8212; AFQ 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding Definitions" href="definitions.html" />
+    <link rel="prev" title="Developing pyAFQ" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Adding Tasks to the pyAFQ Workflow
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="definitions.html">
+   Adding Definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="releasing.html">
+   How to create a release
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developing <cite>pyAFQ</cite></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding Tasks to the pyAFQ Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#task-decorators">Task Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checklist-for-adding-tasks-to-the-pyafq-workflow">Checklist for Adding Tasks to the pyAFQ Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Adding Definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">How to create a release</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Adding Tasks to the pyAFQ Workflow
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#task-decorators">
+   Task Decorators
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#checklist-for-adding-tasks-to-the-pyafq-workflow">
+   Checklist for Adding Tasks to the pyAFQ Workflow
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/developing/tasks.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="adding-tasks-to-the-pyafq-workflow">
+<h1>Adding Tasks to the pyAFQ Workflow<a class="headerlink" href="#adding-tasks-to-the-pyafq-workflow" title="Permalink to this headline">¶</a></h1>
+<p>pyAFQ provides methods for performing tractography, registration, bundle
+recognition, visualization, tract profiling, and other elements of tractometry.
+Additionally, pyAFQ provides a simple UI (which can be accessed as an API or
+CLI) for running part or all of the tractometry pipeline on a given dataset.</p>
+<p>This UI uses <a class="reference external" href="http://bids.neuroimaging.io/">Pimms</a> (a Python immutable
+data structures library) as its workflow engine. Individual tasks in this workflow
+are specified in the AFQ/tasks folder. The tasks are split up into 5 files in the
+AFQ/tasks folder:
+<cite>data.py</cite>, <cite>mapping.py</cite>, <cite>tractography.py</cite>, <cite>segmentation.py</cite>, and <cite>viz.py</cite>. If you want
+to add new functionality to the pyAFQ workflow, first decide which file to
+put it in. Try to keep similar functionality in the same file. All tasks are
+decorated with <cite>&#64;pimms.calc(“output_name”)</cite>, where <cite>output_name</cite> is used as
+input to other tasks and can be accessed by the user through the
+<a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object.</p>
+<p>When a user instantiates an <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object, a Pimms plan is
+created using a selection of tasks based on the configuration provided by
+the user. Each task file has a <cite>get_{task filename}_plan</cite> method which is
+called by the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> class (for example, in AFQ.tasks.data
+there is: <a class="reference internal" href="../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_plan" title="AFQ.tasks.data.get_data_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.data.get_data_plan()</span></code></a>). This method uses the user’s
+configuration choices (which it takes as input) to construct a Pimms plan
+from the tasks in the file. In most cases, new tasks can simply be added to
+the list of tasks being passed to <cite>with_name</cite>. These tasks are always added
+to the plan; however they will only be called if the user needs them. In a few
+cases, additional logic is required, like when two different tasks compute the
+same output, or if the task being provided by a <cite>Definition</cite>-inherited object
+(see the source of <a class="reference internal" href="../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_mapping_plan" title="AFQ.tasks.mapping.get_mapping_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.mapping.get_mapping_plan()</span></code></a> for an example
+of both).</p>
+<p>The outputs of each task can be accessed by the user through the
+AFQ object, either as an attribute or using a <cite>export_</cite> method,
+such as <cite>export_b0</cite>. In each of the 5 tasks files, there is a variable called
+<a class="reference external" href="https://github.com/yeatmanlab/pyAFQ/blob/7204682b22af1c8c89766dacfd25ec01bcce9442/AFQ/tasks/data.py#L26">outputs</a>.
+Add your task output(s) to that variable for them to be attached to
+the AFQ class. Note that when an output is attached to the AFQ class either as
+an attribute or method, if that output name ends in ‘_file’,
+the ‘_file’ is removed from the name automatically.</p>
+</div>
+<div class="section" id="task-decorators">
+<h1>Task Decorators<a class="headerlink" href="#task-decorators" title="Permalink to this headline">¶</a></h1>
+<p>When adding a new task, check AFQ.tasks.decorators to see if any of those
+decorators would be useful. Here are descriptions of some useful decorators:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file" title="AFQ.tasks.decorators.as_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_file()</span></code></a>: in pyAFQ, we often save derivatives to
+the disk so they can be reused in later runs. This decorator implements an if
+statement: if the file already exists, return that, otherwise generate the file
+with a BIDS-compliant filename using the output of the task. To use this
+decorator, your task must have as input subses_dict and return two objects:
+(1) either a Nifti1Image, StatefulTractogram, or pandas dataframe, and (2)
+a dictionary containing metadata. Provide the decorator with the suffix you
+want the file to have and whether or not tracking or segmentation information
+should be included in the BIDS-compliant filename.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_model" title="AFQ.tasks.decorators.as_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_model()</span></code></a>: this decorator is useful for
+implementing ODF models. It adds timing information
+to the metadata dictionary and converts model data into a Nifti1Image, both
+of which can then be passed to <a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file" title="AFQ.tasks.decorators.as_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_file()</span></code></a>. To use
+this decorator, your task must have as input dwi_affine and return two objects:
+(1) model data as an ndarray and (2) a dictionary containing metadata.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_dt_deriv" title="AFQ.tasks.decorators.as_dt_deriv"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_dt_deriv()</span></code></a>: this decorator is useful for
+implementing both DTI and DKI derivatives. You provide it with which model
+you are using, either “DTI” or “DKI”. It creates a metadata dictionary using
+the location of the model params file
+and converts the derivative data into a Nifti1Image, both
+of which can then be passed to <a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file" title="AFQ.tasks.decorators.as_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_file()</span></code></a>. To use
+this decorator, your task must have as input dwi_affine and either
+dki_params_file or dti_params_file. Your task must return the derivative data
+as an ndarray.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_img" title="AFQ.tasks.decorators.as_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_img()</span></code></a>: this decorator simply converts the ndarray
+output of a task into a Nifti1Image, typically to be passed to
+<a class="reference internal" href="../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file" title="AFQ.tasks.decorators.as_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.tasks.decorators.as_file()</span></code></a>. To use this decorator, your task must
+have as input with affine in its name. Your decorator must return two objects:
+(1) data as an ndarray and (2) a dictionary containing metadata.</p></li>
+</ul>
+</div>
+<div class="section" id="checklist-for-adding-tasks-to-the-pyafq-workflow">
+<h1>Checklist for Adding Tasks to the pyAFQ Workflow<a class="headerlink" href="#checklist-for-adding-tasks-to-the-pyafq-workflow" title="Permalink to this headline">¶</a></h1>
+<p>This is what you must do each time you add a task to the workflow:</p>
+<ol class="arabic simple">
+<li><p>Add your task to the relevant tasks file with the pimms.calc decorator.</p></li>
+<li><p>Check AFQ.tasks.decorators for useful decorators that may simplify the code.</p></li>
+<li><p>Add your task to the <cite>get_{task filename}_plan</cite> method.</p></li>
+<li><p>Add outputs of the task to the <cite>outputs</cite> variable in its task file.</p></li>
+</ol>
+<p>In most cases, you should only have to edit the tasks file which you are adding to.
+The API (<a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a>) automatically reads these files to construct its
+workflow.</p>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">Developing <cite>pyAFQ</cite></a>
+    <a class='right-next' id="next-link" href="definitions.html" title="next page">Adding Definitions</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -63,7 +63,7 @@ Classes
    ..
        !! processed by numpydoc !!
 
-   .. method:: get_data(self, afq_object, row)
+   .. method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
 
 
 
@@ -108,7 +108,7 @@ Classes
    .. method:: find_path(self, bids_layout, from_path, subject, session)
 
 
-   .. method:: get_data(self, afq_object, row)
+   .. method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
 
 
 

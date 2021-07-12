@@ -1,0 +1,21 @@
+:mod:`AFQ.tasks`
+================
+
+.. py:module:: AFQ.tasks
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   data/index.rst
+   decorators/index.rst
+   mapping/index.rst
+   segmentation/index.rst
+   tractography/index.rst
+   utils/index.rst
+   viz/index.rst
+
+

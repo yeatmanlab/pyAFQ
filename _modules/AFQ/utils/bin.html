@@ -22,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
@@ -33,7 +33,7 @@
     
   <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -55,7 +55,7 @@
     
 
 <a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/logo.png" class="logo" alt="logo">
+  <img src="../../../_static/_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -196,7 +196,6 @@
 <span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
 <span class="kn">from</span> <span class="nn">funcargparse</span> <span class="kn">import</span> <span class="n">FuncArgParser</span>
@@ -205,7 +204,8 @@
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets mappings loaded from toml</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.scalar</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets scalars loaded from toml</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
-<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>  <span class="c1"># interprets nibabel images for endpoint_info</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>  <span class="c1"># allows users to input nibabel objects</span>
 
 
 <div class="viewcode-block" id="parse_string"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.parse_string">[docs]</a><span class="k">def</span> <span class="nf">parse_string</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
@@ -275,6 +275,11 @@
 <div class="viewcode-block" id="toml_to_val"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.toml_to_val">[docs]</a><span class="k">def</span> <span class="nf">toml_to_val</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">ls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+            <span class="n">ls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">toml_to_val</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ls</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># interpret as dictionary</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Mask&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Map&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Scalar&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">):</span>
@@ -352,7 +357,10 @@
         <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">docstr_parser</span><span class="o">.</span><span class="n">unfinished_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s1">&#39;_params&#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span>
+                            <span class="s2">&quot;tracking_params&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;segmentation_params&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;clean_params&quot;</span><span class="p">]:</span>
                         <span class="k">continue</span>
                     <span class="n">section</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -409,6 +417,8 @@
                 <span class="n">default_arg_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="s1">&#39;bids_path&#39;</span><span class="p">:</span>
                 <span class="n">bids_path</span> <span class="o">=</span> <span class="n">default</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s2">&quot;KWARGS&quot;</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">toml_to_val</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">default_arg_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
                 <span class="n">val</span> <span class="o">=</span> <span class="n">toml_to_val</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
                 <span class="n">is_special</span> <span class="o">=</span> <span class="kc">False</span>
@@ -430,7 +440,7 @@
     <span class="c1"># if overwrite, write new file with updated docs / args</span>
     <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updating configuration file.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating configuration file.&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">toml_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
             <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_toml</span><span class="p">(</span><span class="n">default_arg_dict</span><span class="p">))</span>
 
@@ -504,7 +514,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
 </p>
     </div>
     

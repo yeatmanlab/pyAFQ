@@ -1,0 +1,127 @@
+:mod:`AFQ.tasks.data`
+=====================
+
+.. py:module:: AFQ.tasks.data
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.data.get_data_gtab
+   AFQ.tasks.data.b0
+   AFQ.tasks.data.b0_mask
+   AFQ.tasks.data.dti_fit
+   AFQ.tasks.data.dti
+   AFQ.tasks.data.dki_fit
+   AFQ.tasks.data.dki
+   AFQ.tasks.data.csd
+   AFQ.tasks.data.anisotropic_power_map
+   AFQ.tasks.data.dti_fa
+   AFQ.tasks.data.dti_cfa
+   AFQ.tasks.data.dti_pdd
+   AFQ.tasks.data.dti_md
+   AFQ.tasks.data.dki_fa
+   AFQ.tasks.data.dki_md
+   AFQ.tasks.data.dki_awf
+   AFQ.tasks.data.dki_mk
+   AFQ.tasks.data.get_data_plan
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.data.DIPY_GH
+   AFQ.tasks.data.outputs
+   AFQ.tasks.data.dti_params
+   AFQ.tasks.data.dki_params
+   AFQ.tasks.data.csd_params
+
+
+.. data:: DIPY_GH
+   :annotation: = https://github.com/dipy/dipy/blob/master/dipy/
+
+   
+
+.. data:: outputs
+   :annotation: = ['data', 'gtab', 'img', 'b0_file', 'masked_b0_file', 'dti_tf', 'dti_params_file', 'dki_tf',...
+
+   
+
+.. function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True, patch2self=False)
+
+
+.. function:: b0(subses_dict, data, gtab, img)
+
+
+.. function:: b0_mask(subses_dict, b0_file, brain_mask_file)
+
+
+.. function:: dti_fit(dti_params_file, gtab)
+
+
+.. function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False)
+
+
+.. data:: dti_params
+   
+
+   
+
+.. function:: dki_fit(dki_params_file, gtab)
+
+
+.. function:: dki(subses_dict, dwi_affine, brain_mask_file, gtab, data)
+
+
+.. data:: dki_params
+   
+
+   
+
+.. function:: csd(subses_dict, dwi_affine, brain_mask_file, gtab, data, tracking_params, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
+
+
+.. data:: csd_params
+   
+
+   
+
+.. function:: anisotropic_power_map(subses_dict, csd_params_file)
+
+
+.. function:: dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+
+.. function:: dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+
+.. function:: dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+
+.. function:: dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+
+.. function:: dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+
+.. function:: dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+
+.. function:: dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf, sphere='repulsion100', gtol=0.01)
+
+
+.. function:: dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+
+.. function:: get_data_plan(brain_mask_definition)
+
+

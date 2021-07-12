@@ -33,7 +33,7 @@ BIDS spec.
     described in the existing BIDS specification, but describing these
     is part of an ongoing effort. Wherever possible, we conform with
     the draft implementation of the BIDS DWI derivatives available
-    `here <https://bids-specification.readthedocs.io/en/derivatives/05-derivatives/06-diffusion-derivatives.html>`_
+    `here <https://bids-specification.readthedocs.io/en/wip-derivatives/05-derivatives/05-diffusion-derivatives.html>`_
 
 In this example, we will explore the use of BIDS in pyAFQ and see
 how BIDS allows us to extend and provide flexibility to the users
@@ -104,7 +104,7 @@ format.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-87
+.. GENERATED FROM PYTHON SOURCE LINES 53-89
 
 After doing that, we should have a folder that looks like this:
 
@@ -131,6 +131,8 @@ The top level directory is our overall bids dataset folder. In most
 cases, this folder will include a `raw` folder that will contain the
 raw data. In this case, we do not include the raw folder and only have
 the pipelines that contains the outputs of preprocessing the data.
+In general, only the preprocessed diffusion data is required.
+See the "Organizing your data" section of "Using pyAFQ" for more details.
 In this case, one folder containing Freesurfer derivatives and another
 folder containing the DWI data that has been preprocessed with Vistasoft.
 pyAFQ provides facilities to segment tractography results obtained
@@ -141,7 +143,7 @@ our data and reconstruct tractographies with software such as
 these reconstructions in the pyAFQ segmentation and tractometry pipeline
 We fetch this data and add it as a separate pipeline
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-111
+.. GENERATED FROM PYTHON SOURCE LINES 89-113
 
 .. code-block:: default
 
@@ -179,14 +181,14 @@ We fetch this data and add it as a separate pipeline
 
  .. code-block:: none
 
-      0%|          | 0/11337 [00:00<?, ? MB/s]      0%|          | 4/11337 [00:00<06:43, 28.06 MB/s]      0%|          | 12/11337 [00:00<04:14, 44.49 MB/s]      0%|          | 46/11337 [00:00<01:25, 132.57 MB/s]      2%|1         | 181/11337 [00:00<00:24, 452.18 MB/s]      5%|4         | 551/11337 [00:00<00:08, 1221.18 MB/s]      8%|8         | 921/11337 [00:00<00:06, 1685.67 MB/s]     11%|#1        | 1296/11337 [00:01<00:05, 1990.14 MB/s]     15%|#4        | 1671/11337 [00:01<00:04, 2190.00 MB/s]     18%|#8        | 2047/11337 [00:01<00:03, 2329.66 MB/s]     21%|##1       | 2425/11337 [00:01<00:03, 2426.19 MB/s]     25%|##4       | 2806/11337 [00:01<00:03, 2496.70 MB/s]     28%|##8       | 3178/11337 [00:01<00:02, 2782.76 MB/s]     31%|###       | 3465/11337 [00:01<00:03, 2555.21 MB/s]     33%|###2      | 3728/11337 [00:01<00:03, 2456.18 MB/s]     36%|###5      | 4044/11337 [00:02<00:02, 2612.66 MB/s]     38%|###8      | 4311/11337 [00:02<00:02, 2512.48 MB/s]     41%|####      | 4617/11337 [00:02<00:02, 2655.68 MB/s]     43%|####3     | 4888/11337 [00:02<00:02, 2532.71 MB/s]     46%|####5     | 5175/11337 [00:02<00:02, 2606.56 MB/s]     48%|####7     | 5439/11337 [00:02<00:02, 2543.54 MB/s]     51%|#####     | 5736/11337 [00:02<00:02, 2623.94 MB/s]     53%|#####2    | 6001/11337 [00:02<00:02, 2552.05 MB/s]     56%|#####5    | 6297/11337 [00:02<00:01, 2665.36 MB/s]     58%|#####7    | 6566/11337 [00:03<00:01, 2533.44 MB/s]     61%|######    | 6863/11337 [00:03<00:01, 2653.92 MB/s]     63%|######2   | 7131/11337 [00:03<00:01, 2551.49 MB/s]     66%|######5   | 7431/11337 [00:03<00:01, 2677.06 MB/s]     68%|######7   | 7702/11337 [00:03<00:01, 2564.66 MB/s]     70%|#######   | 7990/11337 [00:03<00:01, 2617.56 MB/s]     73%|#######2  | 8254/11337 [00:03<00:01, 2490.19 MB/s]     75%|#######5  | 8559/11337 [00:03<00:01, 2516.04 MB/s]     78%|#######8  | 8851/11337 [00:03<00:00, 2625.46 MB/s]     80%|########  | 9117/11337 [00:04<00:00, 2532.57 MB/s]     83%|########2 | 9401/11337 [00:04<00:00, 2618.16 MB/s]     85%|########5 | 9682/11337 [00:04<00:00, 2566.13 MB/s]     88%|########7 | 9953/11337 [00:04<00:00, 2595.43 MB/s]     90%|######### | 10247/11337 [00:04<00:00, 2597.15 MB/s]     93%|#########2| 10514/11337 [00:04<00:00, 2603.53 MB/s]     95%|#########5| 10809/11337 [00:04<00:00, 2607.61 MB/s]     98%|#########7| 11076/11337 [00:04<00:00, 2609.22 MB/s]    100%|##########| 11337/11337 [00:04<00:00, 2344.54 MB/s]
-      0%|          | 0/14 [00:00<?, ? MB/s]     21%|##1       | 3/14 [00:00<00:00, 21.28 MB/s]     86%|########5 | 12/14 [00:00<00:00, 46.08 MB/s]    100%|##########| 14/14 [00:00<00:00, 49.29 MB/s]
-      0%|          | 0/1037 [00:00<?, ? MB/s]      0%|          | 4/1037 [00:00<00:36, 28.33 MB/s]      1%|1         | 12/1037 [00:00<00:22, 44.79 MB/s]      5%|4         | 47/1037 [00:00<00:07, 136.73 MB/s]     18%|#8        | 189/1037 [00:00<00:01, 477.14 MB/s]     54%|#####4    | 561/1037 [00:00<00:00, 1248.68 MB/s]     90%|########9 | 930/1037 [00:00<00:00, 1706.95 MB/s]    100%|##########| 1037/1037 [00:00<00:00, 1190.67 MB/s]
+      0%|          | 0/11337 [00:00<?, ? MB/s]      0%|          | 4/11337 [00:00<06:37, 28.49 MB/s]      0%|          | 9/11337 [00:00<05:48, 32.54 MB/s]      0%|          | 36/11337 [00:00<01:47, 104.89 MB/s]      1%|1         | 141/11337 [00:00<00:31, 357.01 MB/s]      4%|4         | 466/11337 [00:00<00:10, 1057.73 MB/s]      7%|7         | 843/11337 [00:00<00:06, 1605.20 MB/s]     11%|#         | 1213/11337 [00:00<00:05, 1935.32 MB/s]     14%|#3        | 1587/11337 [00:01<00:04, 2163.15 MB/s]     17%|#7        | 1967/11337 [00:01<00:04, 2330.59 MB/s]     21%|##        | 2346/11337 [00:01<00:03, 2441.43 MB/s]     24%|##4       | 2721/11337 [00:01<00:03, 2508.28 MB/s]     27%|##7       | 3096/11337 [00:01<00:03, 2554.76 MB/s]     31%|###       | 3473/11337 [00:01<00:03, 2589.43 MB/s]     34%|###3      | 3850/11337 [00:01<00:02, 2612.67 MB/s]     37%|###7      | 4220/11337 [00:02<00:02, 2614.95 MB/s]     41%|####      | 4598/11337 [00:02<00:02, 2632.76 MB/s]     44%|####3     | 4974/11337 [00:02<00:02, 2640.53 MB/s]     47%|####7     | 5347/11337 [00:02<00:02, 2640.08 MB/s]     51%|#####     | 5729/11337 [00:02<00:02, 2636.24 MB/s]     54%|#####3    | 6104/11337 [00:02<00:01, 2665.74 MB/s]     57%|#####7    | 6486/11337 [00:02<00:01, 2646.52 MB/s]     61%|######    | 6860/11337 [00:03<00:01, 2648.19 MB/s]     64%|######3   | 7241/11337 [00:03<00:01, 2661.77 MB/s]     67%|######7   | 7619/11337 [00:03<00:01, 2668.75 MB/s]     71%|#######   | 7997/11337 [00:03<00:01, 2670.31 MB/s]     74%|#######3  | 8372/11337 [00:03<00:01, 2664.34 MB/s]     77%|#######7  | 8753/11337 [00:03<00:00, 2674.96 MB/s]     81%|########  | 9127/11337 [00:03<00:00, 2666.37 MB/s]     84%|########3 | 9505/11337 [00:04<00:00, 2669.09 MB/s]     87%|########7 | 9884/11337 [00:04<00:00, 2673.67 MB/s]     91%|######### | 10266/11337 [00:04<00:00, 2684.32 MB/s]     94%|#########3| 10646/11337 [00:04<00:00, 2687.71 MB/s]     97%|#########7| 11020/11337 [00:04<00:00, 2676.58 MB/s]    100%|##########| 11337/11337 [00:04<00:00, 2385.11 MB/s]
+      0%|          | 0/14 [00:00<?, ? MB/s]     29%|##8       | 4/14 [00:00<00:00, 28.47 MB/s]     79%|#######8  | 11/14 [00:00<00:00, 40.91 MB/s]    100%|##########| 14/14 [00:00<00:00, 49.55 MB/s]
+      0%|          | 0/1037 [00:00<?, ? MB/s]      0%|          | 4/1037 [00:00<00:36, 28.68 MB/s]      1%|1         | 13/1037 [00:00<00:20, 49.58 MB/s]      5%|5         | 52/1037 [00:00<00:06, 154.01 MB/s]     20%|#9        | 204/1037 [00:00<00:01, 520.86 MB/s]     56%|#####6    | 581/1037 [00:00<00:00, 1353.32 MB/s]     92%|#########2| 955/1037 [00:00<00:00, 1811.32 MB/s]    100%|##########| 1037/1037 [00:00<00:00, 1223.13 MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-141
+.. GENERATED FROM PYTHON SOURCE LINES 114-143
 
 After we do that, our dataset folder should look like this:
 
@@ -218,7 +220,7 @@ After we do that, our dataset folder should look like this:
 To explore the layout of these derivatives, we will initialize a
 :class:`BIDSLayout` class instance to help us see what is in this dataset
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-144
+.. GENERATED FROM PYTHON SOURCE LINES 143-146
 
 .. code-block:: default
 
@@ -232,12 +234,12 @@ To explore the layout of these derivatives, we will initialize a
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-147
+.. GENERATED FROM PYTHON SOURCE LINES 147-149
 
 Because there is no raw data in this BIDS layout (only derivatives),
 pybids will report that there are no subjects and sessions:
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-150
+.. GENERATED FROM PYTHON SOURCE LINES 149-152
 
 .. code-block:: default
 
@@ -259,12 +261,12 @@ pybids will report that there are no subjects and sessions:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-153
+.. GENERATED FROM PYTHON SOURCE LINES 153-155
 
 But a query on the derivatives will reveal the different derivatives that
 are stored here:
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-156
+.. GENERATED FROM PYTHON SOURCE LINES 155-158
 
 .. code-block:: default
 
@@ -281,18 +283,18 @@ are stored here:
 
  .. code-block:: none
 
-    {'my_tractography': BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0, 'vistasoft': BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0, 'freesurfer': BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0}
+    {'freesurfer': BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0, 'my_tractography': BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0, 'vistasoft': BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-160
+.. GENERATED FROM PYTHON SOURCE LINES 159-162
 
 We can use a :class:`bids.BIDSValidator` object to make sure that the
 files within our data set are BIDS-compliant. For example, we can
 extract the tractography derivatives part of our layout using:
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-163
+.. GENERATED FROM PYTHON SOURCE LINES 162-165
 
 .. code-block:: default
 
@@ -306,14 +308,14 @@ extract the tractography derivatives part of our layout using:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-168
+.. GENERATED FROM PYTHON SOURCE LINES 166-170
 
 This variable is also a BIDS layout object. This object has a ``get``
 method, which allows us to query and find specific items within the
 layout. For example, we can ask for files that have a suffix consistent
 with tractography results:
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-171
+.. GENERATED FROM PYTHON SOURCE LINES 170-173
 
 .. code-block:: default
 
@@ -327,11 +329,11 @@ with tractography results:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 174-175
 
 Or ask for files that have a ``.trk`` extension:
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-176
+.. GENERATED FROM PYTHON SOURCE LINES 175-178
 
 .. code-block:: default
 
@@ -345,11 +347,11 @@ Or ask for files that have a ``.trk`` extension:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-178
+.. GENERATED FROM PYTHON SOURCE LINES 179-180
 
 In this case, both of these would produce the same result.
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-182
+.. GENERATED FROM PYTHON SOURCE LINES 180-184
 
 .. code-block:: default
 
@@ -372,11 +374,11 @@ In this case, both of these would produce the same result.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-184
+.. GENERATED FROM PYTHON SOURCE LINES 185-186
 
 We can also get some more structured information about this file:
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-188
+.. GENERATED FROM PYTHON SOURCE LINES 186-190
 
 .. code-block:: default
 
@@ -399,7 +401,7 @@ We can also get some more structured information about this file:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-195
+.. GENERATED FROM PYTHON SOURCE LINES 191-197
 
 We can use a :class:`bids.BIDSValidator` class instance to validate that
 this file is compliant with the specification. Note that the validator
@@ -408,7 +410,7 @@ dataset, so we have to split the string that contains the full path
 of the tractography to extract only the part that is relative to the
 root of the entire BIDS ``layout`` object:
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-202
+.. GENERATED FROM PYTHON SOURCE LINES 197-204
 
 .. code-block:: default
 
@@ -434,7 +436,7 @@ root of the entire BIDS ``layout`` object:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-210
+.. GENERATED FROM PYTHON SOURCE LINES 205-212
 
 Next, we specify the information we need to define the bundles that we are
 interested in segmenting. In this case, we are going to use a list of
@@ -444,7 +446,7 @@ needed to segment them (e.g., waypoint ROIs and probability maps).
 For an example that includes custom definition of bundle info, see the
 `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-213
+.. GENERATED FROM PYTHON SOURCE LINES 212-215
 
 .. code-block:: default
 
@@ -458,7 +460,7 @@ For an example that includes custom definition of bundle info, see the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-230
+.. GENERATED FROM PYTHON SOURCE LINES 216-232
 
 Now, we can define our AFQ object, pointing to the derivatives of the
 `'my_tractography'` pipeline as inputs. This is done by setting the
@@ -477,7 +479,7 @@ done by defining the segmentation_params dictionary input.
 To sub-sample to 10,000 streamlines, we define
 `'nb_streamlines' = 10000`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-241
+.. GENERATED FROM PYTHON SOURCE LINES 232-243
 
 .. code-block:: default
 
@@ -499,13 +501,13 @@ To sub-sample to 10,000 streamlines, we define
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-245
+.. GENERATED FROM PYTHON SOURCE LINES 244-247
 
 Finally, to run the segmentation and extract tract profiles, we call
 The `export_all` method. This creates all of the derivative outputs of
 AFQ within the 'stanford_hardi/derivatives/afq' folder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-249
+.. GENERATED FROM PYTHON SOURCE LINES 247-251
 
 .. code-block:: default
 
@@ -532,18 +534,18 @@ AFQ within the 'stanford_hardi/derivatives/afq' folder.
     Optimizing level 2 [max iter: 10000]
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
-      0%|          | 0/2840 [00:00<?, ?it/s]      0%|          | 2/2840 [00:00<03:55, 12.04it/s]      0%|          | 4/2840 [00:06<1:26:26,  1.83s/it]      0%|          | 6/2840 [00:06<48:05,  1.02s/it]       10%|9         | 272/2840 [00:06<00:30, 83.10it/s]     28%|##7       | 784/2840 [00:06<00:06, 294.20it/s]     55%|#####4    | 1552/2840 [00:06<00:01, 672.45it/s]     73%|#######2  | 2064/2840 [00:07<00:00, 910.23it/s]     91%|######### | 2576/2840 [00:07<00:00, 1061.59it/s]    100%|##########| 2840/2840 [00:07<00:00, 385.81it/s] 
-      0%|          | 0/1912 [00:00<?, ?it/s]     13%|#3        | 252/1912 [00:00<00:00, 2169.43it/s]     40%|###9      | 764/1912 [00:00<00:00, 3728.93it/s]     60%|#####9    | 1145/1912 [00:00<00:00, 3243.65it/s]     80%|########  | 1532/1912 [00:00<00:00, 3214.68it/s]    100%|##########| 1912/1912 [00:00<00:00, 3993.48it/s]
-      0%|          | 0/2375 [00:00<?, ?it/s]     10%|#         | 248/2375 [00:00<00:00, 2193.41it/s]     32%|###2      | 760/2375 [00:00<00:00, 3235.79it/s]     64%|######4   | 1528/2375 [00:00<00:00, 3697.45it/s]    100%|##########| 2375/2375 [00:00<00:00, 4577.62it/s]
-      0%|          | 0/1845 [00:00<?, ?it/s]     14%|#3        | 252/1845 [00:00<00:00, 2194.47it/s]     41%|####1     | 764/1845 [00:00<00:00, 3458.99it/s]     83%|########3 | 1532/1845 [00:00<00:00, 3862.82it/s]    100%|##########| 1845/1845 [00:00<00:00, 4411.87it/s]
-      0%|          | 0/1432 [00:00<?, ?it/s]     27%|##6       | 380/1432 [00:00<00:00, 3666.52it/s]     71%|#######1  | 1020/1432 [00:00<00:00, 4362.00it/s]    100%|##########| 1432/1432 [00:00<00:00, 5984.72it/s]
-      0%|          | 0/1054 [00:00<?, ?it/s]     36%|###6      | 380/1054 [00:00<00:00, 3228.14it/s]     97%|#########6| 1020/1054 [00:00<00:00, 4899.80it/s]    100%|##########| 1054/1054 [00:00<00:00, 4778.06it/s]
-      0%|          | 0/1137 [00:00<?, ?it/s]     17%|#6        | 188/1137 [00:00<00:00, 1839.47it/s]     67%|######7   | 764/1137 [00:00<00:00, 3251.07it/s]    100%|##########| 1137/1137 [00:00<00:00, 3370.19it/s]
+      0%|          | 0/2840 [00:00<?, ?it/s]      0%|          | 2/2840 [00:00<06:50,  6.91it/s]      0%|          | 4/2840 [00:05<1:11:31,  1.51s/it]      0%|          | 6/2840 [00:05<40:13,  1.17it/s]       14%|#4        | 398/2840 [00:05<00:16, 145.30it/s]     37%|###6      | 1038/2840 [00:05<00:04, 449.41it/s]     73%|#######2  | 2062/2840 [00:05<00:00, 970.13it/s]     91%|######### | 2574/2840 [00:06<00:00, 1150.80it/s]    100%|##########| 2840/2840 [00:06<00:00, 461.60it/s] 
+      0%|          | 0/1912 [00:00<?, ?it/s]     27%|##6       | 508/1912 [00:00<00:00, 4181.28it/s]     53%|#####3    | 1020/1912 [00:00<00:00, 3661.77it/s]    100%|##########| 1912/1912 [00:00<00:00, 5136.32it/s]
+      0%|          | 0/2375 [00:00<?, ?it/s]     21%|##1       | 508/2375 [00:00<00:00, 4434.82it/s]     65%|######4   | 1532/2375 [00:00<00:00, 5964.06it/s]     89%|########9 | 2114/2375 [00:00<00:00, 5259.86it/s]    100%|##########| 2375/2375 [00:00<00:00, 5954.11it/s]
+      0%|          | 0/1845 [00:00<?, ?it/s]     28%|##7       | 508/1845 [00:00<00:00, 4181.17it/s]     55%|#####5    | 1020/1845 [00:00<00:00, 4452.96it/s]    100%|##########| 1845/1845 [00:00<00:00, 6575.03it/s]
+      0%|          | 0/1432 [00:00<?, ?it/s]     71%|#######1  | 1020/1432 [00:00<00:00, 7936.93it/s]    100%|##########| 1432/1432 [00:00<00:00, 11107.35it/s]
+      0%|          | 0/1054 [00:00<?, ?it/s]     97%|#########6| 1020/1054 [00:00<00:00, 8773.11it/s]    100%|##########| 1054/1054 [00:00<00:00, 9040.43it/s]
+      0%|          | 0/1137 [00:00<?, ?it/s]     33%|###3      | 380/1137 [00:00<00:00, 3426.64it/s]     90%|########9 | 1020/1137 [00:00<00:00, 4227.29it/s]    100%|##########| 1137/1137 [00:00<00:00, 4585.98it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-256
+.. GENERATED FROM PYTHON SOURCE LINES 252-258
 
 A few common issues that can hinder BIDS from working properly are:
 
@@ -555,7 +557,7 @@ A few common issues that can hinder BIDS from working properly are:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 22 minutes  36.422 seconds)
+   **Total running time of the script:** ( 14 minutes  15.304 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_bids_layout.py:
