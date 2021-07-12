@@ -1,3 +1,38 @@
+0.8 (July 12, 2021)
+===================
+This release is the first one to use Pimms as our pipeline engine, which allows
+for parallelization across subjects and sessions using multi-processing. It also
+contains integration of AFQ-Browser as a derivative, and a variety of other
+fixes and improvments.
+
+  * WIP: Add OR fetcher and example (#646)
+  * [Fix] Better export all behavior (#726)
+  * [TESTFIX] Update nightly test to match new, more specific error message (#727)
+  * BF: A couple of places where masks are not being propagated. (#721)
+  * [FIX] Default to serial subject-session processing to ease memory constraints (#720)
+  * [FIX] fix custom bundldict bug and add test (#718)
+  * [DOC] Add developer documentation for adding tasks and definitions (#714)
+  * BF: Fix config file reader for new params (#713)
+  * BF: loop over valid_sub and valid_ses lists correctly (#712)
+  * Fixes broken link in BIDS example  (#709)
+  * Move AAL atlas to figshare (#710)
+  * BF: Fix docker builds  (#708)
+  * [ENH] AFQ-Browser Integration (#703)
+  * [DOC] Bids layout clarifications (#697)
+  * [ENH] Provide more informative errors for incorrect BIDS structure, generate bundle dict lazily (#691)
+  * [FIX] Mask getters have to be aware of whether they are being called from data task (#705)
+  * [Nightly] Split nightly basic again (#706)
+  * [Nightly] Rename nightly tests, split test 2 (#704)
+  * [FIX] Nightly pimms fixes2 (#701)
+  * BF: Only generate warped endpoint ROIs if there are endpoint ROIs to use (#700)
+  * [FIX] Nightly pimms fixes (#699)
+  * [FIX] allow for session folder to not exist (session to be None) (#694)
+  * Pimms (#675)
+  * [ENH] Use ICC for profile reliability (#690)
+  * Allow for other derivatives folders when downloading and combining profiles (#689)
+  * Fixes link on front page (#687)
+
+
 0.7.1 (May 03, 2021)
 ====================
 This micro release improves the look and feel of the documentation.
