@@ -33,9 +33,10 @@ of both).
 
 The outputs of each task can be accessed by the user through the
 AFQ object, either as an attribute or using a `export_` method,
-such as `export_b0`. In each of the 5 tasks files, there is a variable called
+such as `export_b0`. In each of the 5 tasks files, there is a dictionary called
 `outputs <https://github.com/yeatmanlab/pyAFQ/blob/7204682b22af1c8c89766dacfd25ec01bcce9442/AFQ/tasks/data.py#L26>`_.
-Add your task output(s) to that variable for them to be attached to
+Add your task output(s) and descriptions of those outputs to the
+`outputs` dictionary for them to be attached to
 the AFQ class. Note that when an output is attached to the AFQ class either as
 an attribute or method, if that output name ends in '_file',
 the '_file' is removed from the name automatically. 
