@@ -9,7 +9,10 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 
 
-outputs = ["seed_file", "stop_file", "streamlines_file"]
+outputs = {
+    "seed_file": """tractography seed mask file""",
+    "stop_file": """tractography stop mask file""",
+    "streamlines_file": """complete, unsegmented tractography file"""}
 
 
 @pimms.calc("seed_file")

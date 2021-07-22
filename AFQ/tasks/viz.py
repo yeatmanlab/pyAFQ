@@ -17,7 +17,13 @@ from AFQ.viz.utils import visualize_tract_profiles
 logger = logging.getLogger('AFQ.api.viz')
 
 
-outputs = ["all_bundles_figure", "indiv_bundles_figures"]
+outputs = {
+    "all_bundles_figure": """figure for the visualizaion of the recognized
+    bundles in the subject's brain""",
+    "indiv_bundles_figures": """list of filenames for visualizaions
+    by individual bundles""",
+    "tract_profile_plots": """list of filenames, where files contain plots
+    of the tract profiles"""}
 
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
@@ -216,6 +222,7 @@ def viz_indivBundle(subses_dict,
 
         roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
+        fnames = []
         if "no_gif" not in viz_backend.backend:
             fname = op.split(
                 get_fname(
@@ -227,6 +234,7 @@ def viz_indivBundle(subses_dict,
 
             fname = op.join(roi_dir, fname[1])
             viz_backend.create_gif(figure, fname)
+            fnames.append(fname)
         if "plotly" in viz_backend.backend:
             roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
@@ -240,13 +248,14 @@ def viz_indivBundle(subses_dict,
 
             fname = op.join(roi_dir, fname[1])
             figure.write_html(fname)
+            fnames.append(fname)
     meta_fname = get_fname(
         subses_dict, '_vizIndiv.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
     afd.write_json(meta_fname, meta)
-    return True
+    return fnames
 
 
 @pimms.calc("tract_profile_plots")

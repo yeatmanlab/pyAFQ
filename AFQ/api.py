@@ -26,6 +26,7 @@ import pandas as pd
 import numpy as np
 import os
 import os.path as op
+from textwrap import dedent
 import json
 import s3fs
 from time import time
@@ -326,9 +327,9 @@ _sub_attrs = [
     "tractography_imap", "segmentation_imap",
     "subses_dict"]
 
-task_outputs = []
+task_outputs = {}
 for task_module in ["data", "mapping", "segmentation", "tractography", "viz"]:
-    task_outputs.extend(import_module(f"AFQ.tasks.{task_module}").outputs)
+    task_outputs.update(import_module(f"AFQ.tasks.{task_module}").outputs)
 
 
 class AFQ(object):
@@ -1240,8 +1241,20 @@ class AFQ(object):
 
 
 # iterate through all attributes, setting methods for each one
-for output in task_outputs:
-    exec(f"def export_{output}(self):\n    return self.{output}")
+for output, desc in task_outputs.items():
+    desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")
+    exec(dedent(f"""\
+    def export_{output}(self):
+        \"\"\"
+        {output}
+        Returns
+        -------
+        Dictionary where each key is a subjectID.
+        If there is more than one session, each value is another dictionary,
+        where each key is a sessionID. In either case, the final value is:
+        {desc}
+        \"\"\"
+        return self.{output}"""))
     fn = locals()[f"export_{output}"]
     if output[-5:] == "_file":
         setattr(AFQ, f"export_{output[:-5]}", fn)

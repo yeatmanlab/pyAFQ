@@ -26,9 +26,17 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 logger = logging.getLogger('AFQ.api.seg')
 
 
-outputs = [
-    "bundles_file", "clean_bundles_file", "indiv_bundles", "sl_counts_file",
-    "profiles_file", "scalar_dict"]
+outputs = {
+    "bundles_file": """file containting segmented streamlines,
+    labeled by bundle""",
+    "clean_bundles_file": """file containting segmented streamlines,
+    cleaned using the Mahalanobis distance, and labeled by bundle""",
+    "indiv_bundles": """dictionary of files, where each file
+    contains the streamlines of a given bundle, cleaned or uncleaned""",
+    "sl_counts_file": """streamline counts JSON file""",
+    "profiles_file": """tract profiles CSV file""",
+    "scalar_dict": """dicionary mapping scalar names
+    to their respective files"""}
 
 
 @pimms.calc("bundles_file")
