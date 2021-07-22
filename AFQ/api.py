@@ -1246,7 +1246,8 @@ for output, desc in task_outputs.items():
     exec(dedent(f"""\
     def export_{output}(self):
         \"\"\"
-        {output}
+        Triggers a cascade of calculations to generate the desired output.
+        
         Returns
         -------
         Dictionary where each key is a subjectID.
