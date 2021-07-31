@@ -95,7 +95,7 @@ pygments_style = 'sphinx'
 html_theme = 'pydata_sphinx_theme'
 
 # Added theme configuration. See: https://pydata-sphinx-theme.readthedocs.io/
-html_logo = "_static/logo.png"
+html_logo = "logo.png"
 
 html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs", "globaltoc.html"]
