@@ -122,7 +122,7 @@ class BundleDict(MutableMapping):
         else:
             expanded_bundle_names = []
             for bundle_name in bundle_info:
-                if self.seg_algo == "afq" or self.seg_algo == "pediatric":
+                if self.seg_algo == "afq":
                     if bundle_name in ["FA", "FP"]\
                             or bundle_name in CALLOSUM_BUNDLES:
                         expanded_bundle_names.append(bundle_name)
