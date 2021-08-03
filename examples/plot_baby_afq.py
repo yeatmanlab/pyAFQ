@@ -5,9 +5,10 @@ Pediatric Profiles:
 
 The following is an example of tractometry for pediatric bundles.
 
-TODO cite @mareike
-
 .. note::
+
+  This example and resulting pyAFQ support for pediatric bundles was
+  inspired by and largely due to the work of Grotheer et al. [Grotheer2021]_.
 
   This example uses the Yeatman et al. waypoint ROI approach, first
   described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
@@ -22,20 +23,8 @@ import AFQ.data as afd
 from AFQ.definitions.mask import RoiMask, MaskFile
 
 ##########################################################################
-# Get example data:
-# -----------------
-# **Diffusion dataset**
-#
-# .. note::
-#   The diffusion data used in this example are from the Developing Human
-#   Connectome project (dHCP):
-#
-#   http://www.developingconnectome.org/project/
-#
-#   Acknowledgement: These results were obtained using data made available from
-#   the Developing Human Connectome Project funded by the European Research
-#   Council under the European Union’s Seventh Framework Programme
-#   (FP/2007-2013) / ERC Grant Agreement no. [319456]
+# Initialize an AFQ object:
+# -------------------------
 #
 # .. note::
 #   This example assumes:
@@ -44,15 +33,24 @@ from AFQ.definitions.mask import RoiMask, MaskFile
 #
 #   - Subject's session data has been downloaded into
 #
-#     `AFQ_data\\dHCP\\derivatives`
+#     `AFQ_data\\study\\derivatives`
 #
 #   - Subject's session data has been made BIDS compliant
 #
 #     see https://bids.neuroimaging.io
 #
+# .. note::
+#
+#   While it is possible to run tractography and segmentation for pediatric dMRI
+#   data with pyAFQ, we recommend using a custom tractography pipeline and only 
+#   using pyAFQ for segmentation as shown in:
+#
+#   - https://github.com/bloomdt-uw/babyafq/blob/main/mrtrix_pipeline.ipynb
+#   - https://github.com/bloomdt-uw/babyafq/blob/main/pybabyafq.ipynb
+
 
 myafq = api.AFQ(# ==== BIDS parameters ====
-                bids_path=op.join(afd.afq_home, "dHCP"),
+                bids_path=op.join(afd.afq_home, "study"),
                 dmriprep="derivatives",
                 # ===== Registration parameters ====
                 min_bval=1000,
@@ -82,6 +80,12 @@ plotly.io.show(myafq.all_bundles_figure[list(myafq.all_bundles_figure)[0]])
 ##########################################################################
 # References:
 # -------------------------
+# .. [Grotheer2021] Mareike Grotheer, Mona Rosenke, Hua Wu, Holly Kular,
+#                   Francesca R. Querdasi, Vaidehi Natu, Jason D. Yeatman, 
+#                   alanit Grill-Spector, "Catch me if you can: Least
+#                   myelinated white matter develops fastest during early
+#                   infancy", bioRxiv
+# 
 # .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
 #                  Brian A Wandell, Heidi M Feldman, "Tract profiles of
 #                  white matter properties: automating fiber-tract
