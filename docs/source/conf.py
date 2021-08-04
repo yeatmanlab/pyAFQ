@@ -15,6 +15,7 @@
 from plotly.io._sg_scraper import plotly_sg_scraper
 import sys
 import os
+import AFQ
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('sphinxext'))
@@ -29,7 +30,7 @@ author = ''
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = AFQ.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -95,6 +96,7 @@ html_theme = 'pydata_sphinx_theme'
 
 # Added theme configuration. See: https://pydata-sphinx-theme.readthedocs.io/
 html_logo = "_static/logo.png"
+
 html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs", "globaltoc.html"]
 }
