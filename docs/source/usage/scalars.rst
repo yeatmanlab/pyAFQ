@@ -45,4 +45,4 @@ to provide this custom scalar to the AFQ object::
       "T1w",
       {"scope": "freesurfer"})
 
-    api.AFQ(scalars=["dti_fa", "dti_md", my_custom_t1_scalar])
+    api.AFQ("my_bids_path", scalars=["dti_fa", "dti_md", my_custom_t1_scalar])
