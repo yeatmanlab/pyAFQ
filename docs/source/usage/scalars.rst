@@ -16,18 +16,17 @@ Then your custom scalar will be automatically used during tract profile extracti
 - :class:`AFQ.definitions.mask.ScalarFile`: This class can be used if you have your scalar in subject
   space, and there is a scalar file in BIDS format already for each subject.
 
-As an example, one might have T1 files in a BIDS pipeline named "freesurfer"
-and with the suffix "T1w" for each subject and session::
-  
+As an example, one might have "ICVF" and "ODI" maps in a BIDS pipeline named "noddi"::
+
       ~/my_bids_path/
       ├── dataset_description.json
       └── derivatives
-          ├── freesurfer
+          ├── noddi
           │   ├── dataset_description.json
           │   └── sub-01
           │       └── ses-01
-          │           └── anat
-          │               └── sub-01_ses-01_T1w.nii.gz
+          │           └── sub-01_ses-01_ICVF.nii.gz
+          │           └── sub-01_ses-01_ODI.nii.gz
           └── vistasoft
               ├── dataset_description.json
               └── sub-01
@@ -38,11 +37,18 @@ and with the suffix "T1w" for each subject and session::
                           └── sub-01_ses-01_dwi.nii.gz
 
 You can use :class:`AFQ.definitions.mask.ScalarFile`
-to provide this custom scalar to the AFQ object::
+to provide these custom scalars to the AFQ object::
 
-    my_custom_t1_scalar = ScalarFile(
-      "T1",
-      "T1w",
-      {"scope": "freesurfer"})
+    ICVF_scalar = ScalarFile(
+      "ICVF",
+      "ICVF",
+      {"scope": "noddi"})
 
-    api.AFQ("my_bids_path", scalars=["dti_fa", "dti_md", my_custom_t1_scalar])
+    ODI_scalar = ScalarFile(
+      "ODI",
+      "ODI",
+      {"scope": "noddi"})
+
+    api.AFQ("my_bids_path",
+            scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
+
