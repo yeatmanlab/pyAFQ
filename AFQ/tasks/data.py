@@ -28,7 +28,9 @@ outputs = [
     "dti_params_file", "dki_tf", "dki_params_file", "csd_params_file",
     "pmap_file", "dti_fa_file", "dti_cfa_file", "dti_pdd_file",
     "dti_md_file", "dki_fa_file", "dki_md_file", "dki_awf_file",
-    "dki_mk_file", "brain_mask_file"]
+    "dti_ga_file", "dti_rd_file", "dti_ad_file",
+    "dki_ga_file", "dki_rd_file", "dki_ad_file",
+    "dki_rk_file", "dki_ak_file", "dki_mk_file", "brain_mask_file"]
 
 
 @pimms.calc("data", "gtab", "img")
@@ -220,6 +222,27 @@ def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.md
 
 
+@pimms.calc("dti_ga_file")
+@as_file(suffix='_model-DTI_GA.nii.gz')
+@as_dt_deriv(tf_name='DTI')
+def dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    return dti_tf.ga
+
+
+@pimms.calc("dti_rd_file")
+@as_file(suffix='_model-DTI_RD.nii.gz')
+@as_dt_deriv(tf_name='DTI')
+def dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    return dti_tf.rd
+
+
+@pimms.calc("dti_ad_file")
+@as_file(suffix='_model-DTI_AD.nii.gz')
+@as_dt_deriv(tf_name='DTI')
+def dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    return dti_tf.ad
+
+
 @pimms.calc("dki_fa_file")
 @as_file('_model-DKI_FA.nii.gz')
 @as_dt_deriv('DKI')
@@ -251,11 +274,47 @@ def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.mk()
 
 
+@pimms.calc("dki_ga_file")
+@as_file(suffix='_model-DKI_GA.nii.gz')
+@as_dt_deriv(tf_name='DKI')
+def dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    return dki_tf.ga
+
+
+@pimms.calc("dki_rd_file")
+@as_file(suffix='_model-DKI_RD.nii.gz')
+@as_dt_deriv(tf_name='DKI')
+def dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    return dki_tf.rd
+
+
+@pimms.calc("dki_ad_file")
+@as_file(suffix='_model-DKI_AD.nii.gz')
+@as_dt_deriv(tf_name='DKI')
+def dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    return dki_tf.ad
+
+
+@pimms.calc("dki_rk_file")
+@as_file(suffix='_model-DKI_RK.nii.gz')
+@as_dt_deriv(tf_name='DKI')
+def dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    return dki_tf.rk
+
+
+@pimms.calc("dki_ak_file")
+@as_file(suffix='_model-DKI_AK.nii.gz')
+@as_dt_deriv(tf_name='DKI')
+def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    return dki_tf.ak
+
+
 def get_data_plan(brain_mask_definition):
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask,
         dti_fit, dki_fit, anisotropic_power_map,
         dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
+        dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
         dti_params, dki_params, csd_params])
     data_tasks["brain_mask_res"] = \
         pimms.calc("brain_mask_file")(

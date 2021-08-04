@@ -694,6 +694,7 @@ def test_AFQ_data_waypoint():
                     scalars=[
                         "dti_FA",
                         "dti_MD",
+                        "dti_GA",
                         TemplateScalar("T1", t1_path)],
                     robust_tensor_fitting=True,
                     tracking_params=tracking_params,
