@@ -782,6 +782,7 @@ def test_AFQ_data_waypoint():
                       scalars=[
                         "dti_fa",
                         "dti_md",
+                        "dti_ga",
                         f"TemplateScalar('T1', '{t1_path}')"]),
                   VIZ=dict(
                       viz_backend="plotly_no_gif"),
