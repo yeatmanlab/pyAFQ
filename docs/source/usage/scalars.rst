@@ -15,3 +15,34 @@ Then your custom scalar will be automatically used during tract profile extracti
 
 - :class:`AFQ.definitions.mask.ScalarFile`: This class can be used if you have your scalar in subject
   space, and there is a scalar file in BIDS format already for each subject.
+
+As an example, one might have T1 files in a BIDS pipeline named "freesurfer"
+and with the suffix "T1w" for each subject and session::
+  
+      ~/my_bids_path/
+      ├── dataset_description.json
+      └── derivatives
+          ├── freesurfer
+          │   ├── dataset_description.json
+          │   └── sub-01
+          │       └── ses-01
+          │           └── anat
+          │               └── sub-01_ses-01_T1w.nii.gz
+          └── vistasoft
+              ├── dataset_description.json
+              └── sub-01
+                  └── ses-01
+                      └── dwi
+                          ├── sub-01_ses-01_dwi.bval
+                          ├── sub-01_ses-01_dwi.bvec
+                          └── sub-01_ses-01_dwi.nii.gz
+
+You can use :class:`AFQ.definitions.mask.ScalarFile`
+to provide this custom scalar to the AFQ object::
+
+    my_custom_t1_scalar = ScalarFile(
+      "T1",
+      "T1w",
+      {"scope": "freesurfer"})
+
+    api.AFQ(scalars=["dti_fa", "dti_md", my_custom_t1_scalar])
