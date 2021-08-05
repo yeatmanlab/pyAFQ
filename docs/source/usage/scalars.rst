@@ -52,3 +52,5 @@ to provide these custom scalars to the AFQ object::
     api.AFQ("my_bids_path",
             scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
 
+Or provide them using the CLI, by adding them to the `scalars` parameter::
+    scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', 'ODI', {'scope': 'noddi'})", "ScalarFile('ICVF', 'ICVF', {'scope': 'noddi')" ]
