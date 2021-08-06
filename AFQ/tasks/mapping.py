@@ -18,10 +18,11 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 
 outputs = {
-    "b0_warped_file": """b0 transformed to template space file""",
-    "template_xform_file": """registration template transformed to
-    subject space file""",
-    "rois_file": """dictionary of Nifti1Image files of ROIs
+    "b0_warped_file": """full path to a nifti file containing
+    b0 transformed to template space""",
+    "template_xform_file": """full path to a nifti file containing
+    registration template transformed to subject space""",
+    "rois_file": """dictionary of full paths to Nifti1Image files of ROIs
     transformed to subject space""",
     "mapping": """mapping from subject to template space.
     The “mapping” must have transform and transform_inverse functions

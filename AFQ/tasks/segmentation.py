@@ -27,16 +27,19 @@ logger = logging.getLogger('AFQ.api.seg')
 
 
 outputs = {
-    "bundles_file": """file containting segmented streamlines,
-    labeled by bundle""",
-    "clean_bundles_file": """file containting segmented streamlines,
-    cleaned using the Mahalanobis distance, and labeled by bundle""",
-    "indiv_bundles": """dictionary of files, where each file
-    contains the streamlines of a given bundle, cleaned or uncleaned""",
-    "sl_counts_file": """streamline counts JSON file""",
-    "profiles_file": """tract profiles CSV file""",
+    "bundles_file": """full path to a trk file containing containting
+    segmented streamlines, labeled by bundle""",
+    "clean_bundles_file": """full path to a trk file containting segmented
+    streamlines, cleaned using the Mahalanobis distance, and labeled by
+    bundle""",
+    "indiv_bundles": """dictionary of paths, where each path is
+    a full path to a trk file containing the streamlines of a given bundle,
+    cleaned or uncleaned""",
+    "sl_counts_file": """full path to a JSON file containing streamline
+    counts""",
+    "profiles_file": """full path to a CSV file containing tract profiles""",
     "scalar_dict": """dicionary mapping scalar names
-    to their respective files"""}
+    to their respective file paths"""}
 
 
 @pimms.calc("bundles_file")

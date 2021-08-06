@@ -20,10 +20,10 @@ logger = logging.getLogger('AFQ.api.viz')
 outputs = {
     "all_bundles_figure": """figure for the visualizaion of the recognized
     bundles in the subject's brain""",
-    "indiv_bundles_figures": """list of filenames for visualizaions
-    by individual bundles""",
-    "tract_profile_plots": """list of filenames, where files contain plots
-    of the tract profiles"""}
+    "indiv_bundles_figures": """list of full paths to html or gif files
+    containing visualizaions of individual bundles""",
+    "tract_profile_plots": """list of full paths to png files,
+    where files contain plots of the tract profiles"""}
 
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
