@@ -10,9 +10,17 @@ white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
 disorders.
 
-`AFQ` is a software package focused on automated delineation of the major fiber
-tracts in individual human brains, and quantification of the tissue properties
-within the tracts.
+Tissue properties may vary systematically along each tract: different
+populations of axons enter and exit the tract, and disease can strike at local
+positions within the tract. Because of this, quantifying and understanding
+diffusion measures along each fiber tract (the tract profile) may reveal new
+insights into white matter development, function, and disease that are not
+obvious from mean measures of that tract ([Yeatman2012]_).
+
+
+`pyAFQ` is a software package focused on automated delineation of the major
+fiber tracts in individual human brains, and quantification of the tissue
+properties within the tracts. To learn more about the software please refer to the Table of Contents.
 
 .. todo::
   create and link to page that lists the `major fiber tracts` supported by
@@ -22,12 +30,6 @@ within the tracts.
   create and link to page that identifies the supported `tissue properties`
   (believe this includes both dti and dki? fa, md, cfa?, and pdd?)
 
-Tissue properties may vary systematically along each tract: different
-populations of axons enter and exit the tract, and disease can strike at local
-positions within the tract. Because of this, quantifying and understanding
-diffusion measures along each fiber tract (the tract profile) may reveal new
-insights into white matter development, function, and disease that are not
-obvious from mean measures of that tract ([Yeatman2012]_).
 
 
 Tractometry
