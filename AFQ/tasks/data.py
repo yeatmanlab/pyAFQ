@@ -42,37 +42,37 @@ outputs = {
     "pmap_file": """full path to a nifti file containing
     the anisotropic power map""",
     "dti_fa_file": """full path to a nifti file containing
-    DTI fractional anisotropy""",
+    the DTI fractional anisotropy""",
     "dti_cfa_file": """full path to a nifti file containing
-    DTI color fractional anisotropy""",
+    the DTI color fractional anisotropy""",
     "dti_pdd_file": """full path to a nifti file containing
-    DTI PDD""",
+    the DTI principal diffusion direction""",
     "dti_md_file": """full path to a nifti file containing
-    DTI mean diffusivity""",
+    the DTI mean diffusivity""",
     "dki_fa_file": """full path to a nifti file containing
-    DKI fractional anisotropy""",
+    the DKI fractional anisotropy""",
     "dki_md_file": """full path to a nifti file containing
-    DKI mean diffusivity""",
+    the DKI mean diffusivity""",
     "dki_awf_file": """full path to a nifti file containing
-    DKI axonal water fraction""",
+    the DKI axonal water fraction""",
     "dti_ga_file": """full path to a nifti file containing
-    DTI GA""",
+    the DTI geodesic anisotropy""",
     "dti_rd_file": """full path to a nifti file containing
-    DTI radial diffusivity""",
+    the DTI radial diffusivity""",
     "dti_ad_file": """full path to a nifti file containing
-    DTI axial diffusivity""",
+    the DTI axial diffusivity""",
     "dki_ga_file": """full path to a nifti file containing
-    DKI GA""",
+    the DKI geodesic anisotropy""",
     "dki_rd_file": """full path to a nifti file containing
-    DKI radial diffusivity""",
+    the DKI radial diffusivity""",
     "dki_ad_file": """full path to a nifti file containing
-    DKI axial diffusivity""",
+    the DKI axial diffusivity""",
     "dki_rk_file": """full path to a nifti file containing
-    DKI radial kurtosis""",
+    the DKI radial kurtosis""",
     "dki_ak_file": """full path to a nifti file containing
-    DKI axial kurtosis file""",
+    the DKI axial kurtosis file""",
     "dki_mk_file": """full path to a nifti file containing
-    DKI mean kurtosis file""",
+    the DKI mean kurtosis file""",
     "brain_mask_file": """full path to a nifti file containing
     the brain mask"""}
 
