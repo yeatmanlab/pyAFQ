@@ -17,9 +17,19 @@ from dipy.io.stateful_tractogram import Space
 logger = logging.getLogger('AFQ.api.mapping')
 
 
-outputs = [
-    "b0_warped_file", "template_xform_file", "rois_file", "mapping",
-    "reg_subject"]
+outputs = {
+    "b0_warped_file": """full path to a nifti file containing
+    b0 transformed to template space""",
+    "template_xform_file": """full path to a nifti file containing
+    registration template transformed to subject space""",
+    "rois_file": """dictionary of full paths to Nifti1Image files of ROIs
+    transformed to subject space""",
+    "mapping": """mapping from subject to template space.
+    The “mapping” must have transform and transform_inverse functions
+    which each accept two arguments:
+    (1) an ndarray called data and (2) **kwargs""",
+    "reg_subject": """Nifti1Image which represents this subject
+    when registering the subject to the template"""}
 
 
 @pimms.calc("b0_warped_file")

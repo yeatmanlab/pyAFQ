@@ -23,14 +23,58 @@ from AFQ.models.dti import _fit as dti_fit_model
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-outputs = [
-    "data", "gtab", "img", "b0_file", "masked_b0_file", "dti_tf",
-    "dti_params_file", "dki_tf", "dki_params_file", "csd_params_file",
-    "pmap_file", "dti_fa_file", "dti_cfa_file", "dti_pdd_file",
-    "dti_md_file", "dki_fa_file", "dki_md_file", "dki_awf_file",
-    "dti_ga_file", "dti_rd_file", "dti_ad_file",
-    "dki_ga_file", "dki_rd_file", "dki_ad_file",
-    "dki_rk_file", "dki_ak_file", "dki_mk_file", "brain_mask_file"]
+outputs = {
+    "data": """DWI data as an ndarray for selected b values.
+    If patch2self is used, it is already applied to this data""",
+    "gtab": """a DIPY GradientTable with all the gradient information""",
+    "img": """unaltered DWI data in a Nifti1Image""",
+    "b0_file": """full path to a nifti file containing the mean b0""",
+    "masked_b0_file": """full path to a nifti file containing the
+    mean b0 after applying the brain mask""",
+    "dti_tf": """DTI TensorFit object""",
+    "dti_params_file": """full path to a nifti file containing parameters
+    for the DTI fit""",
+    "dki_tf": """DKI DiffusionKurtosisFit object""",
+    "dki_params_file": """full path to a nifti file containing
+    parameters for the DKI fit""",
+    "csd_params_file": """full path to a nifti file containing
+    parameters for the CSD fit""",
+    "pmap_file": """full path to a nifti file containing
+    the anisotropic power map""",
+    "dti_fa_file": """full path to a nifti file containing
+    the DTI fractional anisotropy""",
+    "dti_cfa_file": """full path to a nifti file containing
+    the DTI color fractional anisotropy""",
+    "dti_pdd_file": """full path to a nifti file containing
+    the DTI principal diffusion direction""",
+    "dti_md_file": """full path to a nifti file containing
+    the DTI mean diffusivity""",
+    "dki_fa_file": """full path to a nifti file containing
+    the DKI fractional anisotropy""",
+    "dki_md_file": """full path to a nifti file containing
+    the DKI mean diffusivity""",
+    "dki_awf_file": """full path to a nifti file containing
+    the DKI axonal water fraction""",
+    "dti_ga_file": """full path to a nifti file containing
+    the DTI geodesic anisotropy""",
+    "dti_rd_file": """full path to a nifti file containing
+    the DTI radial diffusivity""",
+    "dti_ad_file": """full path to a nifti file containing
+    the DTI axial diffusivity""",
+    "dki_ga_file": """full path to a nifti file containing
+    the DKI geodesic anisotropy""",
+    "dki_rd_file": """full path to a nifti file containing
+    the DKI radial diffusivity""",
+    "dki_ad_file": """full path to a nifti file containing
+    the DKI axial diffusivity""",
+    "dki_rk_file": """full path to a nifti file containing
+    the DKI radial kurtosis""",
+    "dki_ak_file": """full path to a nifti file containing
+    the DKI axial kurtosis file""",
+    "dki_mk_file": """full path to a nifti file containing
+    the DKI mean kurtosis file""",
+    "brain_mask_file": """full path to a nifti file containing
+    the brain mask"""}
 
 
 @pimms.calc("data", "gtab", "img")
