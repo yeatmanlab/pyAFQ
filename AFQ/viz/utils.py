@@ -124,7 +124,7 @@ def viz_import_msg_error(module):
     """Alerts user to install the appropriate viz module """
     msg = f"To use {module.upper()} visualizations in pyAFQ, you will need "
     msg += f"to have {module.upper()} installed. "
-    msg += f"You can do that by installing pyAFQ with "
+    msg += "You can do that by installing pyAFQ with "
     msg += f"`pip install AFQ[{module.lower()}]`, or by "
     msg += f"separately installing {module.upper()}: "
     msg += f"`pip install {module.lower()}`."
@@ -604,7 +604,7 @@ class BrainAxes():
             sns.lineplot(
                 x=x, y=y,
                 data=data,
-                ci=None, estimator=None, units='subjectID',
+                ci=None, estimator=None,
                 legend=False, ax=ax, alpha=alpha - 0.2,
                 style=[True] * len(data.index), **lineplot_kwargs)
 
@@ -990,16 +990,16 @@ class GroupCSVComparison():
                 raters="raters",
                 ratings="ratings")
             row = stats[stats["Type"] == self.ICC_func].iloc[0]
-            return row["ICC"], row["ICC"]-row["CI95%"][0],\
-                row["CI95%"][1]-row["ICC"]
+            return row["ICC"], row["ICC"] - row["CI95%"][0],\
+                row["CI95%"][1] - row["ICC"]
         elif corrtype == "Srho":
             stats = corr(
                 x=arr[0],
                 y=arr[1],
                 method="spearman")
             row = stats.iloc[0]
-            return row["r"], row["r"]-row["CI95%"][0],\
-                row["CI95%"][1]-row["r"]
+            return row["r"], row["r"] - row["CI95%"][0],\
+                row["CI95%"][1] - row["r"]
         else:
             raise ValueError("corrtype not recognized")
 
@@ -1077,11 +1077,13 @@ class GroupCSVComparison():
                 if i == 0:
                     plot_kwargs = {
                         "hue": "tractID",
+                        "units": 'subjectID',
                         "palette": [self.color_dict[bundle]]}
                 else:
                     plot_kwargs = {
                         "dashes": [(2**(i - 1), 2**(i - 1))],
                         "hue": "tractID",
+                        "units": 'subjectID',
                         "palette": [self.color_dict[bundle]]}
                 profile = self.profile_dict[name]
                 profile = profile[profile['tractID'] == bundle]
@@ -1204,7 +1206,9 @@ class GroupCSVComparison():
                 [bundle], names, scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "ACI", ylim,
-                n_boot, 1.0, {"color": self.color_dict[bundle]},
+                n_boot, 1.0, {
+                    "color": self.color_dict[bundle],
+                    "units": 'subjectID'},
                 plot_subject_lines=plot_subject_lines,
                 ax=axes_dict.get(bundle))
             ci_all_df[bundle] = ci_df
@@ -1282,7 +1286,9 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "ACI", ylim,
-                n_boot, 1.0, {"color": self.color_dict[bundle]},
+                n_boot, 1.0, {
+                    "color": self.color_dict[bundle],
+                    "units": 'subjectID'},
                 plot_subject_lines=plot_subject_lines)
             ba.save_temp_fig(
                 f"contrast_plots/{scalar}/",
@@ -1422,7 +1428,7 @@ class GroupCSVComparison():
                 all_sub_means[m, k] = np.nanmean(bundle_profiles, axis=2)
                 all_sub_coef[m, k], all_sub_coef_err[m, k, 0],\
                     all_sub_coef_err[m, k, 1] =\
-                        self.masked_corr(all_sub_means[m, k], "Srho")
+                    self.masked_corr(all_sub_means[m, k], "Srho")
                 if np.isnan(all_sub_coef[m, k]).all():
                     self.logger.error((
                         f"Not enough non-nan profiles"
@@ -1607,7 +1613,7 @@ class GroupCSVComparison():
                         marker=self.scalar_markers[0],
                         linewidth=0,
                         markersize=15)]
-                leg = ba.fig.legend(
+                ba.fig.legend(
                     legend_labels,
                     display_string(scalars),
                     loc='center',

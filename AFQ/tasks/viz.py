@@ -4,6 +4,7 @@ import numpy as np
 import os
 import os.path as op
 from time import time
+import pandas as pd
 
 import pimms
 
@@ -54,6 +55,7 @@ def viz_bundles(subses_dict,
                 n_points=40):
     mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
+    profiles_file = segmentation_imap["profiles_file"]
     volume = data_imap["b0_file"]
     color_by_volume = data_imap[best_scalar + "_file"]
     start_time = time()
@@ -72,16 +74,27 @@ def viz_bundles(subses_dict,
         interact=False,
         inline=False)
 
-    figure = viz_backend.visualize_bundles(
+    figure, shaded_profiles_figure = viz_backend.visualize_bundles(
         segmentation_imap["clean_bundles_file"],
         color_by_volume=color_by_volume,
         cbv_lims=cbv_lims,
         bundle_dict=bundle_dict,
+        include_profiles=(pd.read_csv(profiles_file), best_scalar),
         n_points=n_points,
         flip_axes=flip_axes,
         interact=False,
         inline=False,
         figure=figure)
+
+    shaded_profiles_fname = get_fname(
+        subses_dict, '_shaded_profiles.svg',
+        tracking_params=tracking_params,
+        segmentation_params=segmentation_params)
+
+    shaded_profiles_figure.savefig(
+        shaded_profiles_fname,
+        format='svg',
+        dpi=300)
 
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(

@@ -1,12 +1,8 @@
 import tempfile
-import os
-import os.path as op
 import enum
 import logging
 
 import numpy as np
-
-import dipy.tracking.streamlinespeed as dps
 
 import AFQ.viz.utils as vut
 
@@ -16,6 +12,9 @@ try:
     import plotly.io as pio
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
+
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.pyplot as plt
 
 scope = pio.kaleido.scope
 viz_logger = logging.getLogger("AFQ.viz")
@@ -56,7 +55,7 @@ def _color_arr2str(color_arr, opacity=1.0):
 
 def set_layout(figure, color=None):
     if color is None:
-        color = f"rgba(0,0,0,0)"
+        color = "rgba(0,0,0,0)"
 
     figure.update_layout(
         plot_bgcolor=color,
@@ -158,11 +157,30 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             hoverinfo='all'
         )
     )
+    return line_color.min(axis=0), line_color.max(axis=0)
+
+
+def _plot_profiles(profiles, bundle_name, c_min, c_max, ba, scalar):
+    for i in range(3):
+        if c_max[i] > 1.0:
+            c_max[i] = 1.0
+        if c_min[i] < 0.0:
+            c_min[i] = 0.0
+    cm = LinearSegmentedColormap.from_list(
+        bundle_name, [c_min, c_max], N=100)
+    profiles = profiles[profiles.tractID == bundle_name]
+
+    ba.plot_line(
+        bundle_name, "nodeID", scalar, profiles,
+        vut.display_string(scalar), 1.0, 100,
+        0.6, {"palette": cm},
+        plot_subject_lines=True)
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], flip_axes=[False, False, False],
+                      cbv_lims=[None, None], include_profiles=(None, None),
+                      flip_axes=[False, False, False],
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
     """
@@ -214,6 +232,16 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         color_by_volume.
         Default: [None, None]
 
+    include_profiles : Tuple of Pandas Dataframe and string
+        The first element of the uple is a
+        Pandas Dataframe containing profiles in the standard pyAFQ
+        output format for the bundle(s) being displayed. It will be used
+        to generate a graph of the tract profiles for each bundle,
+        with colors corresponding to the colors on the bundles. The string
+        is the scalar to use from the profile. If these are None,
+        no tract profiles will be graphed.
+        Defualt: (None, None)
+
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
         visualize.
@@ -247,11 +275,14 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     if figure is None:
         figure = go.Figure()
 
+    if include_profiles[0] is not None:
+        ba = vut.BrainAxes()
+
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
             sft, affine, bundle, bundle_dict, colors, n_points):
-        _draw_streamlines(
+        c_min, c_max = _draw_streamlines(
             figure,
             sls,
             dimensions,
@@ -260,9 +291,19 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             cbv=color_by_volume,
             cbv_lims=cbv_lims,
             flip_axes=flip_axes)
+        if include_profiles[0] is not None:
+            _plot_profiles(
+                include_profiles[0], name, c_min, c_max,
+                ba, include_profiles[1])
 
     figure.update_layout(legend=dict(itemsizing="constant"))
-    return _inline_interact(figure, interact, inline)
+    figure = _inline_interact(figure, interact, inline)
+    if include_profiles[0] is None:
+        return figure
+    else:
+        ba.format()
+        plt.close(ba.temp_fig)
+        return figure, ba.fig
 
 
 def create_gif(figure,
@@ -326,7 +367,7 @@ def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes):
             z=pts[2],
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
-            line=dict(color=f"rgba(0,0,0,0)")
+            line=dict(color="rgba(0,0,0,0)")
         )
     )
 
