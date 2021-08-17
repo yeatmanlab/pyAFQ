@@ -15,6 +15,8 @@ import AFQ.utils.volume as auv
 import AFQ.data as afd
 from AFQ.viz.utils import visualize_tract_profiles
 
+from plotly.subplots import make_subplots
+
 logger = logging.getLogger('AFQ.api.viz')
 
 
@@ -67,14 +69,19 @@ def viz_bundles(subses_dict,
     for i in range(3):
         flip_axes[i] = (dwi_affine[i, i] < 0)
 
+    figure = make_subplots(
+        rows=1, cols=2,
+        specs=[[{"type": "scene"}, {"type": "xy"}]])
+
     figure = viz_backend.visualize_volume(
         volume,
         opacity=volume_opacity,
         flip_axes=flip_axes,
         interact=False,
-        inline=False)
+        inline=False,
+        figure=figure)
 
-    figure, shaded_profiles_figure = viz_backend.visualize_bundles(
+    figure = viz_backend.visualize_bundles(
         segmentation_imap["clean_bundles_file"],
         color_by_volume=color_by_volume,
         cbv_lims=cbv_lims,
@@ -85,14 +92,6 @@ def viz_bundles(subses_dict,
         interact=False,
         inline=False,
         figure=figure)
-
-    shaded_profiles_fname = get_fname(
-        subses_dict, '_shaded_profiles.html',
-        tracking_params=tracking_params,
-        segmentation_params=segmentation_params)
-
-    shaded_profiles_figure.write_html(
-        shaded_profiles_fname)
 
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(

@@ -3,7 +3,6 @@ import enum
 import logging
 
 import numpy as np
-import seaborn as sns
 
 import AFQ.viz.utils as vut
 
@@ -11,7 +10,7 @@ try:
     import plotly
     import plotly.graph_objs as go
     import plotly.io as pio
-    import plotly.express as px
+    from plotly.subplots import make_subplots
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
@@ -144,7 +143,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             x=x_pts,
             y=y_pts,
             z=z_pts,
-            name=name,
+            name=vut.display_string(name),
+            legendgroup=vut.display_string(name),
             marker=dict(
                 size=0.0001,
                 color=_color_arr2str(color)
@@ -155,7 +155,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             ),
             hovertext=customdata,
             hoverinfo='all'
-        )
+        ),
+        row=1, col=1
     )
     return color_constant
 
@@ -170,37 +171,15 @@ def _plot_profiles(profiles, bundle_name, color_constant, fig, scalar):
             x=profiles["nodeID"],
             y=profiles[scalar],
             name=vut.display_string(bundle_name),
+            legendgroup=vut.display_string(bundle_name),
             marker=dict(
                 size=10,
                 opacity=0.8,
                 symbol="triangle-up",
                 line=dict(width=1, color="black"),
                 color=line_color),
-            mode="markers"))
-
-    # cm = LinearSegmentedColormap.from_list(
-    #     bundle_name, [c_min, c_max], N=100)
-    # cm_s = ScalarMappable(
-    #     norm=Normalize(vmin=scalar_min, vmax=scalar_max), cmap=cm)
-    # register_cmap(bundle_name, cm)
-    # cpal = sns.color_palette(bundle_name, n_colors=100, desat=0.0)
-
-    # ax = ba.get_axis(bundle_name)
-    # sns.set(style="whitegrid", rc={"lines.linewidth": 10})
-    # sns.lineplot(
-    #     x="nodeID", y=scalar,
-    #     hue=scalar,
-    #     data=profiles,
-    #     ci=None, estimator=None,
-    #      legend=False, ax=ax, palette=cpal)
-    # ax.set_title(
-    #     vut.display_string(bundle_name),
-    #     fontsize=vut.large_font)
-    # ax.set_ylabel(
-    #     vut.display_string(scalar),
-    #     fontsize=vut.medium_font)
-    # ax.set_ylim([0.0, 1.0])
-    # ba.fig.colorbar(cm_s, ax=ax)
+            mode="markers"),
+        row=1, col=2)
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
@@ -299,10 +278,14 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         color_by_volume = vut.load_volume(color_by_volume)
 
     if figure is None:
-        figure = go.Figure()
-
-    if include_profiles[0] is not None:
-        prof_fig = go.Figure()
+        if include_profiles[0] is None:
+            figure = make_subplots(
+                row=1, col=1,
+                specs=[[{"type": "scene"}]])
+        else:
+            figure = make_subplots(
+                rows=1, cols=2,
+                specs=[[{"type": "scene"}, {"type": "xy"}]])
 
     set_layout(figure, color=_color_arr2str(background))
 
@@ -320,14 +303,10 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         if include_profiles[0] is not None:
             _plot_profiles(
                 include_profiles[0], name, color_constant,
-                prof_fig, include_profiles[1])
+                figure, include_profiles[1])
 
     figure.update_layout(legend=dict(itemsizing="constant"))
-    figure = _inline_interact(figure, interact, inline)
-    if include_profiles[0] is None:
-        return figure
-    else:
-        return figure, prof_fig
+    return _inline_interact(figure, interact, inline)
 
 
 def create_gif(figure,
@@ -392,7 +371,8 @@ def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes):
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
             line=dict(color="rgba(0,0,0,0)")
-        )
+        ),
+        row=1, col=1
     )
 
 
@@ -465,7 +445,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                           roi_affine, static_affine, reg_template)
 
     if figure is None:
-        figure = go.Figure()
+        figure = make_subplots(
+            row=1, col=1,
+            specs=[[{"type": "scene"}]])
 
     set_layout(figure)
 
@@ -519,7 +501,8 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             visible=visible,
             name=_name_from_enum(axis),
             hoverinfo='skip'
-        )
+        ),
+        row=1, col=1
     )
 
 
@@ -637,7 +620,9 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
             volume = np.flip(volume, axis=i)
 
     if figure is None:
-        figure = go.Figure()
+        figure = make_subplots(
+            row=1, col=1,
+            specs=[[{"type": "scene"}]])
 
     set_layout(figure)
     sliders = []
