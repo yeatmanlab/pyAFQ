@@ -87,14 +87,12 @@ def viz_bundles(subses_dict,
         figure=figure)
 
     shaded_profiles_fname = get_fname(
-        subses_dict, '_shaded_profiles.svg',
+        subses_dict, '_shaded_profiles.html',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
 
-    shaded_profiles_figure.savefig(
-        shaded_profiles_fname,
-        format='svg',
-        dpi=300)
+    shaded_profiles_figure.write_html(
+        shaded_profiles_fname)
 
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(

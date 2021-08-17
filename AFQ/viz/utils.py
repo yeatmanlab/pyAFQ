@@ -604,7 +604,7 @@ class BrainAxes():
             sns.lineplot(
                 x=x, y=y,
                 data=data,
-                ci=None, estimator=None,
+                ci=None, estimator=None, units='subjectID',
                 legend=False, ax=ax, alpha=alpha - 0.2,
                 style=[True] * len(data.index), **lineplot_kwargs)
 
@@ -1077,13 +1077,11 @@ class GroupCSVComparison():
                 if i == 0:
                     plot_kwargs = {
                         "hue": "tractID",
-                        "units": 'subjectID',
                         "palette": [self.color_dict[bundle]]}
                 else:
                     plot_kwargs = {
                         "dashes": [(2**(i - 1), 2**(i - 1))],
                         "hue": "tractID",
-                        "units": 'subjectID',
                         "palette": [self.color_dict[bundle]]}
                 profile = self.profile_dict[name]
                 profile = profile[profile['tractID'] == bundle]
@@ -1206,9 +1204,7 @@ class GroupCSVComparison():
                 [bundle], names, scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "ACI", ylim,
-                n_boot, 1.0, {
-                    "color": self.color_dict[bundle],
-                    "units": 'subjectID'},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines,
                 ax=axes_dict.get(bundle))
             ci_all_df[bundle] = ci_df
@@ -1286,9 +1282,7 @@ class GroupCSVComparison():
                 [bundle, other_bundle], [name], scalar)
             ba.plot_line(
                 bundle, "nodeID", "diff", ci_df, "ACI", ylim,
-                n_boot, 1.0, {
-                    "color": self.color_dict[bundle],
-                    "units": 'subjectID'},
+                n_boot, 1.0, {"color": self.color_dict[bundle]},
                 plot_subject_lines=plot_subject_lines)
             ba.save_temp_fig(
                 f"contrast_plots/{scalar}/",

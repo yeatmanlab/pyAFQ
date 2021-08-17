@@ -3,6 +3,7 @@ import enum
 import logging
 
 import numpy as np
+import seaborn as sns
 
 import AFQ.viz.utils as vut
 
@@ -10,11 +11,10 @@ try:
     import plotly
     import plotly.graph_objs as go
     import plotly.io as pio
+    import plotly.express as px
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
-from matplotlib.colors import LinearSegmentedColormap
-import matplotlib.pyplot as plt
 
 scope = pio.kaleido.scope
 viz_logger = logging.getLogger("AFQ.viz")
@@ -157,24 +157,50 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             hoverinfo='all'
         )
     )
-    return line_color.min(axis=0), line_color.max(axis=0)
+    return color_constant
 
 
-def _plot_profiles(profiles, bundle_name, c_min, c_max, ba, scalar):
-    for i in range(3):
-        if c_max[i] > 1.0:
-            c_max[i] = 1.0
-        if c_min[i] < 0.0:
-            c_min[i] = 0.0
-    cm = LinearSegmentedColormap.from_list(
-        bundle_name, [c_min, c_max], N=100)
+def _plot_profiles(profiles, bundle_name, color_constant, fig, scalar):
     profiles = profiles[profiles.tractID == bundle_name]
+    line_color = []
+    for scalar_val in profiles[scalar].to_numpy():
+        line_color.append(_color_arr2str(scalar_val * color_constant))
+    fig.add_trace(
+        go.Scatter(
+            x=profiles["nodeID"],
+            y=profiles[scalar],
+            name=vut.display_string(bundle_name),
+            marker=dict(
+                size=10,
+                opacity=0.8,
+                symbol="triangle-up",
+                line=dict(width=1, color="black"),
+                color=line_color),
+            mode="markers"))
 
-    ba.plot_line(
-        bundle_name, "nodeID", scalar, profiles,
-        vut.display_string(scalar), 1.0, 100,
-        0.6, {"palette": cm},
-        plot_subject_lines=True)
+    # cm = LinearSegmentedColormap.from_list(
+    #     bundle_name, [c_min, c_max], N=100)
+    # cm_s = ScalarMappable(
+    #     norm=Normalize(vmin=scalar_min, vmax=scalar_max), cmap=cm)
+    # register_cmap(bundle_name, cm)
+    # cpal = sns.color_palette(bundle_name, n_colors=100, desat=0.0)
+
+    # ax = ba.get_axis(bundle_name)
+    # sns.set(style="whitegrid", rc={"lines.linewidth": 10})
+    # sns.lineplot(
+    #     x="nodeID", y=scalar,
+    #     hue=scalar,
+    #     data=profiles,
+    #     ci=None, estimator=None,
+    #      legend=False, ax=ax, palette=cpal)
+    # ax.set_title(
+    #     vut.display_string(bundle_name),
+    #     fontsize=vut.large_font)
+    # ax.set_ylabel(
+    #     vut.display_string(scalar),
+    #     fontsize=vut.medium_font)
+    # ax.set_ylim([0.0, 1.0])
+    # ba.fig.colorbar(cm_s, ax=ax)
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
@@ -276,13 +302,13 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         figure = go.Figure()
 
     if include_profiles[0] is not None:
-        ba = vut.BrainAxes()
+        prof_fig = go.Figure()
 
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
             sft, affine, bundle, bundle_dict, colors, n_points):
-        c_min, c_max = _draw_streamlines(
+        color_constant = _draw_streamlines(
             figure,
             sls,
             dimensions,
@@ -293,17 +319,15 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             flip_axes=flip_axes)
         if include_profiles[0] is not None:
             _plot_profiles(
-                include_profiles[0], name, c_min, c_max,
-                ba, include_profiles[1])
+                include_profiles[0], name, color_constant,
+                prof_fig, include_profiles[1])
 
     figure.update_layout(legend=dict(itemsizing="constant"))
     figure = _inline_interact(figure, interact, inline)
     if include_profiles[0] is None:
         return figure
     else:
-        ba.format()
-        plt.close(ba.temp_fig)
-        return figure, ba.fig
+        return figure, prof_fig
 
 
 def create_gif(figure,
