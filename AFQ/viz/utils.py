@@ -459,6 +459,7 @@ class Viz:
             self.visualize_roi = AFQ.viz.plotly_backend.visualize_roi
             self.visualize_volume = AFQ.viz.plotly_backend.visualize_volume
             self.create_gif = AFQ.viz.plotly_backend.create_gif
+            self.single_bundle_viz = AFQ.viz.plotly_backend.single_bundle_viz
         else:
             raise TypeError("Visualization backend contain"
                             + " either 'plotly' or 'fury'. "

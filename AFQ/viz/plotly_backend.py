@@ -3,8 +3,14 @@ import enum
 import logging
 
 import numpy as np
+import pandas as pd
 
 import AFQ.viz.utils as vut
+
+from dipy.tracking.streamline import set_number_of_points
+
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 
 try:
     import plotly
@@ -161,24 +167,34 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
     return color_constant
 
 
-def _plot_profiles(profiles, bundle_name, color_constant, fig, scalar):
-    profiles = profiles[profiles.tractID == bundle_name]
-    line_color = []
-    for scalar_val in profiles[scalar].to_numpy():
-        line_color.append(_color_arr2str(scalar_val * color_constant))
+def _plot_profiles(profiles, bundle_name, color, fig, scalar):
+    if isinstance(profiles, pd.DataFrame):
+        profiles = profiles[profiles.tractID == bundle_name]
+        x = profiles["nodeID"]
+        y = profiles[scalar]
+        line_color = []
+        for scalar_val in profiles[scalar].to_numpy():
+            line_color.append(_color_arr2str(scalar_val * color))
+    else:
+        x = np.arange(len(profiles))
+        y = profiles
+        line_color = []
+        for indiv_color in color:
+            line_color.append(_color_arr2str(indiv_color))
+
     fig.add_trace(
         go.Scatter(
-            x=profiles["nodeID"],
-            y=profiles[scalar],
+            x=x,
+            y=y,
             name=vut.display_string(bundle_name),
-            legendgroup=vut.display_string(bundle_name),
             marker=dict(
                 size=10,
                 opacity=0.8,
                 symbol="triangle-up",
                 line=dict(width=1, color="black"),
                 color=line_color),
-            mode="markers"),
+            mode="markers",
+            legendgroup=vut.display_string(bundle_name)),
         row=1, col=2)
 
 
@@ -280,7 +296,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     if figure is None:
         if include_profiles[0] is None:
             figure = make_subplots(
-                row=1, col=1,
+                rows=1, cols=1,
                 specs=[[{"type": "scene"}]])
         else:
             figure = make_subplots(
@@ -446,7 +462,7 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
 
     if figure is None:
         figure = make_subplots(
-            row=1, col=1,
+            rows=1, cols=1,
             specs=[[{"type": "scene"}]])
 
     set_layout(figure)
@@ -622,7 +638,7 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
 
     if figure is None:
         figure = make_subplots(
-            row=1, col=1,
+            rows=1, cols=1,
             specs=[[{"type": "scene"}]])
 
     set_layout(figure)
@@ -660,3 +676,133 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         figure.update_layout(sliders=tuple(sliders))
 
     return _inline_interact(figure, interact, inline)
+
+
+def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
+               dimensions, flip_axes):
+    fgarray = np.asarray(set_number_of_points(sls, n_points))
+    fgarray = np.median(fgarray, axis=0)
+    colormap = cm.nipy_spectral
+    normalize = mcolors.Normalize(
+        vmin=np.min(indiv_profile),
+        vmax=np.max(indiv_profile))
+    s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+    line_color = s_map.to_rgba(indiv_profile)
+    text = [None] * n_points
+    text[0] = 0
+    text[n_points // 2] = n_points // 2
+    text[-1] = n_points
+
+    if flip_axes[0]:
+        fgarray[:, 0] = dimensions[0] - fgarray[:, 0]
+    if flip_axes[1]:
+        fgarray[:, 1] = dimensions[1] - fgarray[:, 1]
+    if flip_axes[2]:
+        fgarray[:, 2] = dimensions[2] - fgarray[:, 2]
+
+    figure.add_trace(
+        go.Scatter3d(
+            x=fgarray[:, 0],
+            y=fgarray[:, 1],
+            z=fgarray[:, 2],
+            name=vut.display_string(bundle_name + "_core"),
+            marker=dict(
+                size=0.0001,
+                color=_color_arr2str([0, 0.8, 0])
+            ),  # this is necessary to add color to legend
+            line=dict(
+                width=25,
+                color=line_color,
+            ),
+            hovertext=indiv_profile,
+            hoverinfo='all',
+            text=text,
+            mode="lines+text"
+        ),
+        row=1, col=1
+    )
+    return line_color
+
+
+def single_bundle_viz(indiv_profile, sft,
+                      bundle, scalar_name,
+                      affine=None,
+                      bundle_dict=None,
+                      flip_axes=[False, False, False],
+                      figure=None,
+                      include_profile=False):
+    """
+    Visualize a single bundle in 3D with core bundle and associated profile
+
+    Parameters
+    ----------
+    indiv_profile : ndarray
+        A numpy array containing a tract profile for this bundle for a scalar.
+
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information.
+        If bundle is an int, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'.
+        Otherwise, the entire Stateful Tractogram will be used as the bundle
+        for the visualization.
+
+    bundle : str or int
+        The name of the bundle to be used as the label for the plot,
+        or an integer for selection from the sft metadata.
+
+    scalar_name : str
+        The name of the scalar being used.
+
+    affine : ndarray, optional
+       An affine transformation to apply to the streamlines before
+       visualization. Default: no transform.
+
+    bundle_dict : dict, optional
+        This parameter is used if bundle is an int.
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the sft
+        metadata. Default: Either the entire sft is treated as a bundle,
+        or identified only as unique integers in the metadata.
+
+    flip_axes : ndarray
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
+        For example, if the input image is LAS, use [True, False, False].
+        Default: [False, False, False]
+
+    figure : Plotly Figure object, optional
+        If provided, the visualization will be added to this Figure. Default:
+        Initialize a new Figure.
+
+    include_profile : bool, optional
+        If true, also plot the tract profile. Default: False
+
+    Returns
+    -------
+    Plotly Figure object
+    """
+    if figure is None:
+        if include_profile:
+            figure = make_subplots(
+                rows=1, cols=2,
+                specs=[[{"type": "scene"}, {"type": "xy"}]])
+        else:
+            figure = make_subplots(
+                rows=1, cols=1,
+                specs=[[{"type": "scene"}]])
+
+    n_points = len(indiv_profile)
+    sls, _, bundle_name, dimensions = next(vut.tract_generator(
+            sft, affine, bundle, bundle_dict, None, n_points))
+
+    line_color = _draw_core(
+        sls, n_points, figure, bundle_name, indiv_profile,
+        dimensions, flip_axes)
+
+    if include_profile:
+        _plot_profiles(
+            indiv_profile, bundle_name + "_profile",
+            line_color, figure, scalar_name)
+
+    return figure

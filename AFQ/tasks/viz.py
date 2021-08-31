@@ -137,6 +137,7 @@ def viz_indivBundle(subses_dict,
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
     color_by_volume = data_imap[best_scalar + "_file"]
+    profiles = pd.read_csv(segmentation_imap["profiles_file"])
 
     start_time = time()
     volume = _viz_prepare_vol(
@@ -259,6 +260,30 @@ def viz_indivBundle(subses_dict,
             fname = op.join(roi_dir, fname[1])
             figure.write_html(fname)
             fnames.append(fname)
+
+            # also do the core visualizations when using the plotly backend
+            core_dir = op.join(subses_dict['results_dir'], 'viz_core_bundles')
+            os.makedirs(core_dir, exist_ok=True)
+            indiv_profile = profiles[
+                profiles.tractID == bundle_name][best_scalar].to_numpy()
+            if len(indiv_profile) > 1:
+                fname = op.split(
+                    get_fname(
+                        subses_dict,
+                        f'_{bundle_name}'
+                        f'_viz.html',
+                        tracking_params=tracking_params,
+                        segmentation_params=segmentation_params))
+                fname = op.join(core_dir, fname[1])
+                viz_backend.single_bundle_viz(
+                    indiv_profile,
+                    segmentation_imap["clean_bundles_file"],
+                    uid,
+                    best_scalar,
+                    affine=None,
+                    bundle_dict=bundle_dict,
+                    flip_axes=flip_axes,
+                    include_profile=True).write_html(fname)
     meta_fname = get_fname(
         subses_dict, '_vizIndiv.json',
         tracking_params=tracking_params,
