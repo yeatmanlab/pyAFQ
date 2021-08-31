@@ -500,7 +500,8 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             opacity=opacity,
             visible=visible,
             name=_name_from_enum(axis),
-            hoverinfo='skip'
+            hoverinfo='skip',
+            showlegend=True
         ),
         row=1, col=1
     )
