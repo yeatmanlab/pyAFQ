@@ -71,7 +71,7 @@ def viz_bundles(subses_dict,
 
     figure = make_subplots(
         rows=1, cols=2,
-        specs=[[{"type": "scene"}, {"type": "xy"}]])
+        specs=[[{"type": "scene"}, {"type": "scene"}]])
 
     figure = viz_backend.visualize_volume(
         volume,
@@ -275,7 +275,29 @@ def viz_indivBundle(subses_dict,
                         tracking_params=tracking_params,
                         segmentation_params=segmentation_params))
                 fname = op.join(core_dir, fname[1])
-                viz_backend.single_bundle_viz(
+                core_fig = make_subplots(
+                    rows=1, cols=2,
+                    specs=[[{"type": "scene"}, {"type": "scene"}]])
+                core_fig = viz_backend.visualize_volume(
+                    volume,
+                    opacity=volume_opacity_indiv,
+                    flip_axes=flip_axes,
+                    figure=core_fig,
+                    interact=False,
+                    inline=False)
+                core_fig = viz_backend.visualize_bundles(
+                    segmentation_imap["clean_bundles_file"],
+                    color_by_volume=color_by_volume,
+                    cbv_lims=cbv_lims_indiv,
+                    bundle_dict=bundle_dict,
+                    bundle=uid,
+                    colors={bundle_name: [0.5, 0.5, 0.5]},
+                    n_points=n_points_indiv,
+                    flip_axes=flip_axes,
+                    interact=False,
+                    inline=False,
+                    figure=core_fig)
+                core_fig = viz_backend.single_bundle_viz(
                     indiv_profile,
                     segmentation_imap["clean_bundles_file"],
                     uid,
@@ -283,7 +305,9 @@ def viz_indivBundle(subses_dict,
                     affine=None,
                     bundle_dict=bundle_dict,
                     flip_axes=flip_axes,
-                    include_profile=True).write_html(fname)
+                    figure=core_fig,
+                    include_profile=True)
+                core_fig.write_html(fname)
     meta_fname = get_fname(
         subses_dict, '_vizIndiv.json',
         tracking_params=tracking_params,

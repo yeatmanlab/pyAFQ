@@ -11,12 +11,14 @@ from dipy.tracking.streamline import set_number_of_points
 
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 
 try:
     import plotly
     import plotly.graph_objs as go
     import plotly.io as pio
     from plotly.subplots import make_subplots
+    from plotly.tools import mpl_to_plotly
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
@@ -64,13 +66,14 @@ def set_layout(figure, color=None):
 
     figure.update_layout(
         plot_bgcolor=color,
-        scene=dict(
+        scene1=dict(
             xaxis=dict(
                 showbackground=False, showticklabels=False, title=''),
             yaxis=dict(
                 showbackground=False, showticklabels=False, title=''),
             zaxis=dict(
-                showbackground=False, showticklabels=False, title='')
+                showbackground=False, showticklabels=False, title=''),
+            aspectmode='data'
         )
     )
 
@@ -183,19 +186,30 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
             line_color.append(_color_arr2str(indiv_color))
 
     fig.add_trace(
-        go.Scatter(
+        go.Scatter3d(
             x=x,
             y=y,
+            z=np.zeros(len(y)),
             name=vut.display_string(bundle_name),
-            marker=dict(
-                size=10,
-                opacity=0.8,
-                symbol="triangle-up",
-                line=dict(width=1, color="black"),
-                color=line_color),
-            mode="markers",
+            line=dict(color=line_color, width=15),
+            mode="lines",
             legendgroup=vut.display_string(bundle_name)),
         row=1, col=2)
+
+    font = dict(size=20, family="Overpass")
+    fixed_camera_for_2d = dict(
+        projection=dict(type="orthographic"),
+        up=dict(x=0, y=1, z=0),
+        eye=dict(x=0, y=0, z=1),
+        center=dict(x=0, y=0, z=0))
+    fig.update_layout(
+        margin={"t": 15, "b": 0, "l": 0, "r": 0},
+        scene2=dict(
+            camera=fixed_camera_for_2d,
+            zaxis=dict(visible=False),
+            dragmode=False,
+            xaxis_title=dict(text="Location", font=font),
+            yaxis_title=dict(text=vut.display_string(scalar), font=font)))
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
@@ -301,7 +315,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         else:
             figure = make_subplots(
                 rows=1, cols=2,
-                specs=[[{"type": "scene"}, {"type": "xy"}]])
+                specs=[[{"type": "scene"}, {"type": "scene"}]])
 
     set_layout(figure, color=_color_arr2str(background))
 
@@ -688,9 +702,18 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
         vmax=np.max(indiv_profile))
     s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
     line_color = s_map.to_rgba(indiv_profile)
+    line_color_untouched = line_color.copy()
+    for i in range(n_points):
+        if i < n_points - 1:
+            direc = fgarray[i + 1] - fgarray[i]
+            direc = direc / np.linalg.norm(direc)
+            light_direc = -fgarray[i] / np.linalg.norm(fgarray[i])
+            direc_adjust = np.dot(direc, light_direc)
+            direc_adjust = (direc_adjust + 3) / 4
+        line_color[i, 0:3] = line_color[i, 0:3] * direc_adjust
     text = [None] * n_points
     text[0] = 0
-    text[n_points // 2] = n_points // 2
+    # text[n_points // 2] = n_points // 2 # too much clutter
     text[-1] = n_points
 
     if flip_axes[0]:
@@ -706,10 +729,6 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
             y=fgarray[:, 1],
             z=fgarray[:, 2],
             name=vut.display_string(bundle_name + "_core"),
-            marker=dict(
-                size=0.0001,
-                color=_color_arr2str([0, 0.8, 0])
-            ),  # this is necessary to add color to legend
             line=dict(
                 width=25,
                 color=line_color,
@@ -717,11 +736,14 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
             hovertext=indiv_profile,
             hoverinfo='all',
             text=text,
+            textfont=dict(size=20, family="Overpass"),
+            textposition="top right",
             mode="lines+text"
         ),
         row=1, col=1
     )
-    return line_color
+
+    return line_color_untouched
 
 
 def single_bundle_viz(indiv_profile, sft,
@@ -786,11 +808,13 @@ def single_bundle_viz(indiv_profile, sft,
         if include_profile:
             figure = make_subplots(
                 rows=1, cols=2,
-                specs=[[{"type": "scene"}, {"type": "xy"}]])
+                specs=[[{"type": "scene"}, {"type": "scene"}]])
         else:
             figure = make_subplots(
                 rows=1, cols=1,
                 specs=[[{"type": "scene"}]])
+
+    set_layout(figure)
 
     n_points = len(indiv_profile)
     sls, _, bundle_name, dimensions = next(vut.tract_generator(
