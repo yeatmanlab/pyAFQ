@@ -18,7 +18,6 @@ try:
     import plotly.graph_objs as go
     import plotly.io as pio
     from plotly.subplots import make_subplots
-    from plotly.tools import mpl_to_plotly
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
@@ -79,7 +78,8 @@ def set_layout(figure, color=None):
 
 
 def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=[None, None], flip_axes=[False, False, False]):
+                      cbv_lims=[None, None], flip_axes=[False, False, False],
+                      opacity=1.0):
     color = np.asarray(color)
 
     if len(sls._offsets) > 1:
@@ -163,7 +163,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
                 color=line_color,
             ),
             hovertext=customdata,
-            hoverinfo='all'
+            hoverinfo='all',
+            opacity=opacity
         ),
         row=1, col=1
     )
@@ -215,7 +216,7 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, color_by_volume=None,
                       cbv_lims=[None, None], include_profiles=(None, None),
-                      flip_axes=[False, False, False],
+                      flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
     """
@@ -283,6 +284,10 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
 
+    opacity : float
+        Float between 0 and 1 defining the opacity of the bundle.
+        Default: 1.0
+
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
         background.
@@ -329,7 +334,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
             name,
             cbv=color_by_volume,
             cbv_lims=cbv_lims,
-            flip_axes=flip_axes)
+            flip_axes=flip_axes,
+            opacity=opacity)
         if include_profiles[0] is not None:
             _plot_profiles(
                 include_profiles[0], name, color_constant,
