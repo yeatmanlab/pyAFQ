@@ -497,7 +497,8 @@ class Axes(enum.IntEnum):
     Z = 2
 
 
-def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5):
+def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5,
+                colorscale="greys"):
     height = int(volume.shape[axis] * pos)
 
     v_min = volume.min()
@@ -524,7 +525,7 @@ def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5):
             y=Y.flatten(),
             z=Z.flatten(),
             value=values,
-            colorscale='greys',
+            colorscale=colorscale,
             surface_count=1,
             showscale=False,
             opacity=opacity,
@@ -547,6 +548,7 @@ def _name_from_enum(axis):
 
 def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
                      z_pos=0.5, interact=False, inline=False, opacity=0.3,
+                     colorscale="greys",
                      flip_axes=[False, False, False]):
     """
     Visualize a volume
@@ -565,25 +567,29 @@ def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
         Should be a decimal between 0 and 1.
         Indicatesthe fractional position along the perpendicular
         axis to the slice.
-        Default: True
+        Default: 0.5
 
     y_pos : float or None, optional
         Where to show Sagittal Slice. If None, slice is not shown.
         Should be a decimal between 0 and 1.
         Indicatesthe fractional position along the perpendicular
         axis to the slice.
-        Default: True
+        Default: 0.5
 
     z_pos : float or None, optional
         Where to show Axial Slice. If None, slice is not shown.
         Should be a decimal between 0 and 1.
         Indicatesthe fractional position along the perpendicular
         axis to the slice.
-        Default: True
+        Default: 0.5
 
     opacity : float, optional
         Opacity of slices.
         Default: 1.0
+
+    colorscale : string, optional
+        Plotly colorscale to use to color slices.
+        Default: "greys"
 
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
@@ -615,13 +621,11 @@ def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
 
     set_layout(figure)
 
-    # draw stationary slices first
-    if x_pos is not None:
-        _draw_slice(figure, Axes.X, volume, opacity=opacity, pos=x_pos)
-    if y_pos is not None:
-        _draw_slice(figure, Axes.Y, volume, opacity=opacity, pos=y_pos)
-    if z_pos is not None:
-        _draw_slice(figure, Axes.Z, volume, opacity=opacity, pos=z_pos)
+    for pos, axis in [(x_pos, Axes.X), (y_pos, Axes.Y), (z_pos, Axes.Z)]:
+        if pos is not None:
+            _draw_slice(
+                figure, axis, volume, opacity=opacity,
+                pos=pos, colorscale=colorscale)
 
     return _inline_interact(figure, interact, inline)
 
