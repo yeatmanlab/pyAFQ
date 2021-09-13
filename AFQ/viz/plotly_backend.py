@@ -498,7 +498,7 @@ class Axes(enum.IntEnum):
 
 
 def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5,
-                colorscale="greys"):
+                colorscale="greys", invert_colorscale=False):
     height = int(volume.shape[axis] * pos)
 
     v_min = volume.min()
@@ -517,7 +517,9 @@ def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5,
                            :volume.shape[1], height:height + 1]
         values = volume[:, :, height].flatten()
 
-    values = 1 - (values - v_min) / sf
+    values = (values - v_min) / sf
+    if invert_colorscale:
+        values = 1 - values
 
     figure.add_trace(
         go.Volume(
@@ -548,7 +550,7 @@ def _name_from_enum(axis):
 
 def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
                      z_pos=0.5, interact=False, inline=False, opacity=0.3,
-                     colorscale="greys",
+                     colorscale="gray", invert_colorscale=False,
                      flip_axes=[False, False, False]):
     """
     Visualize a volume
@@ -591,6 +593,10 @@ def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
         Plotly colorscale to use to color slices.
         Default: "greys"
 
+    invert_colorscale : bool, optional
+        Whether to invert colorscale.
+        Default: False
+
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
         visualize.
@@ -625,7 +631,8 @@ def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
         if pos is not None:
             _draw_slice(
                 figure, axis, volume, opacity=opacity,
-                pos=pos, colorscale=colorscale)
+                pos=pos, colorscale=colorscale,
+                invert_colorscale=invert_colorscale)
 
     return _inline_interact(figure, interact, inline)
 
