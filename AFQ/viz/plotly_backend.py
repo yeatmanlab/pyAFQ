@@ -11,7 +11,6 @@ from dipy.tracking.streamline import set_number_of_points
 
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
-import matplotlib.pyplot as plt
 
 try:
     import plotly
@@ -498,13 +497,8 @@ class Axes(enum.IntEnum):
     Z = 2
 
 
-def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
-    if step is None:
-        height = volume.shape[axis] // 2
-        visible = True
-    else:
-        height = (volume.shape[axis] * step) // n_steps
-        visible = False
+def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5):
+    height = int(volume.shape[axis] * pos)
 
     v_min = volume.min()
     sf = volume.max() - v_min
@@ -534,7 +528,6 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             surface_count=1,
             showscale=False,
             opacity=opacity,
-            visible=visible,
             name=_name_from_enum(axis),
             hoverinfo='skip',
             showlegend=True
@@ -552,46 +545,9 @@ def _name_from_enum(axis):
         return "Axial"
 
 
-def _draw_slices(figure, axis, volume,
-                 opacity=0.3, sliders=[], n_steps=0, y_loc=0):
-    if n_steps == 0:
-        _draw_slice(figure, axis, volume, opacity=opacity)
-    else:
-        active = n_steps // 2
-        name = _name_from_enum(axis) + " Plane"
-        steps = []
-        for step in range(n_steps):
-            _draw_slice(figure, axis, volume, opacity=opacity,
-                        step=step, n_steps=n_steps)
-
-        for step in range(n_steps):
-            step_dict = dict(
-                method="update",
-                args=[{"visible": [True] * len(figure.data)}],
-                label=""
-            )
-
-            step_dict["args"][0]["visible"][-n_steps:] = [False] * n_steps
-            step_dict["args"][0]["visible"][step] = True
-            steps.append(step_dict)
-
-        figure.data[-active].visible = True
-        sliders.append(dict(
-            active=active,
-            currentvalue=dict(visible=True, prefix=name, xanchor='center'),
-            pad=dict(t=50),
-            steps=steps,
-            y=y_loc,
-            x=0.2,
-            lenmode='fraction',
-            len=0.6
-        ))
-
-
-def visualize_volume(volume, figure=None, show_x=True, show_y=True,
-                     show_z=True, interact=False, inline=False, opacity=0.3,
-                     flip_axes=[False, False, False],
-                     slider_definition=20, which_plane=None):
+def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
+                     z_pos=0.5, interact=False, inline=False, opacity=0.3,
+                     flip_axes=[False, False, False]):
     """
     Visualize a volume
 
@@ -604,16 +560,25 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         If provided, the visualization will be added to this Figure. Default:
         Initialize a new Figure.
 
-    show_x : bool, optional
-        Whether to show Coronal Slice.
+    x_pos : float or None, optional
+        Where to show Coronal Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
         Default: True
 
-    show_x : bool, optional
-        Whether to show Sagittal Slice.
+    y_pos : float or None, optional
+        Where to show Sagittal Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
         Default: True
 
-    show_x : bool, optional
-        Whether to show Axial Slice.
+    z_pos : float or None, optional
+        Where to show Axial Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
         Default: True
 
     opacity : float, optional
@@ -625,19 +590,6 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
-
-    slider_definition : int, optional
-        How many discrete positions the slices can take.
-        If 0, slices are stationary.
-        Default: 50
-
-    which_plane : str, optional
-        Which plane can be moved with a slider.
-        Should be 'Coronal', 'Axial', 'Sagittal', or None.
-        If None, slices are stationary.
-        Note: If slices are not stationary,
-        do not add any more traces to the figure.
-        Default: 'Coronal'
 
     interact : bool
         Whether to open the visualization in an interactive window.
@@ -662,38 +614,14 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
             specs=[[{"type": "scene"}]])
 
     set_layout(figure)
-    sliders = []
 
     # draw stationary slices first
-    if show_x:
-        if (which_plane is None) or which_plane.lower() != 'sagittal':
-            _draw_slices(figure, Axes.X, volume, opacity=opacity, y_loc=0)
-    if show_y:
-        if (which_plane is None) or which_plane.lower() != 'coronal':
-            _draw_slices(figure, Axes.Y, volume, opacity=opacity, y_loc=0)
-    if show_z:
-        if (which_plane is None) or which_plane.lower() != 'axial':
-            _draw_slices(figure, Axes.Z, volume, opacity=opacity, y_loc=0)
-
-    # Then draw interactive slices
-    if show_x:
-        if (which_plane is not None) and which_plane.lower() == 'sagittal':
-            _draw_slices(figure, Axes.X, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-    if show_y:
-        if (which_plane is not None) and which_plane.lower() == 'coronal':
-            _draw_slices(figure, Axes.Y, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-    if show_z:
-        if (which_plane is not None) and which_plane.lower() == 'axial':
-            _draw_slices(figure, Axes.Z, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-
-    if slider_definition > 0 and which_plane is not None:
-        figure.update_layout(sliders=tuple(sliders))
+    if x_pos is not None:
+        _draw_slice(figure, Axes.X, volume, opacity=opacity, pos=x_pos)
+    if y_pos is not None:
+        _draw_slice(figure, Axes.Y, volume, opacity=opacity, pos=y_pos)
+    if z_pos is not None:
+        _draw_slice(figure, Axes.Z, volume, opacity=opacity, pos=z_pos)
 
     return _inline_interact(figure, interact, inline)
 
@@ -824,7 +752,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     n_points = len(indiv_profile)
     sls, _, bundle_name, dimensions = next(vut.tract_generator(
-            sft, affine, bundle, bundle_dict, None, n_points))
+        sft, affine, bundle, bundle_dict, None, n_points))
 
     line_color = _draw_core(
         sls, n_points, figure, bundle_name, indiv_profile,
