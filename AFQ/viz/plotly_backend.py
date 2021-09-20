@@ -76,10 +76,11 @@ def set_layout(figure, color=None):
     )
 
 
-def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=[None, None], flip_axes=[False, False, False],
+def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
+                      sbv_lims=[None, None], flip_axes=[False, False, False],
                       opacity=1.0):
     color = np.asarray(color)
+    cbs = np.asarray(cbs)
 
     if len(sls._offsets) > 1:
         plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
@@ -90,20 +91,20 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
     y_pts = np.zeros(plotting_shape)
     z_pts = np.zeros(plotting_shape)
 
-    if cbv is not None:
-        if cbv_lims[0] is None:
-            cbv_lims[0] = 0
-        if cbv_lims[1] is None:
-            cbv_lims[1] = cbv.max()
+    if cbs is not None:
+        color = cbs[0, :]
+    elif cbv is not None:
+        if sbv_lims[0] is None:
+            sbv_lims[0] = 0
+        if sbv_lims[1] is None:
+            sbv_lims[1] = cbv.max()
 
-        customdata = np.zeros(plotting_shape)
-        line_color = np.zeros((plotting_shape, 3))
         color_constant = (color / color.max())\
-            * (1.4 / (cbv_lims[1] - cbv_lims[0])) + cbv_lims[0]
+            * (1.4 / (sbv_lims[1] - sbv_lims[0])) + sbv_lims[0]
     else:
-        customdata = np.zeros(plotting_shape)
-        line_color = np.zeros((plotting_shape, 3))
         color_constant = color
+    customdata = np.zeros(plotting_shape)
+    line_color = np.zeros((plotting_shape, 3))
 
     for sl_index, plotting_offset in enumerate(sls._offsets):
         sl_length = sls._lengths[sl_index]
@@ -120,6 +121,9 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             x_pts[total_offset + sl_length] = np.nan
             y_pts[total_offset + sl_length] = np.nan
             z_pts[total_offset + sl_length] = np.nan
+
+        if cbs is not None:
+            color_constant = cbs[sl_index]
 
         if cbv is not None:
             brightness = cbv[
@@ -213,8 +217,9 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
-                      bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], include_profiles=(None, None),
+                      bundle=None, colors=None, shade_by_volume=None,
+                      color_by_streamline=None,
+                      sbv_lims=[None, None], include_profiles=(None, None),
                       flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
@@ -254,17 +259,27 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         with Tableau 20 RGB values if bundle_dict is None, or dict from
         bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-    color_by_volume : ndarray or str, optional
+    shade_by_volume : ndarray or str, optional
         3d volume use to shade the bundles. If None, no shading
         is performed. Only works when using the plotly backend.
         Default: None
 
-    cbv_lims : ndarray
+    color_by_streamline : ndarray or dict, optional
+        N by 3 array, where N is the number of streamlines in sft;
+        for each streamline you specify 3 values between 0 and 1 for rgb.
+        If sft has multiple bundles, then use a dict for color_by_streamline,
+        where keys are bundle names and values are n by 3 arrays.
+        Overrides colors for bundles in the keys
+        of the dict if passing a  dict, or for all streamlines if using
+        ndarray.
+        Default: None
+
+    sbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
-        color_by_volume will only differentiate values within these bounds.
+        shade_by_volume will only differentiate values within these bounds.
         If lower bound is None, will default to 0.
         If upper bound is None, will default to the maximum value in
-        color_by_volume.
+        shade_by_volume.
         Default: [None, None]
 
     include_profiles : Tuple of Pandas Dataframe and string
@@ -308,8 +323,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     Plotly Figure object
     """
 
-    if color_by_volume is not None:
-        color_by_volume = vut.load_volume(color_by_volume)
+    if shade_by_volume is not None:
+        shade_by_volume = vut.load_volume(shade_by_volume)
 
     if figure is None:
         if include_profiles[0] is None:
@@ -325,14 +340,21 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
     for (sls, color, name, dimensions) in vut.tract_generator(
             sft, affine, bundle, bundle_dict, colors, n_points):
+        if isinstance(color_by_streamline, dict):
+            if name in color_by_streamline:
+                cbs = color_by_streamline[name]
+        else:
+            cbs = color_by_streamline
+
         color_constant = _draw_streamlines(
             figure,
             sls,
             dimensions,
             color,
             name,
-            cbv=color_by_volume,
-            cbv_lims=cbv_lims,
+            cbv=shade_by_volume,
+            cbs=cbs,
+            sbv_lims=sbv_lims,
             flip_axes=flip_axes,
             opacity=opacity)
         if include_profiles[0] is not None:

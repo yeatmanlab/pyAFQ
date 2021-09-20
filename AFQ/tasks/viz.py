@@ -51,19 +51,19 @@ def viz_bundles(subses_dict,
                 segmentation_params,
                 best_scalar,
                 xform_volume=False,
-                cbv_lims=[None, None],
-                xform_color_by_volume=False,
+                sbv_lims=[None, None],
+                xform_shade_by_volume=False,
                 volume_opacity=0.3,
                 n_points=40):
     mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
     profiles_file = segmentation_imap["profiles_file"]
     volume = data_imap["b0_file"]
-    color_by_volume = data_imap[best_scalar + "_file"]
+    shade_by_volume = data_imap[best_scalar + "_file"]
     start_time = time()
     volume = _viz_prepare_vol(volume, xform_volume, mapping, scalar_dict)
-    color_by_volume = _viz_prepare_vol(
-        color_by_volume, xform_color_by_volume, mapping, scalar_dict)
+    shade_by_volume = _viz_prepare_vol(
+        shade_by_volume, xform_shade_by_volume, mapping, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -83,8 +83,8 @@ def viz_bundles(subses_dict,
 
     figure = viz_backend.visualize_bundles(
         segmentation_imap["clean_bundles_file"],
-        color_by_volume=color_by_volume,
-        cbv_lims=cbv_lims,
+        shade_by_volume=shade_by_volume,
+        sbv_lims=sbv_lims,
         bundle_dict=bundle_dict,
         include_profiles=(pd.read_csv(profiles_file), best_scalar),
         n_points=n_points,
@@ -129,21 +129,21 @@ def viz_indivBundle(subses_dict,
                     reg_template,
                     best_scalar,
                     xform_volume_indiv=False,
-                    cbv_lims_indiv=[None, None],
-                    xform_color_by_volume_indiv=False,
+                    sbv_lims_indiv=[None, None],
+                    xform_shade_by_volume_indiv=False,
                     volume_opacity_indiv=0.3,
                     n_points_indiv=40):
     mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
-    color_by_volume = data_imap[best_scalar + "_file"]
+    shade_by_volume = data_imap[best_scalar + "_file"]
     profiles = pd.read_csv(segmentation_imap["profiles_file"])
 
     start_time = time()
     volume = _viz_prepare_vol(
         volume, xform_volume_indiv, mapping, scalar_dict)
-    color_by_volume = _viz_prepare_vol(
-        color_by_volume, xform_color_by_volume_indiv, mapping, scalar_dict)
+    shade_by_volume = _viz_prepare_vol(
+        shade_by_volume, xform_shade_by_volume_indiv, mapping, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -163,8 +163,8 @@ def viz_indivBundle(subses_dict,
         try:
             figure = viz_backend.visualize_bundles(
                 segmentation_imap["clean_bundles_file"],
-                color_by_volume=color_by_volume,
-                cbv_lims=cbv_lims_indiv,
+                shade_by_volume=shade_by_volume,
+                sbv_lims=sbv_lims_indiv,
                 bundle_dict=bundle_dict,
                 bundle=uid,
                 n_points=n_points_indiv,
@@ -287,8 +287,8 @@ def viz_indivBundle(subses_dict,
                     inline=False)
                 core_fig = viz_backend.visualize_bundles(
                     segmentation_imap["clean_bundles_file"],
-                    color_by_volume=color_by_volume,
-                    cbv_lims=cbv_lims_indiv,
+                    shade_by_volume=shade_by_volume,
+                    sbv_lims=sbv_lims_indiv,
                     bundle_dict=bundle_dict,
                     bundle=uid,
                     colors={bundle_name: [0.5, 0.5, 0.5]},

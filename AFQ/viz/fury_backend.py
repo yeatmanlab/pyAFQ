@@ -36,8 +36,8 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
-                      bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], figure=None, background=(1, 1, 1),
+                      bundle=None, colors=None, shade_by_volume=None,
+                      sbv_lims=[None, None], figure=None, background=(1, 1, 1),
                       interact=False, inline=False, flip_axes=None):
     """
     Visualize bundles in 3D using VTK
@@ -75,17 +75,17 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         with Tableau 20 RGB values if bundle_dict is None, or dict from
         bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-    color_by_volume : ndarray or str, optional
+    shade_by_volume : ndarray or str, optional
         3d volume use to shade the bundles. If None, no shading
         is performed. Only works when using the plotly backend.
         Default: None
 
-    cbv_lims : ndarray
+    sbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
-        color_by_volume will only differentiate values within these bounds.
+        shade_by_volume will only differentiate values within these bounds.
         If lower bound is None, will default to 0.
         If upper bound is None, will default to the maximum value in
-        color_by_volume.
+        shade_by_volume.
         Default: [None, None]
 
     background : tuple, optional

@@ -457,7 +457,7 @@ for bundle in bundles:
 
 plotly.io.show(visualize_bundles(tractogram,
                                  figure=visualize_volume(warped_MNI_T2_data),
-                                 color_by_volume=FA_data))
+                                 shade_by_volume=FA_data))
 
 ##########################################################################
 # Bundle profiles:
