@@ -33,7 +33,7 @@ The other requires that you clone the source code to your machine::
 
 Then, change your working directory into the top-level directory of this repo and issue::
 
-  pip install -e .[dev,fury]
+  pip install -e .[dev,fury,afqbrowser]
 
 which will install pyAFQ locally in editible mode and include extensions.
 
