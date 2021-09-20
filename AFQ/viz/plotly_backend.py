@@ -80,7 +80,6 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
                       sbv_lims=[None, None], flip_axes=[False, False, False],
                       opacity=1.0):
     color = np.asarray(color)
-    cbs = np.asarray(cbs)
 
     if len(sls._offsets) > 1:
         plotting_shape = (sls._data.shape[0] + sls._offsets.shape[0])
@@ -92,6 +91,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
     z_pts = np.zeros(plotting_shape)
 
     if cbs is not None:
+        cbs = np.asarray(cbs)
         color = cbs[0, :]
     elif cbv is not None:
         if sbv_lims[0] is None:
