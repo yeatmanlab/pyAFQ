@@ -92,6 +92,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
 
     if cbs is not None:
         cbs = np.asarray(cbs)
+        line_color = np.zeros((plotting_shape, cbs.shape[1]))
         color = cbs[0, :]
     elif cbv is not None:
         if sbv_lims[0] is None:
@@ -101,10 +102,11 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
 
         color_constant = (color / color.max())\
             * (1.4 / (sbv_lims[1] - sbv_lims[0])) + sbv_lims[0]
+        line_color = np.zeros((plotting_shape, 3))
     else:
         color_constant = color
+        line_color = np.zeros((plotting_shape, 3))
     customdata = np.zeros(plotting_shape)
-    line_color = np.zeros((plotting_shape, 3))
 
     for sl_index, plotting_offset in enumerate(sls._offsets):
         sl_length = sls._lengths[sl_index]
@@ -141,7 +143,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
             customdata[total_offset:total_offset + sl_length] = 1
 
             if len(sls._offsets) > 1:
-                line_color[total_offset + sl_length, :] = [0, 0, 0]
+                line_color[total_offset + sl_length, :] = 0
                 customdata[total_offset + sl_length] = 0
 
     if flip_axes[0]:
