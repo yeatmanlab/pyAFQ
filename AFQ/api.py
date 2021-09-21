@@ -1228,7 +1228,7 @@ class AFQ(object):
                 "AFQ Browser is not installed, so AFQ Browswer instance "
                 "cannot be assembled. AFQ Browser can be installed with: "
                 "`pip install pyAFQ[afqbrowser]` or "
-                "`pip install Browser>=0.3`"))
+                "`pip install AFQ-Browser>=0.3`"))
             return
 
         if output_path is None:
