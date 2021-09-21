@@ -142,9 +142,13 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
                 color_constant
             customdata[total_offset:total_offset + sl_length] = 1
 
-            if len(sls._offsets) > 1:
-                line_color[total_offset + sl_length, :] = 0
-                customdata[total_offset + sl_length] = 0
+        if line_color.shape[1] > 3:
+            line_color[total_offset:total_offset + sl_length, 3] = \
+                color_constant[3]  # dont shade alpha values
+
+        if len(sls._offsets) > 1:
+            line_color[total_offset + sl_length, :] = 0
+            customdata[total_offset + sl_length] = 0
 
     if flip_axes[0]:
         x_pts = dimensions[0] - x_pts
