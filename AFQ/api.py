@@ -33,7 +33,6 @@ from time import time
 import nibabel as nib
 from importlib import import_module
 from collections.abc import MutableMapping
-import afqbrowser as afqb
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -41,6 +40,12 @@ try:
     bids_config.set_option('extension_initial_dot', True)
 except ValueError:
     pass
+
+try:
+    import afqbrowser as afqb
+    using_afqb = True
+except ImportError:
+    using_afqb = False
 
 
 logging.basicConfig(level=logging.INFO)
@@ -1218,6 +1223,13 @@ class AFQ(object):
             If None, prompt is sent to command line.
             Default: ""
         """
+        if not using_afqb:
+            self.logger.warning((
+                "AFQ Browser is not installed, so AFQ Browswer instance "
+                "cannot be assembled. AFQ Browser can be installed with: "
+                "`pip install pyAFQ[afqbrowser]` or "
+                "`pip install AFQ-Browser>=0.3`"))
+            return
 
         if output_path is None:
             output_path = self.afqb_path
