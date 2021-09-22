@@ -1,9 +1,9 @@
 ###############################################################################
-# Dockerfile to build qsiprep and pyAFQ 
+# Dockerfile to build qsiprep and pyAFQ
 ###############################################################################
 
 # Use QSIprep base image
-FROM pennbbl/qsiprep:0.13.0RC1
+FROM pennbbl/qsiprep:0.14.3
 
 ARG COMMIT
 
