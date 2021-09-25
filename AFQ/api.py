@@ -117,6 +117,7 @@ class BundleDict(MutableMapping):
                 f"bundle_info must be a dict or a list,"
                 f" currently a {type(bundle_info)}"))
         self.seg_algo = seg_algo.lower()
+        self.resample_to = resample_to
 
         if isinstance(bundle_info, dict):
             self.bundle_names = list(bundle_info.keys())
@@ -158,7 +159,6 @@ class BundleDict(MutableMapping):
             self._c_uid = ii + 2
 
         self.logger = logging.getLogger('AFQ.api')
-        self.resample_to = resample_to
 
         if self.seg_algo == "afq":
             if "FP" in self.bundle_names\
