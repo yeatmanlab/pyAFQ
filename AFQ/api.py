@@ -121,6 +121,7 @@ class BundleDict(MutableMapping):
         if isinstance(bundle_info, dict):
             self.bundle_names = list(bundle_info.keys())
             self._dict = bundle_info.copy()
+            self.resample_all_roi()
             self.all_gen = True
         else:
             expanded_bundle_names = []
@@ -250,12 +251,9 @@ class BundleDict(MutableMapping):
                             'uid': self._uid_dict[key]}
                     else:
                         raise ValueError(f"{key} is not in AFQ templates")
-                if self.resample_to:
-                    for ii, roi in enumerate(bundle['ROIs']):
-                        bundle['ROIs'][ii] =\
-                            afd.read_resample_roi(
-                                roi, resample_to=self.resample_to)
+                self.resample_all_roi()
                 self._dict[key] = bundle
+            self.resample_all_roi()
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
                 reco_bundle_dict = afd.read_hcp_atlas(80)
@@ -312,6 +310,14 @@ class BundleDict(MutableMapping):
     def copy(self):
         self.gen_all()
         return self._dict.copy()
+
+    def resample_all_roi(self):
+        if self.resample_to:
+            for key in self._dict.keys():
+                for ii, roi in enumerate(self._dict[key]['ROIs']):
+                    self._dict[key]['ROIs'][ii] =\
+                        afd.read_resample_roi(
+                            roi, resample_to=self.resample_to)
 
 
 # get rid of unnecessary columns in df
