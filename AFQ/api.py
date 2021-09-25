@@ -251,7 +251,6 @@ class BundleDict(MutableMapping):
                             'uid': self._uid_dict[key]}
                     else:
                         raise ValueError(f"{key} is not in AFQ templates")
-                self.resample_all_roi()
                 self._dict[key] = bundle
             self.resample_all_roi()
         elif self.seg_algo.startswith("reco"):
