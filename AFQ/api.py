@@ -82,6 +82,9 @@ RECO_UNIQUE = [
     'CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP', 'AC', 'PC', 'SCP',
     'V', 'CC', 'F_L_R']
 
+PEDIATRIC_BUNDLES = [
+    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
@@ -312,6 +315,128 @@ class BundleDict(MutableMapping):
     def copy(self):
         self.gen_all()
         return self._dict.copy()
+
+
+class PediatricBundleDict(BundleDict):
+    def __init__(self,
+                 bundle_info=PEDIATRIC_BUNDLES,
+                 seg_algo="afq",
+                 resample_to=False):
+        """
+        Create a pediatric bundle dictionary, needed for the segmentation
+
+        Parameters
+        ----------
+        bundle_info : list, optional
+            A list of the pediatric bundles to be used in this case. Default: all of them
+
+        seg_algo: only "afq" is supported
+            The bundle segmentation algorithm to use.
+                "afq" : Use waypoint ROIs + probability maps, as described
+                in [Yeatman2012]_
+
+        resample_to : Nifti1Image or bool, optional
+            If set, templates will be resampled to the affine and shape of this
+            image. If False, no resampling will be done.
+            Default: False
+        """
+        BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
+    
+    def gen_all(self):
+        if self.all_gen:
+            return
+        if self.seg_algo == "afq":
+            # Pediatric bundles differ from adult bundles:
+            #   - A third ROI has been introduced for curvy tracts: ARC, ATR, CGC, IFO,
+            #     and UCI
+            #   - ILF posterior ROI has been split into two to separate ILF and mdLF
+            #   - Addition of pAF and VOF ROIs
+            #   - SLF ROIs are restricted to parietal cortex
+            pediatric_templates = afd.read_pediatric_templates()
+
+             # pediatric probability maps
+            prob_map_order = ["ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
+                              "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
+                              "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
+                              "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
+            
+            prob_maps = pediatric_templates['UNCNeo_JHU_tracts_prob-for-babyAFQ']
+            prob_map_data = prob_maps.get_fdata()
+
+            # pediatric bundle dict
+            pediatric_bundles = {}
+
+            # each bundles gets a digit identifier (to be stored in the tractogram)
+            uid = 1
+
+            for name in PEDIATRIC_BUNDLES:
+                # ROIs that cross the mid-line
+                if name in ["FA", "FP"]:
+                    pediatric_bundles[name] = {
+                        'ROIs': [pediatric_templates[name + "_L"],
+                                pediatric_templates[name + "_R"],
+                                pediatric_templates["mid-saggital"]],
+                        'rules': [True, True, True],
+                        'cross_midline': True,
+                        'prob_map': prob_map_data[...,
+                                                prob_map_order.index(name)],
+                        'uid': uid}
+                    uid += 1
+                # SLF is a special case, because it has an exclusion ROI:
+                elif name == "SLF":
+                    for hemi in ['_R', '_L']:
+                        pediatric_bundles[name + hemi] = {
+                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
+                                    pediatric_templates[name + '_roi2' + hemi],
+                                    pediatric_templates["SLFt_roi2" + hemi]],
+                            'rules': [True, True, False],
+                            'cross_midline': False,
+                            'prob_map': prob_map_data[...,
+                                                    prob_map_order.index(name + hemi)],
+                            'uid': uid}
+                        uid += 1
+                # Third ROI for curvy tracts
+                elif name in ["ARC", "ATR", "CGC", "IFO", "UNC"]:
+                    for hemi in ['_R', '_L']:
+                        pediatric_bundles[name + hemi] = {
+                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
+                                    pediatric_templates[name + '_roi2' + hemi],
+                                    pediatric_templates[name + '_roi3' + hemi]],
+                            'rules': [True, True, True],
+                            'cross_midline': False,
+                            'prob_map': prob_map_data[...,
+                                                    prob_map_order.index(name + hemi)],
+                            'uid': uid}
+                        uid += 1
+                elif name == "MdLF":
+                    for hemi in ['_R', '_L']:
+                        pediatric_bundles[name + hemi] = {
+                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
+                                    pediatric_templates[name + '_roi2' + hemi]],
+                            'rules': [True, True],
+                            'cross_midline': False,
+                            # reuse probability map from ILF
+                            'prob_map': prob_map_data[...,
+                                                    prob_map_order.index("ILF" + hemi)],
+                            'uid': uid}
+                        uid += 1
+                # Default: two ROIs within hemisphere
+                else:
+                    for hemi in ['_R', '_L']:
+                        pediatric_bundles[name + hemi] = {
+                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
+                                    pediatric_templates[name + '_roi2' + hemi]],
+                            'rules': [True, True],
+                            'cross_midline': False,
+                            'prob_map': prob_map_data[...,
+                                                    prob_map_order.index(name + hemi)],
+                            'uid': uid}
+                        uid += 1
+            self._dict = pediatric_bundles
+        else:
+            raise ValueError(
+                "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
+        self.all_gen = True
 
 
 # get rid of unnecessary columns in df
@@ -951,6 +1076,9 @@ class AFQ(object):
         return self.scalars[0]
 
     def get_reg_template(self):
+        if isinstance(self.reg_template, nib.Nifti1Image):
+            return self.reg_template
+        
         img_l = self.reg_template.lower()
         if img_l == "mni_t2":
             img = afd.read_mni_template(
