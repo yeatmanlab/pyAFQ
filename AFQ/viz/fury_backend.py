@@ -1,5 +1,4 @@
 import tempfile
-import os
 import os.path as op
 import logging
 
@@ -106,7 +105,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
     inline : bool
         Whether to embed the visualization inline in a notebook. Only works
-        in the notebook context. Default: False.        
+        in the notebook context. Default: False.
 
     Returns
     -------
