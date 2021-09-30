@@ -37,10 +37,14 @@ def _inline_interact(scene, inline, interact):
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, shade_by_volume=None,
-                      sbv_lims=[None, None], figure=None, background=(1, 1, 1),
-                      interact=False, inline=False, flip_axes=None):
+                      color_by_streamline=None,
+                      sbv_lims=[None, None], include_profiles=(None, None),
+                      flip_axes=[False, False, False], opacity=1.0,
+                      figure=None, background=(1, 1, 1), interact=False,
+                      inline=False):
     """
-    Visualize bundles in 3D using VTK
+    Visualize bundles in 3D using VTK.
+    Parameters not described below are extras to conform fury and plotly APIs.
 
     Parameters
     ----------
@@ -102,10 +106,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
 
     inline : bool
         Whether to embed the visualization inline in a notebook. Only works
-        in the notebook context. Default: False.
-
-    flip_axes : None
-        This parameter is to conform fury and plotly APIs.
+        in the notebook context. Default: False.        
 
     Returns
     -------
