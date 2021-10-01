@@ -1,21 +1,25 @@
 import tempfile
-import os
-import os.path as op
 import enum
 import logging
 
 import numpy as np
-
-import dipy.tracking.streamlinespeed as dps
+import pandas as pd
 
 import AFQ.viz.utils as vut
+
+from dipy.tracking.streamline import set_number_of_points
+
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 
 try:
     import plotly
     import plotly.graph_objs as go
     import plotly.io as pio
+    from plotly.subplots import make_subplots
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("plotly"))
+
 
 scope = pio.kaleido.scope
 viz_logger = logging.getLogger("AFQ.viz")
@@ -56,23 +60,25 @@ def _color_arr2str(color_arr, opacity=1.0):
 
 def set_layout(figure, color=None):
     if color is None:
-        color = f"rgba(0,0,0,0)"
+        color = "rgba(0,0,0,0)"
 
     figure.update_layout(
         plot_bgcolor=color,
-        scene=dict(
+        scene1=dict(
             xaxis=dict(
                 showbackground=False, showticklabels=False, title=''),
             yaxis=dict(
                 showbackground=False, showticklabels=False, title=''),
             zaxis=dict(
-                showbackground=False, showticklabels=False, title='')
+                showbackground=False, showticklabels=False, title=''),
+            aspectmode='data'
         )
     )
 
 
-def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
-                      cbv_lims=[None, None], flip_axes=[False, False, False]):
+def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
+                      sbv_lims=[None, None], flip_axes=[False, False, False],
+                      opacity=1.0):
     color = np.asarray(color)
 
     if len(sls._offsets) > 1:
@@ -84,20 +90,23 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
     y_pts = np.zeros(plotting_shape)
     z_pts = np.zeros(plotting_shape)
 
-    if cbv is not None:
-        if cbv_lims[0] is None:
-            cbv_lims[0] = 0
-        if cbv_lims[1] is None:
-            cbv_lims[1] = cbv.max()
+    if cbs is not None:
+        cbs = np.asarray(cbs)
+        line_color = np.zeros((plotting_shape, cbs.shape[1]))
+        color = cbs[0, :]
+    elif cbv is not None:
+        if sbv_lims[0] is None:
+            sbv_lims[0] = 0
+        if sbv_lims[1] is None:
+            sbv_lims[1] = cbv.max()
 
-        customdata = np.zeros(plotting_shape)
-        line_color = np.zeros((plotting_shape, 3))
         color_constant = (color / color.max())\
-            * (1.4 / (cbv_lims[1] - cbv_lims[0])) + cbv_lims[0]
-    else:
-        customdata = np.zeros(plotting_shape)
+            * (1.4 / (sbv_lims[1] - sbv_lims[0])) + sbv_lims[0]
         line_color = np.zeros((plotting_shape, 3))
+    else:
         color_constant = color
+        line_color = np.zeros((plotting_shape, 3))
+    customdata = np.zeros(plotting_shape)
 
     for sl_index, plotting_offset in enumerate(sls._offsets):
         sl_length = sls._lengths[sl_index]
@@ -115,6 +124,9 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             y_pts[total_offset + sl_length] = np.nan
             z_pts[total_offset + sl_length] = np.nan
 
+        if cbs is not None:
+            color_constant = cbs[sl_index]
+
         if cbv is not None:
             brightness = cbv[
                 sl[:, 0].astype(int),
@@ -130,9 +142,13 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
                 color_constant
             customdata[total_offset:total_offset + sl_length] = 1
 
-            if len(sls._offsets) > 1:
-                line_color[total_offset + sl_length, :] = [0, 0, 0]
-                customdata[total_offset + sl_length] = 0
+        if line_color.shape[1] > 3:
+            line_color[total_offset:total_offset + sl_length, 3] = \
+                color_constant[3]  # dont shade alpha values
+
+        if len(sls._offsets) > 1:
+            line_color[total_offset + sl_length, :] = 0
+            customdata[total_offset + sl_length] = 0
 
     if flip_axes[0]:
         x_pts = dimensions[0] - x_pts
@@ -145,7 +161,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
             x=x_pts,
             y=y_pts,
             z=z_pts,
-            name=name,
+            name=vut.display_string(name),
+            legendgroup=vut.display_string(name),
             marker=dict(
                 size=0.0001,
                 color=_color_arr2str(color)
@@ -155,14 +172,61 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None,
                 color=line_color,
             ),
             hovertext=customdata,
-            hoverinfo='all'
-        )
+            hoverinfo='all',
+            opacity=opacity
+        ),
+        row=1, col=1
     )
+    return color_constant
+
+
+def _plot_profiles(profiles, bundle_name, color, fig, scalar):
+    if isinstance(profiles, pd.DataFrame):
+        profiles = profiles[profiles.tractID == bundle_name]
+        x = profiles["nodeID"]
+        y = profiles[scalar]
+        line_color = []
+        for scalar_val in profiles[scalar].to_numpy():
+            line_color.append(_color_arr2str(scalar_val * color))
+    else:
+        x = np.arange(len(profiles))
+        y = profiles
+        line_color = []
+        for indiv_color in color:
+            line_color.append(_color_arr2str(indiv_color))
+
+    fig.add_trace(
+        go.Scatter3d(
+            x=x,
+            y=y,
+            z=np.zeros(len(y)),
+            name=vut.display_string(bundle_name),
+            line=dict(color=line_color, width=15),
+            mode="lines",
+            legendgroup=vut.display_string(bundle_name)),
+        row=1, col=2)
+
+    font = dict(size=20, family="Overpass")
+    fixed_camera_for_2d = dict(
+        projection=dict(type="orthographic"),
+        up=dict(x=0, y=1, z=0),
+        eye=dict(x=0, y=0, z=1),
+        center=dict(x=0, y=0, z=0))
+    fig.update_layout(
+        margin={"t": 15, "b": 0, "l": 0, "r": 0},
+        scene2=dict(
+            camera=fixed_camera_for_2d,
+            zaxis=dict(visible=False),
+            dragmode=False,
+            xaxis_title=dict(text="Location", font=font),
+            yaxis_title=dict(text=vut.display_string(scalar), font=font)))
 
 
 def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
-                      bundle=None, colors=None, color_by_volume=None,
-                      cbv_lims=[None, None], flip_axes=[False, False, False],
+                      bundle=None, colors=None, shade_by_volume=None,
+                      color_by_streamline=None,
+                      sbv_lims=[None, None], include_profiles=(None, None),
+                      flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False):
     """
@@ -201,24 +265,48 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         with Tableau 20 RGB values if bundle_dict is None, or dict from
         bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-    color_by_volume : ndarray or str, optional
+    shade_by_volume : ndarray or str, optional
         3d volume use to shade the bundles. If None, no shading
         is performed. Only works when using the plotly backend.
         Default: None
 
-    cbv_lims : ndarray
+    color_by_streamline : ndarray or dict, optional
+        N by 3 array, where N is the number of streamlines in sft;
+        for each streamline you specify 3 values between 0 and 1 for rgb.
+        If sft has multiple bundles, then use a dict for color_by_streamline,
+        where keys are bundle names and values are n by 3 arrays.
+        Overrides colors for bundles in the keys
+        of the dict if passing a  dict, or for all streamlines if using
+        ndarray.
+        Default: None
+
+    sbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
-        color_by_volume will only differentiate values within these bounds.
+        shade_by_volume will only differentiate values within these bounds.
         If lower bound is None, will default to 0.
         If upper bound is None, will default to the maximum value in
-        color_by_volume.
+        shade_by_volume.
         Default: [None, None]
+
+    include_profiles : Tuple of Pandas Dataframe and string
+        The first element of the uple is a
+        Pandas Dataframe containing profiles in the standard pyAFQ
+        output format for the bundle(s) being displayed. It will be used
+        to generate a graph of the tract profiles for each bundle,
+        with colors corresponding to the colors on the bundles. The string
+        is the scalar to use from the profile. If these are None,
+        no tract profiles will be graphed.
+        Defualt: (None, None)
 
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
         visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
+
+    opacity : float
+        Float between 0 and 1 defining the opacity of the bundle.
+        Default: 1.0
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
@@ -241,25 +329,44 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     Plotly Figure object
     """
 
-    if color_by_volume is not None:
-        color_by_volume = vut.load_volume(color_by_volume)
+    if shade_by_volume is not None:
+        shade_by_volume = vut.load_volume(shade_by_volume)
 
     if figure is None:
-        figure = go.Figure()
+        if include_profiles[0] is None:
+            figure = make_subplots(
+                rows=1, cols=1,
+                specs=[[{"type": "scene"}]])
+        else:
+            figure = make_subplots(
+                rows=1, cols=2,
+                specs=[[{"type": "scene"}, {"type": "scene"}]])
 
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
             sft, affine, bundle, bundle_dict, colors, n_points):
-        _draw_streamlines(
+        if isinstance(color_by_streamline, dict):
+            if name in color_by_streamline:
+                cbs = color_by_streamline[name]
+        else:
+            cbs = color_by_streamline
+
+        color_constant = _draw_streamlines(
             figure,
             sls,
             dimensions,
             color,
             name,
-            cbv=color_by_volume,
-            cbv_lims=cbv_lims,
-            flip_axes=flip_axes)
+            cbv=shade_by_volume,
+            cbs=cbs,
+            sbv_lims=sbv_lims,
+            flip_axes=flip_axes,
+            opacity=opacity)
+        if include_profiles[0] is not None:
+            _plot_profiles(
+                include_profiles[0], name, color_constant,
+                figure, include_profiles[1])
 
     figure.update_layout(legend=dict(itemsizing="constant"))
     return _inline_interact(figure, interact, inline)
@@ -326,8 +433,9 @@ def _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes):
             z=pts[2],
             name=name,
             marker=dict(color=_color_arr2str(color, opacity=opacity)),
-            line=dict(color=f"rgba(0,0,0,0)")
-        )
+            line=dict(color="rgba(0,0,0,0)")
+        ),
+        row=1, col=1
     )
 
 
@@ -400,7 +508,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
                           roi_affine, static_affine, reg_template)
 
     if figure is None:
-        figure = go.Figure()
+        figure = make_subplots(
+            rows=1, cols=1,
+            specs=[[{"type": "scene"}]])
 
     set_layout(figure)
 
@@ -415,13 +525,9 @@ class Axes(enum.IntEnum):
     Z = 2
 
 
-def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
-    if step is None:
-        height = volume.shape[axis] // 2
-        visible = True
-    else:
-        height = (volume.shape[axis] * step) // n_steps
-        visible = False
+def _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5,
+                colorscale="greys", invert_colorscale=False):
+    height = int(volume.shape[axis] * pos)
 
     v_min = volume.min()
     sf = volume.max() - v_min
@@ -439,7 +545,9 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
                            :volume.shape[1], height:height + 1]
         values = volume[:, :, height].flatten()
 
-    values = 1 - (values - v_min) / sf
+    values = (values - v_min) / sf
+    if invert_colorscale:
+        values = 1 - values
 
     figure.add_trace(
         go.Volume(
@@ -447,14 +555,15 @@ def _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0):
             y=Y.flatten(),
             z=Z.flatten(),
             value=values,
-            colorscale='greys',
+            colorscale=colorscale,
             surface_count=1,
             showscale=False,
             opacity=opacity,
-            visible=visible,
             name=_name_from_enum(axis),
-            hoverinfo='skip'
-        )
+            hoverinfo='skip',
+            showlegend=True
+        ),
+        row=1, col=1
     )
 
 
@@ -467,46 +576,10 @@ def _name_from_enum(axis):
         return "Axial"
 
 
-def _draw_slices(figure, axis, volume,
-                 opacity=0.3, sliders=[], n_steps=0, y_loc=0):
-    if n_steps == 0:
-        _draw_slice(figure, axis, volume, opacity=opacity)
-    else:
-        active = n_steps // 2
-        name = _name_from_enum(axis) + " Plane"
-        steps = []
-        for step in range(n_steps):
-            _draw_slice(figure, axis, volume, opacity=opacity,
-                        step=step, n_steps=n_steps)
-
-        for step in range(n_steps):
-            step_dict = dict(
-                method="update",
-                args=[{"visible": [True] * len(figure.data)}],
-                label=""
-            )
-
-            step_dict["args"][0]["visible"][-n_steps:] = [False] * n_steps
-            step_dict["args"][0]["visible"][step] = True
-            steps.append(step_dict)
-
-        figure.data[-active].visible = True
-        sliders.append(dict(
-            active=active,
-            currentvalue=dict(visible=True, prefix=name, xanchor='center'),
-            pad=dict(t=50),
-            steps=steps,
-            y=y_loc,
-            x=0.2,
-            lenmode='fraction',
-            len=0.6
-        ))
-
-
-def visualize_volume(volume, figure=None, show_x=True, show_y=True,
-                     show_z=True, interact=False, inline=False, opacity=0.3,
-                     flip_axes=[False, False, False],
-                     slider_definition=20, which_plane=None):
+def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
+                     z_pos=0.5, interact=False, inline=False, opacity=0.3,
+                     colorscale="gray", invert_colorscale=False,
+                     flip_axes=[False, False, False]):
     """
     Visualize a volume
 
@@ -519,40 +592,44 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
         If provided, the visualization will be added to this Figure. Default:
         Initialize a new Figure.
 
-    show_x : bool, optional
-        Whether to show Coronal Slice.
-        Default: True
+    x_pos : float or None, optional
+        Where to show Coronal Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
+        Default: 0.5
 
-    show_x : bool, optional
-        Whether to show Sagittal Slice.
-        Default: True
+    y_pos : float or None, optional
+        Where to show Sagittal Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
+        Default: 0.5
 
-    show_x : bool, optional
-        Whether to show Axial Slice.
-        Default: True
+    z_pos : float or None, optional
+        Where to show Axial Slice. If None, slice is not shown.
+        Should be a decimal between 0 and 1.
+        Indicatesthe fractional position along the perpendicular
+        axis to the slice.
+        Default: 0.5
 
     opacity : float, optional
         Opacity of slices.
         Default: 1.0
+
+    colorscale : string, optional
+        Plotly colorscale to use to color slices.
+        Default: "greys"
+
+    invert_colorscale : bool, optional
+        Whether to invert colorscale.
+        Default: False
 
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
         visualize.
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
-
-    slider_definition : int, optional
-        How many discrete positions the slices can take.
-        If 0, slices are stationary.
-        Default: 50
-
-    which_plane : str, optional
-        Which plane can be moved with a slider.
-        Should be 'Coronal', 'Axial', 'Sagittal', or None.
-        If None, slices are stationary.
-        Note: If slices are not stationary,
-        do not add any more traces to the figure.
-        Default: 'Coronal'
 
     interact : bool
         Whether to open the visualization in an interactive window.
@@ -572,40 +649,157 @@ def visualize_volume(volume, figure=None, show_x=True, show_y=True,
             volume = np.flip(volume, axis=i)
 
     if figure is None:
-        figure = go.Figure()
+        figure = make_subplots(
+            rows=1, cols=1,
+            specs=[[{"type": "scene"}]])
 
     set_layout(figure)
-    sliders = []
 
-    # draw stationary slices first
-    if show_x:
-        if (which_plane is None) or which_plane.lower() != 'sagittal':
-            _draw_slices(figure, Axes.X, volume, opacity=opacity, y_loc=0)
-    if show_y:
-        if (which_plane is None) or which_plane.lower() != 'coronal':
-            _draw_slices(figure, Axes.Y, volume, opacity=opacity, y_loc=0)
-    if show_z:
-        if (which_plane is None) or which_plane.lower() != 'axial':
-            _draw_slices(figure, Axes.Z, volume, opacity=opacity, y_loc=0)
-
-    # Then draw interactive slices
-    if show_x:
-        if (which_plane is not None) and which_plane.lower() == 'sagittal':
-            _draw_slices(figure, Axes.X, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-    if show_y:
-        if (which_plane is not None) and which_plane.lower() == 'coronal':
-            _draw_slices(figure, Axes.Y, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-    if show_z:
-        if (which_plane is not None) and which_plane.lower() == 'axial':
-            _draw_slices(figure, Axes.Z, volume, sliders=sliders,
-                         opacity=opacity, n_steps=slider_definition,
-                         y_loc=0)
-
-    if slider_definition > 0 and which_plane is not None:
-        figure.update_layout(sliders=tuple(sliders))
+    for pos, axis in [(x_pos, Axes.X), (y_pos, Axes.Y), (z_pos, Axes.Z)]:
+        if pos is not None:
+            _draw_slice(
+                figure, axis, volume, opacity=opacity,
+                pos=pos, colorscale=colorscale,
+                invert_colorscale=invert_colorscale)
 
     return _inline_interact(figure, interact, inline)
+
+
+def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
+               dimensions, flip_axes):
+    fgarray = np.asarray(set_number_of_points(sls, n_points))
+    fgarray = np.median(fgarray, axis=0)
+    colormap = cm.nipy_spectral
+    normalize = mcolors.Normalize(
+        vmin=np.min(indiv_profile),
+        vmax=np.max(indiv_profile))
+    s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+    line_color = s_map.to_rgba(indiv_profile)
+    line_color_untouched = line_color.copy()
+    for i in range(n_points):
+        if i < n_points - 1:
+            direc = fgarray[i + 1] - fgarray[i]
+            direc = direc / np.linalg.norm(direc)
+            light_direc = -fgarray[i] / np.linalg.norm(fgarray[i])
+            direc_adjust = np.dot(direc, light_direc)
+            direc_adjust = (direc_adjust + 3) / 4
+        line_color[i, 0:3] = line_color[i, 0:3] * direc_adjust
+    text = [None] * n_points
+    text[0] = 0
+    # text[n_points // 2] = n_points // 2 # too much clutter
+    text[-1] = n_points
+
+    if flip_axes[0]:
+        fgarray[:, 0] = dimensions[0] - fgarray[:, 0]
+    if flip_axes[1]:
+        fgarray[:, 1] = dimensions[1] - fgarray[:, 1]
+    if flip_axes[2]:
+        fgarray[:, 2] = dimensions[2] - fgarray[:, 2]
+
+    figure.add_trace(
+        go.Scatter3d(
+            x=fgarray[:, 0],
+            y=fgarray[:, 1],
+            z=fgarray[:, 2],
+            name=vut.display_string(bundle_name + "_core"),
+            line=dict(
+                width=25,
+                color=line_color,
+            ),
+            hovertext=indiv_profile,
+            hoverinfo='all',
+            text=text,
+            textfont=dict(size=20, family="Overpass"),
+            textposition="top right",
+            mode="lines+text"
+        ),
+        row=1, col=1
+    )
+
+    return line_color_untouched
+
+
+def single_bundle_viz(indiv_profile, sft,
+                      bundle, scalar_name,
+                      affine=None,
+                      bundle_dict=None,
+                      flip_axes=[False, False, False],
+                      figure=None,
+                      include_profile=False):
+    """
+    Visualize a single bundle in 3D with core bundle and associated profile
+
+    Parameters
+    ----------
+    indiv_profile : ndarray
+        A numpy array containing a tract profile for this bundle for a scalar.
+
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information.
+        If bundle is an int, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'.
+        Otherwise, the entire Stateful Tractogram will be used as the bundle
+        for the visualization.
+
+    bundle : str or int
+        The name of the bundle to be used as the label for the plot,
+        or an integer for selection from the sft metadata.
+
+    scalar_name : str
+        The name of the scalar being used.
+
+    affine : ndarray, optional
+       An affine transformation to apply to the streamlines before
+       visualization. Default: no transform.
+
+    bundle_dict : dict, optional
+        This parameter is used if bundle is an int.
+        Keys are names of bundles and values are dicts that should include
+        a key `'uid'` with values as integers for selection from the sft
+        metadata. Default: Either the entire sft is treated as a bundle,
+        or identified only as unique integers in the metadata.
+
+    flip_axes : ndarray
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
+        For example, if the input image is LAS, use [True, False, False].
+        Default: [False, False, False]
+
+    figure : Plotly Figure object, optional
+        If provided, the visualization will be added to this Figure. Default:
+        Initialize a new Figure.
+
+    include_profile : bool, optional
+        If true, also plot the tract profile. Default: False
+
+    Returns
+    -------
+    Plotly Figure object
+    """
+    if figure is None:
+        if include_profile:
+            figure = make_subplots(
+                rows=1, cols=2,
+                specs=[[{"type": "scene"}, {"type": "scene"}]])
+        else:
+            figure = make_subplots(
+                rows=1, cols=1,
+                specs=[[{"type": "scene"}]])
+
+    set_layout(figure)
+
+    n_points = len(indiv_profile)
+    sls, _, bundle_name, dimensions = next(vut.tract_generator(
+        sft, affine, bundle, bundle_dict, None, n_points))
+
+    line_color = _draw_core(
+        sls, n_points, figure, bundle_name, indiv_profile,
+        dimensions, flip_axes)
+
+    if include_profile:
+        _plot_profiles(
+            indiv_profile, bundle_name + "_profile",
+            line_color, figure, scalar_name)
+
+    return figure
