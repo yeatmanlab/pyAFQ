@@ -17,7 +17,7 @@ with warnings.catch_warnings():
     logger = logging.getLogger('pyAFQ')
 
 usage = \
-    f"""pyAFQ /path/to/afq_config.toml
+    """pyAFQ /path/to/afq_config.toml
 
 Runs full AFQ processing as specified in the configuration file.
 
@@ -29,7 +29,7 @@ The default configuration file looks like:
 """
 
 
-def parse_cli(help_msg):
+def parse_cli(arg_dict):
     cli_parser = ArgumentParser(usage=usage + afb.dict_to_toml(arg_dict))
 
     cli_parser.add_argument(
@@ -45,6 +45,16 @@ def parse_cli(help_msg):
         default=False,
         help="Generate a default config file at the path"
         + " specified without running pyAFQ.")
+
+    cli_parser.add_argument(
+        '-q',
+        '--generate-qsiprep-json-only',
+        dest='generate_json',
+        action="store_true",
+        default=False,
+        help="Generate a default json file at the path"
+        + " specified without running pyAFQ; this json"
+        + " can be used to define a recon workflow in qsiprep.")
 
     cli_parser.add_argument(
         '-o',
@@ -84,19 +94,37 @@ def parse_cli(help_msg):
             "Your use of pyAFQ is being recorded using Google Analytics. "
             "For more information, please refer to the pyAFQ documentation: "
             "https://yeatmanlab.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  # noqa
-            "To turn this off, use the `--notrack` flag when using the pyAFQ CLI")
+            "To turn this off, use the `--notrack` "
+            "flag when using the pyAFQ CLI")
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
-    return opts.config, opts.generate_toml, opts.overwrite, opts.verbose, opts.to_call
+    return opts.config, opts.generate_toml, opts.overwrite,\
+        opts.verbose, opts.to_call, opts.generate_json
 
 
 if __name__ == '__main__':
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
-    config_file, generate_only, overwrite, verbose, to_call =\
+    config_file, generate_only, overwrite, verbose, to_call, generate_json =\
         parse_cli(arg_dict)
+
+    if generate_only and generate_json:
+        raise ValueError("Can only generate .toml or .json; not both")
+    if generate_json:
+        if config_file[-5:] != ".json":
+            raise ValueError(
+                "Config file must be .json when generating a .json")
+    else:
+        if config_file[-5:] != ".toml":
+            raise ValueError(
+                "Config file must be .toml unless generating a .json")
+
     if generate_only:
-        afb.generate_config(config_file, arg_dict, overwrite, logger=logger)
+        afb.generate_config(
+            config_file, arg_dict, overwrite, logger=logger)
+    elif generate_json:
+        afb.generate_json(
+            config_file, arg_dict, overwrite, logger=logger)
     else:
         afb.parse_config_run_afq(
             config_file,

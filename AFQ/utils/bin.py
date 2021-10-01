@@ -83,9 +83,9 @@ def get_default_args(func):
 def toml_to_val(t):
     if isinstance(t, str) and len(t) < 1:
         return None
-    elif isinstance(t, list):
+    elif isinstance(t, str) and t[0] == '[':
         ls = []
-        for e in t:
+        for e in eval(t):  # interpret as list
             ls.append(toml_to_val(e))
         return ls
     elif isinstance(t, str) and t[0] == '{':
@@ -105,19 +105,21 @@ def toml_to_val(t):
 
 def val_to_toml(v):
     if v is None:
-        return "''"
+        return '""'
     elif isinstance(v, Definition):
-        return f"'{v.str_for_toml()}'"
+        return f'"{v.str_for_toml()}"'
     elif isinstance(v, str):
-        return f"'{v}'"
+        return f'"{v}"'
     elif isinstance(v, bool):
         if v:
             return "true"
         else:
             return "false"
     elif callable(v):
-        return f"'{v.__name__}'"
+        return f'"{v.__name__}"'
     elif isinstance(v, dict):
+        return f'"{v}"'
+    elif isinstance(v, list):
         return f'"{v}"'
     else:
         return f"{v}"
@@ -142,6 +144,33 @@ def dict_to_toml(dictionary):
                 toml = toml + f"{arg} = {val_to_toml(arg_info)}\n"
         toml = toml + '\n'
     return toml + '\n'
+
+
+# these params are handled internally in the qsiprep pipeline,
+# not shown to the user (mostly BIDS filters stuff)
+qsi_prep_ignore_params = [
+    "bids_path", "bids_filters", "dmriprep",
+    "custom_tractography_bids_filters", "brain_mask",
+    "mapping"]
+
+
+def dict_to_json(dictionary):
+    json = "                "
+    local_ignore = qsi_prep_ignore_params.copy()
+    for section, args in dictionary.items():
+        if section == "AFQ_desc":
+            continue
+        for arg, arg_info in args.items():
+            if arg in local_ignore:
+                continue
+            local_ignore.append(arg)
+            if isinstance(arg_info, dict):
+                json = json\
+                    + f'"{arg}": {val_to_toml(arg_info["default"])}'
+            else:
+                json = json + f'"{arg}": {val_to_toml(arg_info)}'
+            json = json + ',\n                '
+    return json[:-18]  # remove trailing ,\n and indent
 
 
 def func_dict_to_arg_dict(func_dict=None, logger=None):
@@ -292,3 +321,39 @@ def generate_config(toml_file, default_arg_dict, overwrite=False,
         logger.info("Generating default configuration file.")
     toml_file = open(toml_file, 'w')
     toml_file.write(dict_to_toml(default_arg_dict))
+    toml_file.close()
+
+
+def generate_json(json_file, default_arg_dict, overwrite=False,
+                  logger=None):
+    if not overwrite and op.exists(json_file):
+        raise FileExistsError(
+            "Config file already exists. "
+            + "If you want to overwrite this file,"
+            + " add the argument --overwrite-config")
+    if logger is not None:
+        logger.info("Generating pyAFQ full pipeline QSIprep json file.")
+    qsi_spec_intro = """{
+    "description": "Use pyAFQ to perform the full Tractometry pipeline",
+    "space": "T1w",
+    "name": "pyAFQ_full",
+    "atlases": [],
+    "nodes": [
+        {
+            "name": "pyAFQ_full",
+            "software": "pyAFQ",
+            "action": "pyAFQ_full",
+            "input": "qsiprep",
+            "output_suffix": "PYAFQ_FULL",
+            "parameters": {
+"""
+    qsi_spec_outro = """
+            }
+        }
+    ]
+}"""
+    json_file = open(json_file, 'w')
+    json_file.write(qsi_spec_intro)
+    json_file.write(dict_to_json(default_arg_dict))
+    json_file.write(qsi_spec_outro)
+    json_file.close()
