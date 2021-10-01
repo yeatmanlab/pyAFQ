@@ -66,11 +66,13 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
     Helper function
     Generic calls to get_nearest to find a file
     """
+    if "extension" not in filters:
+        filters["extension"] = extension
+
     # First, try to match the session.
     nearest = bids_layout.get_nearest(
         path,
         **filters,
-        extension=extension,
         suffix=suffix,
         session=session,
         subject=subject,
@@ -83,7 +85,6 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
         nearest = bids_layout.get_nearest(
             path,
             **filters,
-            extension=extension,
             suffix=suffix,
             subject=subject,
             full_search=True,
