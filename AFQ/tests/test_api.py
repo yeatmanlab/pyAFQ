@@ -363,20 +363,21 @@ def test_AFQ_init():
         else:
             participant_labels_to_test = [None]
         for participant_labels in participant_labels_to_test:
-            if participant_labels == None:
+            if participant_labels is None:
                 n_subjects = 3
             else:
                 n_subjects = 1
-            bids_path = create_dummy_bids_path(n_subjects, n_sessions,
-                                            (n_subjects != n_sessions))
-            
+            bids_path = create_dummy_bids_path(
+                n_subjects, n_sessions,
+                (n_subjects != n_sessions))
+
             if participant_labels is not None and\
                     participant_labels[0] == "04":
                 with pytest.raises(
                     ValueError,
                     match="No subjects specified in `participant_labels` "
                     + " found in BIDS derivatives folders."
-                    + " See above warnings."):
+                        + " See above warnings."):
                     my_afq = api.AFQ(
                         bids_path,
                         dmriprep="synthetic",
