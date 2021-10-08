@@ -63,7 +63,7 @@ class Segmentation:
                  rng=None,
                  return_idx=False,
                  presegment_bundle_dict=None,
-                 presegment_kawrgs={},
+                 presegment_kwargs={},
                  filter_by_endpoints=True,
                  endpoint_info=None,
                  dist_to_atlas=4,
@@ -174,7 +174,7 @@ class Segmentation:
                 'prob_map': img3,
                 'cross_midline': False}
             Default: None
-        presegment_kawrgs : dict
+        presegment_kwargs : dict
             Optional arguments for initializing the segmentation for the
             presegmentation. Only used if presegment_bundle_dict is not None.
             Default: {}
@@ -232,7 +232,7 @@ class Segmentation:
         self.pruning_thr = pruning_thr
         self.return_idx = return_idx
         self.presegment_bundle_dict = presegment_bundle_dict
-        self.presegment_kawrgs = presegment_kawrgs
+        self.presegment_kwargs = presegment_kwargs
         self.filter_by_endpoints = filter_by_endpoints
         self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
@@ -897,7 +897,7 @@ class Segmentation:
         # that segmentation and segment using ROIs, else
         # RecoBundles based on the whole brain tractogram
         if self.presegment_bundle_dict is not None:
-            roiseg = Segmentation(**self.presegment_kawrgs)
+            roiseg = Segmentation(**self.presegment_kwargs)
             roiseg.segment(
                 self.presegment_bundle_dict,
                 self.tg,
@@ -925,8 +925,8 @@ class Segmentation:
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
                 afq_bundle_name = afd.BUNDLE_RECO_2_AFQ.get(bundle, bundle)
-                if "return_idx" in self.presegment_kawrgs\
-                        and self.presegment_kawrgs["return_idx"]:
+                if "return_idx" in self.presegment_kwargs\
+                        and self.presegment_kwargs["return_idx"]:
                     indiv_tg = roiseg_fg[afq_bundle_name]['sl']
                 else:
                     indiv_tg = roiseg_fg[afq_bundle_name]
