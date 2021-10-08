@@ -907,14 +907,21 @@ class AFQ(object):
                 if subjectID not in self.subjects:
                     self.logger.warning((
                         f"Subject {subjectID} specified in "
-                        f"`participant_labels` but not found in BIDS"))
+                        f"`participant_labels` but not found "
+                        f"in BIDS derivatives folders"))
                     if not subjects_found_printed:
                         subjects_found_printed = True
-                        self.logger.warning(
-                            f"Only these subjects found: {self.subjects}")
+                        self.logger.warning((
+                            f"Only these subjects found in BIDS "
+                            f"derivatives folders: {self.subjects}"))
                 else:
                     filtered_subjects.append(subjectID)
             self.subjects = filtered_subjects
+            if not len(self.subjects):
+                raise ValueError(
+                    "No subjects specified in `participant_labels` "
+                    + " found in BIDS derivatives folders."
+                    + " See above warnings.")
 
         sessions = bids_layout.get(return_type='id', target='session')
         if len(sessions):

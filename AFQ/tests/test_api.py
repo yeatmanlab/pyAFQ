@@ -352,33 +352,56 @@ def test_AFQ_fury():
     myafq.all_bundles_figure
 
 
-@pytest.mark.nightly_msmt_and_init
 def test_AFQ_init():
     """
     Test the initialization of the AFQ object
     """
     for n_sessions in [1, 2, 3]:
-        n_subjects = 3
-        bids_path = create_dummy_bids_path(n_subjects, n_sessions,
-                                           (n_subjects != n_sessions))
-        my_afq = api.AFQ(bids_path,
-                         dmriprep="synthetic")
-
-        for subject in range(n_subjects):
-            sub = f"0{subject+1}"
-            if n_subjects == n_sessions:
-                npt.assert_equal(
-                    len(my_afq.wf_dict[sub][sub]),
-                    40)
+        if n_sessions == 3:
+            # we only need to test all of these once
+            participant_labels_to_test = [None, ["01"], ["04"]]
+        else:
+            participant_labels_to_test = [None]
+        for participant_labels in participant_labels_to_test:
+            if participant_labels == None:
+                n_subjects = 3
             else:
-                for session in range(n_sessions):
-                    if n_sessions == 1:
-                        sess = "None"
+                n_subjects = 1
+            bids_path = create_dummy_bids_path(n_subjects, n_sessions,
+                                            (n_subjects != n_sessions))
+            
+            if participant_labels is not None and\
+                    participant_labels[0] == "04":
+                with pytest.raises(
+                    ValueError,
+                    match="No subjects specified in `participant_labels` "
+                    + " found in BIDS derivatives folders."
+                    + " See above warnings."):
+                    my_afq = api.AFQ(
+                        bids_path,
+                        dmriprep="synthetic",
+                        participant_labels=participant_labels)
+            else:
+                my_afq = api.AFQ(
+                    bids_path,
+                    dmriprep="synthetic",
+                    participant_labels=participant_labels)
+
+                for subject in range(n_subjects):
+                    sub = f"0{subject+1}"
+                    if n_subjects == n_sessions:
+                        npt.assert_equal(
+                            len(my_afq.wf_dict[sub][sub]),
+                            40)
                     else:
-                        sess = f"0{session+1}"
-                    npt.assert_equal(
-                        len(my_afq.wf_dict[sub][sess]),
-                        40)
+                        for session in range(n_sessions):
+                            if n_sessions == 1:
+                                sess = "None"
+                            else:
+                                sess = f"0{session+1}"
+                            npt.assert_equal(
+                                len(my_afq.wf_dict[sub][sess]),
+                                40)
 
 
 def test_AFQ_custom_bundle_dict():
