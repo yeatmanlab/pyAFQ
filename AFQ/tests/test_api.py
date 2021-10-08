@@ -586,16 +586,18 @@ def test_AFQ_pft():
         MaskFile("GMprobseg"),
         MaskFile("CSFprobseg"))
 
-    my_afq = api.AFQ(
-        bids_path,
-        dmriprep='vistasoft',
-        bundle_info=bundle_names,
-        tracking_params={
-            "stop_mask": stop_mask,
-            "stop_threshold": "CMC",
-            "tracker": "pft"
-        })
-    my_afq.export_streamlines()
+    with nbtmp.InTemporaryDirectory() as t_output_dir:
+        my_afq = api.AFQ(
+            bids_path,
+            dmriprep='vistasoft',
+            bundle_info=bundle_names,
+            output_dir=t_output_dir,
+            tracking_params={
+                "stop_mask": stop_mask,
+                "stop_threshold": "CMC",
+                "tracker": "pft"
+            })
+        my_afq.export_streamlines()
 
 
 @pytest.mark.nightly_custom

@@ -491,6 +491,7 @@ class AFQ(object):
                  bids_filters={"suffix": "dwi"},
                  dmriprep="all",
                  participant_labels=None,
+                 output_dir=None,
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
                  patch2self=False,
@@ -533,6 +534,14 @@ class AFQ(object):
         participant_labels : list or None, optional
             [BIDS] list of participant labels (subject IDs) to perform
             processing on. If None, all subjects are used.
+            Default: None
+        output_dir : str or None, optional
+            [BIDS] path to output directory. If None, outputs are put
+            in a AFQ pipeline folder in the derivatives folder of
+            the BIDS directory. pyAFQ will use existing derivatives
+            from the output directory if they exist, instead of recalculating
+            them (this means you need to clear the output folder if you want
+            to recalculate a derivative).
             Default: None
         custom_tractography_bids_filters : dict, optional
             [BIDS] BIDS filters for inputing a user made tractography file.
@@ -658,6 +667,10 @@ class AFQ(object):
                 and not isinstance(participant_labels, list):
             raise TypeError(
                 "participant_labels must be either a list or None")
+        if output_dir is not None\
+                and not isinstance(output_dir, str):
+            raise TypeError(
+                "output_dir must be either a str or None")
         if custom_tractography_bids_filters is not None\
                 and not isinstance(custom_tractography_bids_filters, dict):
             raise TypeError(
@@ -857,8 +870,12 @@ class AFQ(object):
                     resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
-        self.afq_path = op.join(bids_path, 'derivatives', 'afq')
-        self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
+        if output_dir is None:
+            self.afq_path = op.join(bids_path, 'derivatives', 'afq')
+            self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
+        else:
+            self.afq_path = output_dir
+            self.afqb_path = op.join(output_dir, 'afq_browser')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
