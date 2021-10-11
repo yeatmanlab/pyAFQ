@@ -3,13 +3,13 @@ import os.path as op
 import logging
 
 import numpy as np
-import IPython.display as display
 
 import AFQ.viz.utils as vut
 
 try:
     from dipy.viz import window, actor, ui
     from fury.colormap import line_colors
+    import IPython.display as display
 except ImportError:
     raise ImportError(vut.viz_import_msg_error("fury"))
 

@@ -8,6 +8,7 @@ import AFQ.segmentation as seg
 import AFQ.tractography as aft
 import AFQ.data as afd
 from AFQ.viz.utils import Viz
+import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
 
 from AFQ.tasks.data import get_data_plan
@@ -1365,7 +1366,10 @@ class AFQ(object):
         # i.e., for AFQ Browser
         self.combine_profiles()
         if viz:
-            self.tract_profile_plots
+            try:
+                self.tract_profile_plots
+            except ImportError(vut.viz_import_msg_error("plot")):
+                self.logger.warning(vut.viz_import_msg_error("plot"))
             self.all_bundles_figure
             if self.seg_algo == "afq":
                 self.indiv_bundles_figures
