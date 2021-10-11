@@ -69,9 +69,12 @@ def viz_bundles(subses_dict,
     for i in range(3):
         flip_axes[i] = (dwi_affine[i, i] < 0)
 
-    figure = make_subplots(
-        rows=1, cols=2,
-        specs=[[{"type": "scene"}, {"type": "scene"}]])
+    if "plotly" in viz_backend.backend:
+        figure = make_subplots(
+            rows=1, cols=2,
+            specs=[[{"type": "scene"}, {"type": "scene"}]])
+    else:
+        figure = None
 
     figure = viz_backend.visualize_volume(
         volume,
