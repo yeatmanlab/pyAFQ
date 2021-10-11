@@ -664,6 +664,15 @@ class Segmentation:
                     min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
 
+                # see https://github.com/joblib/joblib/issues/945
+                if (
+                        "backend" in self.parallel_segmentation
+                        and self.parallel_segmentation["backend"] == "loky"):
+                    from joblib.externals.loky import get_reusable_executor
+                    self.logger.info("Cleaning up Loky...")
+                    get_reusable_executor().shutdown(wait=True)
+                    self.logger.info("Loky Cleaned up")
+
             self.logger.info(
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
