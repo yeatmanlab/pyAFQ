@@ -668,6 +668,16 @@ class Segmentation:
                 (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
 
+        # see https://github.com/joblib/joblib/issues/945
+        if (
+                self.parallel_segmentation["engine"] != "serial"
+                and "backend" in self.parallel_segmentation
+                and self.parallel_segmentation["backend"] == "loky"):
+            from joblib.externals.loky import get_reusable_executor
+            self.logger.info("Cleaning up Loky...")
+            get_reusable_executor().shutdown(wait=True)
+            self.logger.info("Loky Cleaned up")
+
         # Eliminate any fibers not selected using the waypoint ROIs:
         possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
         tg = StatefulTractogram(tg.streamlines[possible_fibers],
