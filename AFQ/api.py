@@ -333,7 +333,8 @@ class PediatricBundleDict(BundleDict):
         Parameters
         ----------
         bundle_info : list, optional
-            A list of the pediatric bundles to be used in this case. Default: all of them
+            A list of the pediatric bundles to be used in this case.
+            Default: all of them
 
         seg_algo: only "afq" is supported
             The bundle segmentation algorithm to use.
@@ -346,95 +347,109 @@ class PediatricBundleDict(BundleDict):
             Default: False
         """
         BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
-    
+
     def gen_all(self):
         if self.all_gen:
             return
         if self.seg_algo == "afq":
             # Pediatric bundles differ from adult bundles:
-            #   - A third ROI has been introduced for curvy tracts: ARC, ATR, CGC, IFO,
-            #     and UCI
-            #   - ILF posterior ROI has been split into two to separate ILF and mdLF
+            #   - A third ROI has been introduced for curvy tracts:
+            #     ARC, ATR, CGC, IFO, and UCI
+            #   - ILF posterior ROI has been split into two
+            #     to separate ILF and mdLF
             #   - Addition of pAF and VOF ROIs
             #   - SLF ROIs are restricted to parietal cortex
             pediatric_templates = afd.read_pediatric_templates()
 
-             # pediatric probability maps
-            prob_map_order = ["ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
-                              "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
-                              "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
-                              "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
-            
-            prob_maps = pediatric_templates['UNCNeo_JHU_tracts_prob-for-babyAFQ']
+            # pediatric probability maps
+            prob_map_order = [
+                "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
+                "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
+                "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
+                "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
+
+            prob_maps = pediatric_templates[
+                'UNCNeo_JHU_tracts_prob-for-babyAFQ']
             prob_map_data = prob_maps.get_fdata()
 
             # pediatric bundle dict
             pediatric_bundles = {}
 
-            # each bundles gets a digit identifier (to be stored in the tractogram)
+            # each bundles gets a digit identifier
+            # (to be stored in the tractogram)
             uid = 1
 
             for name in PEDIATRIC_BUNDLES:
                 # ROIs that cross the mid-line
                 if name in ["FA", "FP"]:
                     pediatric_bundles[name] = {
-                        'ROIs': [pediatric_templates[name + "_L"],
-                                pediatric_templates[name + "_R"],
-                                pediatric_templates["mid-saggital"]],
+                        'ROIs': [
+                            pediatric_templates[name + "_L"],
+                            pediatric_templates[name + "_R"],
+                            pediatric_templates["mid-saggital"]],
                         'rules': [True, True, True],
                         'cross_midline': True,
-                        'prob_map': prob_map_data[...,
-                                                prob_map_order.index(name)],
+                        'prob_map': prob_map_data[
+                            ...,
+                            prob_map_order.index(name)],
                         'uid': uid}
                     uid += 1
                 # SLF is a special case, because it has an exclusion ROI:
                 elif name == "SLF":
                     for hemi in ['_R', '_L']:
                         pediatric_bundles[name + hemi] = {
-                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
-                                    pediatric_templates[name + '_roi2' + hemi],
-                                    pediatric_templates["SLFt_roi2" + hemi]],
+                            'ROIs': [
+                                pediatric_templates[name + '_roi1' + hemi],
+                                pediatric_templates[name + '_roi2' + hemi],
+                                pediatric_templates["SLFt_roi2" + hemi]],
                             'rules': [True, True, False],
                             'cross_midline': False,
-                            'prob_map': prob_map_data[...,
-                                                    prob_map_order.index(name + hemi)],
+                            'prob_map': prob_map_data[
+                                ...,
+                                prob_map_order.index(name + hemi)],
                             'uid': uid}
                         uid += 1
                 # Third ROI for curvy tracts
                 elif name in ["ARC", "ATR", "CGC", "IFO", "UNC"]:
                     for hemi in ['_R', '_L']:
                         pediatric_bundles[name + hemi] = {
-                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
-                                    pediatric_templates[name + '_roi2' + hemi],
-                                    pediatric_templates[name + '_roi3' + hemi]],
+                            'ROIs': [
+                                pediatric_templates[name + '_roi1' + hemi],
+                                pediatric_templates[name + '_roi2' + hemi],
+                                pediatric_templates[name + '_roi3' + hemi]],
                             'rules': [True, True, True],
                             'cross_midline': False,
-                            'prob_map': prob_map_data[...,
-                                                    prob_map_order.index(name + hemi)],
+                            'prob_map': prob_map_data[
+                                ...,
+                                prob_map_order.index(name + hemi)],
                             'uid': uid}
                         uid += 1
                 elif name == "MdLF":
                     for hemi in ['_R', '_L']:
                         pediatric_bundles[name + hemi] = {
-                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
-                                    pediatric_templates[name + '_roi2' + hemi]],
+                            'ROIs': [
+                                pediatric_templates[name + '_roi1' + hemi],
+                                pediatric_templates[name + '_roi2' + hemi]],
                             'rules': [True, True],
                             'cross_midline': False,
                             # reuse probability map from ILF
-                            'prob_map': prob_map_data[...,
-                                                    prob_map_order.index("ILF" + hemi)],
+                            'prob_map': prob_map_data[
+                                ...,
+                                prob_map_order.index("ILF" + hemi)],
                             'uid': uid}
                         uid += 1
                 # Default: two ROIs within hemisphere
                 else:
                     for hemi in ['_R', '_L']:
                         pediatric_bundles[name + hemi] = {
-                            'ROIs': [pediatric_templates[name + '_roi1' + hemi],
-                                    pediatric_templates[name + '_roi2' + hemi]],
+                            'ROIs': [
+                                pediatric_templates[name + '_roi1' + hemi],
+                                pediatric_templates[name + '_roi2' + hemi]],
                             'rules': [True, True],
                             'cross_midline': False,
-                            'prob_map': prob_map_data[...,
-                                                    prob_map_order.index(name + hemi)],
+                            'prob_map': prob_map_data[
+                                ...,
+                                prob_map_order.index(name + hemi)],
                             'uid': uid}
                         uid += 1
             self._dict = pediatric_bundles
@@ -475,6 +490,8 @@ class AFQ(object):
                  bids_path,
                  bids_filters={"suffix": "dwi"},
                  dmriprep="all",
+                 participant_labels=None,
+                 output_dir=None,
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
                  patch2self=False,
@@ -514,6 +531,18 @@ class AFQ(object):
         dmriprep : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "all".
+        participant_labels : list or None, optional
+            [BIDS] list of participant labels (subject IDs) to perform
+            processing on. If None, all subjects are used.
+            Default: None
+        output_dir : str or None, optional
+            [BIDS] path to output directory. If None, outputs are put
+            in a AFQ pipeline folder in the derivatives folder of
+            the BIDS directory. pyAFQ will use existing derivatives
+            from the output directory if they exist, instead of recalculating
+            them (this means you need to clear the output folder if you want
+            to recalculate a derivative).
+            Default: None
         custom_tractography_bids_filters : dict, optional
             [BIDS] BIDS filters for inputing a user made tractography file.
             If None, tractography will be performed automatically.
@@ -634,6 +663,14 @@ class AFQ(object):
         if not isinstance(bids_filters, dict):
             raise TypeError("bids_filters must be a dict")
         # dmriprep typechecking handled by pyBIDS
+        if participant_labels is not None\
+                and not isinstance(participant_labels, list):
+            raise TypeError(
+                "participant_labels must be either a list or None")
+        if output_dir is not None\
+                and not isinstance(output_dir, str):
+            raise TypeError(
+                "output_dir must be either a str or None")
         if custom_tractography_bids_filters is not None\
                 and not isinstance(custom_tractography_bids_filters, dict):
             raise TypeError(
@@ -833,8 +870,12 @@ class AFQ(object):
                     resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
-        self.afq_path = op.join(bids_path, 'derivatives', 'afq')
-        self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
+        if output_dir is None:
+            self.afq_path = op.join(bids_path, 'derivatives', 'afq')
+            self.afqb_path = op.join(bids_path, 'derivatives', 'afq_browser')
+        else:
+            self.afq_path = output_dir
+            self.afqb_path = op.join(output_dir, 'afq_browser')
 
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
@@ -874,6 +915,30 @@ class AFQ(object):
                 "`bids_path` contains no subjects in derivatives folders."
                 + " This could be caused by derivatives folders not following"
                 + " the BIDS format.")
+
+        if participant_labels is not None:
+            filtered_subjects = []
+            subjects_found_printed = False
+            for subjectID in participant_labels:
+                subjectID = str(subjectID)
+                if subjectID not in self.subjects:
+                    self.logger.warning((
+                        f"Subject {subjectID} specified in "
+                        f"`participant_labels` but not found "
+                        f"in BIDS derivatives folders"))
+                    if not subjects_found_printed:
+                        subjects_found_printed = True
+                        self.logger.warning((
+                            f"Only these subjects found in BIDS "
+                            f"derivatives folders: {self.subjects}"))
+                else:
+                    filtered_subjects.append(subjectID)
+            self.subjects = filtered_subjects
+            if not len(self.subjects):
+                raise ValueError(
+                    "No subjects specified in `participant_labels` "
+                    + " found in BIDS derivatives folders."
+                    + " See above warnings.")
 
         sessions = bids_layout.get(return_type='id', target='session')
         if len(sessions):
@@ -1083,7 +1148,7 @@ class AFQ(object):
     def get_reg_template(self):
         if isinstance(self.reg_template, nib.Nifti1Image):
             return self.reg_template
-        
+
         img_l = self.reg_template.lower()
         if img_l == "mni_t2":
             img = afd.read_mni_template(
