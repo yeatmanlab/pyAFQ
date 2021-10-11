@@ -13,7 +13,7 @@ from dipy.align import resample
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 import AFQ.data as afd
-from AFQ.viz.utils import visualize_tract_profiles
+from AFQ.viz.plot import visualize_tract_profiles
 
 from plotly.subplots import make_subplots
 
