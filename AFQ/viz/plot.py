@@ -19,7 +19,7 @@ try:
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
     import IPython.display as display
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     raise ImportError(vut.viz_import_msg_error("plot"))
 
 __all__ = ["visualize_tract_profiles", "visualize_gif_inline"]

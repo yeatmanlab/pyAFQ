@@ -10,7 +10,7 @@ try:
     from dipy.viz import window, actor, ui
     from fury.colormap import line_colors
     import IPython.display as display
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     raise ImportError(vut.viz_import_msg_error("fury"))
 
 viz_logger = logging.getLogger("AFQ.viz")

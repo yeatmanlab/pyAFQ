@@ -45,7 +45,7 @@ except ValueError:
 try:
     import afqbrowser as afqb
     using_afqb = True
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     using_afqb = False
 
 
