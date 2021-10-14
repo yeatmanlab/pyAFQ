@@ -1023,7 +1023,7 @@ class AFQ(object):
                     bids_filters["suffix"] = suffix
 
                 if custom_tractography_bids_filters is not None:
-                    custom_tract_file = \
+                    custom_tract_files = \
                         bids_layout.get(subject=subject, session=session,
                                         extension=[
                                             '.trk',
@@ -1032,7 +1032,23 @@ class AFQ(object):
                                             '.fib',
                                             '.dpy'],
                                         return_type='filename',
-                                        **custom_tractography_bids_filters)[0]
+                                        **custom_tractography_bids_filters)
+                    if len(custom_tract_files) < 1:
+                        self.logger.warning(
+                            f"No custom tractography found for subject "
+                            f"{subject} and session "
+                            f"{session}. Will perform tractography"
+                            f" using built-in DIPY tractography.")
+                        custom_tract_file = None
+                    elif len(custom_tract_files) > 1:
+                        custom_tract_file = custom_tract_files[0]
+                        self.logger.warning(
+                            f"Multiple viable custom tractographies found for"
+                            f" subject "
+                            f"{subject} and session "
+                            f"{session}. Will use: {custom_tract_file}")
+                    else:
+                        custom_tract_file = custom_tract_files[0]
                 else:
                     custom_tract_file = None
 
