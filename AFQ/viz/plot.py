@@ -9,6 +9,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 import AFQ.viz.utils as vut
+from AFQ.viz.utils import display_string
 from AFQ.utils.stats import contrast_index as calc_contrast_index
 from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 
@@ -77,13 +78,6 @@ def visualize_tract_profiles(tract_profiles, scalar="dti_fa", ylim=None,
         n_boot=n_boot)
 
     return df
-
-
-def display_string(scalar_name):
-    if isinstance(scalar_name, str):
-        return scalar_name.replace("_", " ").upper()
-    else:
-        return [sn.replace("_", " ").upper() for sn in scalar_name]
 
 
 class BrainAxes():
