@@ -1368,8 +1368,12 @@ class AFQ(object):
         if viz:
             try:
                 self.tract_profile_plots
-            except ImportError(vut.viz_import_msg_error("plot")):
-                self.logger.warning(vut.viz_import_msg_error("plot"))
+            except ImportError as e:
+                plotly_err_message = vut.viz_import_msg_error("plot")
+                if str(e) != plotly_err_message:
+                    raise
+                else:
+                    self.logger.warning(plotly_err_message)
             self.all_bundles_figure
             if self.seg_algo == "afq":
                 self.indiv_bundles_figures
