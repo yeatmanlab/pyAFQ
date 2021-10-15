@@ -40,7 +40,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 from AFQ.utils.volume import transform_inverse_roi, density_map
-from AFQ.viz.utils import show_anatomical_slices
+from AFQ.viz.plot import show_anatomical_slices
 from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
 import logging
