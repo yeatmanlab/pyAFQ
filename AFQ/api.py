@@ -956,27 +956,6 @@ class AFQ(object):
             self.segmentation_params["parallel_segmentation"]["engine"] =\
                 "serial"
 
-        # construct pimms plans
-        if isinstance(mapping, SlrMap):
-            plans = {  # if using SLR map, do tractography first
-                "data": get_data_plan(self.brain_mask_definition),
-                "tractography": get_tractography_plan(
-                    self.custom_tractography_bids_filters,
-                    self.tracking_params),
-                "mapping": get_mapping_plan(
-                    self.reg_subject, self.scalars, use_sls=True),
-                "segmentation": get_segmentation_plan(),
-                "viz": get_viz_plan()}
-        else:
-            plans = {  # Otherwise, do mapping first
-                "data": get_data_plan(self.brain_mask_definition),
-                "mapping": get_mapping_plan(self.reg_subject, self.scalars),
-                "tractography": get_tractography_plan(
-                    self.custom_tractography_bids_filters,
-                    self.tracking_params),
-                "segmentation": get_segmentation_plan(),
-                "viz": get_viz_plan()}
-
         self.valid_sub_list = []
         self.valid_ses_list = []
         for subject in self.subjects:
@@ -1139,6 +1118,29 @@ class AFQ(object):
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params,
                     **kwargs)
+
+                # construct pimms plans
+                if isinstance(mapping, SlrMap):
+                    plans = {  # if using SLR map, do tractography first
+                        "data": get_data_plan(self.brain_mask_definition),
+                        "tractography": get_tractography_plan(
+                            custom_tract_file,
+                            self.tracking_params),
+                        "mapping": get_mapping_plan(
+                            self.reg_subject, self.scalars, use_sls=True),
+                        "segmentation": get_segmentation_plan(),
+                        "viz": get_viz_plan()}
+                else:
+                    plans = {  # Otherwise, do mapping first
+                        "data": get_data_plan(self.brain_mask_definition),
+                        "mapping": get_mapping_plan(
+                            self.reg_subject,
+                            self.scalars),
+                        "tractography": get_tractography_plan(
+                            custom_tract_file,
+                            self.tracking_params),
+                        "segmentation": get_segmentation_plan(),
+                        "viz": get_viz_plan()}
 
                 # chain together a complete plan from individual plans
                 previous_data = {}

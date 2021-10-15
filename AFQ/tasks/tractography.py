@@ -99,11 +99,11 @@ def custom_tractography(custom_tract_file):
     return custom_tract_file
 
 
-def get_tractography_plan(custom_tractography_bids_filters, tracking_params):
+def get_tractography_plan(custom_tract_file, tracking_params):
     tractography_tasks = with_name([
         export_seed_mask, export_stop_mask, streamlines])
 
-    if custom_tractography_bids_filters is not None:
+    if custom_tract_file is not None:
         tractography_tasks["streamlines_res"] = custom_tractography
 
     stop_mask = tracking_params['stop_mask']
