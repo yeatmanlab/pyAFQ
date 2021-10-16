@@ -956,27 +956,6 @@ class AFQ(object):
             self.segmentation_params["parallel_segmentation"]["engine"] =\
                 "serial"
 
-        # construct pimms plans
-        if isinstance(mapping, SlrMap):
-            plans = {  # if using SLR map, do tractography first
-                "data": get_data_plan(self.brain_mask_definition),
-                "tractography": get_tractography_plan(
-                    self.custom_tractography_bids_filters,
-                    self.tracking_params),
-                "mapping": get_mapping_plan(
-                    self.reg_subject, self.scalars, use_sls=True),
-                "segmentation": get_segmentation_plan(),
-                "viz": get_viz_plan()}
-        else:
-            plans = {  # Otherwise, do mapping first
-                "data": get_data_plan(self.brain_mask_definition),
-                "mapping": get_mapping_plan(self.reg_subject, self.scalars),
-                "tractography": get_tractography_plan(
-                    self.custom_tractography_bids_filters,
-                    self.tracking_params),
-                "segmentation": get_segmentation_plan(),
-                "viz": get_viz_plan()}
-
         self.valid_sub_list = []
         self.valid_ses_list = []
         for subject in self.subjects:
@@ -1023,7 +1002,7 @@ class AFQ(object):
                     bids_filters["suffix"] = suffix
 
                 if custom_tractography_bids_filters is not None:
-                    custom_tract_file = \
+                    custom_tract_files = \
                         bids_layout.get(subject=subject, session=session,
                                         extension=[
                                             '.trk',
@@ -1032,7 +1011,23 @@ class AFQ(object):
                                             '.fib',
                                             '.dpy'],
                                         return_type='filename',
-                                        **custom_tractography_bids_filters)[0]
+                                        **custom_tractography_bids_filters)
+                    if len(custom_tract_files) < 1:
+                        self.logger.warning(
+                            f"No custom tractography found for subject "
+                            f"{subject} and session "
+                            f"{session}. Will perform tractography"
+                            f" using built-in DIPY tractography.")
+                        custom_tract_file = None
+                    elif len(custom_tract_files) > 1:
+                        custom_tract_file = custom_tract_files[0]
+                        self.logger.warning(
+                            f"Multiple viable custom tractographies found for"
+                            f" subject "
+                            f"{subject} and session "
+                            f"{session}. Will use: {custom_tract_file}")
+                    else:
+                        custom_tract_file = custom_tract_files[0]
                 else:
                     custom_tract_file = None
 
@@ -1123,6 +1118,29 @@ class AFQ(object):
                     segmentation_params=self.segmentation_params,
                     clean_params=self.clean_params,
                     **kwargs)
+
+                # construct pimms plans
+                if isinstance(mapping, SlrMap):
+                    plans = {  # if using SLR map, do tractography first
+                        "data": get_data_plan(self.brain_mask_definition),
+                        "tractography": get_tractography_plan(
+                            custom_tract_file,
+                            self.tracking_params),
+                        "mapping": get_mapping_plan(
+                            self.reg_subject, self.scalars, use_sls=True),
+                        "segmentation": get_segmentation_plan(),
+                        "viz": get_viz_plan()}
+                else:
+                    plans = {  # Otherwise, do mapping first
+                        "data": get_data_plan(self.brain_mask_definition),
+                        "mapping": get_mapping_plan(
+                            self.reg_subject,
+                            self.scalars),
+                        "tractography": get_tractography_plan(
+                            custom_tract_file,
+                            self.tracking_params),
+                        "segmentation": get_segmentation_plan(),
+                        "viz": get_viz_plan()}
 
                 # chain together a complete plan from individual plans
                 previous_data = {}
