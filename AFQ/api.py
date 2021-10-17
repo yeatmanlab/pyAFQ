@@ -92,7 +92,7 @@ class BundleDict(MutableMapping):
     def __init__(self,
                  bundle_info=BUNDLES,
                  seg_algo="afq",
-                 resample_to=afd.read_mni_template()):
+                 resample_to=None):
         """
         Create a bundle dictionary, needed for the segmentation
 
@@ -111,7 +111,8 @@ class BundleDict(MutableMapping):
 
         resample_to : Nifti1Image or bool, optional
             If set, templates will be resampled to the affine and shape of this
-            image. If False, no resampling will be done.
+            image. If None, the MNI template will be used.
+            If False, no resampling will be done.
             Default: afd.read_mni_template()
         """
         if not (isinstance(bundle_info, dict)
@@ -120,6 +121,8 @@ class BundleDict(MutableMapping):
                 f"bundle_info must be a dict or a list,"
                 f" currently a {type(bundle_info)}"))
         self.seg_algo = seg_algo.lower()
+        if resample_to is None:
+            resample_to = afd.read_mni_template()
         self.resample_to = resample_to
 
         if isinstance(bundle_info, dict):
