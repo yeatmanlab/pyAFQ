@@ -84,10 +84,11 @@ def toml_to_val(t):
     if isinstance(t, str) and len(t) < 1:
         return None
     elif isinstance(t, list):
-        ls = []
-        for e in t:
-            ls.append(toml_to_val(e))
-        return ls
+        return eval(t)
+        # ls = []
+        # for e in t:
+        #     ls.append(toml_to_val(e))
+        # return ls
     elif isinstance(t, str) and t[0] == '[':
         ls = []
         for e in eval(t):  # interpret as list
