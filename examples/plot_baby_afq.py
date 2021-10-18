@@ -42,20 +42,21 @@ from AFQ.definitions.mask import RoiMask, MaskFile
 # .. note::
 #
 #   While it is possible to run tractography and segmentation for pediatric dMRI
-#   data with pyAFQ, we recommend using a custom tractography pipeline and only 
+#   data with pyAFQ, we recommend using a custom tractography pipeline and only
 #   using pyAFQ for segmentation as shown in:
 #
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/mrtrix_pipeline.ipynb
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/pybabyafq.ipynb
 
 
-myafq = api.AFQ(# ==== BIDS parameters ====
+myafq = api.AFQ(  # ==== BIDS parameters ====
                 bids_path=op.join(afd.afq_home, "study"),
-                dmriprep="derivatives",
+                preproc_pipeline="derivatives",
                 # ===== Registration parameters ====
                 min_bval=1000,
                 max_bval=1000,
-                reg_template=afd.read_pediatric_templates()["UNCNeo-withCerebellum-for-babyAFQ"],
+                reg_template=afd.read_pediatric_templates(
+                )["UNCNeo-withCerebellum-for-babyAFQ"],
                 reg_subject="b0",
                 brain_mask=MaskFile("brainmask",
                                     {"scope": "derivatives"}),
@@ -81,11 +82,11 @@ plotly.io.show(myafq.all_bundles_figure[list(myafq.all_bundles_figure)[0]])
 # References:
 # -------------------------
 # .. [Grotheer2021] Mareike Grotheer, Mona Rosenke, Hua Wu, Holly Kular,
-#                   Francesca R. Querdasi, Vaidehi Natu, Jason D. Yeatman, 
+#                   Francesca R. Querdasi, Vaidehi Natu, Jason D. Yeatman,
 #                   alanit Grill-Spector, "Catch me if you can: Least
 #                   myelinated white matter develops fastest during early
 #                   infancy", bioRxiv
-# 
+#
 # .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
 #                  Brian A Wandell, Heidi M Feldman, "Tract profiles of
 #                  white matter properties: automating fiber-tract
