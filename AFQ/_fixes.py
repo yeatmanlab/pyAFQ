@@ -8,7 +8,6 @@ from dipy.tracking.local_tracking import (LocalTracking,
                                           ParticleFilteringTracking)
 import random
 
-import sys
 import math
 
 
@@ -229,7 +228,7 @@ def solve_qp(P, Q, G, H):
     """
     try:
         import cvxpy as cvx
-    except ImportError:
+    except (ImportError, ModuleNotFoundError):
         raise ImportError(
             "Using MSMT in pyAFQ requires the the cvxpy package. "
             "You can install it using `pip install cvxpy` or `pip "
@@ -245,7 +244,7 @@ def solve_qp(P, Q, G, H):
     try:
         prob.solve()
         opt = np.array(x.value).reshape((Q.shape[0],))
-    except (cvx.error.SolverError, cvx.error.DCPError) as e:
+    except (cvx.error.SolverError, cvx.error.DCPError):
         opt = np.empty((Q.shape[0],))
         opt[:] = np.NaN
 

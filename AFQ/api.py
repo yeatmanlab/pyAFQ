@@ -8,6 +8,7 @@ import AFQ.segmentation as seg
 import AFQ.tractography as aft
 import AFQ.data as afd
 from AFQ.viz.utils import Viz
+import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
 
 from AFQ.tasks.data import get_data_plan
@@ -44,7 +45,7 @@ except ValueError:
 try:
     import afqbrowser as afqb
     using_afqb = True
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     using_afqb = False
 
 
@@ -1386,7 +1387,14 @@ class AFQ(object):
         # i.e., for AFQ Browser
         self.combine_profiles()
         if viz:
-            self.tract_profile_plots
+            try:
+                self.tract_profile_plots
+            except ImportError as e:
+                plotly_err_message = vut.viz_import_msg_error("plot")
+                if str(e) != plotly_err_message:
+                    raise
+                else:
+                    self.logger.warning(plotly_err_message)
             self.all_bundles_figure
             if self.seg_algo == "afq":
                 self.indiv_bundles_figures

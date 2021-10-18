@@ -73,7 +73,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 #
 # - Tract probability maps: ``AFQ_data/templates/``
 #
-#   see https://figshare.com/articles/Tract_probability_maps_for_automated_fiber_quantification/6270434
+#   see https://figshare.com/articles/Tract_probability_maps_for_automated_fiber_quantification/6270434  # noqa
 #
 # These waypoints ROIs will used to identify the desired white matter tracts.
 #
@@ -171,6 +171,8 @@ plotly.io.show(bundle_html["01"])
 ##########################################################################
 # We can also visualize the tract profiles in all of the bundles. These
 # plots show both FA (left) and MD (right) layed out anatomically.
+# To make this plots, it is required that you install with
+# `pip install pyAFQ[plot]` so that you have the necessary dependencies.
 #
 
 fig_files = myafq.tract_profile_plots["01"]

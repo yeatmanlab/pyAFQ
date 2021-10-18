@@ -13,7 +13,6 @@ from dipy.align import resample
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 import AFQ.data as afd
-from AFQ.viz.utils import visualize_tract_profiles
 
 from plotly.subplots import make_subplots
 
@@ -323,6 +322,7 @@ def viz_indivBundle(subses_dict,
 @pimms.calc("tract_profile_plots")
 def plot_tract_profiles(subses_dict, scalars, tracking_params,
                         segmentation_params, segmentation_imap):
+    from AFQ.viz.plot import visualize_tract_profiles
     start_time = time()
     fnames = []
     for scalar in scalars:
