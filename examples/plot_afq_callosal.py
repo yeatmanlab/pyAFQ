@@ -48,7 +48,7 @@ tracking_params = dict(seed_mask=RoiMask(),
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
-                dmriprep='vistasoft',
+                preproc_pipeline='vistasoft',
                 bundle_info=api.CALLOSUM_BUNDLES,
                 tracking_params=tracking_params,
                 viz_backend='plotly_no_gif')

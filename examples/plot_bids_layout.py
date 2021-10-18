@@ -232,7 +232,7 @@ bundle_info = ["SLF", "ARC", "CST", "FP"]
 
 my_afq = api.AFQ(
     bids_path,
-    dmriprep='vistasoft',
+    preproc_pipeline='vistasoft',
     bundle_info=bundle_info,
     custom_tractography_bids_filters={
         "suffix": "tractography",

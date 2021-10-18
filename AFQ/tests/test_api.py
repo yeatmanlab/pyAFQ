@@ -276,7 +276,7 @@ def test_AFQ_missing_files():
             ValueError,
             match="No non-json files recognized by pyBIDS"
             + " in the pipeline: missingPipe"):
-        api.AFQ(bids_path, dmriprep="missingPipe")
+        api.AFQ(bids_path, preproc_pipeline="missingPipe")
 
     os.mkdir(op.join(bids_path, "missingPipe"))
     afd.to_bids_description(
@@ -287,7 +287,7 @@ def test_AFQ_missing_files():
             ValueError,
             match="No non-json files recognized by pyBIDS"
             + " in the pipeline: missingPipe"):
-        api.AFQ(bids_path, dmriprep="missingPipe")
+        api.AFQ(bids_path, preproc_pipeline="missingPipe")
 
 
 @pytest.mark.nightly_custom
@@ -315,7 +315,7 @@ def test_AFQ_custom_tract():
     )
     my_afq = api.AFQ(
         bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
         custom_tractography_bids_filters={
             "suffix": "tractography",
@@ -337,7 +337,7 @@ def test_AFQ_no_derivs():
             match=f"No non-json files recognized by pyBIDS in {bids_path}"):
         api.AFQ(
             bids_path,
-            dmriprep="synthetic")
+            preproc_pipeline="synthetic")
 
 
 @pytest.mark.nightly_custom
@@ -347,7 +347,7 @@ def test_AFQ_fury():
 
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         viz_backend="fury")
     myafq.all_bundles_figure
 
@@ -380,12 +380,12 @@ def test_AFQ_init():
                         + " See above warnings."):
                     my_afq = api.AFQ(
                         bids_path,
-                        dmriprep="synthetic",
+                        preproc_pipeline="synthetic",
                         participant_labels=participant_labels)
             else:
                 my_afq = api.AFQ(
                     bids_path,
-                    dmriprep="synthetic",
+                    preproc_pipeline="synthetic",
                     participant_labels=participant_labels)
 
                 for subject in range(n_subjects):
@@ -410,7 +410,7 @@ def test_AFQ_custom_bundle_dict():
     bundle_dict = api.BundleDict()
     api.AFQ(
         bids_path,
-        dmriprep="synthetic",
+        preproc_pipeline="synthetic",
         bundle_info=bundle_dict)
 
 
@@ -424,7 +424,7 @@ def test_AFQ_data():
     for mapping in [SynMap(use_prealign=False), AffMap()]:
         myafq = api.AFQ(
             bids_path=bids_path,
-            dmriprep='vistasoft',
+            preproc_pipeline='vistasoft',
             mapping=mapping)
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
                          nib.load(myafq.dwi_file["01"]).shape[:3])
@@ -445,7 +445,7 @@ def test_AFQ_anisotropic():
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         min_bval=1990,
         max_bval=2010,
         b0_threshold=50,
@@ -517,7 +517,7 @@ def test_AFQ_slr():
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         reg_subject='subject_sls',
         reg_template='hcp_atlas',
         mapping=SlrMap())
@@ -536,7 +536,7 @@ def test_AFQ_reco():
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         viz_backend="plotly",
         profile_weights="median",
         segmentation_params={
@@ -557,7 +557,7 @@ def test_AFQ_reco80():
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         segmentation_params={
             'seg_algo': 'reco80',
             'rng': 42})
@@ -589,7 +589,7 @@ def test_AFQ_pft():
     with nbtmp.InTemporaryDirectory() as t_output_dir:
         my_afq = api.AFQ(
             bids_path,
-            dmriprep='vistasoft',
+            preproc_pipeline='vistasoft',
             bundle_info=bundle_names,
             output_dir=t_output_dir,
             tracking_params={
@@ -612,7 +612,7 @@ def test_AFQ_custom_subject_reg():
 
     b0_file = api.AFQ(
         bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         bundle_info=bundle_names).b0["01"]
 
     # make a different temporary directly to test this custom file in
@@ -622,7 +622,7 @@ def test_AFQ_custom_subject_reg():
 
     my_afq = api.AFQ(
         bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
         reg_template="mni_T2",
         reg_subject={
@@ -640,7 +640,7 @@ def test_AFQ_FA():
     _, bids_path, _ = get_temp_hardi()
     myafq = api.AFQ(
         bids_path=bids_path,
-        dmriprep='vistasoft',
+        preproc_pipeline='vistasoft',
         reg_template='dti_fa_template',
         reg_subject='dti_fa_subject')
     myafq.rois
@@ -654,7 +654,7 @@ def test_DKI_profile():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
-                    dmriprep='dipy')
+                    preproc_pipeline='dipy')
     myafq.dki_fa
     myafq.dki_md
 
@@ -715,7 +715,7 @@ def test_AFQ_data_waypoint():
     clean_params = dict(return_idx=True)
 
     myafq = api.AFQ(bids_path=bids_path,
-                    dmriprep='vistasoft',
+                    preproc_pipeline='vistasoft',
                     bundle_info=bundle_names,
                     scalars=[
                         "dti_FA",
@@ -800,7 +800,7 @@ def test_AFQ_data_waypoint():
                            random_seeds=True,
                            rng_seed=42)
     config = dict(BIDS=dict(bids_path=bids_path,
-                            dmriprep='vistasoft'),
+                            preproc_pipeline='vistasoft'),
                   DATA=dict(
                       robust_tensor_fitting=True),
                   BUNDLES=dict(
@@ -855,7 +855,8 @@ def test_afq_msmt():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = api.AFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
-                    dmriprep='dipy', tracking_params={"odf_model": "MSMT"})
+                    preproc_pipeline='dipy',
+                    tracking_params={"odf_model": "MSMT"})
     npt.assert_equal(
         op.split(myafq.streamlines["01"])[-1],
         "sub-01_ses-01_dwi_space-RASMM_model-MSMT_desc-det_tractography.trk")

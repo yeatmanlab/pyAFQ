@@ -46,7 +46,7 @@ tracking_params = dict(n_seeds=50000,
 
 myafq = api.AFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
-                dmriprep='vistasoft',
+                preproc_pipeline='vistasoft',
                 segmentation_params={"seg_algo": "reco80"},
                 tracking_params=tracking_params)
 

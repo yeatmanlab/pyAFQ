@@ -493,7 +493,7 @@ class AFQ(object):
     def __init__(self,
                  bids_path,
                  bids_filters={"suffix": "dwi"},
-                 dmriprep="all",
+                 preproc_pipeline="all",
                  participant_labels=None,
                  output_dir=None,
                  custom_tractography_bids_filters=None,
@@ -532,7 +532,7 @@ class AFQ(object):
         bids_filters : dict
             [BIDS] Filter to pass to bids_layout.get when finding DWI files.
             Default: {"suffix": "dwi"}
-        dmriprep : str, optional.
+        preproc_pipeline : str, optional.
             [BIDS] The name of the pipeline used to preprocess the DWI data.
             Default: "all".
         participant_labels : list or None, optional
@@ -666,7 +666,7 @@ class AFQ(object):
                              + " in bids_path")
         if not isinstance(bids_filters, dict):
             raise TypeError("bids_filters must be a dict")
-        # dmriprep typechecking handled by pyBIDS
+        # preproc_pipeline typechecking handled by pyBIDS
         if participant_labels is not None\
                 and not isinstance(participant_labels, list):
             raise TypeError(
@@ -895,11 +895,13 @@ class AFQ(object):
                 - len(bids_layout.get(extension="json")) < 1:
             raise ValueError(
                 f"No non-json files recognized by pyBIDS in {bids_path}")
-        if len(bids_layout.get(scope=dmriprep))\
-                - len(bids_layout.get(scope=dmriprep, extension="json")) < 1:
+        if len(bids_layout.get(scope=preproc_pipeline))\
+                - len(bids_layout.get(
+                    scope=preproc_pipeline,
+                    extension="json")) < 1:
             raise ValueError((
                 f"No non-json files recognized by "
-                f"pyBIDS in the pipeline: {dmriprep}"))
+                f"pyBIDS in the pipeline: {preproc_pipeline}"))
 
         # Add required metadata file at top level (inheriting as needed):
         pipeline_description = {
@@ -974,7 +976,7 @@ class AFQ(object):
                     "subject": subject,
                     "session": session,
                     "return_type": "filename",
-                    "scope": dmriprep,
+                    "scope": preproc_pipeline,
                     "extension": "nii.gz",
                     "suffix": "dwi",
                 }
