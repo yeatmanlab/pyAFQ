@@ -133,6 +133,9 @@ class IdentityMap(Definition):
     api.AFQ(mapping=my_example_mapping)
     """
 
+    def __init__(self):
+        pass
+
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
