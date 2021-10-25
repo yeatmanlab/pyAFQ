@@ -122,6 +122,24 @@ class ConformedFnirtMapping():
             + " only transform from template to subject space")
 
 
+class IdentityMap(Definition):
+    """
+    Does not perform any transformations from MNI to subject where
+    pyAFQ normally would.
+
+    Examples
+    --------
+    my_example_mapping = IdentityMap()
+    api.AFQ(mapping=my_example_mapping)
+    """
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+        return ConformedAffineMapping(np.identity(4))
+
+
 class ItkMap(Definition):
     """
     Use an existing Itk map (e.g., from ANTS). Expects the warp file
