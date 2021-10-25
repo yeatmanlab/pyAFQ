@@ -140,7 +140,14 @@ class IdentityMap(Definition):
         pass
 
     def get_for_subses(self, subses_dict, reg_subject, reg_template):
-        return ConformedAffineMapping(np.identity(4))
+        return ConformedAffineMapping(
+            np.identity(4),
+            domain_grid_shape=reg.reduce_shape(
+                reg_subject.shape),
+            domain_grid2world=reg_subject.affine,
+            codomain_grid_shape=reg.reduce_shape(
+                reg_template.shape),
+            codomain_grid2world=reg_template.affine)
 
 
 class ItkMap(Definition):
@@ -395,8 +402,15 @@ class AffMap(GeneratedMapMixin, Definition):
     def gen_mapping(self, subses_dict, reg_subject, reg_template,
                     subject_sls, template_sls,
                     reg_prealign):
-        return ConformedAffineMapping(np.linalg.inv(self.prealign(
-            subses_dict, reg_subject, reg_template, save=False)))
+        return ConformedAffineMapping(
+            np.linalg.inv(self.prealign(
+                subses_dict, reg_subject, reg_template, save=False)),
+            domain_grid_shape=reg.reduce_shape(
+                reg_subject.shape),
+            domain_grid2world=reg_subject.affine,
+            codomain_grid_shape=reg.reduce_shape(
+                reg_template.shape),
+            codomain_grid2world=reg_template.affine)
 
 
 class ConformedAffineMapping(AffineMap):
