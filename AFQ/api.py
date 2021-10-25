@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
+
 import logging
 from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
 from AFQ.definitions.mapping import (SynMap, FnirtMap, ItkMap, SlrMap)
