@@ -201,63 +201,73 @@ the AFQ waypoint ROI approach.
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_001.png
-          :alt: CST_R
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_001.png
+         :alt: CST_R
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_001.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_002.png
-          :alt: CST_L
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_002.png
+         :alt: CST_L
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_002.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_003.png
-          :alt: UF_R
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_003.png
+         :alt: UF_R
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_003.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_004.png
-          :alt: UF_L
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_004.png
+         :alt: UF_L
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_004.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_005.png
-          :alt: CC_ForcepsMajor
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_005.png
+         :alt: CC_ForcepsMajor
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_005.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_006.png
-          :alt: CC_ForcepsMinor
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_006.png
+         :alt: CC_ForcepsMinor
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_006.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_007.png
-          :alt: OR_R
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_007.png
+         :alt: OR_R
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_007.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_008.png
-          :alt: OR_L
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_008.png
+         :alt: OR_L
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_008.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_009.png
-          :alt: VOF_R
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_009.png
+         :alt: VOF_R
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_009.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_recobundles_010.png
-          :alt: VOF_L
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_010.png
+         :alt: VOF_L
+         :srcset: /auto_examples/images/sphx_glr_plot_recobundles_010.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -278,18 +288,18 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16664
+    16669
     Segmenting fiber groups...
-    CST_R 165
-    CST_L 46
-    UF_R 51
-    UF_L 76
-    CC_ForcepsMajor 525
-    CC_ForcepsMinor 1030
+    CST_R 103
+    CST_L 54
+    UF_R 41
+    UF_L 54
+    CC_ForcepsMajor 433
+    CC_ForcepsMinor 950
     OR_R 19
-    OR_L 37
-    VOF_R 103
-    VOF_L 135
+    OR_L 36
+    VOF_R 98
+    VOF_L 134
     Extracting tract profiles...
 
 
@@ -309,7 +319,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 18 minutes  6.717 seconds)
+   **Total running time of the script:** ( 21 minutes  11.056 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

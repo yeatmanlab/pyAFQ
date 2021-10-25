@@ -1,7 +1,13 @@
-:mod:`AFQ.definitions.scalar`
-=============================
+:py:mod:`AFQ.definitions.scalar`
+================================
 
 .. py:module:: AFQ.definitions.scalar
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -18,11 +24,11 @@ Classes
 
 
 
-.. class:: ScalarFile(name, suffix, filters={})
-
+.. py:class:: ScalarFile(name, suffix, filters={})
 
    Bases: :py:obj:`AFQ.definitions.mask.MaskFile`
 
+   
    Define a scalar based on a file for each subject.
    Assumes the scalar is already in subject space.
 
@@ -62,16 +68,34 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
 
-   .. method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
+      
 
 
 
-.. class:: TemplateScalar(name, path)
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: TemplateScalar(name, path)
 
    Bases: :py:obj:`ScalarMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a scalar based on a template.
    This template will be transformed into subject space before use.
 
@@ -104,11 +128,48 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
+      
 
 
-   .. method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_data(self, subses_dict, dwi_affine, reg_template, mapping)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

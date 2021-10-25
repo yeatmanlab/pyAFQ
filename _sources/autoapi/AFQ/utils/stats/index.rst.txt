@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.stats`
-======================
+:py:mod:`AFQ.utils.stats`
+=========================
 
 .. py:module:: AFQ.utils.stats
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -17,8 +23,9 @@ Functions
 
 
 
-.. function:: contrast_index(x1, x2, double=True)
+.. py:function:: contrast_index(x1, x2, double=True)
 
+   
    Calculate the contrast index between two arrays.
    The contrast index is symmetrical with respect to
    the choice of the baseline for comparison
@@ -58,5 +65,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

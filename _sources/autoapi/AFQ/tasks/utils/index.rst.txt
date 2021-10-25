@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.utils`
-======================
+:py:mod:`AFQ.tasks.utils`
+=========================
 
 .. py:module:: AFQ.tasks.utils
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -18,9 +24,47 @@ Functions
 
 
 
-.. function:: get_fname(subses_dict, suffix, tracking_params=None, segmentation_params=None)
+.. py:function:: get_fname(subses_dict, suffix, tracking_params=None, segmentation_params=None)
+
+   
 
 
-.. function:: with_name(task_list)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: with_name(task_list)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

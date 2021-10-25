@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.parallel`
-=========================
+:py:mod:`AFQ.utils.parallel`
+============================
 
 .. py:module:: AFQ.utils.parallel
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -17,8 +23,9 @@ Functions
 
 
 
-.. function:: parfor(func, in_list, out_shape=None, n_jobs=-1, engine='joblib', backend='threading', func_args=[], func_kwargs={}, **kwargs)
+.. py:function:: parfor(func, in_list, out_shape=None, n_jobs=-1, engine='joblib', backend='threading', func_args=[], func_kwargs={}, **kwargs)
 
+   
    Parallel for loop for numpy arrays
 
 
@@ -75,5 +82,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

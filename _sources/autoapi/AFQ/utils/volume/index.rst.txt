@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.volume`
-=======================
+:py:mod:`AFQ.utils.volume`
+==========================
 
 .. py:module:: AFQ.utils.volume
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -28,13 +34,32 @@ Attributes
    AFQ.utils.volume.logger
 
 
-.. data:: logger
+.. py:data:: logger
    
 
    
 
-.. function:: transform_inverse_roi(roi, mapping, bundle_name='ROI')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: transform_inverse_roi(roi, mapping, bundle_name='ROI')
+
+   
    After being non-linearly transformed, ROIs tend to have holes in them.
    We perform a couple of computational geometry operations on the ROI to
    fix that up.
@@ -73,9 +98,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: patch_up_roi(roi, bundle_name='ROI', make_convex=True)
 
-.. function:: patch_up_roi(roi, bundle_name='ROI', make_convex=True)
-
+   
    After being non-linearly transformed, ROIs tend to have holes in them.
    We perform a couple of computational geometry operations on the ROI to
    fix that up.
@@ -116,9 +141,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: density_map(tractogram, n_sls=None, to_vox=False, normalize=False)
 
-.. function:: density_map(tractogram, n_sls=None, to_vox=False, normalize=False)
-
+   
    Create a streamline density map.
    based on:
    https://dipy.org/documentation/1.1.1./examples_built/streamline_formats/
@@ -164,9 +189,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: dice_coeff(arr1, arr2, weighted=True)
 
-.. function:: dice_coeff(arr1, arr2, weighted=True)
-
+   
    Compute Dice's coefficient between two images.
 
 
@@ -213,5 +238,4 @@ Attributes
 
    ..
        !! processed by numpydoc !!
-
 

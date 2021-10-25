@@ -120,7 +120,7 @@ Introductory examples.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="To analyze these datasets, large amounts of compute are needed. One way to gain access  to mass...">
+    <div class="sphx-glr-thumbcontainer" tooltip="To analyze these datasets, large amounts of compute are needed. One way to gain access to massi...">
 
 .. only:: html
 

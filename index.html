@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Automated Fiber Quantification &#8212; AFQ 0.1 documentation</title>
+    <title>Automated Fiber Quantification &#8212; AFQ 0.9 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet" />
-  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="_static/css/theme.css" rel="stylesheet">
+  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -41,7 +41,10 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installing pyAFQ" href="installation_guide.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -56,7 +59,7 @@
     
 
 <a class="navbar-brand" href="#">
-  <img src="_static/_static/logo.png" class="logo" alt="logo">
+  <img src="_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -199,6 +202,11 @@
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#citing-our-work">
+   Citing our work
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#acknowledgements">
    Acknowledgements
   </a>
@@ -237,25 +245,20 @@
 white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
 disorders.</p>
-<p><cite>AFQ</cite> is a software package focused on automated delineation of the major fiber
-tracts in individual human brains, and quantification of the tissue properties
-within the tracts.</p>
 <p>Tissue properties may vary systematically along each tract: different
 populations of axons enter and exit the tract, and disease can strike at local
 positions within the tract. Because of this, quantifying and understanding
 diffusion measures along each fiber tract (the tract profile) may reveal new
 insights into white matter development, function, and disease that are not
-obvious from mean measures of that tract (<a class="reference internal" href="#yeatman2012" id="id3"><span>[Yeatman2012]</span></a>).</p>
-<dl class="citation">
-<dt class="label" id="yeatman2012"><span class="brackets"><a class="fn-backref" href="#id3">Yeatman2012</a></span></dt>
-<dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman, “Tract profiles of white matter properties: automating fiber-tract quantification”, PloS One, 7: e49790</p>
-</dd>
-</dl>
+obvious from mean measures of that tract (<a class="reference internal" href="#yeatman2012" id="id1"><span>[Yeatman2012]</span></a>).</p>
+<p><cite>pyAFQ</cite> is a software package focused on automated delineation of the major
+fiber tracts in individual human brains, and quantification of the tissue
+properties within the tracts. To learn more about the software please refer to the Table of Contents.</p>
 </div>
 <div class="section" id="tractometry">
 <h1>Tractometry<a class="headerlink" href="#tractometry" title="Permalink to this headline">¶</a></h1>
-<table class="colwidths-auto table" id="id7">
-<caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-auto table" id="id11">
+<caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p>Tractography</p></td>
 <td><p>→ <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/registration/index.html">Registration</a></p></td>
@@ -266,6 +269,29 @@ obvious from mean measures of that tract (<a class="reference internal" href="#y
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="citing-our-work">
+<h1>Citing our work<a class="headerlink" href="#citing-our-work" title="Permalink to this headline">¶</a></h1>
+<p>If you use this software in your work, please consider citing the papers that
+describe the method <a class="reference internal" href="#yeatman2012" id="id7"><span>[Yeatman2012]</span></a>, the specific implementation <a class="reference internal" href="#kruper2021" id="id8"><span>[Kruper2021]</span></a>,
+as well as the underlying modeling and tractography implementations in <a class="reference external" href="https://dipy.org">DIPY</a> <a class="reference internal" href="#garyfallidis2014" id="id9"><span>[Garyfallidis2014]</span></a>. If you use the RecoBundles method,
+please also cite the original paper describing that method <a class="reference internal" href="#garyfallidis2018" id="id10"><span>[Garyfallidis2018]</span></a>.</p>
+<dl class="citation">
+<dt class="label" id="yeatman2012"><span class="brackets">Yeatman2012</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id7">2</a>)</span></dt>
+<dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall, Brian A Wandell, Heidi M Feldman. Tract profiles of white matter properties: automating fiber-tract quantification. PloS One, 7: e49790. <a class="reference external" href="https://doi.org/10.1371/journal.pone.0049790">https://doi.org/10.1371/journal.pone.0049790</a></p>
+</dd>
+<dt class="label" id="kruper2021"><span class="brackets"><a class="fn-backref" href="#id8">Kruper2021</a></span></dt>
+<dd><ol class="upperalpha simple" start="10">
+<li><p>Kruper, J. D. Yeatman, A. Richie-Halford, D. Bloom, M. Grotheer, S. Caffarra, G. Kiar, I. I. Karipidis, E. Roy, B. Q. Chandio, E. Garyfallidis, and A. Rokem. Evaluating the reliability of human brain white matter tractometry. Aperture, in press, 2021. doi: <a class="reference external" href="https://doi.org/10.1101/2021.02.24.432740">https://doi.org/10.1101/2021.02.24.432740</a></p></li>
+</ol>
+</dd>
+<dt class="label" id="garyfallidis2014"><span class="brackets"><a class="fn-backref" href="#id9">Garyfallidis2014</a></span></dt>
+<dd><p>Garyfallidis E, Brett M, Amirbekian B, Rokem A, van der Walt S, Descoteaux M, Nimmo-Smith I and Dipy Contributors (2014) Dipy, a library for the analysis of diffusion MRI data. Front. Neuroinform. 8:8. doi: <a class="reference external" href="https://doi.org/10.3389/fninf.2014.00008">https://doi.org/10.3389/fninf.2014.00008</a></p>
+</dd>
+<dt class="label" id="garyfallidis2018"><span class="brackets"><a class="fn-backref" href="#id10">Garyfallidis2018</a></span></dt>
+<dd><p>Garyfallidis E, Côté MA, Rheault F, Sidhu J, Hau J, Petit L, Fortin D, Cunanne S, Descoteaux M. Recognition of white matter bundles using local and global streamline-based registration and clustering. Neuroimage. 2018 170:283-295. <a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2017.07.015">https://doi.org/10.1016/j.neuroimage.2017.07.015</a>.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="acknowledgements">
 <h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
@@ -308,11 +334,16 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by <a class="r
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='right-next' id="next-link" href="installation_guide.html" title="next page">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='right-next' id="next-link" href="installation_guide.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -320,21 +351,20 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by <a class="r
       </div>
     </div>
   
-  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

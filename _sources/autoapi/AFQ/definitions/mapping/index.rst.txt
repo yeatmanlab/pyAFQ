@@ -1,7 +1,13 @@
-:mod:`AFQ.definitions.mapping`
-==============================
+:py:mod:`AFQ.definitions.mapping`
+=================================
 
 .. py:module:: AFQ.definitions.mapping
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -20,11 +26,11 @@ Classes
 
 
 
-.. class:: FnirtMap(warp_suffix, space_suffix, warp_filters={}, space_filters={})
-
+.. py:class:: FnirtMap(warp_suffix, space_suffix, warp_filters={}, space_filters={})
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Use an existing FNIRT map. Expects a warp file
    and an image file for each subject / session; image file
    is used as src space for warp.
@@ -71,19 +77,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_for_subses(self, subses_dict, reg_template, reg_subject)
+      
 
 
 
-.. class:: SynMap(use_prealign=True, affine_kwargs={}, syn_kwargs={})
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_for_subses(self, subses_dict, reg_subject, reg_template)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: SynMap(use_prealign=True, affine_kwargs={}, syn_kwargs={})
 
    Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Calculate a Syn registration for each subject/session
    using reg_subject and reg_template.
 
@@ -129,19 +172,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
+      
 
 
 
-.. class:: SlrMap(slr_kwargs={})
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: SlrMap(slr_kwargs={})
 
    Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Calculate a SLR registration for each subject/session
    using reg_subject and reg_template.
 
@@ -169,19 +249,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: gen_mapping(self, subses_dict, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
+      
 
 
 
-.. class:: AffMap(affine_kwargs={})
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: gen_mapping(self, subses_dict, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AffMap(affine_kwargs={})
 
    Bases: :py:obj:`GeneratedMapMixin`, :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Calculate an affine registration for each subject/session
    using reg_subject and reg_template.
 
@@ -209,11 +326,48 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
+      
 
 
-   .. method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

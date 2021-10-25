@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.utils &#8212; AFQ 0.1 documentation</title>
+    <title>AFQ.viz.utils &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../../../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -42,7 +42,10 @@
     <link rel="next" title="AFQ.api" href="../../api/index.html" />
     <link rel="prev" title="AFQ.viz.plotly_backend" href="../plotly_backend/index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -57,7 +60,7 @@
     
 
 <a class="navbar-brand" href="../../../../index.html">
-  <img src="../../../../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../../../../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -442,6 +445,15 @@
       </a>
      </li>
      <li class="toctree-l3">
+      <a class="reference internal" href="../plot/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.plot
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../plotly_backend/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
@@ -560,25 +572,10 @@
     <a class="reference internal nav-link" href="#classes">
      Classes
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#functions">
-     Functions
-    </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#AFQ.viz.utils.Viz">
        Viz
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.viz.utils.visualize_tract_profiles">
-       visualize_tract_profiles
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.viz.utils.visualize_gif_inline">
-       visualize_gif_inline
       </a>
      </li>
     </ul>
@@ -630,68 +627,11 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_tract_profiles" title="AFQ.viz.utils.visualize_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_tract_profiles</span></code></a>(tract_profiles, scalar=’dti_fa’, ylim=None, n_boot=1000, file_name=None, positions=POSITIONS)</p></td>
-<td><p>Visualize all tract profiles for a scalar in one plot</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.viz.utils.visualize_gif_inline" title="AFQ.viz.utils.visualize_gif_inline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_gif_inline</span></code></a>(fname, use_s3fs=False)</p></td>
-<td><p>Display a gif inline, possible from s3fs</p></td>
-</tr>
-</tbody>
-</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.viz.utils.Viz">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">AFQ.viz.utils.</span></span><span class="sig-name descname"><span class="pre">Viz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fury'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#Viz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.utils.Viz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.viz.utils.visualize_tract_profiles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.viz.utils.</span></span><span class="sig-name descname"><span class="pre">visualize_tract_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tract_profiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dti_fa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">POSITIONS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_tract_profiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Visualize all tract profiles for a scalar in one plot</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tract_profiles</strong><span class="classifier">string</span></dt><dd><p>Path to CSV containing tract_profiles.</p>
-</dd>
-<dt><strong>scalar</strong><span class="classifier">string, optional</span></dt><dd><p>Scalar to use in plots. Default: “dti_fa”.</p>
-</dd>
-<dt><strong>ylim</strong><span class="classifier">list of 2 floats, optional</span></dt><dd><p>Minimum and maximum value used for y-axis bounds.
-If None, ylim is not set.
-Default: None</p>
-</dd>
-<dt><strong>n_boot</strong><span class="classifier">int, optional</span></dt><dd><p>Number of bootstrap resamples for seaborn to use
-to estimate the ci.
-Default: 1000</p>
-</dd>
-<dt><strong>file_name</strong><span class="classifier">string, optional</span></dt><dd><p>File name to save figure to if not None. Default: None</p>
-</dd>
-<dt><strong>positions</strong><span class="classifier">dictionary, optional</span></dt><dd><p>Dictionary that maps bundle names to position in plot.
-Default: POSITIONS</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>Matplotlib figure and axes.</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.viz.utils.visualize_gif_inline">
-<span class="sig-prename descclassname"><span class="pre">AFQ.viz.utils.</span></span><span class="sig-name descname"><span class="pre">visualize_gif_inline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_s3fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/viz/utils.html#visualize_gif_inline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.viz.utils.visualize_gif_inline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display a gif inline, possible from s3fs</p>
-</dd></dl>
-
 </div>
 </div>
 </div>
@@ -700,12 +640,23 @@ Default: POSITIONS</p>
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="../plotly_backend/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a>
-    <a class='right-next' id="next-link" href="../../api/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../plotly_backend/index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../../api/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -713,21 +664,20 @@ Default: POSITIONS</p>
       </div>
     </div>
   
-  <script src="../../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.mapping`
-========================
+:py:mod:`AFQ.tasks.mapping`
+===========================
 
 .. py:module:: AFQ.tasks.mapping
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -32,34 +38,203 @@ Attributes
    AFQ.tasks.mapping.outputs
 
 
-.. data:: logger
+.. py:data:: logger
    
 
    
 
-.. data:: outputs
-   :annotation: = ['b0_warped_file', 'template_xform_file', 'rois_file', 'mapping', 'reg_subject']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: outputs
+   
 
    
 
-.. function:: export_registered_b0(subses_dict, data_imap, mapping, reg_template)
 
 
-.. function:: template_xform(subses_dict, dwi_affine, mapping, reg_template)
 
 
-.. function:: export_rois(subses_dict, bundle_dict, mapping, dwi_affine)
 
 
-.. function:: mapping(subses_dict, mapping_definition, reg_subject, reg_template)
 
 
-.. function:: sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template, tractography_imap)
 
 
-.. function:: get_reg_subject(reg_subject_spec, data_imap)
 
 
-.. function:: get_mapping_plan(reg_subject, scalars, use_sls=False)
 
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_registered_b0(subses_dict, data_imap, mapping, reg_template)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: template_xform(subses_dict, dwi_affine, mapping, reg_template)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_rois(subses_dict, bundle_dict, mapping, dwi_affine)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: mapping(subses_dict, mapping_definition, reg_subject, reg_template)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: sls_mapping(subses_dict, mapping_definition, reg_subject, reg_template, tractography_imap)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_reg_subject(reg_subject_spec, data_imap)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_mapping_plan(reg_subject, scalars, use_sls=False)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

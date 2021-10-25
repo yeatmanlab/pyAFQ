@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.bin`
-====================
+:py:mod:`AFQ.utils.bin`
+=======================
 
 .. py:module:: AFQ.utils.bin
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -20,39 +26,306 @@ Functions
    AFQ.utils.bin.toml_to_val
    AFQ.utils.bin.val_to_toml
    AFQ.utils.bin.dict_to_toml
+   AFQ.utils.bin.dict_to_json
    AFQ.utils.bin.func_dict_to_arg_dict
    AFQ.utils.bin.parse_config_run_afq
    AFQ.utils.bin.generate_config
+   AFQ.utils.bin.generate_json
 
 
 
-.. function:: parse_string(option, opt, value, parser)
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.bin.qsi_prep_ignore_params
 
 
-.. function:: model_input_parser(usage)
+.. py:function:: parse_string(option, opt, value, parser)
+
+   
 
 
-.. function:: model_predict_input_parser(usage)
 
 
-.. function:: get_default_args(func)
 
 
-.. function:: toml_to_val(t)
 
 
-.. function:: val_to_toml(v)
 
 
-.. function:: dict_to_toml(dictionary)
 
 
-.. function:: func_dict_to_arg_dict(func_dict=None, logger=None)
 
 
-.. function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, special_args={'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'})
 
 
-.. function:: generate_config(toml_file, default_arg_dict, overwrite=False, logger=None)
+   ..
+       !! processed by numpydoc !!
 
+.. py:function:: model_input_parser(usage)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: model_predict_input_parser(usage)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_default_args(func)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: toml_to_val(t)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: val_to_toml(v)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dict_to_toml(dictionary)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: qsi_prep_ignore_params
+   :annotation: = ['bids_path', 'bids_filters', 'preproc_pipeline', 'custom_tractography_bids_filters',...
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dict_to_json(dictionary)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: func_dict_to_arg_dict(func_dict=None, logger=None)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, special_args={'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'})
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: generate_config(toml_file, default_arg_dict, overwrite=False, logger=None)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: generate_json(json_file, default_arg_dict, overwrite=False, logger=None)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

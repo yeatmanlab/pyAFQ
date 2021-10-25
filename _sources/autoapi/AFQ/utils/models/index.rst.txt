@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.models`
-=======================
+:py:mod:`AFQ.utils.models`
+==========================
 
 .. py:module:: AFQ.utils.models
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -17,7 +23,11 @@ Functions
 
 
 
-.. function:: prepare_data(data_files, bval_files, bvec_files, mask=None, b0_threshold=50)
+.. py:function:: prepare_data(data_files, bval_files, bvec_files, mask=None, b0_threshold=50)
+
+   
+
+
 
    :Parameters:
 
@@ -62,5 +72,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

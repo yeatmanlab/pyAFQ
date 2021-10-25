@@ -1,0 +1,100 @@
+:py:mod:`AFQ.viz.plot`
+======================
+
+.. py:module:: AFQ.viz.plot
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.plot.visualize_tract_profiles
+   AFQ.viz.plot.visualize_gif_inline
+
+
+
+.. py:function:: visualize_tract_profiles(tract_profiles, scalar='dti_fa', ylim=None, n_boot=1000, file_name=None, positions=vut.POSITIONS)
+
+   
+   Visualize all tract profiles for a scalar in one plot
+
+
+   :Parameters:
+
+       **tract_profiles** : string
+           Path to CSV containing tract_profiles.
+
+       **scalar** : string, optional
+           Scalar to use in plots. Default: "dti_fa".
+
+       **ylim** : list of 2 floats, optional
+           Minimum and maximum value used for y-axis bounds.
+           If None, ylim is not set.
+           Default: None
+
+       **n_boot** : int, optional
+           Number of bootstrap resamples for seaborn to use
+           to estimate the ci.
+           Default: 1000
+
+       **file_name** : string, optional
+           File name to save figure to if not None. Default: None
+
+       **positions** : dictionary, optional
+           Dictionary that maps bundle names to position in plot.
+           Default: vut.POSITIONS
+
+   :Returns:
+
+       Matplotlib figure and axes.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: visualize_gif_inline(fname, use_s3fs=False)
+
+   
+   Display a gif inline, possible from s3fs 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

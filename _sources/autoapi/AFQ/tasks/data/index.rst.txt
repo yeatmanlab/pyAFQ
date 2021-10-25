@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.data`
-=====================
+:py:mod:`AFQ.tasks.data`
+========================
 
 .. py:module:: AFQ.tasks.data
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -26,10 +32,18 @@ Functions
    AFQ.tasks.data.dti_cfa
    AFQ.tasks.data.dti_pdd
    AFQ.tasks.data.dti_md
+   AFQ.tasks.data.dti_ga
+   AFQ.tasks.data.dti_rd
+   AFQ.tasks.data.dti_ad
    AFQ.tasks.data.dki_fa
    AFQ.tasks.data.dki_md
    AFQ.tasks.data.dki_awf
    AFQ.tasks.data.dki_mk
+   AFQ.tasks.data.dki_ga
+   AFQ.tasks.data.dki_rd
+   AFQ.tasks.data.dki_ad
+   AFQ.tasks.data.dki_rk
+   AFQ.tasks.data.dki_ak
    AFQ.tasks.data.get_data_plan
 
 
@@ -46,82 +60,690 @@ Attributes
    AFQ.tasks.data.csd_params
 
 
-.. data:: DIPY_GH
+.. py:data:: DIPY_GH
    :annotation: = https://github.com/dipy/dipy/blob/master/dipy/
 
    
 
-.. data:: outputs
-   :annotation: = ['data', 'gtab', 'img', 'b0_file', 'masked_b0_file', 'dti_tf', 'dti_params_file', 'dki_tf',...
-
-   
-
-.. function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True, patch2self=False)
 
 
-.. function:: b0(subses_dict, data, gtab, img)
 
 
-.. function:: b0_mask(subses_dict, b0_file, brain_mask_file)
 
 
-.. function:: dti_fit(dti_params_file, gtab)
 
 
-.. function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False)
 
 
-.. data:: dti_params
-   
-
-   
-
-.. function:: dki_fit(dki_params_file, gtab)
 
 
-.. function:: dki(subses_dict, dwi_affine, brain_mask_file, gtab, data)
 
 
-.. data:: dki_params
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: outputs
    
 
    
 
-.. function:: csd(subses_dict, dwi_affine, brain_mask_file, gtab, data, tracking_params, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
 
 
-.. data:: csd_params
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True, patch2self=False)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: b0(subses_dict, data, gtab, img)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: b0_mask(subses_dict, b0_file, brain_mask_file)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_fit(dti_params_file, gtab)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: dti_params
    
 
    
 
-.. function:: anisotropic_power_map(subses_dict, csd_params_file)
 
 
-.. function:: dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
 
-.. function:: dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
 
-.. function:: dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
 
-.. function:: dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
 
-.. function:: dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
 
-.. function:: dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
 
-.. function:: dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf, sphere='repulsion100', gtol=0.01)
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_fit(dki_params_file, gtab)
+
+   
 
 
-.. function:: dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
 
-.. function:: get_data_plan(brain_mask_definition)
 
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki(subses_dict, dwi_affine, brain_mask_file, gtab, data)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: dki_params
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csd(subses_dict, dwi_affine, brain_mask_file, gtab, data, tracking_params, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: csd_params
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: anisotropic_power_map(subses_dict, csd_params_file)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf, sphere='repulsion100', gtol=0.01)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_data_plan(brain_mask_definition)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -1,7 +1,13 @@
-:mod:`AFQ.definitions.mask`
-===========================
+:py:mod:`AFQ.definitions.mask`
+==============================
 
 .. py:module:: AFQ.definitions.mask
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -24,11 +30,11 @@ Classes
 
 
 
-.. class:: MaskFile(suffix, filters={})
-
+.. py:class:: MaskFile(suffix, filters={})
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a mask based on a file.
    Does not apply any labels or thresholds;
    Generates mask with floating point data.
@@ -68,25 +74,100 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_path_data_affine(self, subses_dict)
-
-
-   .. method:: apply_conditions(self, mask_data_orig, mask_file)
-
-
-   .. method:: get_mask_getter(self, in_data=False)
+      
 
 
 
-.. class:: FullMask
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_path_data_affine(self, subses_dict)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_conditions(self, mask_data_orig, mask_file)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_mask_getter(self, in_data=False)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: FullMask
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a mask which covers a full volume.
 
 
@@ -109,19 +190,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_mask_getter(self, in_data=False)
+      
 
 
 
-.. class:: RoiMask(use_presegment=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_mask_getter(self, in_data=False)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: RoiMask(use_presegment=False)
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a mask which is all ROIs or'd together.
 
 
@@ -145,19 +263,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_mask_getter(self, in_data=False)
+      
 
 
 
-.. class:: B0Mask(median_otsu_kwargs={})
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_mask_getter(self, in_data=False)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: B0Mask(median_otsu_kwargs={})
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a mask using b0 and dipy's median_otsu.
 
 
@@ -186,19 +341,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_mask_getter(self, in_data=False)
+      
 
 
 
-.. class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_mask_getter(self, in_data=False)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
 
    Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
+   
    Define a mask based on labels in a file.
 
 
@@ -252,16 +444,34 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: apply_conditions(self, mask_data_orig, mask_file)
 
-   .. method:: apply_conditions(self, mask_data_orig, mask_file)
+      
 
 
 
-.. class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
 
    Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
+   
    Define a mask based on thresholding a file.
    Note that this should not be used to directly make a seed mask
    or a stop mask. In those cases, consider thresholding after
@@ -316,16 +526,34 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: apply_conditions(self, mask_data_orig, mask_file)
 
-   .. method:: apply_conditions(self, mask_data_orig, mask_file)
+      
 
 
 
-.. class:: ScalarMask(scalar)
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ScalarMask(scalar)
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
+   
    Define a mask based on a scalar.
    Does not apply any labels or thresholds;
    Generates mask with floating point data.
@@ -362,19 +590,56 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
 
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
-
-
-   .. method:: get_mask_getter(self, in_data=False)
+      
 
 
 
-.. class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
 
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_mask_getter(self, in_data=False)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ThresholdedScalarMask(scalar, lower_bound=None, upper_bound=None, combine='and')
 
    Bases: :py:obj:`ThresholdedMaskFile`, :py:obj:`ScalarMask`
 
+   
    Define a mask based on thresholding a scalar mask.
    Note that this should not be used to directly make a seed mask
    or a stop mask. In those cases, consider thresholding after
@@ -424,5 +689,4 @@ Classes
 
    ..
        !! processed by numpydoc !!
-
 

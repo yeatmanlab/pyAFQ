@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.bin &#8212; AFQ 0.1 documentation</title>
+    <title>AFQ.utils.bin &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -40,7 +40,10 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -55,7 +58,7 @@
     
 
 <a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../../../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -280,6 +283,8 @@
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
             <span class="n">ls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">toml_to_val</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ls</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># interpret as dictionary</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Mask&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Map&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Scalar&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">):</span>
@@ -297,19 +302,21 @@
 
 <div class="viewcode-block" id="val_to_toml"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.val_to_toml">[docs]</a><span class="k">def</span> <span class="nf">val_to_toml</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&#39;&#39;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;&quot;&quot;&#39;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">str_for_toml</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">str_for_toml</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;true&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;false&quot;</span>
     <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span></div>
@@ -334,6 +341,33 @@
                 <span class="n">toml</span> <span class="o">=</span> <span class="n">toml</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">val_to_toml</span><span class="p">(</span><span class="n">arg_info</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">toml</span> <span class="o">=</span> <span class="n">toml</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="k">return</span> <span class="n">toml</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+
+
+<span class="c1"># these params are handled internally in the qsiprep pipeline,</span>
+<span class="c1"># not shown to the user (mostly BIDS filters stuff)</span>
+<div class="viewcode-block" id="qsi_prep_ignore_params"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.qsi_prep_ignore_params">[docs]</a><span class="n">qsi_prep_ignore_params</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;bids_path&quot;</span><span class="p">,</span> <span class="s2">&quot;bids_filters&quot;</span><span class="p">,</span> <span class="s2">&quot;preproc_pipeline&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;custom_tractography_bids_filters&quot;</span><span class="p">,</span> <span class="s2">&quot;brain_mask&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mapping&quot;</span><span class="p">,</span> <span class="s2">&quot;participant_labels&quot;</span><span class="p">,</span> <span class="s2">&quot;output_dir&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dict_to_json"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.dict_to_json">[docs]</a><span class="k">def</span> <span class="nf">dict_to_json</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="s2">&quot;                &quot;</span>
+    <span class="n">local_ignore</span> <span class="o">=</span> <span class="n">qsi_prep_ignore_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s2">&quot;AFQ_desc&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">arg_info</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">local_ignore</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">local_ignore</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_info</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">json</span> <span class="o">=</span> <span class="n">json</span>\
+                    <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&quot;: </span><span class="si">{</span><span class="n">val_to_toml</span><span class="p">(</span><span class="n">arg_info</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">json</span> <span class="o">=</span> <span class="n">json</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&quot;: </span><span class="si">{</span><span class="n">val_to_toml</span><span class="p">(</span><span class="n">arg_info</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">json</span> <span class="o">=</span> <span class="n">json</span> <span class="o">+</span> <span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">                &#39;</span>
+    <span class="k">return</span> <span class="n">json</span><span class="p">[:</span><span class="o">-</span><span class="mi">18</span><span class="p">]</span>  <span class="c1"># remove trailing ,\n and indent</span></div>
 
 
 <div class="viewcode-block" id="func_dict_to_arg_dict"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.func_dict_to_arg_dict">[docs]</a><span class="k">def</span> <span class="nf">func_dict_to_arg_dict</span><span class="p">(</span><span class="n">func_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -483,16 +517,51 @@
     <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating default configuration file.&quot;</span><span class="p">)</span>
     <span class="n">toml_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">toml_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">toml_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_toml</span><span class="p">(</span><span class="n">default_arg_dict</span><span class="p">))</span></div>
+    <span class="n">toml_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_toml</span><span class="p">(</span><span class="n">default_arg_dict</span><span class="p">))</span>
+    <span class="n">toml_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="generate_json"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.generate_json">[docs]</a><span class="k">def</span> <span class="nf">generate_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">default_arg_dict</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_file</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
+            <span class="s2">&quot;Config file already exists. &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;If you want to overwrite this file,&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; add the argument --overwrite-config&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating pyAFQ full pipeline QSIprep json file.&quot;</span><span class="p">)</span>
+    <span class="n">qsi_spec_intro</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;{</span>
+<span class="s2">    &quot;description&quot;: &quot;Use pyAFQ to perform the full Tractometry pipeline&quot;,</span>
+<span class="s2">    &quot;space&quot;: &quot;T1w&quot;,</span>
+<span class="s2">    &quot;name&quot;: &quot;pyAFQ_full&quot;,</span>
+<span class="s2">    &quot;atlases&quot;: [],</span>
+<span class="s2">    &quot;nodes&quot;: [</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;name&quot;: &quot;pyAFQ_full&quot;,</span>
+<span class="s2">            &quot;software&quot;: &quot;pyAFQ&quot;,</span>
+<span class="s2">            &quot;action&quot;: &quot;pyAFQ_full&quot;,</span>
+<span class="s2">            &quot;input&quot;: &quot;qsiprep&quot;,</span>
+<span class="s2">            &quot;output_suffix&quot;: &quot;PYAFQ_FULL&quot;,</span>
+<span class="s2">            &quot;parameters&quot;: {</span>
+<span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">qsi_spec_outro</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            }</span>
+<span class="s2">        }</span>
+<span class="s2">    ]</span>
+<span class="s2">}&quot;&quot;&quot;</span>
+    <span class="n">json_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_intro</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_json</span><span class="p">(</span><span class="n">default_arg_dict</span><span class="p">))</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_outro</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
               
           </main>
           
@@ -500,21 +569,20 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

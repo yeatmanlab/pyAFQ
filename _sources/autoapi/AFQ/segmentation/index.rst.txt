@@ -1,7 +1,13 @@
-:mod:`AFQ.segmentation`
-=======================
+:py:mod:`AFQ.segmentation`
+==========================
 
 .. py:module:: AFQ.segmentation
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -26,14 +32,52 @@ Functions
 
 
 
-.. class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kawrgs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
+
+   
 
 
-   .. method:: _read_tg(self, tg=None)
 
 
-   .. method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
 
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: _read_tg(self, tg=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
+
+      
       Segment streamlines into bundles based on either waypoint ROIs
       [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
       Parameters
@@ -99,9 +143,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: prepare_img(self, fdata, fbval, fbvec)
 
-   .. method:: prepare_img(self, fdata, fbval, fbvec)
-
+      
       Prepare image data from DWI data.
       Parameters
       ----------
@@ -126,9 +170,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: prepare_map(self, mapping=None, reg_prealign=None, reg_template=None)
 
-   .. method:: prepare_map(self, mapping=None, reg_prealign=None, reg_template=None)
-
+      
       Set mapping between DWI space and a template.
       Parameters
       ----------
@@ -162,9 +206,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: cross_streamlines(self, tg=None, template=None, low_coord=10)
 
-   .. method:: cross_streamlines(self, tg=None, template=None, low_coord=10)
-
+      
       Classify the streamlines by whether they cross the midline.
       Creates a crosses attribute which is an array of booleans. Each boolean
       corresponds to a streamline, and is whether or not that streamline
@@ -193,9 +237,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol)
 
-   .. method:: _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol)
-
+      
       Get fiber probabilites and ROIs for a given bundle.
 
 
@@ -216,9 +260,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: _return_empty(self, bundle)
 
-   .. method:: _return_empty(self, bundle)
-
+      
       Helper function for segment_afq, to return an empty dict under
       some conditions.
 
@@ -240,9 +284,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: segment_afq(self, tg=None)
 
-   .. method:: segment_afq(self, tg=None)
-
+      
       Assign streamlines to bundles using the waypoint ROI approach
       Parameters
       ----------
@@ -266,9 +310,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: move_streamlines(self, tg, reg_algo='slr')
 
-   .. method:: move_streamlines(self, tg, reg_algo='slr')
-
+      
       Streamline-based registration of a whole-brain tractogram to
       the MNI whole-brain atlas.
 
@@ -292,9 +336,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: segment_reco(self, tg=None)
 
-   .. method:: segment_reco(self, tg=None)
-
+      
       Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
       Parameters
       ----------
@@ -326,9 +370,9 @@ Functions
           !! processed by numpydoc !!
 
 
+.. py:function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
 
-.. function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
-
+   
    Clean a segmented fiber group based on the Mahalnobis distance of
    each streamline
 
@@ -398,9 +442,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)
 
-.. function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)
-
+   
    Clean a collection of streamlines based on their two endpoints
    Filters down to only include items that have their starting points close to
    the targets0 and ending points close to targets1
@@ -441,5 +485,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

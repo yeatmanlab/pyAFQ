@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.viz &#8212; AFQ 0.1 documentation</title>
+    <title>AFQ.tasks.viz &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../../../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -42,7 +42,10 @@
     <link rel="next" title="AFQ.utils" href="../../utils/index.html" />
     <link rel="prev" title="AFQ.tasks.utils" href="../utils/index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -57,7 +60,7 @@
     
 
 <a class="navbar-brand" href="../../../../index.html">
-  <img src="../../../../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../../../../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -442,6 +445,15 @@
       </a>
      </li>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../viz/plot/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.plot
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../viz/plotly_backend/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
@@ -648,10 +660,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.viz._viz_prepare_vol" title="AFQ.tasks.viz._viz_prepare_vol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_viz_prepare_vol</span></code></a>(vol, xform, mapping, scalar_dict)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.viz.viz_bundles" title="AFQ.tasks.viz.viz_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz_bundles</span></code></a>(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.viz.viz_bundles" title="AFQ.tasks.viz.viz_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz_bundles</span></code></a>(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, sbv_lims=[None, None], xform_shade_by_volume=False, volume_opacity=0.3, n_points=40)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.viz.viz_indivBundle" title="AFQ.tasks.viz.viz_indivBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz_indivBundle</span></code></a>(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, cbv_lims_indiv=[None, None], xform_color_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.viz.viz_indivBundle" title="AFQ.tasks.viz.viz_indivBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz_indivBundle</span></code></a>(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, sbv_lims_indiv=[None, None], xform_shade_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.viz.plot_tract_profiles" title="AFQ.tasks.viz.plot_tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tract_profiles</span></code></a>(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)</p></td>
@@ -686,7 +698,7 @@
 
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.viz.outputs">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">outputs</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['all_bundles_figure',</span> <span class="pre">'indiv_bundles_figures']</span></em><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.outputs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">outputs</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.outputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -696,12 +708,12 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.viz.viz_bundles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">viz_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viz_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#viz_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.viz_bundles" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">viz_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viz_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sbv_lims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_shade_by_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#viz_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.viz_bundles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.viz.viz_indivBundle">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">viz_indivBundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viz_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_lims_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_color_by_volume_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#viz_indivBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.viz_indivBundle" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.viz.</span></span><span class="sig-name descname"><span class="pre">viz_indivBundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viz_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_volume_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sbv_lims_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_shade_by_volume_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_opacity_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points_indiv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/viz.html#viz_indivBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.viz.viz_indivBundle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -722,12 +734,23 @@
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="../utils/index.html" title="previous page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a>
-    <a class='right-next' id="next-link" href="../../utils/index.html" title="next page"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../utils/index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../../utils/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -735,21 +758,20 @@
       </div>
     </div>
   
-  <script src="../../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

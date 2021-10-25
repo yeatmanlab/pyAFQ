@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting tract profiles &#8212; AFQ 0.1 documentation</title>
+    <title>Plotting tract profiles &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet" />
-  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -42,7 +42,10 @@
     <link rel="next" title="Plotting tract profiles using RecoBundles" href="plot_recobundles.html" />
     <link rel="prev" title="AFQ with HCP data" href="cloudknot_hcp_example.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -57,7 +60,7 @@
     
 
 <a class="navbar-brand" href="../index.html">
-  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -452,12 +455,6 @@ using an affine transformation.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Registering to template...
-Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz
-
-  0%|          | 0.00/13.0k [00:00&lt;?, ?B/s]
- 28%|##7       | 3.62k/13.0k [00:00&lt;00:00, 36.2kB/s]
- 61%|######1   | 7.92k/13.0k [00:00&lt;00:00, 40.2kB/s]
-13.0kB [00:00, 44.7kB/s]
 Optimizing level 2 [max iter: 10000]
 Optimizing level 1 [max iter: 1000]
 Optimizing level 0 [max iter: 100]
@@ -540,22 +537,23 @@ not pass through exclusion ROIs.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
 
   0%|          | 0/335 [00:00&lt;?, ?it/s]
-  1%|          | 2/335 [00:00&lt;00:24, 13.81it/s]
-  1%|1         | 4/335 [00:06&lt;10:01,  1.82s/it]
-  2%|1         | 6/335 [00:06&lt;05:32,  1.01s/it]
- 81%|########1 | 272/335 [00:06&lt;00:00, 83.62it/s]
-100%|##########| 335/335 [00:06&lt;00:00, 51.98it/s]
+  1%|          | 2/335 [00:00&lt;00:25, 13.29it/s]
+  1%|1         | 4/335 [00:05&lt;09:24,  1.71s/it]
+  2%|1         | 6/335 [00:05&lt;05:13,  1.05it/s]
+ 81%|########1 | 272/335 [00:06&lt;00:00, 88.54it/s]
+100%|##########| 335/335 [00:06&lt;00:00, 55.12it/s]
 
   0%|          | 0/237 [00:00&lt;?, ?it/s]
-100%|##########| 237/237 [00:00&lt;00:00, 2878.23it/s]
+100%|##########| 237/237 [00:00&lt;00:00, 3161.54it/s]
 
   0%|          | 0/431 [00:00&lt;?, ?it/s]
- 44%|####3     | 188/431 [00:00&lt;00:00, 1721.98it/s]
-100%|##########| 431/431 [00:00&lt;00:00, 2581.07it/s]
+ 44%|####3     | 188/431 [00:00&lt;00:00, 1783.40it/s]
+100%|##########| 431/431 [00:00&lt;00:00, 2700.40it/s]
 
   0%|          | 0/472 [00:00&lt;?, ?it/s]
- 53%|#####3    | 252/472 [00:00&lt;00:00, 1973.64it/s]
-100%|##########| 472/472 [00:00&lt;00:00, 2880.80it/s]
+  2%|1         | 8/472 [00:00&lt;00:06, 77.02it/s]
+ 81%|########  | 380/472 [00:00&lt;00:00, 1965.00it/s]
+100%|##########| 472/472 [00:00&lt;00:00, 2109.74it/s]
 </pre></div>
 </div>
 </div>
@@ -620,14 +618,10 @@ to how representative this streamline is of the bundle overall.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="CST_R" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_001.png" />
-</li>
-<li><img alt="CST_L" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_002.png" />
-</li>
-<li><img alt="ARC_R" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_003.png" />
-</li>
-<li><img alt="ARC_L" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_tract_profile_004.png" />
-</li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_001.png" srcset="../_images/sphx_glr_plot_tract_profile_001.png" alt="CST_R" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_002.png" srcset="../_images/sphx_glr_plot_tract_profile_002.png" alt="CST_L" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_003.png" srcset="../_images/sphx_glr_plot_tract_profile_003.png" alt="ARC_R" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_004.png" srcset="../_images/sphx_glr_plot_tract_profile_004.png" alt="ARC_L" class = "sphx-glr-multi-img"/></li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Extracting tract profiles...
@@ -649,7 +643,7 @@ quantification”, PloS One, 7: e49790</p>
 matter”, Nature Communications 5: 4932</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 15 minutes  44.131 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 18 minutes  46.658 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
@@ -666,12 +660,23 @@ matter”, Nature Communications 5: 4932</p>
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="cloudknot_hcp_example.html" title="previous page">AFQ with HCP data</a>
-    <a class='right-next' id="next-link" href="plot_recobundles.html" title="next page">Plotting tract profiles using RecoBundles</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="cloudknot_hcp_example.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">AFQ with HCP data</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="plot_recobundles.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plotting tract profiles using RecoBundles</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -679,21 +684,20 @@ matter”, Nature Communications 5: 4932</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

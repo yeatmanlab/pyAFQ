@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.decorators`
-===========================
+:py:mod:`AFQ.tasks.decorators`
+==============================
 
 .. py:module:: AFQ.tasks.decorators
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -20,15 +26,91 @@ Functions
 
 
 
-.. function:: as_file(suffix, include_track=False, include_seg=False)
+.. py:function:: as_file(suffix, include_track=False, include_seg=False)
+
+   
 
 
-.. function:: as_model(func)
 
 
-.. function:: as_dt_deriv(tf_name)
 
 
-.. function:: as_img(func)
 
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: as_model(func)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: as_dt_deriv(tf_name)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: as_img(func)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -1,7 +1,29 @@
-:mod:`AFQ.tasks`
-================
+:py:mod:`AFQ.tasks`
+===================
 
 .. py:module:: AFQ.tasks
+
+.. autoapi-nested-parse::
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

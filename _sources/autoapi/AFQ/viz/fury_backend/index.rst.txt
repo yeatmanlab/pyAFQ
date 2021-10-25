@@ -1,7 +1,13 @@
-:mod:`AFQ.viz.fury_backend`
-===========================
+:py:mod:`AFQ.viz.fury_backend`
+==============================
 
 .. py:module:: AFQ.viz.fury_backend
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -30,13 +36,32 @@ Attributes
    AFQ.viz.fury_backend.viz_logger
 
 
-.. data:: viz_logger
+.. py:data:: viz_logger
    
 
    
 
-.. function:: _inline_interact(scene, inline, interact)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _inline_interact(scene, inline, interact)
+
+   
    Helper function to reuse across viz functions
 
 
@@ -57,10 +82,11 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, shade_by_volume=None, color_by_streamline=None, sbv_lims=[None, None], include_profiles=(None, None), flip_axes=[False, False, False], opacity=1.0, figure=None, background=(1, 1, 1), interact=False, inline=False)
 
-.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], figure=None, background=(1, 1, 1), interact=False, inline=False, flip_axes=None)
-
-   Visualize bundles in 3D using VTK
+   
+   Visualize bundles in 3D using VTK.
+   Parameters not described below are extras to conform fury and plotly APIs.
 
 
    :Parameters:
@@ -96,17 +122,17 @@ Attributes
            with Tableau 20 RGB values if bundle_dict is None, or dict from
            bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-       **color_by_volume** : ndarray or str, optional
+       **shade_by_volume** : ndarray or str, optional
            3d volume use to shade the bundles. If None, no shading
            is performed. Only works when using the plotly backend.
            Default: None
 
-       **cbv_lims** : ndarray
+       **sbv_lims** : ndarray
            Of the form (lower bound, upper bound). Shading based on
-           color_by_volume will only differentiate values within these bounds.
+           shade_by_volume will only differentiate values within these bounds.
            If lower bound is None, will default to 0.
            If upper bound is None, will default to the maximum value in
-           color_by_volume.
+           shade_by_volume.
            Default: [None, None]
 
        **background** : tuple, optional
@@ -124,9 +150,6 @@ Attributes
        **inline** : bool
            Whether to embed the visualization inline in a notebook. Only works
            in the notebook context. Default: False.
-
-       **flip_axes** : None
-           This parameter is to conform fury and plotly APIs.
 
    :Returns:
 
@@ -148,12 +171,31 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: scene_rotate_forward(scene)
 
-.. function:: scene_rotate_forward(scene)
+   
 
 
-.. function:: create_gif(figure, file_name, n_frames=60, zoom=1, z_offset=0.5, size=(600, 600), rotate_forward=True)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: create_gif(figure, file_name, n_frames=60, zoom=1, z_offset=0.5, size=(600, 600), rotate_forward=True)
+
+   
    Convert a Fury Scene object into a gif
 
 
@@ -199,9 +241,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([1, 0, 0]), flip_axes=None, opacity=1.0, inline=False, interact=False)
 
-.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, color=np.array([1, 0, 0]), flip_axes=None, opacity=1.0, inline=False, interact=False)
-
+   
    Render a region of interest into a VTK viz as a volume
 
 
@@ -275,9 +317,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: visualize_volume(volume, x=None, y=None, z=None, figure=None, flip_axes=None, opacity=0.6, inline=True, interact=False)
 
-.. function:: visualize_volume(volume, x=None, y=None, z=None, figure=None, flip_axes=None, opacity=0.6, inline=True, interact=False)
-
+   
    Visualize a volume
 
 
@@ -324,5 +366,4 @@ Attributes
 
    ..
        !! processed by numpydoc !!
-
 

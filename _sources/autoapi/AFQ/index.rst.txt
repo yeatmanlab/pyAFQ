@@ -1,7 +1,29 @@
-:mod:`AFQ`
-==========
+:py:mod:`AFQ`
+=============
 
 .. py:module:: AFQ
+
+.. autoapi-nested-parse::
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Subpackages
@@ -70,13 +92,32 @@ Attributes
    AFQ._ga_id
 
 
-.. data:: fetch_callosum_templates
+.. py:data:: fetch_callosum_templates
    
 
    
 
-.. function:: read_callosum_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_callosum_templates(resample_to=False)
+
+   
    Load AFQ callosum templates from file
 
 
@@ -104,14 +145,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_or_templates
+.. py:data:: fetch_or_templates
    
 
    
 
-.. function:: read_or_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_or_templates(resample_to=False)
+
+   
    Load AFQ OR templates from file
 
 
@@ -139,14 +198,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_templates
+.. py:data:: fetch_templates
    
 
    
 
-.. function:: read_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_templates(resample_to=False)
+
+   
    Load AFQ templates from file
 
 
@@ -174,9 +251,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
 
-.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
-
+   
    Fetch HCP diffusion data and arrange it in a manner that resembles the
    BIDS [R8494a6c36190-1]_ specification.
 
@@ -246,14 +323,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_stanford_hardi_tractography
+.. py:data:: fetch_stanford_hardi_tractography
    
 
    
 
-.. function:: read_stanford_hardi_tractography()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_stanford_hardi_tractography()
+
+   
    Reads a minimal tractography from the Stanford dataset.
 
 
@@ -274,9 +369,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: organize_stanford_data(path=None, clear_previous_afq=False)
 
-.. function:: organize_stanford_data(path=None, clear_previous_afq=False)
-
+   
    If necessary, downloads the Stanford HARDI dataset into DIPY directory and
    creates a BIDS compliant file-system structure in AFQ data directory:
 
@@ -320,23 +415,76 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, dmriprep='all', custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, parallel_params={'engine': 'serial'}, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None, **kwargs)
-
+.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, preproc_pipeline='all', participant_labels=None, output_dir=None, custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, parallel_params={'engine': 'serial'}, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None, **kwargs)
 
    Bases: :py:obj:`object`
 
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    ..
        !! processed by numpydoc !!
+   .. py:method:: _get_best_scalar(self)
 
-   .. method:: _get_best_scalar(self)
-
-
-   .. method:: get_reg_template(self)
+      
 
 
-   .. method:: __getattribute__(self, attr)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_reg_template(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __getattribute__(self, attr)
+
+      
       Return getattr(self, name).
 
 
@@ -357,15 +505,53 @@ Attributes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: combine_profiles(self)
 
-   .. method:: combine_profiles(self)
-
-
-   .. method:: get_streamlines_json(self)
+      
 
 
-   .. method:: export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_streamlines_json(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True)
+
+      
       Exports all the possible outputs
 
 
@@ -410,9 +596,9 @@ Attributes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: upload_to_s3(self, s3fs, remote_path)
 
-   .. method:: upload_to_s3(self, s3fs, remote_path)
-
+      
       Upload entire AFQ derivatives folder to S3
 
 
@@ -433,9 +619,9 @@ Attributes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: assemble_AFQ_browser(self, output_path=None, metadata=None, page_title='AFQ Browser', page_subtitle='', page_title_link='', page_subtitle_link='')
 
-   .. method:: assemble_AFQ_browser(self, output_path=None, metadata=None, page_title='AFQ Browser', page_subtitle='', page_title_link='', page_subtitle_link='')
-
+      
       Assembles an instance of the AFQ-Browser from this AFQ instance.
       First, we generate the combined tract profile if it is not already
       generated. This includes running the full AFQ pipeline if it has not
@@ -496,36 +682,226 @@ Attributes
           !! processed by numpydoc !!
 
 
-
-.. class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=False)
-
+.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None)
 
    Bases: :py:obj:`collections.abc.MutableMapping`
 
-   .. method:: gen_all(self)
-
-
-   .. method:: __setitem__(self, key, item)
-
-
-   .. method:: __getitem__(self, key)
-
-
-   .. method:: __len__(self)
-
-
-   .. method:: __delitem__(self, key)
-
-
-   .. method:: __iter__(self)
-
-
-   .. method:: copy(self)
+   
 
 
 
-.. data:: _ga_id
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: gen_all(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __setitem__(self, key, item)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __getitem__(self, key)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __len__(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __delitem__(self, key)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __iter__(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: copy(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: resample_all_roi(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:data:: _ga_id
    :annotation: = UA-156363454-3
 
    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

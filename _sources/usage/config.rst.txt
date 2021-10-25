@@ -30,7 +30,7 @@ See an example configuration file below::
     # The path to preprocessed diffusion data organized in a BIDS
     # dataset. This should contain a BIDS derivative dataset with
     # preprocessed dwi/bvals/bvecs.
-    bids_path = ''
+    bids_path = ""
     
     # Filter to pass to bids_layout.get when finding DWI files.
     # Default: {"suffix": "dwi"}
@@ -38,12 +38,26 @@ See an example configuration file below::
     
     # The name of the pipeline used to preprocess the DWI data.
     # Default: "all".
-    dmriprep = 'all'
+    preproc_pipeline = "all"
+    
+    # list of participant labels (subject IDs) to perform
+    # processing on. If None, all subjects are used.
+    # Default: None
+    participant_labels = ""
+    
+    # path to output directory. If None, outputs are put
+    # in a AFQ pipeline folder in the derivatives folder of
+    # the BIDS directory. pyAFQ will use existing derivatives
+    # from the output directory if they exist, instead of recalculating
+    # them (this means you need to clear the output folder if you want
+    # to recalculate a derivative).
+    # Default: None
+    output_dir = ""
     
     # BIDS filters for inputing a user made tractography file.
     # If None, tractography will be performed automatically.
     # Default: None
-    custom_tractography_bids_filters = ''
+    custom_tractography_bids_filters = ""
     
     [DATA]
     
@@ -64,12 +78,12 @@ See an example configuration file below::
     # Minimum b value you want to use
     # from the dataset (other than b0), inclusive.
     # If None, there is no minimum limit. Default: None
-    min_bval = ''
+    min_bval = ""
     
     # Maximum b value you want to use
     # from the dataset (other than b0), inclusive.
     # If None, there is no maximum limit. Default: None
-    max_bval = ''
+    max_bval = ""
     
     [REGISTRATION]
     
@@ -80,7 +94,7 @@ See an example configuration file below::
     # If "hcp_atlas" is used, slr registration will be used
     # and reg_subject should be "subject_sls".
     # Default: "mni_T1"
-    reg_template = 'mni_T1'
+    reg_template = "mni_T1"
     
     # The source image data to be registered.
     # Can either be a Nifti1Image, bids filters for a Nifti1Image, or
@@ -89,7 +103,7 @@ See an example configuration file below::
     # If "subject_sls" is used, slr registration will be used
     # and reg_template should be "hcp_atlas".
     # Default: "power_map"
-    reg_subject = 'power_map'
+    reg_subject = "power_map"
     
     # This will be used to create
     # the brain mask, which gets applied before registration to a
@@ -97,14 +111,14 @@ See an example configuration file below::
     # If None, no brain mask will not be applied,
     # and no brain mask will be applied to the template.
     # Default: B0Mask()
-    brain_mask = 'B0Mask({})'
+    brain_mask = "B0Mask({})"
     
     # This defines how to either create a mapping from
     # each subject space to template space or load a mapping from
     # another software. If creating a map, will register reg_subject and
     # reg_template.
     # Default: SynMap()
-    mapping = 'SynMap(True, {}, {})'
+    mapping = "SynMap(True, {}, {})"
     
     [PROFILE]
     
@@ -115,7 +129,7 @@ See an example configuration file below::
     # If "median", the median of values at each node will be used
     # instead of a mean or weighted mean.
     # Default: "gauss"
-    profile_weights = 'gauss'
+    profile_weights = "gauss"
     
     [BUNDLES]
     
@@ -125,13 +139,13 @@ See an example configuration file below::
     # If None, will get all appropriate bundles for the chosen
     # segmentation algorithm.
     # Default: None
-    bundle_info = ''
+    bundle_info = ""
     
     # List of scalars to use.
     # Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
     # "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
     # Default:
-    scalars = ['dti_fa', 'dti_md']
+    scalars = "['dti_fa', 'dti_md']"
     
     [COMPUTE]
     
@@ -155,25 +169,25 @@ See an example configuration file below::
     # https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
     # One of {"fury", "plotly", "plotly_no_gif"}.
     # Default: "plotly_no_gif"
-    viz_backend = 'plotly_no_gif'
+    viz_backend = "plotly_no_gif"
     
     [TRACTOGRAPHY]
     
     # How tracking directions are determined.
     # One of: {"det" | "prob"}
-    directions = 'det'
+    directions = "det"
     
     # The maximum turning angle in each step. Default: 30
     max_angle = 30.0
     
     # The discretization of direction getting. default:
     # dipy.data.default_sphere.
-    sphere = ''
+    sphere = ""
     
     # Float or binary mask describing the ROI within which we seed for
     # tracking.
     # Default to the entire volume (all ones).
-    seed_mask = ''
+    seed_mask = ""
     
     # A value of the seed_mask below which tracking is terminated.
     # Default to 0.
@@ -192,7 +206,7 @@ See an example configuration file below::
     
     # random seed used to generate random seeds if random_seeds is
     # set to True. Default: None
-    rng_seed = ''
+    rng_seed = ""
     
     # If array: A float or binary mask that determines a stopping criterion
     # (e.g. FA).
@@ -202,7 +216,7 @@ See an example configuration file below::
     # tractography.
     # A tuple is required if tracker is set to "pft".
     # Defaults to no stopping (all ones).
-    stop_mask = ''
+    stop_mask = ""
     
     # If float, this a value of the stop_mask below which tracking is
     # terminated (and stop_mask has to be an array).
@@ -223,12 +237,12 @@ See an example configuration file below::
     max_length = 1000
     
     # One of {"DTI", "CSD", "DKI", "MSMT"}. Defaults to use "DTI"
-    odf_model = 'DTI'
+    odf_model = "DTI"
     
     # Which strategy to use in tracking. This can be the standard local
     # tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
     # One of {"local", "pft"}. Default: "local"
-    tracker = 'local'
+    tracker = "local"
     
     [SEGMENTATION]
     
@@ -246,7 +260,7 @@ See an example configuration file below::
     # 'Reco': Segment streamlines using the RecoBundles algorithm
     # [Garyfallidis2017].
     # Default: 'AFQ'
-    seg_algo = 'AFQ'
+    seg_algo = "AFQ"
     
     # Algorithm for streamline registration (case-insensitive):
     # 'slr' : Use Streamlinear Registration [Garyfallidis2015]_
@@ -254,7 +268,7 @@ See an example configuration file below::
     # If None, will use SyN if a mapping is provided, slr otherwise.
     # If  seg_algo="AFQ", SyN is always used.
     # Default: None
-    reg_algo = ''
+    reg_algo = ""
     
     # Whether to clip the streamlines to be only in between the ROIs.
     # Default: False
@@ -330,13 +344,13 @@ See an example configuration file below::
     # modification to your bundle_dict:
     # bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
     # Additional tolerances can also be negative.
-    dist_to_waypoint = ''
+    dist_to_waypoint = ""
     
     # If None, creates RandomState.
     # If int, creates RandomState with seed rng.
     # Used in RecoBundles Algorithm.
     # Default: None.
-    rng = ''
+    rng = ""
     
     # Whether to return the indices in the original streamlines as part
     # of the output of segmentation.
@@ -350,12 +364,12 @@ See an example configuration file below::
     # 'prob_map': img3,
     # 'cross_midline': False}
     # Default: None
-    presegment_bundle_dict = ''
+    presegment_bundle_dict = ""
     
     # Optional arguments for initializing the segmentation for the
     # presegmentation. Only used if presegment_bundle_dict is not None.
     # Default: {}
-    presegment_kawrgs = "{}"
+    presegment_kwargs = "{}"
     
     # Whether to filter the bundles based on their endpoints relative
     # to regions defined in the AAL atlas. Applies only to the waypoint
@@ -370,7 +384,7 @@ See an example configuration file below::
     # "endpoint":img2_2}}
     # where the images used are binary masks of the desired
     # endpoints.
-    endpoint_info = ''
+    endpoint_info = ""
     
     # If filter_by_endpoints is True, this is the required distance
     # from the endpoints to the atlas ROIs.
@@ -378,7 +392,7 @@ See an example configuration file below::
     
     # The full path to a folder into which intermediate products
     # are saved. Default: None, means no saving of intermediates.
-    save_intermediates = ''
+    save_intermediates = ""
     
     [CLEANING]
     
@@ -405,7 +419,7 @@ See an example configuration file below::
     
     # The statistic of each node relative to which the Mahalanobis is
     # calculated. Default: `np.mean` (but can also use median, etc.)
-    stat = 'mean'
+    stat = "mean"
     
     # Whether to return indices in the original streamlines.
     # Default: False.

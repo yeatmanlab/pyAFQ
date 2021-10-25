@@ -62,7 +62,7 @@ using waypoint ROIs.
     import AFQ.models.dti as dti
     import AFQ.segmentation as seg
     from AFQ.utils.volume import transform_inverse_roi, density_map
-    from AFQ.viz.utils import show_anatomical_slices
+    from AFQ.viz.plot import show_anatomical_slices
     from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
     import logging
@@ -136,9 +136,10 @@ Get example data:
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_001.png
-    :alt: HARDI 150 DWI
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_001.png
+   :alt: HARDI 150 DWI
+   :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -302,9 +303,10 @@ In this example we will only use FA.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_002.png
-    :alt: Fractional Anisotropy (FA)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_002.png
+   :alt: Fractional Anisotropy (FA)
+   :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -387,15 +389,17 @@ fulfill the segmentation criteria.
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_003.png
-          :alt: Registration Displacement Mapping
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_003.png
+         :alt: Registration Displacement Mapping
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_003.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_004.png
-          :alt: Warped MNI T2
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_004.png
+         :alt: Warped MNI T2
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_004.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -508,21 +512,24 @@ they are brought into the subject's individual native space.
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_005.png
-          :alt: Left anterior frontal ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_005.png
+         :alt: Left anterior frontal ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_005.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_006.png
-          :alt: Right anterior frontal ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_006.png
+         :alt: Right anterior frontal ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_006.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_007.png
-          :alt: Midsagittal ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_007.png
+         :alt: Midsagittal ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_007.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -615,27 +622,31 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_008.png
-          :alt: warped AntFrontal_1 ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_008.png
+         :alt: warped AntFrontal_1 ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_008.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_009.png
-          :alt: warped AntFrontal_2 ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_009.png
+         :alt: warped AntFrontal_2 ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_009.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_010.png
-          :alt: warped AntFrontal_3 ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_010.png
+         :alt: warped AntFrontal_3 ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_010.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_011.png
-          :alt: Seed ROI
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_011.png
+         :alt: Seed ROI
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_011.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -735,15 +746,17 @@ contains the following keys:
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_012.png
-          :alt: DTI Density Map
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_012.png
+         :alt: DTI Density Map
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_012.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_013.png
-          :alt: Segmented AntFrontal Density Map
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_013.png
+         :alt: Segmented AntFrontal Density Map
+         :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_013.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -758,8 +771,10 @@ contains the following keys:
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
     1016 streamlines exceed the probability threshold.
-      0%|          | 0/1016 [00:00<?, ?it/s]      0%|          | 2/1016 [00:00<01:21, 12.41it/s]      0%|          | 4/1016 [00:06<30:54,  1.83s/it]      1%|          | 8/1016 [00:06<11:45,  1.43it/s]     20%|##        | 208/1016 [00:06<00:12, 63.26it/s]     52%|#####1    | 528/1016 [00:06<00:02, 192.69it/s]    100%|##########| 1016/1016 [00:06<00:00, 151.75it/s]
+      0%|          | 0/1016 [00:00<?, ?it/s]      0%|          | 2/1016 [00:00<01:24, 11.99it/s]      0%|          | 4/1016 [00:05<28:38,  1.70s/it]      1%|          | 6/1016 [00:05<15:59,  1.05it/s]     27%|##6       | 272/1016 [00:06<00:08, 88.79it/s]     52%|#####1    | 528/1016 [00:06<00:02, 198.02it/s]    100%|##########| 1016/1016 [00:06<00:00, 162.31it/s]
     153 streamlines selected with waypoint ROIs
+    Cleaning up Loky...
+    Loky Cleaned up
     Re-orienting streamlines to consistent directions
     Processing AntFrontal
 
@@ -821,9 +836,10 @@ of their trajectory and/or length.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_014.png
-    :alt: Cleaned AntFrontal Density Map
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_014.png
+   :alt: Cleaned AntFrontal Density Map
+   :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_014.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -852,7 +868,7 @@ Visualizing bundles and tract profiles:
 
     plotly.io.show(visualize_bundles(tractogram,
                                      figure=visualize_volume(warped_MNI_T2_data),
-                                     color_by_volume=FA_data))
+                                     shade_by_volume=FA_data))
 
 
 
@@ -900,9 +916,10 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_016.png
-    :alt: AntFrontal
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_016.png
+   :alt: AntFrontal
+   :srcset: /auto_examples/images/sphx_glr_plot_callosal_tract_profile_016.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -933,7 +950,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 15 minutes  8.313 seconds)
+   **Total running time of the script:** ( 18 minutes  8.272 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:

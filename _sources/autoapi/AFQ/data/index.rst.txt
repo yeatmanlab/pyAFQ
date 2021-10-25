@@ -1,7 +1,13 @@
-:mod:`AFQ.data`
-===============
+:py:mod:`AFQ.data`
+==================
 
 .. py:module:: AFQ.data
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -33,13 +39,32 @@ Attributes
    AFQ.data.fetch_stanford_hardi_tractography
 
 
-.. data:: fetch_callosum_templates
+.. py:data:: fetch_callosum_templates
    
 
    
 
-.. function:: read_callosum_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_callosum_templates(resample_to=False)
+
+   
    Load AFQ callosum templates from file
 
 
@@ -67,14 +92,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_templates
+.. py:data:: fetch_templates
    
 
    
 
-.. function:: read_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_templates(resample_to=False)
+
+   
    Load AFQ templates from file
 
 
@@ -102,14 +145,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_or_templates
+.. py:data:: fetch_or_templates
    
 
    
 
-.. function:: read_or_templates(resample_to=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_or_templates(resample_to=False)
+
+   
    Load AFQ OR templates from file
 
 
@@ -137,9 +198,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
 
-.. function:: fetch_hcp(subjects, hcp_bucket='hcp-openaccess', profile_name='hcp', path=None, study='HCP_1200', aws_access_key_id=None, aws_secret_access_key=None)
-
+   
    Fetch HCP diffusion data and arrange it in a manner that resembles the
    BIDS [R8494a6c36190-1]_ specification.
 
@@ -209,14 +270,32 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. data:: fetch_stanford_hardi_tractography
+.. py:data:: fetch_stanford_hardi_tractography
    
 
    
 
-.. function:: read_stanford_hardi_tractography()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_stanford_hardi_tractography()
+
+   
    Reads a minimal tractography from the Stanford dataset.
 
 
@@ -237,9 +316,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: organize_stanford_data(path=None, clear_previous_afq=False)
 
-.. function:: organize_stanford_data(path=None, clear_previous_afq=False)
-
+   
    If necessary, downloads the Stanford HARDI dataset into DIPY directory and
    creates a BIDS compliant file-system structure in AFQ data directory:
 
@@ -282,5 +361,4 @@ Attributes
 
    ..
        !! processed by numpydoc !!
-
 

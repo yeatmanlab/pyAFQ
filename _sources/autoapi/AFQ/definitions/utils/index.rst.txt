@@ -1,7 +1,13 @@
-:mod:`AFQ.definitions.utils`
-============================
+:py:mod:`AFQ.definitions.utils`
+===============================
 
 .. py:module:: AFQ.definitions.utils
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -25,11 +31,11 @@ Functions
 
 
 
-.. class:: Definition
-
+.. py:class:: Definition
 
    Bases: :py:obj:`object`
 
+   
    All Definitions should inherit this.
    For a given subject and session within the API, the definition is used
    to create a given mask, map, etc.
@@ -57,13 +63,32 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
-   .. method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
       :abstractmethod:
 
+      
 
-   .. method:: str_for_toml(self)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: str_for_toml(self)
+
+      
       Uses __init__ in str_for_toml to make string that will instantiate
       itself. Assumes object will have attributes of same name as
       __init__ args. This is important for reading/writing definitions
@@ -88,9 +113,9 @@ Functions
           !! processed by numpydoc !!
 
 
+.. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
 
-.. function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
-
+   
    Helper function
    Generic calls to get_nearest to find a file
 
@@ -111,5 +136,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

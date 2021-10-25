@@ -1,7 +1,13 @@
-:mod:`AFQ.bundles`
-==================
+:py:mod:`AFQ.bundles`
+=====================
 
 .. py:module:: AFQ.bundles
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -17,11 +23,30 @@ Classes
 
 
 
-.. class:: Bundles(reference='same', space=Space.RASMM, origin=Origin.NIFTI, bundles_dict=None, using_idx=False)
+.. py:class:: Bundles(reference='same', space=Space.RASMM, origin=Origin.NIFTI, bundles_dict=None, using_idx=False)
+
+   
 
 
-   .. method:: add_bundle(self, bundle_name, streamlines, idx=None)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: add_bundle(self, bundle_name, streamlines, idx=None)
+
+      
       Add a bundle to bundles.
 
 
@@ -53,9 +78,9 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: clean_bundles(self, **kwargs)
 
-   .. method:: clean_bundles(self, **kwargs)
-
+      
       Clean each segmented bundle based on the Mahalnobis distance of
       each streamline
 
@@ -94,12 +119,31 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: _apply_affine_sft(self, sft, affine, reference, origin)
 
-   .. method:: _apply_affine_sft(self, sft, affine, reference, origin)
+      
 
 
-   .. method:: apply_affine(self, affine, reference, origin=Origin.NIFTI)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_affine(self, affine, reference, origin=Origin.NIFTI)
+
+      
       Apply a linear transformation, given by affine, to all
       streamlines.
 
@@ -133,9 +177,9 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: to_space(self, space)
 
-   .. method:: to_space(self, space)
-
+      
       Transform streamlines to space.
 
 
@@ -160,9 +204,9 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: save_bundles(self, file_path='./', file_suffix='.trk', space=None, bbox_valid_check=False)
 
-   .. method:: save_bundles(self, file_path='./', file_suffix='.trk', space=None, bbox_valid_check=False)
-
+      
       Save tractograms in bundles.
 
 
@@ -201,9 +245,9 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: load_bundles(self, bundle_names, file_path='./', file_suffix='.trk', affine=np.eye(4), bbox_valid_check=False)
 
-   .. method:: load_bundles(self, bundle_names, file_path='./', file_suffix='.trk', affine=np.eye(4), bbox_valid_check=False)
-
+      
       load tractograms from file.
 
 
@@ -244,9 +288,9 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: tract_profiles(self, data, subject_label, affine=np.eye(4), method='afq', metric='FA', n_points=100, weight=True)
 
-   .. method:: tract_profiles(self, data, subject_label, affine=np.eye(4), method='afq', metric='FA', n_points=100, weight=True)
-
+      
       Calculate a summarized profile of data for each bundle along
       its length.
 
@@ -295,6 +339,5 @@ Classes
 
       ..
           !! processed by numpydoc !!
-
 
 

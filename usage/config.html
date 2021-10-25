@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ configuration file &#8212; AFQ 0.1 documentation</title>
+    <title>The pyAFQ configuration file &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet" />
-  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -42,7 +42,10 @@
     <link rel="next" title="Visualization Backends" href="viz_backend.html" />
     <link rel="prev" title="Organizing your data" href="data.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -57,7 +60,7 @@
     
 
 <a class="navbar-brand" href="../index.html">
-  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -294,7 +297,7 @@ See an example configuration file below:</p>
 <span class="c1"># The path to preprocessed diffusion data organized in a BIDS</span>
 <span class="c1"># dataset. This should contain a BIDS derivative dataset with</span>
 <span class="c1"># preprocessed dwi/bvals/bvecs.</span>
-<span class="n">bids_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">bids_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Filter to pass to bids_layout.get when finding DWI files.</span>
 <span class="c1"># Default: {&quot;suffix&quot;: &quot;dwi&quot;}</span>
@@ -302,12 +305,26 @@ See an example configuration file below:</p>
 
 <span class="c1"># The name of the pipeline used to preprocess the DWI data.</span>
 <span class="c1"># Default: &quot;all&quot;.</span>
-<span class="n">dmriprep</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
+<span class="n">preproc_pipeline</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+
+<span class="c1"># list of participant labels (subject IDs) to perform</span>
+<span class="c1"># processing on. If None, all subjects are used.</span>
+<span class="c1"># Default: None</span>
+<span class="n">participant_labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># path to output directory. If None, outputs are put</span>
+<span class="c1"># in a AFQ pipeline folder in the derivatives folder of</span>
+<span class="c1"># the BIDS directory. pyAFQ will use existing derivatives</span>
+<span class="c1"># from the output directory if they exist, instead of recalculating</span>
+<span class="c1"># them (this means you need to clear the output folder if you want</span>
+<span class="c1"># to recalculate a derivative).</span>
+<span class="c1"># Default: None</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># BIDS filters for inputing a user made tractography file.</span>
 <span class="c1"># If None, tractography will be performed automatically.</span>
 <span class="c1"># Default: None</span>
-<span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="p">[</span><span class="n">DATA</span><span class="p">]</span>
 
@@ -328,12 +345,12 @@ See an example configuration file below:</p>
 <span class="c1"># Minimum b value you want to use</span>
 <span class="c1"># from the dataset (other than b0), inclusive.</span>
 <span class="c1"># If None, there is no minimum limit. Default: None</span>
-<span class="n">min_bval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">min_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Maximum b value you want to use</span>
 <span class="c1"># from the dataset (other than b0), inclusive.</span>
 <span class="c1"># If None, there is no maximum limit. Default: None</span>
-<span class="n">max_bval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">max_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="p">[</span><span class="n">REGISTRATION</span><span class="p">]</span>
 
@@ -344,7 +361,7 @@ See an example configuration file below:</p>
 <span class="c1"># If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
 <span class="c1"># and reg_subject should be &quot;subject_sls&quot;.</span>
 <span class="c1"># Default: &quot;mni_T1&quot;</span>
-<span class="n">reg_template</span> <span class="o">=</span> <span class="s1">&#39;mni_T1&#39;</span>
+<span class="n">reg_template</span> <span class="o">=</span> <span class="s2">&quot;mni_T1&quot;</span>
 
 <span class="c1"># The source image data to be registered.</span>
 <span class="c1"># Can either be a Nifti1Image, bids filters for a Nifti1Image, or</span>
@@ -353,7 +370,7 @@ See an example configuration file below:</p>
 <span class="c1"># If &quot;subject_sls&quot; is used, slr registration will be used</span>
 <span class="c1"># and reg_template should be &quot;hcp_atlas&quot;.</span>
 <span class="c1"># Default: &quot;power_map&quot;</span>
-<span class="n">reg_subject</span> <span class="o">=</span> <span class="s1">&#39;power_map&#39;</span>
+<span class="n">reg_subject</span> <span class="o">=</span> <span class="s2">&quot;power_map&quot;</span>
 
 <span class="c1"># This will be used to create</span>
 <span class="c1"># the brain mask, which gets applied before registration to a</span>
@@ -361,14 +378,14 @@ See an example configuration file below:</p>
 <span class="c1"># If None, no brain mask will not be applied,</span>
 <span class="c1"># and no brain mask will be applied to the template.</span>
 <span class="c1"># Default: B0Mask()</span>
-<span class="n">brain_mask</span> <span class="o">=</span> <span class="s1">&#39;B0Mask(</span><span class="si">{}</span><span class="s1">)&#39;</span>
+<span class="n">brain_mask</span> <span class="o">=</span> <span class="s2">&quot;B0Mask(</span><span class="si">{}</span><span class="s2">)&quot;</span>
 
 <span class="c1"># This defines how to either create a mapping from</span>
 <span class="c1"># each subject space to template space or load a mapping from</span>
 <span class="c1"># another software. If creating a map, will register reg_subject and</span>
 <span class="c1"># reg_template.</span>
 <span class="c1"># Default: SynMap()</span>
-<span class="n">mapping</span> <span class="o">=</span> <span class="s1">&#39;SynMap(True, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;SynMap(True, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span>
 
 <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span>
 
@@ -379,7 +396,7 @@ See an example configuration file below:</p>
 <span class="c1"># If &quot;median&quot;, the median of values at each node will be used</span>
 <span class="c1"># instead of a mean or weighted mean.</span>
 <span class="c1"># Default: &quot;gauss&quot;</span>
-<span class="n">profile_weights</span> <span class="o">=</span> <span class="s1">&#39;gauss&#39;</span>
+<span class="n">profile_weights</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span>
 
 <span class="p">[</span><span class="n">BUNDLES</span><span class="p">]</span>
 
@@ -389,13 +406,13 @@ See an example configuration file below:</p>
 <span class="c1"># If None, will get all appropriate bundles for the chosen</span>
 <span class="c1"># segmentation algorithm.</span>
 <span class="c1"># Default: None</span>
-<span class="n">bundle_info</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">bundle_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># List of scalars to use.</span>
 <span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
 <span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.scalar.</span>
 <span class="c1"># Default:</span>
-<span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dti_fa&#39;</span><span class="p">,</span> <span class="s1">&#39;dti_md&#39;</span><span class="p">]</span>
+<span class="n">scalars</span> <span class="o">=</span> <span class="s2">&quot;[&#39;dti_fa&#39;, &#39;dti_md&#39;]&quot;</span>
 
 <span class="p">[</span><span class="n">COMPUTE</span><span class="p">]</span>
 
@@ -419,25 +436,25 @@ See an example configuration file below:</p>
 <span class="c1"># https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</span>
 <span class="c1"># One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
 <span class="c1"># Default: &quot;plotly_no_gif&quot;</span>
-<span class="n">viz_backend</span> <span class="o">=</span> <span class="s1">&#39;plotly_no_gif&#39;</span>
+<span class="n">viz_backend</span> <span class="o">=</span> <span class="s2">&quot;plotly_no_gif&quot;</span>
 
 <span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
 
 <span class="c1"># How tracking directions are determined.</span>
 <span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
-<span class="n">directions</span> <span class="o">=</span> <span class="s1">&#39;det&#39;</span>
+<span class="n">directions</span> <span class="o">=</span> <span class="s2">&quot;det&quot;</span>
 
 <span class="c1"># The maximum turning angle in each step. Default: 30</span>
 <span class="n">max_angle</span> <span class="o">=</span> <span class="mf">30.0</span>
 
 <span class="c1"># The discretization of direction getting. default:</span>
 <span class="c1"># dipy.data.default_sphere.</span>
-<span class="n">sphere</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Float or binary mask describing the ROI within which we seed for</span>
 <span class="c1"># tracking.</span>
 <span class="c1"># Default to the entire volume (all ones).</span>
-<span class="n">seed_mask</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">seed_mask</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># A value of the seed_mask below which tracking is terminated.</span>
 <span class="c1"># Default to 0.</span>
@@ -456,7 +473,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># random seed used to generate random seeds if random_seeds is</span>
 <span class="c1"># set to True. Default: None</span>
-<span class="n">rng_seed</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">rng_seed</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># If array: A float or binary mask that determines a stopping criterion</span>
 <span class="c1"># (e.g. FA).</span>
@@ -466,7 +483,7 @@ See an example configuration file below:</p>
 <span class="c1"># tractography.</span>
 <span class="c1"># A tuple is required if tracker is set to &quot;pft&quot;.</span>
 <span class="c1"># Defaults to no stopping (all ones).</span>
-<span class="n">stop_mask</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">stop_mask</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># If float, this a value of the stop_mask below which tracking is</span>
 <span class="c1"># terminated (and stop_mask has to be an array).</span>
@@ -487,12 +504,12 @@ See an example configuration file below:</p>
 <span class="n">max_length</span> <span class="o">=</span> <span class="mi">1000</span>
 
 <span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;, &quot;MSMT&quot;}. Defaults to use &quot;DTI&quot;</span>
-<span class="n">odf_model</span> <span class="o">=</span> <span class="s1">&#39;DTI&#39;</span>
+<span class="n">odf_model</span> <span class="o">=</span> <span class="s2">&quot;DTI&quot;</span>
 
 <span class="c1"># Which strategy to use in tracking. This can be the standard local</span>
 <span class="c1"># tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
 <span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
-<span class="n">tracker</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
 
 <span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
 
@@ -510,7 +527,7 @@ See an example configuration file below:</p>
 <span class="c1"># &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
 <span class="c1"># [Garyfallidis2017].</span>
 <span class="c1"># Default: &#39;AFQ&#39;</span>
-<span class="n">seg_algo</span> <span class="o">=</span> <span class="s1">&#39;AFQ&#39;</span>
+<span class="n">seg_algo</span> <span class="o">=</span> <span class="s2">&quot;AFQ&quot;</span>
 
 <span class="c1"># Algorithm for streamline registration (case-insensitive):</span>
 <span class="c1"># &#39;slr&#39; : Use Streamlinear Registration [Garyfallidis2015]_</span>
@@ -518,7 +535,7 @@ See an example configuration file below:</p>
 <span class="c1"># If None, will use SyN if a mapping is provided, slr otherwise.</span>
 <span class="c1"># If  seg_algo=&quot;AFQ&quot;, SyN is always used.</span>
 <span class="c1"># Default: None</span>
-<span class="n">reg_algo</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">reg_algo</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Whether to clip the streamlines to be only in between the ROIs.</span>
 <span class="c1"># Default: False</span>
@@ -594,13 +611,13 @@ See an example configuration file below:</p>
 <span class="c1"># modification to your bundle_dict:</span>
 <span class="c1"># bundle_dict[&quot;ARC_R&quot;][&quot;additional_tolerances&quot;] = [3, 3]</span>
 <span class="c1"># Additional tolerances can also be negative.</span>
-<span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># If None, creates RandomState.</span>
 <span class="c1"># If int, creates RandomState with seed rng.</span>
 <span class="c1"># Used in RecoBundles Algorithm.</span>
 <span class="c1"># Default: None.</span>
-<span class="n">rng</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Whether to return the indices in the original streamlines as part</span>
 <span class="c1"># of the output of segmentation.</span>
@@ -614,12 +631,12 @@ See an example configuration file below:</p>
 <span class="c1"># &#39;prob_map&#39;: img3,</span>
 <span class="c1"># &#39;cross_midline&#39;: False}</span>
 <span class="c1"># Default: None</span>
-<span class="n">presegment_bundle_dict</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">presegment_bundle_dict</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Optional arguments for initializing the segmentation for the</span>
 <span class="c1"># presegmentation. Only used if presegment_bundle_dict is not None.</span>
 <span class="c1"># Default: {}</span>
-<span class="n">presegment_kawrgs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+<span class="n">presegment_kwargs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
 
 <span class="c1"># Whether to filter the bundles based on their endpoints relative</span>
 <span class="c1"># to regions defined in the AAL atlas. Applies only to the waypoint</span>
@@ -634,7 +651,7 @@ See an example configuration file below:</p>
 <span class="c1"># &quot;endpoint&quot;:img2_2}}</span>
 <span class="c1"># where the images used are binary masks of the desired</span>
 <span class="c1"># endpoints.</span>
-<span class="n">endpoint_info</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">endpoint_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># If filter_by_endpoints is True, this is the required distance</span>
 <span class="c1"># from the endpoints to the atlas ROIs.</span>
@@ -642,7 +659,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># The full path to a folder into which intermediate products</span>
 <span class="c1"># are saved. Default: None, means no saving of intermediates.</span>
-<span class="n">save_intermediates</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">save_intermediates</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="p">[</span><span class="n">CLEANING</span><span class="p">]</span>
 
@@ -669,7 +686,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># The statistic of each node relative to which the Mahalanobis is</span>
 <span class="c1"># calculated. Default: `np.mean` (but can also use median, etc.)</span>
-<span class="n">stat</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
 
 <span class="c1"># Whether to return indices in the original streamlines.</span>
 <span class="c1"># Default: False.</span>
@@ -686,12 +703,23 @@ ignore them.</p>
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="data.html" title="previous page">Organizing your data</a>
-    <a class='right-next' id="next-link" href="viz_backend.html" title="next page">Visualization Backends</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="data.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Organizing your data</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="viz_backend.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Visualization Backends</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -699,21 +727,20 @@ ignore them.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

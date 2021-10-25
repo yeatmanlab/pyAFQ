@@ -1,7 +1,29 @@
-:mod:`AFQ.utils`
-================
+:py:mod:`AFQ.utils`
+===================
 
 .. py:module:: AFQ.utils
+
+.. autoapi-nested-parse::
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

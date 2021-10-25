@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.1 documentation</title>
+    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -40,7 +40,10 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -55,7 +58,7 @@
     
 
 <a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../../../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -191,23 +194,27 @@
                 
   <h1>Source code for AFQ.viz.plotly_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.viz.utils</span> <span class="k">as</span> <span class="nn">vut</span>
+
+<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">set_number_of_points</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">plotly</span>
     <span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
     <span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">plotly.subplots</span> <span class="kn">import</span> <span class="n">make_subplots</span>
+<span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plotly&quot;</span><span class="p">))</span>
+
 
 <div class="viewcode-block" id="scope"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.scope">[docs]</a><span class="n">scope</span> <span class="o">=</span> <span class="n">pio</span><span class="o">.</span><span class="n">kaleido</span><span class="o">.</span><span class="n">scope</span></div>
 <div class="viewcode-block" id="viz_logger"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.viz_logger">[docs]</a><span class="n">viz_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;AFQ.viz&quot;</span><span class="p">)</span></div>
@@ -248,23 +255,25 @@
 
 <div class="viewcode-block" id="set_layout"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.set_layout">[docs]</a><span class="k">def</span> <span class="nf">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">color</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;rgba(0,0,0,0)&quot;</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">scene1</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
             <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
             <span class="n">zaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+                <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+            <span class="n">aspectmode</span><span class="o">=</span><span class="s1">&#39;data&#39;</span></div>
         <span class="p">)</span>
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]):</span>
+<div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">sbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -276,20 +285,23 @@
     <span class="n">y_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
     <span class="n">z_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cbs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cbs</span><span class="p">)</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="n">cbs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">cbs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
-        <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
-        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">color_constant</span> <span class="o">=</span> <span class="p">(</span><span class="n">color</span> <span class="o">/</span> <span class="n">color</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>\
-            <span class="o">*</span> <span class="p">(</span><span class="mf">1.4</span> <span class="o">/</span> <span class="p">(</span><span class="n">cbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">cbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mf">1.4</span> <span class="o">/</span> <span class="p">(</span><span class="n">sbv_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">sbv_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">color_constant</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">plotting_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">customdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">plotting_shape</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">sl_index</span><span class="p">,</span> <span class="n">plotting_offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">):</span>
         <span class="n">sl_length</span> <span class="o">=</span> <span class="n">sls</span><span class="o">.</span><span class="n">_lengths</span><span class="p">[</span><span class="n">sl_index</span><span class="p">]</span>
@@ -307,6 +319,9 @@
             <span class="n">y_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">z_pts</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
+        <span class="k">if</span> <span class="n">cbs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">color_constant</span> <span class="o">=</span> <span class="n">cbs</span><span class="p">[</span><span class="n">sl_index</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="n">cbv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">brightness</span> <span class="o">=</span> <span class="n">cbv</span><span class="p">[</span>
                 <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
@@ -322,9 +337,13 @@
                 <span class="n">color_constant</span>
             <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">line_color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span><span class="p">:</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">color_constant</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># dont shade alpha values</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sls</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">line_color</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">customdata</span><span class="p">[</span><span class="n">total_offset</span> <span class="o">+</span> <span class="n">sl_length</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="n">x_pts</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_pts</span>
@@ -337,7 +356,8 @@
             <span class="n">x</span><span class="o">=</span><span class="n">x_pts</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y_pts</span><span class="p">,</span>
             <span class="n">z</span><span class="o">=</span><span class="n">z_pts</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">legendgroup</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
             <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">size</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
                 <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
@@ -347,14 +367,61 @@
                 <span class="n">color</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">hovertext</span><span class="o">=</span><span class="n">customdata</span><span class="p">,</span>
-            <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;all&#39;</span></div>
-        <span class="p">)</span>
+            <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span>
+        <span class="p">),</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">color_constant</span></div>
+
+
+<div class="viewcode-block" id="_plot_profiles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._plot_profiles">[docs]</a><span class="k">def</span> <span class="nf">_plot_profiles</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">profiles</span><span class="o">.</span><span class="n">tractID</span> <span class="o">==</span> <span class="n">bundle_name</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;nodeID&quot;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">scalar_val</span> <span class="ow">in</span> <span class="n">profiles</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">():</span>
+            <span class="n">line_color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">scalar_val</span> <span class="o">*</span> <span class="n">color</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">profiles</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">profiles</span>
+        <span class="n">line_color</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">indiv_color</span> <span class="ow">in</span> <span class="n">color</span><span class="p">:</span>
+            <span class="n">line_color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">indiv_color</span><span class="p">))</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">bundle_name</span><span class="p">),</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">15</span><span class="p">),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+            <span class="n">legendgroup</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">bundle_name</span><span class="p">)),</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">font</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s2">&quot;Overpass&quot;</span><span class="p">)</span>
+    <span class="n">fixed_camera_for_2d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">projection</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;orthographic&quot;</span><span class="p">),</span>
+        <span class="n">up</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">eye</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">center</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">margin</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="n">scene2</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">camera</span><span class="o">=</span><span class="n">fixed_camera_for_2d</span><span class="p">,</span>
+            <span class="n">zaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="n">dragmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Location&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="p">),</span>
+            <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">scalar</span><span class="p">),</span> <span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="p">)))</span></div>
 
 
 <div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">cbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shade_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">color_by_streamline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">sbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">include_profiles</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                      <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
                       <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -393,24 +460,48 @@
 <span class="sd">        with Tableau 20 RGB values if bundle_dict is None, or dict from</span>
 <span class="sd">        bundles to Tableau 20 RGB values if bundle_dict is not None.</span>
 
-<span class="sd">    color_by_volume : ndarray or str, optional</span>
+<span class="sd">    shade_by_volume : ndarray or str, optional</span>
 <span class="sd">        3d volume use to shade the bundles. If None, no shading</span>
 <span class="sd">        is performed. Only works when using the plotly backend.</span>
 <span class="sd">        Default: None</span>
 
-<span class="sd">    cbv_lims : ndarray</span>
+<span class="sd">    color_by_streamline : ndarray or dict, optional</span>
+<span class="sd">        N by 3 array, where N is the number of streamlines in sft;</span>
+<span class="sd">        for each streamline you specify 3 values between 0 and 1 for rgb.</span>
+<span class="sd">        If sft has multiple bundles, then use a dict for color_by_streamline,</span>
+<span class="sd">        where keys are bundle names and values are n by 3 arrays.</span>
+<span class="sd">        Overrides colors for bundles in the keys</span>
+<span class="sd">        of the dict if passing a  dict, or for all streamlines if using</span>
+<span class="sd">        ndarray.</span>
+<span class="sd">        Default: None</span>
+
+<span class="sd">    sbv_lims : ndarray</span>
 <span class="sd">        Of the form (lower bound, upper bound). Shading based on</span>
-<span class="sd">        color_by_volume will only differentiate values within these bounds.</span>
+<span class="sd">        shade_by_volume will only differentiate values within these bounds.</span>
 <span class="sd">        If lower bound is None, will default to 0.</span>
 <span class="sd">        If upper bound is None, will default to the maximum value in</span>
-<span class="sd">        color_by_volume.</span>
+<span class="sd">        shade_by_volume.</span>
 <span class="sd">        Default: [None, None]</span>
+
+<span class="sd">    include_profiles : Tuple of Pandas Dataframe and string</span>
+<span class="sd">        The first element of the uple is a</span>
+<span class="sd">        Pandas Dataframe containing profiles in the standard pyAFQ</span>
+<span class="sd">        output format for the bundle(s) being displayed. It will be used</span>
+<span class="sd">        to generate a graph of the tract profiles for each bundle,</span>
+<span class="sd">        with colors corresponding to the colors on the bundles. The string</span>
+<span class="sd">        is the scalar to use from the profile. If these are None,</span>
+<span class="sd">        no tract profiles will be graphed.</span>
+<span class="sd">        Defualt: (None, None)</span>
 
 <span class="sd">    flip_axes : ndarray</span>
 <span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
 <span class="sd">        visualize.</span>
 <span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
 <span class="sd">        Default: [False, False, False]</span>
+
+<span class="sd">    opacity : float</span>
+<span class="sd">        Float between 0 and 1 defining the opacity of the bundle.</span>
+<span class="sd">        Default: 1.0</span>
 
 <span class="sd">    background : tuple, optional</span>
 <span class="sd">        RGB values for the background. Default: (1, 1, 1), which is white</span>
@@ -433,25 +524,44 @@
 <span class="sd">    Plotly Figure object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">color_by_volume</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">color_by_volume</span> <span class="o">=</span> <span class="n">vut</span><span class="o">.</span><span class="n">load_volume</span><span class="p">(</span><span class="n">color_by_volume</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">shade_by_volume</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">vut</span><span class="o">.</span><span class="n">load_volume</span><span class="p">(</span><span class="n">shade_by_volume</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">figure</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">include_profiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">background</span><span class="p">))</span>
 
     <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
             <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
-        <span class="n">_draw_streamlines</span><span class="p">(</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_by_streamline</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color_by_streamline</span><span class="p">:</span>
+                <span class="n">cbs</span> <span class="o">=</span> <span class="n">color_by_streamline</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cbs</span> <span class="o">=</span> <span class="n">color_by_streamline</span>
+
+        <span class="n">color_constant</span> <span class="o">=</span> <span class="n">_draw_streamlines</span><span class="p">(</span>
             <span class="n">figure</span><span class="p">,</span>
             <span class="n">sls</span><span class="p">,</span>
             <span class="n">dimensions</span><span class="p">,</span>
             <span class="n">color</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
-            <span class="n">cbv</span><span class="o">=</span><span class="n">color_by_volume</span><span class="p">,</span>
-            <span class="n">cbv_lims</span><span class="o">=</span><span class="n">cbv_lims</span><span class="p">,</span>
-            <span class="n">flip_axes</span><span class="o">=</span><span class="n">flip_axes</span><span class="p">)</span>
+            <span class="n">cbv</span><span class="o">=</span><span class="n">shade_by_volume</span><span class="p">,</span>
+            <span class="n">cbs</span><span class="o">=</span><span class="n">cbs</span><span class="p">,</span>
+            <span class="n">sbv_lims</span><span class="o">=</span><span class="n">sbv_lims</span><span class="p">,</span>
+            <span class="n">flip_axes</span><span class="o">=</span><span class="n">flip_axes</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_profiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_plot_profiles</span><span class="p">(</span>
+                <span class="n">include_profiles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="p">,</span> <span class="n">color_constant</span><span class="p">,</span>
+                <span class="n">figure</span><span class="p">,</span> <span class="n">include_profiles</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">itemsizing</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
@@ -518,8 +628,9 @@
             <span class="n">z</span><span class="o">=</span><span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)),</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">)</span></div>
-        <span class="p">)</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
     <span class="p">)</span>
 
 
@@ -592,7 +703,9 @@
                           <span class="n">roi_affine</span><span class="p">,</span> <span class="n">static_affine</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">figure</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
 
@@ -607,13 +720,9 @@
 <div class="viewcode-block" id="Axes.Z"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.Axes.Z">[docs]</a>    <span class="n">Z</span> <span class="o">=</span> <span class="mi">2</span></div></div>
 
 
-<div class="viewcode-block" id="_draw_slice"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_slice">[docs]</a><span class="k">def</span> <span class="nf">_draw_slice</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">height</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">height</span> <span class="o">=</span> <span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="o">//</span> <span class="n">n_steps</span>
-        <span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+<div class="viewcode-block" id="_draw_slice"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_slice">[docs]</a><span class="k">def</span> <span class="nf">_draw_slice</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">colorscale</span><span class="o">=</span><span class="s2">&quot;greys&quot;</span><span class="p">,</span> <span class="n">invert_colorscale</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">*</span> <span class="n">pos</span><span class="p">)</span>
 
     <span class="n">v_min</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
     <span class="n">sf</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">v_min</span>
@@ -631,7 +740,9 @@
                            <span class="p">:</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">height</span><span class="p">:</span><span class="n">height</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">volume</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">height</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-    <span class="n">values</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">v_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">sf</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">v_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">sf</span>
+    <span class="k">if</span> <span class="n">invert_colorscale</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">values</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Volume</span><span class="p">(</span>
@@ -639,14 +750,15 @@
             <span class="n">y</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
             <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
             <span class="n">value</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
-            <span class="n">colorscale</span><span class="o">=</span><span class="s1">&#39;greys&#39;</span><span class="p">,</span>
+            <span class="n">colorscale</span><span class="o">=</span><span class="n">colorscale</span><span class="p">,</span>
             <span class="n">surface_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">showscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
-            <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">_name_from_enum</span><span class="p">(</span><span class="n">axis</span><span class="p">),</span>
-            <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;skip&#39;</span></div>
-        <span class="p">)</span>
+            <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;skip&#39;</span><span class="p">,</span>
+            <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
     <span class="p">)</span>
 
 
@@ -659,46 +771,10 @@
         <span class="k">return</span> <span class="s2">&quot;Axial&quot;</span></div>
 
 
-<div class="viewcode-block" id="_draw_slices"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_slices">[docs]</a><span class="k">def</span> <span class="nf">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span>
-                 <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">sliders</span><span class="o">=</span><span class="p">[],</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">_draw_slice</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">active</span> <span class="o">=</span> <span class="n">n_steps</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">_name_from_enum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Plane&quot;</span>
-        <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-            <span class="n">_draw_slice</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
-                        <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="n">n_steps</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-            <span class="n">step_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;update&quot;</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">figure</span><span class="o">.</span><span class="n">data</span><span class="p">)}],</span>
-                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-            <span class="p">)</span>
-
-            <span class="n">step_dict</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">][</span><span class="o">-</span><span class="n">n_steps</span><span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_steps</span>
-            <span class="n">step_dict</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">][</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_dict</span><span class="p">)</span>
-
-        <span class="n">figure</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="n">active</span><span class="p">]</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">sliders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
-            <span class="n">currentvalue</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">xanchor</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">),</span>
-            <span class="n">pad</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">50</span><span class="p">),</span>
-            <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">y_loc</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-            <span class="n">lenmode</span><span class="o">=</span><span class="s1">&#39;fraction&#39;</span><span class="p">,</span>
-            <span class="nb">len</span><span class="o">=</span><span class="mf">0.6</span></div>
-        <span class="p">))</span>
-
-
-<div class="viewcode-block" id="visualize_volume"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_volume">[docs]</a><span class="k">def</span> <span class="nf">visualize_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">show_z</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
-                     <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
-                     <span class="n">slider_definition</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">which_plane</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="visualize_volume"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_volume">[docs]</a><span class="k">def</span> <span class="nf">visualize_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_pos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">y_pos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                     <span class="n">z_pos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                     <span class="n">colorscale</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">invert_colorscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize a volume</span>
 
@@ -711,40 +787,44 @@
 <span class="sd">        If provided, the visualization will be added to this Figure. Default:</span>
 <span class="sd">        Initialize a new Figure.</span>
 
-<span class="sd">    show_x : bool, optional</span>
-<span class="sd">        Whether to show Coronal Slice.</span>
-<span class="sd">        Default: True</span>
+<span class="sd">    x_pos : float or None, optional</span>
+<span class="sd">        Where to show Coronal Slice. If None, slice is not shown.</span>
+<span class="sd">        Should be a decimal between 0 and 1.</span>
+<span class="sd">        Indicatesthe fractional position along the perpendicular</span>
+<span class="sd">        axis to the slice.</span>
+<span class="sd">        Default: 0.5</span>
 
-<span class="sd">    show_x : bool, optional</span>
-<span class="sd">        Whether to show Sagittal Slice.</span>
-<span class="sd">        Default: True</span>
+<span class="sd">    y_pos : float or None, optional</span>
+<span class="sd">        Where to show Sagittal Slice. If None, slice is not shown.</span>
+<span class="sd">        Should be a decimal between 0 and 1.</span>
+<span class="sd">        Indicatesthe fractional position along the perpendicular</span>
+<span class="sd">        axis to the slice.</span>
+<span class="sd">        Default: 0.5</span>
 
-<span class="sd">    show_x : bool, optional</span>
-<span class="sd">        Whether to show Axial Slice.</span>
-<span class="sd">        Default: True</span>
+<span class="sd">    z_pos : float or None, optional</span>
+<span class="sd">        Where to show Axial Slice. If None, slice is not shown.</span>
+<span class="sd">        Should be a decimal between 0 and 1.</span>
+<span class="sd">        Indicatesthe fractional position along the perpendicular</span>
+<span class="sd">        axis to the slice.</span>
+<span class="sd">        Default: 0.5</span>
 
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        Opacity of slices.</span>
 <span class="sd">        Default: 1.0</span>
+
+<span class="sd">    colorscale : string, optional</span>
+<span class="sd">        Plotly colorscale to use to color slices.</span>
+<span class="sd">        Default: &quot;greys&quot;</span>
+
+<span class="sd">    invert_colorscale : bool, optional</span>
+<span class="sd">        Whether to invert colorscale.</span>
+<span class="sd">        Default: False</span>
 
 <span class="sd">    flip_axes : ndarray</span>
 <span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
 <span class="sd">        visualize.</span>
 <span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
 <span class="sd">        Default: [False, False, False]</span>
-
-<span class="sd">    slider_definition : int, optional</span>
-<span class="sd">        How many discrete positions the slices can take.</span>
-<span class="sd">        If 0, slices are stationary.</span>
-<span class="sd">        Default: 50</span>
-
-<span class="sd">    which_plane : str, optional</span>
-<span class="sd">        Which plane can be moved with a slider.</span>
-<span class="sd">        Should be &#39;Coronal&#39;, &#39;Axial&#39;, &#39;Sagittal&#39;, or None.</span>
-<span class="sd">        If None, slices are stationary.</span>
-<span class="sd">        Note: If slices are not stationary,</span>
-<span class="sd">        do not add any more traces to the figure.</span>
-<span class="sd">        Default: &#39;Coronal&#39;</span>
 
 <span class="sd">    interact : bool</span>
 <span class="sd">        Whether to open the visualization in an interactive window.</span>
@@ -764,52 +844,168 @@
             <span class="n">volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">figure</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
 
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
-    <span class="n">sliders</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># draw stationary slices first</span>
-    <span class="k">if</span> <span class="n">show_x</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;sagittal&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_y</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;coronal&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_z</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;axial&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="c1"># Then draw interactive slices</span>
-    <span class="k">if</span> <span class="n">show_x</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;sagittal&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">sliders</span><span class="o">=</span><span class="n">sliders</span><span class="p">,</span>
-                         <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="n">slider_definition</span><span class="p">,</span>
-                         <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_y</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;coronal&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">sliders</span><span class="o">=</span><span class="n">sliders</span><span class="p">,</span>
-                         <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="n">slider_definition</span><span class="p">,</span>
-                         <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_z</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">which_plane</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">which_plane</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;axial&#39;</span><span class="p">:</span>
-            <span class="n">_draw_slices</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">sliders</span><span class="o">=</span><span class="n">sliders</span><span class="p">,</span>
-                         <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="n">slider_definition</span><span class="p">,</span>
-                         <span class="n">y_loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">slider_definition</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">which_plane</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">sliders</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">sliders</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">X</span><span class="p">),</span> <span class="p">(</span><span class="n">y_pos</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Y</span><span class="p">),</span> <span class="p">(</span><span class="n">z_pos</span><span class="p">,</span> <span class="n">Axes</span><span class="o">.</span><span class="n">Z</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="n">pos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_draw_slice</span><span class="p">(</span>
+                <span class="n">figure</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">colorscale</span><span class="o">=</span><span class="n">colorscale</span><span class="p">,</span>
+                <span class="n">invert_colorscale</span><span class="o">=</span><span class="n">invert_colorscale</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">inline</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_draw_core"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_core">[docs]</a><span class="k">def</span> <span class="nf">_draw_core</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
+               <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
+    <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
+    <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">nipy_spectral</span>
+    <span class="n">normalize</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">))</span>
+    <span class="n">s_map</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+    <span class="n">line_color</span> <span class="o">=</span> <span class="n">s_map</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span>
+    <span class="n">line_color_untouched</span> <span class="o">=</span> <span class="n">line_color</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">direc</span> <span class="o">=</span> <span class="n">fgarray</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">direc</span> <span class="o">=</span> <span class="n">direc</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direc</span><span class="p">)</span>
+            <span class="n">light_direc</span> <span class="o">=</span> <span class="o">-</span><span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">direc_adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">direc</span><span class="p">,</span> <span class="n">light_direc</span><span class="p">)</span>
+            <span class="n">direc_adjust</span> <span class="o">=</span> <span class="p">(</span><span class="n">direc_adjust</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">direc_adjust</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_points</span>
+    <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># text[n_points // 2] = n_points // 2 # too much clutter</span>
+    <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_points</span>
+
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">figure</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">bundle_name</span> <span class="o">+</span> <span class="s2">&quot;_core&quot;</span><span class="p">),</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">hovertext</span><span class="o">=</span><span class="n">indiv_profile</span><span class="p">,</span>
+            <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+            <span class="n">textfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s2">&quot;Overpass&quot;</span><span class="p">),</span>
+            <span class="n">textposition</span><span class="o">=</span><span class="s2">&quot;top right&quot;</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines+text&quot;</span>
+        <span class="p">),</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">line_color_untouched</span></div>
+
+
+<div class="viewcode-block" id="single_bundle_viz"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.single_bundle_viz">[docs]</a><span class="k">def</span> <span class="nf">single_bundle_viz</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">,</span> <span class="n">sft</span><span class="p">,</span>
+                      <span class="n">bundle</span><span class="p">,</span> <span class="n">scalar_name</span><span class="p">,</span>
+                      <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">include_profile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualize a single bundle in 3D with core bundle and associated profile</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    indiv_profile : ndarray</span>
+<span class="sd">        A numpy array containing a tract profile for this bundle for a scalar.</span>
+
+<span class="sd">    sft : Stateful Tractogram, str</span>
+<span class="sd">        A Stateful Tractogram containing streamline information.</span>
+<span class="sd">        If bundle is an int, the Stateful Tractogram</span>
+<span class="sd">        must contain a bundle key in it&#39;s data_per_streamline which is a list</span>
+<span class="sd">        of bundle `&#39;uid&#39;.</span>
+<span class="sd">        Otherwise, the entire Stateful Tractogram will be used as the bundle</span>
+<span class="sd">        for the visualization.</span>
+
+<span class="sd">    bundle : str or int</span>
+<span class="sd">        The name of the bundle to be used as the label for the plot,</span>
+<span class="sd">        or an integer for selection from the sft metadata.</span>
+
+<span class="sd">    scalar_name : str</span>
+<span class="sd">        The name of the scalar being used.</span>
+
+<span class="sd">    affine : ndarray, optional</span>
+<span class="sd">       An affine transformation to apply to the streamlines before</span>
+<span class="sd">       visualization. Default: no transform.</span>
+
+<span class="sd">    bundle_dict : dict, optional</span>
+<span class="sd">        This parameter is used if bundle is an int.</span>
+<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
+<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the sft</span>
+<span class="sd">        metadata. Default: Either the entire sft is treated as a bundle,</span>
+<span class="sd">        or identified only as unique integers in the metadata.</span>
+
+<span class="sd">    flip_axes : ndarray</span>
+<span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
+<span class="sd">        visualize.</span>
+<span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
+<span class="sd">        Default: [False, False, False]</span>
+
+<span class="sd">    figure : Plotly Figure object, optional</span>
+<span class="sd">        If provided, the visualization will be added to this Figure. Default:</span>
+<span class="sd">        Initialize a new Figure.</span>
+
+<span class="sd">    include_profile : bool, optional</span>
+<span class="sd">        If true, also plot the tract profile. Default: False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Plotly Figure object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">include_profile</span><span class="p">:</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">}]])</span>
+
+    <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span>
+    <span class="n">sls</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
+        <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
+
+    <span class="n">line_color</span> <span class="o">=</span> <span class="n">_draw_core</span><span class="p">(</span>
+        <span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
+        <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">include_profile</span><span class="p">:</span>
+        <span class="n">_plot_profiles</span><span class="p">(</span>
+            <span class="n">indiv_profile</span><span class="p">,</span> <span class="n">bundle_name</span> <span class="o">+</span> <span class="s2">&quot;_profile&quot;</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">scalar_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">figure</span></div>
 </pre></div>
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
               
           </main>
           
@@ -817,21 +1013,20 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

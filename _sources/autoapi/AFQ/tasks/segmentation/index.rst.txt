@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.segmentation`
-=============================
+:py:mod:`AFQ.tasks.segmentation`
+================================
 
 .. py:module:: AFQ.tasks.segmentation
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -32,34 +38,203 @@ Attributes
    AFQ.tasks.segmentation.outputs
 
 
-.. data:: logger
+.. py:data:: logger
    
 
    
 
-.. data:: outputs
-   :annotation: = ['bundles_file', 'clean_bundles_file', 'indiv_bundles', 'sl_counts_file', 'profiles_file', 'scalar_dict']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: outputs
+   
 
    
 
-.. function:: segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap, tractography_imap, tracking_params, segmentation_params)
 
 
-.. function:: clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params, tracking_params, segmentation_params)
 
 
-.. function:: export_bundles(subses_dict, clean_bundles_file, bundles_file, bundle_dict, tracking_params, segmentation_params)
 
 
-.. function:: export_sl_counts(subses_dict, bundle_dict, clean_bundles_file, bundles_file, tracking_params, segmentation_params)
 
 
-.. function:: tract_profiles(subses_dict, clean_bundles_file, bundle_dict, scalar_dict, profile_weights, dwi_affine, tracking_params, segmentation_params)
 
 
-.. function:: get_scalar_dict(scalars, data_imap, mapping_imap)
 
 
-.. function:: get_segmentation_plan()
 
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap, tractography_imap, tracking_params, segmentation_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params, tracking_params, segmentation_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_bundles(subses_dict, clean_bundles_file, bundles_file, bundle_dict, tracking_params, segmentation_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_sl_counts(subses_dict, bundle_dict, clean_bundles_file, bundles_file, tracking_params, segmentation_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: tract_profiles(subses_dict, clean_bundles_file, bundle_dict, scalar_dict, profile_weights, dwi_affine, tracking_params, segmentation_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_scalar_dict(scalars, data_imap, mapping_imap)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_segmentation_plan()
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

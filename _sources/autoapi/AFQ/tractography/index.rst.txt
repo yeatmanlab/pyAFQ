@@ -1,7 +1,13 @@
-:mod:`AFQ.tractography`
-=======================
+:py:mod:`AFQ.tractography`
+==========================
 
 .. py:module:: AFQ.tractography
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -18,8 +24,9 @@ Functions
 
 
 
-.. function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI', tracker='local')
+.. py:function:: track(params_file, directions='det', max_angle=30.0, sphere=None, seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5, min_length=10, max_length=1000, odf_model='DTI', tracker='local')
 
+   
    Tractography
 
 
@@ -129,9 +136,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: _tracking(tracker, seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)
 
-.. function:: _tracking(tracker, seeds, dg, stopping_criterion, params_img, step_size=0.5, min_length=10, max_length=1000, random_seed=None)
-
+   
    Helper function
 
 
@@ -151,5 +158,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

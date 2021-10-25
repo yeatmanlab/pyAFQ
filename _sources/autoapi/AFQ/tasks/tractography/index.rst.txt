@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.tractography`
-=============================
+:py:mod:`AFQ.tasks.tractography`
+================================
 
 .. py:module:: AFQ.tasks.tractography
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -30,26 +36,158 @@ Attributes
    AFQ.tasks.tractography.outputs
 
 
-.. data:: outputs
-   :annotation: = ['seed_file', 'stop_file', 'streamlines_file']
+.. py:data:: outputs
+   
 
    
 
-.. function:: export_seed_mask(subses_dict, dwi_affine, tracking_params)
 
 
-.. function:: export_stop_mask(subses_dict, dwi_affine, tracking_params)
 
 
-.. function:: export_stop_mask_pft(pve_wm, pve_gm, pve_csf)
 
 
-.. function:: streamlines(subses_dict, data_imap, seed_file, stop_file, tracking_params)
 
 
-.. function:: custom_tractography(custom_tract_file)
 
 
-.. function:: get_tractography_plan(custom_tractography_bids_filters, tracking_params)
 
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_seed_mask(subses_dict, dwi_affine, tracking_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_stop_mask(subses_dict, dwi_affine, tracking_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_stop_mask_pft(pve_wm, pve_gm, pve_csf)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: streamlines(subses_dict, data_imap, seed_file, stop_file, tracking_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: custom_tractography(custom_tract_file)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_tractography_plan(custom_tract_file, tracking_params)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

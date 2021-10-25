@@ -1,7 +1,13 @@
-:mod:`AFQ.models.dti`
-=====================
+:py:mod:`AFQ.models.dti`
+========================
 
 .. py:module:: AFQ.models.dti
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -18,8 +24,9 @@ Functions
 
 
 
-.. function:: fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None, file_prefix=None, b0_threshold=50)
+.. py:function:: fit_dti(data_files, bval_files, bvec_files, mask=None, out_dir=None, file_prefix=None, b0_threshold=50)
 
+   
    Fit the DTI model using default settings, save files with derived maps
 
 
@@ -70,9 +77,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: predict(params_file, gtab, S0_file=None, out_dir=None)
 
-.. function:: predict(params_file, gtab, S0_file=None, out_dir=None)
-
+   
    Create a signal prediction from DTI params
 
    params_file : str
@@ -102,5 +109,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

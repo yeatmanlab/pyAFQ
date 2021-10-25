@@ -1,7 +1,13 @@
-:mod:`AFQ.tasks.viz`
-====================
+:py:mod:`AFQ.tasks.viz`
+=======================
 
 .. py:module:: AFQ.tasks.viz
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -30,28 +36,159 @@ Attributes
    AFQ.tasks.viz.outputs
 
 
-.. data:: logger
+.. py:data:: logger
    
 
    
 
-.. data:: outputs
-   :annotation: = ['all_bundles_figure', 'indiv_bundles_figures']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: outputs
+   
 
    
 
-.. function:: _viz_prepare_vol(vol, xform, mapping, scalar_dict)
 
 
-.. function:: viz_bundles(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, cbv_lims=[None, None], xform_color_by_volume=False, volume_opacity=0.3, n_points=40)
 
 
-.. function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, cbv_lims_indiv=[None, None], xform_color_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)
 
 
-.. function:: plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)
 
 
-.. function:: get_viz_plan()
 
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _viz_prepare_vol(vol, xform, mapping, scalar_dict)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: viz_bundles(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, sbv_lims=[None, None], xform_shade_by_volume=False, volume_opacity=0.3, n_points=40)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, sbv_lims_indiv=[None, None], xform_shade_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_viz_plan()
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

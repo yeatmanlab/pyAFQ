@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>How pyAFQ uses BIDS &#8212; AFQ 0.1 documentation</title>
+    <title>How pyAFQ uses BIDS &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet" />
-  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -42,7 +42,10 @@
     <link rel="next" title="Using cloudknot to run pyAFQ on AWS batch:" href="cloudknot_example.html" />
     <link rel="prev" title="Plotting the Optic Radiations" href="plot_optic_radiations.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -57,7 +60,7 @@
     
 
 <a class="navbar-brand" href="../index.html">
-  <img src="../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -413,60 +416,98 @@ We fetch this data and add it as a separate pipeline</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/11337 [00:00&lt;?, ? MB/s]
-  0%|          | 3/11337 [00:00&lt;08:50, 21.38 MB/s]
-  0%|          | 15/11337 [00:00&lt;03:12, 58.94 MB/s]
-  0%|          | 52/11337 [00:00&lt;01:14, 152.03 MB/s]
-  2%|1         | 206/11337 [00:00&lt;00:21, 522.20 MB/s]
-  5%|4         | 566/11337 [00:00&lt;00:08, 1252.50 MB/s]
-  8%|8         | 928/11337 [00:00&lt;00:06, 1695.25 MB/s]
- 12%|#1        | 1306/11337 [00:00&lt;00:04, 2014.69 MB/s]
- 15%|#4        | 1655/11337 [00:01&lt;00:04, 2160.22 MB/s]
- 18%|#7        | 2028/11337 [00:01&lt;00:04, 2301.32 MB/s]
- 21%|##1       | 2400/11337 [00:01&lt;00:03, 2402.39 MB/s]
- 24%|##4       | 2772/11337 [00:01&lt;00:03, 2473.67 MB/s]
- 28%|##7       | 3146/11337 [00:01&lt;00:03, 2525.74 MB/s]
- 31%|###1      | 3522/11337 [00:01&lt;00:03, 2559.32 MB/s]
- 34%|###4      | 3884/11337 [00:01&lt;00:02, 2581.38 MB/s]
- 37%|###7      | 4215/11337 [00:02&lt;00:02, 2750.33 MB/s]
- 40%|###9      | 4495/11337 [00:02&lt;00:02, 2595.03 MB/s]
- 42%|####2     | 4816/11337 [00:02&lt;00:02, 2567.34 MB/s]
- 45%|####5     | 5136/11337 [00:02&lt;00:02, 2722.87 MB/s]
- 48%|####7     | 5413/11337 [00:02&lt;00:02, 2600.91 MB/s]
- 51%|#####     | 5732/11337 [00:02&lt;00:02, 2537.65 MB/s]
- 53%|#####3    | 6041/11337 [00:02&lt;00:01, 2654.56 MB/s]
- 56%|#####5    | 6310/11337 [00:02&lt;00:01, 2602.62 MB/s]
- 58%|#####8    | 6609/11337 [00:02&lt;00:01, 2687.09 MB/s]
- 61%|######    | 6880/11337 [00:03&lt;00:01, 2615.03 MB/s]
- 63%|######3   | 7178/11337 [00:03&lt;00:01, 2710.41 MB/s]
- 66%|######5   | 7451/11337 [00:03&lt;00:01, 2609.45 MB/s]
- 68%|######8   | 7753/11337 [00:03&lt;00:01, 2717.77 MB/s]
- 71%|#######   | 8027/11337 [00:03&lt;00:01, 2622.47 MB/s]
- 73%|#######3  | 8326/11337 [00:03&lt;00:01, 2714.43 MB/s]
- 76%|#######5  | 8600/11337 [00:03&lt;00:01, 2616.42 MB/s]
- 79%|#######8  | 8904/11337 [00:03&lt;00:00, 2732.10 MB/s]
- 81%|########  | 9179/11337 [00:03&lt;00:00, 2633.55 MB/s]
- 84%|########3 | 9480/11337 [00:04&lt;00:00, 2733.33 MB/s]
- 86%|########6 | 9756/11337 [00:04&lt;00:00, 2638.58 MB/s]
- 89%|########8 | 10057/11337 [00:04&lt;00:00, 2548.11 MB/s]
- 92%|#########1| 10384/11337 [00:04&lt;00:00, 2745.06 MB/s]
- 94%|#########4| 10662/11337 [00:04&lt;00:00, 2566.52 MB/s]
- 97%|#########7| 11005/11337 [00:04&lt;00:00, 2801.30 MB/s]
-100%|#########9| 11291/11337 [00:04&lt;00:00, 2677.27 MB/s]
-100%|##########| 11337/11337 [00:04&lt;00:00, 2378.97 MB/s]
+  0%|          | 2/11337 [00:00&lt;13:14, 14.26 MB/s]
+  0%|          | 4/11337 [00:00&lt;13:17, 14.21 MB/s]
+  0%|          | 6/11337 [00:00&lt;13:18, 14.20 MB/s]
+  0%|          | 8/11337 [00:00&lt;13:18, 14.18 MB/s]
+  0%|          | 13/11337 [00:00&lt;08:38, 21.86 MB/s]
+  0%|          | 23/11337 [00:00&lt;04:53, 38.50 MB/s]
+  0%|          | 43/11337 [00:00&lt;02:36, 72.24 MB/s]
+  1%|          | 81/11337 [00:01&lt;01:23, 135.02 MB/s]
+  1%|1         | 160/11337 [00:01&lt;00:41, 267.86 MB/s]
+  3%|2         | 316/11337 [00:01&lt;00:20, 526.42 MB/s]
+  4%|4         | 501/11337 [00:01&lt;00:14, 766.30 MB/s]
+  6%|6         | 687/11337 [00:01&lt;00:11, 934.21 MB/s]
+  8%|7         | 878/11337 [00:01&lt;00:09, 1061.55 MB/s]
+  9%|9         | 1063/11337 [00:01&lt;00:09, 1137.50 MB/s]
+ 11%|#1        | 1250/11337 [00:02&lt;00:08, 1193.47 MB/s]
+ 13%|#2        | 1440/11337 [00:02&lt;00:07, 1239.55 MB/s]
+ 14%|#4        | 1631/11337 [00:02&lt;00:07, 1273.91 MB/s]
+ 16%|#6        | 1819/11337 [00:02&lt;00:07, 1291.66 MB/s]
+ 18%|#7        | 2009/11337 [00:02&lt;00:07, 1307.97 MB/s]
+ 19%|#9        | 2198/11337 [00:02&lt;00:06, 1316.77 MB/s]
+ 21%|##1       | 2388/11337 [00:02&lt;00:06, 1324.82 MB/s]
+ 23%|##2       | 2579/11337 [00:03&lt;00:06, 1333.00 MB/s]
+ 24%|##4       | 2771/11337 [00:03&lt;00:06, 1339.86 MB/s]
+ 26%|##6       | 2962/11337 [00:03&lt;00:06, 1345.54 MB/s]
+ 28%|##7       | 3152/11337 [00:03&lt;00:06, 1345.82 MB/s]
+ 29%|##9       | 3342/11337 [00:03&lt;00:05, 1345.72 MB/s]
+ 31%|###1      | 3533/11337 [00:03&lt;00:05, 1347.45 MB/s]
+ 33%|###2      | 3723/11337 [00:03&lt;00:05, 1346.91 MB/s]
+ 35%|###4      | 3912/11337 [00:04&lt;00:05, 1343.72 MB/s]
+ 36%|###6      | 4097/11337 [00:04&lt;00:05, 1333.52 MB/s]
+ 38%|###7      | 4285/11337 [00:04&lt;00:05, 1332.62 MB/s]
+ 39%|###9      | 4473/11337 [00:04&lt;00:05, 1332.20 MB/s]
+ 41%|####1     | 4663/11337 [00:04&lt;00:04, 1336.62 MB/s]
+ 43%|####2     | 4852/11337 [00:04&lt;00:04, 1337.31 MB/s]
+ 44%|####4     | 5042/11337 [00:04&lt;00:04, 1339.16 MB/s]
+ 46%|####6     | 5231/11337 [00:05&lt;00:04, 1338.57 MB/s]
+ 48%|####7     | 5405/11337 [00:05&lt;00:04, 1239.66 MB/s]
+ 49%|####9     | 5597/11337 [00:05&lt;00:04, 1271.51 MB/s]
+ 50%|#####     | 5725/11337 [00:05&lt;00:04, 1162.33 MB/s]
+ 52%|#####2    | 5904/11337 [00:05&lt;00:04, 1196.34 MB/s]
+ 54%|#####3    | 6088/11337 [00:05&lt;00:04, 1227.56 MB/s]
+ 55%|#####5    | 6266/11337 [00:05&lt;00:04, 1237.20 MB/s]
+ 57%|#####6    | 6453/11337 [00:06&lt;00:03, 1262.63 MB/s]
+ 59%|#####8    | 6642/11337 [00:06&lt;00:03, 1285.47 MB/s]
+ 60%|######    | 6833/11337 [00:06&lt;00:03, 1306.21 MB/s]
+ 62%|######1   | 7016/11337 [00:06&lt;00:03, 1303.03 MB/s]
+ 64%|######3   | 7199/11337 [00:06&lt;00:03, 1301.32 MB/s]
+ 65%|######4   | 7330/11337 [00:06&lt;00:03, 1187.77 MB/s]
+ 66%|######6   | 7513/11337 [00:06&lt;00:03, 1222.62 MB/s]
+ 68%|######7   | 7702/11337 [00:07&lt;00:02, 1256.93 MB/s]
+ 70%|######9   | 7887/11337 [00:07&lt;00:02, 1272.72 MB/s]
+ 71%|#######1  | 8078/11337 [00:07&lt;00:02, 1296.35 MB/s]
+ 73%|#######2  | 8268/11337 [00:07&lt;00:02, 1311.15 MB/s]
+ 75%|#######4  | 8454/11337 [00:07&lt;00:02, 1312.21 MB/s]
+ 76%|#######6  | 8645/11337 [00:07&lt;00:02, 1325.01 MB/s]
+ 78%|#######7  | 8831/11337 [00:07&lt;00:01, 1323.41 MB/s]
+ 80%|#######9  | 9016/11337 [00:08&lt;00:01, 1319.06 MB/s]
+ 81%|########1 | 9206/11337 [00:08&lt;00:01, 1327.41 MB/s]
+ 83%|########2 | 9391/11337 [00:08&lt;00:01, 1322.53 MB/s]
+ 85%|########4 | 9580/11337 [00:08&lt;00:01, 1327.38 MB/s]
+ 86%|########6 | 9769/11337 [00:08&lt;00:01, 1330.09 MB/s]
+ 88%|########7 | 9941/11337 [00:08&lt;00:01, 1295.93 MB/s]
+ 89%|########9 | 10127/11337 [00:08&lt;00:00, 1301.35 MB/s]
+ 91%|######### | 10316/11337 [00:09&lt;00:00, 1312.37 MB/s]
+ 93%|#########2| 10507/11337 [00:09&lt;00:00, 1321.70 MB/s]
+ 94%|#########4| 10695/11337 [00:09&lt;00:00, 1327.23 MB/s]
+ 96%|#########5| 10883/11337 [00:09&lt;00:00, 1327.58 MB/s]
+ 98%|#########7| 11075/11337 [00:09&lt;00:00, 1337.15 MB/s]
+ 99%|#########9| 11265/11337 [00:09&lt;00:00, 1340.02 MB/s]
+100%|##########| 11337/11337 [00:09&lt;00:00, 1159.39 MB/s]
 
   0%|          | 0/14 [00:00&lt;?, ? MB/s]
- 29%|##8       | 4/14 [00:00&lt;00:00, 28.50 MB/s]
- 79%|#######8  | 11/14 [00:00&lt;00:00, 40.93 MB/s]
-100%|##########| 14/14 [00:00&lt;00:00, 49.60 MB/s]
+  7%|7         | 1/14 [00:00&lt;00:01,  7.04 MB/s]
+ 29%|##8       | 4/14 [00:00&lt;00:00, 15.24 MB/s]
+ 43%|####2     | 6/14 [00:00&lt;00:00, 14.67 MB/s]
+ 86%|########5 | 12/14 [00:00&lt;00:00, 25.45 MB/s]
+100%|##########| 14/14 [00:00&lt;00:00, 24.45 MB/s]
 
   0%|          | 0/1037 [00:00&lt;?, ? MB/s]
-  0%|          | 4/1037 [00:00&lt;00:36, 28.55 MB/s]
-  1%|          | 8/1037 [00:00&lt;00:36, 28.43 MB/s]
-  2%|2         | 25/1037 [00:00&lt;00:14, 70.44 MB/s]
-  9%|9         | 94/1037 [00:00&lt;00:04, 235.48 MB/s]
- 35%|###4      | 361/1037 [00:00&lt;00:00, 832.13 MB/s]
- 70%|######9   | 724/1037 [00:00&lt;00:00, 1421.22 MB/s]
-100%|##########| 1037/1037 [00:00&lt;00:00, 1111.80 MB/s]
+  0%|          | 2/1037 [00:00&lt;01:13, 14.01 MB/s]
+  0%|          | 4/1037 [00:00&lt;01:14, 13.95 MB/s]
+  1%|          | 7/1037 [00:00&lt;01:00, 17.10 MB/s]
+  1%|1         | 13/1037 [00:00&lt;00:38, 26.81 MB/s]
+  3%|2         | 26/1037 [00:00&lt;00:20, 49.72 MB/s]
+  5%|5         | 53/1037 [00:00&lt;00:10, 96.60 MB/s]
+ 10%|#         | 105/1037 [00:01&lt;00:05, 183.19 MB/s]
+ 20%|##        | 209/1037 [00:01&lt;00:02, 354.69 MB/s]
+ 38%|###7      | 394/1037 [00:01&lt;00:00, 645.11 MB/s]
+ 55%|#####5    | 574/1037 [00:01&lt;00:00, 831.65 MB/s]
+ 73%|#######2  | 757/1037 [00:01&lt;00:00, 965.95 MB/s]
+ 91%|######### | 943/1037 [00:01&lt;00:00, 1064.88 MB/s]
+100%|##########| 1037/1037 [00:01&lt;00:00, 597.28 MB/s]
 </pre></div>
 </div>
 <p>After we do that, our dataset folder should look like this:</p>
@@ -526,7 +567,7 @@ are stored here:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;freesurfer&#39;: BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;my_tractography&#39;: BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;vistasoft&#39;: BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;my_tractography&#39;: BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;freesurfer&#39;: BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;vistasoft&#39;: BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0}
 </pre></div>
 </div>
 <p>We can use a <code class="xref py py-class docutils literal notranslate"><span class="pre">bids.BIDSValidator</span></code> object to make sure that the
@@ -608,7 +649,7 @@ To sub-sample to 10,000 streamlines, we define
 <cite>‘nb_streamlines’ = 10000</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_afq</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">AFQ</span><span class="p">(</span>
     <span class="n">bids_path</span><span class="p">,</span>
-    <span class="n">dmriprep</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
+    <span class="n">preproc_pipeline</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
     <span class="n">bundle_info</span><span class="o">=</span><span class="n">bundle_info</span><span class="p">,</span>
     <span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;tractography&quot;</span><span class="p">,</span>
@@ -635,50 +676,64 @@ Optimizing level 1 [max iter: 1000]
 Optimizing level 0 [max iter: 100]
 
   0%|          | 0/2840 [00:00&lt;?, ?it/s]
-  0%|          | 2/2840 [00:00&lt;06:23,  7.41it/s]
-  0%|          | 4/2840 [00:06&lt;1:27:38,  1.85s/it]
-  0%|          | 6/2840 [00:06&lt;48:42,  1.03s/it]
-  5%|5         | 144/2840 [00:06&lt;01:02, 42.99it/s]
- 19%|#8        | 528/2840 [00:06&lt;00:11, 198.36it/s]
- 37%|###6      | 1040/2840 [00:06&lt;00:03, 451.61it/s]
- 55%|#####4    | 1552/2840 [00:07&lt;00:01, 771.07it/s]
- 73%|#######2  | 2064/2840 [00:07&lt;00:00, 1029.01it/s]
- 91%|######### | 2576/2840 [00:07&lt;00:00, 1216.79it/s]
-100%|##########| 2840/2840 [00:07&lt;00:00, 374.93it/s]
+  0%|          | 2/2840 [00:00&lt;06:05,  7.77it/s]
+  0%|          | 4/2840 [00:05&lt;1:21:09,  1.72s/it]
+  0%|          | 6/2840 [00:06&lt;45:20,  1.04it/s]
+  5%|5         | 144/2840 [00:06&lt;00:58, 46.32it/s]
+ 19%|#8        | 528/2840 [00:06&lt;00:10, 212.60it/s]
+ 37%|###6      | 1040/2840 [00:06&lt;00:03, 484.67it/s]
+ 55%|#####4    | 1552/2840 [00:06&lt;00:01, 821.53it/s]
+ 73%|#######2  | 2064/2840 [00:06&lt;00:00, 1104.75it/s]
+ 91%|######### | 2576/2840 [00:07&lt;00:00, 1243.89it/s]
+100%|##########| 2840/2840 [00:07&lt;00:00, 399.92it/s]
 
   0%|          | 0/1912 [00:00&lt;?, ?it/s]
- 13%|#3        | 252/1912 [00:00&lt;00:00, 2153.97it/s]
- 40%|###9      | 764/1912 [00:00&lt;00:00, 3566.15it/s]
- 59%|#####8    | 1124/1912 [00:00&lt;00:00, 3018.26it/s]
- 80%|########  | 1532/1912 [00:00&lt;00:00, 3110.16it/s]
-100%|##########| 1912/1912 [00:00&lt;00:00, 3840.74it/s]
+  5%|4         | 92/1912 [00:00&lt;00:02, 695.83it/s]
+ 27%|##6       | 508/1912 [00:00&lt;00:00, 1987.93it/s]
+ 53%|#####3    | 1020/1912 [00:00&lt;00:00, 2320.01it/s]
+ 80%|########  | 1532/1912 [00:00&lt;00:00, 2932.20it/s]
+100%|##########| 1912/1912 [00:00&lt;00:00, 3189.56it/s]
 
   0%|          | 0/2375 [00:00&lt;?, ?it/s]
- 11%|#         | 252/2375 [00:00&lt;00:00, 2298.36it/s]
- 32%|###2      | 764/2375 [00:00&lt;00:00, 3277.29it/s]
- 65%|######4   | 1532/2375 [00:00&lt;00:00, 4017.47it/s]
- 86%|########6 | 2044/2375 [00:00&lt;00:00, 3572.91it/s]
-100%|##########| 2375/2375 [00:00&lt;00:00, 4110.31it/s]
+  5%|5         | 124/2375 [00:00&lt;00:01, 1146.59it/s]
+ 21%|##1       | 508/2375 [00:00&lt;00:00, 2386.87it/s]
+ 43%|####2     | 1020/2375 [00:00&lt;00:00, 2825.43it/s]
+ 65%|######4   | 1532/2375 [00:00&lt;00:00, 3432.76it/s]
+ 86%|########6 | 2044/2375 [00:00&lt;00:00, 3137.46it/s]
+100%|##########| 2375/2375 [00:00&lt;00:00, 3459.39it/s]
 
   0%|          | 0/1845 [00:00&lt;?, ?it/s]
- 14%|#3        | 252/1845 [00:00&lt;00:00, 2439.31it/s]
- 55%|#####5    | 1020/1845 [00:00&lt;00:00, 3449.46it/s]
-100%|##########| 1845/1845 [00:00&lt;00:00, 4916.83it/s]
+  7%|6         | 124/1845 [00:00&lt;00:01, 1181.94it/s]
+ 28%|##7       | 508/1845 [00:00&lt;00:00, 2552.26it/s]
+ 55%|#####5    | 1020/1845 [00:00&lt;00:00, 2994.46it/s]
+100%|##########| 1845/1845 [00:00&lt;00:00, 4128.67it/s]
 
   0%|          | 0/1432 [00:00&lt;?, ?it/s]
- 35%|###5      | 508/1432 [00:00&lt;00:00, 4241.02it/s]
- 71%|#######1  | 1020/1432 [00:00&lt;00:00, 4546.66it/s]
-100%|##########| 1432/1432 [00:00&lt;00:00, 6302.97it/s]
+ 27%|##6       | 380/1432 [00:00&lt;00:00, 3150.27it/s]
+ 71%|#######1  | 1020/1432 [00:00&lt;00:00, 3646.51it/s]
+100%|##########| 1432/1432 [00:00&lt;00:00, 5021.23it/s]
 
   0%|          | 0/1054 [00:00&lt;?, ?it/s]
- 36%|###6      | 380/1054 [00:00&lt;00:00, 3389.33it/s]
- 97%|#########6| 1020/1054 [00:00&lt;00:00, 4754.38it/s]
-100%|##########| 1054/1054 [00:00&lt;00:00, 4696.80it/s]
+  4%|4         | 44/1054 [00:00&lt;00:03, 314.75it/s]
+ 48%|####8     | 508/1054 [00:00&lt;00:00, 2367.03it/s]
+100%|##########| 1054/1054 [00:00&lt;00:00, 3097.46it/s]
 
   0%|          | 0/1137 [00:00&lt;?, ?it/s]
- 17%|#6        | 188/1137 [00:00&lt;00:00, 1715.71it/s]
- 67%|######7   | 764/1137 [00:00&lt;00:00, 3129.38it/s]
-100%|##########| 1137/1137 [00:00&lt;00:00, 3400.61it/s]
+  8%|8         | 92/1137 [00:00&lt;00:02, 515.14it/s]
+ 45%|####4     | 508/1137 [00:00&lt;00:00, 1805.61it/s]
+ 90%|########9 | 1020/1137 [00:00&lt;00:00, 2625.90it/s]
+100%|##########| 1137/1137 [00:00&lt;00:00, 2488.88it/s]
+
+  0%|          | 0/7 [00:00&lt;?, ?it/s]
+ 14%|#4        | 1/7 [00:00&lt;00:00,  6.64it/s]
+ 57%|#####7    | 4/7 [00:00&lt;00:00, 15.99it/s]
+100%|##########| 7/7 [00:00&lt;00:00, 19.56it/s]
+100%|##########| 7/7 [00:00&lt;00:00, 17.47it/s]
+
+  0%|          | 0/7 [00:00&lt;?, ?it/s]
+ 43%|####2     | 3/7 [00:00&lt;00:00, 23.29it/s]
+ 86%|########5 | 6/7 [00:00&lt;00:00, 25.00it/s]
+100%|##########| 7/7 [00:00&lt;00:00, 24.74it/s]
 </pre></div>
 </div>
 <p>A few common issues that can hinder BIDS from working properly are:</p>
@@ -688,7 +743,7 @@ file contains the right names for the pipeline. See above for an example
 of that.</p></li>
 <li><p>File naming convention doesn’t uniquely identify file with bids filters.</p></li>
 </ol>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  7.099 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 16 minutes  41.060 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-bids-layout-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9bdf3bad98b30ef023e365f728dd0600/plot_bids_layout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_bids_layout.py</span></code></a></p>
@@ -704,12 +759,23 @@ of that.</p></li>
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="plot_optic_radiations.html" title="previous page">Plotting the Optic Radiations</a>
-    <a class='right-next' id="next-link" href="cloudknot_example.html" title="next page">Using cloudknot to run pyAFQ on AWS batch:</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="plot_optic_radiations.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Plotting the Optic Radiations</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="cloudknot_example.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Using cloudknot to run pyAFQ on AWS batch:</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
@@ -717,21 +783,20 @@ of that.</p></li>
       </div>
     </div>
   
-  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

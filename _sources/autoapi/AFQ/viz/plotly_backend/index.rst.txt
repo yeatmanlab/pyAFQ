@@ -1,7 +1,13 @@
-:mod:`AFQ.viz.plotly_backend`
-=============================
+:py:mod:`AFQ.viz.plotly_backend`
+================================
 
 .. py:module:: AFQ.viz.plotly_backend
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -26,14 +32,16 @@ Functions
    AFQ.viz.plotly_backend._color_arr2str
    AFQ.viz.plotly_backend.set_layout
    AFQ.viz.plotly_backend._draw_streamlines
+   AFQ.viz.plotly_backend._plot_profiles
    AFQ.viz.plotly_backend.visualize_bundles
    AFQ.viz.plotly_backend.create_gif
    AFQ.viz.plotly_backend._draw_roi
    AFQ.viz.plotly_backend.visualize_roi
    AFQ.viz.plotly_backend._draw_slice
    AFQ.viz.plotly_backend._name_from_enum
-   AFQ.viz.plotly_backend._draw_slices
    AFQ.viz.plotly_backend.visualize_volume
+   AFQ.viz.plotly_backend._draw_core
+   AFQ.viz.plotly_backend.single_bundle_viz
 
 
 
@@ -46,18 +54,55 @@ Attributes
    AFQ.viz.plotly_backend.viz_logger
 
 
-.. data:: scope
+.. py:data:: scope
    
 
    
 
-.. data:: viz_logger
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: viz_logger
    
 
    
 
-.. function:: _inline_interact(figure, show, show_inline)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _inline_interact(figure, show, show_inline)
+
+   
    Helper function to reuse across viz functions
 
 
@@ -78,21 +123,119 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: _to_color_range(num)
 
-.. function:: _to_color_range(num)
-
-
-.. function:: _color_arr2str(color_arr, opacity=1.0)
+   
 
 
-.. function:: set_layout(figure, color=None)
 
 
-.. function:: _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbv_lims=[None, None], flip_axes=[False, False, False])
 
 
-.. function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_volume=None, cbv_lims=[None, None], flip_axes=[False, False, False], figure=None, background=(1, 1, 1), interact=False, inline=False)
 
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _color_arr2str(color_arr, opacity=1.0)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: set_layout(figure, color=None)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None, sbv_lims=[None, None], flip_axes=[False, False, False], opacity=1.0)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _plot_profiles(profiles, bundle_name, color, fig, scalar)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, shade_by_volume=None, color_by_streamline=None, sbv_lims=[None, None], include_profiles=(None, None), flip_axes=[False, False, False], opacity=1.0, figure=None, background=(1, 1, 1), interact=False, inline=False)
+
+   
    Visualize bundles in 3D
 
 
@@ -129,24 +272,48 @@ Attributes
            with Tableau 20 RGB values if bundle_dict is None, or dict from
            bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-       **color_by_volume** : ndarray or str, optional
+       **shade_by_volume** : ndarray or str, optional
            3d volume use to shade the bundles. If None, no shading
            is performed. Only works when using the plotly backend.
            Default: None
 
-       **cbv_lims** : ndarray
+       **color_by_streamline** : ndarray or dict, optional
+           N by 3 array, where N is the number of streamlines in sft;
+           for each streamline you specify 3 values between 0 and 1 for rgb.
+           If sft has multiple bundles, then use a dict for color_by_streamline,
+           where keys are bundle names and values are n by 3 arrays.
+           Overrides colors for bundles in the keys
+           of the dict if passing a  dict, or for all streamlines if using
+           ndarray.
+           Default: None
+
+       **sbv_lims** : ndarray
            Of the form (lower bound, upper bound). Shading based on
-           color_by_volume will only differentiate values within these bounds.
+           shade_by_volume will only differentiate values within these bounds.
            If lower bound is None, will default to 0.
            If upper bound is None, will default to the maximum value in
-           color_by_volume.
+           shade_by_volume.
            Default: [None, None]
+
+       **include_profiles** : Tuple of Pandas Dataframe and string
+           The first element of the uple is a
+           Pandas Dataframe containing profiles in the standard pyAFQ
+           output format for the bundle(s) being displayed. It will be used
+           to generate a graph of the tract profiles for each bundle,
+           with colors corresponding to the colors on the bundles. The string
+           is the scalar to use from the profile. If these are None,
+           no tract profiles will be graphed.
+           Defualt: (None, None)
 
        **flip_axes** : ndarray
            Which axes to flip, to orient the image as RAS, which is how we
            visualize.
            For example, if the input image is LAS, use [True, False, False].
            Default: [False, False, False]
+
+       **opacity** : float
+           Float between 0 and 1 defining the opacity of the bundle.
+           Default: 1.0
 
        **background** : tuple, optional
            RGB values for the background. Default: (1, 1, 1), which is white
@@ -184,9 +351,9 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: create_gif(figure, file_name, n_frames=30, zoom=2.5, z_offset=0.5, size=(600, 600))
 
-.. function:: create_gif(figure, file_name, n_frames=30, zoom=2.5, z_offset=0.5, size=(600, 600))
-
+   
    Convert a Plotly Figure object into a gif
 
 
@@ -227,12 +394,31 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes)
 
-.. function:: _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes)
+   
 
 
-.. function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, flip_axes=[False, False, False], color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, flip_axes=[False, False, False], color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
+
+   
    Render a region of interest into a volume
 
 
@@ -309,12 +495,11 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-
-.. class:: Axes
-
+.. py:class:: Axes
 
    Bases: :py:obj:`enum.IntEnum`
 
+   
    Enum where members are also (and must be) ints
 
 
@@ -334,34 +519,123 @@ Attributes
 
    ..
        !! processed by numpydoc !!
-
-   .. attribute:: X
+   .. py:attribute:: X
       :annotation: = 0
 
       
 
-   .. attribute:: Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: Y
       :annotation: = 1
 
       
 
-   .. attribute:: Z
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: Z
       :annotation: = 2
 
       
 
 
-.. function:: _draw_slice(figure, axis, volume, opacity=0.3, step=None, n_steps=0)
 
 
-.. function:: _name_from_enum(axis)
 
 
-.. function:: _draw_slices(figure, axis, volume, opacity=0.3, sliders=[], n_steps=0, y_loc=0)
 
 
-.. function:: visualize_volume(volume, figure=None, show_x=True, show_y=True, show_z=True, interact=False, inline=False, opacity=0.3, flip_axes=[False, False, False], slider_definition=20, which_plane=None)
 
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5, colorscale='greys', invert_colorscale=False)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _name_from_enum(axis)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5, z_pos=0.5, interact=False, inline=False, opacity=0.3, colorscale='gray', invert_colorscale=False, flip_axes=[False, False, False])
+
+   
    Visualize a volume
 
 
@@ -374,40 +648,44 @@ Attributes
            If provided, the visualization will be added to this Figure. Default:
            Initialize a new Figure.
 
-       **show_x** : bool, optional
-           Whether to show Coronal Slice.
-           Default: True
+       **x_pos** : float or None, optional
+           Where to show Coronal Slice. If None, slice is not shown.
+           Should be a decimal between 0 and 1.
+           Indicatesthe fractional position along the perpendicular
+           axis to the slice.
+           Default: 0.5
 
-       **show_x** : bool, optional
-           Whether to show Sagittal Slice.
-           Default: True
+       **y_pos** : float or None, optional
+           Where to show Sagittal Slice. If None, slice is not shown.
+           Should be a decimal between 0 and 1.
+           Indicatesthe fractional position along the perpendicular
+           axis to the slice.
+           Default: 0.5
 
-       **show_x** : bool, optional
-           Whether to show Axial Slice.
-           Default: True
+       **z_pos** : float or None, optional
+           Where to show Axial Slice. If None, slice is not shown.
+           Should be a decimal between 0 and 1.
+           Indicatesthe fractional position along the perpendicular
+           axis to the slice.
+           Default: 0.5
 
        **opacity** : float, optional
            Opacity of slices.
            Default: 1.0
+
+       **colorscale** : string, optional
+           Plotly colorscale to use to color slices.
+           Default: "greys"
+
+       **invert_colorscale** : bool, optional
+           Whether to invert colorscale.
+           Default: False
 
        **flip_axes** : ndarray
            Which axes to flip, to orient the image as RAS, which is how we
            visualize.
            For example, if the input image is LAS, use [True, False, False].
            Default: [False, False, False]
-
-       **slider_definition** : int, optional
-           How many discrete positions the slices can take.
-           If 0, slices are stationary.
-           Default: 50
-
-       **which_plane** : str, optional
-           Which plane can be moved with a slider.
-           Should be 'Coronal', 'Axial', 'Sagittal', or None.
-           If None, slices are stationary.
-           Note: If slices are not stationary,
-           do not add any more traces to the figure.
-           Default: 'Coronal'
 
        **interact** : bool
            Whether to open the visualization in an interactive window.
@@ -437,4 +715,95 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: _draw_core(sls, n_points, figure, bundle_name, indiv_profile, dimensions, flip_axes)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: single_bundle_viz(indiv_profile, sft, bundle, scalar_name, affine=None, bundle_dict=None, flip_axes=[False, False, False], figure=None, include_profile=False)
+
+   
+   Visualize a single bundle in 3D with core bundle and associated profile
+
+
+   :Parameters:
+
+       **indiv_profile** : ndarray
+           A numpy array containing a tract profile for this bundle for a scalar.
+
+       **sft** : Stateful Tractogram, str
+           A Stateful Tractogram containing streamline information.
+           If bundle is an int, the Stateful Tractogram
+           must contain a bundle key in it's data_per_streamline which is a list
+           of bundle `'uid'.
+           Otherwise, the entire Stateful Tractogram will be used as the bundle
+           for the visualization.
+
+       **bundle** : str or int
+           The name of the bundle to be used as the label for the plot,
+           or an integer for selection from the sft metadata.
+
+       **scalar_name** : str
+           The name of the scalar being used.
+
+       **affine** : ndarray, optional
+           An affine transformation to apply to the streamlines before
+           visualization. Default: no transform.
+
+       **bundle_dict** : dict, optional
+           This parameter is used if bundle is an int.
+           Keys are names of bundles and values are dicts that should include
+           a key `'uid'` with values as integers for selection from the sft
+           metadata. Default: Either the entire sft is treated as a bundle,
+           or identified only as unique integers in the metadata.
+
+       **flip_axes** : ndarray
+           Which axes to flip, to orient the image as RAS, which is how we
+           visualize.
+           For example, if the input image is LAS, use [True, False, False].
+           Default: [False, False, False]
+
+       **figure** : Plotly Figure object, optional
+           If provided, the visualization will be added to this Figure. Default:
+           Initialize a new Figure.
+
+       **include_profile** : bool, optional
+           If true, also plot the tract profile. Default: False
+
+   :Returns:
+
+       Plotly Figure object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -1,5 +1,5 @@
-:mod:`AFQ.registration`
-=======================
+:py:mod:`AFQ.registration`
+==========================
 
 .. py:module:: AFQ.registration
 
@@ -9,7 +9,6 @@
 
    ..
        !! processed by numpydoc !!
-
 
 
 Module Contents
@@ -29,8 +28,9 @@ Functions
 
 
 
-.. function:: syn_register_dwi(dwi, gtab, template=None, **syn_kwargs)
+.. py:function:: syn_register_dwi(dwi, gtab, template=None, **syn_kwargs)
 
+   
    Register DWI data to a template.
 
 
@@ -68,9 +68,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: write_mapping(mapping, fname)
 
-.. function:: write_mapping(mapping, fname)
-
+   
    Write out a syn registration mapping to file
 
 
@@ -98,9 +98,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: read_mapping(disp, domain_img, codomain_img, prealign=None)
 
-.. function:: read_mapping(disp, domain_img, codomain_img, prealign=None)
-
+   
    Read a syn registration mapping from a nifti file
 
 
@@ -138,9 +138,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: register_dwi(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[center_of_mass, translation, rigid, affine], out_dir=None)
 
-.. function:: register_dwi(data_files, bval_files, bvec_files, b0_ref=0, pipeline=[center_of_mass, translation, rigid, affine], out_dir=None)
-
+   
    Register a DWI data-set
 
 
@@ -172,9 +172,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: slr_registration(moving_data, static_data, moving_affine=None, static_affine=None, moving_shape=None, static_shape=None, **kwargs)
 
-.. function:: slr_registration(moving_data, static_data, moving_affine=None, static_affine=None, moving_shape=None, static_shape=None, **kwargs)
-
+   
    Register a source image (moving) to a target image (static).
 
 
@@ -220,5 +220,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

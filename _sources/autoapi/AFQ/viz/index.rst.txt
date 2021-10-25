@@ -1,7 +1,29 @@
-:mod:`AFQ.viz`
-==============
+:py:mod:`AFQ.viz`
+=================
 
 .. py:module:: AFQ.viz
+
+.. autoapi-nested-parse::
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules
@@ -11,6 +33,7 @@ Submodules
    :maxdepth: 1
 
    fury_backend/index.rst
+   plot/index.rst
    plotly_backend/index.rst
    utils/index.rst
 

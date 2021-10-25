@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.data &#8212; AFQ 0.1 documentation</title>
+    <title>AFQ.data &#8212; AFQ 0.9 documentation</title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -23,15 +23,15 @@
 
     
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -40,7 +40,10 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -55,7 +58,7 @@
     
 
 <a class="navbar-brand" href="../../index.html">
-  <img src="../../_static/_static/logo.png" class="logo" alt="logo">
+  <img src="../../_static/logo.png" class="logo" alt="logo">
 </a>
 
 
@@ -377,6 +380,149 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;callosum templates loaded in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">template_dict</span></div>
+
+
+<span class="c1">##########################################################################</span>
+<span class="c1"># Pediatric templates:</span>
+<span class="c1"># --------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Templates include the UNC 0-1-2 Infant Atlases and waypoint ROIs matched</span>
+<span class="c1"># to the atlas.</span>
+<span class="c1">#</span>
+<span class="c1"># Information on:</span>
+<span class="c1">#</span>
+<span class="c1"># - atlas: https://www.nitrc.org/projects/pediatricatlas</span>
+<span class="c1">#</span>
+<span class="c1"># - pediatric templates: https://github.com/yeatmanlab/AFQ/tree/babyAFQ</span>
+<span class="c1">#</span>
+<span class="c1"># Templates downloaded from:</span>
+<span class="c1">#</span>
+<span class="c1"># - https://figshare.com/articles/dataset/ROIs_probabilistic_maps_and_transform_data_for_pediatric_automated_fiber_quantification/13027487</span>
+<span class="c1">#</span>
+
+<span class="n">pediatric_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;ATR_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;ATR_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ATR_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;ATR_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ATR_roi3_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;ATR_roi3_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CGC_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;CGC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CGC_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;CGC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CGC_roi3_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;CGC_roi3_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CST_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CST_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FA_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;FA_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FP_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;FP_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HCC_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;HCC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HCC_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;HCC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;IFO_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;IFO_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;IFO_roi3_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO_roi3_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ILF_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ILF_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LH_Parietal.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;RH_Parietal.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MdLF_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;MdLF_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SLF_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SLF_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SLFt_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;SLFt_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SLFt_roi3_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;SLFt_roi3_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UNC_roi1_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC_roi1_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UNC_roi2_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC_roi2_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UNC_roi3_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC_roi3_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;VOF_box_L.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;VOF_box_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UNCNeo-withCerebellum-for-babyAFQ.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UNCNeo_JHU_tracts_prob-for-babyAFQ.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mid-saggital.nii.gz&quot;</span>
+<span class="p">]</span>
+
+<span class="n">pediatric_md5_hashes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;2efe0deb19ac9e175404bf0cb29d9dbd&quot;</span><span class="p">,</span> <span class="s2">&quot;c2e07cd50699527bd7b0cbbe88703c56&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;76b36d8d6759df58131644281ed16bd2&quot;</span><span class="p">,</span> <span class="s2">&quot;645102225bad33da30bafd41d24b3ab0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;45ec94d42fdc9448afa6760c656920e9&quot;</span><span class="p">,</span> <span class="s2">&quot;54e3cb1b8c242be279f1410d8bb3c383&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1ee9f7e8b21ef8ceee81d5a7a178ef33&quot;</span><span class="p">,</span> <span class="s2">&quot;4f11097f7ae317aa8d612511be79e2f1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1c4c0823c23b676d6d35004d93b9c695&quot;</span><span class="p">,</span> <span class="s2">&quot;d4830d558cc8f707ebec912b32d197a5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;c405e0dbd9a4091c77b3d1ad200229b4&quot;</span><span class="p">,</span> <span class="s2">&quot;ec0aeccc6661d2ee5ed79259383cdcee&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;2802cd227b550f6e85df0fec1d515c29&quot;</span><span class="p">,</span> <span class="s2">&quot;385addb999dc6d76957d2a35c4ee74bb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b79f01829bd95682faaf545c72b1d52c&quot;</span><span class="p">,</span> <span class="s2">&quot;b79f01829bd95682faaf545c72b1d52c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;e49ba370edca96734d9376f551d413db&quot;</span><span class="p">,</span> <span class="s2">&quot;f59e9e69e06325198f70047cd63c3bdc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ae3bd2931f95adae0280a8f75cd3ca9b&quot;</span><span class="p">,</span> <span class="s2">&quot;c409a0036b8c2dd4d03d11fbc6bfbdcd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;c2597a474ea5ec9e3126c35fd238f6b2&quot;</span><span class="p">,</span> <span class="s2">&quot;67af59c934147c9f9ff6e0b76c4cc6eb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;72d0bbc0b6162e9291fdc450c103a1f0&quot;</span><span class="p">,</span> <span class="s2">&quot;51f5041be63ad0ac10d1ac09e3bf1a8e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6200f5cdc1402dce46dedd505468b147&quot;</span><span class="p">,</span> <span class="s2">&quot;83cb5bf6b9b1eda63c8643871e84a6d4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;2a5d8d309b1256d6e48958e112201c2c&quot;</span><span class="p">,</span> <span class="s2">&quot;ba24d0915fdff215a403480d0a7745c9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1001e833d1344274d543ffd02a66af80&quot;</span><span class="p">,</span> <span class="s2">&quot;03e20c5eebcd4d439c4ffb36d26a10d9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6200f5cdc1402dce46dedd505468b147&quot;</span><span class="p">,</span> <span class="s2">&quot;83cb5bf6b9b1eda63c8643871e84a6d4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a6ae325cce2dc4bb21b52ee4c6ca844f&quot;</span><span class="p">,</span> <span class="s2">&quot;a96a31df8f96ccf1c5f871a18e4a2d72&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;65b7378ca85689a5f23b1b84a6ed78f0&quot;</span><span class="p">,</span> <span class="s2">&quot;ce0d0ea696ef51c671aa118e11192e2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ce4918086ca1e829698576bcf95db62b&quot;</span><span class="p">,</span> <span class="s2">&quot;96168d2eff74ec2acf9065f499732526&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6b20ba319d44472ec21d6ece937605bb&quot;</span><span class="p">,</span> <span class="s2">&quot;26b1cf6ec8bd365dde42e3efe9beeac2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0b3ccf06564d973bfcfff9a87e74f8b5&quot;</span><span class="p">,</span> <span class="s2">&quot;84f3426033a2b225b0920b2622864375&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;5351b3cb7efa9aa8e83e266342809ebe&quot;</span><span class="p">,</span> <span class="s2">&quot;4e8a34aaba4e0f22a6149f38620dc39d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;682c08f66e8c2cf9e4e60f5ce308c76c&quot;</span><span class="p">,</span> <span class="s2">&quot;9077affd4f3a8a1d6b44678cde4b3bf4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;5adf36f00669cc547d5eb978acf46266&quot;</span><span class="p">,</span> <span class="s2">&quot;66a8002688ffdf3943722361da90ec6a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;efb5ae138df92019541861f9aa6a4d57&quot;</span><span class="p">,</span> <span class="s2">&quot;757ec61078b2e9f9a073871b3216ff7a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ff1e238c52a21f8cc5d44ac614d9627f&quot;</span><span class="p">,</span> <span class="s2">&quot;cf16dd2767c6ab2d3fceb2890f6c3e41&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6016621e244b60b9c69fd44b055e4a03&quot;</span><span class="p">,</span> <span class="s2">&quot;fd495a2c94b6b13bfb4cd63e293d3fc0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bf81a23d80f55e5f1eb0c16717193105&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6f8bf8f70216788d14d9a49a3c664b16&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;19df0297d6a2ac21da5e432645d63174&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">pediatric_remote_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;24880625&quot;</span><span class="p">,</span> <span class="s2">&quot;24880628&quot;</span><span class="p">,</span> <span class="s2">&quot;24880631&quot;</span><span class="p">,</span> <span class="s2">&quot;24880634&quot;</span><span class="p">,</span> <span class="s2">&quot;24880637&quot;</span><span class="p">,</span> <span class="s2">&quot;24880640&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880643&quot;</span><span class="p">,</span> <span class="s2">&quot;24880646&quot;</span><span class="p">,</span> <span class="s2">&quot;24880649&quot;</span><span class="p">,</span> <span class="s2">&quot;24880652&quot;</span><span class="p">,</span> <span class="s2">&quot;24880655&quot;</span><span class="p">,</span> <span class="s2">&quot;24880661&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880664&quot;</span><span class="p">,</span> <span class="s2">&quot;24880667&quot;</span><span class="p">,</span> <span class="s2">&quot;24880670&quot;</span><span class="p">,</span> <span class="s2">&quot;24880673&quot;</span><span class="p">,</span> <span class="s2">&quot;24880676&quot;</span><span class="p">,</span> <span class="s2">&quot;24880679&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880685&quot;</span><span class="p">,</span> <span class="s2">&quot;24880688&quot;</span><span class="p">,</span> <span class="s2">&quot;24880691&quot;</span><span class="p">,</span> <span class="s2">&quot;24880694&quot;</span><span class="p">,</span> <span class="s2">&quot;24880697&quot;</span><span class="p">,</span> <span class="s2">&quot;24880700&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880703&quot;</span><span class="p">,</span> <span class="s2">&quot;24880706&quot;</span><span class="p">,</span> <span class="s2">&quot;24880712&quot;</span><span class="p">,</span> <span class="s2">&quot;24880715&quot;</span><span class="p">,</span> <span class="s2">&quot;24880718&quot;</span><span class="p">,</span> <span class="s2">&quot;24880721&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880724&quot;</span><span class="p">,</span> <span class="s2">&quot;24880727&quot;</span><span class="p">,</span> <span class="s2">&quot;24880730&quot;</span><span class="p">,</span> <span class="s2">&quot;24880733&quot;</span><span class="p">,</span> <span class="s2">&quot;24880736&quot;</span><span class="p">,</span> <span class="s2">&quot;24880748&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880739&quot;</span><span class="p">,</span> <span class="s2">&quot;24880742&quot;</span><span class="p">,</span> <span class="s2">&quot;24880754&quot;</span><span class="p">,</span> <span class="s2">&quot;24880757&quot;</span><span class="p">,</span> <span class="s2">&quot;24880760&quot;</span><span class="p">,</span> <span class="s2">&quot;24880763&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880769&quot;</span><span class="p">,</span> <span class="s2">&quot;24880772&quot;</span><span class="p">,</span> <span class="s2">&quot;24880775&quot;</span><span class="p">,</span> <span class="s2">&quot;24880778&quot;</span><span class="p">,</span> <span class="s2">&quot;24880781&quot;</span><span class="p">,</span> <span class="s2">&quot;24880787&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880790&quot;</span><span class="p">,</span> <span class="s2">&quot;24880793&quot;</span><span class="p">,</span> <span class="s2">&quot;24880796&quot;</span><span class="p">,</span> <span class="s2">&quot;24880802&quot;</span><span class="p">,</span> <span class="s2">&quot;24880805&quot;</span><span class="p">,</span> <span class="s2">&quot;24880808&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880616&quot;</span><span class="p">,</span> <span class="s2">&quot;24880613&quot;</span><span class="p">,</span> <span class="s2">&quot;24986396&quot;</span>
+<span class="p">]</span>
+
+<span class="n">fetch_pediatric_templates</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span>
+    <span class="s1">&#39;fetch_pediatric_templates&#39;</span><span class="p">,</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span> <span class="s1">&#39;pediatric_templates&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;https://ndownloader.figshare.com/files/&#39;</span><span class="p">,</span>
+    <span class="n">pediatric_remote_fnames</span><span class="p">,</span>
+    <span class="n">pediatric_fnames</span><span class="p">,</span>
+    <span class="n">md5_list</span><span class="o">=</span><span class="n">pediatric_md5_hashes</span><span class="p">,</span>
+    <span class="n">doc</span><span class="o">=</span><span class="s1">&#39;Download pediatric templates&#39;</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_pediatric_templates</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load pediatric pyAFQ templates. </span>
+<span class="sd">    </span>
+<span class="sd">    Used to create pediatric `bundle_dict`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict : </span>
+<span class="sd">        keys = names of template ROIs, and </span>
+<span class="sd">        values = `Nifti1Image` from each of the ROI nifti files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">fetch_pediatric_templates</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading pediatric templates...&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pediatric_templates</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="n">pediatric_templates</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">img</span>
+
+    <span class="c1"># For the arcuate (AF/ARC), reuse the SLF ROIs</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi1_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLF_roi1_L&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi1_R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLF_roi1_R&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi2_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLFt_roi2_L&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi2_R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLFt_roi2_R&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi3_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLFt_roi3_L&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ARC_roi3_R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;SLFt_roi3_R&#39;</span><span class="p">]</span>
+
+    <span class="c1"># For the middle longitudinal fasciculus (MdLF) reuse ILF ROI</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;MdLF_roi2_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ILF_roi2_L&#39;</span><span class="p">]</span>
+    <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;MdLF_roi2_R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pediatric_templates</span><span class="p">[</span><span class="s1">&#39;ILF_roi2_R&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">pediatric_templates</span>
 
 
 <span class="k">def</span> <span class="nf">read_resample_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">resample_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -2724,10 +2870,9 @@
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
               
           </main>
           
@@ -2735,21 +2880,20 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018--, The pyAFQ Contributors.<br/>
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
 </p>
     </div>
     

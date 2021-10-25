@@ -1,7 +1,13 @@
-:mod:`AFQ.models.dki`
-=====================
+:py:mod:`AFQ.models.dki`
+========================
 
 .. py:module:: AFQ.models.dki
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -18,8 +24,9 @@ Functions
 
 
 
-.. function:: fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=50)
+.. py:function:: fit_dki(data_files, bval_files, bvec_files, mask=None, min_kurtosis=-1, max_kurtosis=3, out_dir=None, b0_threshold=50)
 
+   
    Fit the DKI model, save files with derived maps
 
 
@@ -76,9 +83,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: predict(params_file, gtab, S0_file=None, out_dir=None)
 
-.. function:: predict(params_file, gtab, S0_file=None, out_dir=None)
-
+   
    Create a signal prediction from DKI params
 
    params_file : str
@@ -108,5 +115,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 

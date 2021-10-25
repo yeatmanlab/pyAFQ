@@ -1,7 +1,13 @@
-:mod:`AFQ.utils.streamlines`
-============================
+:py:mod:`AFQ.utils.streamlines`
+===============================
 
 .. py:module:: AFQ.utils.streamlines
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
 
 
 Module Contents
@@ -20,8 +26,9 @@ Functions
 
 
 
-.. function:: add_bundles(t1, t2)
+.. py:function:: add_bundles(t1, t2)
 
+   
    Combine two bundles, using the second bundles' affine and
    data_per_streamline keys.
     Parameters
@@ -46,9 +53,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: bundles_to_tgram(bundles, bundle_dict, reference)
 
-.. function:: bundles_to_tgram(bundles, bundle_dict, reference)
-
+   
    Create a StatefulTractogram object from bundles and their
    specification.
 
@@ -84,9 +91,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: tgram_to_bundles(tgram, bundle_dict, reference)
 
-.. function:: tgram_to_bundles(tgram, bundle_dict, reference)
-
+   
    Convert a StatefulTractogram object to a dict with StatefulTractogram
    objects for each bundle.
 
@@ -116,9 +123,9 @@ Functions
    ..
        !! processed by numpydoc !!
 
+.. py:function:: split_streamline(streamlines, sl_to_split, split_idx)
 
-.. function:: split_streamline(streamlines, sl_to_split, split_idx)
-
+   
    Given a Streamlines object, split one of the underlying streamlines
 
 
@@ -148,5 +155,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 
