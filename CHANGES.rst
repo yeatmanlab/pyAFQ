@@ -1,3 +1,35 @@
+0.9 (October 25, 2021)
+======================
+This is a maintenance release, including many small fixes to specific
+issues that arose during usage with particular datasets. It also includes
+some improvements to visualizations. This version includes some of the
+requirements for a BIDS App: participant list and output directory and
+the initial requirements for integration with QSIPrep.
+
+  * Generate json for QSIprep from command line (#744)
+  * Enh: rename this variable (thoughts?) (#756)
+  * Enh: Reduce pyAFQ required dependencies (#752)
+  * [ENH] Change default BundleDict behavior to resample (#755)
+  * [ENH] alert users when custom tractography is not found for a given sub/ses (#754)
+  * [FIX] Clean up Loky (#750)
+  * [FIX] Attempt to fix the docker push for tags (#751)
+  * [ENH] Participant labels implementation (#749)
+  * [FIX] fury nightly fix (#748)
+  * Fixes a typo in this variable name. (#747)
+  * Allow other extensions than nii.gz to be given by the user for optional input files (#745)
+  * [ENH] Replicating mAFQ visualizations using our rendering framework (#736)
+  * BF: Resample ROI for custom bundledict as well (#742)
+  * pyBabyAFQ (#524)
+  * [ENH] Allow AFQ browser installation to be optional (#740)
+  * Updates qsiprep version to inherit from. (#741)
+  * [BF] ITK and FNIRT mappings had typo reversing reg_subject and reg_template (#739)
+  * [DOC] Generate simple docs for export function outputs (#729)
+  * [DOC] Adds an example to the custom scalar docs (#732)
+  * Adding a citation file. (#734)
+  * [ENH] add more scalars, add one to the test (#733)
+  * DOC: Insert the current version into the documentation. (#731)
+
+
 0.8 (July 12, 2021)
 ===================
 This release is the first one to use Pimms as our pipeline engine, which allows
