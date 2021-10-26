@@ -122,6 +122,34 @@ class ConformedFnirtMapping():
             + " only transform from template to subject space")
 
 
+class IdentityMap(Definition):
+    """
+    Does not perform any transformations from MNI to subject where
+    pyAFQ normally would.
+
+    Examples
+    --------
+    my_example_mapping = IdentityMap()
+    api.AFQ(mapping=my_example_mapping)
+    """
+
+    def __init__(self):
+        pass
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+        return ConformedAffineMapping(
+            np.identity(4),
+            domain_grid_shape=reg.reduce_shape(
+                reg_subject.shape),
+            domain_grid2world=reg_subject.affine,
+            codomain_grid_shape=reg.reduce_shape(
+                reg_template.shape),
+            codomain_grid2world=reg_template.affine)
+
+
 class ItkMap(Definition):
     """
     Use an existing Itk map (e.g., from ANTS). Expects the warp file
@@ -374,8 +402,15 @@ class AffMap(GeneratedMapMixin, Definition):
     def gen_mapping(self, subses_dict, reg_subject, reg_template,
                     subject_sls, template_sls,
                     reg_prealign):
-        return ConformedAffineMapping(np.linalg.inv(self.prealign(
-            subses_dict, reg_subject, reg_template, save=False)))
+        return ConformedAffineMapping(
+            np.linalg.inv(self.prealign(
+                subses_dict, reg_subject, reg_template, save=False)),
+            domain_grid_shape=reg.reduce_shape(
+                reg_subject.shape),
+            domain_grid2world=reg_subject.affine,
+            codomain_grid_shape=reg.reduce_shape(
+                reg_template.shape),
+            codomain_grid2world=reg_template.affine)
 
 
 class ConformedAffineMapping(AffineMap):
