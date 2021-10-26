@@ -24,8 +24,7 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 outputs = {
-    "data": """DWI data as an ndarray for selected b values.
-    If patch2self is used, it is already applied to this data""",
+    "data": """DWI data as an ndarray for selected b values.""",
     "gtab": """a DIPY GradientTable with all the gradient information""",
     "img": """unaltered DWI data in a Nifti1Image""",
     "b0_file": """full path to a nifti file containing the mean b0""",
@@ -79,7 +78,7 @@ outputs = {
 
 @pimms.calc("data", "gtab", "img")
 def get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval,
-                  max_bval, filter_b=True, patch2self=False):
+                  max_bval, filter_b=True):
     img = nib.load(subses_dict["dwi_file"])
     data = img.get_fdata()
     bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
@@ -98,9 +97,6 @@ def get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval,
     gtab = dpg.gradient_table(
         bvals, bvecs,
         b0_threshold=b0_threshold)
-    if patch2self:
-        from dipy.denoise.patch2self import patch2self
-        data = patch2self(data, bvals, b0_threshold=b0_threshold)
     return data, gtab, img
 
 

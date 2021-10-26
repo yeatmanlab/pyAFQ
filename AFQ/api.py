@@ -501,7 +501,6 @@ class AFQ(object):
                  output_dir=None,
                  custom_tractography_bids_filters=None,
                  b0_threshold=50,
-                 patch2self=False,
                  robust_tensor_fitting=False,
                  min_bval=None,
                  max_bval=None,
@@ -557,10 +556,6 @@ class AFQ(object):
         b0_threshold : int, optional
             [DATA] The value of b under which
             it is considered to be b0. Default: 50.
-        patch2self : bool, optional
-            [DATA] Whether to use patch2self
-            to denoise the dwi data.
-            Default: False
         robust_tensor_fitting : bool, optional
             [DATA] Whether to use robust_tensor_fitting when
             doing dti. Only applies to dti.
@@ -685,8 +680,6 @@ class AFQ(object):
                 + " either a dict or None")
         if not isinstance(b0_threshold, int):
             raise TypeError("b0_threshold must be an int")
-        if not isinstance(patch2self, bool):
-            raise TypeError("patch2self must be a bool")
         if not isinstance(robust_tensor_fitting, bool):
             raise TypeError("robust_tensor_fitting must be a bool")
         if min_bval is not None and not isinstance(min_bval, int):
@@ -792,7 +785,6 @@ class AFQ(object):
         self.mapping_definition = mapping
 
         self.b0_threshold = b0_threshold
-        self.patch2self = patch2self
         self.robust_tensor_fitting = robust_tensor_fitting
         self.custom_tractography_bids_filters =\
             custom_tractography_bids_filters
@@ -1111,7 +1103,6 @@ class AFQ(object):
                     b0_threshold=self.b0_threshold,
                     min_bval=self.min_bval,
                     max_bval=self.max_bval,
-                    patch2self=self.patch2self,
                     brain_mask_definition=self.brain_mask_definition,
                     custom_tract_file=custom_tract_file,
                     reg_template=self.reg_template_img,
