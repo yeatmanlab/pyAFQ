@@ -227,6 +227,27 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     return arg_dict
 
 
+def parse_qsiprep_params_dict(params_dict):
+    arg_dict = func_dict_to_arg_dict()
+    kwargs = {}
+
+    special_args = {
+        "CLEANING": "clean_params",
+        "SEGMENTATION": "segmentation_params",
+        "TRACTOGRAPHY": "tracking_params"}
+
+    for section, arg_name in special_args.items():
+        kwargs[arg_name] = {}
+        for key in arg_dict[section].keys():
+            if key in params_dict:
+                kwargs[arg_name][key] = toml_to_val(params_dict[key])
+
+    for arg, val in params_dict.items():
+        kwargs[arg] = toml_to_val(val)
+
+    return kwargs
+
+
 def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
