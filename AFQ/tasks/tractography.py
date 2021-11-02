@@ -7,7 +7,8 @@ from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
-
+from AFQ.utils.bin import get_default_args
+from AFQ.definitions.mask import ScalarMask
 
 outputs = {
     "seed_file": """full path to a nifti file containing the
@@ -95,19 +96,59 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
 
 
 @pimms.calc("streamlines_file")
-def custom_tractography(custom_tract_file):
-    return custom_tract_file
+def custom_tractography(import_tract_path):
+    return import_tract_path
 
 
-def get_tractography_plan(custom_tract_file, tracking_params):
+def get_tractography_plan(kwargs):
+    if "tracking_params" in kwargs\
+            and not isinstance(kwargs["tracking_params"], dict):
+        raise TypeError(
+            "tracking_params a dict")
+    if "import_tract_path" in kwargs\
+            and not isinstance(kwargs["import_tract_path"], str):
+        raise TypeError(
+            "import_tract_path must be a str")
+
     tractography_tasks = with_name([
         export_seed_mask, export_stop_mask, streamlines])
 
-    if custom_tract_file is not None:
+    # use imported tractography if given
+    if "import_tract_path" in kwargs:
         tractography_tasks["streamlines_res"] = custom_tractography
 
-    stop_mask = tracking_params['stop_mask']
-    if tracking_params["tracker"] == "pft":
+    # determine reasonable defaults
+    best_scalar = None
+    for scalar in kwargs["scalars"]:
+        if isinstance(scalar, str):
+            if "fa" in scalar:
+                best_scalar = scalar
+                break
+        else:
+            if "fa" in scalar.name:
+                best_scalar = scalar
+                break
+
+    default_tracking_params = get_default_args(aft.track)
+    default_tracking_params["seed_mask"] = ScalarMask(
+        best_scalar)
+    default_tracking_params["stop_mask"] = ScalarMask(
+        best_scalar)
+    default_tracking_params["seed_threshold"] = 0.2
+    default_tracking_params["stop_threshold"] = 0.2
+
+    # Replace the defaults only for kwargs for which a non-default value
+    # was given:
+    if "tracking_params" in kwargs:
+        for k in kwargs["tracking_params"]:
+            default_tracking_params[k] = kwargs["tracking_params"][k]
+
+    kwargs["tracking_params"] = default_tracking_params
+    kwargs["tracking_params"]["odf_model"] =\
+        kwargs["tracking_params"]["odf_model"].upper()
+
+    stop_mask = kwargs["tracking_params"]['stop_mask']
+    if kwargs["tracking_params"]["tracker"] == "pft":
         probseg_funcs = stop_mask.get_mask_getter()
         tractography_tasks["wm_res"] = pimms.calc("pve_wm")(probseg_funcs[0])
         tractography_tasks["gm_res"] = pimms.calc("pve_gm")(probseg_funcs[1])
@@ -120,9 +161,9 @@ def get_tractography_plan(custom_tract_file, tracking_params):
                 pimms.calc("stop_file")(as_file('_stop_mask.nii.gz')(
                     stop_mask.get_mask_getter()))
 
-    if isinstance(tracking_params['seed_mask'], Definition):
+    if isinstance(kwargs["tracking_params"]['seed_mask'], Definition):
         tractography_tasks["export_seed_mask_res"] = pimms.calc("seed_file")(
             as_file('_seed_mask.nii.gz')(
-                tracking_params['seed_mask'].get_mask_getter()))
+                kwargs["tracking_params"]['seed_mask'].get_mask_getter()))
 
     return pimms.plan(**tractography_tasks)

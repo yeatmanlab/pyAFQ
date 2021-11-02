@@ -15,6 +15,7 @@ import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 from AFQ.utils.bin import get_default_args
 import AFQ.data as afd
+import AFQ.api.bundle_dict as abd
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -91,8 +92,14 @@ def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
 
 @pimms.calc("clean_bundles_file")
 @as_file('-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
-                  tracking_params, segmentation_params):
+def clean_bundles(subses_dict, bundles_file, bundle_dict,
+                  tracking_params, segmentation_params, clean_params=None):
+    default_clean_params = get_default_args(seg.clean_bundle)
+    if clean_params is not None:
+        for k in clean_params:
+            default_clean_params[k] = clean_params[k]
+    clean_params = default_clean_params
+
     img = nib.load(subses_dict['dwi_file'])
     sft = load_tractogram(
         bundles_file,
@@ -153,7 +160,17 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
 
 @pimms.calc("indiv_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
-                   bundle_dict, tracking_params, segmentation_params):
+                   reg_template, bundle_dict, tracking_params,
+                   segmentation_params):
+    if "presegment_bundle_dict" in segmentation_params and not isinstance(
+            segmentation_params["presegment_bundle_dict"],
+            abd.BundleDict):
+        segmentation_params["presegment_bundle_dict"] =\
+            abd.BundleDict(
+                segmentation_params["presegment_bundle_dict"],
+                seg_algo="afq",
+                resample_to=reg_template)
+
     img = nib.load(subses_dict['dwi_file'])
     for this_bundles_file, folder in zip([clean_bundles_file, bundles_file],
                                          ['clean_bundles', 'bundles']):
@@ -225,8 +242,24 @@ def export_sl_counts(subses_dict, bundle_dict,
 @pimms.calc("profiles_file")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
 def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
-                   scalar_dict, profile_weights, dwi_affine,
-                   tracking_params, segmentation_params):
+                   scalar_dict, dwi_affine,
+                   tracking_params, segmentation_params,
+                   profile_weights="gauss"):
+    if not (profile_weights is None
+            or isinstance(profile_weights, str)
+            or callable(profile_weights)
+            or hasattr(profile_weights, "__len__")):
+        raise TypeError(
+            "profile_weights must be string, None, callable, or"
+            + "a 1D or 2D array")
+    if isinstance(profile_weights, str):
+        profile_weights = profile_weights.lower()
+    if isinstance(profile_weights, str) and\
+            profile_weights != "gauss" and profile_weights != "median":
+        raise TypeError(
+            "if profile_weights is a string,"
+            + " it must be 'gauss' or 'median'")
+
     keys = []
     vals = []
     for k in bundle_dict.keys():
@@ -305,7 +338,11 @@ def get_scalar_dict(scalars, data_imap, mapping_imap):
     return {"scalar_dict": scalar_dict}
 
 
-def get_segmentation_plan():
+def get_segmentation_plan(kwargs):
+    if "segmentation_params" in kwargs\
+            and not isinstance(kwargs["segmentation_params"], dict):
+        raise TypeError(
+            "segmentation_params a dict")
     segmentation_tasks = with_name([
         get_scalar_dict,
         export_sl_counts,
@@ -313,4 +350,11 @@ def get_segmentation_plan():
         clean_bundles,
         segment,
         tract_profiles])
+
+    default_seg_params = get_default_args(seg.Segmentation.__init__)
+    if "segmentation_params" in kwargs:
+        for k in kwargs["segmentation_params"]:
+            default_seg_params[k] = kwargs["segmentation_params"][k]
+
+    kwargs["segmentation_params"] = default_seg_params
     return pimms.plan(**segmentation_tasks)

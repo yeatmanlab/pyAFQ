@@ -13,6 +13,7 @@ from dipy.align import resample
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 import AFQ.data as afd
+from AFQ.viz.utils import Viz
 
 from plotly.subplots import make_subplots
 
@@ -358,7 +359,26 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     return fnames
 
 
-def get_viz_plan():
+def get_viz_plan(kwargs):
+    if "virtual_frame_buffer" in kwargs\
+            and not isinstance(kwargs["virtual_frame_buffer"], bool):
+        raise TypeError("virtual_frame_buffer must be a bool")
+    if "viz_backend" in kwargs\
+        and "fury" not in kwargs["viz_backend"]\
+            and "plotly" not in kwargs["viz_backend"]:
+        raise TypeError(
+            "viz_backend must contain either 'fury' or 'plotly'")
+
     viz_tasks = with_name([
         plot_tract_profiles, viz_bundles, viz_indivBundle])
+
+    if "viz_backend" not in kwargs:
+        kwargs["viz_backend"] = "plotly_no_gif"
+
+    if "virtual_frame_buffer" in kwargs and kwargs["virtual_frame_buffer"]:
+        from xvfbwrapper import Xvfb
+        vdisplay = Xvfb(width=1280, height=1280)
+        vdisplay.start()
+    kwargs["viz_backend"] = Viz(backend=kwargs["viz_backend"].lower())
+
     return pimms.plan(**viz_tasks)

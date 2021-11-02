@@ -3,22 +3,15 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
-from AFQ.definitions.mask import (B0Mask, ScalarMask, FullMask)
-from AFQ.definitions.mapping import (SynMap, FnirtMap, ItkMap, SlrMap)
+from textwrap import dedent
+from AFQ.definitions.mapping import (FnirtMap, ItkMap)
 from AFQ.definitions.utils import Definition
-from AFQ.utils.bin import get_default_args
-import AFQ.segmentation as seg
-import AFQ.tractography as aft
 import AFQ.data as afd
-from AFQ.viz.utils import Viz
+from AFQ.api.participant import ParticipantAFQ
+from AFQ.api.utils import wf_sections, task_outputs
+
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
-
-from AFQ.tasks.data import get_data_plan
-from AFQ.tasks.mapping import get_mapping_plan
-from AFQ.tasks.tractography import get_tractography_plan
-from AFQ.tasks.segmentation import get_segmentation_plan
-from AFQ.tasks.viz import get_viz_plan
 
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import load_tractogram
@@ -30,13 +23,10 @@ import pandas as pd
 import numpy as np
 import os
 import os.path as op
-from textwrap import dedent
 import json
 import s3fs
 from time import time
 import nibabel as nib
-from importlib import import_module
-from collections.abc import MutableMapping
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -52,419 +42,7 @@ except (ImportError, ModuleNotFoundError):
     using_afqb = False
 
 
-logging.basicConfig(level=logging.INFO)
-
-
-__all__ = ["AFQ", "BundleDict"]
-
-
-def do_preprocessing():
-    raise NotImplementedError
-
-
-BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
-           "FA", "FP"]
-
-CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
-                    "PostParietal", "SupFrontal", "SupParietal",
-                    "Temporal"]
-
-# See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
-
-RECO_BUNDLES_16 = [
-    'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
-    'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
-
-RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
-                   "CC_ForcepsMinor", "CC", "CCMid", "CNII", "CNIII",
-                   "CNIV", "CNV", "CNVII", "CNVIII", "CS", "CST", "CT",
-                   "CTT", "DLF", "EMC", "F_L_R", "FPT", "ICP", "IFOF", "ILF",
-                   "LL", "MCP", "MdLF", "ML", "MLF", "OPT", "OR", "PC", "PPT",
-                   "RST", "SCP", "SLF", "STT", "TPT", "UF", "V", "VOF"]
-
-RECO_UNIQUE = [
-    'CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP', 'AC', 'PC', 'SCP',
-    'V', 'CC', 'F_L_R']
-
-PEDIATRIC_BUNDLES = [
-    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
-
-DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
-
-
-class BundleDict(MutableMapping):
-    def __init__(self,
-                 bundle_info=BUNDLES,
-                 seg_algo="afq",
-                 resample_to=None):
-        """
-        Create a bundle dictionary, needed for the segmentation
-
-        Parameters
-        ----------
-        bundle_names : list, optional
-            A list of the bundles to be used in this case. Default: all of them
-
-        seg_algo: One of {"afq", "reco", "reco16", "reco80"}
-            The bundle segmentation algorithm to use.
-                "afq" : Use waypoint ROIs + probability maps, as described
-                in [Yeatman2012]_
-                "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
-                with a 16-bundle set.
-                "reco80": Use Recobundles with an 80-bundle set.
-
-        resample_to : Nifti1Image or bool, optional
-            If set, templates will be resampled to the affine and shape of this
-            image. If None, the MNI template will be used.
-            If False, no resampling will be done.
-            Default: afd.read_mni_template()
-        """
-        if not (isinstance(bundle_info, dict)
-                or isinstance(bundle_info, list)):
-            raise TypeError((
-                f"bundle_info must be a dict or a list,"
-                f" currently a {type(bundle_info)}"))
-        self.seg_algo = seg_algo.lower()
-        if resample_to is None:
-            resample_to = afd.read_mni_template()
-        self.resample_to = resample_to
-
-        if isinstance(bundle_info, dict):
-            self.bundle_names = list(bundle_info.keys())
-            self._dict = bundle_info.copy()
-            self.resample_all_roi()
-            self.all_gen = True
-        else:
-            expanded_bundle_names = []
-            for bundle_name in bundle_info:
-                if self.seg_algo == "afq":
-                    if bundle_name in ["FA", "FP"]\
-                            or bundle_name in CALLOSUM_BUNDLES:
-                        expanded_bundle_names.append(bundle_name)
-                    else:
-                        expanded_bundle_names.append(bundle_name + "_R")
-                        expanded_bundle_names.append(bundle_name + "_L")
-                elif self.seg_algo.startswith("reco"):
-                    if bundle_name in RECO_UNIQUE\
-                            or bundle_name == "whole_brain":
-                        expanded_bundle_names.append(bundle_name)
-                    else:
-                        expanded_bundle_names.append(bundle_name + "_R")
-                        expanded_bundle_names.append(bundle_name + "_L")
-                else:
-                    raise ValueError(
-                        "Input: %s is not a valid input`seg_algo`"
-                        % self.seg_algo)
-            self.bundle_names = expanded_bundle_names
-            self._dict = {}
-            self.all_gen = False
-
-        # Each bundles gets a digit identifier
-        # (to be stored in the tractogram)
-        # we keep track of this for when bundles are added
-        # with set item
-        self._uid_dict = {}
-        for ii, b_name in enumerate(self.bundle_names):
-            self._uid_dict[b_name] = ii + 1
-            self._c_uid = ii + 2
-
-        self.logger = logging.getLogger('AFQ.api')
-
-        if self.seg_algo == "afq":
-            if "FP" in self.bundle_names\
-                    and "Occipital" in self.bundle_names:
-                self.logger.warning((
-                    "FP and Occipital bundles are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only Occipital will be used."))
-                self.bundle_names.remove("FP")
-            if "FA" in self.bundle_names\
-                    and "Orbital" in self.bundle_names:
-                self.logger.warning((
-                    "FA and Orbital bundles are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only Orbital will be used."))
-                self.bundle_names.remove("FA")
-            if "FA" in self.bundle_names\
-                    and "AntFrontal" in self.bundle_names:
-                self.logger.warning((
-                    "FA and AntFrontal bundles are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only AntFrontal will be used."))
-                self.bundle_names.remove("FA")
-
-    def gen_all(self):
-        if self.all_gen:
-            return
-        if self.seg_algo == "afq":
-            templates =\
-                afd.read_templates(resample_to=self.resample_to)
-            # For the arcuate, we need to rename a few of these
-            # and duplicate the SLF ROI:
-            templates['ARC_roi1_L'] = templates['SLF_roi1_L']
-            templates['ARC_roi1_R'] = templates['SLF_roi1_R']
-            templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
-            templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
-            callosal_templates =\
-                afd.read_callosum_templates(resample_to=self.resample_to)
-
-            for key in self.bundle_names:
-                # Consider hard coding since we might have different rules
-                # for some tracts
-                if key in ["FA", "FP"]:
-                    bundle = {
-                        'ROIs': [
-                            templates[key + "_L"],
-                            templates[key + "_R"],
-                            callosal_templates["Callosum_midsag"]],
-                        'rules': [True, True, True],
-                        'prob_map': templates[key + "_prob_map"],
-                        'cross_midline': True,
-                        'uid': self._uid_dict[key]}
-                elif key in CALLOSUM_BUNDLES:
-                    bundle = {
-                        'ROIs': [
-                            callosal_templates["L_" + key],
-                            callosal_templates["R_" + key],
-                            callosal_templates["Callosum_midsag"]],
-                        'rules': [True, True, True],
-                        'cross_midline': True,
-                        'uid': self._uid_dict[key]}
-
-                # SLF is a special case, because it has an exclusion ROI:
-                elif key in ["SLF_L", "SLF_R"]:
-                    name = key[:-2]
-                    hemi = key[-2:]
-                    bundle = {
-                        'ROIs': [
-                            templates[name + '_roi1' + hemi],
-                            templates[name + '_roi2' + hemi],
-                            templates["SLFt_roi2" + hemi]],
-                        'rules': [True, True, False],
-                        'prob_map': templates[name + hemi + '_prob_map'],
-                        'cross_midline': False,
-                        'uid': self._uid_dict[key]}
-                else:
-                    name = key[:-2]
-                    hemi = key[-2:]
-                    if (templates.get(name + '_roi1' + hemi)
-                            and templates.get(name + '_roi2' + hemi)
-                            and templates.get(name + hemi + '_prob_map')):
-                        bundle = {
-                            'ROIs': [
-                                templates[name + '_roi1' + hemi],
-                                templates[name + '_roi2' + hemi]],
-                            'rules': [True, True],
-                            'prob_map': templates[
-                                name + hemi + '_prob_map'],
-                            'cross_midline': False,
-                            'uid': self._uid_dict[key]}
-                    else:
-                        raise ValueError(f"{key} is not in AFQ templates")
-                self._dict[key] = bundle
-            self.resample_all_roi()
-        elif self.seg_algo.startswith("reco"):
-            if self.seg_algo.endswith("80"):
-                reco_bundle_dict = afd.read_hcp_atlas(80)
-            else:
-                reco_bundle_dict = afd.read_hcp_atlas(16)
-            for key in self.bundle_names:
-                bundle = reco_bundle_dict[key]
-                bundle['uid'] = self._uid_dict[key]
-                self._dict[key] = bundle
-        else:
-            raise ValueError(
-                "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
-        self.all_gen = True
-
-    def __setitem__(self, key, item):
-        if not isinstance(item, dict):
-            raise ValueError((
-                "After BundleDict initialization, additional"
-                " bundles can only be added as dictionaries "
-                "(see BundleDict.gen_all for examples)"))
-        self.gen_all()
-        self._dict[key] = item
-        self._uid_dict[key] = self._c_uid
-        self._dict[key]["uid"] = self._c_uid
-        self._c_uid += 1
-        self.bundle_names.append(key)
-
-    def __getitem__(self, key):
-        self.gen_all()
-        return self._dict[key]
-
-    def __len__(self):
-        return len(self.bundle_names)
-
-    def __delitem__(self, key):
-        if key not in self._dict and key not in self.bundle_names:
-            raise KeyError(f"{key} not found")
-        if key in self._dict:
-            del self._dict[key]
-        else:
-            raise RuntimeError((
-                f"{key} not found in internal dictionary, "
-                f"but found in bundle_names"))
-        if key in self.bundle_names:
-            self.bundle_names.remove(key)
-        else:
-            raise RuntimeError((
-                f"{key} not found in bundle_names, "
-                f"but found in internal dictionary"))
-
-    def __iter__(self):
-        self.gen_all()
-        return iter(self._dict)
-
-    def copy(self):
-        self.gen_all()
-        return self._dict.copy()
-
-    def resample_all_roi(self):
-        if self.resample_to:
-            for key in self._dict.keys():
-                for ii, roi in enumerate(self._dict[key]['ROIs']):
-                    self._dict[key]['ROIs'][ii] =\
-                        afd.read_resample_roi(
-                            roi, resample_to=self.resample_to)
-
-
-class PediatricBundleDict(BundleDict):
-    def __init__(self,
-                 bundle_info=PEDIATRIC_BUNDLES,
-                 seg_algo="afq",
-                 resample_to=False):
-        """
-        Create a pediatric bundle dictionary, needed for the segmentation
-
-        Parameters
-        ----------
-        bundle_info : list, optional
-            A list of the pediatric bundles to be used in this case.
-            Default: all of them
-
-        seg_algo: only "afq" is supported
-            The bundle segmentation algorithm to use.
-                "afq" : Use waypoint ROIs + probability maps, as described
-                in [Yeatman2012]_
-
-        resample_to : Nifti1Image or bool, optional
-            If set, templates will be resampled to the affine and shape of this
-            image. If False, no resampling will be done.
-            Default: False
-        """
-        BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
-
-    def gen_all(self):
-        if self.all_gen:
-            return
-        if self.seg_algo == "afq":
-            # Pediatric bundles differ from adult bundles:
-            #   - A third ROI has been introduced for curvy tracts:
-            #     ARC, ATR, CGC, IFO, and UCI
-            #   - ILF posterior ROI has been split into two
-            #     to separate ILF and mdLF
-            #   - Addition of pAF and VOF ROIs
-            #   - SLF ROIs are restricted to parietal cortex
-            pediatric_templates = afd.read_pediatric_templates()
-
-            # pediatric probability maps
-            prob_map_order = [
-                "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
-                "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
-                "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
-                "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
-
-            prob_maps = pediatric_templates[
-                'UNCNeo_JHU_tracts_prob-for-babyAFQ']
-            prob_map_data = prob_maps.get_fdata()
-
-            # pediatric bundle dict
-            pediatric_bundles = {}
-
-            # each bundles gets a digit identifier
-            # (to be stored in the tractogram)
-            uid = 1
-
-            for name in PEDIATRIC_BUNDLES:
-                # ROIs that cross the mid-line
-                if name in ["FA", "FP"]:
-                    pediatric_bundles[name] = {
-                        'ROIs': [
-                            pediatric_templates[name + "_L"],
-                            pediatric_templates[name + "_R"],
-                            pediatric_templates["mid-saggital"]],
-                        'rules': [True, True, True],
-                        'cross_midline': True,
-                        'prob_map': prob_map_data[
-                            ...,
-                            prob_map_order.index(name)],
-                        'uid': uid}
-                    uid += 1
-                # SLF is a special case, because it has an exclusion ROI:
-                elif name == "SLF":
-                    for hemi in ['_R', '_L']:
-                        pediatric_bundles[name + hemi] = {
-                            'ROIs': [
-                                pediatric_templates[name + '_roi1' + hemi],
-                                pediatric_templates[name + '_roi2' + hemi],
-                                pediatric_templates["SLFt_roi2" + hemi]],
-                            'rules': [True, True, False],
-                            'cross_midline': False,
-                            'prob_map': prob_map_data[
-                                ...,
-                                prob_map_order.index(name + hemi)],
-                            'uid': uid}
-                        uid += 1
-                # Third ROI for curvy tracts
-                elif name in ["ARC", "ATR", "CGC", "IFO", "UNC"]:
-                    for hemi in ['_R', '_L']:
-                        pediatric_bundles[name + hemi] = {
-                            'ROIs': [
-                                pediatric_templates[name + '_roi1' + hemi],
-                                pediatric_templates[name + '_roi2' + hemi],
-                                pediatric_templates[name + '_roi3' + hemi]],
-                            'rules': [True, True, True],
-                            'cross_midline': False,
-                            'prob_map': prob_map_data[
-                                ...,
-                                prob_map_order.index(name + hemi)],
-                            'uid': uid}
-                        uid += 1
-                elif name == "MdLF":
-                    for hemi in ['_R', '_L']:
-                        pediatric_bundles[name + hemi] = {
-                            'ROIs': [
-                                pediatric_templates[name + '_roi1' + hemi],
-                                pediatric_templates[name + '_roi2' + hemi]],
-                            'rules': [True, True],
-                            'cross_midline': False,
-                            # reuse probability map from ILF
-                            'prob_map': prob_map_data[
-                                ...,
-                                prob_map_order.index("ILF" + hemi)],
-                            'uid': uid}
-                        uid += 1
-                # Default: two ROIs within hemisphere
-                else:
-                    for hemi in ['_R', '_L']:
-                        pediatric_bundles[name + hemi] = {
-                            'ROIs': [
-                                pediatric_templates[name + '_roi1' + hemi],
-                                pediatric_templates[name + '_roi2' + hemi]],
-                            'rules': [True, True],
-                            'cross_midline': False,
-                            'prob_map': prob_map_data[
-                                ...,
-                                prob_map_order.index(name + hemi)],
-                            'uid': uid}
-                        uid += 1
-            self._dict = pediatric_bundles
-        else:
-            raise ValueError(
-                "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
-        self.all_gen = True
+__all__ = ["GroupAFQ"]
 
 
 # get rid of unnecessary columns in df
@@ -479,18 +57,7 @@ def _getter_helper(wf_dict, attr_name):
     return wf_dict[attr_name]
 
 
-# define sections in workflow dictionary
-_sub_attrs = [
-    "data_imap", "mapping_imap",
-    "tractography_imap", "segmentation_imap",
-    "subses_dict"]
-
-task_outputs = {}
-for task_module in ["data", "mapping", "segmentation", "tractography", "viz"]:
-    task_outputs.update(import_module(f"AFQ.tasks.{task_module}").outputs)
-
-
-class AFQ(object):
+class GroupAFQ(object):
     """
     """
 
@@ -500,25 +67,7 @@ class AFQ(object):
                  preproc_pipeline="all",
                  participant_labels=None,
                  output_dir=None,
-                 custom_tractography_bids_filters=None,
-                 b0_threshold=50,
-                 robust_tensor_fitting=False,
-                 min_bval=None,
-                 max_bval=None,
-                 reg_template="mni_T1",
-                 reg_subject="power_map",
-                 brain_mask=B0Mask(),
-                 mapping=SynMap(),
-                 profile_weights="gauss",
-                 bundle_info=None,
                  parallel_params={"engine": "serial"},
-                 scalars=["dti_fa", "dti_md"],
-                 virtual_frame_buffer=False,
-                 viz_backend="plotly_no_gif",
-                 tracking_params=None,
-                 segmentation_params=None,
-                 clean_params=None,
-                 bids_layout_kwargs={},
                  **kwargs):
         '''
         Initialize an AFQ object.
@@ -680,97 +229,8 @@ class AFQ(object):
                 and not isinstance(output_dir, str):
             raise TypeError(
                 "output_dir must be either a str or None")
-        if custom_tractography_bids_filters is not None\
-                and not isinstance(custom_tractography_bids_filters, dict):
-            raise TypeError(
-                "custom_tractography_bids_filters must be"
-                + " either a dict or None")
-        if not isinstance(b0_threshold, int):
-            raise TypeError("b0_threshold must be an int")
-        if not isinstance(robust_tensor_fitting, bool):
-            raise TypeError("robust_tensor_fitting must be a bool")
-        if min_bval is not None and not isinstance(min_bval, int):
-            raise TypeError("min_bval must be an int")
-        if max_bval is not None and not isinstance(max_bval, int):
-            raise TypeError("max_bval must be an int")
-        if not isinstance(reg_template, str)\
-                and not isinstance(reg_template, nib.Nifti1Image):
-            raise TypeError(
-                "reg_template must be a str or Nifti1Image")
-        if not isinstance(reg_subject, str)\
-            and not isinstance(reg_subject, nib.Nifti1Image)\
-                and not isinstance(reg_subject, dict):
-            raise TypeError(
-                "reg_subject must be a str, dict, or Nifti1Image")
-        if isinstance(reg_subject, str) and isinstance(reg_template, str)\
-                and (reg_subject.lower() == 'subject_sls'
-                     or reg_template.lower() == 'hcp_atlas'):
-            if reg_template.lower() != 'hcp_atlas':
-                raise TypeError(
-                    "If reg_subject is 'subject_sls',"
-                    + " reg_template must be 'hcp_atlas'")
-            if reg_subject.lower() != 'subject_sls':
-                raise TypeError(
-                    "If reg_template is 'hcp_atlas',"
-                    + " reg_subject must be 'subject_sls'")
-        if brain_mask is not None and not isinstance(
-                brain_mask, Definition):
-            raise TypeError(
-                "brain_mask must be None or a mask "
-                "defined in `AFQ.definitions.mask`")
-        if not isinstance(mapping, Definition):
-            raise TypeError(
-                "mapping must be a mapping defined"
-                + " in `AFQ.definitions.mapping`")
-        if not (profile_weights is None
-                or isinstance(profile_weights, str)
-                or callable(profile_weights)
-                or hasattr(profile_weights, "__len__")):
-            raise TypeError(
-                "profile_weights must be string, None, callable, or"
-                + "a 1D or 2D array")
-        if isinstance(profile_weights, str) and\
-                profile_weights != "gauss" and profile_weights != "median":
-            raise TypeError(
-                "if profile_weights is a string,"
-                + " it must be 'gauss' or 'median'")
-        if bundle_info is not None and not ((
-                isinstance(bundle_info, list)
-                and isinstance(bundle_info[0], str)) or (
-                    isinstance(bundle_info, dict)) or (
-                        isinstance(bundle_info, BundleDict))):
-            raise TypeError((
-                "bundle_info must be None, a list of strings,"
-                " a dict, or a BundleDict"))
         if not isinstance(parallel_params, dict):
             raise TypeError("parallel_params must be a dict")
-        if scalars is not None and not (
-                isinstance(scalars, list)
-                and (
-                    isinstance(scalars[0], str)
-                    or isinstance(scalars[0], Definition))):
-            raise TypeError(
-                "scalars must be None or a list of "
-                "strings/scalar definitions")
-        if not isinstance(virtual_frame_buffer, bool):
-            raise TypeError("virtual_frame_buffer must be a bool")
-        if "fury" not in viz_backend and "plotly" not in viz_backend:
-            raise TypeError(
-                "viz_backend must contain either 'fury' or 'plotly'")
-        if tracking_params is not None\
-                and not isinstance(tracking_params, dict):
-            raise TypeError(
-                "tracking_params must be None or a dict")
-        if segmentation_params is not None\
-                and not isinstance(segmentation_params, dict):
-            raise TypeError(
-                "segmentation_params must be None or a dict")
-        if clean_params is not None\
-                and not isinstance(clean_params, dict):
-            raise TypeError(
-                "clean_params must be None or a dict")
-        if not isinstance(bids_layout_kwargs, dict):
-            raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logging.getLogger('AFQ.api')
         self.parallel_params = parallel_params
@@ -779,105 +239,6 @@ class AFQ(object):
         # validate input and fail early
         if not op.exists(bids_path):
             raise ValueError(f'Unable to locate BIDS dataset in: {bids_path}')
-
-        self.max_bval = max_bval
-        self.min_bval = min_bval
-
-        self.reg_subject = reg_subject
-        self.reg_template = reg_template
-        if brain_mask is None:
-            self.brain_mask_definition = FullMask()
-            self.mask_template = False
-        else:
-            self.brain_mask_definition = brain_mask
-            self.mask_template = True
-        self.mapping_definition = mapping
-
-        self.b0_threshold = b0_threshold
-        self.robust_tensor_fitting = robust_tensor_fitting
-        self.custom_tractography_bids_filters =\
-            custom_tractography_bids_filters
-
-        self.scalars = []
-        for scalar in scalars:
-            if isinstance(scalar, str):
-                self.scalars.append(scalar.lower())
-            else:
-                self.scalars.append(scalar)
-
-        if virtual_frame_buffer:
-            from xvfbwrapper import Xvfb
-            self.vdisplay = Xvfb(width=1280, height=1280)
-            self.vdisplay.start()
-        self.viz = Viz(backend=viz_backend.lower())
-
-        best_scalar = self._get_best_scalar()
-        default_tracking_params = get_default_args(aft.track)
-        # Replace the defaults only for kwargs for which a non-default value
-        # was given:
-        if tracking_params is not None:
-            for k in tracking_params:
-                default_tracking_params[k] = tracking_params[k]
-
-        self.tracking_params = default_tracking_params
-        self.tracking_params["odf_model"] =\
-            self.tracking_params["odf_model"].upper()
-        if self.tracking_params["seed_mask"] is None:
-            self.tracking_params["seed_mask"] = ScalarMask(
-                best_scalar)
-            self.tracking_params["seed_threshold"] = 0.2
-        if self.tracking_params["stop_mask"] is None:
-            self.tracking_params["stop_mask"] = ScalarMask(
-                best_scalar)
-            self.tracking_params["stop_threshold"] = 0.2
-
-        default_seg_params = get_default_args(seg.Segmentation.__init__)
-        if segmentation_params is not None:
-            for k in segmentation_params:
-                default_seg_params[k] = segmentation_params[k]
-
-        self.segmentation_params = default_seg_params
-        self.seg_algo = self.segmentation_params["seg_algo"].lower()
-
-        default_clean_params = get_default_args(seg.clean_bundle)
-        if clean_params is not None:
-            for k in clean_params:
-                default_clean_params[k] = clean_params[k]
-
-        self.clean_params = default_clean_params
-        self.profile_weights = profile_weights
-        if isinstance(self.profile_weights, str):
-            self.profile_weights = self.profile_weights.lower()
-
-        if bundle_info is None:
-            if self.seg_algo == "reco" or self.seg_algo == "reco16":
-                bundle_info = RECO_BUNDLES_16
-            elif self.seg_algo == "reco80":
-                bundle_info = RECO_BUNDLES_80
-            else:
-                bundle_info = BUNDLES
-
-        # set reg_template and bundle_info:
-        self.reg_template_img = self.get_reg_template()
-        self.bundle_info = bundle_info
-        if isinstance(bundle_info, BundleDict):
-            self.bundle_dict = bundle_info
-        else:
-            self.bundle_dict = BundleDict(
-                bundle_info,
-                seg_algo=self.seg_algo,
-                resample_to=self.reg_template_img)
-
-        if not (isinstance(
-                self.segmentation_params["presegment_bundle_dict"],
-                BundleDict)
-                or self.segmentation_params["presegment_bundle_dict"]
-                is None):
-            self.segmentation_params["presegment_bundle_dict"] =\
-                BundleDict(
-                    self.segmentation_params["presegment_bundle_dict"],
-                    seg_algo="afq",
-                    resample_to=self.reg_template_img)
 
         # This is where all the outputs will go:
         if output_dir is None:
@@ -974,6 +335,7 @@ class AFQ(object):
         for subject in self.subjects:
             self.wf_dict[subject] = {}
             for session in self.sessions:
+                this_kwargs = kwargs.copy()
                 results_dir = op.join(self.afq_path, 'sub-' + subject)
 
                 if session is not None:
@@ -1014,8 +376,12 @@ class AFQ(object):
                 if suffix is not None:
                     bids_filters["suffix"] = suffix
 
-                if custom_tractography_bids_filters is not None:
-                    custom_tract_files = \
+                if "import_tract_definition" in kwargs:
+                    if not isinstance(kwargs["import_tract_definition"], dict):
+                        raise TypeError(
+                            "import_tract_definition must be"
+                            + " either a dict or None")
+                    this_kwargs["import_tract_path"] = \
                         bids_layout.get(subject=subject, session=session,
                                         extension=[
                                             '.trk',
@@ -1024,176 +390,95 @@ class AFQ(object):
                                             '.fib',
                                             '.dpy'],
                                         return_type='filename',
-                                        **custom_tractography_bids_filters)
-                    if len(custom_tract_files) < 1:
+                                        **kwargs["import_tract_definition"])
+                    if len(this_kwargs[
+                            "import_tract_path"]) < 1:
                         self.logger.warning(
                             f"No custom tractography found for subject "
                             f"{subject} and session "
                             f"{session}. Will perform tractography"
                             f" using built-in DIPY tractography.")
                         custom_tract_file = None
-                    elif len(custom_tract_files) > 1:
-                        custom_tract_file = custom_tract_files[0]
+                    elif len(this_kwargs[
+                            "import_tract_path"]) > 1:
+                        custom_tract_file = this_kwargs[
+                            "import_tract_path"][0]
                         self.logger.warning(
                             f"Multiple viable custom tractographies found for"
                             f" subject "
                             f"{subject} and session "
                             f"{session}. Will use: {custom_tract_file}")
                     else:
-                        custom_tract_file = custom_tract_files[0]
+                        custom_tract_file = this_kwargs[
+                            "import_tract_path"][0]
                 else:
                     custom_tract_file = None
 
-                if isinstance(self.reg_subject, dict):
-                    reg_subject_spec = \
-                        bids_layout.get(
-                            **self.reg_subject,
-                            session=session,
-                            subject=subject,
-                            return_type='filename'
-                        )[0]
-                else:
-                    reg_subject_spec = self.reg_subject
+                if "reg_subject" in kwargs and\
+                        isinstance(kwargs["kwargs"], dict):
+                    this_kwargs["reg_subject"] = bids_layout.get(
+                        **self.reg_subject,
+                        session=session,
+                        subject=subject,
+                        return_type='filename'
+                    )[0]
 
-                for scalar in self.scalars:
-                    if isinstance(scalar, Definition):
-                        scalar.find_path(
+                if "scalars" in kwargs:
+                    for scalar in kwargs["scalars"]:
+                        if isinstance(scalar, Definition):
+                            scalar.find_path(
+                                bids_layout,
+                                dwi_data_file,
+                                subject,
+                                session
+                            )
+
+                if "tracking_params" in kwargs:
+                    tracking_params = kwargs["tracking_params"]
+                    if "seed_mask" in tracking_params and isinstance(
+                            tracking_params["seed_mask"], Definition):
+                        tracking_params["seed_mask"].find_path(
                             bids_layout,
                             dwi_data_file,
                             subject,
                             session
                         )
 
-                if isinstance(
-                        self.tracking_params["seed_mask"], Definition):
-                    self.tracking_params["seed_mask"].find_path(
+                    if "stop_mask" in tracking_params and isinstance(
+                            tracking_params["stop_mask"], Definition):
+                        tracking_params["stop_mask"].find_path(
+                            bids_layout,
+                            dwi_data_file,
+                            subject,
+                            session
+                        )
+
+                if "brain_mask_definition" in kwargs:
+                    kwargs["brain_mask_definition"].find_path(
                         bids_layout,
                         dwi_data_file,
                         subject,
                         session
                     )
 
-                if isinstance(
-                        self.tracking_params["stop_mask"], Definition):
-                    self.tracking_params["stop_mask"].find_path(
+                if "mapping_definition" in kwargs:
+                    kwargs["mapping_definition"].find_path(
                         bids_layout,
                         dwi_data_file,
                         subject,
                         session
                     )
-
-                self.brain_mask_definition.find_path(
-                    bids_layout,
-                    dwi_data_file,
-                    subject,
-                    session
-                )
-
-                self.mapping_definition.find_path(
-                    bids_layout,
-                    dwi_data_file,
-                    subject,
-                    session
-                )
 
                 self.valid_sub_list.append(subject)
                 self.valid_ses_list.append(session)
 
-                img = nib.load(dwi_data_file)
-                subses_dict = {
-                    "ses": session,
-                    "subject": subject,
-                    "dwi_file": dwi_data_file,
-                    "results_dir": results_dir}
-
-                input_data = dict(
-                    subses_dict=subses_dict,
-                    dwi_img=img,
-                    dwi_affine=img.affine,
-                    bval_file=bval_file,
-                    bvec_file=bvec_file,
-                    b0_threshold=self.b0_threshold,
-                    min_bval=self.min_bval,
-                    max_bval=self.max_bval,
-                    brain_mask_definition=self.brain_mask_definition,
-                    custom_tract_file=custom_tract_file,
-                    reg_template=self.reg_template_img,
-                    reg_subject_spec=reg_subject_spec,
-                    bundle_dict=self.bundle_dict,
-                    scalars=self.scalars,
-                    mapping_definition=self.mapping_definition,
-                    robust_tensor_fitting=self.robust_tensor_fitting,
-                    profile_weights=self.profile_weights,
-                    viz_backend=self.viz,
-                    best_scalar=best_scalar,
-                    tracking_params=self.tracking_params,
-                    segmentation_params=self.segmentation_params,
-                    clean_params=self.clean_params,
-                    **kwargs)
-
-                # construct pimms plans
-                if isinstance(mapping, SlrMap):
-                    plans = {  # if using SLR map, do tractography first
-                        "data": get_data_plan(self.brain_mask_definition),
-                        "tractography": get_tractography_plan(
-                            custom_tract_file,
-                            self.tracking_params),
-                        "mapping": get_mapping_plan(
-                            self.reg_subject, self.scalars, use_sls=True),
-                        "segmentation": get_segmentation_plan(),
-                        "viz": get_viz_plan()}
-                else:
-                    plans = {  # Otherwise, do mapping first
-                        "data": get_data_plan(self.brain_mask_definition),
-                        "mapping": get_mapping_plan(
-                            self.reg_subject,
-                            self.scalars),
-                        "tractography": get_tractography_plan(
-                            custom_tract_file,
-                            self.tracking_params),
-                        "segmentation": get_segmentation_plan(),
-                        "viz": get_viz_plan()}
-
-                # chain together a complete plan from individual plans
-                previous_data = {}
-                for name, plan in plans.items():
-                    previous_data[f"{name}_imap"] = plan(
-                        **input_data,
-                        **previous_data)
-                    last_name = name
-
-                self.wf_dict[subject][str(session)] =\
-                    previous_data[f"{last_name}_imap"]
-
-    def _get_best_scalar(self):
-        for scalar in self.scalars:
-            if isinstance(scalar, str):
-                if "fa" in scalar:
-                    return scalar
-            else:
-                if "fa" in scalar.name:
-                    return scalar
-        return self.scalars[0]
-
-    def get_reg_template(self):
-        if isinstance(self.reg_template, nib.Nifti1Image):
-            return self.reg_template
-
-        img_l = self.reg_template.lower()
-        if img_l == "mni_t2":
-            img = afd.read_mni_template(
-                mask=self.mask_template, weight="T2w")
-        elif img_l == "mni_t1":
-            img = afd.read_mni_template(
-                mask=self.mask_template, weight="T1w")
-        elif img_l == "dti_fa_template":
-            img = afd.read_ukbb_fa_template(mask=self.mask_template)
-        elif img_l == "hcp_atlas":
-            img = afd.read_mni_template(mask=self.mask_template)
-        else:
-            img = nib.load(self.reg_template)
-
-        return img
+                this_pAFQ = ParticipantAFQ(
+                    session + "_" + subject,
+                    dwi_data_file,
+                    bval_file, bvec_file,
+                    results_dir,
+                    **this_kwargs)
+                self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
 
     def __getattribute__(self, attr):
         # check if normal attr exists first
@@ -1214,7 +499,7 @@ class AFQ(object):
             attr_name = attr_file
             section = None
         else:
-            for sub_attr in _sub_attrs:
+            for sub_attr in wf_sections:
                 if attr in first_dict[sub_attr]:
                     attr_name = attr
                     section = sub_attr
@@ -1504,9 +789,9 @@ for output, desc in task_outputs.items():
         return self.{output}"""))
     fn = locals()[f"export_{output}"]
     if output[-5:] == "_file":
-        setattr(AFQ, f"export_{output[:-5]}", fn)
+        setattr(ParticipantAFQ, f"export_{output[:-5]}", fn)
     else:
-        setattr(AFQ, f"export_{output}", fn)
+        setattr(ParticipantAFQ, f"export_{output}", fn)
 
 
 def download_and_combine_afq_profiles(bucket,

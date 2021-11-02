@@ -14,6 +14,9 @@ from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
 
+from AFQ.definitions.utils import Definition
+from AFQ.definitions.mask import FullMask, B0Mask
+
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
 from AFQ.models.dki import _fit as dki_fit_model
@@ -77,8 +80,8 @@ outputs = {
 
 
 @pimms.calc("data", "gtab", "img")
-def get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval,
-                  max_bval, filter_b=True):
+def get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None,
+                  max_bval=None, filter_b=True, b0_threshold=50):
     img = nib.load(subses_dict["dwi_file"])
     data = img.get_fdata()
     bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
@@ -137,7 +140,7 @@ def dti_fit(dti_params_file, gtab):
 @as_file(suffix='_model-DTI_diffmodel.nii.gz')
 @as_model
 def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
-        bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False):
+        bval_file, bvec_file, b0_threshold=50, robust_tensor_fitting=False):
     mask =\
         nib.load(brain_mask_file).get_fdata()
     if robust_tensor_fitting:
@@ -349,15 +352,47 @@ def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.ak
 
 
-def get_data_plan(brain_mask_definition):
+@pimms.calc("brain_mask_file")
+@as_file('_brain_mask.nii.gz')
+def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file):
+    return brain_mask_definition.get_brain_mask(
+        subses_dict, dwi_affine, b0_file)
+
+
+def get_data_plan(kwargs):
+    if "scalars" in kwargs and kwargs["scalars"] is not (
+            isinstance(kwargs["scalars"], list)
+            and (
+                isinstance(kwargs["scalars"][0], str)
+                or isinstance(kwargs["scalars"][0], Definition))):
+        raise TypeError(
+            "scalars a list of "
+            "strings/scalar definitions")
+    if "brain_mask_definition" in kwargs and\
+        kwargs["brain_mask_definition"] is not None and not isinstance(
+            kwargs["brain_mask_definition"], Definition):
+        raise TypeError(
+            "brain_mask must be None or a mask "
+            "defined in `AFQ.definitions.mask`")
+
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask,
         dti_fit, dki_fit, anisotropic_power_map,
         dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
         dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
         dti_params, dki_params, csd_params])
-    data_tasks["brain_mask_res"] = \
-        pimms.calc("brain_mask_file")(
-            as_file('_brain_mask.nii.gz')(
-                brain_mask_definition.get_mask_getter(in_data=True)))
+    if "brain_mask_definition" not in kwargs:
+        kwargs["brain_mask_definition"] = B0Mask()
+    if kwargs["brain_mask_definition"] is None:
+        kwargs["brain_mask_definition"] = FullMask()
+    if "scalars" not in kwargs:
+        kwargs["scalars"] = ["dti_fa", "dti_md"]
+    else:
+        scalars = []
+        for scalar in kwargs["scalars"]:
+            if isinstance(scalar, str):
+                scalars.append(scalar.lower())
+            else:
+                scalars.append(scalar)
+        kwargs["scalars"] = scalars
     return pimms.plan(**data_tasks)
