@@ -112,7 +112,7 @@ class MaskFile(Definition):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine):
             # Load data
@@ -131,6 +131,9 @@ class MaskFile(Definition):
             return mask_data, meta
         return mask_getter
 
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        return self.get_mask_getter()(subses_dict, dwi_affine)
+
 
 class FullMask(Definition):
     """
@@ -147,13 +150,16 @@ class FullMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine):
             return np.ones(nib.load(
                 subses_dict["dwi_file"]).get_fdata()[..., 0].shape),\
                 dict(source="Entire Volume")
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        return self.get_mask_getter()(subses_dict, dwi_affine)
 
 
 class RoiMask(Definition):
@@ -173,7 +179,7 @@ class RoiMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine, mapping_imap,
                         bundle_dict, segmentation_params):
@@ -200,6 +206,9 @@ class RoiMask(Definition):
             return mask_data, dict(source="ROIs")
         return mask_getter
 
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        raise ValueError("Brain mask should not be made from waypoint ROIs")
+
 
 class B0Mask(Definition):
     """
@@ -223,28 +232,26 @@ class B0Mask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
-        if in_data:
-            @as_img
-            def mask_getter(subses_dict, dwi_affine, b0_file):
-                mean_b0_img = nib.load(b0_file)
-                mean_b0 = mean_b0_img.get_fdata()
-                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-                return mask_data, dict(
-                    source=b0_file,
-                    technique="median_otsu applied to b0",
-                    median_otsu_kwargs=self.median_otsu_kwargs)
-        else:
-            @as_img
-            def mask_getter(subses_dict, dwi_affine, data_imap):
-                mean_b0_img = nib.load(data_imap["b0_file"])
-                mean_b0 = mean_b0_img.get_fdata()
-                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-                return mask_data, dict(
-                    source=data_imap["b0_file"],
-                    technique="median_otsu applied to b0",
-                    median_otsu_kwargs=self.median_otsu_kwargs)
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, data_imap):
+            mean_b0_img = nib.load(data_imap["b0_file"])
+            mean_b0 = mean_b0_img.get_fdata()
+            _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+            return mask_data, dict(
+                source=data_imap["b0_file"],
+                technique="median_otsu applied to b0",
+                median_otsu_kwargs=self.median_otsu_kwargs)
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        mean_b0_img = nib.load(b0_file)
+        mean_b0 = mean_b0_img.get_fdata()
+        _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+        return nib.Nifti1Image(mask_data, mean_b0_img.affine), dict(
+            source=b0_file,
+            technique="median_otsu applied to b0",
+            median_otsu_kwargs=self.median_otsu_kwargs)
 
 
 class LabelledMaskFile(MaskFile, CombineMaskMixin):
@@ -402,16 +409,16 @@ class ScalarMask(Definition):
         pass
 
     # overrides MaskFile
-    def get_mask_getter(self, in_data=False):
-        if in_data:
-            raise ValueError(
-                "Brain mask cannot be a built-in scalar, "
-                + "because the brain mask is used to calculate scalars")
-
+    def get_mask_getter(self):
         def mask_getter(subses_dict, dwi_affine, data_imap):
             scalar_file = data_imap[self.scalar + "_file"]
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        raise ValueError(
+            "Brain mask cannot be a built-in scalar, "
+            + "because the brain mask is used to calculate scalars")
 
 
 class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
@@ -495,6 +502,8 @@ class PFTMask(Definition):
             probseg_funcs.append(probseg.get_mask_getter())
         return probseg_funcs
 
+    def get_brain_mask(self, subses_dict, dwi_affine, b0_file):
+        raise ValueError("Brain mask should not be made from PFT Mask")
 
 # class CombinedMask(Definition, CombineMaskMixin):
 #     """  # TODO: can this be done in current system?
