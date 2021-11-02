@@ -61,7 +61,7 @@ class FnirtMap(Definition):
         "MNI",
         {"scope": "TBSS"},
         {"scope": "TBSS"})
-    api.AFQ(mapping=fnirt_map)
+    api.GroupAFQ(mapping=fnirt_map)
     """
 
     def __init__(self, warp_suffix, space_suffix,
@@ -130,7 +130,7 @@ class IdentityMap(Definition):
     Examples
     --------
     my_example_mapping = IdentityMap()
-    api.AFQ(mapping=my_example_mapping)
+    api.GroupAFQ(mapping=my_example_mapping)
     """
 
     def __init__(self):
@@ -172,7 +172,7 @@ class ItkMap(Definition):
         {"scope": "qsiprep",
         "from": "MNI152NLin2009cAsym",
         "to": "T1w"})
-    api.AFQ(mapping=itk_map)
+    api.GroupAFQ(mapping=itk_map)
     """
 
     def __init__(self, warp_suffix, warp_filters={}):
@@ -315,7 +315,7 @@ class SynMap(GeneratedMapMixin, Definition):
         Default: {}
     Examples
     --------
-    api.AFQ(mapping=SynMap())
+    api.GroupAFQ(mapping=SynMap())
     """
 
     def __init__(self, use_prealign=True, affine_kwargs={}, syn_kwargs={}):
@@ -354,7 +354,7 @@ class SlrMap(GeneratedMapMixin, Definition):
 
     Examples
     --------
-    api.AFQ(mapping=SlrMap())
+    api.GroupAFQ(mapping=SlrMap())
     """
 
     def __init__(self, slr_kwargs={}):
@@ -388,7 +388,7 @@ class AffMap(GeneratedMapMixin, Definition):
 
     Examples
     --------
-    api.AFQ(mapping=AffMap())
+    api.GroupAFQ(mapping=AffMap())
     """
 
     def __init__(self, affine_kwargs={}):

@@ -87,7 +87,7 @@ Here is an example of using the :class:`AFQ.definitions.mask.RoiMask` and :class
 data with the AFQ object::
 
     from AFQ.data import fetch_hcp
-    import AFQ.api as api
+    import AFQ.api.group as api
     import AFQ.definitions.mask as afm
 
     # Download a subject to the AWS Batch machine from s3
@@ -108,7 +108,7 @@ data with the AFQ object::
         'seg', {'scope': 'dmriprep'}, exclusive_labels=[0])
 
     # define the api AFQ object
-    myafq = api.AFQ(
+    myafq = api.GroupAFQ(
         hcp_bids,
         brain_mask=brain_mask,
         tracking_params=tracking_params)

@@ -360,13 +360,13 @@ def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file):
 
 
 def get_data_plan(kwargs):
-    if "scalars" in kwargs and kwargs["scalars"] is not (
+    if "scalars" in kwargs and not (
             isinstance(kwargs["scalars"], list)
             and (
                 isinstance(kwargs["scalars"][0], str)
                 or isinstance(kwargs["scalars"][0], Definition))):
         raise TypeError(
-            "scalars a list of "
+            "scalars must be a list of "
             "strings/scalar definitions")
     if "brain_mask_definition" in kwargs and\
         kwargs["brain_mask_definition"] is not None and not isinstance(
@@ -376,7 +376,7 @@ def get_data_plan(kwargs):
             "defined in `AFQ.definitions.mask`")
 
     data_tasks = with_name([
-        get_data_gtab, b0, b0_mask,
+        get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, anisotropic_power_map,
         dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
         dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,

@@ -84,7 +84,7 @@ class MaskFile(Definition):
     seed_mask = MaskFile(
         "WM_mask",
         {"scope":"dmriprep"})
-    api.AFQ(tracking_params={"seed_mask": seed_mask,
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask,
                                 "seed_threshold": 0.1})
     """
 
@@ -169,7 +169,7 @@ class RoiMask(Definition):
     Examples
     --------
     seed_mask = RoiMask()
-    api.AFQ(tracking_params={"seed_mask": seed_mask})
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
     def __init__(self, use_presegment=False):
@@ -223,7 +223,7 @@ class B0Mask(Definition):
     Examples
     --------
     brain_mask = B0Mask()
-    api.AFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask=brain_mask)
     """
 
     def __init__(self, median_otsu_kwargs={}):
@@ -288,7 +288,7 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
         "aseg",
         {"scope": "dmriprep"},
         exclusive_labels=[0])
-    api.AFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask=brain_mask)
     """
 
     def __init__(self, suffix, filters={}, inclusive_labels=None,
@@ -352,7 +352,7 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
         "brain_mask",
         {"scope":"dmriprep"},
         lower_bound=0.1)
-    api.AFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask=brain_mask)
     """
 
     def __init__(self, suffix, filters={}, lower_bound=None,
@@ -397,7 +397,7 @@ class ScalarMask(Definition):
     seed_mask = ScalarMask(
         "dti_fa",
         scope="dmriprep")
-    api.AFQ(tracking_params={
+    api.GroupAFQ(tracking_params={
         "seed_mask": seed_mask,
         "seed_threshold": 0.2})
     """
@@ -452,7 +452,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
     seed_mask = ThresholdedScalarMask(
         "dti_fa",
         lower_bound=0.2)
-    api.AFQ(tracking_params={"seed_mask": seed_mask})
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
     def __init__(self, scalar, lower_bound=None, upper_bound=None,
@@ -483,7 +483,7 @@ class PFTMask(Definition):
         afm.MaskFile("WMprobseg"),
         afm.MaskFile("GMprobseg"),
         afm.MaskFile("CSFprobseg"))
-    api.AFQ(tracking_params={
+    api.GroupAFQ(tracking_params={
         "stop_mask": stop_mask,
         "stop_threshold": "CMC",
         "tracker": "pft"})
@@ -530,7 +530,7 @@ class PFTMask(Definition):
 #         ThresholdedScalarMask(
 #             "dti_md",
 #             upper_bound=0.002)])
-#     api.AFQ(tracking_params={"seed_mask": seed_mask})
+#     api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
 #     """
 
 #     def __init__(self, mask_list, combine="and"):

@@ -9,7 +9,7 @@ import os.path as op
 
 import plotly
 
-from AFQ import api
+import AFQ.api.group as api
 from AFQ.definitions.mask import RoiMask
 import AFQ.data as afd
 
@@ -46,7 +46,7 @@ tracking_params = dict(seed_mask=RoiMask(),
 # instead. This would tell the AFQ object to use bundles from both
 # the standard and callosal templates.
 
-myafq = api.AFQ(bids_path=op.join(afd.afq_home,
+myafq = api.GroupAFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 preproc_pipeline='vistasoft',
                 bundle_info=api.CALLOSUM_BUNDLES,

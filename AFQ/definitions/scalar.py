@@ -58,7 +58,7 @@ class ScalarFile(MaskFile):
         "my_scalar",
         "scalarSuffix",
         {"scope": "dmriprep"})
-    api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
+    api.GroupAFQ(scalars=["dti_fa", "dti_md", my_scalar])
     """
 
     def __init__(self, name, suffix, filters={}):
@@ -85,7 +85,7 @@ class TemplateScalar(ScalarMixin, Definition):
     --------
     my_scalar = TemplateScalar(
         "my_scalar", "path/to/my_scalar_in_MNI.nii.gz")
-    api.AFQ(scalars=["dti_fa", "dti_md", my_scalar])
+    api.GroupAFQ(scalars=["dti_fa", "dti_md", my_scalar])
     """
 
     def __init__(self, name, path):

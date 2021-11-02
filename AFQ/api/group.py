@@ -18,7 +18,7 @@ from dipy.io.streamline import load_tractogram
 import dipy.tracking.streamlinespeed as dps
 import dipy.tracking.streamline as dts
 
-from .version import version as pyafq_version
+from AFQ.version import version as pyafq_version
 import pandas as pd
 import numpy as np
 import os
@@ -209,7 +209,7 @@ class GroupAFQ(object):
             [KWARGS] You can set additional parameters for any step
             of the process.
             For example, to set the sh_order for csd to 4, do:
-            api.AFQ(my_path, sh_order=4)
+            api.GroupAFQ(my_path, sh_order=4)
         '''
         if not isinstance(bids_path, str):
             raise TypeError("bids_path must be a string")

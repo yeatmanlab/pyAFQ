@@ -37,20 +37,6 @@ class ParticipantAFQ(object):
             raise TypeError(
                 "id must be a str")
 
-        img = nib.load(dwi_data_file)
-        subses_dict = {
-            "id": id,
-            "dwi_file": dwi_data_file,
-            "results_dir": output_dir}
-
-        input_data = dict(
-            subses_dict=subses_dict,
-            dwi_img=img,
-            dwi_affine=img.affine,
-            bval_file=bval_file,
-            bvec_file=bvec_file,
-            **kwargs)
-
         # construct pimms plans
         if "mapping" in kwargs and isinstance(kwargs["mapping"], SlrMap):
             plans = {  # if using SLR map, do tractography first
@@ -66,6 +52,20 @@ class ParticipantAFQ(object):
                 "tractography": get_tractography_plan(kwargs),
                 "segmentation": get_segmentation_plan(kwargs),
                 "viz": get_viz_plan(kwargs)}
+
+        img = nib.load(dwi_data_file)
+        subses_dict = {
+            "id": id,
+            "dwi_file": dwi_data_file,
+            "results_dir": output_dir}
+
+        input_data = dict(
+            subses_dict=subses_dict,
+            dwi_img=img,
+            dwi_affine=img.affine,
+            bval_file=bval_file,
+            bvec_file=bvec_file,
+            **kwargs)
 
         # chain together a complete plan from individual plans
         previous_data = {}

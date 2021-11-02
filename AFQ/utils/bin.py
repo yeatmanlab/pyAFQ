@@ -179,10 +179,10 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     if func_dict is None:
         import AFQ.segmentation as seg
         import AFQ.tractography as aft
-        import AFQ.api as api
+        import AFQ.api.group as api
 
         func_dict = {
-            "AFQ": api.AFQ.__init__,
+            "AFQ": api.GroupAFQ.__init__,
             "Tractography": aft.track,
             "Segmentation": seg.Segmentation.__init__,
             "Cleaning": seg.clean_bundle}
@@ -237,7 +237,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          special_args={"CLEANING": "clean_params",
                                        "SEGMENTATION": "segmentation_params",
                                        "TRACTOGRAPHY": "tracking_params"}):
-    import AFQ.api as api
+    import AFQ.api.group as api
     from AFQ import __version__
     # load configuration file
     if not op.exists(toml_file):
@@ -300,7 +300,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
 
-    myafq = api.AFQ(bids_path, **kwargs)
+    myafq = api.GroupAFQ(bids_path, **kwargs)
 
     # call user specified function:
     getattr(myafq, to_call)()

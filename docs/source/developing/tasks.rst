@@ -15,12 +15,12 @@ to add new functionality to the pyAFQ workflow, first decide which file to
 put it in. Try to keep similar functionality in the same file. All tasks are
 decorated with `@pimms.calc("output_name")`, where `output_name` is used as
 input to other tasks and can be accessed by the user through the
-:class:`AFQ.api.AFQ` object.
+:class:`AFQ.api.GroupAFQ` object.
 
-When a user instantiates an :class:`AFQ.api.AFQ` object, a Pimms plan is
+When a user instantiates an :class:`AFQ.api.GroupAFQ` object, a Pimms plan is
 created using a selection of tasks based on the configuration provided by
 the user. Each task file has a `get_{task filename}_plan` method which is
-called by the :class:`AFQ.api.AFQ` class (for example, in AFQ.tasks.data
+called by the :class:`AFQ.api.GroupAFQ` class (for example, in AFQ.tasks.data
 there is: :func:`AFQ.tasks.data.get_data_plan`). This method uses the user's
 configuration choices (which it takes as input) to construct a Pimms plan
 from the tasks in the file. In most cases, new tasks can simply be added to
@@ -94,5 +94,5 @@ This is what you must do each time you add a task to the workflow:
 #. Add outputs of the task to the `outputs` variable in its task file.
 
 In most cases, you should only have to edit the tasks file which you are adding to.
-The API (:class:`AFQ.api.AFQ`) automatically reads these files to construct its
+The API (:class:`AFQ.api.GroupAFQ`) automatically reads these files to construct its
 workflow.

@@ -1,14 +1,14 @@
 Adding Definitions 
 ~~~~~~~~~~~~~~~~~~
 pyAFQ uses definitions to allow users to customize the mappings, masks,
-etc. used by the :class:`AFQ.api.AFQ` object. All definitions ultimately
+etc. used by the :class:`AFQ.api.GroupAFQ` object. All definitions ultimately
 inherit from :class:`AFQ.definitions.utils.Definition`. For a given subject and
 session within the API, a definition is used to create a given mask, map, etc.
 `Definition`-inherited classes must have three methods: `__init__`, `find_path`, and `get_for_subses`.
 The requirements of each of these methods are described below:
 
 - `Definition`-inherited classes have an `__init__` method which the users uses to configure
-  the the definition for a given instance of the :class:`AFQ.api.AFQ` object.
+  the the definition for a given instance of the :class:`AFQ.api.GroupAFQ` object.
   These `__init__` methods must be thoroughly
   documented as they are what the user interacts with. The class must have attributes
   of same name as the `__init__` args. This is important for reading/writing
@@ -16,15 +16,15 @@ The requirements of each of these methods are described below:
   For scalar definitions, each class should have a `name` parameter (see
   :class:`AFQ.definitions.scalar.ScalarFile` source for an example). 
 
-- The api calls `find_path` during the :class:`AFQ.api.AFQ` object initialization to
+- The api calls `find_path` during the :class:`AFQ.api.GroupAFQ` object initialization to
   let the definition find relevant files for the given subject and session. All `find_path`
   methods have the same input: `bids_layout`, `from_path`, `subject`, `session`. See
   :func:`AFQ.definitions.mask.MaskFile.find_path` for a basic example.
-  If your definition does not need to run anything during :class:`AFQ.api.AFQ`
+  If your definition does not need to run anything during :class:`AFQ.api.GroupAFQ`
   object initialization, simply override this method with a method that only
   passes (see :func:`AFQ.definitions.mask.FullMask.find_path` source for an example.)
 
-- The :class:`AFQ.api.AFQ` object calls `get_for_subses` to get the mask, map,
+- The :class:`AFQ.api.GroupAFQ` object calls `get_for_subses` to get the mask, map,
   etc. during workflow construction or execution. The form of this method varies significantly
   between mapping, scalar, and mask `Definition`-inherited classes. In
   mask `Definition`-inherited classes, `get_mask_getter` takes two arguments:

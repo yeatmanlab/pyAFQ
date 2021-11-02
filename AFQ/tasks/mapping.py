@@ -94,7 +94,7 @@ def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
 @pimms.calc("mapping")
 def mapping(subses_dict, reg_subject, reg_template,
             mapping_definition=SynMap()):
-    if not isinstance(mapping, Definition):
+    if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
@@ -105,7 +105,7 @@ def mapping(subses_dict, reg_subject, reg_template,
 @pimms.calc("mapping")
 def sls_mapping(subses_dict, reg_subject, reg_template,
                 tractography_imap, mapping_definition=SynMap()):
-    if not isinstance(mapping, Definition):
+    if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
@@ -193,9 +193,11 @@ def get_mapping_plan(kwargs, use_sls=False):
                 "If reg_template is 'hcp_atlas',"
                 + " reg_subject must be 'subject_sls'")
 
-    seg_algo = kwargs.get(kwargs["segmentation_params"], None)
+    seg_algo = kwargs.get("segmentation_params", None)
     if seg_algo is not None:
-        seg_algo = kwargs.get(kwargs["seg_algo"], None)
+        seg_algo = kwargs.get("seg_algo", None)
+    if seg_algo is None:
+        seg_algo = "AFQ"
 
     if "bundle_info" in kwargs and not ((
             isinstance(kwargs["bundle_info"], list)
