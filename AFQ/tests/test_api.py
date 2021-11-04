@@ -524,7 +524,7 @@ def test_AFQ_slr():
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
     bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.img["01"])
+        tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CST_L']) > 0)
 
 
@@ -544,7 +544,7 @@ def test_AFQ_reco():
             'rng': 42})
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.img["01"])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
     myafq.export_all()
 
@@ -584,7 +584,7 @@ def test_AFQ_reco80():
             'rng': 42})
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict, myafq.img["01"])
+    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
 
 
@@ -769,7 +769,7 @@ def test_AFQ_data_waypoint():
     tgram = load_tractogram(myafq.bundles["01"], myafq.img["01"])
 
     bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.img["01"])
+        tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
@@ -846,7 +846,7 @@ def test_AFQ_data_waypoint():
     del myafq
     gc.collect()
 
-    cmd = "pyAFQ " + config_file
+    cmd = "pyAFQ -v " + config_file
     completed_process = subprocess.run(
         cmd, shell=True, capture_output=True)
     if completed_process.returncode != 0:

@@ -473,7 +473,6 @@ class GroupAFQ(object):
                 self.valid_ses_list.append(session)
 
                 this_pAFQ = ParticipantAFQ(
-                    session + "_" + subject,
                     dwi_data_file,
                     bval_file, bvec_file,
                     results_dir,
@@ -592,15 +591,20 @@ class GroupAFQ(object):
                     Space.VOX)
                 subses_info.append((this_sft, this_img, this_mapping))
 
+            bundle_dict = self.bundle_dict[
+                self.valid_sub_list[0]]
+            if len(self.sessions) > 1:
+                bundle_dict = bundle_dict[self.valid_ses_list[0]]
+
             sls_dict = {}
             load_next_subject()  # load first subject
-            for b in self.bundle_dict.keys():
+            for b in bundle_dict.keys():
                 if b != "whole_brain":
                     for i in range(len(self.valid_sub_list)):
                         sft, img, mapping = subses_info[i]
                         idx = np.where(
                             sft.data_per_streamline['bundle']
-                            == self.bundle_dict[b]['uid'])[0]
+                            == bundle_dict[b]['uid'])[0]
                         # use the first subses that works
                         # otherwise try each successive subses
                         if len(idx) == 0:
@@ -664,6 +668,12 @@ class GroupAFQ(object):
             Default: True
         """
         start_time = time()
+        seg_params = self.segmentation_params[
+            self.valid_sub_list[0]]
+        if len(self.sessions) > 1:
+            seg_params = seg_params[self.valid_ses_list[0]]
+        seg_algo = seg_params.get("seg_algo", "AFQ")
+
         if xforms:
             if not isinstance(self.mapping_definition, FnirtMap)\
                     and not isinstance(self.mapping_definition, ItkMap):
@@ -671,7 +681,7 @@ class GroupAFQ(object):
             self.template_xform
         if indiv:
             self.indiv_bundles
-            if self.seg_algo == "afq":
+            if seg_algo == "AFQ":
                 self.rois
         self.sl_counts
         self.profiles
@@ -689,7 +699,7 @@ class GroupAFQ(object):
                 else:
                     self.logger.warning(plotly_err_message)
             self.all_bundles_figure
-            if self.seg_algo == "afq":
+            if seg_algo == "AFQ":
                 self.indiv_bundles_figures
         if afqbrowser:
             self.assemble_AFQ_browser()
@@ -789,9 +799,9 @@ for output, desc in task_outputs.items():
         return self.{output}"""))
     fn = locals()[f"export_{output}"]
     if output[-5:] == "_file":
-        setattr(ParticipantAFQ, f"export_{output[:-5]}", fn)
+        setattr(GroupAFQ, f"export_{output[:-5]}", fn)
     else:
-        setattr(ParticipantAFQ, f"export_{output}", fn)
+        setattr(GroupAFQ, f"export_{output}", fn)
 
 
 def download_and_combine_afq_profiles(bucket,

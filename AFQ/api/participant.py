@@ -16,7 +16,6 @@ __all__ = ["ParticipantAFQ"]
 
 class ParticipantAFQ(object):
     def __init__(self,
-                 id,
                  dwi_data_file,
                  bval_file, bvec_file,
                  output_dir,
@@ -33,9 +32,6 @@ class ParticipantAFQ(object):
         if not isinstance(bvec_file, str):
             raise TypeError(
                 "bvec_file must be a str")
-        if not isinstance(id, str):
-            raise TypeError(
-                "id must be a str")
 
         # construct pimms plans
         if "mapping" in kwargs and isinstance(kwargs["mapping"], SlrMap):
@@ -55,7 +51,6 @@ class ParticipantAFQ(object):
 
         img = nib.load(dwi_data_file)
         subses_dict = {
-            "id": id,
             "dwi_file": dwi_data_file,
             "results_dir": output_dir}
 

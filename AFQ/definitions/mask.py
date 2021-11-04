@@ -248,10 +248,11 @@ class B0Mask(Definition):
         mean_b0_img = nib.load(b0_file)
         mean_b0 = mean_b0_img.get_fdata()
         _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-        return nib.Nifti1Image(mask_data, mean_b0_img.affine), dict(
-            source=b0_file,
-            technique="median_otsu applied to b0",
-            median_otsu_kwargs=self.median_otsu_kwargs)
+        return nib.Nifti1Image(
+            mask_data.astype(int), mean_b0_img.affine), dict(
+                source=b0_file,
+                technique="median_otsu applied to b0",
+                median_otsu_kwargs=self.median_otsu_kwargs)
 
 
 class LabelledMaskFile(MaskFile, CombineMaskMixin):

@@ -118,7 +118,7 @@ def get_tractography_plan(kwargs):
         tractography_tasks["streamlines_res"] = custom_tractography
 
     # determine reasonable defaults
-    best_scalar = None
+    best_scalar = kwargs["scalars"][0]
     for scalar in kwargs["scalars"]:
         if isinstance(scalar, str):
             if "fa" in scalar:
@@ -128,12 +128,13 @@ def get_tractography_plan(kwargs):
             if "fa" in scalar.name:
                 best_scalar = scalar
                 break
+    kwargs["best_scalar"] = best_scalar
 
     default_tracking_params = get_default_args(aft.track)
     default_tracking_params["seed_mask"] = ScalarMask(
-        best_scalar)
+        kwargs["best_scalar"])
     default_tracking_params["stop_mask"] = ScalarMask(
-        best_scalar)
+        kwargs["best_scalar"])
     default_tracking_params["seed_threshold"] = 0.2
     default_tracking_params["stop_threshold"] = 0.2
 

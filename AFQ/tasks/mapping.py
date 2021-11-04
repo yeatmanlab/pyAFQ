@@ -193,11 +193,9 @@ def get_mapping_plan(kwargs, use_sls=False):
                 "If reg_template is 'hcp_atlas',"
                 + " reg_subject must be 'subject_sls'")
 
-    seg_algo = kwargs.get("segmentation_params", None)
-    if seg_algo is not None:
-        seg_algo = kwargs.get("seg_algo", None)
-    if seg_algo is None:
-        seg_algo = "AFQ"
+    if "segmentation_params" not in kwargs:
+        kwargs["segmentation_params"] = {}
+    kwargs["seg_algo"] = kwargs["segmentation_params"].get("seg_algo", "AFQ")
 
     if "bundle_info" in kwargs and not ((
             isinstance(kwargs["bundle_info"], list)
@@ -209,9 +207,9 @@ def get_mapping_plan(kwargs, use_sls=False):
             " a dict, or a BundleDict"))
 
     if "bundle_info" not in kwargs:
-        if seg_algo == "reco" or seg_algo == "reco16":
+        if kwargs["seg_algo"] == "reco" or kwargs["seg_algo"] == "reco16":
             kwargs["bundle_info"] = abd.RECO_BUNDLES_16
-        elif seg_algo == "reco80":
+        elif kwargs["seg_algo"] == "reco80":
             kwargs["bundle_info"] = abd.RECO_BUNDLES_80
         else:
             kwargs["bundle_info"] = abd.BUNDLES
@@ -225,7 +223,7 @@ def get_mapping_plan(kwargs, use_sls=False):
     else:
         kwargs["bundle_dict"] = abd.BundleDict(
             kwargs["bundle_info"],
-            seg_algo=seg_algo,
+            seg_algo=kwargs["seg_algo"],
             resample_to=kwargs["reg_template"])
 
     # add custom scalars

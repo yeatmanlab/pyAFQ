@@ -162,7 +162,9 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict,
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                    reg_template, bundle_dict, tracking_params,
                    segmentation_params):
-    if "presegment_bundle_dict" in segmentation_params and not isinstance(
+    if "presegment_bundle_dict" in segmentation_params and\
+        segmentation_params["presegment_bundle_dict"] is not None\
+        and not isinstance(
             segmentation_params["presegment_bundle_dict"],
             abd.BundleDict):
         segmentation_params["presegment_bundle_dict"] =\
