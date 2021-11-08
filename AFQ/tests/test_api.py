@@ -26,6 +26,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.testing.decorators import xvfb_it
 
 import AFQ.api.group as api
+import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
@@ -182,12 +183,12 @@ def test_BundleDict():
     """
 
     # test defaults
-    afq_bundles = api.BundleDict()
+    afq_bundles = abd.BundleDict()
 
     # bundles restricted within hemisphere
     # NOTE: FA and FP cross midline so are removed
     # NOTE: all others generate two bundles
-    num_hemi_bundles = (len(api.BUNDLES)-2)*2
+    num_hemi_bundles = (len(abd.BUNDLES)-2)*2
 
     # bundles that cross the midline
     num_whole_bundles = 2
@@ -195,24 +196,24 @@ def test_BundleDict():
     assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
 
     # Arcuate Fasciculus
-    afq_bundles = api.BundleDict(["ARC"])
+    afq_bundles = abd.BundleDict(["ARC"])
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = api.BundleDict(["FA"])
+    afq_bundles = abd.BundleDict(["FA"])
 
     assert len(afq_bundles) == 1
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = api.BundleDict(["HCC"])
+    afq_bundles = abd.BundleDict(["HCC"])
 
     assert len(afq_bundles) == 2
 
     # Test "custom" bundle
     afq_templates = afd.read_templates()
-    afq_bundles = api.BundleDict({
+    afq_bundles = abd.BundleDict({
         "custom_bundle": {
             "ROIs": [afq_templates["FA_L"],
                      afq_templates["FP_R"]],
@@ -228,13 +229,13 @@ def test_BundleDict():
     with pytest.raises(
             ValueError,
             match="VOF_R is not in AFQ templates"):
-        afq_bundles = api.BundleDict(["VOF"])
+        afq_bundles = abd.BundleDict(["VOF"])
         afq_bundles["VOF_R"]
 
-    afq_bundles = api.BundleDict(["VOF"], seg_algo="reco80")
+    afq_bundles = abd.BundleDict(["VOF"], seg_algo="reco80")
     assert len(afq_bundles) == 2
 
-    afq_bundles = api.BundleDict(["whole_brain"], seg_algo="reco80")
+    afq_bundles = abd.BundleDict(["whole_brain"], seg_algo="reco80")
     assert len(afq_bundles) == 1
 
 
@@ -407,7 +408,7 @@ def test_AFQ_init():
 
 def test_AFQ_custom_bundle_dict():
     bids_path = create_dummy_bids_path(3, 1)
-    bundle_dict = api.BundleDict()
+    bundle_dict = abd.BundleDict()
     api.GroupAFQ(
         bids_path,
         preproc_pipeline="synthetic",

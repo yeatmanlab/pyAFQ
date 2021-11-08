@@ -34,6 +34,7 @@ import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
 import AFQ.api.group as api
+import AFQ.api.bundle_dict as abd
 
 # Target directory for this example's output files
 working_dir = "./recobundles"
@@ -83,7 +84,7 @@ else:
 
 
 bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
-bundles = api.BundleDict(bundle_names, seg_algo="reco80")
+bundles = abd.BundleDict(bundle_names, seg_algo="reco80")
 
 print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):

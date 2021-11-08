@@ -21,7 +21,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.align import affine_registration
 
-import AFQ.api.group as api
+import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
@@ -109,7 +109,7 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = api.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
+bundles = abd.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
 
 
 ##########################################################################

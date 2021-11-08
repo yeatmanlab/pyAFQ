@@ -14,6 +14,7 @@ provide these ROIs as part of the software.
 
 import os.path as op
 import AFQ.api.group as api
+import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 from AFQ.definitions.mask import LabelledMaskFile, RoiMask
 
@@ -21,7 +22,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 
 or_rois = afd.read_or_templates()
 
-bundles = api.BundleDict({
+bundles = abd.BundleDict({
     "L_OR": {
         "ROIs": [or_rois["left_OR_1"],
                  or_rois["left_OR_2"],
