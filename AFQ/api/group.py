@@ -381,7 +381,7 @@ class GroupAFQ(object):
                         raise TypeError(
                             "import_tract_definition must be"
                             + " either a dict or None")
-                    this_kwargs["import_tract_path"] = \
+                    this_kwargs["import_tract"] = \
                         bids_layout.get(subject=subject, session=session,
                                         extension=[
                                             '.trk',
@@ -392,7 +392,7 @@ class GroupAFQ(object):
                                         return_type='filename',
                                         **kwargs["import_tract_definition"])
                     if len(this_kwargs[
-                            "import_tract_path"]) < 1:
+                            "import_tract"]) < 1:
                         self.logger.warning(
                             f"No custom tractography found for subject "
                             f"{subject} and session "
@@ -400,9 +400,9 @@ class GroupAFQ(object):
                             f" using built-in DIPY tractography.")
                         custom_tract_file = None
                     elif len(this_kwargs[
-                            "import_tract_path"]) > 1:
+                            "import_tract"]) > 1:
                         custom_tract_file = this_kwargs[
-                            "import_tract_path"][0]
+                            "import_tract"][0]
                         self.logger.warning(
                             f"Multiple viable custom tractographies found for"
                             f" subject "
@@ -410,7 +410,7 @@ class GroupAFQ(object):
                             f"{session}. Will use: {custom_tract_file}")
                     else:
                         custom_tract_file = this_kwargs[
-                            "import_tract_path"][0]
+                            "import_tract"][0]
                 else:
                     custom_tract_file = None
 

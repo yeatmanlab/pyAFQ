@@ -96,8 +96,8 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
 
 
 @pimms.calc("streamlines_file")
-def custom_tractography(import_tract_path):
-    return import_tract_path
+def custom_tractography(import_tract):
+    return import_tract
 
 
 def get_tractography_plan(kwargs):
@@ -105,16 +105,16 @@ def get_tractography_plan(kwargs):
             and not isinstance(kwargs["tracking_params"], dict):
         raise TypeError(
             "tracking_params a dict")
-    if "import_tract_path" in kwargs\
-            and not isinstance(kwargs["import_tract_path"], str):
+    if "import_tract" in kwargs\
+            and not isinstance(kwargs["import_tract"], str):
         raise TypeError(
-            "import_tract_path must be a str")
+            "import_tract must be a str")
 
     tractography_tasks = with_name([
         export_seed_mask, export_stop_mask, streamlines])
 
     # use imported tractography if given
-    if "import_tract_path" in kwargs:
+    if "import_tract" in kwargs:
         tractography_tasks["streamlines_res"] = custom_tractography
 
     # determine reasonable defaults

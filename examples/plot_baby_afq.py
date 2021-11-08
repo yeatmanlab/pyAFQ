@@ -58,8 +58,8 @@ myafq = api.GroupAFQ(  # ==== BIDS parameters ====
                 reg_template=afd.read_pediatric_templates(
                 )["UNCNeo-withCerebellum-for-babyAFQ"],
                 reg_subject="b0",
-                brain_mask=MaskFile("brainmask",
-                                    {"scope": "derivatives"}),
+                brain_mask_definition=MaskFile(
+                  "brainmask", {"scope": "derivatives"}),
                 # ==== Bundle parameters ====
                 bundle_info=api.PediatricBundleDict(),
                 # ==== Compute parameters ====

@@ -295,7 +295,7 @@ def test_AFQ_missing_files():
 def test_AFQ_custom_tract():
     """
     Test whether AFQ can use tractography from
-    custom_tractography_bids_filters
+    import_tract
     """
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
@@ -318,7 +318,7 @@ def test_AFQ_custom_tract():
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
-        custom_tractography_bids_filters={
+        import_tract={
             "suffix": "tractography",
             "scope": "vistasoft"
         })
@@ -394,7 +394,7 @@ def test_AFQ_init():
                     if n_subjects == n_sessions:
                         npt.assert_equal(
                             len(my_afq.wf_dict[sub][sub]),
-                            39)
+                            33)
                     else:
                         for session in range(n_sessions):
                             if n_sessions == 1:
@@ -403,7 +403,7 @@ def test_AFQ_init():
                                 sess = f"0{session+1}"
                             npt.assert_equal(
                                 len(my_afq.wf_dict[sub][sess]),
-                                39)
+                                33)
 
 
 def test_AFQ_custom_bundle_dict():
@@ -483,19 +483,18 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="custom_tractography_bids_filters must be"
-            + " either a dict or None"):
+            match="import_tract must be a str"):
         api.GroupAFQ(
             bids_path,
-            custom_tractography_bids_filters=["dwi"])
+            import_tract=["dwi"])
 
     with pytest.raises(
             TypeError,
-            match=("brain_mask must be None or a mask defined"
+            match=("brain_mask_definition must be None or a mask defined"
                    " in `AFQ.definitions.mask`")):
         api.GroupAFQ(
             bids_path,
-            brain_mask="not a brain mask")
+            brain_mask_definition="not a brain mask")
 
     with pytest.raises(
             TypeError,
@@ -505,7 +504,7 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match=(
-                "bundle_info must be None, a list of strings,"
+                "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
         api.GroupAFQ(bids_path, bundle_info=[2, 3])
 

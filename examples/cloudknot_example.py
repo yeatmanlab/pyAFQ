@@ -66,14 +66,14 @@ def afq_process_subject(subject):
     # in this case, we look for a file with suffix 'seg'
     # in the 'pipeline_name' pipeline,
     # and we consider all non-zero labels to be a part of the brain
-    brain_mask = afm.LabelledMaskFile(
+    brain_mask_definition = afm.LabelledMaskFile(
         'seg', {'scope': 'pipeline_name'}, exclusive_labels=[0])
 
     # define the api AFQ object
     myafq = api.GroupAFQ(
         "local_bids_dir",
         preproc_pipeline="pipeline_name",
-        brain_mask=brain_mask,
+        brain_mask_definition=brain_mask_definition,
         viz_backend='plotly',  # this will generate both interactive html and GIFs # noqa
         scalars=["dki_fa", "dki_md"])
 

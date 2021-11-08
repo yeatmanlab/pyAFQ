@@ -141,7 +141,7 @@ class FullMask(Definition):
 
     Examples
     --------
-    brain_mask = FullMask()
+    brain_mask_definition = FullMask()
     """
 
     def __init__(self):
@@ -222,8 +222,8 @@ class B0Mask(Definition):
 
     Examples
     --------
-    brain_mask = B0Mask()
-    api.GroupAFQ(brain_mask=brain_mask)
+    brain_mask_definition = B0Mask()
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
     def __init__(self, median_otsu_kwargs={}):
@@ -285,11 +285,11 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
 
     Examples
     --------
-    brain_mask = LabelledMaskFile(
+    brain_mask_definition = LabelledMaskFile(
         "aseg",
         {"scope": "dmriprep"},
         exclusive_labels=[0])
-    api.GroupAFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
     def __init__(self, suffix, filters={}, inclusive_labels=None,
@@ -349,11 +349,11 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
 
     Examples
     --------
-    brain_mask = ThresholdedMaskFile(
+    brain_mask_definition = ThresholdedMaskFile(
         "brain_mask",
         {"scope":"dmriprep"},
         lower_bound=0.1)
-    api.GroupAFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
     def __init__(self, suffix, filters={}, lower_bound=None,

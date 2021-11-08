@@ -54,14 +54,15 @@ endpoint_info = {
         "startpoint": or_rois['right_thal_MNI'],
         "endpoint": or_rois['right_V1_MNI']}}
 
-brain_mask = LabelledMaskFile("seg",
-                              {"scope": "freesurfer"},
-                              exclusive_labels=[0])
+brain_mask_definition = LabelledMaskFile(
+    "seg",
+    {"scope": "freesurfer"},
+    exclusive_labels=[0])
 
 my_afq = api.GroupAFQ(
     bids_path=op.join(afd.afq_home,
                      'stanford_hardi'),
-    brain_mask=brain_mask,
+    brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 3,
                      "directions": "prob",
                      "odf_model": "CSD",
