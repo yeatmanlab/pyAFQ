@@ -26,7 +26,7 @@ jobs:
           "${{ github.event.release.tag_name }}" "nrdg"
 
     - name: Login to GHCR 
-      if: github.event.pull_request.base.ref == 'master' || startsWith(github.event.ref, 'refs/tags')
+      if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
@@ -34,5 +34,5 @@ jobs:
         password: ${{secrets.CR_PAT_NRDG}}
 
     - name: Push pyAFQ docker image
-      if: github.event.pull_request.base.ref == 'master' || startsWith(github.event.ref, 'refs/tags')
+      if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
       run: sh ./pyafq_docker/docker-push.sh "nrdg"
