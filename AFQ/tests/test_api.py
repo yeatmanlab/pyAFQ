@@ -554,7 +554,28 @@ def test_AFQ_reco80():
     """
     Test API segmentation with the 80-bundle atlas
     """
-    _, bids_path, _ = get_temp_hardi()
+    tmpdir, bids_path, _ = get_temp_hardi()
+    config_file = op.join(tmpdir.name, "afq_config.toml")
+    completed_process = subprocess.run(
+        f"pyAFQ -g {config_file}",
+        shell=True, capture_output=True)
+    if completed_process.returncode != 0:
+        print(completed_process.stdout)
+    print(completed_process.stderr)
+
+    with open(config_file, 'a') as ff:
+        ff.write((
+            f"\nbids_path = {bids_path}\n"
+            "preproc_pipeline = 'vistasoft'\n"
+            "segmentation_params = \"{'seg_algo': 'reco80', 'rng': 42}\""))
+
+    cmd = "pyAFQ -v -c export_clean_bundles" + config_file
+    completed_process = subprocess.run(
+        cmd, shell=True, capture_output=True)
+    if completed_process.returncode != 0:
+        print(completed_process.stdout)
+    print(completed_process.stderr)
+
     myafq = api.AFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
