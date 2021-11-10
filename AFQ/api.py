@@ -804,12 +804,6 @@ class AFQ(object):
 
         best_scalar = self._get_best_scalar()
         default_tracking_params = get_default_args(aft.track)
-        default_tracking_params["seed_mask"] = ScalarMask(
-            best_scalar)
-        default_tracking_params["stop_mask"] = ScalarMask(
-            best_scalar)
-        default_tracking_params["seed_threshold"] = 0.2
-        default_tracking_params["stop_threshold"] = 0.2
         # Replace the defaults only for kwargs for which a non-default value
         # was given:
         if tracking_params is not None:
@@ -819,6 +813,14 @@ class AFQ(object):
         self.tracking_params = default_tracking_params
         self.tracking_params["odf_model"] =\
             self.tracking_params["odf_model"].upper()
+        if self.tracking_params["seed_mask"] is None:
+            self.tracking_params["seed_mask"] = ScalarMask(
+                best_scalar)
+            self.tracking_params["seed_threshold"] = 0.2
+        if self.tracking_params["stop_mask"] is None:
+            self.tracking_params["stop_mask"] = ScalarMask(
+                best_scalar)
+            self.tracking_params["stop_threshold"] = 0.2
 
         default_seg_params = get_default_args(seg.Segmentation.__init__)
         if segmentation_params is not None:
