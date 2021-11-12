@@ -11,3 +11,5 @@ ARG COMMIT
 RUN pip install --no-cache-dir git+https://github.com/yeatmanlab/pyAFQ.git@${COMMIT}
 RUN pip install fslpy
 RUN pip install h5py
+
+ENTRYPOINT ["pyAFQ"]
