@@ -1,3 +1,18 @@
+0.9.1 (November 12, 2021)
+=========================
+This is a bug-fix release, which fixes some issues with the CLI in the previous
+release. It also implements a docker entrypoint and should improve automated
+tagging of docker images.
+
+  * [FIX] Remember to add docker-push.sh (#772)
+  * [ENH] Add entrypoint for pyAFQ docker image (#769)
+  * [ENH] Update the docker worklow to hopefully push tags, as well as remove AFQsi docker (#770)
+  * [FIX] this is a quick fix for the problem with using the default config file (#768)
+  * [ENH] Identity Map (#758)
+  * [ENH] remove patch2self (#757)
+  * Suppress warnings when using api (#759)
+
+
 0.9 (October 25, 2021)
 ======================
 This is a maintenance release, including many small fixes to specific
