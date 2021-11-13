@@ -224,7 +224,7 @@ Classes
           !! processed by numpydoc !!
 
 
-.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, preproc_pipeline='all', participant_labels=None, output_dir=None, custom_tractography_bids_filters=None, b0_threshold=50, patch2self=False, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, parallel_params={'engine': 'serial'}, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None, **kwargs)
+.. py:class:: AFQ(bids_path, bids_filters={'suffix': 'dwi'}, preproc_pipeline='all', participant_labels=None, output_dir=None, custom_tractography_bids_filters=None, b0_threshold=50, robust_tensor_fitting=False, min_bval=None, max_bval=None, reg_template='mni_T1', reg_subject='power_map', brain_mask=B0Mask(), mapping=SynMap(), profile_weights='gauss', bundle_info=None, parallel_params={'engine': 'serial'}, scalars=['dti_fa', 'dti_md'], virtual_frame_buffer=False, viz_backend='plotly_no_gif', tracking_params=None, segmentation_params=None, clean_params=None, **kwargs)
 
    Bases: :py:obj:`object`
 

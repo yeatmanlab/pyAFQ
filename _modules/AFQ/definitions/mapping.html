@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.mapping &#8212; AFQ 0.9 documentation</title>
+    <title>AFQ.definitions.mapping &#8212; AFQ 0.9.1 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -317,6 +317,34 @@
             <span class="o">+</span> <span class="s2">&quot; only transform from template to subject space&quot;</span><span class="p">)</span>
 
 
+<span class="k">class</span> <span class="nc">IdentityMap</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Does not perform any transformations from MNI to subject where</span>
+<span class="sd">    pyAFQ normally would.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    my_example_mapping = IdentityMap()</span>
+<span class="sd">    api.AFQ(mapping=my_example_mapping)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+            <span class="n">domain_grid_shape</span><span class="o">=</span><span class="n">reg</span><span class="o">.</span><span class="n">reduce_shape</span><span class="p">(</span>
+                <span class="n">reg_subject</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+            <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">codomain_grid_shape</span><span class="o">=</span><span class="n">reg</span><span class="o">.</span><span class="n">reduce_shape</span><span class="p">(</span>
+                <span class="n">reg_template</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+            <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
+
 <span class="k">class</span> <span class="nc">ItkMap</span><span class="p">(</span><span class="n">Definition</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Use an existing Itk map (e.g., from ANTS). Expects the warp file</span>
@@ -569,8 +597,15 @@
 <div class="viewcode-block" id="AffMap.gen_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.gen_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
                     <span class="n">subject_sls</span><span class="p">,</span> <span class="n">template_sls</span><span class="p">,</span>
                     <span class="n">reg_prealign</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span>
-            <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span></div></div>
+        <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prealign</span><span class="p">(</span>
+                <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+            <span class="n">domain_grid_shape</span><span class="o">=</span><span class="n">reg</span><span class="o">.</span><span class="n">reduce_shape</span><span class="p">(</span>
+                <span class="n">reg_subject</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+            <span class="n">domain_grid2world</span><span class="o">=</span><span class="n">reg_subject</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">codomain_grid_shape</span><span class="o">=</span><span class="n">reg</span><span class="o">.</span><span class="n">reduce_shape</span><span class="p">(</span>
+                <span class="n">reg_template</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+            <span class="n">codomain_grid2world</span><span class="o">=</span><span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">ConformedAffineMapping</span><span class="p">(</span><span class="n">AffineMap</span><span class="p">):</span>
@@ -614,7 +649,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
 </p>
     </div>
     

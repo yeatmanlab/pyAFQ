@@ -65,11 +65,6 @@ See an example configuration file below::
     # it is considered to be b0. Default: 50.
     b0_threshold = 50
     
-    # Whether to use patch2self
-    # to denoise the dwi data.
-    # Default: False
-    patch2self = false
-    
     # Whether to use robust_tensor_fitting when
     # doing dti. Only applies to dti.
     # Default: False

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 0.9 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 0.9.1 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -219,8 +219,7 @@
 
 
 <div class="viewcode-block" id="outputs"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.outputs">[docs]</a><span class="n">outputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;DWI data as an ndarray for selected b values.</span>
-<span class="s2">    If patch2self is used, it is already applied to this data&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;DWI data as an ndarray for selected b values.&quot;&quot;&quot;</span><span class="p">,</span>
     <span class="s2">&quot;gtab&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;a DIPY GradientTable with all the gradient information&quot;&quot;&quot;</span><span class="p">,</span>
     <span class="s2">&quot;img&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;unaltered DWI data in a Nifti1Image&quot;&quot;&quot;</span><span class="p">,</span>
     <span class="s2">&quot;b0_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing the mean b0&quot;&quot;&quot;</span><span class="p">,</span>
@@ -268,13 +267,13 @@
 <span class="s2">    the DKI axial kurtosis file&quot;&quot;&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dki_mk_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
 <span class="s2">    the DKI mean kurtosis file&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;brain_mask_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span></div>
-<span class="s2">    the brain mask&quot;&quot;&quot;</span><span class="p">}</span>
+    <span class="s2">&quot;brain_mask_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
+<span class="s2">    the brain mask&quot;&quot;&quot;</span><span class="p">}</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;gtab&quot;</span><span class="p">,</span> <span class="s2">&quot;img&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="get_data_gtab"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">[docs]</a><span class="k">def</span> <span class="nf">get_data_gtab</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="p">,</span> <span class="n">min_bval</span><span class="p">,</span>
-                  <span class="n">max_bval</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">patch2self</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                  <span class="n">max_bval</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">])</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span> <span class="o">=</span> <span class="n">read_bvals_bvecs</span><span class="p">(</span><span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">)</span>
@@ -293,9 +292,6 @@
     <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span>
         <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span>
         <span class="n">b0_threshold</span><span class="o">=</span><span class="n">b0_threshold</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">patch2self</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">dipy.denoise.patch2self</span> <span class="kn">import</span> <span class="n">patch2self</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">patch2self</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="n">b0_threshold</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span></div>
 
 
@@ -588,7 +584,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
 </p>
     </div>
     

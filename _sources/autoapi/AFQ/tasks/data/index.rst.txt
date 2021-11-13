@@ -106,7 +106,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True, patch2self=False)
+.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True)
 
    
 
