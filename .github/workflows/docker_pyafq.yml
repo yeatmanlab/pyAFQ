@@ -15,6 +15,9 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v1
 
+    - name: test
+      run: echo "${GITHUB_REF/refs\/tags\//}"
+
     - name: Build pyAFQ docker image
       run: sh ./pyafq_docker/docker-build.sh \
         "${{github.sha}}" "nrdg"
