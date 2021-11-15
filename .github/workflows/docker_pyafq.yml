@@ -21,9 +21,10 @@ jobs:
 
     - name: Build a tagged image
       if: startsWith(github.event.ref, 'refs/tags')
+      run: echo "COMMIT_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       run: |
         sh ./pyafq_docker/docker-build.sh \
-          "${{ github.event.release.tag_name }}" "nrdg"
+          "${{env.COMMIT_TAG}}" "nrdg"
 
     - name: Login to GHCR 
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
