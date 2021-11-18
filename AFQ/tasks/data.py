@@ -356,13 +356,15 @@ def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file('_brain_mask.nii.gz')
 def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file,
                bids_info):
+    if not isinstance(brain_mask_definition, Definition):
+        raise TypeError(
+            "brain_mask_definition must be a Definition")
     if bids_info is not None:
-        if isinstance(brain_mask_definition, Definition):
-            brain_mask_definition.find_path(
-                bids_info["bids_layout"],
-                subses_dict["dwi_file"],
-                bids_info["subject"],
-                bids_info["session"])
+        brain_mask_definition.find_path(
+            bids_info["bids_layout"],
+            subses_dict["dwi_file"],
+            bids_info["subject"],
+            bids_info["session"])
     return brain_mask_definition.get_brain_mask(
         subses_dict, dwi_affine, b0_file)
 
