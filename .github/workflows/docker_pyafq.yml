@@ -23,7 +23,7 @@ jobs:
       if: startsWith(github.event.ref, 'refs/tags')
       run: |
         sh ./pyafq_docker/docker-build.sh \
-          "${{ github.event.release.tag_name }}" "nrdg"
+          "${GITHUB_REF:10}" "nrdg"
 
     - name: Login to GHCR 
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
