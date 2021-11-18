@@ -98,6 +98,10 @@ class TemplateScalar(ScalarMixin, Definition):
         pass
 
     def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
+        if mapping is None:
+            raise ValueError((
+                "You cannot use a TemplateScalar to generate "
+                "the subject image for mapping."))
         if not self.is_resampled:
             self.img = resample(
                 self.img.get_fdata(),

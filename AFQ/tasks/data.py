@@ -354,12 +354,20 @@ def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
 
 @pimms.calc("brain_mask_file")
 @as_file('_brain_mask.nii.gz')
-def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file):
+def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file,
+               bids_info):
+    if bids_info is not None:
+        if isinstance(brain_mask_definition, Definition):
+            brain_mask_definition.find_path(
+                bids_info["bids_layout"],
+                subses_dict["dwi_file"],
+                bids_info["subject"],
+                bids_info["session"])
     return brain_mask_definition.get_brain_mask(
         subses_dict, dwi_affine, b0_file)
 
 
-def get_data_plan(kwargs):
+def get_data_plan(kwargs, bids_info):
     if "scalars" in kwargs and not (
             isinstance(kwargs["scalars"], list)
             and (
@@ -381,6 +389,7 @@ def get_data_plan(kwargs):
         dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
         dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
         dti_params, dki_params, csd_params])
+
     if "brain_mask_definition" not in kwargs:
         kwargs["brain_mask_definition"] = B0Mask()
     if kwargs["brain_mask_definition"] is None:

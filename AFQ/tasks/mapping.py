@@ -92,23 +92,35 @@ def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
 
 
 @pimms.calc("mapping")
-def mapping(subses_dict, reg_subject, reg_template,
+def mapping(subses_dict, reg_subject, reg_template, bids_info,
             mapping_definition=SynMap()):
     if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
+    if bids_info is not None:
+        mapping_definition.find_path(
+            bids_info["bids_layout"],
+            subses_dict["dwi_file"],
+            bids_info["subject"],
+            bids_info["session"])
     return mapping_definition.get_for_subses(
         subses_dict, reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
-def sls_mapping(subses_dict, reg_subject, reg_template,
+def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
                 tractography_imap, mapping_definition=SynMap()):
     if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
+    if bids_info is not None:
+        mapping_definition.find_path(
+            bids_info["bids_layout"],
+            subses_dict["dwi_file"],
+            bids_info["subject"],
+            bids_info["session"])
     streamlines_file = tractography_imap["streamlines_file"]
     tg = load_tractogram(
         streamlines_file, reg_subject,
@@ -133,17 +145,30 @@ def sls_mapping(subses_dict, reg_subject, reg_template,
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(reg_subject_spec, data_imap):
+def get_reg_subject(data_imap, bids_info, subses_dict, reg_template,
+                    reg_subject_spec="pmap_file"):
     filename_dict = {
         "b0": data_imap["b0_file"],
         "power_map": data_imap["pmap_file"],
         "dti_fa_subject": data_imap["dti_fa_file"],
         "subject_sls": data_imap["b0_file"],
     }
-    if reg_subject_spec in filename_dict:
-        reg_subject_spec = filename_dict[reg_subject_spec]
-    img = nib.load(reg_subject_spec)
-    bm = nib.load(data_imap["brain_mask_file"]).get_fdata().astype(bool)
+    bm = nib.load(data_imap["brain_mask_file"])
+
+    if bids_info is not None and isinstance(reg_subject_spec, Definition):
+        reg_subject_spec.find_path(
+            bids_info["bids_layout"],
+            subses_dict["dwi_file"],
+            bids_info["subject"],
+            bids_info["session"])
+        scalar_data, _ = reg_subject_spec.get_data(
+            subses_dict, subses_dict["dwi_affine"], reg_template, None)
+        img = nib.Nifti1Image(scalar_data, bm.affine)
+    else:
+        if reg_subject_spec in filename_dict:
+            reg_subject_spec = filename_dict[reg_subject_spec]
+        img = nib.load(reg_subject_spec)
+    bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
     masked_data[~bm] = 0
     img = nib.Nifti1Image(masked_data, img.affine)
@@ -226,9 +251,16 @@ def get_mapping_plan(kwargs, use_sls=False):
             seg_algo=kwargs["seg_algo"],
             resample_to=kwargs["reg_template"])
 
+    bids_info = kwargs["bids_info"]
     # add custom scalars
     for scalar in kwargs["scalars"]:
-        if not isinstance(scalar, str):
+        if isinstance(scalar, Definition):
+            scalar.find_path(
+                bids_info["bids_layout"],
+                kwargs["subses_dict"]["dwi_file"],
+                bids_info["subject"],
+                bids_info["session"]
+            )
             mapping_tasks["{scalar.name}_file_res"] =\
                 pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
 

@@ -19,6 +19,7 @@ class ParticipantAFQ(object):
                  dwi_data_file,
                  bval_file, bvec_file,
                  output_dir,
+                 bids_info=None,
                  **kwargs):
         if not isinstance(output_dir, str):
             raise TypeError(
@@ -32,6 +33,8 @@ class ParticipantAFQ(object):
         if not isinstance(bvec_file, str):
             raise TypeError(
                 "bvec_file must be a str")
+
+        kwargs["bids_info"] = bids_info
 
         # construct pimms plans
         if "mapping" in kwargs and isinstance(kwargs["mapping"], SlrMap):

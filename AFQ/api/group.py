@@ -4,8 +4,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
 from textwrap import dedent
-from AFQ.definitions.mapping import (FnirtMap, ItkMap)
-from AFQ.definitions.utils import Definition
 import AFQ.data as afd
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, task_outputs
@@ -121,7 +119,7 @@ class GroupAFQ(object):
             If None, there is no maximum limit. Default: None
         reg_subject : str, Nifti1Image, dict, optional
             [REGISTRATION] The source image data to be registered.
-            Can either be a Nifti1Image, bids filters for a Nifti1Image, or
+            Can either be a Nifti1Image, a scalar definition, or
             if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
             image data will be loaded automatically.
             If "subject_sls" is used, slr registration will be used
@@ -376,99 +374,6 @@ class GroupAFQ(object):
                 if suffix is not None:
                     bids_filters["suffix"] = suffix
 
-                if "import_tract_definition" in kwargs:
-                    if not isinstance(kwargs["import_tract_definition"], dict):
-                        raise TypeError(
-                            "import_tract_definition must be"
-                            + " either a dict or None")
-                    this_kwargs["import_tract"] = \
-                        bids_layout.get(subject=subject, session=session,
-                                        extension=[
-                                            '.trk',
-                                            '.tck',
-                                            '.vtk',
-                                            '.fib',
-                                            '.dpy'],
-                                        return_type='filename',
-                                        **kwargs["import_tract_definition"])
-                    if len(this_kwargs[
-                            "import_tract"]) < 1:
-                        self.logger.warning(
-                            f"No custom tractography found for subject "
-                            f"{subject} and session "
-                            f"{session}. Will perform tractography"
-                            f" using built-in DIPY tractography.")
-                        custom_tract_file = None
-                    elif len(this_kwargs[
-                            "import_tract"]) > 1:
-                        custom_tract_file = this_kwargs[
-                            "import_tract"][0]
-                        self.logger.warning(
-                            f"Multiple viable custom tractographies found for"
-                            f" subject "
-                            f"{subject} and session "
-                            f"{session}. Will use: {custom_tract_file}")
-                    else:
-                        custom_tract_file = this_kwargs[
-                            "import_tract"][0]
-                else:
-                    custom_tract_file = None
-
-                if "reg_subject" in kwargs and\
-                        isinstance(kwargs["kwargs"], dict):
-                    this_kwargs["reg_subject"] = bids_layout.get(
-                        **self.reg_subject,
-                        session=session,
-                        subject=subject,
-                        return_type='filename'
-                    )[0]
-
-                if "scalars" in kwargs:
-                    for scalar in kwargs["scalars"]:
-                        if isinstance(scalar, Definition):
-                            scalar.find_path(
-                                bids_layout,
-                                dwi_data_file,
-                                subject,
-                                session
-                            )
-
-                if "tracking_params" in kwargs:
-                    tracking_params = kwargs["tracking_params"]
-                    if "seed_mask" in tracking_params and isinstance(
-                            tracking_params["seed_mask"], Definition):
-                        tracking_params["seed_mask"].find_path(
-                            bids_layout,
-                            dwi_data_file,
-                            subject,
-                            session
-                        )
-
-                    if "stop_mask" in tracking_params and isinstance(
-                            tracking_params["stop_mask"], Definition):
-                        tracking_params["stop_mask"].find_path(
-                            bids_layout,
-                            dwi_data_file,
-                            subject,
-                            session
-                        )
-
-                if "brain_mask_definition" in kwargs:
-                    kwargs["brain_mask_definition"].find_path(
-                        bids_layout,
-                        dwi_data_file,
-                        subject,
-                        session
-                    )
-
-                if "mapping_definition" in kwargs:
-                    kwargs["mapping_definition"].find_path(
-                        bids_layout,
-                        dwi_data_file,
-                        subject,
-                        session
-                    )
-
                 self.valid_sub_list.append(subject)
                 self.valid_ses_list.append(session)
 
@@ -476,6 +381,10 @@ class GroupAFQ(object):
                     dwi_data_file,
                     bval_file, bvec_file,
                     results_dir,
+                    bids_info={
+                        "bids_layout": bids_layout,
+                        "subject": subject,
+                        "session": session},
                     **this_kwargs)
                 self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
 
@@ -675,9 +584,13 @@ class GroupAFQ(object):
         seg_algo = seg_params.get("seg_algo", "AFQ")
 
         if xforms:
-            if not isinstance(self.mapping_definition, FnirtMap)\
-                    and not isinstance(self.mapping_definition, ItkMap):
+            try:
                 self.b0_warped
+            except Exception as e:
+                self.logger.warning((
+                    "Failed to export warped b0. This could be because your "
+                    "mapping type is only compatible with transformation "
+                    f"from template to subject space. The error is: {e}"))
             self.template_xform
         if indiv:
             self.indiv_bundles

@@ -1,5 +1,6 @@
 import nibabel as nib
 from time import time
+import logging
 
 import pimms
 
@@ -9,6 +10,8 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 from AFQ.utils.bin import get_default_args
 from AFQ.definitions.mask import ScalarMask
+
+logger = logging.getLogger('AFQ.api')
 
 outputs = {
     "seed_file": """full path to a nifti file containing the
@@ -96,7 +99,43 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
 
 
 @pimms.calc("streamlines_file")
-def custom_tractography(import_tract):
+def custom_tractography(bids_info, import_tract=None):
+    if not isinstance(import_tract, dict) and\
+            not isinstance(import_tract, str):
+        raise TypeError(
+            "import_tract_definition must be"
+            + " either a dict or a str")
+    if isinstance(import_tract, dict):
+        if bids_info is None:
+            raise ValueError((
+                "bids_info must be provided if using"
+                " bids filters to find imported tracts"))
+        import_tract = \
+            bids_info["bids_layout"].get(
+                subject=bids_info["subject"],
+                session=bids_info["session"],
+                extension=[
+                    '.trk',
+                    '.tck',
+                    '.vtk',
+                    '.fib',
+                    '.dpy'],
+                return_type='filename',
+                **import_tract)
+        if len(import_tract) < 1:
+            raise ValueError((
+                "No custom tractography found for subject "
+                f"{bids_info['subject']} and session "
+                f"{bids_info['session']}."))
+        elif len(import_tract) > 1:
+            import_tract = import_tract[0]
+            logger.warning((
+                f"Multiple viable custom tractographies found for"
+                f" subject "
+                f"{bids_info['subject']} and session "
+                f"{bids_info['session']}. Will use: {import_tract}"))
+        else:
+            import_tract = import_tract[0]
     return import_tract
 
 
@@ -149,6 +188,24 @@ def get_tractography_plan(kwargs):
         kwargs["tracking_params"]["odf_model"].upper()
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
+    seed_mask = kwargs["tracking_params"]['seed_mask']
+    subses_dict = kwargs["subses_dict"]
+    bids_info = kwargs["bids_info"]
+
+    if bids_info is not None:
+        if isinstance(stop_mask, Definition):
+            stop_mask.find_path(
+                bids_info["bids_layout"],
+                subses_dict["dwi_file"],
+                bids_info["subject"],
+                bids_info["session"])
+        if isinstance(seed_mask, Definition):
+            seed_mask.find_path(
+                bids_info["bids_layout"],
+                subses_dict["dwi_file"],
+                bids_info["subject"],
+                bids_info["session"])
+
     if kwargs["tracking_params"]["tracker"] == "pft":
         probseg_funcs = stop_mask.get_mask_getter()
         tractography_tasks["wm_res"] = pimms.calc("pve_wm")(probseg_funcs[0])
@@ -156,15 +213,14 @@ def get_tractography_plan(kwargs):
         tractography_tasks["csf_res"] = pimms.calc("pve_csf")(probseg_funcs[2])
         tractography_tasks["export_stop_mask_res"] = \
             export_stop_mask_pft
-    else:
-        if isinstance(stop_mask, Definition):
-            tractography_tasks["export_stop_mask_res"] =\
-                pimms.calc("stop_file")(as_file('_stop_mask.nii.gz')(
-                    stop_mask.get_mask_getter()))
+    elif isinstance(stop_mask, Definition):
+        tractography_tasks["export_stop_mask_res"] =\
+            pimms.calc("stop_file")(as_file('_stop_mask.nii.gz')(
+                stop_mask.get_mask_getter()))
 
-    if isinstance(kwargs["tracking_params"]['seed_mask'], Definition):
+    if isinstance(seed_mask, Definition):
         tractography_tasks["export_seed_mask_res"] = pimms.calc("seed_file")(
             as_file('_seed_mask.nii.gz')(
-                kwargs["tracking_params"]['seed_mask'].get_mask_getter()))
+                seed_mask.get_mask_getter()))
 
     return pimms.plan(**tractography_tasks)
