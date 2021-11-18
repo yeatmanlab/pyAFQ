@@ -544,7 +544,8 @@ def test_AFQ_reco():
             'rng': 42})
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict["01"], myafq.img["01"])
+    bundles = aus.tgram_to_bundles(
+        tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
     myafq.export_all()
 
@@ -584,7 +585,8 @@ def test_AFQ_reco80():
             'rng': 42})
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(tgram, myafq.bundle_dict["01"], myafq.img["01"])
+    bundles = aus.tgram_to_bundles(
+        tgram, myafq.bundle_dict["01"], myafq.img["01"])
     npt.assert_(len(bundles['CCMid']) > 0)
 
 

@@ -369,7 +369,7 @@ def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file,
         subses_dict, dwi_affine, b0_file)
 
 
-def get_data_plan(kwargs, bids_info):
+def get_data_plan(kwargs):
     if "scalars" in kwargs and not (
             isinstance(kwargs["scalars"], list)
             and (
