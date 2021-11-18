@@ -72,9 +72,13 @@ class MaskFile(Definition):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -82,18 +86,28 @@ class MaskFile(Definition):
     Examples
     --------
     seed_mask = MaskFile(
-        "WM_mask",
-        {"scope":"dmriprep"})
+        suffix="WM_mask",
+        filters={"scope":"dmriprep"})
     api.GroupAFQ(tracking_params={"seed_mask": seed_mask,
                                 "seed_threshold": 0.1})
     """
 
-    def __init__(self, suffix, filters={}):
-        self.suffix = suffix
-        self.filters = filters
-        self.fnames = {}
+    def __init__(self, path=None, suffix=None, filters={}):
+        if path is None and suffix is None:
+            raise ValueError("One of path or suffix must not be None.")
+
+        if path is not None:
+            self.from_path = True
+            self.fname = path
+        else:
+            self.from_path = False
+            self.suffix = suffix
+            self.filters = filters
+            self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
+        if self.from_path:
+            return
         if session not in self.fnames:
             self.fnames[session] = {}
 
@@ -104,7 +118,11 @@ class MaskFile(Definition):
         self.fnames[session][subject] = nearest_mask
 
     def get_path_data_affine(self, subses_dict):
-        mask_file = self.fnames[subses_dict['ses']][subses_dict['subject']]
+        if self.from_path:
+            mask_file = self.fname
+        else:
+            mask_file = self.fnames[
+                subses_dict['ses']][subses_dict['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
@@ -261,9 +279,13 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -286,15 +308,16 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
     Examples
     --------
     brain_mask_definition = LabelledMaskFile(
-        "aseg",
-        {"scope": "dmriprep"},
+        suffix="aseg",
+        filters={"scope": "dmriprep"},
         exclusive_labels=[0])
     api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
-    def __init__(self, suffix, filters={}, inclusive_labels=None,
+    def __init__(self, path=None, suffix=None, filters={},
+                 inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
-        MaskFile.__init__(self, suffix, filters)
+        MaskFile.__init__(self, path, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.inclusive_labels = inclusive_labels
         self.exclusive_labels = exclusive_labels
@@ -327,9 +350,13 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -350,15 +377,15 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
     Examples
     --------
     brain_mask_definition = ThresholdedMaskFile(
-        "brain_mask",
-        {"scope":"dmriprep"},
+        suffix="brain_mask",
+        filters={"scope":"dmriprep"},
         lower_bound=0.1)
     api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
-    def __init__(self, suffix, filters={}, lower_bound=None,
+    def __init__(self, path=None, suffix=None, filters={}, lower_bound=None,
                  upper_bound=None, combine="and"):
-        MaskFile.__init__(self, suffix, filters)
+        MaskFile.__init__(self, path, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound

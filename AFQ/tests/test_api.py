@@ -31,7 +31,7 @@ import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
-from AFQ.definitions.mask import RoiMask, ThresholdedScalarMask,\
+from AFQ.definitions.mask import RoiMask,\
     PFTMask, MaskFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
 from AFQ.definitions.scalar import TemplateScalar
@@ -603,9 +603,9 @@ def test_AFQ_pft():
     os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
     stop_mask = PFTMask(
-        MaskFile("WMprobseg"),
-        MaskFile("GMprobseg"),
-        MaskFile("CSFprobseg"))
+        MaskFile(suffix="WMprobseg"),
+        MaskFile(suffix="GMprobseg"),
+        MaskFile(suffix="CSFprobseg"))
 
     with nbtmp.InTemporaryDirectory() as t_output_dir:
         my_afq = api.GroupAFQ(

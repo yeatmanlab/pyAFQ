@@ -67,7 +67,8 @@ def afq_process_subject(subject):
     # in the 'pipeline_name' pipeline,
     # and we consider all non-zero labels to be a part of the brain
     brain_mask_definition = afm.LabelledMaskFile(
-        'seg', {'scope': 'pipeline_name'}, exclusive_labels=[0])
+        suffix='seg', filters={'scope': 'pipeline_name'},
+        exclusive_labels=[0])
 
     # define the api AFQ object
     myafq = api.GroupAFQ(

@@ -32,7 +32,7 @@ bundles = abd.BundleDict({
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 1
-        },
+    },
     "R_OR": {
         "ROIs": [or_rois["right_OR_1"],
                  or_rois["right_OR_2"],
@@ -42,9 +42,8 @@ bundles = abd.BundleDict({
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 2
-        }
     }
-)
+})
 
 endpoint_info = {
     "L_OR": {
@@ -55,13 +54,14 @@ endpoint_info = {
         "endpoint": or_rois['right_V1_MNI']}}
 
 brain_mask_definition = LabelledMaskFile(
-    "seg",
-    {"scope": "freesurfer"},
+    suffix="seg",
+    filters={"scope": "freesurfer"},
     exclusive_labels=[0])
 
 my_afq = api.GroupAFQ(
-    bids_path=op.join(afd.afq_home,
-                     'stanford_hardi'),
+    bids_path=op.join(
+        afd.afq_home,
+        'stanford_hardi'),
     brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 3,
                      "directions": "prob",

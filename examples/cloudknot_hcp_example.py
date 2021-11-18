@@ -80,7 +80,8 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # use segmentation file from HCP to get a brain mask,
     # where everything not labelled 0 is considered a part of the brain
     brain_mask_definition = afm.LabelledMaskFile(
-        'seg', {'scope': 'dmriprep'}, exclusive_labels=[0])
+        suffix='seg', filters={'scope': 'dmriprep'},
+        exclusive_labels=[0])
 
     # define the api AFQ object
     myafq = api.GroupAFQ(

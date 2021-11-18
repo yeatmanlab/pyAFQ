@@ -41,36 +41,37 @@ from AFQ.definitions.mask import RoiMask, MaskFile
 #
 # .. note::
 #
-#   While it is possible to run tractography and segmentation for pediatric dMRI
-#   data with pyAFQ, we recommend using a custom tractography pipeline and only
-#   using pyAFQ for segmentation as shown in:
+#   While it is possible to run tractography and segmentation for pediatric
+#   dMRI data with pyAFQ, we recommend using a custom tractography pipeline
+#   and only using pyAFQ for segmentation as shown in:
 #
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/mrtrix_pipeline.ipynb
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/pybabyafq.ipynb
 
 
 myafq = api.GroupAFQ(  # ==== BIDS parameters ====
-                bids_path=op.join(afd.afq_home, "study"),
-                preproc_pipeline="derivatives",
-                # ===== Registration parameters ====
-                min_bval=1000,
-                max_bval=1000,
-                reg_template=afd.read_pediatric_templates(
-                )["UNCNeo-withCerebellum-for-babyAFQ"],
-                reg_subject="b0",
-                brain_mask_definition=MaskFile(
-                  "brainmask", {"scope": "derivatives"}),
-                # ==== Bundle parameters ====
-                bundle_info=api.PediatricBundleDict(),
-                # ==== Compute parameters ====
-                force_recompute=True,
-                # ==== Tracking parameters ====
-                tracking_params={"seed_mask": RoiMask(),
-                                 "stop_threshold": 0.1},
-                # ==== Segmentation parameters ====
-                segmentation_params={
-                    "filter_by_endpoints": False},
-                )
+    bids_path=op.join(afd.afq_home, "study"),
+    preproc_pipeline="derivatives",
+    # ===== Registration parameters ====
+    min_bval=1000,
+    max_bval=1000,
+    reg_template=afd.read_pediatric_templates(
+    )["UNCNeo-withCerebellum-for-babyAFQ"],
+    reg_subject="b0",
+    brain_mask_definition=MaskFile(
+        suffix="brainmask", filters={"scope": "derivatives"}),
+    # ==== Bundle parameters ====
+    bundle_info=api.PediatricBundleDict(),
+    # ==== Compute parameters ====
+    force_recompute=True,
+    # ==== Tracking parameters ====
+    tracking_params={
+        "seed_mask": RoiMask(),
+        "stop_threshold": 0.1},
+    # ==== Segmentation parameters ====
+    segmentation_params={
+        "filter_by_endpoints": False},
+)
 
 ##########################################################################
 # Visualizing bundles:

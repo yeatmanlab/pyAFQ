@@ -6,10 +6,8 @@ import pytest
 from bids.layout import BIDSLayout
 
 import AFQ.definitions.mask as afm
-import AFQ.definitions.mapping as ama
 from AFQ.definitions.mask import *  # interprets masks from eval
 from AFQ.definitions.mapping import *  # interprets mappings from eval
-from AFQ.definitions.utils import Definition
 from AFQ.tests.test_api import create_dummy_bids_path
 
 

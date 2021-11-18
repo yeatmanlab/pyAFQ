@@ -45,9 +45,13 @@ class ScalarFile(MaskFile):
     ----------
     name : str
         name of the scalar.
-    suffix : str
+    path : str, optional
+        path to file to get scalar from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -56,13 +60,13 @@ class ScalarFile(MaskFile):
     --------
     my_scalar = ScalarFile(
         "my_scalar",
-        "scalarSuffix",
-        {"scope": "dmriprep"})
+        suffix="scalarSuffix",
+        filters={"scope": "dmriprep"})
     api.GroupAFQ(scalars=["dti_fa", "dti_md", my_scalar])
     """
 
-    def __init__(self, name, suffix, filters={}):
-        MaskFile.__init__(self, suffix, filters)
+    def __init__(self, name, path=None, suffix=None, filters={}):
+        MaskFile.__init__(self, path, suffix, filters)
         self.name = name
 
     def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
