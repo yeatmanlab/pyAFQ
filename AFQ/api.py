@@ -652,7 +652,7 @@ class AFQ(object):
             Default: use the default behavior of the seg.clean_bundle
             function.
         bids_layout_kwargs: dict, optional
-            Additional arguments to give to BIDSLayout from pybids.
+            [DATA] Additional arguments to give to BIDSLayout from pybids.
             For large datasets, try:
             {"validate": False, "index_metadata": False}
             Default: {}
