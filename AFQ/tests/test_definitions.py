@@ -59,7 +59,7 @@ def test_find_path(subject, session):
         suffix="dwi", extension="nii.gz"
     )[0]
 
-    mask_file = MaskFile("seg", {'scope': 'synthetic'})
+    mask_file = MaskFile(suffix="seg", filters={'scope': 'synthetic'})
     mask_file.find_path(bids_layout, test_dwi_path, subject, session)
 
     assert mask_file.fnames[session][subject] == op.join(

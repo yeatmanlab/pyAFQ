@@ -508,9 +508,9 @@ class PFTMask(Definition):
     Examples
     --------
     stop_mask = PFTMask(
-        afm.MaskFile("WMprobseg"),
-        afm.MaskFile("GMprobseg"),
-        afm.MaskFile("CSFprobseg"))
+        afm.MaskFile(suffix="WMprobseg"),
+        afm.MaskFile(suffix="GMprobseg"),
+        afm.MaskFile(suffix="CSFprobseg"))
     api.GroupAFQ(tracking_params={
         "stop_mask": stop_mask,
         "stop_threshold": "CMC",

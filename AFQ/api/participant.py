@@ -63,6 +63,9 @@ class ParticipantAFQ(object):
                 "bvec_file must be a str")
 
         kwargs["bids_info"] = bids_info
+        kwargs["subses_dict"] = {
+            "dwi_file": dwi_data_file,
+            "results_dir": output_dir}
 
         # construct pimms plans
         if "mapping" in kwargs and isinstance(kwargs["mapping"], SlrMap):
@@ -81,12 +84,8 @@ class ParticipantAFQ(object):
                 "viz": get_viz_plan(kwargs)}
 
         img = nib.load(dwi_data_file)
-        subses_dict = {
-            "dwi_file": dwi_data_file,
-            "results_dir": output_dir}
 
         input_data = dict(
-            subses_dict=subses_dict,
             dwi_img=img,
             dwi_affine=img.affine,
             bval_file=bval_file,
