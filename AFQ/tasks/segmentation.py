@@ -169,13 +169,14 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
 
 @pimms.calc("indiv_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
-                   data_imap, bundle_dict, tracking_params,
+                   data_imap, tracking_params,
                    segmentation_params):
     """
     dictionary of paths, where each path is
     a full path to a trk file containing the streamlines of a given bundle,
     cleaned or uncleaned
     """
+    bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     if "presegment_bundle_dict" in segmentation_params and\
         segmentation_params["presegment_bundle_dict"] is not None\

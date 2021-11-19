@@ -21,7 +21,7 @@ for task_module in task_modules:
             if len(calc_obj.efferents) > 1:
                 eff_descs = docstr_parser.description.split(",")
                 if len(eff_descs) != len(calc_obj.efferents):
-                    raise RuntimeError((
+                    raise NotImplementedError((
                         "If calc method has mutliple outputs, "
                         "their descriptions must be divided by commas."
                         f" {calc_obj.name} has {len(eff_descs)} comma-divided"

@@ -835,7 +835,7 @@ def test_AFQ_data_waypoint():
         DATA=dict(
             robust_tensor_fitting=True,
             bundle_info=bundle_names),
-        SEGMENTATION = dict(
+        SEGMENTATION=dict(
             scalars=[
                 "dti_fa",
                 "dti_md",
