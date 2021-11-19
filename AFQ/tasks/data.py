@@ -13,6 +13,8 @@ from dipy.reconst.dki_micro import axonal_water_fraction
 
 from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
+import AFQ.api.bundle_dict as abd
+import AFQ.data as afd
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import B0Mask
@@ -491,6 +493,86 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
         subses_dict, dwi_affine, b0_file)
 
 
+@pimms.calc("bundle_dict", "reg_template")
+def get_bundle_dict(segmentation_params, data_imap, bundle_info=None,
+                    reg_template_spec="mni_T1"):
+    """
+    Dictionary defining the different bundles to be segmented,
+    and a Nifti1Image containing the template for registration
+
+    Parameters
+    ----------
+    bundle_info : list of strings, dict, or BundleDict, optional
+        List of bundle names to include in segmentation,
+        or a bundle dictionary (see BundleDict for inspiration),
+        or a BundleDict.
+        If None, will get all appropriate bundles for the chosen
+        segmentation algorithm.
+        Default: None
+    reg_template_spec : str, or Nifti1Image, optional
+        The target image data for registration.
+        Can either be a Nifti1Image, a path to a Nifti1Image, or
+        if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+        image data will be loaded automatically.
+        If "hcp_atlas" is used, slr registration will be used
+        and reg_subject should be "subject_sls".
+        Default: "mni_T1"
+    """
+    if not isinstance(reg_template_spec, str)\
+            and not isinstance(reg_template_spec, nib.Nifti1Image):
+        raise TypeError(
+            "reg_template must be a str or Nifti1Image")
+
+    if bundle_info is not None and not ((
+            isinstance(bundle_info, list)
+            and isinstance(bundle_info[0], str)) or (
+                isinstance(bundle_info, dict)) or (
+                    isinstance(bundle_info, abd.BundleDict))):
+        raise TypeError((
+            "bundle_info must a list of strings,"
+            " a dict, or a BundleDict"))
+
+    if bundle_info is None:
+        if segmentation_params["seg_algo"] == "reco" or\
+                segmentation_params["seg_algo"] == "reco16":
+            bundle_info = abd.RECO_BUNDLES_16
+        elif segmentation_params["seg_algo"] == "reco80":
+            bundle_info = abd.RECO_BUNDLES_80
+        else:
+            bundle_info = abd.BUNDLES
+
+    use_brain_mask = True
+    brain_mask = nib.load(data_imap["brain_mask_file"]).get_fdata()
+    if np.all(brain_mask == 1.0):
+        use_brain_mask = False
+    if isinstance(reg_template_spec, nib.Nifti1Image):
+        reg_template = reg_template_spec
+    else:
+        img_l = reg_template_spec.lower()
+        if img_l == "mni_t2":
+            reg_template = afd.read_mni_template(
+                mask=use_brain_mask, weight="T2w")
+        elif img_l == "mni_t1":
+            reg_template = afd.read_mni_template(
+                mask=use_brain_mask, weight="T1w")
+        elif img_l == "dti_fa_template":
+            reg_template = afd.read_ukbb_fa_template(mask=use_brain_mask)
+        elif img_l == "hcp_atlas":
+            reg_template = afd.read_mni_template(mask=use_brain_mask)
+        else:
+            reg_template = nib.load(reg_template_spec)
+
+    if isinstance(bundle_info, abd.BundleDict):
+        bundle_dict = bundle_info
+    else:
+        bundle_dict = abd.BundleDict(
+            bundle_info,
+            seg_algo=segmentation_params["seg_algo"],
+            resample_to=reg_template)
+
+    return bundle_dict, reg_template
+
+
 def get_data_plan(kwargs):
     if "scalars" in kwargs and not (
             isinstance(kwargs["scalars"], list)
@@ -506,7 +588,7 @@ def get_data_plan(kwargs):
         dti_fit, dki_fit, anisotropic_power_map,
         dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
         dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
-        dti_params, dki_params, csd_params])
+        dti_params, dki_params, csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]

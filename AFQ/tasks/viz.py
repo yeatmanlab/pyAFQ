@@ -34,7 +34,6 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
 def viz_bundles(subses_dict,
                 dwi_affine,
                 viz_backend,
-                bundle_dict,
                 data_imap,
                 mapping_imap,
                 segmentation_imap,
@@ -66,6 +65,7 @@ def viz_bundles(subses_dict,
         Default: 40
     """
     mapping = mapping_imap["mapping"]
+    bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
     profiles_file = segmentation_imap["profiles_file"]
     volume = data_imap["b0_file"]
@@ -133,7 +133,6 @@ def viz_bundles(subses_dict,
 def viz_indivBundle(subses_dict,
                     dwi_affine,
                     viz_backend,
-                    bundle_dict,
                     data_imap,
                     mapping_imap,
                     segmentation_imap,
@@ -166,6 +165,7 @@ def viz_indivBundle(subses_dict,
         Default: 40
     """
     mapping = mapping_imap["mapping"]
+    bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
     shade_by_volume = data_imap[best_scalar + "_file"]
