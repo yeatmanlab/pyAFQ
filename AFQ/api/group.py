@@ -68,141 +68,40 @@ class GroupAFQ(object):
                  parallel_params={"engine": "serial"},
                  **kwargs):
         '''
-        Initialize an AFQ object.
-        Some special notes on parameters:
-        In tracking_params, parameters with the suffix mask which are also
-        a mask from AFQ.definitions.mask will be handled automatically by the
-        api.
+        Initialize a GroupAFQ object from a BIDS dataset.
 
         Parameters
         ----------
         bids_path : str
-            [BIDS] The path to preprocessed diffusion data organized in a BIDS
+            The path to preprocessed diffusion data organized in a BIDS
             dataset. This should contain a BIDS derivative dataset with
             preprocessed dwi/bvals/bvecs.
         bids_filters : dict
-            [BIDS] Filter to pass to bids_layout.get when finding DWI files.
+            Filter to pass to bids_layout.get when finding DWI files.
             Default: {"suffix": "dwi"}
         preproc_pipeline : str, optional.
-            [BIDS] The name of the pipeline used to preprocess the DWI data.
+            The name of the pipeline used to preprocess the DWI data.
             Default: "all".
         participant_labels : list or None, optional
-            [BIDS] list of participant labels (subject IDs) to perform
+            List of participant labels (subject IDs) to perform
             processing on. If None, all subjects are used.
             Default: None
         output_dir : str or None, optional
-            [BIDS] path to output directory. If None, outputs are put
+            Path to output directory. If None, outputs are put
             in a AFQ pipeline folder in the derivatives folder of
             the BIDS directory. pyAFQ will use existing derivatives
             from the output directory if they exist, instead of recalculating
             them (this means you need to clear the output folder if you want
             to recalculate a derivative).
             Default: None
-        custom_tractography_bids_filters : dict, optional
-            [BIDS] BIDS filters for inputing a user made tractography file.
-            If None, tractography will be performed automatically.
-            Default: None
-        b0_threshold : int, optional
-            [DATA] The value of b under which
-            it is considered to be b0. Default: 50.
-        robust_tensor_fitting : bool, optional
-            [DATA] Whether to use robust_tensor_fitting when
-            doing dti. Only applies to dti.
-            Default: False
-        min_bval : float, optional
-            [DATA] Minimum b value you want to use
-            from the dataset (other than b0), inclusive.
-            If None, there is no minimum limit. Default: None
-        max_bval : float, optional
-            [DATA] Maximum b value you want to use
-            from the dataset (other than b0), inclusive.
-            If None, there is no maximum limit. Default: None
-        reg_subject : str, Nifti1Image, dict, optional
-            [REGISTRATION] The source image data to be registered.
-            Can either be a Nifti1Image, a scalar definition, or
-            if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
-            image data will be loaded automatically.
-            If "subject_sls" is used, slr registration will be used
-            and reg_template should be "hcp_atlas".
-            Default: "power_map"
-        reg_template : str or Nifti1Image, optional
-            [REGISTRATION] The target image data for registration.
-            Can either be a Nifti1Image, a path to a Nifti1Image, or
-            if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
-            image data will be loaded automatically.
-            If "hcp_atlas" is used, slr registration will be used
-            and reg_subject should be "subject_sls".
-            Default: "mni_T1"
-        brain_mask : instance of class from `AFQ.definitions.mask`, optional
-            [REGISTRATION] This will be used to create
-            the brain mask, which gets applied before registration to a
-            template.
-            If None, no brain mask will not be applied,
-            and no brain mask will be applied to the template.
-            Default: B0Mask()
-        mapping : instance of class from `AFQ.definitions.mapping`, optional
-            [REGISTRATION] This defines how to either create a mapping from
-            each subject space to template space or load a mapping from
-            another software. If creating a map, will register reg_subject and
-            reg_template.
-            Default: SynMap()
-        profile_weights : str, 1D array, 2D array callable, optional
-            [PROFILE] How to weight each streamline (1D) or each node (2D)
-            when calculating the tract-profiles. If callable, this is a
-            function that calculates weights. If None, no weighting will
-            be applied. If "gauss", gaussian weights will be used.
-            If "median", the median of values at each node will be used
-            instead of a mean or weighted mean.
-            Default: "gauss"
-        bundle_info : list of strings, dict, or BundleDict, optional
-            [BUNDLES] List of bundle names to include in segmentation,
-            or a bundle dictionary (see BundleDict for inspiration),
-            or a BundleDict.
-            If None, will get all appropriate bundles for the chosen
-            segmentation algorithm.
-            Default: None
         parallel_params : dict, optional
-            [COMPUTE] Parameters to pass to parfor in AFQ.utils.parallel,
+            Parameters to pass to parfor in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
             Set "n_jobs" to -1 to automatically parallelize as
             the number of cpus. Here is an example for how to do
             multiprocessing with 4 cpus:
             {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
             Default: {"engine": "serial"}
-        scalars : list of strings and/or scalar definitions, optional
-            [BUNDLES] List of scalars to use.
-            Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-            "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
-            Default: ["dti_fa", "dti_md"]
-        virtual_frame_buffer : bool, optional
-            [VIZ] Whether to use a virtual fram buffer. This is neccessary if
-            generating GIFs in a headless environment. Default: False
-        viz_backend : str, optional
-            [VIZ] Which visualization backend to use.
-            See Visualization Backends page in documentation for details:
-            https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
-            One of {"fury", "plotly", "plotly_no_gif"}.
-            Default: "plotly_no_gif"
-        segmentation_params : dict, optional
-            The parameters for segmentation.
-            Default: use the default behavior of the seg.Segmentation object.
-        tracking_params: dict, optional
-            The parameters for tracking. Default: use the default behavior of
-            the aft.track function. Seed mask and seed threshold, if not
-            specified, are replaced with scalar masks from scalar[0]
-            thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-            this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
-            If ``tracker`` is set to "pft" then ``stop_mask`` should be
-            an instance of ``AFQ.definitions.mask.PFTMask``.
-        clean_params: dict, optional
-            The parameters for cleaning.
-            Default: use the default behavior of the seg.clean_bundle
-            function.
-        bids_layout_kwargs: dict, optional
-            [DATA] Additional arguments to give to BIDSLayout from pybids.
-            For large datasets, try:
-            {"validate": False, "index_metadata": False}
-            Default: {}
         kwargs : additional optional parameters
             [KWARGS] You can set additional parameters for any step
             of the process.

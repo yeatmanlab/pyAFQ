@@ -13,19 +13,15 @@ from AFQ.definitions.mask import ScalarMask
 
 logger = logging.getLogger('AFQ.api')
 
-outputs = {
-    "seed_file": """full path to a nifti file containing the
-    tractography seed mask""",
-    "stop_file": """full path to a nifti file containing the
-    tractography stop mask""",
-    "streamlines_file": """full path to the complete,
-    unsegmented tractography file"""}
-
 
 @pimms.calc("seed_file")
 @as_file('_seed_mask.nii.gz')
 @as_img
 def export_seed_mask(subses_dict, dwi_affine, tracking_params):
+    """
+    full path to a nifti file containing the
+    tractography seed mask
+    """
     seed_mask = tracking_params['seed_mask']
     seed_mask_desc = dict(source=tracking_params['seed_mask'])
     return seed_mask, seed_mask_desc
@@ -35,6 +31,10 @@ def export_seed_mask(subses_dict, dwi_affine, tracking_params):
 @as_file('_stop_mask.nii.gz')
 @as_img
 def export_stop_mask(subses_dict, dwi_affine, tracking_params):
+    """
+    full path to a nifti file containing the
+    tractography stop mask
+    """
     stop_mask = tracking_params['stop_mask']
     stop_mask_desc = dict(source=tracking_params['stop_mask'])
     return stop_mask, stop_mask_desc
@@ -42,6 +42,10 @@ def export_stop_mask(subses_dict, dwi_affine, tracking_params):
 
 @pimms.calc("stop_file")
 def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
+    """
+    full path to a nifti file containing the
+    tractography stop mask
+    """
     return {"stop_file": [pve_wm, pve_gm, pve_csf]}
 
 
@@ -49,6 +53,20 @@ def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
 @as_file('_tractography.trk', include_track=True)
 def streamlines(subses_dict, data_imap, seed_file, stop_file,
                 tracking_params):
+    """
+    full path to the complete, unsegmented tractography file
+
+    Parameters
+    ----------
+    tracking_params : dict, optional
+        The parameters for tracking. Default: use the default behavior of
+        the aft.track function. Seed mask and seed threshold, if not
+        specified, are replaced with scalar masks from scalar[0]
+        thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
+        this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+        If ``tracker`` is set to "pft" then ``stop_mask`` should be
+        an instance of ``AFQ.definitions.mask.PFTMask``.
+    """
     this_tracking_params = tracking_params.copy()
 
     # get odf_model
@@ -100,6 +118,16 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
 
 @pimms.calc("streamlines_file")
 def custom_tractography(bids_info, import_tract=None):
+    """
+    full path to the complete, unsegmented tractography file
+
+    Parameters
+    ----------
+    import_tract : dict, optional
+        BIDS filters for inputing a user made tractography file.
+        If None, tractography will be performed automatically.
+        Default: None
+    """
     if not isinstance(import_tract, dict) and\
             not isinstance(import_tract, str):
         raise TypeError(
@@ -170,12 +198,6 @@ def get_tractography_plan(kwargs):
     kwargs["best_scalar"] = best_scalar
 
     default_tracking_params = get_default_args(aft.track)
-    default_tracking_params["seed_mask"] = ScalarMask(
-        kwargs["best_scalar"])
-    default_tracking_params["stop_mask"] = ScalarMask(
-        kwargs["best_scalar"])
-    default_tracking_params["seed_threshold"] = 0.2
-    default_tracking_params["stop_threshold"] = 0.2
 
     # Replace the defaults only for kwargs for which a non-default value
     # was given:
@@ -186,6 +208,14 @@ def get_tractography_plan(kwargs):
     kwargs["tracking_params"] = default_tracking_params
     kwargs["tracking_params"]["odf_model"] =\
         kwargs["tracking_params"]["odf_model"].upper()
+    if kwargs["tracking_params"]["seed_mask"] is None:
+        kwargs["tracking_params"]["seed_mask"] = ScalarMask(
+            kwargs["best_scalar"])
+        kwargs["tracking_params"]["seed_threshold"] = 0.2
+    if kwargs["tracking_params"]["stop_mask"] is None:
+        kwargs["tracking_params"]["stop_mask"] = ScalarMask(
+            kwargs["best_scalar"])
+        kwargs["tracking_params"]["stop_threshold"] = 0.2
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']

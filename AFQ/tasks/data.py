@@ -15,7 +15,7 @@ from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
 
 from AFQ.definitions.utils import Definition
-from AFQ.definitions.mask import FullMask, B0Mask
+from AFQ.definitions.mask import B0Mask
 
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
@@ -26,62 +26,31 @@ from AFQ.models.dti import _fit as dti_fit_model
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-outputs = {
-    "data": """DWI data as an ndarray for selected b values.""",
-    "gtab": """a DIPY GradientTable with all the gradient information""",
-    "img": """unaltered DWI data in a Nifti1Image""",
-    "b0_file": """full path to a nifti file containing the mean b0""",
-    "masked_b0_file": """full path to a nifti file containing the
-    mean b0 after applying the brain mask""",
-    "dti_tf": """DTI TensorFit object""",
-    "dti_params_file": """full path to a nifti file containing parameters
-    for the DTI fit""",
-    "dki_tf": """DKI DiffusionKurtosisFit object""",
-    "dki_params_file": """full path to a nifti file containing
-    parameters for the DKI fit""",
-    "csd_params_file": """full path to a nifti file containing
-    parameters for the CSD fit""",
-    "pmap_file": """full path to a nifti file containing
-    the anisotropic power map""",
-    "dti_fa_file": """full path to a nifti file containing
-    the DTI fractional anisotropy""",
-    "dti_cfa_file": """full path to a nifti file containing
-    the DTI color fractional anisotropy""",
-    "dti_pdd_file": """full path to a nifti file containing
-    the DTI principal diffusion direction""",
-    "dti_md_file": """full path to a nifti file containing
-    the DTI mean diffusivity""",
-    "dki_fa_file": """full path to a nifti file containing
-    the DKI fractional anisotropy""",
-    "dki_md_file": """full path to a nifti file containing
-    the DKI mean diffusivity""",
-    "dki_awf_file": """full path to a nifti file containing
-    the DKI axonal water fraction""",
-    "dti_ga_file": """full path to a nifti file containing
-    the DTI geodesic anisotropy""",
-    "dti_rd_file": """full path to a nifti file containing
-    the DTI radial diffusivity""",
-    "dti_ad_file": """full path to a nifti file containing
-    the DTI axial diffusivity""",
-    "dki_ga_file": """full path to a nifti file containing
-    the DKI geodesic anisotropy""",
-    "dki_rd_file": """full path to a nifti file containing
-    the DKI radial diffusivity""",
-    "dki_ad_file": """full path to a nifti file containing
-    the DKI axial diffusivity""",
-    "dki_rk_file": """full path to a nifti file containing
-    the DKI radial kurtosis""",
-    "dki_ak_file": """full path to a nifti file containing
-    the DKI axial kurtosis file""",
-    "dki_mk_file": """full path to a nifti file containing
-    the DKI mean kurtosis file""",
-    "brain_mask_file": """full path to a nifti file containing
-    the brain mask"""}
-
-
 @pimms.calc("data", "gtab", "img")
 def get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50):
+    """
+    DWI data as an ndarray for selected b values,
+    A DIPY GradientTable with all the gradient information,
+    and unaltered DWI data in a Nifti1Image.
+
+    Parameters
+    ----------
+    min_bval : float, optional
+        Minimum b value you want to use
+        from the dataset (other than b0), inclusive.
+        If None, there is no minimum limit. Default: None
+    max_bval : float, optional
+        Maximum b value you want to use
+        from the dataset (other than b0), inclusive.
+        If None, there is no maximum limit. Default: None
+    filter_b : bool, optional
+        Whether to filter the DWI data based on min or max bvals.
+        Default: True
+    b0_threshold : int, optional
+        The value of b under which
+        it is considered to be b0. Default: 50.
+    """
     img = nib.load(subses_dict["dwi_file"])
     data = img.get_fdata()
     bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
@@ -106,6 +75,9 @@ def get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None,
 @pimms.calc("b0_file")
 @as_file('_b0.nii.gz')
 def b0(subses_dict, data, gtab, img):
+    """
+    full path to a nifti file containing the mean b0
+    """
     mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
     mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
@@ -116,6 +88,10 @@ def b0(subses_dict, data, gtab, img):
 @pimms.calc("masked_b0_file")
 @as_file('_maskedb0.nii.gz')
 def b0_mask(subses_dict, b0_file, brain_mask_file):
+    """
+    full path to a nifti file containing the
+    mean b0 after applying the brain mask
+    """
     img = nib.load(b0_file)
     brain_mask = nib.load(brain_mask_file).get_fdata().astype(bool)
 
@@ -131,6 +107,7 @@ def b0_mask(subses_dict, b0_file, brain_mask_file):
 
 @pimms.calc("dti_tf")
 def dti_fit(dti_params_file, gtab):
+    """DTI TensorFit object"""
     dti_params = nib.load(dti_params_file).get_fdata()
     tm = dpy_dti.TensorModel(gtab)
     dti_tf = dpy_dti.TensorFit(tm, dti_params)
@@ -141,6 +118,20 @@ def dti_fit(dti_params_file, gtab):
 @as_model
 def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
         bval_file, bvec_file, b0_threshold=50, robust_tensor_fitting=False):
+    """
+    full path to a nifti file containing parameters
+    for the DTI fit
+
+    Parameters
+    ----------
+    robust_tensor_fitting : bool, optional
+        Whether to use robust_tensor_fitting when
+        doing dti. Only applies to dti.
+        Default: False
+    b0_threshold : int, optional
+        The value of b under which
+        it is considered to be b0. Default: 50.
+    """
     mask =\
         nib.load(brain_mask_file).get_fdata()
     if robust_tensor_fitting:
@@ -167,6 +158,7 @@ dti_params = pimms.calc("dti_params_file")(dti)
 
 @pimms.calc("dki_tf")
 def dki_fit(dki_params_file, gtab):
+    """DKI DiffusionKurtosisFit object"""
     dki_params = nib.load(dki_params_file).get_fdata()
     tm = dpy_dki.DiffusionKurtosisModel(gtab)
     dki_tf = dpy_dki.DiffusionKurtosisFit(tm, dki_params)
@@ -176,6 +168,10 @@ def dki_fit(dki_params_file, gtab):
 @as_file(suffix='_model-DKI_diffmodel.nii.gz')
 @as_model
 def dki(subses_dict, dwi_affine, brain_mask_file, gtab, data):
+    """
+    full path to a nifti file containing
+    parameters for the DKI fit
+    """
     mask =\
         nib.load(brain_mask_file).get_fdata()
     dkf = dki_fit_model(
@@ -199,6 +195,33 @@ def csd(subses_dict, dwi_affine,
         tracking_params,
         csd_response=None, csd_sh_order=None,
         csd_lambda_=1, csd_tau=0.1):
+    """
+    full path to a nifti file containing
+    parameters for the CSD fit
+
+    Parameters
+    ----------
+    csd_response : tuple or None, optional.
+        The response function to be used by CSD, as a tuple with two elements.
+        The first is the eigen-values as an (3,) ndarray and the second is
+        the signal value for the response function without diffusion-weighting
+        (i.e. S0). If not provided, auto_response will be used to calculate
+        these values.
+        Default: None
+    csd_sh_order : int or None, optional.
+        default: infer the number of parameters from the number of data
+        volumes, but no larger than 8.
+        Default: None
+    csd_lambda_ : float, optional.
+        weight given to the constrained-positivity regularization part of
+        the deconvolution equation. Default: 1
+    csd_tau : float, optional.
+        threshold controlling the amplitude below which the corresponding
+        fODF is assumed to be zero.  Ideally, tau should be set to
+        zero. However, to improve the stability of the algorithm, tau is
+        set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+        (see [1]_). Default: 0.1
+    """
     msmt = (tracking_params["odf_model"] == "MSMT")
     mask =\
         nib.load(brain_mask_file).get_fdata()
@@ -228,6 +251,10 @@ csd_params = pimms.calc("csd_params_file")(csd)
 @pimms.calc("pmap_file")
 @as_file(suffix='_model-CSD_APM.nii.gz')
 def anisotropic_power_map(subses_dict, csd_params_file):
+    """
+    full path to a nifti file containing
+    the anisotropic power map
+    """
     sh_coeff = nib.load(csd_params_file)
     pmap = shm.anisotropic_power(sh_coeff.get_fdata())
     pmap = nib.Nifti1Image(pmap, sh_coeff.affine)
@@ -238,6 +265,10 @@ def anisotropic_power_map(subses_dict, csd_params_file):
 @as_file(suffix='_model-DTI_FA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI fractional anisotropy
+    """
     return dti_tf.fa
 
 
@@ -245,6 +276,10 @@ def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI color fractional anisotropy
+    """
     return dti_tf.color_fa
 
 
@@ -252,6 +287,10 @@ def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file(suffix='_model-DTI_PDD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI principal diffusion direction
+    """
     pdd = dti_tf.directions.squeeze()
     # Invert the x coordinates:
     pdd[..., 0] = pdd[..., 0] * -1
@@ -262,6 +301,10 @@ def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file('_model-DTI_MD.nii.gz')
 @as_dt_deriv('DTI')
 def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI mean diffusivity
+    """
     return dti_tf.md
 
 
@@ -269,6 +312,10 @@ def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file(suffix='_model-DTI_GA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI geodesic anisotropy
+    """
     return dti_tf.ga
 
 
@@ -276,6 +323,10 @@ def dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file(suffix='_model-DTI_RD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI radial diffusivity
+    """
     return dti_tf.rd
 
 
@@ -283,6 +334,10 @@ def dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file(suffix='_model-DTI_AD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf):
+    """
+    full path to a nifti file containing
+    the DTI axial diffusivity
+    """
     return dti_tf.ad
 
 
@@ -290,6 +345,10 @@ def dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf):
 @as_file('_model-DKI_FA.nii.gz')
 @as_dt_deriv('DKI')
 def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI fractional anisotropy
+    """
     return dki_tf.fa
 
 
@@ -297,6 +356,10 @@ def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file('_model-DKI_MD.nii.gz')
 @as_dt_deriv('DKI')
 def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI mean diffusivity
+    """
     return dki_tf.md
 
 
@@ -305,6 +368,25 @@ def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_dt_deriv('DKI')
 def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
             sphere='repulsion100', gtol=1e-2):
+    """
+    full path to a nifti file containing
+    the DKI axonal water fraction
+
+    Parameters
+    ----------
+    sphere : Sphere class instance, optional
+        The sphere providing sample directions for the initial
+        search of the maximal value of kurtosis.
+        Default: 'repulsion100'
+    gtol : float, optional
+        This input is to refine kurtosis maxima under the precision of
+        the directions sampled on the sphere class instance.
+        The gradient of the convergence procedure must be less than gtol
+        before successful termination.
+        If gtol is None, fiber direction is directly taken from the initial
+        sampled directions of the given sphere object.
+        Default: 1e-2
+    """
     dki_params = nib.load(dki_params_file).get_fdata()
     awf = axonal_water_fraction(dki_params, sphere=sphere, gtol=gtol)
     return awf
@@ -314,6 +396,10 @@ def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
 @as_file('_model-DKI_MK.nii.gz')
 @as_dt_deriv('DKI')
 def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI mean kurtosis file
+    """
     return dki_tf.mk()
 
 
@@ -321,6 +407,10 @@ def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file(suffix='_model-DKI_GA.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI geodesic anisotropy
+    """
     return dki_tf.ga
 
 
@@ -328,6 +418,10 @@ def dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file(suffix='_model-DKI_RD.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI radial diffusivity
+    """
     return dki_tf.rd
 
 
@@ -335,6 +429,10 @@ def dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file(suffix='_model-DKI_AD.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI axial diffusivity
+    """
     return dki_tf.ad
 
 
@@ -342,6 +440,10 @@ def dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file(suffix='_model-DKI_RK.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI radial kurtosis
+    """
     return dki_tf.rk
 
 
@@ -349,13 +451,30 @@ def dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @as_file(suffix='_model-DKI_AK.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI axial kurtosis file
+    """
     return dki_tf.ak
 
 
 @pimms.calc("brain_mask_file")
 @as_file('_brain_mask.nii.gz')
-def brain_mask(brain_mask_definition, subses_dict, dwi_affine, b0_file,
-               bids_info):
+def brain_mask(subses_dict, dwi_affine, b0_file,
+               bids_info, brain_mask_definition=B0Mask()):
+    """
+    full path to a nifti file containing
+    the brain mask
+
+    Parameters
+    ----------
+    brain_mask_definition : instance from `AFQ.definitions.mask`, optional
+        [REGISTRATION] This will be used to create
+        the brain mask, which gets applied before registration to a
+        template.
+        If you want no brain mask to be applied, use FullMask.
+        Default: B0Mask()
+    """
     if not isinstance(brain_mask_definition, Definition):
         raise TypeError(
             "brain_mask_definition must be a Definition")
@@ -378,12 +497,6 @@ def get_data_plan(kwargs):
         raise TypeError(
             "scalars must be a list of "
             "strings/scalar definitions")
-    if "brain_mask_definition" in kwargs and\
-        kwargs["brain_mask_definition"] is not None and not isinstance(
-            kwargs["brain_mask_definition"], Definition):
-        raise TypeError(
-            "brain_mask must be None or a mask "
-            "defined in `AFQ.definitions.mask`")
 
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
@@ -392,10 +505,6 @@ def get_data_plan(kwargs):
         dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
         dti_params, dki_params, csd_params])
 
-    if "brain_mask_definition" not in kwargs:
-        kwargs["brain_mask_definition"] = B0Mask()
-    if kwargs["brain_mask_definition"] is None:
-        kwargs["brain_mask_definition"] = FullMask()
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]
     else:

@@ -21,6 +21,35 @@ class ParticipantAFQ(object):
                  output_dir,
                  bids_info=None,
                  **kwargs):
+        """
+        Initialize a ParticipantAFQ object from a BIDS dataset.
+        Some special notes on parameters:
+        In tracking_params, parameters with the suffix mask which are also
+        a mask from AFQ.definitions.mask will be handled automatically by
+        the api.
+
+        Parameters
+        ----------
+        dwi_data_file : str
+            Path to DWI data file.
+        bval_file : str
+            Path to bval file.
+        bvec_file : str
+            Path to bvec file.
+        output_dir : str
+            Path to output directory.
+        bids_info : dict or None, optional
+            This is used by GroupAFQ to provide information about
+            the BIDS layout to each particpant. It is reccomended
+            that you leave this parameter as None,
+            and instead pass in the paths
+            to the files you want to use directly.
+        kwargs : additional optional parameters
+            You can set additional parameters for any step
+            of the process.
+            For example, to set the sh_order for csd to 4, do:
+            api.GroupAFQ(my_path, sh_order=4)
+        """
         if not isinstance(output_dir, str):
             raise TypeError(
                 "output_dir must be a str")
