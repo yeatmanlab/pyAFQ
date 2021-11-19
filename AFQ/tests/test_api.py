@@ -474,6 +474,7 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
 
 
+@pytest.mark.nightly_slr
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
     with pytest.raises(
@@ -492,21 +493,26 @@ def test_API_type_checking():
             TypeError,
             match=("brain_mask_definition must be None or a mask defined"
                    " in `AFQ.definitions.mask`")):
-        api.GroupAFQ(
+        myafq = api.GroupAFQ(
             bids_path,
             brain_mask_definition="not a brain mask")
+        myafq.brain_mask
+    del myafq
 
     with pytest.raises(
             TypeError,
             match="viz_backend must contain either 'fury' or 'plotly'"):
-        api.GroupAFQ(bids_path, viz_backend="matplotlib")
+        myafq = api.GroupAFQ(bids_path, viz_backend="matplotlib")
+        myafq.all_bundles_figure
+    del myafq
 
     with pytest.raises(
             TypeError,
             match=(
                 "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
-        api.GroupAFQ(bids_path, bundle_info=[2, 3])
+        myafq = api.GroupAFQ(bids_path, bundle_info=[2, 3])
+        myafq.bundle_dict
 
 
 @pytest.mark.nightly_slr

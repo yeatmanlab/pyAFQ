@@ -45,11 +45,12 @@ def template_xform(subses_dict, dwi_affine, mapping, reg_template):
 
 
 @pimms.calc("rois_file")
-def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
+def export_rois(subses_dict, data_imap, mapping, dwi_affine):
     """
     dictionary of full paths to Nifti1Image files of ROIs
     transformed to subject space
     """
+    bundle_dict = data_imap["bundle_dict"]
     rois_dir = op.join(subses_dict['results_dir'], 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}

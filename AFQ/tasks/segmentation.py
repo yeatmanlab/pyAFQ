@@ -29,7 +29,7 @@ logger = logging.getLogger('AFQ.api.seg')
 
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
+def segment(subses_dict, data_imap, reg_template, mapping_imap,
             tractography_imap, tracking_params, segmentation_params):
     """
     full path to a trk file containing containting
@@ -41,6 +41,7 @@ def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
         The parameters for segmentation.
         Default: use the default behavior of the seg.Segmentation object.
     """
+    bundle_dict = data_imap["bundle_dict"]
     streamlines_file = tractography_imap["streamlines_file"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
@@ -86,7 +87,7 @@ def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
 
 @pimms.calc("clean_bundles_file")
 @as_file('-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(subses_dict, bundles_file, bundle_dict,
+def clean_bundles(subses_dict, bundles_file, data_imap,
                   tracking_params, segmentation_params, clean_params=None):
     """
     full path to a trk file containting segmented
@@ -100,6 +101,7 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict,
         Default: use the default behavior of the seg.clean_bundle
         function.
     """
+    bundle_dict = data_imap["bundle_dict"]
     default_clean_params = get_default_args(seg.clean_bundle)
     if clean_params is not None:
         for k in clean_params:
@@ -221,12 +223,13 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
 
 @pimms.calc("sl_counts_file")
 @as_file('_sl_count.csv', include_track=True, include_seg=True)
-def export_sl_counts(subses_dict, bundle_dict,
+def export_sl_counts(subses_dict, data_imap,
                      clean_bundles_file, bundles_file,
                      tracking_params, segmentation_params):
     """
     full path to a JSON file containing streamline counts
     """
+    bundle_dict = data_imap["bundle_dict"]
     img = nib.load(subses_dict['dwi_file'])
     sl_counts_clean = []
     sl_counts = []
@@ -257,7 +260,7 @@ def export_sl_counts(subses_dict, bundle_dict,
 
 @pimms.calc("profiles_file")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
-def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
+def tract_profiles(subses_dict, clean_bundles_file, data_imap,
                    scalar_dict, dwi_affine,
                    tracking_params, segmentation_params,
                    profile_weights="gauss"):
@@ -275,6 +278,7 @@ def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
         instead of a mean or weighted mean.
         Default: "gauss"
     """
+    bundle_dict = data_imap["bundle_dict"]
     if not (profile_weights is None
             or isinstance(profile_weights, str)
             or callable(profile_weights)
