@@ -494,7 +494,7 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
 
 
 @pimms.calc("bundle_dict", "reg_template")
-def get_bundle_dict(segmentation_params, data_imap, bundle_info=None,
+def get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None,
                     reg_template_spec="mni_T1"):
     """
     Dictionary defining the different bundles to be segmented,
@@ -542,7 +542,7 @@ def get_bundle_dict(segmentation_params, data_imap, bundle_info=None,
             bundle_info = abd.BUNDLES
 
     use_brain_mask = True
-    brain_mask = nib.load(data_imap["brain_mask_file"]).get_fdata()
+    brain_mask = nib.load(brain_mask_file).get_fdata()
     if np.all(brain_mask == 1.0):
         use_brain_mask = False
     if isinstance(reg_template_spec, nib.Nifti1Image):
