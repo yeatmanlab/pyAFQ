@@ -46,12 +46,12 @@ tracking_params = dict(seed_mask=RoiMask(),
 # instead. This would tell the AFQ object to use bundles from both
 # the standard and callosal templates.
 
-myafq = api.GroupAFQ(bids_path=op.join(afd.afq_home,
-                                  'stanford_hardi'),
-                preproc_pipeline='vistasoft',
-                bundle_info=api.CALLOSUM_BUNDLES,
-                tracking_params=tracking_params,
-                viz_backend='plotly_no_gif')
+myafq = api.GroupAFQ(
+    bids_path=op.join(afd.afq_home, 'stanford_hardi'),
+    preproc_pipeline='vistasoft',
+    bundle_info=api.CALLOSUM_BUNDLES,
+    tracking_params=tracking_params,
+    viz_backend_spec='plotly_no_gif')
 
 # Calling export all produces all of the outputs of processing, including
 # tractography, scalar maps, tract profiles and visualizations:

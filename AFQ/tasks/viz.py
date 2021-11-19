@@ -415,7 +415,7 @@ def init_viz_backend(viz_backend_spec="plotly_no_gif",
     if "fury" not in viz_backend_spec\
             and "plotly" not in viz_backend_spec:
         raise TypeError(
-            "viz_backend must contain either 'fury' or 'plotly'")
+            "viz_backend_spec must contain either 'fury' or 'plotly'")
 
     if virtual_frame_buffer:
         from xvfbwrapper import Xvfb

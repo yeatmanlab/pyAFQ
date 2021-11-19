@@ -349,7 +349,7 @@ def test_AFQ_fury():
     myafq = api.GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
-        viz_backend="fury")
+        viz_backend_spec="fury")
     myafq.all_bundles_figure
 
 
@@ -501,8 +501,8 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="viz_backend must contain either 'fury' or 'plotly'"):
-        myafq = api.GroupAFQ(bids_path, viz_backend="matplotlib")
+            match="viz_backend_spec must contain either 'fury' or 'plotly'"):
+        myafq = api.GroupAFQ(bids_path, viz_backend_spec="matplotlib")
         myafq.all_bundles_figure
     del myafq
 
@@ -543,7 +543,7 @@ def test_AFQ_reco():
     myafq = api.GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
-        viz_backend="plotly",
+        viz_backend_spec="plotly",
         profile_weights="median",
         segmentation_params={
             'seg_algo': 'reco',
@@ -842,7 +842,7 @@ def test_AFQ_data_waypoint():
                 "dti_ga",
                 f"TemplateScalar('T1', '{t1_path}')"]),
         VIZ=dict(
-            viz_backend="plotly_no_gif"),
+            viz_backend_spec="plotly_no_gif"),
         TRACTOGRAPHY_PARAMS=tracking_params,
         SEGMENTATION_PARAMS=segmentation_params,
         CLEANING_PARAMS=clean_params)

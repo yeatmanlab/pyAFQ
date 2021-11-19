@@ -75,7 +75,7 @@ def afq_process_subject(subject):
         "local_bids_dir",
         preproc_pipeline="pipeline_name",
         brain_mask_definition=brain_mask_definition,
-        viz_backend='plotly',  # this will generate both interactive html and GIFs # noqa
+        viz_backend_spec='plotly',  # this will generate both interactive html and GIFs # noqa
         scalars=["dki_fa", "dki_md"])
 
     # export_all runs the entire pipeline and creates many useful derivates
