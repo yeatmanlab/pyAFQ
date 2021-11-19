@@ -310,10 +310,10 @@ not pass through exclusion ROIs.
  .. code-block:: none
 
     Segmenting fiber groups...
-      0%|          | 0/335 [00:00<?, ?it/s]      1%|          | 2/335 [00:00<00:28, 11.56it/s]      1%|1         | 4/335 [00:05<08:49,  1.60s/it]      2%|1         | 6/335 [00:05<04:54,  1.12it/s]    100%|##########| 335/335 [00:05<00:00, 58.98it/s]
-      0%|          | 0/237 [00:00<?, ?it/s]    100%|##########| 237/237 [00:00<00:00, 4985.71it/s]
-      0%|          | 0/431 [00:00<?, ?it/s]      2%|1         | 8/431 [00:00<00:08, 52.48it/s]     88%|########8 | 380/431 [00:00<00:00, 1819.14it/s]    100%|##########| 431/431 [00:00<00:00, 1699.10it/s]
-      0%|          | 0/472 [00:00<?, ?it/s]     81%|########  | 380/472 [00:00<00:00, 3548.69it/s]    100%|##########| 472/472 [00:00<00:00, 4392.81it/s]
+      0%|          | 0/341 [00:00<?, ?it/s]      1%|          | 2/341 [00:00<00:18, 18.01it/s]      1%|1         | 4/341 [00:05<08:34,  1.53s/it]      2%|1         | 6/341 [00:05<04:47,  1.17it/s]    100%|##########| 341/341 [00:05<00:00, 62.74it/s]
+      0%|          | 0/243 [00:00<?, ?it/s]    100%|##########| 243/243 [00:00<00:00, 3538.45it/s]
+      0%|          | 0/429 [00:00<?, ?it/s]      2%|1         | 8/429 [00:00<00:06, 63.06it/s]     89%|########8 | 380/429 [00:00<00:00, 1844.94it/s]    100%|##########| 429/429 [00:00<00:00, 1764.95it/s]
+      0%|          | 0/471 [00:00<?, ?it/s]     54%|#####3    | 252/471 [00:00<00:00, 2514.18it/s]    100%|##########| 471/471 [00:00<00:00, 3782.51it/s]
 
 
 
@@ -361,17 +361,17 @@ of their trajector and/or length.
 
     Cleaning fiber groups...
     Cleaning CST_R
-    Before cleaning: 26 streamlines
-    Afer cleaning: 26 streamlines
+    Before cleaning: 19 streamlines
+    Afer cleaning: 19 streamlines
     Cleaning CST_L
-    Before cleaning: 29 streamlines
-    Afer cleaning: 29 streamlines
+    Before cleaning: 30 streamlines
+    Afer cleaning: 30 streamlines
     Cleaning ARC_R
-    Before cleaning: 15 streamlines
-    Afer cleaning: 15 streamlines
+    Before cleaning: 14 streamlines
+    Afer cleaning: 14 streamlines
     Cleaning ARC_L
-    Before cleaning: 25 streamlines
-    Afer cleaning: 25 streamlines
+    Before cleaning: 23 streamlines
+    Afer cleaning: 23 streamlines
 
 
 
@@ -465,7 +465,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  30.691 seconds)
+   **Total running time of the script:** ( 15 minutes  49.935 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tract_profile.py:
