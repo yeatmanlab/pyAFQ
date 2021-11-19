@@ -33,11 +33,11 @@ of both).
 
 The outputs of each task can be accessed by the user through the
 AFQ object, either as an attribute or using a `export_` method,
-such as `export_b0`. In each of the 5 tasks files, there is a dictionary called
-`outputs <https://github.com/yeatmanlab/pyAFQ/blob/7204682b22af1c8c89766dacfd25ec01bcce9442/AFQ/tasks/data.py#L26>`_.
-Add your task output(s) and descriptions of those outputs to the
-`outputs` dictionary for them to be attached to
-the AFQ class. Note that when an output is attached to the AFQ class either as
+such as `export_b0`. Descriptions for these methods are taken from
+each tasks' dosctring. Additionally, if there are any parameters in your
+task which the user should input, make them a kwarg with a reasonable default,
+and add a description to the docstring in a properly formated parameters
+section. Note that when an output is attached to the AFQ class either as
 an attribute or method, if that output name ends in '_file',
 the '_file' is removed from the name automatically. 
 
@@ -91,7 +91,8 @@ This is what you must do each time you add a task to the workflow:
 
 #. Add your task to the `get_{task filename}_plan` method.
 
-#. Add outputs of the task to the `outputs` variable in its task file.
+#. Add a docstring to describe the output, as well as any parameters that the
+user would input.
 
 In most cases, you should only have to edit the tasks file which you are adding to.
 The API (:class:`AFQ.api.GroupAFQ`) automatically reads these files to construct its

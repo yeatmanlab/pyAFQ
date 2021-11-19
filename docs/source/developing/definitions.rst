@@ -26,12 +26,9 @@ The requirements of each of these methods are described below:
 
 - The :class:`AFQ.api.GroupAFQ` object calls `get_for_subses` to get the mask, map,
   etc. during workflow construction or execution. The form of this method varies significantly
-  between mapping, scalar, and mask `Definition`-inherited classes. In
-  mask `Definition`-inherited classes, `get_mask_getter` takes two arguments:
-  `self` and `in_data`. The `in_data` argument specifies whether this mask is being
-  called from the data Pimms plan (i.e., the brain mask) or not (i.e., the tractography
-  seed and stop masks). `get_for_subses` then must return a task which can be called
-  to generate the mask. In scalar `Definition`-inherited classes, `get_for_subses` only takes the `self`
+  between mapping, scalar, and mask `Definition`-inherited classes. `get_for_subses` must
+  return a task which can be called to generate the mask.
+  In scalar `Definition`-inherited classes, `get_for_subses` only takes the `self`
   argument and similarly returns a task which generates the mask. In mapping
   `Definition`-inherited classes, `get_for_subses` should return a "mapping". The "mapping" must have
   `transform` and `transform_inverse` functions which each accept two arguments: (1)
