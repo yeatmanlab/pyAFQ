@@ -21,25 +21,26 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 @pimms.calc("b0_warped_file")
 @as_file('_b0_in_MNI.nii.gz')
-def export_registered_b0(subses_dict, data_imap, mapping, reg_template):
+def export_registered_b0(subses_dict, data_imap, mapping):
     """
     full path to a nifti file containing
     b0 transformed to template space
     """
     mean_b0 = nib.load(data_imap["b0_file"]).get_fdata()
     warped_b0 = mapping.transform(mean_b0)
-    warped_b0 = nib.Nifti1Image(warped_b0, reg_template.affine)
+    warped_b0 = nib.Nifti1Image(warped_b0, data_imap["reg_template"].affine)
     return warped_b0, dict(b0InSubject=data_imap["b0_file"])
 
 
 @pimms.calc("template_xform_file")
 @as_file('_template_xform.nii.gz')
-def template_xform(subses_dict, dwi_affine, mapping, reg_template):
+def template_xform(subses_dict, dwi_affine, mapping, data_imap):
     """
     full path to a nifti file containing
     registration template transformed to subject space
     """
-    template_xform = mapping.transform_inverse(reg_template.get_fdata())
+    template_xform = mapping.transform_inverse(
+        data_imap["reg_template"].get_fdata())
     template_xform = nib.Nifti1Image(template_xform, dwi_affine)
     return template_xform, dict()
 

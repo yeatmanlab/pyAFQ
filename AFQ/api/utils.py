@@ -18,9 +18,28 @@ for task_module in task_modules:
         if isinstance(calc_obj, pimms.calculation.Calc):
             docstr_parser = FuncArgParser()
             docstr_parser.setup_args(calc_obj.function)
-            methods_descriptors[
-                calc_obj.name.split('.')[-1]] =\
-                docstr_parser.description
+            if len(calc_obj.efferents) > 1:
+                eff_descs = docstr_parser.description.split(",")
+                if len(eff_descs) != len(calc_obj.efferents):
+                    raise RuntimeError((
+                        "If calc method has mutliple outputs, "
+                        "their descriptions must be divided by commas."
+                        f" {calc_obj.name} has {len(eff_descs)} comma-divided"
+                        f"sections but {len(calc_obj.efferents)} outputs"))
+                for i in range(len(calc_obj.efferents)):
+                    if eff_descs[i][0] == ' ' or eff_descs[i][0] == '\n':
+                        eff_descs[i] = eff_descs[i][1:]
+                    if eff_descs[i][0:3] == "and":
+                        eff_descs[i] = eff_descs[i][3:]
+                    if eff_descs[i][0] == ' ' or eff_descs[i][0] == '\n':
+                        eff_descs[i] = eff_descs[i][1:]
+                    methods_descriptors[
+                        calc_obj.efferents[i]] =\
+                        eff_descs[i]
+            else:
+                methods_descriptors[
+                    calc_obj.efferents[0]] =\
+                    docstr_parser.description
             for arg, info in docstr_parser.unfinished_arguments.items():
                 if "help" in info:
                     if "default" in info:
