@@ -394,7 +394,7 @@ def test_AFQ_init():
                     if n_subjects == n_sessions:
                         npt.assert_equal(
                             len(my_afq.wf_dict[sub][sub]),
-                            23)
+                            26)
                     else:
                         for session in range(n_sessions):
                             if n_sessions == 1:
@@ -403,7 +403,7 @@ def test_AFQ_init():
                                 sess = f"0{session+1}"
                             npt.assert_equal(
                                 len(my_afq.wf_dict[sub][sess]),
-                                23)
+                                26)
 
 
 def test_AFQ_custom_bundle_dict():

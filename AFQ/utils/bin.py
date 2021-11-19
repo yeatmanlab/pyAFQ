@@ -184,7 +184,8 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
             try:
                 section = name.upper() + "_PARAMS"
                 desc = info['help']
-                if 'positional' in info and info['positional']:
+                if name != "BIDS" and 'positional' in info and info[
+                        'positional']:
                     continue
             except (KeyError, IndexError) as error:
                 if logger is not None:
