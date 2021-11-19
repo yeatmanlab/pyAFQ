@@ -88,7 +88,7 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
 
 
 @pimms.calc("mapping")
-def mapping(subses_dict, reg_subject, reg_template, bids_info,
+def mapping(subses_dict, reg_subject, data_imap, bids_info,
             mapping_definition=None):
     """
     mapping from subject to template space.
@@ -103,6 +103,7 @@ def mapping(subses_dict, reg_subject, reg_template, bids_info,
         If None, use SynMap()
         Default: None
     """
+    reg_template = data_imap["reg_template"]
     if mapping_definition is None:
         mapping_definition = SynMap()
     if not isinstance(mapping_definition, Definition):
@@ -120,7 +121,7 @@ def mapping(subses_dict, reg_subject, reg_template, bids_info,
 
 
 @pimms.calc("mapping")
-def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
+def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
                 tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
@@ -135,6 +136,7 @@ def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
         If None, use SynMap()
         Default: None
     """
+    reg_template = data_imap["reg_template"]
     if mapping_definition is None:
         mapping_definition = SynMap()
     if not isinstance(mapping_definition, Definition):
@@ -172,7 +174,6 @@ def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
 
 @pimms.calc("reg_subject")
 def get_reg_subject(data_imap, bids_info, subses_dict,
-                    reg_template,
                     reg_subject_spec="power_map"):
     """
     Nifti1Image which represents this subject
@@ -189,6 +190,7 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
         and reg_template should be "hcp_atlas".
         Default: "power_map"
     """
+    reg_template = data_imap["reg_template"]
     if not isinstance(reg_subject_spec, str)\
             and not isinstance(reg_subject_spec, nib.Nifti1Image)\
             and not isinstance(reg_subject_spec, dict):

@@ -29,7 +29,7 @@ logger = logging.getLogger('AFQ.api.seg')
 
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, data_imap, reg_template, mapping_imap,
+def segment(subses_dict, data_imap, mapping_imap,
             tractography_imap, tracking_params, segmentation_params):
     """
     full path to a trk file containing containting
@@ -42,6 +42,7 @@ def segment(subses_dict, data_imap, reg_template, mapping_imap,
         Default: use the default behavior of the seg.Segmentation object.
     """
     bundle_dict = data_imap["bundle_dict"]
+    reg_template = data_imap["reg_template"]
     streamlines_file = tractography_imap["streamlines_file"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
@@ -168,13 +169,14 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
 
 @pimms.calc("indiv_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
-                   reg_template, bundle_dict, tracking_params,
+                   data_imap, bundle_dict, tracking_params,
                    segmentation_params):
     """
     dictionary of paths, where each path is
     a full path to a trk file containing the streamlines of a given bundle,
     cleaned or uncleaned
     """
+    reg_template = data_imap["reg_template"]
     if "presegment_bundle_dict" in segmentation_params and\
         segmentation_params["presegment_bundle_dict"] is not None\
         and not isinstance(

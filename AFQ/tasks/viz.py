@@ -138,7 +138,6 @@ def viz_indivBundle(subses_dict,
                     segmentation_imap,
                     tracking_params,
                     segmentation_params,
-                    reg_template,
                     best_scalar,
                     sbv_lims_indiv=[None, None],
                     volume_opacity_indiv=0.3,
@@ -166,6 +165,7 @@ def viz_indivBundle(subses_dict,
     """
     mapping = mapping_imap["mapping"]
     bundle_dict = data_imap["bundle_dict"]
+    reg_template = data_imap["reg_template"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
     shade_by_volume = data_imap[best_scalar + "_file"]
