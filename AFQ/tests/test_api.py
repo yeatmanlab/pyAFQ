@@ -687,7 +687,7 @@ def test_auto_cli():
     config_file = op.join(tmpdir.name, 'test.toml')
 
     arg_dict = afb.func_dict_to_arg_dict()
-    arg_dict['BIDS']['bids_path']['default'] = tmpdir.name
+    arg_dict['BIDS_PARAMS']['bids_path']['default'] = tmpdir.name
     afb.generate_config(config_file, arg_dict, False)
     with pytest.raises(
             ValueError,
@@ -705,11 +705,11 @@ def test_run_using_auto_cli():
     # set our custom defaults for the toml file
     # It is easier to edit them here, than to parse the file and edit them
     # after the file is written
-    arg_dict['BIDS']['bids_path']['default'] = bids_path
-    arg_dict['BIDS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['BUNDLES']['bundle_names']['default'] = ["CST"]
-    arg_dict['TRACTOGRAPHY']['n_seeds']['default'] = 500
-    arg_dict['TRACTOGRAPHY']['random_seeds']['default'] = True
+    arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
+    arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
+    arg_dict['MAPPING']['bundle_names']['default'] = ["CST"]
+    arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
+    arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
     afb.generate_config(config_file, arg_dict, False)
     afb.parse_config_run_afq(config_file, arg_dict, False)
@@ -822,22 +822,25 @@ def test_AFQ_data_waypoint():
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
-    config = dict(BIDS=dict(bids_path=bids_path,
-                            preproc_pipeline='vistasoft'),
-                  DATA=dict(
-                      robust_tensor_fitting=True),
-                  BUNDLES=dict(
-                      bundle_info=bundle_names,
-                      scalars=[
-                        "dti_fa",
-                        "dti_md",
-                        "dti_ga",
-                        f"TemplateScalar('T1', '{t1_path}')"]),
-                  VIZ=dict(
-                      viz_backend="plotly_no_gif"),
-                  TRACTOGRAPHY=tracking_params,
-                  SEGMENTATION=segmentation_params,
-                  CLEANING=clean_params)
+    config = dict(
+        BIDS_PARAMS=dict(
+            bids_path=bids_path,
+            preproc_pipeline='vistasoft'),
+        DATA=dict(
+            robust_tensor_fitting=True),
+        MAPPING=dict(
+            bundle_info=bundle_names),
+        SEGMENTATION = dict(
+            scalars=[
+                "dti_fa",
+                "dti_md",
+                "dti_ga",
+                f"TemplateScalar('T1', '{t1_path}')"]),
+        VIZ=dict(
+            viz_backend="plotly_no_gif"),
+        TRACTOGRAPHY_PARAMS=tracking_params,
+        SEGMENTATION_PARAMS=segmentation_params,
+        CLEANING_PARAMS=clean_params)
 
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:
