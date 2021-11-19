@@ -1,3 +1,10 @@
+0.9.2 (November 18, 2021)
+=========================
+Another bug fix release meant to improve tagging of Docker images.
+
+  * [ENH] try to get the tag name even not on release (#775)
+
+
 0.9.1 (November 12, 2021)
 =========================
 This is a bug-fix release, which fixes some issues with the CLI in the previous
