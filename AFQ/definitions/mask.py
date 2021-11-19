@@ -200,8 +200,9 @@ class RoiMask(Definition):
     def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine, mapping_imap,
-                        bundle_dict, segmentation_params):
+                        data_imap, segmentation_params):
             mask_data = None
+            bundle_dict = data_imap["bundle_dict"]
             if self.use_presegment:
                 bundle_dict = \
                     segmentation_params["presegment_bundle_dict"]
