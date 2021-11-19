@@ -427,5 +427,5 @@ def init_viz_backend(viz_backend_spec="plotly_no_gif",
 
 def get_viz_plan(kwargs):
     viz_tasks = with_name([
-        plot_tract_profiles, viz_bundles, viz_indivBundle])
+        plot_tract_profiles, viz_bundles, viz_indivBundle, init_viz_backend])
     return pimms.plan(**viz_tasks)
