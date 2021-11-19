@@ -1,8 +1,7 @@
 import nibabel as nib
-from textwrap import dedent
 
 from AFQ.definitions.mapping import SlrMap
-from AFQ.api.utils import wf_sections, task_outputs
+from AFQ.api.utils import wf_sections, add_method_descriptors
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -129,20 +128,4 @@ class ParticipantAFQ(object):
         return object.__getattribute__(self, attr)
 
 
-# iterate through all attributes, setting methods for each one
-for output, desc in task_outputs.items():
-    desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")
-    exec(dedent(f"""\
-    def export_{output}(self):
-        \"\"\"
-        Triggers a cascade of calculations to generate the desired output.
-        Returns
-        -------
-        {desc}
-        \"\"\"
-        return self.{output}"""))
-    fn = locals()[f"export_{output}"]
-    if output[-5:] == "_file":
-        setattr(ParticipantAFQ, f"export_{output[:-5]}", fn)
-    else:
-        setattr(ParticipantAFQ, f"export_{output}", fn)
+add_method_descriptors(ParticipantAFQ)

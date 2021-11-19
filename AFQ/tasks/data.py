@@ -461,7 +461,7 @@ def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
 @pimms.calc("brain_mask_file")
 @as_file('_brain_mask.nii.gz')
 def brain_mask(subses_dict, dwi_affine, b0_file,
-               bids_info, brain_mask_definition=B0Mask()):
+               bids_info, brain_mask_definition=None):
     """
     full path to a nifti file containing
     the brain mask
@@ -473,8 +473,11 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
         the brain mask, which gets applied before registration to a
         template.
         If you want no brain mask to be applied, use FullMask.
-        Default: B0Mask()
+        If None, use B0Mask()
+        Default: None
     """
+    if brain_mask_definition is None:
+        brain_mask_definition = B0Mask()
     if not isinstance(brain_mask_definition, Definition):
         raise TypeError(
             "brain_mask_definition must be a Definition")

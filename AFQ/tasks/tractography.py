@@ -8,7 +8,7 @@ from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
-from AFQ.utils.bin import get_default_args
+from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.mask import ScalarMask
 
 logger = logging.getLogger('AFQ.api')

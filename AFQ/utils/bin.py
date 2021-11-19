@@ -1,4 +1,3 @@
-import inspect
 import toml
 import datetime
 import platform
@@ -12,12 +11,9 @@ from AFQ.definitions.mask import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
 from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
+from AFQ.api.utils import kwargs_descriptors
 
 import nibabel as nib  # allows users to input nibabel objects
-
-
-def parse_string(option, opt, value, parser):
-    setattr(parser.values, option.dest, value.split(','))
 
 
 def model_input_parser(usage):
@@ -69,15 +65,6 @@ def model_predict_input_parser(usage):
                         help="b0 threshold (default: 0)",
                         action="store", default=0)
     return parser
-
-
-def get_default_args(func):
-    signature = inspect.signature(func)
-    return {
-        k: v.default
-        for k, v in signature.parameters.items()
-        if v.default is not inspect.Parameter.empty
-    }
 
 
 def toml_to_val(t):
@@ -182,7 +169,7 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
         import AFQ.api.group as api
 
         func_dict = {
-            "AFQ": api.GroupAFQ.__init__,
+            "BIDS": api.GroupAFQ.__init__,
             "Tractography": aft.track,
             "Segmentation": seg.Segmentation.__init__,
             "Cleaning": seg.clean_bundle}
@@ -191,22 +178,14 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     for name, func in func_dict.items():
         docstr_parser = FuncArgParser()
         docstr_parser.setup_args(func)
-        if name == "AFQ":
+        if name == "BIDS":
             arg_dict["AFQ_desc"] = docstr_parser.description
         for arg, info in docstr_parser.unfinished_arguments.items():
             try:
-                if name == "AFQ":
-                    if arg in [
-                            "tracking_params",
-                            "segmentation_params",
-                            "clean_params"]:
-                        continue
-                    section, desc = info['help'].split('[')[1].split(']')
-                else:
-                    section = name.upper()
-                    desc = info['help']
-                    if 'positional' in info and info['positional']:
-                        continue
+                section = name.upper() + "_PARAMS"
+                desc = info['help']
+                if 'positional' in info and info['positional']:
+                    continue
             except (KeyError, IndexError) as error:
                 if logger is not None:
                     logger.error(
@@ -221,6 +200,23 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
             else:
                 default = None
             arg_dict[section][arg]['default'] = default
+            arg_dict[section][arg]['desc'] = desc
+
+    for section, arg_info in kwargs_descriptors.items():
+        section = section.upper()
+        if section not in arg_dict.keys():
+            arg_dict[section] = {}
+        for arg, info in arg_info.items():
+            if arg not in [
+                    "clean_params", "segmentation_params",
+                    "tracking_params"]:
+                arg_dict[section][arg] = info
+
+    for section, arg_info in arg_dict.items():
+        if section == "AFQ_desc":
+            continue
+        for arg, info in arg_info.items():
+            desc = arg_dict[section][arg]['desc']
             arg_dict[section][arg]['desc'] = ''
             for desc_line in desc.splitlines():
                 f_desc_line = '# ' + desc_line.strip() + '\n'
@@ -234,9 +230,10 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
                          verbose=False,
-                         special_args={"CLEANING": "clean_params",
-                                       "SEGMENTATION": "segmentation_params",
-                                       "TRACTOGRAPHY": "tracking_params"}):
+                         special_args={
+                             "CLEANING_PARAMS": "clean_params",
+                             "SEGMENTATION_PARAMS": "segmentation_params",
+                             "TRACTOGRAPHY_PARAMS": "tracking_params"}):
     import AFQ.api.group as api
     from AFQ import __version__
     # load configuration file
@@ -256,8 +253,6 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                 default_arg_dict[section] = {}
             if arg == 'bids_path':
                 bids_path = default
-            elif section == "KWARGS":
-                kwargs[arg] = toml_to_val(default)
             else:
                 val = toml_to_val(default)
                 is_special = False

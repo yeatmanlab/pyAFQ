@@ -3,10 +3,9 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
-from textwrap import dedent
 import AFQ.data as afd
 from AFQ.api.participant import ParticipantAFQ
-from AFQ.api.utils import wf_sections, task_outputs
+from AFQ.api.utils import wf_sections, add_method_descriptors
 
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
@@ -594,26 +593,7 @@ class GroupAFQ(object):
             sublink=page_subtitle_link)
 
 
-# iterate through all attributes, setting methods for each one
-for output, desc in task_outputs.items():
-    desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")
-    exec(dedent(f"""\
-    def export_{output}(self):
-        \"\"\"
-        Triggers a cascade of calculations to generate the desired output.
-        Returns
-        -------
-        Dictionary where each key is a subjectID.
-        If there is more than one session, each value is another dictionary,
-        where each key is a sessionID. In either case, the final value is:
-        {desc}
-        \"\"\"
-        return self.{output}"""))
-    fn = locals()[f"export_{output}"]
-    if output[-5:] == "_file":
-        setattr(GroupAFQ, f"export_{output[:-5]}", fn)
-    else:
-        setattr(GroupAFQ, f"export_{output}", fn)
+add_method_descriptors(GroupAFQ)
 
 
 def download_and_combine_afq_profiles(bucket,

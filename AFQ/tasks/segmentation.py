@@ -13,7 +13,7 @@ from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
-from AFQ.utils.bin import get_default_args
+from AFQ.tasks.utils import get_default_args
 import AFQ.data as afd
 import AFQ.api.bundle_dict as abd
 

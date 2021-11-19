@@ -89,7 +89,7 @@ def export_rois(subses_dict, bundle_dict, mapping, dwi_affine):
 
 @pimms.calc("mapping")
 def mapping(subses_dict, reg_subject, reg_template, bids_info,
-            mapping_definition=SynMap()):
+            mapping_definition=None):
     """
     mapping from subject to template space.
 
@@ -100,8 +100,11 @@ def mapping(subses_dict, reg_subject, reg_template, bids_info,
         each subject space to template space or load a mapping from
         another software. If creating a map, will register reg_subject and
         reg_template.
-        Default: SynMap()
+        If None, use SynMap()
+        Default: None
     """
+    if mapping_definition is None:
+        mapping_definition = SynMap()
     if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
@@ -118,7 +121,7 @@ def mapping(subses_dict, reg_subject, reg_template, bids_info,
 
 @pimms.calc("mapping")
 def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
-                tractography_imap, mapping_definition=SynMap()):
+                tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
 
@@ -129,8 +132,11 @@ def sls_mapping(subses_dict, reg_subject, reg_template, bids_info,
         each subject space to template space or load a mapping from
         another software. If creating a map, will register reg_subject and
         reg_template.
-        Default: SynMap()
+        If None, use SynMap()
+        Default: None
     """
+    if mapping_definition is None:
+        mapping_definition = SynMap()
     if not isinstance(mapping_definition, Definition):
         raise TypeError(
             "mapping must be a mapping defined"
@@ -174,7 +180,7 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
 
     Parameters
     ----------
-    reg_subject : str, Nifti1Image, dict, optional
+    reg_subject_spec : str, Nifti1Image, dict, optional
         The source image data to be registered.
         Can either be a Nifti1Image, a scalar definition, or
         if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
