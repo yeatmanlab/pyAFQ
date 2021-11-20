@@ -54,6 +54,7 @@ def _getter_helper(wf_dict, attr_name):
     return wf_dict[attr_name]
 
 
+@add_method_descriptors
 class GroupAFQ(object):
     """
     """
@@ -592,9 +593,6 @@ class GroupAFQ(object):
             subtitle=page_subtitle,
             link=page_title_link,
             sublink=page_subtitle_link)
-
-
-add_method_descriptors(GroupAFQ)  # todo: make this a decorator
 
 
 def download_and_combine_afq_profiles(bucket,

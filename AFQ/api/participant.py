@@ -13,6 +13,7 @@ from AFQ.tasks.viz import get_viz_plan
 __all__ = ["ParticipantAFQ"]
 
 
+@add_method_descriptors
 class ParticipantAFQ(object):
     def __init__(self,
                  dwi_data_file,
@@ -125,6 +126,3 @@ class ParticipantAFQ(object):
 
         # attr not found, allow typical AttributeError
         return object.__getattribute__(self, attr)
-
-
-add_method_descriptors(ParticipantAFQ)

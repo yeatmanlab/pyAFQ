@@ -96,3 +96,5 @@ def add_method_descriptors(AFQclass):
                 AFQclass_doc = AFQclass_doc + "\n\n"
 
         setattr(AFQclass, "__doc__", AFQclass_doc)
+
+        return AFQclass
