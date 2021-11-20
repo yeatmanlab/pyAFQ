@@ -10,6 +10,7 @@ import os.path as op
 import plotly
 
 import AFQ.api.group as api
+import AFQ.api.bundle_dict as abd
 from AFQ.definitions.mask import RoiMask
 import AFQ.data as afd
 
@@ -41,15 +42,15 @@ tracking_params = dict(seed_mask=RoiMask(),
 # -------------------------
 #
 # We specify bundle_info as the callosal bundles only
-# (`api.CALLOSUM_BUNDLES`). If we want to segment both the callosum
-# and the other bundles, we would pass `api.CALLOSUM_BUNDLES + api.BUNDLES`
+# (`abd.CALLOSUM_BUNDLES`). If we want to segment both the callosum
+# and the other bundles, we would pass `abd.CALLOSUM_BUNDLES + abd.BUNDLES`
 # instead. This would tell the AFQ object to use bundles from both
 # the standard and callosal templates.
 
 myafq = api.GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     preproc_pipeline='vistasoft',
-    bundle_info=api.CALLOSUM_BUNDLES,
+    bundle_info=abd.CALLOSUM_BUNDLES,
     tracking_params=tracking_params,
     viz_backend_spec='plotly_no_gif')
 

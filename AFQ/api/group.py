@@ -68,6 +68,7 @@ class GroupAFQ(object):
                  **kwargs):
         '''
         Initialize a GroupAFQ object from a BIDS dataset.
+        # TODO: add a link here to where the rst files will be, generated like the config
 
         Parameters
         ----------
@@ -593,7 +594,7 @@ class GroupAFQ(object):
             sublink=page_subtitle_link)
 
 
-add_method_descriptors(GroupAFQ)
+add_method_descriptors(GroupAFQ)  # todo: make this a decorator
 
 
 def download_and_combine_afq_profiles(bucket,
