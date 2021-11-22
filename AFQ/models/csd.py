@@ -19,6 +19,7 @@ __all__ = ["fit_csd"]
 
 
 class CsdNanResponseError(Exception):
+    pass
 
 
 def _model(gtab, data, response=None, sh_order=None, msmt=False):
