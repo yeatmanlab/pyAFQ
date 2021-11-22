@@ -21,6 +21,7 @@ from AFQ.definitions.mask import B0Mask
 
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
+from AFQ.models.csd import CsdNanResponseError
 from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
 
@@ -234,12 +235,19 @@ def csd(subses_dict, dwi_affine,
     msmt = (tracking_params["odf_model"] == "MSMT")
     mask =\
         nib.load(brain_mask_file).get_fdata()
-    csdf = csd_fit_model(
-        gtab, data,
-        mask=mask,
-        response=csd_response, sh_order=csd_sh_order,
-        lambda_=csd_lambda_, tau=csd_tau,
-        msmt=msmt)
+    try:
+        csdf = csd_fit_model(
+            gtab, data,
+            mask=mask,
+            response=csd_response, sh_order=csd_sh_order,
+            lambda_=csd_lambda_, tau=csd_tau,
+            msmt=msmt)
+    except CsdNanResponseError:
+        raise CsdNanResponseError(
+            'Could not compute CSD response function for subject: '
+            f'{subses_dict["subject"]} in session: {subses_dict["ses"]} '
+            f'file: {subses_dict["dwi_file"]}.'
+            )
     meta = dict(
         SphericalHarmonicDegree=csd_sh_order,
         ResponseFunctionTensor=csd_response,
