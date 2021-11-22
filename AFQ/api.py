@@ -283,6 +283,7 @@ class BundleDict(MutableMapping):
                 "After BundleDict initialization, additional"
                 " bundles can only be added as dictionaries "
                 "(see BundleDict.gen_all for examples)"))
+        self.gen_all()
         self._dict[key] = item
         self._uid_dict[key] = self._c_uid
         self._dict[key]["uid"] = self._c_uid
@@ -517,6 +518,7 @@ class AFQ(object):
                  tracking_params=None,
                  segmentation_params=None,
                  clean_params=None,
+                 bids_layout_kwargs={},
                  **kwargs):
         '''
         Initialize an AFQ object.
@@ -649,6 +651,11 @@ class AFQ(object):
             The parameters for cleaning.
             Default: use the default behavior of the seg.clean_bundle
             function.
+        bids_layout_kwargs: dict, optional
+            [DATA] Additional arguments to give to BIDSLayout from pybids.
+            For large datasets, try:
+            {"validate": False, "index_metadata": False}
+            Default: {}
         kwargs : additional optional parameters
             [KWARGS] You can set additional parameters for any step
             of the process.
@@ -762,6 +769,8 @@ class AFQ(object):
                 and not isinstance(clean_params, dict):
             raise TypeError(
                 "clean_params must be None or a dict")
+        if not isinstance(bids_layout_kwargs, dict):
+            raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logging.getLogger('AFQ.api')
         self.parallel_params = parallel_params
@@ -881,7 +890,8 @@ class AFQ(object):
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
 
-        bids_layout = BIDSLayout(bids_path, derivatives=True)
+        bids_layout = BIDSLayout(
+            bids_path, derivatives=True, **bids_layout_kwargs)
         bids_description = bids_layout.description
 
         # check that any files exist in the derivatives folder,

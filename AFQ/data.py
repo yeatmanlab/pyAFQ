@@ -298,7 +298,7 @@ fetch_pediatric_templates = _make_fetcher(
 def read_pediatric_templates():
     """
     Load pediatric pyAFQ templates. 
-    
+
     Used to create pediatric `bundle_dict`.
 
     Returns
@@ -663,7 +663,6 @@ def read_or_templates(resample_to=False):
     logger.debug(f'or templates loaded in {toc - tic:0.4f} seconds')
 
     return template_dict
-
 
 
 # +----------------------------------------------------+
@@ -2336,7 +2335,7 @@ def bundles_to_aal(bundles, atlas=None):
     for the first and last node of the streamlines in this bundle.
     """
     if atlas is None:
-        atlas = read_aal_atlas()['atlas']
+        atlas = read_aal_atlas()['atlas'].get_fdata()
 
     endpoint_dict = {
         "ATR_L": [['leftfrontal'], None],
