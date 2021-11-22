@@ -322,7 +322,7 @@ def generate_config(toml_file, default_arg_dict, overwrite=False,
     toml_file.close()
 
 
-def generate_json(json_file, default_arg_dict, overwrite=False,
+def generate_json(json_file, overwrite=False,
                   logger=None):
     if not overwrite and op.exists(json_file):
         raise FileExistsError(
@@ -350,8 +350,18 @@ def generate_json(json_file, default_arg_dict, overwrite=False,
         }
     ]
 }"""
+    import AFQ.segmentation as seg
+    import AFQ.tractography as aft
+
+    func_dict = {
+        "Tractography": aft.track,
+        "Segmentation": seg.Segmentation.__init__,
+        "Cleaning": seg.clean_bundle}
+
+    arg_dict = func_dict_to_arg_dict(func_dict, logger=logger)
+
     json_file = open(json_file, 'w')
     json_file.write(qsi_spec_intro)
-    json_file.write(dict_to_json(default_arg_dict))
+    json_file.write(dict_to_json(arg_dict))
     json_file.write(qsi_spec_outro)
     json_file.close()

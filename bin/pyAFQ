@@ -124,7 +124,7 @@ if __name__ == '__main__':
             config_file, arg_dict, overwrite, logger=logger)
     elif generate_json:
         afb.generate_json(
-            config_file, arg_dict, overwrite, logger=logger)
+            config_file, overwrite, logger=logger)
     else:
         afb.parse_config_run_afq(
             config_file,
