@@ -46,7 +46,9 @@ class ParticipantAFQ(object):
             to the files you want to use directly.
         kwargs : additional optional parameters
             You can set additional parameters for any step
-            of the process.
+            of the process. See `The pyAFQ API optional arguments`
+            in the `usage` section of pyAFQ's documentation for more
+            details.
             For example, to set the sh_order for csd to 4, do:
             api.GroupAFQ(my_path, sh_order=4)
         """

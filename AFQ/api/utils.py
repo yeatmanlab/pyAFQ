@@ -5,7 +5,7 @@ from funcargparse import FuncArgParser
 
 __all__ = [
     "methods_descriptors", "kwargs_descriptors",
-    "wf_sections", "add_method_descriptors"]
+    "wf_sections", "add_method_descriptors", "AFQclass_doc"]
 
 task_modules = ["data", "mapping", "segmentation", "tractography", "viz"]
 
@@ -57,6 +57,21 @@ wf_sections = [
     "tractography_imap", "segmentation_imap",
     "subses_dict"]
 
+AFQclass_doc = ""
+for task_module in task_modules:
+    AFQclass_doc = AFQclass_doc + "\n"
+    AFQclass_doc = AFQclass_doc +\
+        "==========================================================\n"
+    AFQclass_doc = AFQclass_doc + task_module.upper() + "\n"
+    AFQclass_doc = AFQclass_doc +\
+        "==========================================================\n"
+    for arg, info in kwargs_descriptors[task_module].items():
+        AFQclass_doc = AFQclass_doc + arg + ": " + info["kind"]
+        AFQclass_doc = AFQclass_doc + "\n\t"
+        AFQclass_doc = AFQclass_doc + info["desc"].replace(
+            "\n", "\n\t")
+        AFQclass_doc = AFQclass_doc + "\n\n"
+
 
 def add_method_descriptors(AFQclass):
     # iterate through all attributes, setting methods for each one
@@ -77,24 +92,11 @@ def add_method_descriptors(AFQclass):
         else:
             setattr(AFQclass, f"export_{output}", fn)
 
-    AFQclass_doc = (
+    AFQclass_doc_intro = (
         "Here are the arguments you can pass to kwargs,"
         " to customize the tractometry pipeline. They are organized"
         " into 5 sections.\n")
-    for task_module in task_modules:
-        AFQclass_doc = AFQclass_doc + "\n"
-        AFQclass_doc = AFQclass_doc +\
-            "==========================================================\n"
-        AFQclass_doc = AFQclass_doc + task_module.upper() + "\n"
-        AFQclass_doc = AFQclass_doc +\
-            "==========================================================\n"
-        for arg, info in kwargs_descriptors[task_module].items():
-            AFQclass_doc = AFQclass_doc + arg + ": " + info["kind"]
-            AFQclass_doc = AFQclass_doc + "\n\t"
-            AFQclass_doc = AFQclass_doc + info["desc"].replace(
-                "\n", "\n\t")
-            AFQclass_doc = AFQclass_doc + "\n\n"
 
-    setattr(AFQclass, "__doc__", AFQclass_doc)
+    setattr(AFQclass, "__doc__", AFQclass_doc_intro + AFQclass_doc)
 
     return AFQclass
