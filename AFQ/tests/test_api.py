@@ -354,7 +354,7 @@ def test_AFQ_data():
         myafq = api.GroupAFQ(
             bids_path=bids_path,
             preproc_pipeline='vistasoft',
-            mapping=mapping)
+            mapping_definition=mapping)
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
                          nib.load(myafq.dwi_file["01"]).shape[:3])
         npt.assert_equal(nib.load(myafq.b0["01"]).shape,
@@ -378,8 +378,8 @@ def test_AFQ_anisotropic():
         min_bval=1990,
         max_bval=2010,
         b0_threshold=50,
-        reg_template="mni_T1",
-        reg_subject="power_map")
+        reg_template_spec="mni_T1",
+        reg_subject_spec="power_map")
 
     gtab = myafq.gtab["01"]
 
@@ -412,15 +412,16 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="import_tract must be a str"):
+            match=(
+                "import_tract must be"
+                " either a dict or a str")):
         api.GroupAFQ(
             bids_path,
             import_tract=["dwi"])
 
     with pytest.raises(
             TypeError,
-            match=("brain_mask_definition must be None or a mask defined"
-                   " in `AFQ.definitions.mask`")):
+            match="brain_mask_definition must be a Definition"):
         myafq = api.GroupAFQ(
             bids_path,
             brain_mask_definition="not a brain mask")
@@ -452,9 +453,9 @@ def test_AFQ_slr():
     myafq = api.GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
-        reg_subject='subject_sls',
-        reg_template='hcp_atlas',
-        mapping=SlrMap())
+        reg_subject_spec='subject_sls',
+        reg_template_spec='hcp_atlas',
+        mapping_definition=SlrMap())
 
     tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
     bundles = aus.tgram_to_bundles(
@@ -581,8 +582,8 @@ def test_AFQ_custom_subject_reg():
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
-        reg_template="mni_T2",
-        reg_subject={
+        reg_template_spec="mni_T2",
+        reg_subject_spec={
             "suffix": "customb0",
             "scope": "vistasoft"})
     my_afq.export_rois()
@@ -598,8 +599,8 @@ def test_AFQ_FA():
     myafq = api.GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
-        reg_template='dti_fa_template',
-        reg_subject='dti_fa_subject')
+        reg_template_spec='dti_fa_template',
+        reg_subject_spec='dti_fa_subject')
     myafq.rois
 
 

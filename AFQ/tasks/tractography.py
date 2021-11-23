@@ -131,7 +131,7 @@ def custom_tractography(bids_info, import_tract=None):
     if not isinstance(import_tract, dict) and\
             not isinstance(import_tract, str):
         raise TypeError(
-            "import_tract_definition must be"
+            "import_tract must be"
             + " either a dict or a str")
     if isinstance(import_tract, dict):
         if bids_info is None:
@@ -172,10 +172,6 @@ def get_tractography_plan(kwargs):
             and not isinstance(kwargs["tracking_params"], dict):
         raise TypeError(
             "tracking_params a dict")
-    if "import_tract" in kwargs\
-            and not isinstance(kwargs["import_tract"], str):
-        raise TypeError(
-            "import_tract must be a str")
 
     tractography_tasks = with_name([
         export_seed_mask, export_stop_mask, streamlines])
