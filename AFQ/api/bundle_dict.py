@@ -234,6 +234,7 @@ class BundleDict(MutableMapping):
                 "After BundleDict initialization, additional"
                 " bundles can only be added as dictionaries "
                 "(see BundleDict.gen_all for examples)"))
+        self.gen_all()
         self._dict[key] = item
         self._uid_dict[key] = self._c_uid
         self._dict[key]["uid"] = self._c_uid

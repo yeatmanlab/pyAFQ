@@ -66,6 +66,7 @@ class GroupAFQ(object):
                  participant_labels=None,
                  output_dir=None,
                  parallel_params={"engine": "serial"},
+                 bids_layout_kwargs={},
                  **kwargs):
         '''
         Initialize a GroupAFQ object from a BIDS dataset.
@@ -102,6 +103,11 @@ class GroupAFQ(object):
             multiprocessing with 4 cpus:
             {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
             Default: {"engine": "serial"}
+        bids_layout_kwargs: dict, optional
+            Additional arguments to give to BIDSLayout from pybids.
+            For large datasets, try:
+            {"validate": False, "index_metadata": False}
+            Default: {}
         kwargs : additional optional parameters
             [KWARGS] You can set additional parameters for any step
             of the process. See :ref:`kwargs_docs` for more details.
@@ -131,6 +137,8 @@ class GroupAFQ(object):
                 "output_dir must be either a str or None")
         if not isinstance(parallel_params, dict):
             raise TypeError("parallel_params must be a dict")
+        if not isinstance(bids_layout_kwargs, dict):
+            raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logging.getLogger('AFQ.api')
         self.parallel_params = parallel_params
