@@ -5,7 +5,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 import logging
 import AFQ.data as afd
 from AFQ.api.participant import ParticipantAFQ
-from AFQ.api.utils import wf_sections, add_method_descriptors
+from AFQ.api.utils import wf_sections, add_method_descriptions
 
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
@@ -54,7 +54,7 @@ def _getter_helper(wf_dict, attr_name):
     return wf_dict[attr_name]
 
 
-@add_method_descriptors
+@add_method_descriptions
 class GroupAFQ(object):
     """
     """
@@ -104,11 +104,12 @@ class GroupAFQ(object):
             Default: {"engine": "serial"}
         kwargs : additional optional parameters
             [KWARGS] You can set additional parameters for any step
-            of the process. See `The pyAFQ API optional arguments`
-            in the `usage` section of pyAFQ's documentation for more
-            details.
-            For example, to set the sh_order for csd to 4, do:
-            api.GroupAFQ(my_path, sh_order=4)
+            of the process. See :ref:`kwargs_docs` for more details.
+
+        Examples
+        --------
+        api.GroupAFQ(my_path, csd_sh_order=4)
+        api.GroupAFQ(my_path, reg_template="mni_t2", reg_subject="b0")
         '''
         if not isinstance(bids_path, str):
             raise TypeError("bids_path must be a string")

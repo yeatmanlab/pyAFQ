@@ -1,6 +1,6 @@
 import AFQ.api.bundle_dict as abd
 from AFQ.tests.test_api import create_dummy_bids_path
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
 import AFQ.data as afd
 import pytest
 
@@ -8,7 +8,7 @@ import pytest
 def test_AFQ_custom_bundle_dict():
     bids_path = create_dummy_bids_path(3, 1)
     bundle_dict = abd.BundleDict()
-    api.GroupAFQ(
+    GroupAFQ(
         bids_path,
         preproc_pipeline="synthetic",
         bundle_info=bundle_dict)

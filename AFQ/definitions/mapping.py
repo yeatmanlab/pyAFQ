@@ -79,16 +79,17 @@ class FnirtMap(Definition):
             raise ImportError(
                 "Please install fslpy if you want to use FnirtMap")
         if warp_path is None and warp_suffix is None:
-            raise ValueError(
-                "One of warp_path or warp_suffix must not be None.")
+            raise ValueError((
+                "One of `warp_path` or `warp_suffix` should be set "
+                "to a value other than None."))
         if space_path is None and space_suffix is None:
             raise ValueError(
                 "One of space_path or space_suffix must not be None.")
         if warp_path is not None and space_path is None\
                 or space_path is not None and warp_path is None:
             raise ValueError((
-                "If using warp_path, you must use space_path"
-                ", and vice versa."))
+                "If passing a value for `warp_path`, "
+                "you must also pass a value for `space_path`"))
         if warp_path is not None:
             self.from_path = True
             self.fnames = (warp_path, space_path)
@@ -214,8 +215,9 @@ class ItkMap(Definition):
             raise ImportError(
                 "Please install h5py if you want to use ItkMap")
         if warp_path is None and warp_suffix is None:
-            raise ValueError(
-                "One of warp_path or warp_suffix must not be None.")
+            raise ValueError((
+                "One of `warp_path` or `warp_suffix` should be set "
+                "to a value other than None."))
 
         if warp_path is not None:
             self.from_path = True

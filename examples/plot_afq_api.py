@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 import plotly
 
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
 import AFQ.data as afd
 
 ##########################################################################
@@ -95,7 +95,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 #    We will also be using plotly to generate an interactive visualization.
 #    So we will specify plotly_no_gif as the visualization backend.
 
-myafq = api.GroupAFQ(
+myafq = GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     preproc_pipeline='vistasoft',
     viz_backend_spec='plotly_no_gif')

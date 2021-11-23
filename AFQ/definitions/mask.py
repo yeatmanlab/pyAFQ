@@ -86,7 +86,7 @@ class MaskFile(Definition):
     Examples
     --------
     seed_mask = MaskFile(
-        suffix="WM_mask",
+        suffix="WM",
         filters={"scope":"dmriprep"})
     api.GroupAFQ(tracking_params={"seed_mask": seed_mask,
                                 "seed_threshold": 0.1})
@@ -94,7 +94,9 @@ class MaskFile(Definition):
 
     def __init__(self, path=None, suffix=None, filters={}):
         if path is None and suffix is None:
-            raise ValueError("One of path or suffix must not be None.")
+            raise ValueError((
+                "One of `path` or `suffix` must set to "
+                "a value other than None."))
 
         if path is not None:
             self.from_path = True
@@ -378,7 +380,7 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
     Examples
     --------
     brain_mask_definition = ThresholdedMaskFile(
-        suffix="brain_mask",
+        suffix="BM",
         filters={"scope":"dmriprep"},
         lower_bound=0.1)
     api.GroupAFQ(brain_mask_definition=brain_mask_definition)

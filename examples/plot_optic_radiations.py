@@ -13,7 +13,7 @@ provide these ROIs as part of the software.
 """
 
 import os.path as op
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 from AFQ.definitions.mask import LabelledMaskFile, RoiMask
@@ -58,7 +58,7 @@ brain_mask_definition = LabelledMaskFile(
     filters={"scope": "freesurfer"},
     exclusive_labels=[0])
 
-my_afq = api.GroupAFQ(
+my_afq = GroupAFQ(
     bids_path=op.join(
         afd.afq_home,
         'stanford_hardi'),

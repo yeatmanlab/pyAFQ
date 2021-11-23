@@ -5,7 +5,7 @@ from funcargparse import FuncArgParser
 
 __all__ = [
     "methods_descriptors", "kwargs_descriptors",
-    "wf_sections", "add_method_descriptors", "AFQclass_doc"]
+    "wf_sections", "add_method_descriptions", "AFQclass_doc"]
 
 task_modules = ["data", "mapping", "segmentation", "tractography", "viz"]
 
@@ -73,7 +73,7 @@ for task_module in task_modules:
         AFQclass_doc = AFQclass_doc + "\n\n"
 
 
-def add_method_descriptors(AFQclass):
+def add_method_descriptions(AFQclass):
     # iterate through all attributes, setting methods for each one
     for output, desc in methods_descriptors.items():
         desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")

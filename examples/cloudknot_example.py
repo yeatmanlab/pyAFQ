@@ -45,7 +45,7 @@ def afq_process_subject(subject):
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
     import AFQ.data as afqd
-    import AFQ.api.group as api
+    from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 
     # Download the given subject to your local machine from s3
@@ -71,7 +71,7 @@ def afq_process_subject(subject):
         exclusive_labels=[0])
 
     # define the api AFQ object
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         "local_bids_dir",
         preproc_pipeline="pipeline_name",
         brain_mask_definition=brain_mask_definition,

@@ -37,7 +37,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
     from AFQ.data import fetch_hcp
-    import AFQ.api.group as api
+    from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 
     import numpy as np
@@ -84,7 +84,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
         exclusive_labels=[0])
 
     # define the api AFQ object
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         hcp_bids,
         brain_mask_definition=brain_mask_definition,
         tracking_params=tracking_params)

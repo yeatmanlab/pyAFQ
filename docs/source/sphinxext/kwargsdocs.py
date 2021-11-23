@@ -5,6 +5,8 @@ from AFQ.api.utils import methods_descriptors, AFQclass_doc
 from textwrap import dedent
 
 prologue = """
+.. _kwargs_docs:
+
 The pyAFQ API optional arguments
 --------------------------------
 You can run pyAFQ on either a subject or participant level

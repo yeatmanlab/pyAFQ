@@ -223,6 +223,13 @@ def csd(subses_dict, dwi_affine,
         zero. However, to improve the stability of the algorithm, tau is
         set to tau*100 % of the mean fODF amplitude (here, 10% by default)
         (see [1]_). Default: 0.1
+
+    References
+    ----------
+    .. [1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of
+            the fibre orientation distribution in diffusion MRI:
+            Non-negativity constrained super-resolved spherical
+            deconvolution
     """
     msmt = (tracking_params["odf_model"] == "MSMT")
     mask =\
@@ -471,7 +478,7 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
     Parameters
     ----------
     brain_mask_definition : instance from `AFQ.definitions.mask`, optional
-        [REGISTRATION] This will be used to create
+        This will be used to create
         the brain mask, which gets applied before registration to a
         template.
         If you want no brain mask to be applied, use FullMask.

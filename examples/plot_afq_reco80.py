@@ -11,7 +11,7 @@ import os.path as op
 
 import plotly
 
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
 import AFQ.data as afd
 
 ##########################################################################
@@ -44,7 +44,7 @@ tracking_params = dict(n_seeds=50000,
 # object to perform RecoBundles using the 80 bundles atlas in the
 # segmentation step.
 
-myafq = api.GroupAFQ(bids_path=op.join(afd.afq_home,
+myafq = GroupAFQ(bids_path=op.join(afd.afq_home,
                                   'stanford_hardi'),
                 preproc_pipeline='vistasoft',
                 segmentation_params={"seg_algo": "reco80"},

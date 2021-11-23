@@ -33,7 +33,6 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
-import AFQ.api.group as api
 import AFQ.api.bundle_dict as abd
 
 # Target directory for this example's output files

@@ -7,7 +7,6 @@ import nibabel as nib
 from dipy.reconst import csdeconv as csd
 from dipy.reconst import mcsd
 from dipy.reconst import shm
-import dipy.data as dpd
 import AFQ.utils.models as ut
 
 # Monkey patch fixed spherical harmonics for conda and fixed solve_qp from
@@ -106,10 +105,16 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     msmt : bool, optional
         If False, standard single-shell CSD will be used. Otherwise,
 
-
     Returns
     -------
     fname : the full path to the file containing the SH coefficients.
+
+    References
+    ----------
+    .. [1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of
+            the fibre orientation distribution in diffusion MRI:
+            Non-negativity constrained super-resolved spherical
+            deconvolution
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files,
                                             b0_threshold=b0_threshold,

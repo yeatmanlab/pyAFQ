@@ -36,7 +36,7 @@ AFQ object, either as an attribute or using a `export_` method,
 such as `export_b0`. Descriptions for these methods are taken from
 each tasks' dosctring. Additionally, if there are any parameters in your
 task which the user should input, make them a kwarg with a reasonable default,
-and add a description to the docstring in a properly formated parameters
+and add a description to the docstring in a properly formatted parameters
 section. Note that when an output is attached to the AFQ class either as
 an attribute or method, if that output name ends in '_file',
 the '_file' is removed from the name automatically. 

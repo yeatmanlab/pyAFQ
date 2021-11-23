@@ -17,7 +17,8 @@ The following is an example of tractometry for pediatric bundles.
 import os.path as op
 import plotly
 
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
+import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 
 from AFQ.definitions.mask import RoiMask, MaskFile
@@ -49,7 +50,7 @@ from AFQ.definitions.mask import RoiMask, MaskFile
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/pybabyafq.ipynb
 
 
-myafq = api.GroupAFQ(  # ==== BIDS parameters ====
+myafq = GroupAFQ(  # ==== BIDS parameters ====
     bids_path=op.join(afd.afq_home, "study"),
     preproc_pipeline="derivatives",
     # ===== Registration parameters ====
@@ -61,7 +62,7 @@ myafq = api.GroupAFQ(  # ==== BIDS parameters ====
     brain_mask_definition=MaskFile(
         suffix="brainmask", filters={"scope": "derivatives"}),
     # ==== Bundle parameters ====
-    bundle_info=api.PediatricBundleDict(),
+    bundle_info=abd.PediatricBundleDict(),
     # ==== Compute parameters ====
     force_recompute=True,
     # ==== Tracking parameters ====

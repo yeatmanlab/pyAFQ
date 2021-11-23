@@ -1,7 +1,7 @@
 import nibabel as nib
 
 from AFQ.definitions.mapping import SlrMap
-from AFQ.api.utils import wf_sections, add_method_descriptors
+from AFQ.api.utils import wf_sections, add_method_descriptions
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -13,7 +13,7 @@ from AFQ.tasks.viz import get_viz_plan
 __all__ = ["ParticipantAFQ"]
 
 
-@add_method_descriptors
+@add_method_descriptions
 class ParticipantAFQ(object):
     def __init__(self,
                  dwi_data_file,
@@ -23,10 +23,6 @@ class ParticipantAFQ(object):
                  **kwargs):
         """
         Initialize a ParticipantAFQ object from a BIDS dataset.
-        Some special notes on parameters:
-        In tracking_params, parameters with the suffix mask which are also
-        a mask from AFQ.definitions.mask will be handled automatically by
-        the api.
 
         Parameters
         ----------
@@ -40,17 +36,28 @@ class ParticipantAFQ(object):
             Path to output directory.
         bids_info : dict or None, optional
             This is used by GroupAFQ to provide information about
-            the BIDS layout to each particpant. It is reccomended
-            that you leave this parameter as None,
-            and instead pass in the paths
-            to the files you want to use directly.
+            the BIDS layout to each participant.
         kwargs : additional optional parameters
             You can set additional parameters for any step
-            of the process. See `The pyAFQ API optional arguments`
-            in the `usage` section of pyAFQ's documentation for more
-            details.
-            For example, to set the sh_order for csd to 4, do:
-            api.GroupAFQ(my_path, sh_order=4)
+            of the process. See :ref:`kwargs_docs` for more details.
+
+        Examples
+        --------
+        api.ParticipantAFQ(
+            dwi_data_file, bval_file, bvec_file, output_dir,
+            csd_sh_order=4)
+        api.ParticipantAFQ(
+            dwi_data_file, bval_file, bvec_file, output_dir,
+            reg_template="mni_t2", reg_subject="b0")
+
+        Notes
+        -----
+        In tracking_params, parameters with the suffix mask which are also
+        a mask from AFQ.definitions.mask will be handled automatically by
+        the api.
+
+        It is recommended that you leave the bids_info parameter as None,
+        and instead pass in the paths to the files you want to use directly.
         """
         if not isinstance(output_dir, str):
             raise TypeError(
