@@ -33,10 +33,10 @@ def has_args(og_func):
             else:
                 if isinstance(param.default, str):
                     header = header + f"{name}='{param.default}', "
-                    content = content + f"{name}='{param.default}', "
+                    content = content + f"{name}, "
                 else:
                     header = header + f"{name}={param.default}, "
-                    content = content + f"{name}={param.default}, "
+                    content = content + f"{name}, "
         header = header[:-2]
         content = content[:-2]
         content = content + ")"

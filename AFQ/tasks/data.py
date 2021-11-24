@@ -536,7 +536,7 @@ def get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None,
                 isinstance(bundle_info, dict)) or (
                     isinstance(bundle_info, abd.BundleDict))):
         raise TypeError((
-            "bundle_info must a list of strings,"
+            "bundle_info must be a list of strings,"
             " a dict, or a BundleDict"))
 
     if bundle_info is None:

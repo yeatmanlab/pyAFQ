@@ -415,9 +415,11 @@ def test_API_type_checking():
             match=(
                 "import_tract must be"
                 " either a dict or a str")):
-        api.GroupAFQ(
+        myafq = api.GroupAFQ(
             bids_path,
             import_tract=["dwi"])
+        myafq.streamlines
+    del myafq
 
     with pytest.raises(
             TypeError,
@@ -425,7 +427,7 @@ def test_API_type_checking():
         myafq = api.GroupAFQ(
             bids_path,
             brain_mask_definition="not a brain mask")
-        myafq.brain_mask
+        myafq.brain_mask_file
     del myafq
 
     with pytest.raises(

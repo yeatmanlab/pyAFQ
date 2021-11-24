@@ -109,13 +109,15 @@ class GroupAFQ(object):
             {"validate": False, "index_metadata": False}
             Default: {}
         kwargs : additional optional parameters
-            [KWARGS] You can set additional parameters for any step
+            You can set additional parameters for any step
             of the process. See :ref:`kwargs_docs` for more details.
 
         Examples
         --------
         api.GroupAFQ(my_path, csd_sh_order=4)
-        api.GroupAFQ(my_path, reg_template="mni_t2", reg_subject="b0")
+        api.GroupAFQ(
+            my_path,
+            reg_template_spec="mni_t2", reg_subject_spec="b0")
         '''
         if not isinstance(bids_path, str):
             raise TypeError("bids_path must be a string")

@@ -48,7 +48,7 @@ class ParticipantAFQ(object):
             csd_sh_order=4)
         api.ParticipantAFQ(
             dwi_data_file, bval_file, bvec_file, output_dir,
-            reg_template="mni_t2", reg_subject="b0")
+            reg_template_spec="mni_t2", reg_subject_spec="b0")
 
         Notes
         -----
@@ -78,7 +78,8 @@ class ParticipantAFQ(object):
             "results_dir": output_dir}
 
         # construct pimms plans
-        if "mapping" in kwargs and isinstance(kwargs["mapping"], SlrMap):
+        if "mapping_definition" in kwargs and isinstance(
+                kwargs["mapping_definition"], SlrMap):
             plans = {  # if using SLR map, do tractography first
                 "data": get_data_plan(kwargs),
                 "tractography": get_tractography_plan(kwargs),
