@@ -151,7 +151,7 @@ def viz_import_msg_error(module):
     return msg
 
 
-def bundle_selector(bundle_dict, colors, b):
+def bundle_selector(bundle_dict, colors, bundle):
     """
     Selects bundle and color
     from the given bundle dictionary and color informaiton
@@ -165,32 +165,32 @@ def bundle_selector(bundle_dict, colors, b):
         metadata. Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
-    bundle : str or int, optional
-        The name of a bundle to select from among the keys in `bundle_dict`
-        or an integer for selection from the trk metadata.
-
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
         If this is a list, each item is an RGB tuple. Defaults to a list
         with Tableau 20 RGB values
 
+    bundle : str or int, optional
+        The name of a bundle to select from among the keys in `bundle_dict`
+        or an integer for selection from the trk metadata.
+
     Returns
     -------
     RGB tuple and str
     """
-    b_name = str(b)
+    b_name = str(bundle)
     if bundle_dict is None:
         # We'll choose a color from a rotating list:
         if isinstance(colors, list):
-            color = colors[np.mod(len(colors), int(b))]
+            color = colors[np.mod(len(colors), int(bundle))]
         else:
-            color_list = colors.values()
-            color = color_list[np.mod(len(colors), int(b))]
+            color_list = list(colors.values())
+            color = color_list[np.mod(len(colors), int(bundle))]
     else:
         # We have a mapping from UIDs to bundle names:
         b_found = False
         for b_name_iter, b_iter in bundle_dict.items():
-            if b_iter['uid'] == b:
+            if b_iter['uid'] == bundle:
                 b_name = b_name_iter
                 b_found = True
                 break
