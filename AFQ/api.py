@@ -355,6 +355,7 @@ class PediatricBundleDict(BundleDict):
             Default: False
         """
         BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
+        self._c_uid = 1
 
     def gen_all(self):
         if self.all_gen:
