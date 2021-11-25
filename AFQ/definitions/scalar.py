@@ -17,14 +17,14 @@ __all__ = ["ScalarFile", "TemplateScalar"]
 class ScalarMixin():
     def get_for_subses(self):
         def get_for_subses_getter(
-                subses_dict, dwi_affine, data_imap, mapping):
+                subses_dict, bids_info, dwi_affine, data_imap, mapping):
             reg_template = data_imap["reg_template"]
             scalar_file = get_fname(
                 subses_dict,
                 f'_model-{self.name}.nii.gz')
             if not op.exists(scalar_file):
                 scalar_data, meta = self.get_data(
-                    subses_dict, dwi_affine, reg_template, mapping)
+                    subses_dict, bids_info, dwi_affine, reg_template, mapping)
 
                 nib.save(
                     nib.Nifti1Image(scalar_data, dwi_affine),
@@ -70,8 +70,9 @@ class ScalarFile(MaskFile):
         MaskFile.__init__(self, path, suffix, filters)
         self.name = name
 
-    def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
-        return self.fnames[subses_dict['ses']][subses_dict['subject']]
+    def get_data(self, subses_dict, bids_info, dwi_affine,
+                 reg_template, mapping):
+        return self.fnames[bids_info['session']][bids_info['subject']]
 
 
 class TemplateScalar(ScalarMixin, Definition):
@@ -102,7 +103,8 @@ class TemplateScalar(ScalarMixin, Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_data(self, subses_dict, dwi_affine, reg_template, mapping):
+    def get_data(self, subses_dict, bids_info, dwi_affine,
+                 reg_template, mapping):
         if mapping is None:
             raise ValueError((
                 "You cannot use a TemplateScalar to generate "

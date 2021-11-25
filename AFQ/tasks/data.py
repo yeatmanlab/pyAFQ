@@ -497,7 +497,7 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
             bids_info["subject"],
             bids_info["session"])
     return brain_mask_definition.get_brain_mask(
-        subses_dict, dwi_affine, b0_file)
+        subses_dict, bids_info, dwi_affine, b0_file)
 
 
 @pimms.calc("bundle_dict", "reg_template")

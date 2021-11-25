@@ -117,12 +117,13 @@ class FnirtMap(Definition):
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
         if self.from_path:
             nearest_warp, nearest_space = self.fnames
         else:
             nearest_warp, nearest_space = self.fnames[
-                subses_dict['ses']][subses_dict['subject']]
+                bids_info['session']][bids_info['subject']]
 
         our_templ = reg_template
         subj = Image(subses_dict['dwi_file'])
@@ -170,7 +171,8 @@ class IdentityMap(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
         return ConformedAffineMapping(
             np.identity(4),
             domain_grid_shape=reg.reduce_shape(
@@ -238,12 +240,13 @@ class ItkMap(Definition):
             bids_layout, from_path, self.warp_filters, self.warp_suffix,
             session, subject, extension="h5")
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
         if self.from_path:
             nearest_warp = self.fname
         else:
             nearest_warp = self.fnames[
-                subses_dict['ses']][subses_dict['subject']]
+                bids_info['session']][bids_info['subject']]
         warp_f5 = h5py.File(nearest_warp)
         their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
             'TransformFixedParameters'], dtype=int)[:3]
@@ -310,8 +313,8 @@ class GeneratedMapMixin(object):
         else:
             return np.load(prealign_file)
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template,
-                       subject_sls=None, template_sls=None):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template, subject_sls=None, template_sls=None):
         mapping_file, meta_fname = self.get_fnames(
             self.extension, subses_dict)
 

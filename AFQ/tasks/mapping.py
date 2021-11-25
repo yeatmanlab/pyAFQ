@@ -118,7 +118,7 @@ def mapping(subses_dict, reg_subject, data_imap, bids_info,
             bids_info["subject"],
             bids_info["session"])
     return mapping_definition.get_for_subses(
-        subses_dict, reg_subject, reg_template)
+        subses_dict, bids_info, reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
@@ -168,7 +168,7 @@ def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
         atlas_fname,
         'same', bbox_valid_check=False)
     return mapping_definition.get_for_subses(
-        subses_dict, reg_subject, reg_template,
+        subses_dict, bids_info, reg_subject, reg_template,
         subject_sls=tg.streamlines,
         template_sls=hcp_atlas.streamlines)
 
@@ -182,9 +182,9 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
 
     Parameters
     ----------
-    reg_subject_spec : str, Nifti1Image, dict, optional
+    reg_subject_spec : str, instance of `AFQ.definitions.scalar`, dict, optional  # noqa
         The source image data to be registered.
-        Can either be a Nifti1Image, a scalar definition, or
+        Can either be a Nifti1Image, a scalar definition, or str.
         if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
         image data will be loaded automatically.
         If "subject_sls" is used, slr registration will be used
@@ -194,9 +194,9 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
     reg_template = data_imap["reg_template"]
     if not isinstance(reg_subject_spec, str)\
             and not isinstance(reg_subject_spec, nib.Nifti1Image)\
-            and not isinstance(reg_subject_spec, dict):
+            and not isinstance(reg_subject_spec, Definition):
         raise TypeError(
-            "reg_subject must be a str, dict, or Nifti1Image")
+            "reg_subject must be a str, Definition, or Nifti1Image")
 
     filename_dict = {
         "b0": data_imap["b0_file"],
@@ -213,7 +213,8 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
             bids_info["subject"],
             bids_info["session"])
         scalar_data, _ = reg_subject_spec.get_data(
-            subses_dict, subses_dict["dwi_affine"], reg_template, None)
+            subses_dict, bids_info, subses_dict["dwi_affine"],
+            reg_template, None)
         img = nib.Nifti1Image(scalar_data, bm.affine)
     else:
         if reg_subject_spec in filename_dict:
