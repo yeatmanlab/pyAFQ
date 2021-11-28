@@ -174,7 +174,7 @@ def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(data_imap, bids_info, subses_dict,
+def get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine,
                     reg_subject_spec="power_map"):
     """
     Nifti1Image which represents this subject
@@ -182,7 +182,7 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
 
     Parameters
     ----------
-    reg_subject_spec : str, instance of `AFQ.definitions.scalar`, dict, optional  # noqa
+    reg_subject_spec : str, instance of `AFQ.definitions.scalar`, optional  # noqa
         The source image data to be registered.
         Can either be a Nifti1Image, a scalar definition, or str.
         if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
@@ -212,14 +212,13 @@ def get_reg_subject(data_imap, bids_info, subses_dict,
             subses_dict["dwi_file"],
             bids_info["subject"],
             bids_info["session"])
-        scalar_data, _ = reg_subject_spec.get_data(
-            subses_dict, bids_info, subses_dict["dwi_affine"],
+        reg_subject_spec = reg_subject_spec.get_data(
+            subses_dict, bids_info, dwi_affine,
             reg_template, None)
-        img = nib.Nifti1Image(scalar_data, bm.affine)
     else:
         if reg_subject_spec in filename_dict:
             reg_subject_spec = filename_dict[reg_subject_spec]
-        img = nib.load(reg_subject_spec)
+    img = nib.load(reg_subject_spec)
     bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
     masked_data[~bm] = 0

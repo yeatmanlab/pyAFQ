@@ -33,7 +33,7 @@ import AFQ.utils.bin as afb
 from AFQ.definitions.mask import RoiMask,\
     PFTMask, MaskFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
-from AFQ.definitions.scalar import TemplateScalar
+from AFQ.definitions.scalar import TemplateScalar, ScalarFile
 
 
 def touch(fname, times=None):
@@ -585,9 +585,10 @@ def test_AFQ_custom_subject_reg():
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
         reg_template_spec="mni_T2",
-        reg_subject_spec={
-            "suffix": "customb0",
-            "scope": "vistasoft"})
+        reg_subject_spec=ScalarFile(
+            "customb0",
+            suffix="customb0",
+            filters={"scope": "vistasoft"}))
     my_afq.export_rois()
 
 
