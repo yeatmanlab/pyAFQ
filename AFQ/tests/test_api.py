@@ -679,7 +679,7 @@ def test_AFQ_data_waypoint():
     vista_folder = op.join(
         bids_path,
         "derivatives/vistasoft/sub-01/ses-01/dwi")
-    afq_folder = op.join(bids_path, "derivatives/afq")
+    afq_folder = op.join(bids_path, "derivatives/afq/sub-01/ses-01")
     os.makedirs(afq_folder, exist_ok=True)
     myafq = ParticipantAFQ(
         op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz"),
@@ -759,6 +759,11 @@ def test_AFQ_data_waypoint():
                           'ROIs'))
     os.remove(tract_profile_fname)
 
+    # save memory
+    results_dir = myafq.results_dir
+    del myafq
+    gc.collect()
+
     # Test the CLI:
     print("Running the CLI:")
 
@@ -791,11 +796,6 @@ def test_AFQ_data_waypoint():
     config_file = op.join(tmpdir.name, "afq_config.toml")
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
-
-    # save memory
-    results_dir = myafq.results_dir
-    del myafq
-    gc.collect()
 
     cmd = "pyAFQ -v " + config_file
     completed_process = subprocess.run(
