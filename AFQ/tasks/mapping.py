@@ -231,16 +231,24 @@ def get_mapping_plan(kwargs, use_sls=False):
         export_registered_b0, template_xform, export_rois, mapping,
         get_reg_subject])
 
-    bids_info = kwargs["bids_info"]
+    bids_info = kwargs.get("bids_info", None)
     # add custom scalars
     for scalar in kwargs["scalars"]:
         if isinstance(scalar, Definition):
-            scalar.find_path(
-                bids_info["bids_layout"],
-                kwargs["subses_dict"]["dwi_file"],
-                bids_info["subject"],
-                bids_info["session"]
-            )
+            if bids_info is None:
+                scalar.find_path(
+                    None,
+                    kwargs["subses_dict"]["dwi_file"],
+                    None,
+                    None
+                )
+            else:
+                scalar.find_path(
+                    bids_info["bids_layout"],
+                    kwargs["subses_dict"]["dwi_file"],
+                    bids_info["subject"],
+                    bids_info["session"]
+                )
             mapping_tasks["{scalar.name}_file_res"] =\
                 pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
 

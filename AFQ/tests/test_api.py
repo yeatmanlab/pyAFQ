@@ -25,7 +25,8 @@ from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.testing.decorators import xvfb_it
 
-import AFQ.api.group as api
+from AFQ.api.group import GroupAFQ
+from AFQ.api.participant import ParticipantAFQ
 import AFQ.data as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
@@ -183,7 +184,7 @@ def test_AFQ_missing_files():
     with pytest.raises(
             ValueError,
             match="There must be a dataset_description.json in bids_path"):
-        api.GroupAFQ(bids_path)
+        GroupAFQ(bids_path)
     afd.to_bids_description(
         bids_path,
         **{"Name": "Missing", "Subjects": ["sub-01"]})
@@ -191,7 +192,7 @@ def test_AFQ_missing_files():
     with pytest.raises(
             ValueError,
             match=f"No non-json files recognized by pyBIDS in {bids_path}"):
-        api.GroupAFQ(bids_path)
+        GroupAFQ(bids_path)
 
     subses_folder = op.join(
         bids_path,
@@ -214,7 +215,7 @@ def test_AFQ_missing_files():
             ValueError,
             match="No non-json files recognized by pyBIDS"
             + " in the pipeline: missingPipe"):
-        api.GroupAFQ(bids_path, preproc_pipeline="missingPipe")
+        GroupAFQ(bids_path, preproc_pipeline="missingPipe")
 
     os.mkdir(op.join(bids_path, "missingPipe"))
     afd.to_bids_description(
@@ -225,7 +226,7 @@ def test_AFQ_missing_files():
             ValueError,
             match="No non-json files recognized by pyBIDS"
             + " in the pipeline: missingPipe"):
-        api.GroupAFQ(bids_path, preproc_pipeline="missingPipe")
+        GroupAFQ(bids_path, preproc_pipeline="missingPipe")
 
 
 @pytest.mark.nightly_custom
@@ -251,7 +252,7 @@ def test_AFQ_custom_tract():
             'subsampled_tractography.trk'
             )
     )
-    my_afq = api.GroupAFQ(
+    my_afq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
@@ -273,7 +274,7 @@ def test_AFQ_no_derivs():
     with pytest.raises(
             ValueError,
             match=f"No non-json files recognized by pyBIDS in {bids_path}"):
-        api.GroupAFQ(
+        GroupAFQ(
             bids_path,
             preproc_pipeline="synthetic")
 
@@ -283,7 +284,7 @@ def test_AFQ_no_derivs():
 def test_AFQ_fury():
     _, bids_path, _ = get_temp_hardi()
 
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         viz_backend_spec="fury")
@@ -316,12 +317,12 @@ def test_AFQ_init():
                     match="No subjects specified in `participant_labels` "
                     + " found in BIDS derivatives folders."
                         + " See above warnings."):
-                    my_afq = api.GroupAFQ(
+                    my_afq = GroupAFQ(
                         bids_path,
                         preproc_pipeline="synthetic",
                         participant_labels=participant_labels)
             else:
-                my_afq = api.GroupAFQ(
+                my_afq = GroupAFQ(
                     bids_path,
                     preproc_pipeline="synthetic",
                     participant_labels=participant_labels)
@@ -351,7 +352,7 @@ def test_AFQ_data():
     _, bids_path, _ = get_temp_hardi()
 
     for mapping in [SynMap(use_prealign=False), AffMap()]:
-        myafq = api.GroupAFQ(
+        myafq = GroupAFQ(
             bids_path=bids_path,
             preproc_pipeline='vistasoft',
             mapping_definition=mapping)
@@ -372,7 +373,7 @@ def test_AFQ_anisotropic():
     with a specific selection of b vals
     """
     _, bids_path, _ = get_temp_hardi()
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         min_bval=1990,
@@ -408,14 +409,14 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match="bids_path must be a string"):
-        api.GroupAFQ(2)
+        GroupAFQ(2)
 
     with pytest.raises(
             TypeError,
             match=(
                 "import_tract must be"
                 " either a dict or a str")):
-        myafq = api.GroupAFQ(
+        myafq = GroupAFQ(
             bids_path,
             import_tract=["dwi"])
         myafq.streamlines
@@ -424,7 +425,7 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match="brain_mask_definition must be a Definition"):
-        myafq = api.GroupAFQ(
+        myafq = GroupAFQ(
             bids_path,
             brain_mask_definition="not a brain mask")
         myafq.brain_mask_file
@@ -433,7 +434,7 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match="viz_backend_spec must contain either 'fury' or 'plotly'"):
-        myafq = api.GroupAFQ(bids_path, viz_backend_spec="matplotlib")
+        myafq = GroupAFQ(bids_path, viz_backend_spec="matplotlib")
         myafq.all_bundles_figure
     del myafq
 
@@ -442,7 +443,7 @@ def test_API_type_checking():
             match=(
                 "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
-        myafq = api.GroupAFQ(bids_path, bundle_info=[2, 3])
+        myafq = GroupAFQ(bids_path, bundle_info=[2, 3])
         myafq.bundle_dict
 
 
@@ -452,7 +453,7 @@ def test_AFQ_slr():
     Test if API can run using slr map
     """
     _, bids_path, _ = get_temp_hardi()
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         reg_subject_spec='subject_sls',
@@ -471,7 +472,7 @@ def test_AFQ_reco():
     Test if API can run segmentation with recobundles
     """
     _, bids_path, _ = get_temp_hardi()
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         viz_backend_spec="plotly",
@@ -514,7 +515,7 @@ def test_AFQ_reco80():
         print(completed_process.stdout)
     print(completed_process.stderr)
 
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         segmentation_params={
@@ -547,7 +548,7 @@ def test_AFQ_pft():
         MaskFile(suffix="CSFprobseg"))
 
     with nbtmp.InTemporaryDirectory() as t_output_dir:
-        my_afq = api.GroupAFQ(
+        my_afq = GroupAFQ(
             bids_path,
             preproc_pipeline='vistasoft',
             bundle_info=bundle_names,
@@ -570,7 +571,7 @@ def test_AFQ_custom_subject_reg():
 
     bundle_names = ["SLF", "ARC", "CST", "FP"]
 
-    b0_file = api.GroupAFQ(
+    b0_file = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names).b0["01"]
@@ -580,7 +581,7 @@ def test_AFQ_custom_subject_reg():
 
     os.rename(b0_file, op.join(sub_path, "sub-01_ses-01_customb0.nii.gz"))
 
-    my_afq = api.GroupAFQ(
+    my_afq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
@@ -599,7 +600,7 @@ def test_AFQ_FA():
     Test if API can run registeration with FA
     """
     _, bids_path, _ = get_temp_hardi()
-    myafq = api.GroupAFQ(
+    myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         reg_template_spec='dti_fa_template',
@@ -614,7 +615,7 @@ def test_DKI_profile():
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
-    myafq = api.GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
+    myafq = GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     preproc_pipeline='dipy')
     myafq.dki_fa
     myafq.dki_md
@@ -675,18 +676,26 @@ def test_AFQ_data_waypoint():
 
     clean_params = dict(return_idx=True)
 
-    myafq = api.GroupAFQ(bids_path=bids_path,
-                    preproc_pipeline='vistasoft',
-                    bundle_info=bundle_names,
-                    scalars=[
-                        "dti_FA",
-                        "dti_MD",
-                        "dti_GA",
-                        TemplateScalar("T1", t1_path)],
-                    robust_tensor_fitting=True,
-                    tracking_params=tracking_params,
-                    segmentation_params=segmentation_params,
-                    clean_params=clean_params)
+    vista_folder = op.join(
+        bids_path,
+        "derivatives/vistasoft/sub-01/ses-01/dwi")
+    afq_folder = op.join(bids_path, "derivatives/afq")
+    os.makedirs(afq_folder, exist_ok=True)
+    myafq = ParticipantAFQ(
+        op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz"),
+        op.join(vista_folder, "sub-01_ses-01_dwi.bval"),
+        op.join(vista_folder, "sub-01_ses-01_dwi.bvec"),
+        afq_folder,
+        bundle_info=bundle_names,
+        scalars=[
+            "dti_FA",
+            "dti_MD",
+            "dti_GA",
+            TemplateScalar("t1", t1_path)],
+        robust_tensor_fitting=True,
+        tracking_params=tracking_params,
+        segmentation_params=segmentation_params,
+        clean_params=clean_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -695,58 +704,58 @@ def test_AFQ_data_waypoint():
     streamlines = dts.Streamlines(
         dtu.transform_tracking_output(
             [s for s in streamlines if s.shape[0] > 100],
-            np.linalg.inv(myafq.dwi_affine["01"])))
+            np.linalg.inv(myafq.dwi_affine)))
 
     mapping_file = op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    tgram = load_tractogram(myafq.bundles["01"], myafq.img["01"])
+    tgram = load_tractogram(myafq.bundles, myafq.img)
 
     bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
+        tgram, myafq.bundle_dict, myafq.img)
     npt.assert_(len(bundles['CST_L']) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
     myafq.export_indiv_bundles()
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
 
-    tract_profile_fname = myafq.profiles["01"]
+    tract_profile_fname = myafq.profiles
     tract_profiles = pd.read_csv(tract_profile_fname)
     assert tract_profiles.shape == (400, 7)
 
     myafq.indiv_bundles_figures
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         "viz_bundles",
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_CST_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        myafq.results_dir,
         "viz_bundles",
         'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_CST_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
-    shutil.rmtree(op.join(myafq.results_dir["01"],
+    shutil.rmtree(op.join(myafq.results_dir,
                           'bundles'))
 
-    shutil.rmtree(op.join(myafq.results_dir["01"],
+    shutil.rmtree(op.join(myafq.results_dir,
                           'ROIs'))
     os.remove(tract_profile_fname)
 
@@ -784,7 +793,7 @@ def test_AFQ_data_waypoint():
         toml.dump(config, ff)
 
     # save memory
-    results_dir = myafq.results_dir["01"]
+    results_dir = myafq.results_dir
     del myafq
     gc.collect()
 
@@ -817,7 +826,7 @@ def test_AFQ_data_waypoint():
 def test_afq_msmt():
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
-    myafq = api.GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
+    myafq = GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     preproc_pipeline='dipy',
                     tracking_params={"odf_model": "MSMT"})
     npt.assert_equal(

@@ -1,4 +1,5 @@
 import nibabel as nib
+import os.path as op
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import wf_sections, add_method_descriptions
@@ -71,6 +72,9 @@ class ParticipantAFQ(object):
         if not isinstance(bvec_file, str):
             raise TypeError(
                 "bvec_file must be a str")
+        if not op.exists(output_dir):
+            raise ValueError(
+                f"output_dir does not exist: {output_dir}")
 
         kwargs["bids_info"] = bids_info
         kwargs["subses_dict"] = {
