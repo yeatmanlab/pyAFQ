@@ -13,8 +13,9 @@ from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
-from AFQ.utils.bin import get_default_args
+from AFQ.tasks.utils import get_default_args
 import AFQ.data as afd
+import AFQ.api.bundle_dict as abd
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -26,26 +27,22 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 logger = logging.getLogger('AFQ.api.seg')
 
 
-outputs = {
-    "bundles_file": """full path to a trk file containing containting
-    segmented streamlines, labeled by bundle""",
-    "clean_bundles_file": """full path to a trk file containting segmented
-    streamlines, cleaned using the Mahalanobis distance, and labeled by
-    bundle""",
-    "indiv_bundles": """dictionary of paths, where each path is
-    a full path to a trk file containing the streamlines of a given bundle,
-    cleaned or uncleaned""",
-    "sl_counts_file": """full path to a JSON file containing streamline
-    counts""",
-    "profiles_file": """full path to a CSV file containing tract profiles""",
-    "scalar_dict": """dicionary mapping scalar names
-    to their respective file paths"""}
-
-
 @pimms.calc("bundles_file")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
+def segment(subses_dict, data_imap, mapping_imap,
             tractography_imap, tracking_params, segmentation_params):
+    """
+    full path to a trk file containing containting
+    segmented streamlines, labeled by bundle
+
+    Parameters
+    ----------
+    segmentation_params : dict, optional
+        The parameters for segmentation.
+        Default: use the default behavior of the seg.Segmentation object.
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    reg_template = data_imap["reg_template"]
     streamlines_file = tractography_imap["streamlines_file"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
@@ -91,8 +88,27 @@ def segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap,
 
 @pimms.calc("clean_bundles_file")
 @as_file('-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
-                  tracking_params, segmentation_params):
+def clean_bundles(subses_dict, bundles_file, data_imap,
+                  tracking_params, segmentation_params, clean_params=None):
+    """
+    full path to a trk file containting segmented
+    streamlines, cleaned using the Mahalanobis distance, and labeled by
+    bundle
+
+    Parameters
+    ----------
+    clean_params: dict, optional
+        The parameters for cleaning.
+        Default: use the default behavior of the seg.clean_bundle
+        function.
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    default_clean_params = get_default_args(seg.clean_bundle)
+    if clean_params is not None:
+        for k in clean_params:
+            default_clean_params[k] = clean_params[k]
+    clean_params = default_clean_params
+
     img = nib.load(subses_dict['dwi_file'])
     sft = load_tractogram(
         bundles_file,
@@ -153,7 +169,26 @@ def clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params,
 
 @pimms.calc("indiv_bundles")
 def export_bundles(subses_dict, clean_bundles_file, bundles_file,
-                   bundle_dict, tracking_params, segmentation_params):
+                   data_imap, tracking_params,
+                   segmentation_params):
+    """
+    dictionary of paths, where each path is
+    a full path to a trk file containing the streamlines of a given bundle,
+    cleaned or uncleaned
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    reg_template = data_imap["reg_template"]
+    if "presegment_bundle_dict" in segmentation_params and\
+        segmentation_params["presegment_bundle_dict"] is not None\
+        and not isinstance(
+            segmentation_params["presegment_bundle_dict"],
+            abd.BundleDict):
+        segmentation_params["presegment_bundle_dict"] =\
+            abd.BundleDict(
+                segmentation_params["presegment_bundle_dict"],
+                seg_algo="afq",
+                resample_to=reg_template)
+
     img = nib.load(subses_dict['dwi_file'])
     for this_bundles_file, folder in zip([clean_bundles_file, bundles_file],
                                          ['clean_bundles', 'bundles']):
@@ -191,9 +226,13 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
 
 @pimms.calc("sl_counts_file")
 @as_file('_sl_count.csv', include_track=True, include_seg=True)
-def export_sl_counts(subses_dict, bundle_dict,
+def export_sl_counts(subses_dict, data_imap,
                      clean_bundles_file, bundles_file,
                      tracking_params, segmentation_params):
+    """
+    full path to a JSON file containing streamline counts
+    """
+    bundle_dict = data_imap["bundle_dict"]
     img = nib.load(subses_dict['dwi_file'])
     sl_counts_clean = []
     sl_counts = []
@@ -224,9 +263,40 @@ def export_sl_counts(subses_dict, bundle_dict,
 
 @pimms.calc("profiles_file")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
-def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
-                   scalar_dict, profile_weights, dwi_affine,
-                   tracking_params, segmentation_params):
+def tract_profiles(subses_dict, clean_bundles_file, data_imap,
+                   scalar_dict, dwi_affine,
+                   tracking_params, segmentation_params,
+                   profile_weights="gauss"):
+    """
+    full path to a CSV file containing tract profiles
+
+    Parameters
+    ----------
+    profile_weights : str, 1D array, 2D array callable, optional
+        How to weight each streamline (1D) or each node (2D)
+        when calculating the tract-profiles. If callable, this is a
+        function that calculates weights. If None, no weighting will
+        be applied. If "gauss", gaussian weights will be used.
+        If "median", the median of values at each node will be used
+        instead of a mean or weighted mean.
+        Default: "gauss"
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    if not (profile_weights is None
+            or isinstance(profile_weights, str)
+            or callable(profile_weights)
+            or hasattr(profile_weights, "__len__")):
+        raise TypeError(
+            "profile_weights must be string, None, callable, or"
+            + "a 1D or 2D array")
+    if isinstance(profile_weights, str):
+        profile_weights = profile_weights.lower()
+    if isinstance(profile_weights, str) and\
+            profile_weights != "gauss" and profile_weights != "median":
+        raise TypeError(
+            "if profile_weights is a string,"
+            + " it must be 'gauss' or 'median'")
+
     keys = []
     vals = []
     for k in bundle_dict.keys():
@@ -294,7 +364,20 @@ def tract_profiles(subses_dict, clean_bundles_file, bundle_dict,
 
 
 @pimms.calc("scalar_dict")
-def get_scalar_dict(scalars, data_imap, mapping_imap):
+def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
+    """
+    dicionary mapping scalar names
+    to their respective file paths
+
+    Parameters
+    ----------
+    scalars : list of strings and/or scalar definitions, optional
+        List of scalars to use.
+        Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
+        "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+        Default: ["dti_fa", "dti_md"]
+    """
+    # Note: some scalars preprocessing done in plans, before this step
     scalar_dict = {}
     for scalar in scalars:
         if isinstance(scalar, str):
@@ -305,7 +388,11 @@ def get_scalar_dict(scalars, data_imap, mapping_imap):
     return {"scalar_dict": scalar_dict}
 
 
-def get_segmentation_plan():
+def get_segmentation_plan(kwargs):
+    if "segmentation_params" in kwargs\
+            and not isinstance(kwargs["segmentation_params"], dict):
+        raise TypeError(
+            "segmentation_params a dict")
     segmentation_tasks = with_name([
         get_scalar_dict,
         export_sl_counts,
@@ -313,4 +400,11 @@ def get_segmentation_plan():
         clean_bundles,
         segment,
         tract_profiles])
+
+    default_seg_params = get_default_args(seg.Segmentation.__init__)
+    if "segmentation_params" in kwargs:
+        for k in kwargs["segmentation_params"]:
+            default_seg_params[k] = kwargs["segmentation_params"][k]
+
+    kwargs["segmentation_params"] = default_seg_params
     return pimms.plan(**segmentation_tasks)

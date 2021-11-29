@@ -1,4 +1,5 @@
 import os.path as op
+import inspect
 
 __all__ = ["get_fname", "with_name"]
 
@@ -28,3 +29,12 @@ def with_name(task_list):
     for task in task_list:
         task_dict[task.function.__name__ + "_res"] = task
     return task_dict
+
+
+def get_default_args(func):
+    signature = inspect.signature(func)
+    return {
+        k: v.default
+        for k, v in signature.parameters.items()
+        if v.default is not inspect.Parameter.empty
+    }

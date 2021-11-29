@@ -7,7 +7,7 @@ In AFQ/definitions/scalar.py, there are two scalar classes one
 can use to specify custom scalars. As a user, one should initialize scalar
 classes and pass them to the AFQ object, or write out the initialization as
 a string inside of one's configuration file for use with the CLI. To do this,
-give a scalar object as an element of the scalars array passed to :class:`AFQ.api.AFQ`.
+give a scalar object as an element of the scalars array passed to :class:`AFQ.api.group.GroupAFQ`.
 Then your custom scalar will be automatically used during tract profile extraction.
 
 - :class:`AFQ.definitions.mask.TemplateMask`: This class can be used if you want to transform a scalar
@@ -49,7 +49,7 @@ to provide these custom scalars to the AFQ object::
       "ODI",
       {"scope": "noddi"})
 
-    api.AFQ("my_bids_path",
+    api.GroupAFQ("my_bids_path",
             scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
 
 Or provide them using the CLI, by adding them to the `scalars` parameter::

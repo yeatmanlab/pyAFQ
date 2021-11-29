@@ -28,7 +28,7 @@ import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
 
-from AFQ import api
+from AFQ.api.group import GroupAFQ
 import AFQ.data as afd
 
 
@@ -230,7 +230,7 @@ bundle_info = ["SLF", "ARC", "CST", "FP"]
 # To sub-sample to 10,000 streamlines, we define
 # `'nb_streamlines' = 10000`.
 
-my_afq = api.AFQ(
+my_afq = GroupAFQ(
     bids_path,
     preproc_pipeline='vistasoft',
     bundle_info=bundle_info,

@@ -40,15 +40,23 @@ class FnirtMap(Definition):
 
     Parameters
     ----------
-    warp_suffix : str
+    warp_path : str, optional
+        path to file to get warp from. Use this or warp_suffix.
+        Default: None
+    space_path : str, optional
+        path to file to get warp from. Use this or space_suffix.
+        Default: None
+    warp_suffix : str, optional
         suffix to pass to bids_layout.get() to identify the warp file.
-    space_suffix : str
+        Default: None
+    space_suffix : str, optional
         suffix to pass to bids_layout.get() to identify the space file.
-    warp_filters : str
+        Default: None
+    warp_filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the warp file.
         Default: {}
-    space_filters : str
+    space_filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the space file.
         Default: {}
@@ -57,25 +65,45 @@ class FnirtMap(Definition):
     Examples
     --------
     fnirt_map = FnirtMap(
-        "warp",
-        "MNI",
-        {"scope": "TBSS"},
-        {"scope": "TBSS"})
-    api.AFQ(mapping=fnirt_map)
+        warp_suffix="warp",
+        space_suffix="MNI",
+        warp_filters={"scope": "TBSS"},
+        space_filters={"scope": "TBSS"})
+    api.GroupAFQ(mapping=fnirt_map)
     """
 
-    def __init__(self, warp_suffix, space_suffix,
+    def __init__(self, warp_path=None, space_path=None,
+                 warp_suffix=None, space_suffix=None,
                  warp_filters={}, space_filters={}):
         if not has_fslpy:
             raise ImportError(
                 "Please install fslpy if you want to use FnirtMap")
-        self.warp_suffix = warp_suffix
-        self.space_suffix = space_suffix
-        self.warp_filters = warp_filters
-        self.space_filters = space_filters
-        self.fnames = {}
+        if warp_path is None and warp_suffix is None:
+            raise ValueError((
+                "One of `warp_path` or `warp_suffix` should be set "
+                "to a value other than None."))
+        if space_path is None and space_suffix is None:
+            raise ValueError(
+                "One of space_path or space_suffix must not be None.")
+        if warp_path is not None and space_path is None\
+                or space_path is not None and warp_path is None:
+            raise ValueError((
+                "If passing a value for `warp_path`, "
+                "you must also pass a value for `space_path`"))
+        if warp_path is not None:
+            self.from_path = True
+            self.fnames = (warp_path, space_path)
+        else:
+            self.from_path = False
+            self.warp_suffix = warp_suffix
+            self.warp_filters = warp_filters
+            self.space_suffix = space_suffix
+            self.space_filters = space_filters
+            self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
+        if self.from_path:
+            return
         if session not in self.fnames:
             self.fnames[session] = {}
 
@@ -89,9 +117,13 @@ class FnirtMap(Definition):
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
-        nearest_warp, nearest_space = self.fnames[
-            subses_dict['ses']][subses_dict['subject']]
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
+        if self.from_path:
+            nearest_warp, nearest_space = self.fnames
+        else:
+            nearest_warp, nearest_space = self.fnames[
+                bids_info['session']][bids_info['subject']]
 
         our_templ = reg_template
         subj = Image(subses_dict['dwi_file'])
@@ -130,7 +162,7 @@ class IdentityMap(Definition):
     Examples
     --------
     my_example_mapping = IdentityMap()
-    api.AFQ(mapping=my_example_mapping)
+    api.GroupAFQ(mapping=my_example_mapping)
     """
 
     def __init__(self):
@@ -139,7 +171,8 @@ class IdentityMap(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
         return ConformedAffineMapping(
             np.identity(4),
             domain_grid_shape=reg.reduce_shape(
@@ -157,9 +190,12 @@ class ItkMap(Definition):
 
     Parameters
     ----------
-    warp_suffix : str
+    warp_path : str, optional
+        path to file to get warp from. Use this or warp_suffix.
+        Default: None
+    warp_suffix : str, optional
         suffix to pass to bids_layout.get() to identify the warp file.
-    warp_filters : str
+    warp_filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the warp file.
         Default: {}
@@ -168,22 +204,35 @@ class ItkMap(Definition):
     Examples
     --------
     itk_map = ItkMap(
-        "xfm",
-        {"scope": "qsiprep",
-        "from": "MNI152NLin2009cAsym",
-        "to": "T1w"})
-    api.AFQ(mapping=itk_map)
+        warp_suffix="xfm",
+        warp_filters={
+            "scope": "qsiprep",
+            "from": "MNI152NLin2009cAsym",
+            "to": "T1w"})
+    api.GroupAFQ(mapping=itk_map)
     """
 
-    def __init__(self, warp_suffix, warp_filters={}):
+    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={}):
         if not has_h5py:
             raise ImportError(
                 "Please install h5py if you want to use ItkMap")
-        self.warp_suffix = warp_suffix
-        self.warp_filters = warp_filters
-        self.fnames = {}
+        if warp_path is None and warp_suffix is None:
+            raise ValueError((
+                "One of `warp_path` or `warp_suffix` should be set "
+                "to a value other than None."))
+
+        if warp_path is not None:
+            self.from_path = True
+            self.fname = warp_path
+        else:
+            self.from_path = False
+            self.suffix = warp_suffix
+            self.filters = warp_filters
+            self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
+        if self.from_path:
+            return
         if session not in self.fnames:
             self.fnames[session] = {}
 
@@ -191,8 +240,13 @@ class ItkMap(Definition):
             bids_layout, from_path, self.warp_filters, self.warp_suffix,
             session, subject, extension="h5")
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template):
-        nearest_warp = self.fnames[subses_dict['ses']][subses_dict['subject']]
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template):
+        if self.from_path:
+            nearest_warp = self.fname
+        else:
+            nearest_warp = self.fnames[
+                bids_info['session']][bids_info['subject']]
         warp_f5 = h5py.File(nearest_warp)
         their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
             'TransformFixedParameters'], dtype=int)[:3]
@@ -259,8 +313,8 @@ class GeneratedMapMixin(object):
         else:
             return np.load(prealign_file)
 
-    def get_for_subses(self, subses_dict, reg_subject, reg_template,
-                       subject_sls=None, template_sls=None):
+    def get_for_subses(self, subses_dict, bids_info, reg_subject,
+                       reg_template, subject_sls=None, template_sls=None):
         mapping_file, meta_fname = self.get_fnames(
             self.extension, subses_dict)
 
@@ -315,7 +369,7 @@ class SynMap(GeneratedMapMixin, Definition):
         Default: {}
     Examples
     --------
-    api.AFQ(mapping=SynMap())
+    api.GroupAFQ(mapping=SynMap())
     """
 
     def __init__(self, use_prealign=True, affine_kwargs={}, syn_kwargs={}):
@@ -354,7 +408,7 @@ class SlrMap(GeneratedMapMixin, Definition):
 
     Examples
     --------
-    api.AFQ(mapping=SlrMap())
+    api.GroupAFQ(mapping=SlrMap())
     """
 
     def __init__(self, slr_kwargs={}):
@@ -388,7 +442,7 @@ class AffMap(GeneratedMapMixin, Definition):
 
     Examples
     --------
-    api.AFQ(mapping=AffMap())
+    api.GroupAFQ(mapping=AffMap())
     """
 
     def __init__(self, affine_kwargs={}):

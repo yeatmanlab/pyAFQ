@@ -45,7 +45,7 @@ def afq_process_subject(subject):
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
     import AFQ.data as afqd
-    import AFQ.api as api
+    from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 
     # Download the given subject to your local machine from s3
@@ -66,15 +66,16 @@ def afq_process_subject(subject):
     # in this case, we look for a file with suffix 'seg'
     # in the 'pipeline_name' pipeline,
     # and we consider all non-zero labels to be a part of the brain
-    brain_mask = afm.LabelledMaskFile(
-        'seg', {'scope': 'pipeline_name'}, exclusive_labels=[0])
+    brain_mask_definition = afm.LabelledMaskFile(
+        suffix='seg', filters={'scope': 'pipeline_name'},
+        exclusive_labels=[0])
 
     # define the api AFQ object
-    myafq = api.AFQ(
+    myafq = GroupAFQ(
         "local_bids_dir",
         preproc_pipeline="pipeline_name",
-        brain_mask=brain_mask,
-        viz_backend='plotly',  # this will generate both interactive html and GIFs # noqa
+        brain_mask_definition=brain_mask_definition,
+        viz_backend_spec='plotly',  # this will generate both interactive html and GIFs # noqa
         scalars=["dki_fa", "dki_md"])
 
     # export_all runs the entire pipeline and creates many useful derivates

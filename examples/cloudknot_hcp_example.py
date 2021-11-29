@@ -37,7 +37,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
     from AFQ.data import fetch_hcp
-    import AFQ.api as api
+    from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 
     import numpy as np
@@ -79,13 +79,14 @@ def afq_process_subject(subject, seed_mask, n_seeds,
 
     # use segmentation file from HCP to get a brain mask,
     # where everything not labelled 0 is considered a part of the brain
-    brain_mask = afm.LabelledMaskFile(
-        'seg', {'scope': 'dmriprep'}, exclusive_labels=[0])
+    brain_mask_definition = afm.LabelledMaskFile(
+        suffix='seg', filters={'scope': 'dmriprep'},
+        exclusive_labels=[0])
 
     # define the api AFQ object
-    myafq = api.AFQ(
+    myafq = GroupAFQ(
         hcp_bids,
-        brain_mask=brain_mask,
+        brain_mask_definition=brain_mask_definition,
         tracking_params=tracking_params)
 
     # export_all runs the entire pipeline and creates many useful derivates

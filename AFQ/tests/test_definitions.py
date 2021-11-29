@@ -6,10 +6,8 @@ import pytest
 from bids.layout import BIDSLayout
 
 import AFQ.definitions.mask as afm
-import AFQ.definitions.mapping as ama
 from AFQ.definitions.mask import *  # interprets masks from eval
 from AFQ.definitions.mapping import *  # interprets mappings from eval
-from AFQ.definitions.utils import Definition
 from AFQ.tests.test_api import create_dummy_bids_path
 
 
@@ -61,7 +59,7 @@ def test_find_path(subject, session):
         suffix="dwi", extension="nii.gz"
     )[0]
 
-    mask_file = MaskFile("seg", {'scope': 'synthetic'})
+    mask_file = MaskFile(suffix="seg", filters={'scope': 'synthetic'})
     mask_file.find_path(bids_layout, test_dwi_path, subject, session)
 
     assert mask_file.fnames[session][subject] == op.join(

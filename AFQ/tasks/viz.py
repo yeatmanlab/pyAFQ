@@ -13,19 +13,11 @@ from dipy.align import resample
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 import AFQ.data as afd
+from AFQ.viz.utils import Viz
 
 from plotly.subplots import make_subplots
 
 logger = logging.getLogger('AFQ.api.viz')
-
-
-outputs = {
-    "all_bundles_figure": """figure for the visualizaion of the recognized
-    bundles in the subject's brain""",
-    "indiv_bundles_figures": """list of full paths to html or gif files
-    containing visualizaions of individual bundles""",
-    "tract_profile_plots": """list of full paths to png files,
-    where files contain plots of the tract profiles"""}
 
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
@@ -42,27 +34,46 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
 def viz_bundles(subses_dict,
                 dwi_affine,
                 viz_backend,
-                bundle_dict,
                 data_imap,
                 mapping_imap,
                 segmentation_imap,
                 tracking_params,
                 segmentation_params,
                 best_scalar,
-                xform_volume=False,
-                sbv_lims=[None, None],
-                xform_shade_by_volume=False,
-                volume_opacity=0.3,
-                n_points=40):
+                sbv_lims_bundles=[None, None],
+                volume_opacity_bundles=0.3,
+                n_points_bundles=40):
+    """
+    figure for the visualizaion of the recognized
+    bundles in the subject's brain
+
+    Parameters
+    ----------
+    sbv_lims_bundles : ndarray
+        Of the form (lower bound, upper bound). Shading based on
+        shade_by_volume will only differentiate values within these bounds.
+        If lower bound is None, will default to 0.
+        If upper bound is None, will default to the maximum value in
+        shade_by_volume.
+        Default: [None, None]
+    volume_opacity_bundles : float, optional
+        Opacity of volume slices.
+        Default: 0.3
+    n_points_bundles : int or None
+        n_points to resample streamlines to before plotting. If None, no
+        resampling is done.
+        Default: 40
+    """
     mapping = mapping_imap["mapping"]
+    bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
     profiles_file = segmentation_imap["profiles_file"]
     volume = data_imap["b0_file"]
     shade_by_volume = data_imap[best_scalar + "_file"]
     start_time = time()
-    volume = _viz_prepare_vol(volume, xform_volume, mapping, scalar_dict)
+    volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, xform_shade_by_volume, mapping, scalar_dict)
+        shade_by_volume, False, mapping, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -77,7 +88,7 @@ def viz_bundles(subses_dict,
 
     figure = viz_backend.visualize_volume(
         volume,
-        opacity=volume_opacity,
+        opacity=volume_opacity_bundles,
         flip_axes=flip_axes,
         interact=False,
         inline=False,
@@ -86,10 +97,10 @@ def viz_bundles(subses_dict,
     figure = viz_backend.visualize_bundles(
         segmentation_imap["clean_bundles_file"],
         shade_by_volume=shade_by_volume,
-        sbv_lims=sbv_lims,
+        sbv_lims=sbv_lims_bundles,
         bundle_dict=bundle_dict,
         include_profiles=(pd.read_csv(profiles_file), best_scalar),
-        n_points=n_points,
+        n_points=n_points_bundles,
         flip_axes=flip_axes,
         interact=False,
         inline=False,
@@ -122,20 +133,39 @@ def viz_bundles(subses_dict,
 def viz_indivBundle(subses_dict,
                     dwi_affine,
                     viz_backend,
-                    bundle_dict,
                     data_imap,
                     mapping_imap,
                     segmentation_imap,
                     tracking_params,
                     segmentation_params,
-                    reg_template,
                     best_scalar,
-                    xform_volume_indiv=False,
                     sbv_lims_indiv=[None, None],
-                    xform_shade_by_volume_indiv=False,
                     volume_opacity_indiv=0.3,
                     n_points_indiv=40):
+    """
+    list of full paths to html or gif files
+    containing visualizaions of individual bundles
+
+    Parameters
+    ----------
+    sbv_lims_indiv : ndarray
+        Of the form (lower bound, upper bound). Shading based on
+        shade_by_volume will only differentiate values within these bounds.
+        If lower bound is None, will default to 0.
+        If upper bound is None, will default to the maximum value in
+        shade_by_volume.
+        Default: [None, None]
+    volume_opacity_indiv : float, optional
+        Opacity of volume slices.
+        Default: 0.3
+    n_points_indiv : int or None
+        n_points to resample streamlines to before plotting. If None, no
+        resampling is done.
+        Default: 40
+    """
     mapping = mapping_imap["mapping"]
+    bundle_dict = data_imap["bundle_dict"]
+    reg_template = data_imap["reg_template"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["b0_file"]
     shade_by_volume = data_imap[best_scalar + "_file"]
@@ -143,9 +173,9 @@ def viz_indivBundle(subses_dict,
 
     start_time = time()
     volume = _viz_prepare_vol(
-        volume, xform_volume_indiv, mapping, scalar_dict)
+        volume, False, mapping, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, xform_shade_by_volume_indiv, mapping, scalar_dict)
+        shade_by_volume, False, mapping, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -322,6 +352,10 @@ def viz_indivBundle(subses_dict,
 @pimms.calc("tract_profile_plots")
 def plot_tract_profiles(subses_dict, scalars, tracking_params,
                         segmentation_params, segmentation_imap):
+    """
+    list of full paths to png files,
+    where files contain plots of the tract profiles
+    """
     from AFQ.viz.plot import visualize_tract_profiles
     start_time = time()
     fnames = []
@@ -358,7 +392,40 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     return fnames
 
 
-def get_viz_plan():
+@pimms.calc("viz_backend")
+def init_viz_backend(viz_backend_spec="plotly_no_gif",
+                     virtual_frame_buffer=False):
+    """
+    An instance of the `AFQ.viz.utils.viz_backend` class.
+
+    Parameters
+    ----------
+    virtual_frame_buffer : bool, optional
+        Whether to use a virtual fram buffer. This is neccessary if
+        generating GIFs in a headless environment. Default: False
+    viz_backend_spec : str, optional
+        Which visualization backend to use.
+        See Visualization Backends page in documentation for details:
+        https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
+        One of {"fury", "plotly", "plotly_no_gif"}.
+        Default: "plotly_no_gif"
+    """
+    if not isinstance(virtual_frame_buffer, bool):
+        raise TypeError("virtual_frame_buffer must be a bool")
+    if "fury" not in viz_backend_spec\
+            and "plotly" not in viz_backend_spec:
+        raise TypeError(
+            "viz_backend_spec must contain either 'fury' or 'plotly'")
+
+    if virtual_frame_buffer:
+        from xvfbwrapper import Xvfb
+        vdisplay = Xvfb(width=1280, height=1280)
+        vdisplay.start()
+
+    return Viz(backend=viz_backend_spec.lower())
+
+
+def get_viz_plan(kwargs):
     viz_tasks = with_name([
-        plot_tract_profiles, viz_bundles, viz_indivBundle])
+        plot_tract_profiles, viz_bundles, viz_indivBundle, init_viz_backend])
     return pimms.plan(**viz_tasks)

@@ -13,7 +13,8 @@ provide these ROIs as part of the software.
 """
 
 import os.path as op
-from AFQ import api
+from AFQ.api.group import GroupAFQ
+import AFQ.api.bundle_dict as abd
 import AFQ.data as afd
 from AFQ.definitions.mask import LabelledMaskFile, RoiMask
 
@@ -21,7 +22,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 
 or_rois = afd.read_or_templates()
 
-bundles = api.BundleDict({
+bundles = abd.BundleDict({
     "L_OR": {
         "ROIs": [or_rois["left_OR_1"],
                  or_rois["left_OR_2"],
@@ -31,7 +32,7 @@ bundles = api.BundleDict({
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 1
-        },
+    },
     "R_OR": {
         "ROIs": [or_rois["right_OR_1"],
                  or_rois["right_OR_2"],
@@ -41,9 +42,8 @@ bundles = api.BundleDict({
         "rules": [True, True, False, False, False],
         "cross_midline": False,
         "uid": 2
-        }
     }
-)
+})
 
 endpoint_info = {
     "L_OR": {
@@ -53,14 +53,16 @@ endpoint_info = {
         "startpoint": or_rois['right_thal_MNI'],
         "endpoint": or_rois['right_V1_MNI']}}
 
-brain_mask = LabelledMaskFile("seg",
-                              {"scope": "freesurfer"},
-                              exclusive_labels=[0])
+brain_mask_definition = LabelledMaskFile(
+    suffix="seg",
+    filters={"scope": "freesurfer"},
+    exclusive_labels=[0])
 
-my_afq = api.AFQ(
-    bids_path=op.join(afd.afq_home,
-                     'stanford_hardi'),
-    brain_mask=brain_mask,
+my_afq = GroupAFQ(
+    bids_path=op.join(
+        afd.afq_home,
+        'stanford_hardi'),
+    brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 3,
                      "directions": "prob",
                      "odf_model": "CSD",

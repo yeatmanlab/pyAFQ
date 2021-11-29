@@ -27,6 +27,7 @@ The csv file has the same format as
 
     data
     usage
+    kwargs
     config
     viz_backend
     mask

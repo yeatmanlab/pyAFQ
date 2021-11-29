@@ -72,9 +72,13 @@ class MaskFile(Definition):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -82,18 +86,30 @@ class MaskFile(Definition):
     Examples
     --------
     seed_mask = MaskFile(
-        "WM_mask",
-        {"scope":"dmriprep"})
-    api.AFQ(tracking_params={"seed_mask": seed_mask,
+        suffix="WM",
+        filters={"scope":"dmriprep"})
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask,
                                 "seed_threshold": 0.1})
     """
 
-    def __init__(self, suffix, filters={}):
-        self.suffix = suffix
-        self.filters = filters
-        self.fnames = {}
+    def __init__(self, path=None, suffix=None, filters={}):
+        if path is None and suffix is None:
+            raise ValueError((
+                "One of `path` or `suffix` must set to "
+                "a value other than None."))
+
+        if path is not None:
+            self.from_path = True
+            self.fname = path
+        else:
+            self.from_path = False
+            self.suffix = suffix
+            self.filters = filters
+            self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
+        if self.from_path:
+            return
         if session not in self.fnames:
             self.fnames[session] = {}
 
@@ -103,8 +119,12 @@ class MaskFile(Definition):
 
         self.fnames[session][subject] = nearest_mask
 
-    def get_path_data_affine(self, subses_dict):
-        mask_file = self.fnames[subses_dict['ses']][subses_dict['subject']]
+    def get_path_data_affine(self, subses_dict, bids_info):
+        if self.from_path:
+            mask_file = self.fname
+        else:
+            mask_file = self.fnames[
+                bids_info['session']][bids_info['subject']]
         mask_img = nib.load(mask_file)
         return mask_file, mask_img.get_fdata(), mask_img.affine
 
@@ -112,12 +132,12 @@ class MaskFile(Definition):
     def apply_conditions(self, mask_data_orig, mask_file):
         return mask_data_orig, dict(source=mask_file)
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
-        def mask_getter(subses_dict, dwi_affine):
+        def mask_getter(subses_dict, dwi_affine, bids_info):
             # Load data
             mask_file, mask_data_orig, mask_affine = \
-                self.get_path_data_affine(subses_dict)
+                self.get_path_data_affine(subses_dict, bids_info)
 
             # Apply any conditions on the data
             mask_data, meta = self.apply_conditions(mask_data_orig, mask_file)
@@ -131,6 +151,9 @@ class MaskFile(Definition):
             return mask_data, meta
         return mask_getter
 
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        return self.get_mask_getter()(subses_dict, dwi_affine, bids_info)
+
 
 class FullMask(Definition):
     """
@@ -138,7 +161,7 @@ class FullMask(Definition):
 
     Examples
     --------
-    brain_mask = FullMask()
+    brain_mask_definition = FullMask()
     """
 
     def __init__(self):
@@ -147,13 +170,16 @@ class FullMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine):
             return np.ones(nib.load(
                 subses_dict["dwi_file"]).get_fdata()[..., 0].shape),\
                 dict(source="Entire Volume")
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        return self.get_mask_getter()(subses_dict, dwi_affine)
 
 
 class RoiMask(Definition):
@@ -163,7 +189,7 @@ class RoiMask(Definition):
     Examples
     --------
     seed_mask = RoiMask()
-    api.AFQ(tracking_params={"seed_mask": seed_mask})
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
     def __init__(self, use_presegment=False):
@@ -173,11 +199,12 @@ class RoiMask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
+    def get_mask_getter(self):
         @as_img
         def mask_getter(subses_dict, dwi_affine, mapping_imap,
-                        bundle_dict, segmentation_params):
+                        data_imap, segmentation_params):
             mask_data = None
+            bundle_dict = data_imap["bundle_dict"]
             if self.use_presegment:
                 bundle_dict = \
                     segmentation_params["presegment_bundle_dict"]
@@ -200,6 +227,9 @@ class RoiMask(Definition):
             return mask_data, dict(source="ROIs")
         return mask_getter
 
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        raise ValueError("Brain mask should not be made from waypoint ROIs")
+
 
 class B0Mask(Definition):
     """
@@ -213,8 +243,8 @@ class B0Mask(Definition):
 
     Examples
     --------
-    brain_mask = B0Mask()
-    api.AFQ(brain_mask=brain_mask)
+    brain_mask_definition = B0Mask()
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
     def __init__(self, median_otsu_kwargs={}):
@@ -223,28 +253,27 @@ class B0Mask(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_mask_getter(self, in_data=False):
-        if in_data:
-            @as_img
-            def mask_getter(subses_dict, dwi_affine, b0_file):
-                mean_b0_img = nib.load(b0_file)
-                mean_b0 = mean_b0_img.get_fdata()
-                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-                return mask_data, dict(
-                    source=b0_file,
-                    technique="median_otsu applied to b0",
-                    median_otsu_kwargs=self.median_otsu_kwargs)
-        else:
-            @as_img
-            def mask_getter(subses_dict, dwi_affine, data_imap):
-                mean_b0_img = nib.load(data_imap["b0_file"])
-                mean_b0 = mean_b0_img.get_fdata()
-                _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-                return mask_data, dict(
-                    source=data_imap["b0_file"],
-                    technique="median_otsu applied to b0",
-                    median_otsu_kwargs=self.median_otsu_kwargs)
+    def get_mask_getter(self):
+        @as_img
+        def mask_getter(subses_dict, dwi_affine, data_imap):
+            mean_b0_img = nib.load(data_imap["b0_file"])
+            mean_b0 = mean_b0_img.get_fdata()
+            _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+            return mask_data, dict(
+                source=data_imap["b0_file"],
+                technique="median_otsu applied to b0",
+                median_otsu_kwargs=self.median_otsu_kwargs)
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        mean_b0_img = nib.load(b0_file)
+        mean_b0 = mean_b0_img.get_fdata()
+        _, mask_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
+        return nib.Nifti1Image(
+            mask_data.astype(int), mean_b0_img.affine), dict(
+                source=b0_file,
+                technique="median_otsu applied to b0",
+                median_otsu_kwargs=self.median_otsu_kwargs)
 
 
 class LabelledMaskFile(MaskFile, CombineMaskMixin):
@@ -253,9 +282,13 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -277,16 +310,17 @@ class LabelledMaskFile(MaskFile, CombineMaskMixin):
 
     Examples
     --------
-    brain_mask = LabelledMaskFile(
-        "aseg",
-        {"scope": "dmriprep"},
+    brain_mask_definition = LabelledMaskFile(
+        suffix="aseg",
+        filters={"scope": "dmriprep"},
         exclusive_labels=[0])
-    api.AFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
-    def __init__(self, suffix, filters={}, inclusive_labels=None,
+    def __init__(self, path=None, suffix=None, filters={},
+                 inclusive_labels=None,
                  exclusive_labels=None, combine="or"):
-        MaskFile.__init__(self, suffix, filters)
+        MaskFile.__init__(self, path, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.inclusive_labels = inclusive_labels
         self.exclusive_labels = exclusive_labels
@@ -319,9 +353,13 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
 
     Parameters
     ----------
-    suffix : str
+    path : str, optional
+        path to file to get mask from. Use this or suffix.
+        Default: None
+    suffix : str, optional
         suffix to pass to bids_layout.get() to identify the file.
-    filters : str
+        Default: None
+    filters : str, optional
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
@@ -341,16 +379,16 @@ class ThresholdedMaskFile(MaskFile, CombineMaskMixin):
 
     Examples
     --------
-    brain_mask = ThresholdedMaskFile(
-        "brain_mask",
-        {"scope":"dmriprep"},
+    brain_mask_definition = ThresholdedMaskFile(
+        suffix="BM",
+        filters={"scope":"dmriprep"},
         lower_bound=0.1)
-    api.AFQ(brain_mask=brain_mask)
+    api.GroupAFQ(brain_mask_definition=brain_mask_definition)
     """
 
-    def __init__(self, suffix, filters={}, lower_bound=None,
+    def __init__(self, path=None, suffix=None, filters={}, lower_bound=None,
                  upper_bound=None, combine="and"):
-        MaskFile.__init__(self, suffix, filters)
+        MaskFile.__init__(self, path, suffix, filters)
         CombineMaskMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -390,7 +428,7 @@ class ScalarMask(Definition):
     seed_mask = ScalarMask(
         "dti_fa",
         scope="dmriprep")
-    api.AFQ(tracking_params={
+    api.GroupAFQ(tracking_params={
         "seed_mask": seed_mask,
         "seed_threshold": 0.2})
     """
@@ -402,16 +440,16 @@ class ScalarMask(Definition):
         pass
 
     # overrides MaskFile
-    def get_mask_getter(self, in_data=False):
-        if in_data:
-            raise ValueError(
-                "Brain mask cannot be a built-in scalar, "
-                + "because the brain mask is used to calculate scalars")
-
+    def get_mask_getter(self):
         def mask_getter(subses_dict, dwi_affine, data_imap):
             scalar_file = data_imap[self.scalar + "_file"]
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
         return mask_getter
+
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        raise ValueError(
+            "Brain mask cannot be a built-in scalar, "
+            + "because the brain mask is used to calculate scalars")
 
 
 class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
@@ -445,7 +483,7 @@ class ThresholdedScalarMask(ThresholdedMaskFile, ScalarMask):
     seed_mask = ThresholdedScalarMask(
         "dti_fa",
         lower_bound=0.2)
-    api.AFQ(tracking_params={"seed_mask": seed_mask})
+    api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
     def __init__(self, scalar, lower_bound=None, upper_bound=None,
@@ -473,10 +511,10 @@ class PFTMask(Definition):
     Examples
     --------
     stop_mask = PFTMask(
-        afm.MaskFile("WMprobseg"),
-        afm.MaskFile("GMprobseg"),
-        afm.MaskFile("CSFprobseg"))
-    api.AFQ(tracking_params={
+        afm.MaskFile(suffix="WMprobseg"),
+        afm.MaskFile(suffix="GMprobseg"),
+        afm.MaskFile(suffix="CSFprobseg"))
+    api.GroupAFQ(tracking_params={
         "stop_mask": stop_mask,
         "stop_threshold": "CMC",
         "tracker": "pft"})
@@ -495,6 +533,8 @@ class PFTMask(Definition):
             probseg_funcs.append(probseg.get_mask_getter())
         return probseg_funcs
 
+    def get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file):
+        raise ValueError("Brain mask should not be made from PFT Mask")
 
 # class CombinedMask(Definition, CombineMaskMixin):
 #     """  # TODO: can this be done in current system?
@@ -521,7 +561,7 @@ class PFTMask(Definition):
 #         ThresholdedScalarMask(
 #             "dti_md",
 #             upper_bound=0.002)])
-#     api.AFQ(tracking_params={"seed_mask": seed_mask})
+#     api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
 #     """
 
 #     def __init__(self, mask_list, combine="and"):
