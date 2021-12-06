@@ -18,6 +18,10 @@ mcsd.solve_qp = solve_qp
 __all__ = ["fit_csd"]
 
 
+class CsdNanResponseError(Exception):
+    pass
+
+
 def _model(gtab, data, response=None, sh_order=None, msmt=False):
     """
     Helper function that defines a CSD model.
@@ -46,6 +50,9 @@ def _model(gtab, data, response=None, sh_order=None, msmt=False):
         if response is None:
             response, _ = csd.auto_response_ssst(gtab, data, roi_radii=10,
                                                  fa_thr=0.7)
+        # Catch conditions where an auto-response could not be calculated:
+        if np.all(np.isnan(response[0])):
+            raise CsdNanResponseError
 
     csdmodel = my_model(gtab, response, sh_order=sh_order)
     return csdmodel
