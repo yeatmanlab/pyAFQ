@@ -1,3 +1,18 @@
+0.10 (December 07, 2021)
+========================
+This release introduces a new API for BIDS-organized group studies
+(`GroupAFQ`). This API is backwards-compatible (apart from the name) with
+the API of the now-deprecated `AFQ` class. A new class is introduced that
+provides more flexibility for users: `ParticipantAFQ`, which accepts
+data for a single participant in any format (i.e., non-BIDS), so long
+as strings pointing to the full paths of the data, bvals, bvecs can
+be provided.
+
+  * NF: Handle situations where CSD auto-response function cannot complete. (#776)
+  * Group AFQ / Participant AFQ (#764)
+  * [ENH] allow user to pass arguments to pyBIDS BIDSLayout (#774)
+
+
 0.9.2 + 0.9.3 (November 18, 2021)
 ==================================
 These bug fix releases are meant to improve tagging of Docker images.
