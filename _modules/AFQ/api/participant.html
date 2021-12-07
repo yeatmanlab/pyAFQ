@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.api.participant &#8212; AFQ 0.10 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../index.html">
+  <img src="../../../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for AFQ.api.participant</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="n">SlrMap</span>
+<span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="n">wf_sections</span><span class="p">,</span> <span class="n">add_method_descriptions</span>
+
+<span class="kn">from</span> <span class="nn">AFQ.tasks.data</span> <span class="kn">import</span> <span class="n">get_data_plan</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.mapping</span> <span class="kn">import</span> <span class="n">get_mapping_plan</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.tractography</span> <span class="kn">import</span> <span class="n">get_tractography_plan</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.segmentation</span> <span class="kn">import</span> <span class="n">get_segmentation_plan</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.viz</span> <span class="kn">import</span> <span class="n">get_viz_plan</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ParticipantAFQ&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@add_method_descriptions</span>
+<div class="viewcode-block" id="ParticipantAFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ">[docs]</a><span class="k">class</span> <span class="nc">ParticipantAFQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">dwi_data_file</span><span class="p">,</span>
+                 <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span>
+                 <span class="n">output_dir</span><span class="p">,</span>
+                 <span class="n">bids_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a ParticipantAFQ object from a BIDS dataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dwi_data_file : str</span>
+<span class="sd">            Path to DWI data file.</span>
+<span class="sd">        bval_file : str</span>
+<span class="sd">            Path to bval file.</span>
+<span class="sd">        bvec_file : str</span>
+<span class="sd">            Path to bvec file.</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            Path to output directory.</span>
+<span class="sd">        bids_info : dict or None, optional</span>
+<span class="sd">            This is used by GroupAFQ to provide information about</span>
+<span class="sd">            the BIDS layout to each participant.</span>
+<span class="sd">        kwargs : additional optional parameters</span>
+<span class="sd">            You can set additional parameters for any step</span>
+<span class="sd">            of the process. See :ref:`kwargs_docs` for more details.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        api.ParticipantAFQ(</span>
+<span class="sd">            dwi_data_file, bval_file, bvec_file, output_dir,</span>
+<span class="sd">            csd_sh_order=4)</span>
+<span class="sd">        api.ParticipantAFQ(</span>
+<span class="sd">            dwi_data_file, bval_file, bvec_file, output_dir,</span>
+<span class="sd">            reg_template_spec=&quot;mni_t2&quot;, reg_subject_spec=&quot;b0&quot;)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        In tracking_params, parameters with the suffix mask which are also</span>
+<span class="sd">        a mask from AFQ.definitions.mask will be handled automatically by</span>
+<span class="sd">        the api.</span>
+
+<span class="sd">        It is recommended that you leave the bids_info parameter as None,</span>
+<span class="sd">        and instead pass in the paths to the files you want to use directly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;output_dir must be a str&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;dwi_data_file must be a str&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bval_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;bval_file must be a str&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bvec_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;bvec_file must be a str&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;output_dir does not exist: </span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bids_info</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;dwi_file&quot;</span><span class="p">:</span> <span class="n">dwi_data_file</span><span class="p">,</span>
+            <span class="s2">&quot;results_dir&quot;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">}</span>
+
+        <span class="c1"># construct pimms plans</span>
+        <span class="k">if</span> <span class="s2">&quot;mapping_definition&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mapping_definition&quot;</span><span class="p">],</span> <span class="n">SlrMap</span><span class="p">):</span>
+            <span class="n">plans</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># if using SLR map, do tractography first</span>
+                <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">get_data_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;tractography&quot;</span><span class="p">:</span> <span class="n">get_tractography_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="n">get_mapping_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">use_sls</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="s2">&quot;segmentation&quot;</span><span class="p">:</span> <span class="n">get_segmentation_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;viz&quot;</span><span class="p">:</span> <span class="n">get_viz_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plans</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># Otherwise, do mapping first</span>
+                <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">get_data_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="n">get_mapping_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;tractography&quot;</span><span class="p">:</span> <span class="n">get_tractography_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;segmentation&quot;</span><span class="p">:</span> <span class="n">get_segmentation_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="s2">&quot;viz&quot;</span><span class="p">:</span> <span class="n">get_viz_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)}</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">)</span>
+
+        <span class="n">input_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dwi_img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+            <span class="n">dwi_affine</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">bval_file</span><span class="o">=</span><span class="n">bval_file</span><span class="p">,</span>
+            <span class="n">bvec_file</span><span class="o">=</span><span class="n">bvec_file</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># chain together a complete plan from individual plans</span>
+        <span class="n">previous_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">plan</span> <span class="ow">in</span> <span class="n">plans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">previous_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_imap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plan</span><span class="p">(</span>
+                <span class="o">**</span><span class="n">input_data</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">previous_data</span><span class="p">)</span>
+            <span class="n">last_name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span> <span class="o">=</span>\
+            <span class="n">previous_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">_imap&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ParticipantAFQ.__getattribute__"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.__getattribute__">[docs]</a>    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="c1"># check if normal attr exists first</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># find what name to use</span>
+        <span class="n">attr_file</span> <span class="o">=</span> <span class="n">attr</span> <span class="o">+</span> <span class="s2">&quot;_file&quot;</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">attr_file</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sub_attr</span> <span class="ow">in</span> <span class="n">wf_sections</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">][</span><span class="n">attr_file</span><span class="p">]</span>
+
+        <span class="c1"># attr not found, allow typical AttributeError</span>
+        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -44,6 +44,8 @@ Functions
    AFQ.tasks.data.dki_ad
    AFQ.tasks.data.dki_rk
    AFQ.tasks.data.dki_ak
+   AFQ.tasks.data.brain_mask
+   AFQ.tasks.data.get_bundle_dict
    AFQ.tasks.data.get_data_plan
 
 
@@ -54,7 +56,6 @@ Attributes
 .. autoapisummary::
 
    AFQ.tasks.data.DIPY_GH
-   AFQ.tasks.data.outputs
    AFQ.tasks.data.dti_params
    AFQ.tasks.data.dki_params
    AFQ.tasks.data.csd_params
@@ -83,34 +84,33 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:data:: outputs
-   
+.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
 
    
+   DWI data as an ndarray for selected b values,
+   A DIPY GradientTable with all the gradient information,
+   and unaltered DWI data in a Nifti1Image.
 
 
+   :Parameters:
 
+       **min_bval** : float, optional
+           Minimum b value you want to use
+           from the dataset (other than b0), inclusive.
+           If None, there is no minimum limit. Default: None
 
+       **max_bval** : float, optional
+           Maximum b value you want to use
+           from the dataset (other than b0), inclusive.
+           If None, there is no maximum limit. Default: None
 
+       **filter_b** : bool, optional
+           Whether to filter the DWI data based on min or max bvals.
+           Default: True
 
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, b0_threshold, min_bval, max_bval, filter_b=True)
-
-   
-
-
+       **b0_threshold** : int, optional
+           The value of b under which
+           it is considered to be b0. Default: 50.
 
 
 
@@ -131,6 +131,7 @@ Attributes
 .. py:function:: b0(subses_dict, data, gtab, img)
 
    
+   full path to a nifti file containing the mean b0
 
 
 
@@ -153,6 +154,8 @@ Attributes
 .. py:function:: b0_mask(subses_dict, b0_file, brain_mask_file)
 
    
+   full path to a nifti file containing the
+   mean b0 after applying the brain mask
 
 
 
@@ -175,6 +178,7 @@ Attributes
 .. py:function:: dti_fit(dti_params_file, gtab)
 
    
+   DTI TensorFit object
 
 
 
@@ -194,11 +198,23 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold, robust_tensor_fitting=False)
+.. py:function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold=50, robust_tensor_fitting=False)
 
    
+   full path to a nifti file containing parameters
+   for the DTI fit
 
 
+   :Parameters:
+
+       **robust_tensor_fitting** : bool, optional
+           Whether to use robust_tensor_fitting when
+           doing dti. Only applies to dti.
+           Default: False
+
+       **b0_threshold** : int, optional
+           The value of b under which
+           it is considered to be b0. Default: 50.
 
 
 
@@ -242,6 +258,7 @@ Attributes
 .. py:function:: dki_fit(dki_params_file, gtab)
 
    
+   DKI DiffusionKurtosisFit object
 
 
 
@@ -264,6 +281,8 @@ Attributes
 .. py:function:: dki(subses_dict, dwi_affine, brain_mask_file, gtab, data)
 
    
+   full path to a nifti file containing
+   parameters for the DKI fit
 
 
 
@@ -309,6 +328,35 @@ Attributes
 .. py:function:: csd(subses_dict, dwi_affine, brain_mask_file, gtab, data, tracking_params, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
 
    
+   full path to a nifti file containing
+   parameters for the CSD fit
+
+
+   :Parameters:
+
+       **csd_response** : tuple or None, optional.
+           The response function to be used by CSD, as a tuple with two elements.
+           The first is the eigen-values as an (3,) ndarray and the second is
+           the signal value for the response function without diffusion-weighting
+           (i.e. S0). If not provided, auto_response will be used to calculate
+           these values.
+           Default: None
+
+       **csd_sh_order** : int or None, optional.
+           default: infer the number of parameters from the number of data
+           volumes, but no larger than 8.
+           Default: None
+
+       **csd_lambda_** : float, optional.
+           weight given to the constrained-positivity regularization part of
+           the deconvolution equation. Default: 1
+
+       **csd_tau** : float, optional.
+           threshold controlling the amplitude below which the corresponding
+           fODF is assumed to be zero.  Ideally, tau should be set to
+           zero. However, to improve the stability of the algorithm, tau is
+           set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+           (see [Rff3b1074f624-1]_). Default: 0.1
 
 
 
@@ -319,8 +367,16 @@ Attributes
 
 
 
+   .. rubric:: References
 
+   .. [Rff3b1074f624-1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of
+           the fibre orientation distribution in diffusion MRI:
+           Non-negativity constrained super-resolved spherical
+           deconvolution
 
+   .. only:: latex
+
+      [Rff3b1074f624-1]_
 
 
 
@@ -354,6 +410,8 @@ Attributes
 .. py:function:: anisotropic_power_map(subses_dict, csd_params_file)
 
    
+   full path to a nifti file containing
+   the anisotropic power map
 
 
 
@@ -376,6 +434,8 @@ Attributes
 .. py:function:: dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI fractional anisotropy
 
 
 
@@ -398,6 +458,8 @@ Attributes
 .. py:function:: dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI color fractional anisotropy
 
 
 
@@ -420,6 +482,8 @@ Attributes
 .. py:function:: dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI principal diffusion direction
 
 
 
@@ -442,6 +506,8 @@ Attributes
 .. py:function:: dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI mean diffusivity
 
 
 
@@ -464,6 +530,8 @@ Attributes
 .. py:function:: dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI geodesic anisotropy
 
 
 
@@ -486,6 +554,8 @@ Attributes
 .. py:function:: dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI radial diffusivity
 
 
 
@@ -508,6 +578,8 @@ Attributes
 .. py:function:: dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf)
 
    
+   full path to a nifti file containing
+   the DTI axial diffusivity
 
 
 
@@ -530,6 +602,8 @@ Attributes
 .. py:function:: dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI fractional anisotropy
 
 
 
@@ -552,6 +626,8 @@ Attributes
 .. py:function:: dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI mean diffusivity
 
 
 
@@ -574,8 +650,25 @@ Attributes
 .. py:function:: dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf, sphere='repulsion100', gtol=0.01)
 
    
+   full path to a nifti file containing
+   the DKI axonal water fraction
 
 
+   :Parameters:
+
+       **sphere** : Sphere class instance, optional
+           The sphere providing sample directions for the initial
+           search of the maximal value of kurtosis.
+           Default: 'repulsion100'
+
+       **gtol** : float, optional
+           This input is to refine kurtosis maxima under the precision of
+           the directions sampled on the sphere class instance.
+           The gradient of the convergence procedure must be less than gtol
+           before successful termination.
+           If gtol is None, fiber direction is directly taken from the initial
+           sampled directions of the given sphere object.
+           Default: 1e-2
 
 
 
@@ -596,6 +689,8 @@ Attributes
 .. py:function:: dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI mean kurtosis file
 
 
 
@@ -618,6 +713,8 @@ Attributes
 .. py:function:: dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI geodesic anisotropy
 
 
 
@@ -640,6 +737,8 @@ Attributes
 .. py:function:: dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI radial diffusivity
 
 
 
@@ -662,6 +761,8 @@ Attributes
 .. py:function:: dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI axial diffusivity
 
 
 
@@ -684,6 +785,8 @@ Attributes
 .. py:function:: dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI radial kurtosis
 
 
 
@@ -706,6 +809,8 @@ Attributes
 .. py:function:: dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf)
 
    
+   full path to a nifti file containing
+   the DKI axial kurtosis file
 
 
 
@@ -725,7 +830,82 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_data_plan(brain_mask_definition)
+.. py:function:: brain_mask(subses_dict, dwi_affine, b0_file, bids_info, brain_mask_definition=None)
+
+   
+   full path to a nifti file containing
+   the brain mask
+
+
+   :Parameters:
+
+       **brain_mask_definition** : instance from `AFQ.definitions.mask`, optional
+           This will be used to create
+           the brain mask, which gets applied before registration to a
+           template.
+           If you want no brain mask to be applied, use FullMask.
+           If None, use B0Mask()
+           Default: None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None, reg_template_spec='mni_T1')
+
+   
+   Dictionary defining the different bundles to be segmented,
+   and a Nifti1Image containing the template for registration
+
+
+   :Parameters:
+
+       **bundle_info** : list of strings, dict, or BundleDict, optional
+           List of bundle names to include in segmentation,
+           or a bundle dictionary (see BundleDict for inspiration),
+           or a BundleDict.
+           If None, will get all appropriate bundles for the chosen
+           segmentation algorithm.
+           Default: None
+
+       **reg_template_spec** : str, or Nifti1Image, optional
+           The target image data for registration.
+           Can either be a Nifti1Image, a path to a Nifti1Image, or
+           if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+           image data will be loaded automatically.
+           If "hcp_atlas" is used, slr registration will be used
+           and reg_subject should be "subject_sls".
+           Default: "mni_T1"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_data_plan(kwargs)
 
    
 

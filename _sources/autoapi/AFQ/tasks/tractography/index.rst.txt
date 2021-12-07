@@ -33,10 +33,10 @@ Attributes
 
 .. autoapisummary::
 
-   AFQ.tasks.tractography.outputs
+   AFQ.tasks.tractography.logger
 
 
-.. py:data:: outputs
+.. py:data:: logger
    
 
    
@@ -62,6 +62,8 @@ Attributes
 .. py:function:: export_seed_mask(subses_dict, dwi_affine, tracking_params)
 
    
+   full path to a nifti file containing the
+   tractography seed mask
 
 
 
@@ -84,6 +86,8 @@ Attributes
 .. py:function:: export_stop_mask(subses_dict, dwi_affine, tracking_params)
 
    
+   full path to a nifti file containing the
+   tractography stop mask
 
 
 
@@ -106,6 +110,8 @@ Attributes
 .. py:function:: export_stop_mask_pft(pve_wm, pve_gm, pve_csf)
 
    
+   full path to a nifti file containing the
+   tractography stop mask
 
 
 
@@ -128,8 +134,19 @@ Attributes
 .. py:function:: streamlines(subses_dict, data_imap, seed_file, stop_file, tracking_params)
 
    
+   full path to the complete, unsegmented tractography file
 
 
+   :Parameters:
+
+       **tracking_params** : dict, optional
+           The parameters for tracking. Default: use the default behavior of
+           the aft.track function. Seed mask and seed threshold, if not
+           specified, are replaced with scalar masks from scalar[0]
+           thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
+           this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+           If ``tracker`` is set to "pft" then ``stop_mask`` should be
+           an instance of ``AFQ.definitions.mask.PFTMask``.
 
 
 
@@ -147,11 +164,18 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: custom_tractography(custom_tract_file)
+.. py:function:: custom_tractography(bids_info, import_tract=None)
 
    
+   full path to the complete, unsegmented tractography file
 
 
+   :Parameters:
+
+       **import_tract** : dict, optional
+           BIDS filters for inputing a user made tractography file.
+           If None, tractography will be performed automatically.
+           Default: None
 
 
 
@@ -169,7 +193,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_tractography_plan(custom_tract_file, tracking_params)
+.. py:function:: get_tractography_plan(kwargs)
 
    
 

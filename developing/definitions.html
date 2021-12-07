@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adding Definitions &#8212; AFQ 0.9.2 documentation</title>
+    <title>Adding Definitions &#8212; AFQ 0.10 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -242,35 +242,32 @@
   <div class="section" id="adding-definitions">
 <h1>Adding Definitions<a class="headerlink" href="#adding-definitions" title="Permalink to this headline">¶</a></h1>
 <p>pyAFQ uses definitions to allow users to customize the mappings, masks,
-etc. used by the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object. All definitions ultimately
+etc. used by the <a class="reference internal" href="../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ" title="AFQ.api.group.GroupAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.GroupAFQ</span></code></a> object. All definitions ultimately
 inherit from <a class="reference internal" href="../autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a>. For a given subject and
 session within the API, a definition is used to create a given mask, map, etc.
 <cite>Definition</cite>-inherited classes must have three methods: <cite>__init__</cite>, <cite>find_path</cite>, and <cite>get_for_subses</cite>.
 The requirements of each of these methods are described below:</p>
 <ul class="simple">
 <li><p><cite>Definition</cite>-inherited classes have an <cite>__init__</cite> method which the users uses to configure
-the the definition for a given instance of the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object.
+the the definition for a given instance of the <a class="reference internal" href="../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ" title="AFQ.api.group.GroupAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.GroupAFQ</span></code></a> object.
 These <cite>__init__</cite> methods must be thoroughly
 documented as they are what the user interacts with. The class must have attributes
 of same name as the <cite>__init__</cite> args. This is important for reading/writing
 <cite>Definition</cite>-inherited classes as arguments to config files.
 For scalar definitions, each class should have a <cite>name</cite> parameter (see
 <a class="reference internal" href="../autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile" title="AFQ.definitions.scalar.ScalarFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.scalar.ScalarFile</span></code></a> source for an example).</p></li>
-<li><p>The api calls <cite>find_path</cite> during the <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object initialization to
+<li><p>The api calls <cite>find_path</cite> during the <a class="reference internal" href="../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ" title="AFQ.api.group.GroupAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.GroupAFQ</span></code></a> object initialization to
 let the definition find relevant files for the given subject and session. All <cite>find_path</cite>
 methods have the same input: <cite>bids_layout</cite>, <cite>from_path</cite>, <cite>subject</cite>, <cite>session</cite>. See
 <a class="reference internal" href="../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.MaskFile.find_path" title="AFQ.definitions.mask.MaskFile.find_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.definitions.mask.MaskFile.find_path()</span></code></a> for a basic example.
-If your definition does not need to run anything during <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a>
+If your definition does not need to run anything during <a class="reference internal" href="../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ" title="AFQ.api.group.GroupAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.GroupAFQ</span></code></a>
 object initialization, simply override this method with a method that only
 passes (see <a class="reference internal" href="../autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask.find_path" title="AFQ.definitions.mask.FullMask.find_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">AFQ.definitions.mask.FullMask.find_path()</span></code></a> source for an example.)</p></li>
-<li><p>The <a class="reference internal" href="../autoapi/AFQ/api/index.html#AFQ.api.AFQ" title="AFQ.api.AFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.AFQ</span></code></a> object calls <cite>get_for_subses</cite> to get the mask, map,
+<li><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.group.GroupAFQ</span></code> object calls <cite>get_for_subses</cite> to get the mask, map,
 etc. during workflow construction or execution. The form of this method varies significantly
-between mapping, scalar, and mask <cite>Definition</cite>-inherited classes. In
-mask <cite>Definition</cite>-inherited classes, <cite>get_mask_getter</cite> takes two arguments:
-<cite>self</cite> and <cite>in_data</cite>. The <cite>in_data</cite> argument specifies whether this mask is being
-called from the data Pimms plan (i.e., the brain mask) or not (i.e., the tractography
-seed and stop masks). <cite>get_for_subses</cite> then must return a task which can be called
-to generate the mask. In scalar <cite>Definition</cite>-inherited classes, <cite>get_for_subses</cite> only takes the <cite>self</cite>
+between mapping, scalar, and mask <cite>Definition</cite>-inherited classes. <cite>get_for_subses</cite> must
+return a task which can be called to generate the mask.
+In scalar <cite>Definition</cite>-inherited classes, <cite>get_for_subses</cite> only takes the <cite>self</cite>
 argument and similarly returns a task which generates the mask. In mapping
 <cite>Definition</cite>-inherited classes, <cite>get_for_subses</cite> should return a “mapping”. The “mapping” must have
 <cite>transform</cite> and <cite>transform_inverse</cite> functions which each accept two arguments: (1)
@@ -320,7 +317,7 @@ takes as input self, subses_dict, reg_template, and reg_subject.</p></li>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

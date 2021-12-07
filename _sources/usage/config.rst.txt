@@ -15,17 +15,13 @@ See an example configuration file below::
 
     title = "My AFQ analysis"
 
-    # Initialize an AFQ object.
-    # Some special notes on parameters:
-    # In tracking_params, parameters with the suffix mask which are also
-    # a mask from AFQ.definitions.mask will be handled automatically by the
-    # api.
+    # Initialize a GroupAFQ object from a BIDS dataset.
     
     # Use '' to indicate None
     # Wrap dictionaries in quotes
     # Wrap definition object instantiations in quotes
     
-    [BIDS]
+    [BIDS_PARAMS]
     
     # The path to preprocessed diffusion data organized in a BIDS
     # dataset. This should contain a BIDS derivative dataset with
@@ -40,12 +36,12 @@ See an example configuration file below::
     # Default: "all".
     preproc_pipeline = "all"
     
-    # list of participant labels (subject IDs) to perform
+    # List of participant labels (subject IDs) to perform
     # processing on. If None, all subjects are used.
     # Default: None
     participant_labels = ""
     
-    # path to output directory. If None, outputs are put
+    # Path to output directory. If None, outputs are put
     # in a AFQ pipeline folder in the derivatives folder of
     # the BIDS directory. pyAFQ will use existing derivatives
     # from the output directory if they exist, instead of recalculating
@@ -53,96 +49,6 @@ See an example configuration file below::
     # to recalculate a derivative).
     # Default: None
     output_dir = ""
-    
-    # BIDS filters for inputing a user made tractography file.
-    # If None, tractography will be performed automatically.
-    # Default: None
-    custom_tractography_bids_filters = ""
-    
-    [DATA]
-    
-    # The value of b under which
-    # it is considered to be b0. Default: 50.
-    b0_threshold = 50
-    
-    # Whether to use robust_tensor_fitting when
-    # doing dti. Only applies to dti.
-    # Default: False
-    robust_tensor_fitting = false
-    
-    # Minimum b value you want to use
-    # from the dataset (other than b0), inclusive.
-    # If None, there is no minimum limit. Default: None
-    min_bval = ""
-    
-    # Maximum b value you want to use
-    # from the dataset (other than b0), inclusive.
-    # If None, there is no maximum limit. Default: None
-    max_bval = ""
-    
-    [REGISTRATION]
-    
-    # The target image data for registration.
-    # Can either be a Nifti1Image, a path to a Nifti1Image, or
-    # if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
-    # image data will be loaded automatically.
-    # If "hcp_atlas" is used, slr registration will be used
-    # and reg_subject should be "subject_sls".
-    # Default: "mni_T1"
-    reg_template = "mni_T1"
-    
-    # The source image data to be registered.
-    # Can either be a Nifti1Image, bids filters for a Nifti1Image, or
-    # if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
-    # image data will be loaded automatically.
-    # If "subject_sls" is used, slr registration will be used
-    # and reg_template should be "hcp_atlas".
-    # Default: "power_map"
-    reg_subject = "power_map"
-    
-    # This will be used to create
-    # the brain mask, which gets applied before registration to a
-    # template.
-    # If None, no brain mask will not be applied,
-    # and no brain mask will be applied to the template.
-    # Default: B0Mask()
-    brain_mask = "B0Mask({})"
-    
-    # This defines how to either create a mapping from
-    # each subject space to template space or load a mapping from
-    # another software. If creating a map, will register reg_subject and
-    # reg_template.
-    # Default: SynMap()
-    mapping = "SynMap(True, {}, {})"
-    
-    [PROFILE]
-    
-    # How to weight each streamline (1D) or each node (2D)
-    # when calculating the tract-profiles. If callable, this is a
-    # function that calculates weights. If None, no weighting will
-    # be applied. If "gauss", gaussian weights will be used.
-    # If "median", the median of values at each node will be used
-    # instead of a mean or weighted mean.
-    # Default: "gauss"
-    profile_weights = "gauss"
-    
-    [BUNDLES]
-    
-    # List of bundle names to include in segmentation,
-    # or a bundle dictionary (see BundleDict for inspiration),
-    # or a BundleDict.
-    # If None, will get all appropriate bundles for the chosen
-    # segmentation algorithm.
-    # Default: None
-    bundle_info = ""
-    
-    # List of scalars to use.
-    # Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-    # "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
-    # Default:
-    scalars = "['dti_fa', 'dti_md']"
-    
-    [COMPUTE]
     
     # Parameters to pass to parfor in AFQ.utils.parallel,
     # to parallelize computations across subjects and sessions.
@@ -153,20 +59,13 @@ See an example configuration file below::
     # Default: {"engine": "serial"}
     parallel_params = "{'engine': 'serial'}"
     
-    [VIZ]
+    # Additional arguments to give to BIDSLayout from pybids.
+    # For large datasets, try:
+    # {"validate": False, "index_metadata": False}
+    # Default: {}
+    bids_layout_kwargs = "{}"
     
-    # Whether to use a virtual fram buffer. This is neccessary if
-    # generating GIFs in a headless environment. Default: False
-    virtual_frame_buffer = false
-    
-    # Which visualization backend to use.
-    # See Visualization Backends page in documentation for details:
-    # https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
-    # One of {"fury", "plotly", "plotly_no_gif"}.
-    # Default: "plotly_no_gif"
-    viz_backend = "plotly_no_gif"
-    
-    [TRACTOGRAPHY]
+    [TRACTOGRAPHY_PARAMS]
     
     # How tracking directions are determined.
     # One of: {"det" | "prob"}
@@ -239,7 +138,7 @@ See an example configuration file below::
     # One of {"local", "pft"}. Default: "local"
     tracker = "local"
     
-    [SEGMENTATION]
+    [SEGMENTATION_PARAMS]
     
     # Resample streamlines to nb_points number of points.
     # If False, no resampling is done. Default: False
@@ -389,7 +288,7 @@ See an example configuration file below::
     # are saved. Default: None, means no saving of intermediates.
     save_intermediates = ""
     
-    [CLEANING]
+    [CLEANING_PARAMS]
     
     # Number of points to resample streamlines to.
     # Default: 100
@@ -419,6 +318,184 @@ See an example configuration file below::
     # Whether to return indices in the original streamlines.
     # Default: False.
     return_idx = false
+    
+    [DATA]
+    
+    # Minimum b value you want to use
+    # from the dataset (other than b0), inclusive.
+    # If None, there is no minimum limit. Default: None
+    min_bval = ""
+    
+    # Maximum b value you want to use
+    # from the dataset (other than b0), inclusive.
+    # If None, there is no maximum limit. Default: None
+    max_bval = ""
+    
+    # Whether to filter the DWI data based on min or max bvals.
+    # Default: True
+    filter_b = true
+    
+    # The value of b under which
+    # it is considered to be b0. Default: 50.
+    b0_threshold = 50
+    
+    # Whether to use robust_tensor_fitting when
+    # doing dti. Only applies to dti.
+    # Default: False
+    robust_tensor_fitting = false
+    
+    # The response function to be used by CSD, as a tuple with two elements.
+    # The first is the eigen-values as an (3,) ndarray and the second is
+    # the signal value for the response function without diffusion-weighting
+    # (i.e. S0). If not provided, auto_response will be used to calculate
+    # these values.
+    # Default: None
+    csd_response = ""
+    
+    # default: infer the number of parameters from the number of data
+    # volumes, but no larger than 8.
+    # Default: None
+    csd_sh_order = ""
+    
+    # weight given to the constrained-positivity regularization part of
+    # the deconvolution equation. Default: 1
+    csd_lambda_ = 1
+    
+    # threshold controlling the amplitude below which the corresponding
+    # fODF is assumed to be zero.  Ideally, tau should be set to
+    # zero. However, to improve the stability of the algorithm, tau is
+    # set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+    # (see [1]_). Default: 0.1
+    csd_tau = 0.1
+    
+    # The sphere providing sample directions for the initial
+    # search of the maximal value of kurtosis.
+    # Default: 'repulsion100'
+    sphere = "repulsion100"
+    
+    # This input is to refine kurtosis maxima under the precision of
+    # the directions sampled on the sphere class instance.
+    # The gradient of the convergence procedure must be less than gtol
+    # before successful termination.
+    # If gtol is None, fiber direction is directly taken from the initial
+    # sampled directions of the given sphere object.
+    # Default: 1e-2
+    gtol = 0.01
+    
+    # This will be used to create
+    # the brain mask, which gets applied before registration to a
+    # template.
+    # If you want no brain mask to be applied, use FullMask.
+    # If None, use B0Mask()
+    # Default: None
+    brain_mask_definition = ""
+    
+    # List of bundle names to include in segmentation,
+    # or a bundle dictionary (see BundleDict for inspiration),
+    # or a BundleDict.
+    # If None, will get all appropriate bundles for the chosen
+    # segmentation algorithm.
+    # Default: None
+    bundle_info = ""
+    
+    # The target image data for registration.
+    # Can either be a Nifti1Image, a path to a Nifti1Image, or
+    # if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+    # image data will be loaded automatically.
+    # If "hcp_atlas" is used, slr registration will be used
+    # and reg_subject should be "subject_sls".
+    # Default: "mni_T1"
+    reg_template_spec = "mni_T1"
+    
+    [MAPPING]
+    
+    # This defines how to either create a mapping from
+    # each subject space to template space or load a mapping from
+    # another software. If creating a map, will register reg_subject and
+    # reg_template.
+    # If None, use SynMap()
+    # Default: None
+    mapping_definition = ""
+    
+    # The source image data to be registered.
+    # Can either be a Nifti1Image, a scalar definition, or str.
+    # if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
+    # image data will be loaded automatically.
+    # If "subject_sls" is used, slr registration will be used
+    # and reg_template should be "hcp_atlas".
+    # Default: "power_map"
+    reg_subject_spec = "power_map"
+    
+    [SEGMENTATION]
+    
+    # How to weight each streamline (1D) or each node (2D)
+    # when calculating the tract-profiles. If callable, this is a
+    # function that calculates weights. If None, no weighting will
+    # be applied. If "gauss", gaussian weights will be used.
+    # If "median", the median of values at each node will be used
+    # instead of a mean or weighted mean.
+    # Default: "gauss"
+    profile_weights = "gauss"
+    
+    # List of scalars to use.
+    # Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
+    # "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+    # Default: ["dti_fa", "dti_md"]
+    scalars = "['dti_fa', 'dti_md']"
+    
+    [TRACTOGRAPHY]
+    
+    # BIDS filters for inputing a user made tractography file.
+    # If None, tractography will be performed automatically.
+    # Default: None
+    import_tract = ""
+    
+    [VIZ]
+    
+    # Of the form (lower bound, upper bound). Shading based on
+    # shade_by_volume will only differentiate values within these bounds.
+    # If lower bound is None, will default to 0.
+    # If upper bound is None, will default to the maximum value in
+    # shade_by_volume.
+    # Default: [None, None]
+    sbv_lims_bundles = "[None, None]"
+    
+    # Opacity of volume slices.
+    # Default: 0.3
+    volume_opacity_bundles = 0.3
+    
+    # n_points to resample streamlines to before plotting. If None, no
+    # resampling is done.
+    # Default: 40
+    n_points_bundles = 40
+    
+    # Of the form (lower bound, upper bound). Shading based on
+    # shade_by_volume will only differentiate values within these bounds.
+    # If lower bound is None, will default to 0.
+    # If upper bound is None, will default to the maximum value in
+    # shade_by_volume.
+    # Default: [None, None]
+    sbv_lims_indiv = "[None, None]"
+    
+    # Opacity of volume slices.
+    # Default: 0.3
+    volume_opacity_indiv = 0.3
+    
+    # n_points to resample streamlines to before plotting. If None, no
+    # resampling is done.
+    # Default: 40
+    n_points_indiv = 40
+    
+    # Which visualization backend to use.
+    # See Visualization Backends page in documentation for details:
+    # https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
+    # One of {"fury", "plotly", "plotly_no_gif"}.
+    # Default: "plotly_no_gif"
+    viz_backend_spec = "plotly_no_gif"
+    
+    # Whether to use a virtual fram buffer. This is neccessary if
+    # generating GIFs in a headless environment. Default: False
+    virtual_frame_buffer = false
     
     
     

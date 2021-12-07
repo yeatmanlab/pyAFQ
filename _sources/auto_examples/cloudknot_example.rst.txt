@@ -63,7 +63,7 @@ Below, we define the function that we will use. Notice that
 used. This is necessary so that ``Cloudknot`` knows
 what dependencies to install into AWS Batch to run this function.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-89
+.. GENERATED FROM PYTHON SOURCE LINES 39-90
 
 .. code-block:: default
 
@@ -76,7 +76,7 @@ what dependencies to install into AWS Batch to run this function.
         # all imports must be at the top of the function
         # cloudknot installs the appropriate packages from pip
         import AFQ.data as afqd
-        import AFQ.api as api
+        from AFQ.api.group import GroupAFQ
         import AFQ.definitions.mask as afm
 
         # Download the given subject to your local machine from s3
@@ -97,15 +97,16 @@ what dependencies to install into AWS Batch to run this function.
         # in this case, we look for a file with suffix 'seg'
         # in the 'pipeline_name' pipeline,
         # and we consider all non-zero labels to be a part of the brain
-        brain_mask = afm.LabelledMaskFile(
-            'seg', {'scope': 'pipeline_name'}, exclusive_labels=[0])
+        brain_mask_definition = afm.LabelledMaskFile(
+            suffix='seg', filters={'scope': 'pipeline_name'},
+            exclusive_labels=[0])
 
         # define the api AFQ object
-        myafq = api.AFQ(
+        myafq = GroupAFQ(
             "local_bids_dir",
             preproc_pipeline="pipeline_name",
-            brain_mask=brain_mask,
-            viz_backend='plotly',  # this will generate both interactive html and GIFs # noqa
+            brain_mask_definition=brain_mask_definition,
+            viz_backend_spec='plotly',  # this will generate both interactive html and GIFs # noqa
             scalars=["dki_fa", "dki_md"])
 
         # export_all runs the entire pipeline and creates many useful derivates
@@ -118,21 +119,21 @@ what dependencies to install into AWS Batch to run this function.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-94
+.. GENERATED FROM PYTHON SOURCE LINES 91-95
 
 Here we provide a list of subjects that we have selected to process
 to randomly select 3 subjects without replacement, instead do:
 subjects = [[1], [2], [3]]
 see the docstring for S3BIDSStudy.__init__ for more information
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-96
+.. GENERATED FROM PYTHON SOURCE LINES 95-97
 
 .. code-block:: default
 
     subjects = ["123456", "123457", "123458"]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-113
+.. GENERATED FROM PYTHON SOURCE LINES 98-114
 
 Defining a ``Knot`` instance
 ---------------------------------
@@ -151,7 +152,7 @@ do not set this key-word argument. Using the `image_github_installs`
 key-word argument will install pyAFQ from GitHub.
 You can also specify other forks and branches to install from.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-121
+.. GENERATED FROM PYTHON SOURCE LINES 114-122
 
 .. code-block:: default
 
@@ -164,7 +165,7 @@ You can also specify other forks and branches to install from.
         bid_percentage=100)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-127
+.. GENERATED FROM PYTHON SOURCE LINES 123-128
 
 Launching the computation
 --------------------------------
@@ -172,14 +173,14 @@ The :meth:`map` method of the :class:`Knot object maps each of the inputs
 provided as a sequence onto the function and executes the function on each
 one of them in parallel.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-129
+.. GENERATED FROM PYTHON SOURCE LINES 128-130
 
 .. code-block:: default
 
     result_futures = knot.map(subjects)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-138
+.. GENERATED FROM PYTHON SOURCE LINES 131-139
 
 Once computations have started, you can call the following
 function to view the progress of jobs::
@@ -190,12 +191,12 @@ You can also view the status of a specific job::
 
     knot.jobs[0].status
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-143
+.. GENERATED FROM PYTHON SOURCE LINES 142-144
 
 When all jobs are finished, remember to use the :meth:`clobber` method to
 destroy all of the AWS resources created by the :class:`Knot`
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-146
+.. GENERATED FROM PYTHON SOURCE LINES 144-147
 
 .. code-block:: default
 
@@ -203,12 +204,12 @@ destroy all of the AWS resources created by the :class:`Knot`
     knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-149
+.. GENERATED FROM PYTHON SOURCE LINES 148-150
 
 In a second :class:`Knot` object, we use a function that takes the
 resulting profiles of each subject and combines them into one csv file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-165
+.. GENERATED FROM PYTHON SOURCE LINES 150-166
 
 .. code-block:: default
 
@@ -229,14 +230,14 @@ resulting profiles of each subject and combines them into one csv file.
         bid_percentage=100)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-170
+.. GENERATED FROM PYTHON SOURCE LINES 167-171
 
 This knot is called with a dummy argument, which is not used within the
 function itself. The `job_type` key-word argument is used to signal to
 ``Cloudknot`` that only one job is submitted rather than the default
 array of jobs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-173
+.. GENERATED FROM PYTHON SOURCE LINES 171-174
 
 .. code-block:: default
 

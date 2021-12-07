@@ -1,0 +1,840 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.api.bundle_dict &#8212; AFQ 0.10 documentation</title>
+    
+  <link href="../../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="AFQ.api.group" href="../group/index.html" />
+    <link rel="prev" title="AFQ.api" href="../index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../../index.html">
+  <img src="../../../../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../../../index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../../index.html">
+   <code class="xref py py-mod docutils literal notranslate">
+    <span class="pre">
+     AFQ
+    </span>
+   </code>
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active has-children">
+    <a class="reference internal" href="../index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.api
+      </span>
+     </code>
+    </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul class="current">
+     <li class="toctree-l3 current active">
+      <a class="current reference internal" href="#">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.api.bundle_dict
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../group/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.api.group
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../participant/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.api.participant
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.api.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../definitions/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.definitions
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/mapping/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.mapping
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/mask/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.mask
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/scalar/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.scalar
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../models/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.models
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../models/csd/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.models.csd
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../models/dki/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.models.dki
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../models/dti/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.models.dti
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../tasks/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tasks
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/data/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.data
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/decorators/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.decorators
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/mapping/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.mapping
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/segmentation/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.segmentation
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/tractography/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.tractography
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.utils
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../tasks/viz/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.tasks.viz
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../utils/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.utils
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/bin/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.bin
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/models/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.models
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/parallel/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.parallel
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/stats/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.stats
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/streamlines/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.streamlines
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../utils/volume/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.utils.volume
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../viz/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.viz
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+    <label for="toctree-checkbox-7">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../viz/fury_backend/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.fury_backend
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../viz/plot/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.plot
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../viz/plotly_backend/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.plotly_backend
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../viz/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.viz.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../registration/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.registration
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../segmentation/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.segmentation
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../tractography/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.tractography
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+<h3><a href="../../../../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-contents">
+   Module Contents
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classes">
+     Classes
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict">
+       BundleDict
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.gen_all">
+         gen_all
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.__setitem__">
+         __setitem__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.__getitem__">
+         __getitem__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.__len__">
+         __len__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.__delitem__">
+         __delitem__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.__iter__">
+         __iter__
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.copy">
+         copy
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.BundleDict.resample_all_roi">
+         resample_all_roi
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.PediatricBundleDict">
+       PediatricBundleDict
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.bundle_dict.PediatricBundleDict.gen_all">
+         gen_all
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/autoapi/AFQ/api/bundle_dict/index.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="module-AFQ.api.bundle_dict">
+<span id="afq-api-bundle-dict"></span><h1><a class="reference internal" href="#module-AFQ.api.bundle_dict" title="AFQ.api.bundle_dict"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a><a class="headerlink" href="#module-AFQ.api.bundle_dict" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.api.bundle_dict.BundleDict" title="AFQ.api.bundle_dict.BundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BundleDict</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.api.bundle_dict.PediatricBundleDict" title="AFQ.api.bundle_dict.PediatricBundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PediatricBundleDict</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.api.bundle_dict.</span></span><span class="sig-name descname"><span class="pre">BundleDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BUNDLES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'afq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.gen_all">
+<span class="sig-name descname"><span class="pre">gen_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.gen_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.gen_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.__delitem__">
+<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.resample_all_roi">
+<span class="sig-name descname"><span class="pre">resample_all_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.resample_all_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.resample_all_roi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.PediatricBundleDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.api.bundle_dict.</span></span><span class="sig-name descname"><span class="pre">PediatricBundleDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PEDIATRIC_BUNDLES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'afq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#PediatricBundleDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.PediatricBundleDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AFQ.api.bundle_dict.BundleDict" title="AFQ.api.bundle_dict.BundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BundleDict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.bundle_dict.PediatricBundleDict.gen_all">
+<span class="sig-name descname"><span class="pre">gen_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#PediatricBundleDict.gen_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.PediatricBundleDict.gen_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../group/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

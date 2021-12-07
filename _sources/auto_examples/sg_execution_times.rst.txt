@@ -5,24 +5,24 @@
 
 Computation times
 =================
-**185:25.896** total execution time for **auto_examples** files:
+**147:26.446** total execution time for **auto_examples** files:
 
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_reco80.py` (``plot_afq_reco80.py``)                         | 46:08.224 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_reco80.py` (``plot_afq_reco80.py``)                         | 36:19.164 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)                               | 27:36.257 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)                               | 22:47.925 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 22:10.914 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 16:49.042 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)                   | 19:36.357 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_bids_layout.py` (``plot_bids_layout.py``)                       | 15:35.384 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)             | 18:57.036 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)             | 14:54.244 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 18:37.611 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)                   | 14:43.659 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_bids_layout.py` (``plot_bids_layout.py``)                       | 16:52.145 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 14:11.338 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 15:27.352 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 12:05.689 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_cloudknot_example.py` (``cloudknot_example.py``)                     | 00:00.000 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+

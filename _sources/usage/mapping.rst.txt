@@ -16,7 +16,7 @@ a string inside of one's configuration file for use with the CLI.
 
 - :class:`AFQ.definitions.mapping.SlrMap`: Use this class to tell pyAFQ to use
   Streamline-based Linear Registration (SLR) for registration. Note that the
-  reg_template and reg_subject parameters passed to :class:`AFQ.api.AFQ` should
+  reg_template and reg_subject parameters passed to :class:`AFQ.api.group.GroupAFQ` should
   be streamlines when using this registration.
 
 - :class:`AFQ.definitions.mapping.AffMap`: This will only perform a linear

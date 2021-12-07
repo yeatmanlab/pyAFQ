@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting tract profiles &#8212; AFQ 0.9.2 documentation</title>
+    <title>Plotting tract profiles &#8212; AFQ 0.10 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -370,7 +370,7 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
 <span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">affine_registration</span>
 
-<span class="kn">from</span> <span class="nn">AFQ</span> <span class="kn">import</span> <span class="n">api</span>
+<span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
 <span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
@@ -473,7 +473,7 @@ Optimizing level 0 [max iter: 100]
 data structure. The templates are first resampled into the MNI space, before
 they are brought into the subject’s individual native space.
 For speed, we only segment two bundles here.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">([</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">],</span> <span class="n">resample_to</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">([</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">],</span> <span class="n">resample_to</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -537,22 +537,21 @@ not pass through exclusion ROIs.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
 
   0%|          | 0/335 [00:00&lt;?, ?it/s]
-  1%|          | 2/335 [00:00&lt;00:31, 10.64it/s]
-  1%|1         | 4/335 [00:06&lt;10:58,  1.99s/it]
-  2%|1         | 6/335 [00:06&lt;06:05,  1.11s/it]
-100%|##########| 335/335 [00:07&lt;00:00, 47.67it/s]
+  1%|          | 2/335 [00:00&lt;00:25, 13.00it/s]
+  1%|1         | 4/335 [00:03&lt;06:12,  1.12s/it]
+ 19%|#8        | 62/335 [00:03&lt;00:12, 21.71it/s]
+100%|##########| 335/335 [00:04&lt;00:00, 83.34it/s]
 
   0%|          | 0/237 [00:00&lt;?, ?it/s]
-100%|##########| 237/237 [00:00&lt;00:00, 4207.33it/s]
+100%|##########| 237/237 [00:00&lt;00:00, 5308.20it/s]
 
   0%|          | 0/431 [00:00&lt;?, ?it/s]
-  2%|1         | 8/431 [00:00&lt;00:09, 46.48it/s]
- 88%|########8 | 380/431 [00:00&lt;00:00, 1664.96it/s]
-100%|##########| 431/431 [00:00&lt;00:00, 1545.65it/s]
+ 14%|#3        | 60/431 [00:00&lt;00:00, 591.12it/s]
+100%|##########| 431/431 [00:00&lt;00:00, 2384.23it/s]
 
   0%|          | 0/472 [00:00&lt;?, ?it/s]
- 53%|#####3    | 252/472 [00:00&lt;00:00, 2350.06it/s]
-100%|##########| 472/472 [00:00&lt;00:00, 3518.39it/s]
+ 81%|########  | 380/472 [00:00&lt;00:00, 3414.96it/s]
+100%|##########| 472/472 [00:00&lt;00:00, 4229.39it/s]
 </pre></div>
 </div>
 </div>
@@ -642,7 +641,7 @@ quantification”, PloS One, 7: e49790</p>
 matter”, Nature Communications 5: 4932</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  36.357 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 14 minutes  43.659 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
@@ -696,7 +695,7 @@ matter”, Nature Communications 5: 4932</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

@@ -19,10 +19,8 @@ Functions
 
 .. autoapisummary::
 
-   AFQ.utils.bin.parse_string
    AFQ.utils.bin.model_input_parser
    AFQ.utils.bin.model_predict_input_parser
-   AFQ.utils.bin.get_default_args
    AFQ.utils.bin.toml_to_val
    AFQ.utils.bin.val_to_toml
    AFQ.utils.bin.dict_to_toml
@@ -41,28 +39,6 @@ Attributes
 
    AFQ.utils.bin.qsi_prep_ignore_params
 
-
-.. py:function:: parse_string(option, opt, value, parser)
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: model_input_parser(usage)
 
@@ -87,28 +63,6 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:function:: model_predict_input_parser(usage)
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: get_default_args(func)
 
    
 
@@ -263,7 +217,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, special_args={'CLEANING': 'clean_params', 'SEGMENTATION': 'segmentation_params', 'TRACTOGRAPHY': 'tracking_params'})
+.. py:function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, special_args={'CLEANING_PARAMS': 'clean_params', 'SEGMENTATION_PARAMS': 'segmentation_params', 'TRACTOGRAPHY_PARAMS': 'tracking_params'})
 
    
 
@@ -307,7 +261,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: generate_json(json_file, default_arg_dict, overwrite=False, logger=None)
+.. py:function:: generate_json(json_file, overwrite=False, logger=None)
 
    
 

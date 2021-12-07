@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.mapping &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.tasks.mapping &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -204,6 +204,8 @@
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span><span class="p">,</span> <span class="n">with_name</span>
 <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="n">SynMap</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
 
 <span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
@@ -212,40 +214,39 @@
 <div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.logger">[docs]</a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api.mapping&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="outputs"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.outputs">[docs]</a><span class="n">outputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;b0_warped_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    b0 transformed to template space&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;template_xform_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    registration template transformed to subject space&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rois_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;dictionary of full paths to Nifti1Image files of ROIs</span>
-<span class="s2">    transformed to subject space&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;mapping from subject to template space.</span>
-<span class="s2">    The “mapping” must have transform and transform_inverse functions</span>
-<span class="s2">    which each accept two arguments:</span>
-<span class="s2">    (1) an ndarray called data and (2) **kwargs&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg_subject&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Nifti1Image which represents this subject</span></div>
-<span class="s2">    when registering the subject to the template&quot;&quot;&quot;</span><span class="p">}</span>
-
-
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;b0_warped_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_b0_in_MNI.nii.gz&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="export_registered_b0"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_registered_b0">[docs]</a><span class="k">def</span> <span class="nf">export_registered_b0</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+<div class="viewcode-block" id="export_registered_b0"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_registered_b0">[docs]</a><span class="k">def</span> <span class="nf">export_registered_b0</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    b0 transformed to template space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">warped_b0</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">)</span>
-    <span class="n">warped_b0</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_b0</span><span class="p">,</span> <span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+    <span class="n">warped_b0</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_b0</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">warped_b0</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">b0InSubject</span><span class="o">=</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">])</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;template_xform_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_template_xform.nii.gz&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="template_xform"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.template_xform">[docs]</a><span class="k">def</span> <span class="nf">template_xform</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
-    <span class="n">template_xform</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span><span class="n">reg_template</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
+<div class="viewcode-block" id="template_xform"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.template_xform">[docs]</a><span class="k">def</span> <span class="nf">template_xform</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    registration template transformed to subject space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template_xform</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">transform_inverse</span><span class="p">(</span>
+        <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
     <span class="n">template_xform</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">template_xform</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">template_xform</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;rois_file&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="export_rois"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">[docs]</a><span class="k">def</span> <span class="nf">export_rois</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">):</span>
+<div class="viewcode-block" id="export_rois"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">[docs]</a><span class="k">def</span> <span class="nf">export_rois</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dictionary of full paths to Nifti1Image files of ROIs</span>
+<span class="sd">    transformed to subject space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
     <span class="n">rois_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;ROIs&#39;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">roi_files</span> <span class="o">=</span> <span class="p">{}</span>
@@ -283,14 +284,67 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.mapping">[docs]</a><span class="k">def</span> <span class="nf">mapping</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">mapping_definition</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+<div class="viewcode-block" id="mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.mapping">[docs]</a><span class="k">def</span> <span class="nf">mapping</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span>
+            <span class="n">mapping_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    mapping from subject to template space.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mapping_definition : instance of `AFQ.definitions.mapping`, optional</span>
+<span class="sd">        This defines how to either create a mapping from</span>
+<span class="sd">        each subject space to template space or load a mapping from</span>
+<span class="sd">        another software. If creating a map, will register reg_subject and</span>
+<span class="sd">        reg_template.</span>
+<span class="sd">        If None, use SynMap()</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reg_template</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">mapping_definition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping_definition</span> <span class="o">=</span> <span class="n">SynMap</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping_definition</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;mapping must be a mapping defined&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; in `AFQ.definitions.mapping`&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">mapping_definition</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">(</span>
-        <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span></div>
+        <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="sls_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.sls_mapping">[docs]</a><span class="k">def</span> <span class="nf">sls_mapping</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">mapping_definition</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
-                <span class="n">tractography_imap</span><span class="p">):</span>
+<div class="viewcode-block" id="sls_mapping"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.sls_mapping">[docs]</a><span class="k">def</span> <span class="nf">sls_mapping</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span>
+                <span class="n">tractography_imap</span><span class="p">,</span> <span class="n">mapping_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    mapping from subject to template space.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mapping_definition : instance of `AFQ.definitions.mapping`, optional</span>
+<span class="sd">        This defines how to either create a mapping from</span>
+<span class="sd">        each subject space to template space or load a mapping from</span>
+<span class="sd">        another software. If creating a map, will register reg_subject and</span>
+<span class="sd">        reg_template.</span>
+<span class="sd">        If None, use SynMap()</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reg_template</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">mapping_definition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping_definition</span> <span class="o">=</span> <span class="n">SynMap</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping_definition</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;mapping must be a mapping defined&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; in `AFQ.definitions.mapping`&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
     <span class="n">streamlines_file</span> <span class="o">=</span> <span class="n">tractography_imap</span><span class="p">[</span><span class="s2">&quot;streamlines_file&quot;</span><span class="p">]</span>
     <span class="n">tg</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span>
         <span class="n">streamlines_file</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
@@ -309,37 +363,87 @@
         <span class="n">atlas_fname</span><span class="p">,</span>
         <span class="s1">&#39;same&#39;</span><span class="p">,</span> <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mapping_definition</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">(</span>
-        <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
+        <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
         <span class="n">subject_sls</span><span class="o">=</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
         <span class="n">template_sls</span><span class="o">=</span><span class="n">hcp_atlas</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;reg_subject&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="get_reg_subject"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_reg_subject">[docs]</a><span class="k">def</span> <span class="nf">get_reg_subject</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
+<div class="viewcode-block" id="get_reg_subject"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_reg_subject">[docs]</a><span class="k">def</span> <span class="nf">get_reg_subject</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span>
+                    <span class="n">reg_subject_spec</span><span class="o">=</span><span class="s2">&quot;power_map&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Nifti1Image which represents this subject</span>
+<span class="sd">    when registering the subject to the template</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reg_subject_spec : str, instance of `AFQ.definitions.scalar`, optional  # noqa</span>
+<span class="sd">        The source image data to be registered.</span>
+<span class="sd">        Can either be a Nifti1Image, a scalar definition, or str.</span>
+<span class="sd">        if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
+<span class="sd">        image data will be loaded automatically.</span>
+<span class="sd">        If &quot;subject_sls&quot; is used, slr registration will be used</span>
+<span class="sd">        and reg_template should be &quot;hcp_atlas&quot;.</span>
+<span class="sd">        Default: &quot;power_map&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reg_template</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>\
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">)</span>\
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;reg_subject must be a str, Definition, or Nifti1Image&quot;</span><span class="p">)</span>
+
     <span class="n">filename_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;b0&quot;</span><span class="p">:</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">],</span>
         <span class="s2">&quot;power_map&quot;</span><span class="p">:</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;pmap_file&quot;</span><span class="p">],</span>
         <span class="s2">&quot;dti_fa_subject&quot;</span><span class="p">:</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dti_fa_file&quot;</span><span class="p">],</span>
         <span class="s2">&quot;subject_sls&quot;</span><span class="p">:</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">],</span>
     <span class="p">}</span>
-    <span class="k">if</span> <span class="n">reg_subject_spec</span> <span class="ow">in</span> <span class="n">filename_dict</span><span class="p">:</span>
-        <span class="n">reg_subject_spec</span> <span class="o">=</span> <span class="n">filename_dict</span><span class="p">[</span><span class="n">reg_subject_spec</span><span class="p">]</span>
+    <span class="n">bm</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;brain_mask_file&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="n">reg_subject_spec</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
+        <span class="n">reg_subject_spec</span> <span class="o">=</span> <span class="n">reg_subject_spec</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+            <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span>
+            <span class="n">reg_template</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reg_subject_spec</span> <span class="ow">in</span> <span class="n">filename_dict</span><span class="p">:</span>
+            <span class="n">reg_subject_spec</span> <span class="o">=</span> <span class="n">filename_dict</span><span class="p">[</span><span class="n">reg_subject_spec</span><span class="p">]</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">reg_subject_spec</span><span class="p">)</span>
-    <span class="n">bm</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;brain_mask_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">bm</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
     <span class="n">masked_data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">masked_data</span><span class="p">[</span><span class="o">~</span><span class="n">bm</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">masked_data</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">img</span></div>
 
 
-<div class="viewcode-block" id="get_mapping_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_mapping_plan">[docs]</a><span class="k">def</span> <span class="nf">get_mapping_plan</span><span class="p">(</span><span class="n">reg_subject</span><span class="p">,</span> <span class="n">scalars</span><span class="p">,</span> <span class="n">use_sls</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="get_mapping_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_mapping_plan">[docs]</a><span class="k">def</span> <span class="nf">get_mapping_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">use_sls</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">mapping_tasks</span> <span class="o">=</span> <span class="n">with_name</span><span class="p">([</span>
         <span class="n">export_registered_b0</span><span class="p">,</span> <span class="n">template_xform</span><span class="p">,</span> <span class="n">export_rois</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span>
         <span class="n">get_reg_subject</span><span class="p">])</span>
 
+    <span class="n">bids_info</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bids_info&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1"># add custom scalars</span>
-    <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">scalars</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">scalar</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">][</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="kc">None</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scalar</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">][</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
             <span class="n">mapping_tasks</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{scalar.name}</span><span class="s2">_file_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
                 <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_file&quot;</span><span class="p">)(</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">())</span>
 
@@ -375,7 +479,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

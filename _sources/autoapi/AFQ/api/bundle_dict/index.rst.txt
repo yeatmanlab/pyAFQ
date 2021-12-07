@@ -1,0 +1,272 @@
+:py:mod:`AFQ.api.bundle_dict`
+=============================
+
+.. py:module:: AFQ.api.bundle_dict
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.bundle_dict.BundleDict
+   AFQ.api.bundle_dict.PediatricBundleDict
+
+
+
+
+.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None)
+
+   Bases: :py:obj:`collections.abc.MutableMapping`
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: gen_all(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __setitem__(self, key, item)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __getitem__(self, key)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __len__(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __delitem__(self, key)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __iter__(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: copy(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: resample_all_roi(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=False)
+
+   Bases: :py:obj:`BundleDict`
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: gen_all(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

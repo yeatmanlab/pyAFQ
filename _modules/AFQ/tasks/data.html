@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -208,9 +208,15 @@
 
 <span class="kn">from</span> <span class="nn">AFQ.tasks.decorators</span> <span class="kn">import</span> <span class="n">as_file</span><span class="p">,</span> <span class="n">as_model</span><span class="p">,</span> <span class="n">as_dt_deriv</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span><span class="p">,</span> <span class="n">with_name</span>
+<span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
+<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+
+<span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="n">B0Mask</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.models.dti</span> <span class="kn">import</span> <span class="n">noise_from_b0</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.csd</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">csd_fit_model</span>
+<span class="kn">from</span> <span class="nn">AFQ.models.csd</span> <span class="kn">import</span> <span class="n">CsdNanResponseError</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.dki</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">dki_fit_model</span>
 <span class="kn">from</span> <span class="nn">AFQ.models.dti</span> <span class="kn">import</span> <span class="n">_fit</span> <span class="k">as</span> <span class="n">dti_fit_model</span>
 
@@ -218,62 +224,31 @@
 <div class="viewcode-block" id="DIPY_GH"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.DIPY_GH">[docs]</a><span class="n">DIPY_GH</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/dipy/dipy/blob/master/dipy/&quot;</span></div>
 
 
-<div class="viewcode-block" id="outputs"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.outputs">[docs]</a><span class="n">outputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;DWI data as an ndarray for selected b values.&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gtab&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;a DIPY GradientTable with all the gradient information&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;img&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;unaltered DWI data in a Nifti1Image&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;b0_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing the mean b0&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;masked_b0_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing the</span>
-<span class="s2">    mean b0 after applying the brain mask&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_tf&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;DTI TensorFit object&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_params_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing parameters</span>
-<span class="s2">    for the DTI fit&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_tf&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;DKI DiffusionKurtosisFit object&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_params_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    parameters for the DKI fit&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csd_params_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    parameters for the CSD fit&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pmap_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the anisotropic power map&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_fa_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI fractional anisotropy&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_cfa_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI color fractional anisotropy&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_pdd_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI principal diffusion direction&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_md_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI mean diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_fa_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI fractional anisotropy&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_md_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI mean diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_awf_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI axonal water fraction&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_ga_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI geodesic anisotropy&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_rd_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI radial diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dti_ad_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DTI axial diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_ga_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI geodesic anisotropy&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_rd_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI radial diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_ad_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI axial diffusivity&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_rk_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI radial kurtosis&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_ak_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI axial kurtosis file&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dki_mk_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span>
-<span class="s2">    the DKI mean kurtosis file&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;brain_mask_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing</span></div>
-<span class="s2">    the brain mask&quot;&quot;&quot;</span><span class="p">}</span>
-
-
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;gtab&quot;</span><span class="p">,</span> <span class="s2">&quot;img&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="get_data_gtab"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">[docs]</a><span class="k">def</span> <span class="nf">get_data_gtab</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="p">,</span> <span class="n">min_bval</span><span class="p">,</span>
-                  <span class="n">max_bval</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="get_data_gtab"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">[docs]</a><span class="k">def</span> <span class="nf">get_data_gtab</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span> <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">max_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DWI data as an ndarray for selected b values,</span>
+<span class="sd">    A DIPY GradientTable with all the gradient information,</span>
+<span class="sd">    and unaltered DWI data in a Nifti1Image.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    min_bval : float, optional</span>
+<span class="sd">        Minimum b value you want to use</span>
+<span class="sd">        from the dataset (other than b0), inclusive.</span>
+<span class="sd">        If None, there is no minimum limit. Default: None</span>
+<span class="sd">    max_bval : float, optional</span>
+<span class="sd">        Maximum b value you want to use</span>
+<span class="sd">        from the dataset (other than b0), inclusive.</span>
+<span class="sd">        If None, there is no maximum limit. Default: None</span>
+<span class="sd">    filter_b : bool, optional</span>
+<span class="sd">        Whether to filter the DWI data based on min or max bvals.</span>
+<span class="sd">        Default: True</span>
+<span class="sd">    b0_threshold : int, optional</span>
+<span class="sd">        The value of b under which</span>
+<span class="sd">        it is considered to be b0. Default: 50.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">])</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span> <span class="o">=</span> <span class="n">read_bvals_bvecs</span><span class="p">(</span><span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">)</span>
@@ -298,6 +273,9 @@
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;b0_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_b0.nii.gz&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="b0"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.b0">[docs]</a><span class="k">def</span> <span class="nf">b0</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing the mean b0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">~</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">b0_threshold</span><span class="o">=</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">,</span>
@@ -308,6 +286,10 @@
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;masked_b0_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_maskedb0.nii.gz&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="b0_mask"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.b0_mask">[docs]</a><span class="k">def</span> <span class="nf">b0_mask</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">b0_file</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing the</span>
+<span class="sd">    mean b0 after applying the brain mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">b0_file</span><span class="p">)</span>
     <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 
@@ -323,6 +305,7 @@
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;dti_tf&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_fit"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_fit">[docs]</a><span class="k">def</span> <span class="nf">dti_fit</span><span class="p">(</span><span class="n">dti_params_file</span><span class="p">,</span> <span class="n">gtab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DTI TensorFit object&quot;&quot;&quot;</span>
     <span class="n">dti_params</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">tm</span> <span class="o">=</span> <span class="n">dpy_dti</span><span class="o">.</span><span class="n">TensorModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
     <span class="n">dti_tf</span> <span class="o">=</span> <span class="n">dpy_dti</span><span class="o">.</span><span class="n">TensorFit</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="n">dti_params</span><span class="p">)</span>
@@ -332,7 +315,21 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_diffmodel.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_model</span>
 <div class="viewcode-block" id="dti"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti">[docs]</a><span class="k">def</span> <span class="nf">dti</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
-        <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="p">,</span> <span class="n">robust_tensor_fitting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">robust_tensor_fitting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing parameters</span>
+<span class="sd">    for the DTI fit</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    robust_tensor_fitting : bool, optional</span>
+<span class="sd">        Whether to use robust_tensor_fitting when</span>
+<span class="sd">        doing dti. Only applies to dti.</span>
+<span class="sd">        Default: False</span>
+<span class="sd">    b0_threshold : int, optional</span>
+<span class="sd">        The value of b under which</span>
+<span class="sd">        it is considered to be b0. Default: 50.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mask</span> <span class="o">=</span>\
         <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">robust_tensor_fitting</span><span class="p">:</span>
@@ -359,6 +356,7 @@
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;dki_tf&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_fit"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_fit">[docs]</a><span class="k">def</span> <span class="nf">dki_fit</span><span class="p">(</span><span class="n">dki_params_file</span><span class="p">,</span> <span class="n">gtab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DKI DiffusionKurtosisFit object&quot;&quot;&quot;</span>
     <span class="n">dki_params</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dki_params_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">tm</span> <span class="o">=</span> <span class="n">dpy_dki</span><span class="o">.</span><span class="n">DiffusionKurtosisModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
     <span class="n">dki_tf</span> <span class="o">=</span> <span class="n">dpy_dki</span><span class="o">.</span><span class="n">DiffusionKurtosisFit</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="n">dki_params</span><span class="p">)</span>
@@ -368,6 +366,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_diffmodel.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_model</span>
 <div class="viewcode-block" id="dki"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki">[docs]</a><span class="k">def</span> <span class="nf">dki</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    parameters for the DKI fit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mask</span> <span class="o">=</span>\
         <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">dkf</span> <span class="o">=</span> <span class="n">dki_fit_model</span><span class="p">(</span>
@@ -391,15 +393,56 @@
         <span class="n">tracking_params</span><span class="p">,</span>
         <span class="n">csd_response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">csd_sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">csd_lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">csd_tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    parameters for the CSD fit</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    csd_response : tuple or None, optional.</span>
+<span class="sd">        The response function to be used by CSD, as a tuple with two elements.</span>
+<span class="sd">        The first is the eigen-values as an (3,) ndarray and the second is</span>
+<span class="sd">        the signal value for the response function without diffusion-weighting</span>
+<span class="sd">        (i.e. S0). If not provided, auto_response will be used to calculate</span>
+<span class="sd">        these values.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    csd_sh_order : int or None, optional.</span>
+<span class="sd">        default: infer the number of parameters from the number of data</span>
+<span class="sd">        volumes, but no larger than 8.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    csd_lambda_ : float, optional.</span>
+<span class="sd">        weight given to the constrained-positivity regularization part of</span>
+<span class="sd">        the deconvolution equation. Default: 1</span>
+<span class="sd">    csd_tau : float, optional.</span>
+<span class="sd">        threshold controlling the amplitude below which the corresponding</span>
+<span class="sd">        fODF is assumed to be zero.  Ideally, tau should be set to</span>
+<span class="sd">        zero. However, to improve the stability of the algorithm, tau is</span>
+<span class="sd">        set to tau*100 % of the mean fODF amplitude (here, 10% by default)</span>
+<span class="sd">        (see [1]_). Default: 0.1</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of</span>
+<span class="sd">            the fibre orientation distribution in diffusion MRI:</span>
+<span class="sd">            Non-negativity constrained super-resolved spherical</span>
+<span class="sd">            deconvolution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">msmt</span> <span class="o">=</span> <span class="p">(</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;MSMT&quot;</span><span class="p">)</span>
     <span class="n">mask</span> <span class="o">=</span>\
         <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-    <span class="n">csdf</span> <span class="o">=</span> <span class="n">csd_fit_model</span><span class="p">(</span>
-        <span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
-        <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
-        <span class="n">response</span><span class="o">=</span><span class="n">csd_response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">csd_sh_order</span><span class="p">,</span>
-        <span class="n">lambda_</span><span class="o">=</span><span class="n">csd_lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">csd_tau</span><span class="p">,</span>
-        <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">csdf</span> <span class="o">=</span> <span class="n">csd_fit_model</span><span class="p">(</span>
+            <span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">csd_response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">csd_sh_order</span><span class="p">,</span>
+            <span class="n">lambda_</span><span class="o">=</span><span class="n">csd_lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">csd_tau</span><span class="p">,</span>
+            <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">CsdNanResponseError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CsdNanResponseError</span><span class="p">(</span>
+            <span class="s1">&#39;Could not compute CSD response function for subject: &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> in session: </span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;ses&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;file: </span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span>
+            <span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">SphericalHarmonicDegree</span><span class="o">=</span><span class="n">csd_sh_order</span><span class="p">,</span>
         <span class="n">ResponseFunctionTensor</span><span class="o">=</span><span class="n">csd_response</span><span class="p">,</span>
@@ -420,6 +463,10 @@
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;pmap_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-CSD_APM.nii.gz&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="anisotropic_power_map"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.anisotropic_power_map">[docs]</a><span class="k">def</span> <span class="nf">anisotropic_power_map</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">csd_params_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the anisotropic power map</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sh_coeff</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">csd_params_file</span><span class="p">)</span>
     <span class="n">pmap</span> <span class="o">=</span> <span class="n">shm</span><span class="o">.</span><span class="n">anisotropic_power</span><span class="p">(</span><span class="n">sh_coeff</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
     <span class="n">pmap</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">pmap</span><span class="p">,</span> <span class="n">sh_coeff</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
@@ -430,6 +477,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_FA.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_fa"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_fa">[docs]</a><span class="k">def</span> <span class="nf">dti_fa</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI fractional anisotropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">fa</span></div>
 
 
@@ -437,6 +488,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_desc-DEC_FA.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_cfa"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_cfa">[docs]</a><span class="k">def</span> <span class="nf">dti_cfa</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI color fractional anisotropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">color_fa</span></div>
 
 
@@ -444,6 +499,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_PDD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_pdd"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_pdd">[docs]</a><span class="k">def</span> <span class="nf">dti_pdd</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI principal diffusion direction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pdd</span> <span class="o">=</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">directions</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
     <span class="c1"># Invert the x coordinates:</span>
     <span class="n">pdd</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdd</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
@@ -454,6 +513,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_model-DTI_MD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_md"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_md">[docs]</a><span class="k">def</span> <span class="nf">dti_md</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI mean diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">md</span></div>
 
 
@@ -461,6 +524,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_GA.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_ga"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_ga">[docs]</a><span class="k">def</span> <span class="nf">dti_ga</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI geodesic anisotropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">ga</span></div>
 
 
@@ -468,6 +535,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_RD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_rd"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_rd">[docs]</a><span class="k">def</span> <span class="nf">dti_rd</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI radial diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">rd</span></div>
 
 
@@ -475,6 +546,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DTI_AD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DTI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dti_ad"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_ad">[docs]</a><span class="k">def</span> <span class="nf">dti_ad</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dti_params_file</span><span class="p">,</span> <span class="n">dti_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DTI axial diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dti_tf</span><span class="o">.</span><span class="n">ad</span></div>
 
 
@@ -482,6 +557,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_model-DKI_FA.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_fa"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_fa">[docs]</a><span class="k">def</span> <span class="nf">dki_fa</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI fractional anisotropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">fa</span></div>
 
 
@@ -489,6 +568,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_model-DKI_MD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_md"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_md">[docs]</a><span class="k">def</span> <span class="nf">dki_md</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI mean diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">md</span></div>
 
 
@@ -497,6 +580,25 @@
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_awf"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_awf">[docs]</a><span class="k">def</span> <span class="nf">dki_awf</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">,</span>
             <span class="n">sphere</span><span class="o">=</span><span class="s1">&#39;repulsion100&#39;</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI axonal water fraction</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sphere : Sphere class instance, optional</span>
+<span class="sd">        The sphere providing sample directions for the initial</span>
+<span class="sd">        search of the maximal value of kurtosis.</span>
+<span class="sd">        Default: &#39;repulsion100&#39;</span>
+<span class="sd">    gtol : float, optional</span>
+<span class="sd">        This input is to refine kurtosis maxima under the precision of</span>
+<span class="sd">        the directions sampled on the sphere class instance.</span>
+<span class="sd">        The gradient of the convergence procedure must be less than gtol</span>
+<span class="sd">        before successful termination.</span>
+<span class="sd">        If gtol is None, fiber direction is directly taken from the initial</span>
+<span class="sd">        sampled directions of the given sphere object.</span>
+<span class="sd">        Default: 1e-2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dki_params</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dki_params_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">awf</span> <span class="o">=</span> <span class="n">axonal_water_fraction</span><span class="p">(</span><span class="n">dki_params</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="n">gtol</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">awf</span></div>
@@ -506,6 +608,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_model-DKI_MK.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_mk"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_mk">[docs]</a><span class="k">def</span> <span class="nf">dki_mk</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI mean kurtosis file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">mk</span><span class="p">()</span></div>
 
 
@@ -513,6 +619,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_GA.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_ga"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_ga">[docs]</a><span class="k">def</span> <span class="nf">dki_ga</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI geodesic anisotropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">ga</span></div>
 
 
@@ -520,6 +630,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_RD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_rd"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_rd">[docs]</a><span class="k">def</span> <span class="nf">dki_rd</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI radial diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">rd</span></div>
 
 
@@ -527,6 +641,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_AD.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_ad"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_ad">[docs]</a><span class="k">def</span> <span class="nf">dki_ad</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI axial diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">ad</span></div>
 
 
@@ -534,6 +652,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_RK.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_rk"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_rk">[docs]</a><span class="k">def</span> <span class="nf">dki_rk</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI radial kurtosis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">rk</span></div>
 
 
@@ -541,20 +663,153 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-DKI_AK.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="o">=</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="dki_ak"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_ak">[docs]</a><span class="k">def</span> <span class="nf">dki_ak</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">dki_params_file</span><span class="p">,</span> <span class="n">dki_tf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI axial kurtosis file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">ak</span></div>
 
 
-<div class="viewcode-block" id="get_data_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_plan">[docs]</a><span class="k">def</span> <span class="nf">get_data_plan</span><span class="p">(</span><span class="n">brain_mask_definition</span><span class="p">):</span>
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;brain_mask_file&quot;</span><span class="p">)</span>
+<span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_brain_mask.nii.gz&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="brain_mask"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.brain_mask">[docs]</a><span class="k">def</span> <span class="nf">brain_mask</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">b0_file</span><span class="p">,</span>
+               <span class="n">bids_info</span><span class="p">,</span> <span class="n">brain_mask_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the brain mask</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    brain_mask_definition : instance from `AFQ.definitions.mask`, optional</span>
+<span class="sd">        This will be used to create</span>
+<span class="sd">        the brain mask, which gets applied before registration to a</span>
+<span class="sd">        template.</span>
+<span class="sd">        If you want no brain mask to be applied, use FullMask.</span>
+<span class="sd">        If None, use B0Mask()</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">brain_mask_definition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">B0Mask</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">brain_mask_definition</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;brain_mask_definition must be a Definition&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+            <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">get_brain_mask</span><span class="p">(</span>
+        <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">b0_file</span><span class="p">)</span></div>
+
+
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">,</span> <span class="s2">&quot;reg_template&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="get_bundle_dict"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_bundle_dict">[docs]</a><span class="k">def</span> <span class="nf">get_bundle_dict</span><span class="p">(</span><span class="n">segmentation_params</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">,</span> <span class="n">bundle_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">reg_template_spec</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dictionary defining the different bundles to be segmented,</span>
+<span class="sd">    and a Nifti1Image containing the template for registration</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bundle_info : list of strings, dict, or BundleDict, optional</span>
+<span class="sd">        List of bundle names to include in segmentation,</span>
+<span class="sd">        or a bundle dictionary (see BundleDict for inspiration),</span>
+<span class="sd">        or a BundleDict.</span>
+<span class="sd">        If None, will get all appropriate bundles for the chosen</span>
+<span class="sd">        segmentation algorithm.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    reg_template_spec : str, or Nifti1Image, optional</span>
+<span class="sd">        The target image data for registration.</span>
+<span class="sd">        Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
+<span class="sd">        if &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
+<span class="sd">        image data will be loaded automatically.</span>
+<span class="sd">        If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
+<span class="sd">        and reg_subject should be &quot;subject_sls&quot;.</span>
+<span class="sd">        Default: &quot;mni_T1&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template_spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>\
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template_spec</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;reg_template must be a str or Nifti1Image&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bundle_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">((</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">))):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;bundle_info must be a list of strings,&quot;</span>
+            <span class="s2">&quot; a dict, or a BundleDict&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bundle_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reco&quot;</span> <span class="ow">or</span>\
+                <span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reco16&quot;</span><span class="p">:</span>
+            <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">RECO_BUNDLES_16</span>
+        <span class="k">elif</span> <span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reco80&quot;</span><span class="p">:</span>
+            <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">RECO_BUNDLES_80</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">BUNDLES</span>
+
+    <span class="n">use_brain_mask</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">brain_mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">brain_mask</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">):</span>
+        <span class="n">use_brain_mask</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_template_spec</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+        <span class="n">reg_template</span> <span class="o">=</span> <span class="n">reg_template_spec</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_l</span> <span class="o">=</span> <span class="n">reg_template_spec</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;mni_t2&quot;</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">(</span>
+                <span class="n">mask</span><span class="o">=</span><span class="n">use_brain_mask</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;T2w&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;mni_t1&quot;</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">(</span>
+                <span class="n">mask</span><span class="o">=</span><span class="n">use_brain_mask</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;T1w&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;dti_fa_template&quot;</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_ukbb_fa_template</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">use_brain_mask</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">img_l</span> <span class="o">==</span> <span class="s2">&quot;hcp_atlas&quot;</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">use_brain_mask</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reg_template</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">reg_template_spec</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">):</span>
+        <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_info</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">(</span>
+            <span class="n">bundle_info</span><span class="p">,</span>
+            <span class="n">seg_algo</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">],</span>
+            <span class="n">resample_to</span><span class="o">=</span><span class="n">reg_template</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">reg_template</span></div>
+
+
+<div class="viewcode-block" id="get_data_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_plan">[docs]</a><span class="k">def</span> <span class="nf">get_data_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;scalars&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">Definition</span><span class="p">))):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;scalars must be a list of &quot;</span>
+            <span class="s2">&quot;strings/scalar definitions&quot;</span><span class="p">)</span>
+
     <span class="n">data_tasks</span> <span class="o">=</span> <span class="n">with_name</span><span class="p">([</span>
-        <span class="n">get_data_gtab</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b0_mask</span><span class="p">,</span>
+        <span class="n">get_data_gtab</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b0_mask</span><span class="p">,</span> <span class="n">brain_mask</span><span class="p">,</span>
         <span class="n">dti_fit</span><span class="p">,</span> <span class="n">dki_fit</span><span class="p">,</span> <span class="n">anisotropic_power_map</span><span class="p">,</span>
         <span class="n">dti_fa</span><span class="p">,</span> <span class="n">dti_cfa</span><span class="p">,</span> <span class="n">dti_pdd</span><span class="p">,</span> <span class="n">dti_md</span><span class="p">,</span> <span class="n">dki_fa</span><span class="p">,</span> <span class="n">dki_md</span><span class="p">,</span> <span class="n">dki_awf</span><span class="p">,</span> <span class="n">dki_mk</span><span class="p">,</span>
         <span class="n">dti_ga</span><span class="p">,</span> <span class="n">dti_rd</span><span class="p">,</span> <span class="n">dti_ad</span><span class="p">,</span> <span class="n">dki_ga</span><span class="p">,</span> <span class="n">dki_rd</span><span class="p">,</span> <span class="n">dki_ad</span><span class="p">,</span> <span class="n">dki_rk</span><span class="p">,</span> <span class="n">dki_ak</span><span class="p">,</span>
-        <span class="n">dti_params</span><span class="p">,</span> <span class="n">dki_params</span><span class="p">,</span> <span class="n">csd_params</span><span class="p">])</span>
-    <span class="n">data_tasks</span><span class="p">[</span><span class="s2">&quot;brain_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span> \
-        <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;brain_mask_file&quot;</span><span class="p">)(</span>
-            <span class="n">as_file</span><span class="p">(</span><span class="s1">&#39;_brain_mask.nii.gz&#39;</span><span class="p">)(</span>
-                <span class="n">brain_mask_definition</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">(</span><span class="n">in_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+        <span class="n">dti_params</span><span class="p">,</span> <span class="n">dki_params</span><span class="p">,</span> <span class="n">csd_params</span><span class="p">,</span> <span class="n">get_bundle_dict</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="s2">&quot;scalars&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scalars</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">scalars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scalar</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scalars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalars</span>
     <span class="k">return</span> <span class="n">pimms</span><span class="o">.</span><span class="n">plan</span><span class="p">(</span><span class="o">**</span><span class="n">data_tasks</span><span class="p">)</span></div>
 </pre></div>
 
@@ -584,7 +839,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

@@ -1,0 +1,72 @@
+:py:mod:`AFQ.api.participant`
+=============================
+
+.. py:module:: AFQ.api.participant
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.participant.ParticipantAFQ
+
+
+
+
+.. py:class:: ParticipantAFQ(dwi_data_file, bval_file, bvec_file, output_dir, bids_info=None, **kwargs)
+
+   Bases: :py:obj:`object`
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: __getattribute__(self, attr)
+
+      
+      Return getattr(self, name).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

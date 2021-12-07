@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The pyAFQ API optional arguments &#8212; AFQ 0.10 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The pyAFQ configuration file" href="config.html" />
+    <link rel="prev" title="Organizing your data" href="data.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="data.html">
+   Organizing your data
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   The pyAFQ API optional arguments
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="config.html">
+   The pyAFQ configuration file
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="viz_backend.html">
+   Visualization Backends
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="mask.html">
+   The pyAFQ Mask API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="mapping.html">
+   The pyAFQ Mapping API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="scalars.html">
+   The pyAFQ Custom Scalars API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="converter.html">
+   Tractography from other pipelines
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tracking.html">
+   Usage tracking with Google Analytics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker.html">
+   The pyAFQ docker image
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-pyafq-api-methods">The pyAFQ API methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scalars.html">The pyAFQ Custom Scalars API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html">Tractography from other pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converter.html#matlab-afq-to-python-afq-conversion">Matlab AFQ to Python AFQ conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">The pyAFQ docker image</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
+</ul>
+
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   The pyAFQ API optional arguments
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data">
+     DATA
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mapping">
+     MAPPING
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#segmentation">
+     SEGMENTATION
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#tractography">
+     TRACTOGRAPHY
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#viz">
+     VIZ
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-pyafq-api-methods">
+   The pyAFQ API methods
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/usage/kwargs.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="the-pyafq-api-optional-arguments">
+<span id="kwargs-docs"></span><h1>The pyAFQ API optional arguments<a class="headerlink" href="#the-pyafq-api-optional-arguments" title="Permalink to this headline">¶</a></h1>
+<p>You can run pyAFQ on either a subject or participant level
+using pyAFQ’s API objects, <a class="reference internal" href="../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ" title="AFQ.api.group.GroupAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.group.GroupAFQ</span></code></a>
+and <a class="reference internal" href="../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ" title="AFQ.api.participant.ParticipantAFQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.api.participant.ParticipantAFQ</span></code></a>. Either way,
+these classes take additional optional arguments. These arguments
+give the user control over each step of the tractometry pipeline,
+allowing customizaiton of tractography, bundle recognition, registration,
+etc. Here are all of these arguments and their descriptions, organized
+into 5 sections:</p>
+<div class="section" id="data">
+<h2>DATA<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>min_bval: float, optional</dt><dd><p>Minimum b value you want to use
+from the dataset (other than b0), inclusive.
+If None, there is no minimum limit. Default: None</p>
+</dd>
+<dt>max_bval: float, optional</dt><dd><p>Maximum b value you want to use
+from the dataset (other than b0), inclusive.
+If None, there is no maximum limit. Default: None</p>
+</dd>
+<dt>filter_b: bool, optional</dt><dd><p>Whether to filter the DWI data based on min or max bvals.
+Default: True</p>
+</dd>
+<dt>b0_threshold: int, optional</dt><dd><p>The value of b under which
+it is considered to be b0. Default: 50.</p>
+</dd>
+<dt>robust_tensor_fitting: bool, optional</dt><dd><p>Whether to use robust_tensor_fitting when
+doing dti. Only applies to dti.
+Default: False</p>
+</dd>
+<dt>csd_response: tuple or None, optional.</dt><dd><p>The response function to be used by CSD, as a tuple with two elements.
+The first is the eigen-values as an (3,) ndarray and the second is
+the signal value for the response function without diffusion-weighting
+(i.e. S0). If not provided, auto_response will be used to calculate
+these values.
+Default: None</p>
+</dd>
+<dt>csd_sh_order: int or None, optional.</dt><dd><p>default: infer the number of parameters from the number of data
+volumes, but no larger than 8.
+Default: None</p>
+</dd>
+<dt><a href="#id2"><span class="problematic" id="id3">csd_lambda_</span></a>: float, optional.</dt><dd><p>weight given to the constrained-positivity regularization part of
+the deconvolution equation. Default: 1</p>
+</dd>
+<dt>csd_tau: float, optional.</dt><dd><p>threshold controlling the amplitude below which the corresponding
+fODF is assumed to be zero.  Ideally, tau should be set to
+zero. However, to improve the stability of the algorithm, tau is
+set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+(see <a href="#id4"><span class="problematic" id="id1">[1]_</span></a>). Default: 0.1</p>
+</dd>
+<dt>sphere: Sphere class instance, optional</dt><dd><p>The sphere providing sample directions for the initial
+search of the maximal value of kurtosis.
+Default: ‘repulsion100’</p>
+</dd>
+<dt>gtol: float, optional</dt><dd><p>This input is to refine kurtosis maxima under the precision of
+the directions sampled on the sphere class instance.
+The gradient of the convergence procedure must be less than gtol
+before successful termination.
+If gtol is None, fiber direction is directly taken from the initial
+sampled directions of the given sphere object.
+Default: 1e-2</p>
+</dd>
+<dt>brain_mask_definition: instance from <cite>AFQ.definitions.mask</cite>, optional</dt><dd><p>This will be used to create
+the brain mask, which gets applied before registration to a
+template.
+If you want no brain mask to be applied, use FullMask.
+If None, use B0Mask()
+Default: None</p>
+</dd>
+<dt>bundle_info: strings, dict, or BundleDict, optional</dt><dd><p>List of bundle names to include in segmentation,
+or a bundle dictionary (see BundleDict for inspiration),
+or a BundleDict.
+If None, will get all appropriate bundles for the chosen
+segmentation algorithm.
+Default: None</p>
+</dd>
+<dt>reg_template_spec: str, or Nifti1Image, optional</dt><dd><p>The target image data for registration.
+Can either be a Nifti1Image, a path to a Nifti1Image, or
+if “mni_T2”, “dti_fa_template”, “hcp_atlas”, or “mni_T1”,
+image data will be loaded automatically.
+If “hcp_atlas” is used, slr registration will be used
+and reg_subject should be “subject_sls”.
+Default: “mni_T1”</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="mapping">
+<h2>MAPPING<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>mapping_definition: instance of <cite>AFQ.definitions.mapping</cite>, optional</dt><dd><p>This defines how to either create a mapping from
+each subject space to template space or load a mapping from
+another software. If creating a map, will register reg_subject and
+reg_template.
+If None, use SynMap()
+Default: None</p>
+</dd>
+<dt>reg_subject_spec: str, instance of <cite>AFQ.definitions.scalar</cite>, optional  # noqa</dt><dd><p>The source image data to be registered.
+Can either be a Nifti1Image, a scalar definition, or str.
+if “b0”, “dti_fa_subject”, “subject_sls”, or “power_map,”
+image data will be loaded automatically.
+If “subject_sls” is used, slr registration will be used
+and reg_template should be “hcp_atlas”.
+Default: “power_map”</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="segmentation">
+<h2>SEGMENTATION<a class="headerlink" href="#segmentation" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>segmentation_params: dict, optional</dt><dd><p>The parameters for segmentation.
+Default: use the default behavior of the seg.Segmentation object.</p>
+</dd>
+<dt>clean_params: dict, optional</dt><dd><p>The parameters for cleaning.
+Default: use the default behavior of the seg.clean_bundle
+function.</p>
+</dd>
+<dt>profile_weights: str, 1D array, 2D array callable, optional</dt><dd><p>How to weight each streamline (1D) or each node (2D)
+when calculating the tract-profiles. If callable, this is a
+function that calculates weights. If None, no weighting will
+be applied. If “gauss”, gaussian weights will be used.
+If “median”, the median of values at each node will be used
+instead of a mean or weighted mean.
+Default: “gauss”</p>
+</dd>
+<dt>scalars: strings and/or scalar definitions, optional</dt><dd><p>List of scalars to use.
+Can be any of: “dti_fa”, “dti_md”, “dki_fa”, “dki_md”, “dki_awf”,
+“dki_mk”. Can also be a scalar from AFQ.definitions.scalar.
+Default: [“dti_fa”, “dti_md”]</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="tractography">
+<h2>TRACTOGRAPHY<a class="headerlink" href="#tractography" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>tracking_params: dict, optional</dt><dd><p>The parameters for tracking. Default: use the default behavior of
+the aft.track function. Seed mask and seed threshold, if not
+specified, are replaced with scalar masks from scalar[0]
+thresholded to 0.2. The <code class="docutils literal notranslate"><span class="pre">seed_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> items of
+this dict may be <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.MaskFile</span></code> instances.
+If <code class="docutils literal notranslate"><span class="pre">tracker</span></code> is set to “pft” then <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> should be
+an instance of <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.PFTMask</span></code>.</p>
+</dd>
+<dt>import_tract: dict, optional</dt><dd><p>BIDS filters for inputing a user made tractography file.
+If None, tractography will be performed automatically.
+Default: None</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="viz">
+<h2>VIZ<a class="headerlink" href="#viz" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>sbv_lims_bundles: ndarray</dt><dd><p>Of the form (lower bound, upper bound). Shading based on
+shade_by_volume will only differentiate values within these bounds.
+If lower bound is None, will default to 0.
+If upper bound is None, will default to the maximum value in
+shade_by_volume.
+Default: [None, None]</p>
+</dd>
+<dt>volume_opacity_bundles: float, optional</dt><dd><p>Opacity of volume slices.
+Default: 0.3</p>
+</dd>
+<dt>n_points_bundles: int or None</dt><dd><p>n_points to resample streamlines to before plotting. If None, no
+resampling is done.
+Default: 40</p>
+</dd>
+<dt>sbv_lims_indiv: ndarray</dt><dd><p>Of the form (lower bound, upper bound). Shading based on
+shade_by_volume will only differentiate values within these bounds.
+If lower bound is None, will default to 0.
+If upper bound is None, will default to the maximum value in
+shade_by_volume.
+Default: [None, None]</p>
+</dd>
+<dt>volume_opacity_indiv: float, optional</dt><dd><p>Opacity of volume slices.
+Default: 0.3</p>
+</dd>
+<dt>n_points_indiv: int or None</dt><dd><p>n_points to resample streamlines to before plotting. If None, no
+resampling is done.
+Default: 40</p>
+</dd>
+<dt>viz_backend_spec: str, optional</dt><dd><p>Which visualization backend to use.
+See Visualization Backends page in documentation for details:
+<a class="reference external" href="https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html">https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</a>
+One of {“fury”, “plotly”, “plotly_no_gif”}.
+Default: “plotly_no_gif”</p>
+</dd>
+<dt>virtual_frame_buffer: bool, optional</dt><dd><p>Whether to use a virtual fram buffer. This is neccessary if
+generating GIFs in a headless environment. Default: False</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="the-pyafq-api-methods">
+<h1>The pyAFQ API methods<a class="headerlink" href="#the-pyafq-api-methods" title="Permalink to this headline">¶</a></h1>
+<p>After defining your pyAFQ API object, you can ask for the output of
+any step of the pipeline. It is common for users to just call export_all
+(for example, <cite>myafq.export_all()</cite>). However, if the user only wants the
+tractography, the user can instead call <cite>myafq.export_tractography()</cite>. Here
+is a list of all of pyAFQ’s possible outputs:</p>
+<dl class="simple">
+<dt>def  export_data(self):</dt><dd><p>DWI data as an ndarray for selected b values</p>
+</dd>
+<dt>def  export_gtab(self):</dt><dd><p>A DIPY GradientTable with all the gradient information</p>
+</dd>
+<dt>def  export_img(self):</dt><dd><p>unaltered DWI data in a Nifti1Image.</p>
+</dd>
+<dt>def  export_b0_file(self):</dt><dd><p>full path to a nifti file containing the mean b0</p>
+</dd>
+<dt>def  export_masked_b0_file(self):</dt><dd><p>full path to a nifti file containing the mean b0 after applying the brain mask</p>
+</dd>
+<dt>def  export_dti_tf(self):</dt><dd><p>DTI TensorFit object</p>
+</dd>
+<dt>def  export_dti_params_file(self):</dt><dd><p>full path to a nifti file containing parameters for the DTI fit</p>
+</dd>
+<dt>def  export_dki_tf(self):</dt><dd><p>DKI DiffusionKurtosisFit object</p>
+</dd>
+<dt>def  export_dki_params_file(self):</dt><dd><p>full path to a nifti file containing parameters for the DKI fit</p>
+</dd>
+<dt>def  export_csd_params_file(self):</dt><dd><p>full path to a nifti file containing parameters for the CSD fit</p>
+</dd>
+<dt>def  export_pmap_file(self):</dt><dd><p>full path to a nifti file containing the anisotropic power map</p>
+</dd>
+<dt>def  export_dti_fa_file(self):</dt><dd><p>full path to a nifti file containing the DTI fractional anisotropy</p>
+</dd>
+<dt>def  export_dti_cfa_file(self):</dt><dd><p>full path to a nifti file containing the DTI color fractional anisotropy</p>
+</dd>
+<dt>def  export_dti_pdd_file(self):</dt><dd><p>full path to a nifti file containing the DTI principal diffusion direction</p>
+</dd>
+<dt>def  export_dti_md_file(self):</dt><dd><p>full path to a nifti file containing the DTI mean diffusivity</p>
+</dd>
+<dt>def  export_dti_ga_file(self):</dt><dd><p>full path to a nifti file containing the DTI geodesic anisotropy</p>
+</dd>
+<dt>def  export_dti_rd_file(self):</dt><dd><p>full path to a nifti file containing the DTI radial diffusivity</p>
+</dd>
+<dt>def  export_dti_ad_file(self):</dt><dd><p>full path to a nifti file containing the DTI axial diffusivity</p>
+</dd>
+<dt>def  export_dki_fa_file(self):</dt><dd><p>full path to a nifti file containing the DKI fractional anisotropy</p>
+</dd>
+<dt>def  export_dki_md_file(self):</dt><dd><p>full path to a nifti file containing the DKI mean diffusivity</p>
+</dd>
+<dt>def  export_dki_awf_file(self):</dt><dd><p>full path to a nifti file containing the DKI axonal water fraction</p>
+</dd>
+<dt>def  export_dki_mk_file(self):</dt><dd><p>full path to a nifti file containing the DKI mean kurtosis file</p>
+</dd>
+<dt>def  export_dki_ga_file(self):</dt><dd><p>full path to a nifti file containing the DKI geodesic anisotropy</p>
+</dd>
+<dt>def  export_dki_rd_file(self):</dt><dd><p>full path to a nifti file containing the DKI radial diffusivity</p>
+</dd>
+<dt>def  export_dki_ad_file(self):</dt><dd><p>full path to a nifti file containing the DKI axial diffusivity</p>
+</dd>
+<dt>def  export_dki_rk_file(self):</dt><dd><p>full path to a nifti file containing the DKI radial kurtosis</p>
+</dd>
+<dt>def  export_dki_ak_file(self):</dt><dd><p>full path to a nifti file containing the DKI axial kurtosis file</p>
+</dd>
+<dt>def  export_brain_mask_file(self):</dt><dd><p>full path to a nifti file containing the brain mask</p>
+</dd>
+<dt>def  export_bundle_dict(self):</dt><dd><p>Dictionary defining the different bundles to be segmented</p>
+</dd>
+<dt>def  export_reg_template(self):</dt><dd><p>a Nifti1Image containing the template for registration</p>
+</dd>
+<dt>def  export_b0_warped_file(self):</dt><dd><p>full path to a nifti file containing b0 transformed to template space</p>
+</dd>
+<dt>def  export_template_xform_file(self):</dt><dd><p>full path to a nifti file containing registration template transformed to subject space</p>
+</dd>
+<dt>def  export_rois_file(self):</dt><dd><p>dictionary of full paths to Nifti1Image files of ROIs transformed to subject space</p>
+</dd>
+<dt>def  export_mapping(self):</dt><dd><p>mapping from subject to template space.</p>
+</dd>
+<dt>def  export_reg_subject(self):</dt><dd><p>Nifti1Image which represents this subject when registering the subject to the template</p>
+</dd>
+<dt>def  export_bundles_file(self):</dt><dd><p>full path to a trk file containing containting segmented streamlines, labeled by bundle</p>
+</dd>
+<dt>def  export_clean_bundles_file(self):</dt><dd><p>full path to a trk file containting segmented streamlines, cleaned using the Mahalanobis distance, and labeled by bundle</p>
+</dd>
+<dt>def  export_indiv_bundles(self):</dt><dd><p>dictionary of paths, where each path is a full path to a trk file containing the streamlines of a given bundle, cleaned or uncleaned</p>
+</dd>
+<dt>def  export_sl_counts_file(self):</dt><dd><p>full path to a JSON file containing streamline counts</p>
+</dd>
+<dt>def  export_profiles_file(self):</dt><dd><p>full path to a CSV file containing tract profiles</p>
+</dd>
+<dt>def  export_scalar_dict(self):</dt><dd><p>dicionary mapping scalar names to their respective file paths</p>
+</dd>
+<dt>def  export_seed_file(self):</dt><dd><p>full path to a nifti file containing the tractography seed mask</p>
+</dd>
+<dt>def  export_stop_file(self):</dt><dd><p>full path to a nifti file containing the tractography stop mask</p>
+</dd>
+<dt>def  export_streamlines_file(self):</dt><dd><p>full path to the complete, unsegmented tractography file</p>
+</dd>
+<dt>def  export_all_bundles_figure(self):</dt><dd><p>figure for the visualizaion of the recognized bundles in the subject’s brain</p>
+</dd>
+<dt>def  export_indiv_bundles_figures(self):</dt><dd><p>list of full paths to html or gif files containing visualizaions of individual bundles</p>
+</dd>
+<dt>def  export_tract_profile_plots(self):</dt><dd><p>list of full paths to png files, where files contain plots of the tract profiles</p>
+</dd>
+<dt>def  export_viz_backend(self):</dt><dd><p>An instance of the <cite>AFQ.viz.utils.viz_backend</cite> class.</p>
+</dd>
+</dl>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="data.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Organizing your data</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="config.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The pyAFQ configuration file</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -69,7 +69,7 @@ Functions
            fODF is assumed to be zero.  Ideally, tau should be set to
            zero. However, to improve the stability of the algorithm, tau is
            set to tau*100 % of the mean fODF amplitude (here, 10% by default)
-           (see [1]_). Default: 0.1
+           (see [R0c7dc59d4c68-1]_). Default: 0.1
 
        **out_dir** : str, optional
            A full path to a directory to store the maps that get computed.
@@ -92,6 +92,16 @@ Functions
 
 
 
+   .. rubric:: References
+
+   .. [R0c7dc59d4c68-1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of
+           the fibre orientation distribution in diffusion MRI:
+           Non-negativity constrained super-resolved spherical
+           deconvolution
+
+   .. only:: latex
+
+      [R0c7dc59d4c68-1]_
 
 
 

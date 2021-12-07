@@ -12,7 +12,7 @@ This would look for a file with the suffix 'tractography' inside of the
 specified in its dataset_description.json.
 
 There is an example usage of custom_tractography_bids_filters with the
-:class:`AFQ.api.AFQ` object in the 'How pyAFQ uses BIDS' example in :ref:`examples`.
+:class:`AFQ.api.group.GroupAFQ` object in the 'How pyAFQ uses BIDS' example in :ref:`examples`.
 
 
 Matlab AFQ to Python AFQ conversion

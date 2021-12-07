@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.mapping &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.definitions.mapping &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -235,15 +235,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    warp_suffix : str</span>
+<span class="sd">    warp_path : str, optional</span>
+<span class="sd">        path to file to get warp from. Use this or warp_suffix.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    space_path : str, optional</span>
+<span class="sd">        path to file to get warp from. Use this or space_suffix.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    warp_suffix : str, optional</span>
 <span class="sd">        suffix to pass to bids_layout.get() to identify the warp file.</span>
-<span class="sd">    space_suffix : str</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    space_suffix : str, optional</span>
 <span class="sd">        suffix to pass to bids_layout.get() to identify the space file.</span>
-<span class="sd">    warp_filters : str</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    warp_filters : str, optional</span>
 <span class="sd">        Additional filters to pass to bids_layout.get() to identify</span>
 <span class="sd">        the warp file.</span>
 <span class="sd">        Default: {}</span>
-<span class="sd">    space_filters : str</span>
+<span class="sd">    space_filters : str, optional</span>
 <span class="sd">        Additional filters to pass to bids_layout.get() to identify</span>
 <span class="sd">        the space file.</span>
 <span class="sd">        Default: {}</span>
@@ -252,25 +260,45 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    fnirt_map = FnirtMap(</span>
-<span class="sd">        &quot;warp&quot;,</span>
-<span class="sd">        &quot;MNI&quot;,</span>
-<span class="sd">        {&quot;scope&quot;: &quot;TBSS&quot;},</span>
-<span class="sd">        {&quot;scope&quot;: &quot;TBSS&quot;})</span>
-<span class="sd">    api.AFQ(mapping=fnirt_map)</span>
+<span class="sd">        warp_suffix=&quot;warp&quot;,</span>
+<span class="sd">        space_suffix=&quot;MNI&quot;,</span>
+<span class="sd">        warp_filters={&quot;scope&quot;: &quot;TBSS&quot;},</span>
+<span class="sd">        space_filters={&quot;scope&quot;: &quot;TBSS&quot;})</span>
+<span class="sd">    api.GroupAFQ(mapping=fnirt_map)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warp_suffix</span><span class="p">,</span> <span class="n">space_suffix</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warp_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">warp_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">warp_filters</span><span class="o">=</span><span class="p">{},</span> <span class="n">space_filters</span><span class="o">=</span><span class="p">{}):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">has_fslpy</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                 <span class="s2">&quot;Please install fslpy if you want to use FnirtMap&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warp_suffix</span> <span class="o">=</span> <span class="n">warp_suffix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">space_suffix</span> <span class="o">=</span> <span class="n">space_suffix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warp_filters</span> <span class="o">=</span> <span class="n">warp_filters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">space_filters</span> <span class="o">=</span> <span class="n">space_filters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">warp_suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;One of `warp_path` or `warp_suffix` should be set &quot;</span>
+                <span class="s2">&quot;to a value other than None.&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">space_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">space_suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;One of space_path or space_suffix must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">space_path</span> <span class="ow">is</span> <span class="kc">None</span>\
+                <span class="ow">or</span> <span class="n">space_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;If passing a value for `warp_path`, &quot;</span>
+                <span class="s2">&quot;you must also pass a value for `space_path`&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">(</span><span class="n">warp_path</span><span class="p">,</span> <span class="n">space_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warp_suffix</span> <span class="o">=</span> <span class="n">warp_suffix</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warp_filters</span> <span class="o">=</span> <span class="n">warp_filters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">space_suffix</span> <span class="o">=</span> <span class="n">space_suffix</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">space_filters</span> <span class="o">=</span> <span class="n">space_filters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="FnirtMap.find_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -284,9 +312,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FnirtMap.get_for_subses"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.get_for_subses">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
-        <span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span>
-            <span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
+<div class="viewcode-block" id="FnirtMap.get_for_subses"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.get_for_subses">[docs]</a>    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
+                       <span class="n">reg_template</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span><span class="p">:</span>
+            <span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nearest_warp</span><span class="p">,</span> <span class="n">nearest_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]][</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
 
         <span class="n">our_templ</span> <span class="o">=</span> <span class="n">reg_template</span>
         <span class="n">subj</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;dwi_file&#39;</span><span class="p">])</span>
@@ -325,7 +357,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    my_example_mapping = IdentityMap()</span>
-<span class="sd">    api.AFQ(mapping=my_example_mapping)</span>
+<span class="sd">    api.GroupAFQ(mapping=my_example_mapping)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -334,7 +366,8 @@
     <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
+                       <span class="n">reg_template</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ConformedAffineMapping</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
             <span class="n">domain_grid_shape</span><span class="o">=</span><span class="n">reg</span><span class="o">.</span><span class="n">reduce_shape</span><span class="p">(</span>
@@ -352,9 +385,12 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    warp_suffix : str</span>
+<span class="sd">    warp_path : str, optional</span>
+<span class="sd">        path to file to get warp from. Use this or warp_suffix.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    warp_suffix : str, optional</span>
 <span class="sd">        suffix to pass to bids_layout.get() to identify the warp file.</span>
-<span class="sd">    warp_filters : str</span>
+<span class="sd">    warp_filters : str, optional</span>
 <span class="sd">        Additional filters to pass to bids_layout.get() to identify</span>
 <span class="sd">        the warp file.</span>
 <span class="sd">        Default: {}</span>
@@ -363,22 +399,35 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    itk_map = ItkMap(</span>
-<span class="sd">        &quot;xfm&quot;,</span>
-<span class="sd">        {&quot;scope&quot;: &quot;qsiprep&quot;,</span>
-<span class="sd">        &quot;from&quot;: &quot;MNI152NLin2009cAsym&quot;,</span>
-<span class="sd">        &quot;to&quot;: &quot;T1w&quot;})</span>
-<span class="sd">    api.AFQ(mapping=itk_map)</span>
+<span class="sd">        warp_suffix=&quot;xfm&quot;,</span>
+<span class="sd">        warp_filters={</span>
+<span class="sd">            &quot;scope&quot;: &quot;qsiprep&quot;,</span>
+<span class="sd">            &quot;from&quot;: &quot;MNI152NLin2009cAsym&quot;,</span>
+<span class="sd">            &quot;to&quot;: &quot;T1w&quot;})</span>
+<span class="sd">    api.GroupAFQ(mapping=itk_map)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warp_suffix</span><span class="p">,</span> <span class="n">warp_filters</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warp_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warp_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warp_filters</span><span class="o">=</span><span class="p">{}):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">has_h5py</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                 <span class="s2">&quot;Please install h5py if you want to use ItkMap&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warp_suffix</span> <span class="o">=</span> <span class="n">warp_suffix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warp_filters</span> <span class="o">=</span> <span class="n">warp_filters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">warp_suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;One of `warp_path` or `warp_suffix` should be set &quot;</span>
+                <span class="s2">&quot;to a value other than None.&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">warp_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="n">warp_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">warp_suffix</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">warp_filters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -386,8 +435,13 @@
             <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_suffix</span><span class="p">,</span>
             <span class="n">session</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;h5&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
-        <span class="n">nearest_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;ses&#39;</span><span class="p">]][</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
+                       <span class="n">reg_template</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_path</span><span class="p">:</span>
+            <span class="n">nearest_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nearest_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]][</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
         <span class="n">warp_f5</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nearest_warp</span><span class="p">)</span>
         <span class="n">their_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">warp_f5</span><span class="p">[</span><span class="s2">&quot;TransformGroup&quot;</span><span class="p">][</span><span class="s1">&#39;1&#39;</span><span class="p">][</span>
             <span class="s1">&#39;TransformFixedParameters&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
@@ -454,8 +508,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prealign_file</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
-                       <span class="n">subject_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_for_subses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
+                       <span class="n">reg_template</span><span class="p">,</span> <span class="n">subject_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">mapping_file</span><span class="p">,</span> <span class="n">meta_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fnames</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extension</span><span class="p">,</span> <span class="n">subses_dict</span><span class="p">)</span>
 
@@ -510,7 +564,7 @@
 <span class="sd">        Default: {}</span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    api.AFQ(mapping=SynMap())</span>
+<span class="sd">    api.GroupAFQ(mapping=SynMap())</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_prealign</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">affine_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">syn_kwargs</span><span class="o">=</span><span class="p">{}):</span>
@@ -549,7 +603,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    api.AFQ(mapping=SlrMap())</span>
+<span class="sd">    api.GroupAFQ(mapping=SlrMap())</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slr_kwargs</span><span class="o">=</span><span class="p">{}):</span>
@@ -583,7 +637,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    api.AFQ(mapping=AffMap())</span>
+<span class="sd">    api.GroupAFQ(mapping=AffMap())</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">affine_kwargs</span><span class="o">=</span><span class="p">{}):</span>
@@ -649,7 +703,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

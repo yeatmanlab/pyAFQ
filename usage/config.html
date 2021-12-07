@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ configuration file &#8212; AFQ 0.9.2 documentation</title>
+    <title>The pyAFQ configuration file &#8212; AFQ 0.10 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Visualization Backends" href="viz_backend.html" />
-    <link rel="prev" title="Organizing your data" href="data.html" />
+    <link rel="prev" title="The pyAFQ API optional arguments" href="kwargs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -168,6 +168,11 @@
    Organizing your data
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="kwargs.html">
+   The pyAFQ API optional arguments
+  </a>
+ </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    The pyAFQ configuration file
@@ -217,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kwargs.html#the-pyafq-api-methods">The pyAFQ API methods</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">The pyAFQ configuration file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
@@ -288,17 +295,13 @@ minimum, the file should contain information about the location of the
 See an example configuration file below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My AFQ analysis&quot;</span>
 
-<span class="c1"># Initialize an AFQ object.</span>
-<span class="c1"># Some special notes on parameters:</span>
-<span class="c1"># In tracking_params, parameters with the suffix mask which are also</span>
-<span class="c1"># a mask from AFQ.definitions.mask will be handled automatically by the</span>
-<span class="c1"># api.</span>
+<span class="c1"># Initialize a GroupAFQ object from a BIDS dataset.</span>
 
 <span class="c1"># Use &#39;&#39; to indicate None</span>
 <span class="c1"># Wrap dictionaries in quotes</span>
 <span class="c1"># Wrap definition object instantiations in quotes</span>
 
-<span class="p">[</span><span class="n">BIDS</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BIDS_PARAMS</span><span class="p">]</span>
 
 <span class="c1"># The path to preprocessed diffusion data organized in a BIDS</span>
 <span class="c1"># dataset. This should contain a BIDS derivative dataset with</span>
@@ -313,12 +316,12 @@ See an example configuration file below:</p>
 <span class="c1"># Default: &quot;all&quot;.</span>
 <span class="n">preproc_pipeline</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
 
-<span class="c1"># list of participant labels (subject IDs) to perform</span>
+<span class="c1"># List of participant labels (subject IDs) to perform</span>
 <span class="c1"># processing on. If None, all subjects are used.</span>
 <span class="c1"># Default: None</span>
 <span class="n">participant_labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-<span class="c1"># path to output directory. If None, outputs are put</span>
+<span class="c1"># Path to output directory. If None, outputs are put</span>
 <span class="c1"># in a AFQ pipeline folder in the derivatives folder of</span>
 <span class="c1"># the BIDS directory. pyAFQ will use existing derivatives</span>
 <span class="c1"># from the output directory if they exist, instead of recalculating</span>
@@ -326,96 +329,6 @@ See an example configuration file below:</p>
 <span class="c1"># to recalculate a derivative).</span>
 <span class="c1"># Default: None</span>
 <span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-<span class="c1"># BIDS filters for inputing a user made tractography file.</span>
-<span class="c1"># If None, tractography will be performed automatically.</span>
-<span class="c1"># Default: None</span>
-<span class="n">custom_tractography_bids_filters</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-<span class="p">[</span><span class="n">DATA</span><span class="p">]</span>
-
-<span class="c1"># The value of b under which</span>
-<span class="c1"># it is considered to be b0. Default: 50.</span>
-<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c1"># Whether to use robust_tensor_fitting when</span>
-<span class="c1"># doing dti. Only applies to dti.</span>
-<span class="c1"># Default: False</span>
-<span class="n">robust_tensor_fitting</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Minimum b value you want to use</span>
-<span class="c1"># from the dataset (other than b0), inclusive.</span>
-<span class="c1"># If None, there is no minimum limit. Default: None</span>
-<span class="n">min_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-<span class="c1"># Maximum b value you want to use</span>
-<span class="c1"># from the dataset (other than b0), inclusive.</span>
-<span class="c1"># If None, there is no maximum limit. Default: None</span>
-<span class="n">max_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-<span class="p">[</span><span class="n">REGISTRATION</span><span class="p">]</span>
-
-<span class="c1"># The target image data for registration.</span>
-<span class="c1"># Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
-<span class="c1"># if &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
-<span class="c1"># image data will be loaded automatically.</span>
-<span class="c1"># If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
-<span class="c1"># and reg_subject should be &quot;subject_sls&quot;.</span>
-<span class="c1"># Default: &quot;mni_T1&quot;</span>
-<span class="n">reg_template</span> <span class="o">=</span> <span class="s2">&quot;mni_T1&quot;</span>
-
-<span class="c1"># The source image data to be registered.</span>
-<span class="c1"># Can either be a Nifti1Image, bids filters for a Nifti1Image, or</span>
-<span class="c1"># if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
-<span class="c1"># image data will be loaded automatically.</span>
-<span class="c1"># If &quot;subject_sls&quot; is used, slr registration will be used</span>
-<span class="c1"># and reg_template should be &quot;hcp_atlas&quot;.</span>
-<span class="c1"># Default: &quot;power_map&quot;</span>
-<span class="n">reg_subject</span> <span class="o">=</span> <span class="s2">&quot;power_map&quot;</span>
-
-<span class="c1"># This will be used to create</span>
-<span class="c1"># the brain mask, which gets applied before registration to a</span>
-<span class="c1"># template.</span>
-<span class="c1"># If None, no brain mask will not be applied,</span>
-<span class="c1"># and no brain mask will be applied to the template.</span>
-<span class="c1"># Default: B0Mask()</span>
-<span class="n">brain_mask</span> <span class="o">=</span> <span class="s2">&quot;B0Mask(</span><span class="si">{}</span><span class="s2">)&quot;</span>
-
-<span class="c1"># This defines how to either create a mapping from</span>
-<span class="c1"># each subject space to template space or load a mapping from</span>
-<span class="c1"># another software. If creating a map, will register reg_subject and</span>
-<span class="c1"># reg_template.</span>
-<span class="c1"># Default: SynMap()</span>
-<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;SynMap(True, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span>
-
-<span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span>
-
-<span class="c1"># How to weight each streamline (1D) or each node (2D)</span>
-<span class="c1"># when calculating the tract-profiles. If callable, this is a</span>
-<span class="c1"># function that calculates weights. If None, no weighting will</span>
-<span class="c1"># be applied. If &quot;gauss&quot;, gaussian weights will be used.</span>
-<span class="c1"># If &quot;median&quot;, the median of values at each node will be used</span>
-<span class="c1"># instead of a mean or weighted mean.</span>
-<span class="c1"># Default: &quot;gauss&quot;</span>
-<span class="n">profile_weights</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span>
-
-<span class="p">[</span><span class="n">BUNDLES</span><span class="p">]</span>
-
-<span class="c1"># List of bundle names to include in segmentation,</span>
-<span class="c1"># or a bundle dictionary (see BundleDict for inspiration),</span>
-<span class="c1"># or a BundleDict.</span>
-<span class="c1"># If None, will get all appropriate bundles for the chosen</span>
-<span class="c1"># segmentation algorithm.</span>
-<span class="c1"># Default: None</span>
-<span class="n">bundle_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-<span class="c1"># List of scalars to use.</span>
-<span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
-<span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.scalar.</span>
-<span class="c1"># Default:</span>
-<span class="n">scalars</span> <span class="o">=</span> <span class="s2">&quot;[&#39;dti_fa&#39;, &#39;dti_md&#39;]&quot;</span>
-
-<span class="p">[</span><span class="n">COMPUTE</span><span class="p">]</span>
 
 <span class="c1"># Parameters to pass to parfor in AFQ.utils.parallel,</span>
 <span class="c1"># to parallelize computations across subjects and sessions.</span>
@@ -426,20 +339,13 @@ See an example configuration file below:</p>
 <span class="c1"># Default: {&quot;engine&quot;: &quot;serial&quot;}</span>
 <span class="n">parallel_params</span> <span class="o">=</span> <span class="s2">&quot;{&#39;engine&#39;: &#39;serial&#39;}&quot;</span>
 
-<span class="p">[</span><span class="n">VIZ</span><span class="p">]</span>
+<span class="c1"># Additional arguments to give to BIDSLayout from pybids.</span>
+<span class="c1"># For large datasets, try:</span>
+<span class="c1"># {&quot;validate&quot;: False, &quot;index_metadata&quot;: False}</span>
+<span class="c1"># Default: {}</span>
+<span class="n">bids_layout_kwargs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Whether to use a virtual fram buffer. This is neccessary if</span>
-<span class="c1"># generating GIFs in a headless environment. Default: False</span>
-<span class="n">virtual_frame_buffer</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># Which visualization backend to use.</span>
-<span class="c1"># See Visualization Backends page in documentation for details:</span>
-<span class="c1"># https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</span>
-<span class="c1"># One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
-<span class="c1"># Default: &quot;plotly_no_gif&quot;</span>
-<span class="n">viz_backend</span> <span class="o">=</span> <span class="s2">&quot;plotly_no_gif&quot;</span>
-
-<span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
+<span class="p">[</span><span class="n">TRACTOGRAPHY_PARAMS</span><span class="p">]</span>
 
 <span class="c1"># How tracking directions are determined.</span>
 <span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
@@ -512,7 +418,7 @@ See an example configuration file below:</p>
 <span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
 <span class="n">tracker</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
 
-<span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEGMENTATION_PARAMS</span><span class="p">]</span>
 
 <span class="c1"># Resample streamlines to nb_points number of points.</span>
 <span class="c1"># If False, no resampling is done. Default: False</span>
@@ -662,7 +568,7 @@ See an example configuration file below:</p>
 <span class="c1"># are saved. Default: None, means no saving of intermediates.</span>
 <span class="n">save_intermediates</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-<span class="p">[</span><span class="n">CLEANING</span><span class="p">]</span>
+<span class="p">[</span><span class="n">CLEANING_PARAMS</span><span class="p">]</span>
 
 <span class="c1"># Number of points to resample streamlines to.</span>
 <span class="c1"># Default: 100</span>
@@ -692,6 +598,184 @@ See an example configuration file below:</p>
 <span class="c1"># Whether to return indices in the original streamlines.</span>
 <span class="c1"># Default: False.</span>
 <span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="p">[</span><span class="n">DATA</span><span class="p">]</span>
+
+<span class="c1"># Minimum b value you want to use</span>
+<span class="c1"># from the dataset (other than b0), inclusive.</span>
+<span class="c1"># If None, there is no minimum limit. Default: None</span>
+<span class="n">min_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Maximum b value you want to use</span>
+<span class="c1"># from the dataset (other than b0), inclusive.</span>
+<span class="c1"># If None, there is no maximum limit. Default: None</span>
+<span class="n">max_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Whether to filter the DWI data based on min or max bvals.</span>
+<span class="c1"># Default: True</span>
+<span class="n">filter_b</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># The value of b under which</span>
+<span class="c1"># it is considered to be b0. Default: 50.</span>
+<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Whether to use robust_tensor_fitting when</span>
+<span class="c1"># doing dti. Only applies to dti.</span>
+<span class="c1"># Default: False</span>
+<span class="n">robust_tensor_fitting</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># The response function to be used by CSD, as a tuple with two elements.</span>
+<span class="c1"># The first is the eigen-values as an (3,) ndarray and the second is</span>
+<span class="c1"># the signal value for the response function without diffusion-weighting</span>
+<span class="c1"># (i.e. S0). If not provided, auto_response will be used to calculate</span>
+<span class="c1"># these values.</span>
+<span class="c1"># Default: None</span>
+<span class="n">csd_response</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># default: infer the number of parameters from the number of data</span>
+<span class="c1"># volumes, but no larger than 8.</span>
+<span class="c1"># Default: None</span>
+<span class="n">csd_sh_order</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># weight given to the constrained-positivity regularization part of</span>
+<span class="c1"># the deconvolution equation. Default: 1</span>
+<span class="n">csd_lambda_</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># threshold controlling the amplitude below which the corresponding</span>
+<span class="c1"># fODF is assumed to be zero.  Ideally, tau should be set to</span>
+<span class="c1"># zero. However, to improve the stability of the algorithm, tau is</span>
+<span class="c1"># set to tau*100 % of the mean fODF amplitude (here, 10% by default)</span>
+<span class="c1"># (see [1]_). Default: 0.1</span>
+<span class="n">csd_tau</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># The sphere providing sample directions for the initial</span>
+<span class="c1"># search of the maximal value of kurtosis.</span>
+<span class="c1"># Default: &#39;repulsion100&#39;</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="s2">&quot;repulsion100&quot;</span>
+
+<span class="c1"># This input is to refine kurtosis maxima under the precision of</span>
+<span class="c1"># the directions sampled on the sphere class instance.</span>
+<span class="c1"># The gradient of the convergence procedure must be less than gtol</span>
+<span class="c1"># before successful termination.</span>
+<span class="c1"># If gtol is None, fiber direction is directly taken from the initial</span>
+<span class="c1"># sampled directions of the given sphere object.</span>
+<span class="c1"># Default: 1e-2</span>
+<span class="n">gtol</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="c1"># This will be used to create</span>
+<span class="c1"># the brain mask, which gets applied before registration to a</span>
+<span class="c1"># template.</span>
+<span class="c1"># If you want no brain mask to be applied, use FullMask.</span>
+<span class="c1"># If None, use B0Mask()</span>
+<span class="c1"># Default: None</span>
+<span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># List of bundle names to include in segmentation,</span>
+<span class="c1"># or a bundle dictionary (see BundleDict for inspiration),</span>
+<span class="c1"># or a BundleDict.</span>
+<span class="c1"># If None, will get all appropriate bundles for the chosen</span>
+<span class="c1"># segmentation algorithm.</span>
+<span class="c1"># Default: None</span>
+<span class="n">bundle_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># The target image data for registration.</span>
+<span class="c1"># Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
+<span class="c1"># if &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
+<span class="c1"># image data will be loaded automatically.</span>
+<span class="c1"># If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
+<span class="c1"># and reg_subject should be &quot;subject_sls&quot;.</span>
+<span class="c1"># Default: &quot;mni_T1&quot;</span>
+<span class="n">reg_template_spec</span> <span class="o">=</span> <span class="s2">&quot;mni_T1&quot;</span>
+
+<span class="p">[</span><span class="n">MAPPING</span><span class="p">]</span>
+
+<span class="c1"># This defines how to either create a mapping from</span>
+<span class="c1"># each subject space to template space or load a mapping from</span>
+<span class="c1"># another software. If creating a map, will register reg_subject and</span>
+<span class="c1"># reg_template.</span>
+<span class="c1"># If None, use SynMap()</span>
+<span class="c1"># Default: None</span>
+<span class="n">mapping_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># The source image data to be registered.</span>
+<span class="c1"># Can either be a Nifti1Image, a scalar definition, or str.</span>
+<span class="c1"># if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
+<span class="c1"># image data will be loaded automatically.</span>
+<span class="c1"># If &quot;subject_sls&quot; is used, slr registration will be used</span>
+<span class="c1"># and reg_template should be &quot;hcp_atlas&quot;.</span>
+<span class="c1"># Default: &quot;power_map&quot;</span>
+<span class="n">reg_subject_spec</span> <span class="o">=</span> <span class="s2">&quot;power_map&quot;</span>
+
+<span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
+
+<span class="c1"># How to weight each streamline (1D) or each node (2D)</span>
+<span class="c1"># when calculating the tract-profiles. If callable, this is a</span>
+<span class="c1"># function that calculates weights. If None, no weighting will</span>
+<span class="c1"># be applied. If &quot;gauss&quot;, gaussian weights will be used.</span>
+<span class="c1"># If &quot;median&quot;, the median of values at each node will be used</span>
+<span class="c1"># instead of a mean or weighted mean.</span>
+<span class="c1"># Default: &quot;gauss&quot;</span>
+<span class="n">profile_weights</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span>
+
+<span class="c1"># List of scalars to use.</span>
+<span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
+<span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.scalar.</span>
+<span class="c1"># Default: [&quot;dti_fa&quot;, &quot;dti_md&quot;]</span>
+<span class="n">scalars</span> <span class="o">=</span> <span class="s2">&quot;[&#39;dti_fa&#39;, &#39;dti_md&#39;]&quot;</span>
+
+<span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
+
+<span class="c1"># BIDS filters for inputing a user made tractography file.</span>
+<span class="c1"># If None, tractography will be performed automatically.</span>
+<span class="c1"># Default: None</span>
+<span class="n">import_tract</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="p">[</span><span class="n">VIZ</span><span class="p">]</span>
+
+<span class="c1"># Of the form (lower bound, upper bound). Shading based on</span>
+<span class="c1"># shade_by_volume will only differentiate values within these bounds.</span>
+<span class="c1"># If lower bound is None, will default to 0.</span>
+<span class="c1"># If upper bound is None, will default to the maximum value in</span>
+<span class="c1"># shade_by_volume.</span>
+<span class="c1"># Default: [None, None]</span>
+<span class="n">sbv_lims_bundles</span> <span class="o">=</span> <span class="s2">&quot;[None, None]&quot;</span>
+
+<span class="c1"># Opacity of volume slices.</span>
+<span class="c1"># Default: 0.3</span>
+<span class="n">volume_opacity_bundles</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># n_points to resample streamlines to before plotting. If None, no</span>
+<span class="c1"># resampling is done.</span>
+<span class="c1"># Default: 40</span>
+<span class="n">n_points_bundles</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="c1"># Of the form (lower bound, upper bound). Shading based on</span>
+<span class="c1"># shade_by_volume will only differentiate values within these bounds.</span>
+<span class="c1"># If lower bound is None, will default to 0.</span>
+<span class="c1"># If upper bound is None, will default to the maximum value in</span>
+<span class="c1"># shade_by_volume.</span>
+<span class="c1"># Default: [None, None]</span>
+<span class="n">sbv_lims_indiv</span> <span class="o">=</span> <span class="s2">&quot;[None, None]&quot;</span>
+
+<span class="c1"># Opacity of volume slices.</span>
+<span class="c1"># Default: 0.3</span>
+<span class="n">volume_opacity_indiv</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># n_points to resample streamlines to before plotting. If None, no</span>
+<span class="c1"># resampling is done.</span>
+<span class="c1"># Default: 40</span>
+<span class="n">n_points_indiv</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="c1"># Which visualization backend to use.</span>
+<span class="c1"># See Visualization Backends page in documentation for details:</span>
+<span class="c1"># https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</span>
+<span class="c1"># One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
+<span class="c1"># Default: &quot;plotly_no_gif&quot;</span>
+<span class="n">viz_backend_spec</span> <span class="o">=</span> <span class="s2">&quot;plotly_no_gif&quot;</span>
+
+<span class="c1"># Whether to use a virtual fram buffer. This is neccessary if</span>
+<span class="c1"># generating GIFs in a headless environment. Default: False</span>
+<span class="n">virtual_frame_buffer</span> <span class="o">=</span> <span class="n">false</span>
 </pre></div>
 </div>
 <p>pyAFQ will store a copy of the configuration file alongside the computed
@@ -706,11 +790,11 @@ ignore them.</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="data.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="kwargs.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Organizing your data</p>
+            <p class="prev-next-title">The pyAFQ API optional arguments</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="viz_backend.html" title="next page">
@@ -741,7 +825,7 @@ ignore them.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

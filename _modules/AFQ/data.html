@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.data &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.data &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -493,7 +493,7 @@
 <span class="k">def</span> <span class="nf">read_pediatric_templates</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load pediatric pyAFQ templates. </span>
-<span class="sd">    </span>
+
 <span class="sd">    Used to create pediatric `bundle_dict`.</span>
 
 <span class="sd">    Returns</span>
@@ -858,7 +858,6 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;or templates loaded in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">template_dict</span></div>
-
 
 
 <span class="c1"># +----------------------------------------------------+</span>
@@ -2531,7 +2530,7 @@
 <span class="sd">    for the first and last node of the streamlines in this bundle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
+        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
     <span class="n">endpoint_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
@@ -2893,7 +2892,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

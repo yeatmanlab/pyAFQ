@@ -30,7 +30,7 @@ Classes
 
 
 
-.. py:class:: MaskFile(suffix, filters={})
+.. py:class:: MaskFile(path=None, suffix=None, filters={})
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
@@ -44,10 +44,15 @@ Classes
 
    :Parameters:
 
-       **suffix** : str
-           suffix to pass to bids_layout.get() to identify the file.
+       **path** : str, optional
+           path to file to get mask from. Use this or suffix.
+           Default: None
 
-       **filters** : str
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
            Additional filters to pass to bids_layout.get() to identify
            the file.
            Default: {}
@@ -65,9 +70,9 @@ Classes
    .. rubric:: Examples
 
    seed_mask = MaskFile(
-       "WM_mask",
-       {"scope":"dmriprep"})
-   api.AFQ(tracking_params={"seed_mask": seed_mask,
+       suffix="WM",
+       filters={"scope":"dmriprep"})
+   api.GroupAFQ(tracking_params={"seed_mask": seed_mask,
                                "seed_threshold": 0.1})
 
 
@@ -96,7 +101,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_path_data_affine(self, subses_dict)
+   .. py:method:: get_path_data_affine(self, subses_dict, bids_info)
 
       
 
@@ -140,7 +145,29 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_mask_getter(self, in_data=False)
+   .. py:method:: get_mask_getter(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file)
 
       
 
@@ -184,7 +211,7 @@ Classes
 
    .. rubric:: Examples
 
-   brain_mask = FullMask()
+   brain_mask_definition = FullMask()
 
 
 
@@ -212,7 +239,29 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_mask_getter(self, in_data=False)
+   .. py:method:: get_mask_getter(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file)
 
       
 
@@ -257,7 +306,7 @@ Classes
    .. rubric:: Examples
 
    seed_mask = RoiMask()
-   api.AFQ(tracking_params={"seed_mask": seed_mask})
+   api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
 
 
 
@@ -285,7 +334,29 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_mask_getter(self, in_data=False)
+   .. py:method:: get_mask_getter(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file)
 
       
 
@@ -334,8 +405,8 @@ Classes
 
    .. rubric:: Examples
 
-   brain_mask = B0Mask()
-   api.AFQ(brain_mask=brain_mask)
+   brain_mask_definition = B0Mask()
+   api.GroupAFQ(brain_mask_definition=brain_mask_definition)
 
 
 
@@ -363,7 +434,29 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_mask_getter(self, in_data=False)
+   .. py:method:: get_mask_getter(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file)
 
       
 
@@ -386,7 +479,7 @@ Classes
           !! processed by numpydoc !!
 
 
-.. py:class:: LabelledMaskFile(suffix, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
+.. py:class:: LabelledMaskFile(path=None, suffix=None, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
 
    Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
@@ -396,10 +489,15 @@ Classes
 
    :Parameters:
 
-       **suffix** : str
-           suffix to pass to bids_layout.get() to identify the file.
+       **path** : str, optional
+           path to file to get mask from. Use this or suffix.
+           Default: None
 
-       **filters** : str
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
            Additional filters to pass to bids_layout.get() to identify
            the file.
            Default: {}
@@ -434,11 +532,11 @@ Classes
 
    .. rubric:: Examples
 
-   brain_mask = LabelledMaskFile(
-       "aseg",
-       {"scope": "dmriprep"},
+   brain_mask_definition = LabelledMaskFile(
+       suffix="aseg",
+       filters={"scope": "dmriprep"},
        exclusive_labels=[0])
-   api.AFQ(brain_mask=brain_mask)
+   api.GroupAFQ(brain_mask_definition=brain_mask_definition)
 
 
 
@@ -467,7 +565,7 @@ Classes
           !! processed by numpydoc !!
 
 
-.. py:class:: ThresholdedMaskFile(suffix, filters={}, lower_bound=None, upper_bound=None, combine='and')
+.. py:class:: ThresholdedMaskFile(path=None, suffix=None, filters={}, lower_bound=None, upper_bound=None, combine='and')
 
    Bases: :py:obj:`MaskFile`, :py:obj:`CombineMaskMixin`
 
@@ -480,10 +578,15 @@ Classes
 
    :Parameters:
 
-       **suffix** : str
-           suffix to pass to bids_layout.get() to identify the file.
+       **path** : str, optional
+           path to file to get mask from. Use this or suffix.
+           Default: None
 
-       **filters** : str
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
            Additional filters to pass to bids_layout.get() to identify
            the file.
            Default: {}
@@ -516,11 +619,11 @@ Classes
 
    .. rubric:: Examples
 
-   brain_mask = ThresholdedMaskFile(
-       "brain_mask",
-       {"scope":"dmriprep"},
+   brain_mask_definition = ThresholdedMaskFile(
+       suffix="BM",
+       filters={"scope":"dmriprep"},
        lower_bound=0.1)
-   api.AFQ(brain_mask=brain_mask)
+   api.GroupAFQ(brain_mask_definition=brain_mask_definition)
 
 
 
@@ -582,7 +685,7 @@ Classes
    seed_mask = ScalarMask(
        "dti_fa",
        scope="dmriprep")
-   api.AFQ(tracking_params={
+   api.GroupAFQ(tracking_params={
        "seed_mask": seed_mask,
        "seed_threshold": 0.2})
 
@@ -612,7 +715,29 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_mask_getter(self, in_data=False)
+   .. py:method:: get_mask_getter(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_brain_mask(self, subses_dict, bids_info, dwi_affine, b0_file)
 
       
 
@@ -683,7 +808,7 @@ Classes
    seed_mask = ThresholdedScalarMask(
        "dti_fa",
        lower_bound=0.2)
-   api.AFQ(tracking_params={"seed_mask": seed_mask})
+   api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
 
 
 

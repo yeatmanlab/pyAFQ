@@ -35,7 +35,6 @@ Attributes
 .. autoapisummary::
 
    AFQ.tasks.segmentation.logger
-   AFQ.tasks.segmentation.outputs
 
 
 .. py:data:: logger
@@ -61,10 +60,72 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:data:: outputs
-   
+.. py:function:: segment(subses_dict, data_imap, mapping_imap, tractography_imap, tracking_params, segmentation_params)
 
    
+   full path to a trk file containing containting
+   segmented streamlines, labeled by bundle
+
+
+   :Parameters:
+
+       **segmentation_params** : dict, optional
+           The parameters for segmentation.
+           Default: use the default behavior of the seg.Segmentation object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: clean_bundles(subses_dict, bundles_file, data_imap, tracking_params, segmentation_params, clean_params=None)
+
+   
+   full path to a trk file containting segmented
+   streamlines, cleaned using the Mahalanobis distance, and labeled by
+   bundle
+
+
+   :Parameters:
+
+       **clean_params: dict, optional**
+           The parameters for cleaning.
+           Default: use the default behavior of the seg.clean_bundle
+           function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_bundles(subses_dict, clean_bundles_file, bundles_file, data_imap, tracking_params, segmentation_params)
+
+   
+   dictionary of paths, where each path is
+   a full path to a trk file containing the streamlines of a given bundle,
+   cleaned or uncleaned
 
 
 
@@ -84,9 +145,10 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: segment(subses_dict, bundle_dict, data_imap, reg_template, mapping_imap, tractography_imap, tracking_params, segmentation_params)
+.. py:function:: export_sl_counts(subses_dict, data_imap, clean_bundles_file, bundles_file, tracking_params, segmentation_params)
 
    
+   full path to a JSON file containing streamline counts
 
 
 
@@ -106,11 +168,22 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: clean_bundles(subses_dict, bundles_file, bundle_dict, clean_params, tracking_params, segmentation_params)
+.. py:function:: tract_profiles(subses_dict, clean_bundles_file, data_imap, scalar_dict, dwi_affine, tracking_params, segmentation_params, profile_weights='gauss')
 
    
+   full path to a CSV file containing tract profiles
 
 
+   :Parameters:
+
+       **profile_weights** : str, 1D array, 2D array callable, optional
+           How to weight each streamline (1D) or each node (2D)
+           when calculating the tract-profiles. If callable, this is a
+           function that calculates weights. If None, no weighting will
+           be applied. If "gauss", gaussian weights will be used.
+           If "median", the median of values at each node will be used
+           instead of a mean or weighted mean.
+           Default: "gauss"
 
 
 
@@ -128,11 +201,20 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_bundles(subses_dict, clean_bundles_file, bundles_file, bundle_dict, tracking_params, segmentation_params)
+.. py:function:: get_scalar_dict(data_imap, mapping_imap, scalars=['dti_fa', 'dti_md'])
 
    
+   dicionary mapping scalar names
+   to their respective file paths
 
 
+   :Parameters:
+
+       **scalars** : list of strings and/or scalar definitions, optional
+           List of scalars to use.
+           Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
+           "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+           Default: ["dti_fa", "dti_md"]
 
 
 
@@ -150,73 +232,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_sl_counts(subses_dict, bundle_dict, clean_bundles_file, bundles_file, tracking_params, segmentation_params)
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: tract_profiles(subses_dict, clean_bundles_file, bundle_dict, scalar_dict, profile_weights, dwi_affine, tracking_params, segmentation_params)
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: get_scalar_dict(scalars, data_imap, mapping_imap)
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: get_segmentation_plan()
+.. py:function:: get_segmentation_plan(kwargs)
 
    
 

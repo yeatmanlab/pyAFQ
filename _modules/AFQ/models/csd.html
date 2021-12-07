@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.models.csd &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.models.csd &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -202,7 +202,6 @@
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">csdeconv</span> <span class="k">as</span> <span class="n">csd</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">mcsd</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
-<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
 
 <span class="c1"># Monkey patch fixed spherical harmonics for conda and fixed solve_qp from</span>
@@ -212,6 +211,10 @@
 <span class="n">mcsd</span><span class="o">.</span><span class="n">solve_qp</span> <span class="o">=</span> <span class="n">solve_qp</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit_csd&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">CsdNanResponseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -242,6 +245,9 @@
         <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">auto_response_ssst</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">roi_radii</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                                                  <span class="n">fa_thr</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+        <span class="c1"># Catch conditions where an auto-response could not be calculated:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="k">raise</span> <span class="n">CsdNanResponseError</span>
 
     <span class="n">csdmodel</span> <span class="o">=</span> <span class="n">my_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">csdmodel</span>
@@ -301,10 +307,16 @@
 <span class="sd">    msmt : bool, optional</span>
 <span class="sd">        If False, standard single-shell CSD will be used. Otherwise,</span>
 
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    fname : the full path to the file containing the SH coefficients.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of</span>
+<span class="sd">            the fibre orientation distribution in diffusion MRI:</span>
+<span class="sd">            Non-negativity constrained super-resolved spherical</span>
+<span class="sd">            deconvolution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">img</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span>
                                             <span class="n">b0_threshold</span><span class="o">=</span><span class="n">b0_threshold</span><span class="p">,</span>
@@ -351,7 +363,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

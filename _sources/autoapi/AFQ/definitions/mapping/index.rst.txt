@@ -26,7 +26,7 @@ Classes
 
 
 
-.. py:class:: FnirtMap(warp_suffix, space_suffix, warp_filters={}, space_filters={})
+.. py:class:: FnirtMap(warp_path=None, space_path=None, warp_suffix=None, space_suffix=None, warp_filters={}, space_filters={})
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
@@ -38,18 +38,28 @@ Classes
 
    :Parameters:
 
-       **warp_suffix** : str
+       **warp_path** : str, optional
+           path to file to get warp from. Use this or warp_suffix.
+           Default: None
+
+       **space_path** : str, optional
+           path to file to get warp from. Use this or space_suffix.
+           Default: None
+
+       **warp_suffix** : str, optional
            suffix to pass to bids_layout.get() to identify the warp file.
+           Default: None
 
-       **space_suffix** : str
+       **space_suffix** : str, optional
            suffix to pass to bids_layout.get() to identify the space file.
+           Default: None
 
-       **warp_filters** : str
+       **warp_filters** : str, optional
            Additional filters to pass to bids_layout.get() to identify
            the warp file.
            Default: {}
 
-       **space_filters** : str
+       **space_filters** : str, optional
            Additional filters to pass to bids_layout.get() to identify
            the space file.
            Default: {}
@@ -67,11 +77,11 @@ Classes
    .. rubric:: Examples
 
    fnirt_map = FnirtMap(
-       "warp",
-       "MNI",
-       {"scope": "TBSS"},
-       {"scope": "TBSS"})
-   api.AFQ(mapping=fnirt_map)
+       warp_suffix="warp",
+       space_suffix="MNI",
+       warp_filters={"scope": "TBSS"},
+       space_filters={"scope": "TBSS"})
+   api.GroupAFQ(mapping=fnirt_map)
 
 
 
@@ -99,7 +109,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_for_subses(self, subses_dict, reg_subject, reg_template)
+   .. py:method:: get_for_subses(self, subses_dict, bids_info, reg_subject, reg_template)
 
       
 
@@ -154,7 +164,7 @@ Classes
        **--------**
            ..
 
-       **api.AFQ(mapping=SynMap())**
+       **api.GroupAFQ(mapping=SynMap())**
            ..
 
 
@@ -243,7 +253,7 @@ Classes
 
    .. rubric:: Examples
 
-   api.AFQ(mapping=SlrMap())
+   api.GroupAFQ(mapping=SlrMap())
 
 
 
@@ -320,7 +330,7 @@ Classes
 
    .. rubric:: Examples
 
-   api.AFQ(mapping=AffMap())
+   api.GroupAFQ(mapping=AffMap())
 
 
 

@@ -23,7 +23,7 @@ backend. Currently, there are three choices:
    And install `libGL <https://dri.freedesktop.org/wiki/libGL/>`_. If running
    fury on a headless environment, additionally install and use
    `Xvfb <https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml>`_.
-   Xvfb is used automatically in the api.AFQ object if the virtual_frame_buffer
+   Xvfb is used automatically in the api.GroupAFQ object if the virtual_frame_buffer
    argument is set to True.
 
 By default, plotly_no_gif is used. Fury requires additional

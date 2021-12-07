@@ -1,0 +1,174 @@
+:py:mod:`AFQ.api.utils`
+=======================
+
+.. py:module:: AFQ.api.utils
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.utils.add_method_descriptions
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.utils.methods_descriptors
+   AFQ.api.utils.kwargs_descriptors
+   AFQ.api.utils.wf_sections
+   AFQ.api.utils.AFQclass_doc
+   AFQ.api.utils.AFQclass_doc
+
+
+.. py:data:: methods_descriptors
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: kwargs_descriptors
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: wf_sections
+   :annotation: = ['data_imap', 'mapping_imap', 'tractography_imap', 'segmentation_imap', 'subses_dict']
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: AFQclass_doc
+   :annotation: = 
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: AFQclass_doc
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: add_method_descriptions(AFQclass)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

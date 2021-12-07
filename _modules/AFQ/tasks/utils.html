@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.utils &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.tasks.utils &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -194,6 +194,7 @@
                 
   <h1>Source code for AFQ.tasks.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;with_name&quot;</span><span class="p">]</span>
 
@@ -223,6 +224,15 @@
     <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">task_list</span><span class="p">:</span>
         <span class="n">task_dict</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
     <span class="k">return</span> <span class="n">task_dict</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_default_args</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span>
+    <span class="p">}</span>
 </pre></div>
 
               </div>
@@ -251,7 +261,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

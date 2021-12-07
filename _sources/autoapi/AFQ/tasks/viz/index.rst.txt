@@ -23,6 +23,7 @@ Functions
    AFQ.tasks.viz.viz_bundles
    AFQ.tasks.viz.viz_indivBundle
    AFQ.tasks.viz.plot_tract_profiles
+   AFQ.tasks.viz.init_viz_backend
    AFQ.tasks.viz.get_viz_plan
 
 
@@ -33,33 +34,9 @@ Attributes
 .. autoapisummary::
 
    AFQ.tasks.viz.logger
-   AFQ.tasks.viz.outputs
 
 
 .. py:data:: logger
-   
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:data:: outputs
    
 
    
@@ -104,11 +81,31 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_bundles(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, xform_volume=False, sbv_lims=[None, None], xform_shade_by_volume=False, volume_opacity=0.3, n_points=40)
+.. py:function:: viz_bundles(subses_dict, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_bundles=[None, None], volume_opacity_bundles=0.3, n_points_bundles=40)
 
    
+   figure for the visualizaion of the recognized
+   bundles in the subject's brain
 
 
+   :Parameters:
+
+       **sbv_lims_bundles** : ndarray
+           Of the form (lower bound, upper bound). Shading based on
+           shade_by_volume will only differentiate values within these bounds.
+           If lower bound is None, will default to 0.
+           If upper bound is None, will default to the maximum value in
+           shade_by_volume.
+           Default: [None, None]
+
+       **volume_opacity_bundles** : float, optional
+           Opacity of volume slices.
+           Default: 0.3
+
+       **n_points_bundles** : int or None
+           n_points to resample streamlines to before plotting. If None, no
+           resampling is done.
+           Default: 40
 
 
 
@@ -126,11 +123,31 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, bundle_dict, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, reg_template, best_scalar, xform_volume_indiv=False, sbv_lims_indiv=[None, None], xform_shade_by_volume_indiv=False, volume_opacity_indiv=0.3, n_points_indiv=40)
+.. py:function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
 
    
+   list of full paths to html or gif files
+   containing visualizaions of individual bundles
 
 
+   :Parameters:
+
+       **sbv_lims_indiv** : ndarray
+           Of the form (lower bound, upper bound). Shading based on
+           shade_by_volume will only differentiate values within these bounds.
+           If lower bound is None, will default to 0.
+           If upper bound is None, will default to the maximum value in
+           shade_by_volume.
+           Default: [None, None]
+
+       **volume_opacity_indiv** : float, optional
+           Opacity of volume slices.
+           Default: 0.3
+
+       **n_points_indiv** : int or None
+           n_points to resample streamlines to before plotting. If None, no
+           resampling is done.
+           Default: 40
 
 
 
@@ -151,6 +168,8 @@ Attributes
 .. py:function:: plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)
 
    
+   list of full paths to png files,
+   where files contain plots of the tract profiles
 
 
 
@@ -170,7 +189,42 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_viz_plan()
+.. py:function:: init_viz_backend(viz_backend_spec='plotly_no_gif', virtual_frame_buffer=False)
+
+   
+   An instance of the `AFQ.viz.utils.viz_backend` class.
+
+
+   :Parameters:
+
+       **virtual_frame_buffer** : bool, optional
+           Whether to use a virtual fram buffer. This is neccessary if
+           generating GIFs in a headless environment. Default: False
+
+       **viz_backend_spec** : str, optional
+           Which visualization backend to use.
+           See Visualization Backends page in documentation for details:
+           https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html
+           One of {"fury", "plotly", "plotly_no_gif"}.
+           Default: "plotly_no_gif"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_viz_plan(kwargs)
 
    
 

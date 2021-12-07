@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visualization Backends &#8212; AFQ 0.9.2 documentation</title>
+    <title>Visualization Backends &#8212; AFQ 0.10 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -169,6 +169,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="kwargs.html">
+   The pyAFQ API optional arguments
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="config.html">
    The pyAFQ configuration file
   </a>
@@ -217,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kwargs.html#the-pyafq-api-methods">The pyAFQ API methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualization Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
@@ -314,7 +321,7 @@ backend, install pyAFQ with the optional fury requirements:</p>
 <p>And install <a class="reference external" href="https://dri.freedesktop.org/wiki/libGL/">libGL</a>. If running
 fury on a headless environment, additionally install and use
 <a class="reference external" href="https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml">Xvfb</a>.
-Xvfb is used automatically in the api.AFQ object if the virtual_frame_buffer
+Xvfb is used automatically in the api.GroupAFQ object if the virtual_frame_buffer
 argument is set to True.</p>
 </li>
 </ol>
@@ -378,7 +385,7 @@ Below is an example dockerfile that can be used to build that base image:</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     

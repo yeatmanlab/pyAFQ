@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.tractography &#8212; AFQ 0.9.2 documentation</title>
+    <title>AFQ.tasks.tractography &#8212; AFQ 0.10 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -195,6 +195,7 @@
   <h1>Source code for AFQ.tasks.tractography</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">pimms</span>
 
@@ -202,21 +203,20 @@
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">with_name</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
 <span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
+<span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_default_args</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="n">ScalarMask</span>
 
-
-<div class="viewcode-block" id="outputs"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.outputs">[docs]</a><span class="n">outputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;seed_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing the</span>
-<span class="s2">    tractography seed mask&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;stop_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to a nifti file containing the</span>
-<span class="s2">    tractography stop mask&quot;&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;streamlines_file&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;full path to the complete,</span></div>
-<span class="s2">    unsegmented tractography file&quot;&quot;&quot;</span><span class="p">}</span>
+<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.logger">[docs]</a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;seed_file&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_seed_mask.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_img</span>
 <div class="viewcode-block" id="export_seed_mask"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_seed_mask">[docs]</a><span class="k">def</span> <span class="nf">export_seed_mask</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing the</span>
+<span class="sd">    tractography seed mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span>
     <span class="n">seed_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">seed_mask_desc</span></div>
@@ -226,6 +226,10 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_stop_mask.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_img</span>
 <div class="viewcode-block" id="export_stop_mask"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_stop_mask">[docs]</a><span class="k">def</span> <span class="nf">export_stop_mask</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing the</span>
+<span class="sd">    tractography stop mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span>
     <span class="n">stop_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">stop_mask</span><span class="p">,</span> <span class="n">stop_mask_desc</span></div>
@@ -233,6 +237,10 @@
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;stop_file&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="export_stop_mask_pft"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_stop_mask_pft">[docs]</a><span class="k">def</span> <span class="nf">export_stop_mask_pft</span><span class="p">(</span><span class="n">pve_wm</span><span class="p">,</span> <span class="n">pve_gm</span><span class="p">,</span> <span class="n">pve_csf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing the</span>
+<span class="sd">    tractography stop mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;stop_file&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pve_wm</span><span class="p">,</span> <span class="n">pve_gm</span><span class="p">,</span> <span class="n">pve_csf</span><span class="p">]}</span></div>
 
 
@@ -240,6 +248,20 @@
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_tractography.trk&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <div class="viewcode-block" id="streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.streamlines">[docs]</a><span class="k">def</span> <span class="nf">streamlines</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">seed_file</span><span class="p">,</span> <span class="n">stop_file</span><span class="p">,</span>
                 <span class="n">tracking_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to the complete, unsegmented tractography file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tracking_params : dict, optional</span>
+<span class="sd">        The parameters for tracking. Default: use the default behavior of</span>
+<span class="sd">        the aft.track function. Seed mask and seed threshold, if not</span>
+<span class="sd">        specified, are replaced with scalar masks from scalar[0]</span>
+<span class="sd">        thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of</span>
+<span class="sd">        this dict may be ``AFQ.definitions.mask.MaskFile`` instances.</span>
+<span class="sd">        If ``tracker`` is set to &quot;pft&quot; then ``stop_mask`` should be</span>
+<span class="sd">        an instance of ``AFQ.definitions.mask.PFTMask``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">this_tracking_params</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># get odf_model</span>
@@ -290,35 +312,137 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;streamlines_file&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="custom_tractography"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.custom_tractography">[docs]</a><span class="k">def</span> <span class="nf">custom_tractography</span><span class="p">(</span><span class="n">custom_tract_file</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">custom_tract_file</span></div>
+<div class="viewcode-block" id="custom_tractography"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.custom_tractography">[docs]</a><span class="k">def</span> <span class="nf">custom_tractography</span><span class="p">(</span><span class="n">bids_info</span><span class="p">,</span> <span class="n">import_tract</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to the complete, unsegmented tractography file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    import_tract : dict, optional</span>
+<span class="sd">        BIDS filters for inputing a user made tractography file.</span>
+<span class="sd">        If None, tractography will be performed automatically.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">import_tract</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span>\
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">import_tract</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;import_tract must be&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; either a dict or a str&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">import_tract</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;bids_info must be provided if using&quot;</span>
+                <span class="s2">&quot; bids filters to find imported tracts&quot;</span><span class="p">))</span>
+        <span class="n">import_tract</span> <span class="o">=</span> \
+            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">subject</span><span class="o">=</span><span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+                <span class="n">session</span><span class="o">=</span><span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">],</span>
+                <span class="n">extension</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s1">&#39;.trk&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;.tck&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;.vtk&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;.fib&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;.dpy&#39;</span><span class="p">],</span>
+                <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">import_tract</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">import_tract</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;No custom tractography found for subject &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> and session &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">import_tract</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">import_tract</span> <span class="o">=</span> <span class="n">import_tract</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="sa">f</span><span class="s2">&quot;Multiple viable custom tractographies found for&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; subject &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> and session &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. Will use: </span><span class="si">{</span><span class="n">import_tract</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">import_tract</span> <span class="o">=</span> <span class="n">import_tract</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">import_tract</span></div>
 
 
-<div class="viewcode-block" id="get_tractography_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.get_tractography_plan">[docs]</a><span class="k">def</span> <span class="nf">get_tractography_plan</span><span class="p">(</span><span class="n">custom_tract_file</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">):</span>
+<div class="viewcode-block" id="get_tractography_plan"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.get_tractography_plan">[docs]</a><span class="k">def</span> <span class="nf">get_tractography_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;tracking_params&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span>\
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;tracking_params a dict&quot;</span><span class="p">)</span>
+
     <span class="n">tractography_tasks</span> <span class="o">=</span> <span class="n">with_name</span><span class="p">([</span>
         <span class="n">export_seed_mask</span><span class="p">,</span> <span class="n">export_stop_mask</span><span class="p">,</span> <span class="n">streamlines</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">custom_tract_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># use imported tractography if given</span>
+    <span class="k">if</span> <span class="s2">&quot;import_tract&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;streamlines_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">custom_tractography</span>
 
-    <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;tracker&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pft&quot;</span><span class="p">:</span>
+    <span class="c1"># determine reasonable defaults</span>
+    <span class="n">best_scalar</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;fa&quot;</span> <span class="ow">in</span> <span class="n">scalar</span><span class="p">:</span>
+                <span class="n">best_scalar</span> <span class="o">=</span> <span class="n">scalar</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;fa&quot;</span> <span class="ow">in</span> <span class="n">scalar</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">best_scalar</span> <span class="o">=</span> <span class="n">scalar</span>
+                <span class="k">break</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;best_scalar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_scalar</span>
+
+    <span class="n">default_tracking_params</span> <span class="o">=</span> <span class="n">get_default_args</span><span class="p">(</span><span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">)</span>
+
+    <span class="c1"># Replace the defaults only for kwargs for which a non-default value</span>
+    <span class="c1"># was given:</span>
+    <span class="k">if</span> <span class="s2">&quot;tracking_params&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">]:</span>
+            <span class="n">default_tracking_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_tracking_params</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span> <span class="o">=</span>\
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;seed_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScalarMask</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;best_scalar&quot;</span><span class="p">])</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;seed_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;stop_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScalarMask</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;best_scalar&quot;</span><span class="p">])</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;stop_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+    <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span>
+    <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span>
+    <span class="n">subses_dict</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">]</span>
+    <span class="n">bids_info</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+            <span class="n">stop_mask</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+                <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+            <span class="n">seed_mask</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+                <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s2">&quot;tracker&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pft&quot;</span><span class="p">:</span>
         <span class="n">probseg_funcs</span> <span class="o">=</span> <span class="n">stop_mask</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">()</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;wm_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;pve_wm&quot;</span><span class="p">)(</span><span class="n">probseg_funcs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;gm_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;pve_gm&quot;</span><span class="p">)(</span><span class="n">probseg_funcs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;csf_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;pve_csf&quot;</span><span class="p">)(</span><span class="n">probseg_funcs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;export_stop_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="n">export_stop_mask_pft</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
-            <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;export_stop_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
-                <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;stop_file&quot;</span><span class="p">)(</span><span class="n">as_file</span><span class="p">(</span><span class="s1">&#39;_stop_mask.nii.gz&#39;</span><span class="p">)(</span>
-                    <span class="n">stop_mask</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">()))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
+        <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;export_stop_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;stop_file&quot;</span><span class="p">)(</span><span class="n">as_file</span><span class="p">(</span><span class="s1">&#39;_stop_mask.nii.gz&#39;</span><span class="p">)(</span>
+                <span class="n">stop_mask</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">()))</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">],</span> <span class="n">Definition</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
         <span class="n">tractography_tasks</span><span class="p">[</span><span class="s2">&quot;export_seed_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;seed_file&quot;</span><span class="p">)(</span>
             <span class="n">as_file</span><span class="p">(</span><span class="s1">&#39;_seed_mask.nii.gz&#39;</span><span class="p">)(</span>
-                <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">()))</span>
+                <span class="n">seed_mask</span><span class="o">.</span><span class="n">get_mask_getter</span><span class="p">()))</span>
 
     <span class="k">return</span> <span class="n">pimms</span><span class="o">.</span><span class="n">plan</span><span class="p">(</span><span class="o">**</span><span class="n">tractography_tasks</span><span class="p">)</span></div>
 </pre></div>
@@ -349,7 +473,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
 </p>
     </div>
     
