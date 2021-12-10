@@ -1,8 +1,11 @@
 import nibabel as nib
 import os.path as op
+from time import time
+import logging
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import wf_sections, add_method_descriptions
+from AFQ.viz.utils import viz_import_msg_error
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -76,6 +79,8 @@ class ParticipantAFQ(object):
             raise ValueError(
                 f"output_dir does not exist: {output_dir}")
 
+        self.logger = logging.getLogger('AFQ.api')
+
         kwargs["bids_info"] = bids_info
         kwargs["subses_dict"] = {
             "dwi_file": dwi_data_file,
@@ -140,3 +145,60 @@ class ParticipantAFQ(object):
 
         # attr not found, allow typical AttributeError
         return object.__getattribute__(self, attr)
+
+    def export_all(self, viz=True, xforms=True,
+                   indiv=True):
+        """ Exports all the possible outputs
+
+        Parameters
+        ----------
+        viz : bool
+            Whether to output visualizations. This includes tract profile
+            plots, a figure containing all bundles, and, if using the AFQ
+            segmentation algorithm, individual bundle figures.
+            Default: True
+        xforms : bool
+            Whether to output the reg_template image in subject space and,
+            depending on if it is possible based on the mapping used, to
+            output the b0 in template space.
+            Default: True
+        indiv : bool
+            Whether to output individual bundles in their own files, in
+            addition to the one file containing all bundles. If using
+            the AFQ segmentation algorithm, individual ROIs are also
+            output.
+            Default: True
+        """
+        start_time = time()
+        seg_algo = self.segmentation_params.get("seg_algo", "AFQ")
+
+        if xforms:
+            try:
+                self.b0_warped
+            except Exception as e:
+                self.logger.warning((
+                    "Failed to export warped b0. This could be because your "
+                    "mapping type is only compatible with transformation "
+                    f"from template to subject space. The error is: {e}"))
+            self.template_xform
+        if indiv:
+            self.indiv_bundles
+            if seg_algo == "AFQ":
+                self.rois
+        self.sl_counts
+        self.profiles
+
+        if viz:
+            try:
+                self.tract_profile_plots
+            except ImportError as e:
+                plotly_err_message = viz_import_msg_error("plot")
+                if str(e) != plotly_err_message:
+                    raise
+                else:
+                    self.logger.warning(plotly_err_message)
+            self.all_bundles_figure
+            if seg_algo == "AFQ":
+                self.indiv_bundles_figures
+        self.logger.info(
+            "Time taken for export all: " + str(time() - start_time))
