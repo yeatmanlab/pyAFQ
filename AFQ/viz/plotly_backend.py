@@ -9,14 +9,12 @@ import AFQ.viz.utils as vut
 
 from dipy.tracking.streamline import set_number_of_points
 
-import matplotlib.cm as cm
-import matplotlib.colors as mcolors
-
 try:
     import plotly
     import plotly.graph_objs as go
     import plotly.io as pio
     from plotly.subplots import make_subplots
+    import plotly.express as px
 except (ImportError, ModuleNotFoundError):
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
@@ -669,12 +667,16 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
                dimensions, flip_axes):
     fgarray = np.asarray(set_number_of_points(sls, n_points))
     fgarray = np.median(fgarray, axis=0)
-    colormap = cm.nipy_spectral
-    normalize = mcolors.Normalize(
-        vmin=np.min(indiv_profile),
-        vmax=np.max(indiv_profile))
-    s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
-    line_color = s_map.to_rgba(indiv_profile)
+    colormap = px.colors.diverging.Portland
+    colormap = np.asarray(
+        [[int(i) for i in c[4:-1].split(',')] for c in colormap]) / 256
+    xp = np.linspace(
+        np.min(indiv_profile),
+        np.max(indiv_profile),
+        num=len(colormap))
+    line_color = np.ones((n_points, 4))
+    for i in range(3):
+        line_color[:, i] = np.interp(indiv_profile, xp, colormap[:, i])
     line_color_untouched = line_color.copy()
     for i in range(n_points):
         if i < n_points - 1:
