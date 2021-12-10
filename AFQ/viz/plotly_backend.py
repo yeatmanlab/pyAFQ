@@ -15,6 +15,7 @@ try:
     import plotly.io as pio
     from plotly.subplots import make_subplots
     import plotly.express as px
+    from plotly.colors import hex_to_rgb
 except (ImportError, ModuleNotFoundError):
     raise ImportError(vut.viz_import_msg_error("plotly"))
 
@@ -667,9 +668,12 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
                dimensions, flip_axes):
     fgarray = np.asarray(set_number_of_points(sls, n_points))
     fgarray = np.median(fgarray, axis=0)
-    colormap = px.colors.diverging.Portland
+    #colormap = px.colors.diverging.Portland
+    # colormap = np.asarray(
+    #     [[int(i) for i in c[4:-1].split(',')] for c in colormap]) / 256
+    colormap = px.colors.sequential.Viridis
     colormap = np.asarray(
-        [[int(i) for i in c[4:-1].split(',')] for c in colormap]) / 256
+        [hex_to_rgb(c) for c in colormap]) / 256
     xp = np.linspace(
         np.min(indiv_profile),
         np.max(indiv_profile),
