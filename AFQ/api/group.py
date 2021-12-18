@@ -101,7 +101,7 @@ class GroupAFQ(object):
             Set "n_jobs" to -1 to automatically parallelize as
             the number of cpus. Here is an example for how to do
             multiprocessing with 4 cpus:
-            {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
+            {"n_jobs": 4, "engine": "joblib", "backend": "loky"}
             Default: {"engine": "serial"}
         bids_layout_kwargs: dict, optional
             Additional arguments to give to BIDSLayout from pybids.
@@ -237,7 +237,11 @@ class GroupAFQ(object):
         # do not parallelize segmentation if parallelizing across
         # subject-sessions
         if self.parallel_params["engine"] != "serial":
-            self.segmentation_params["parallel_segmentation"]["engine"] =\
+            if "segmentation_params" not in kwargs:
+                kwargs["segmentation_params"] = {}
+            if "parallel_segmentation" not in kwargs["segmentation_params"]:
+                kwargs["segmentation_params"]["parallel_segmentation"] = {}
+            kwargs["segmentation_params"]["parallel_segmentation"]["engine"] =\
                 "serial"
 
         self.valid_sub_list = []
