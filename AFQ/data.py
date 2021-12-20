@@ -2335,7 +2335,7 @@ def bundles_to_aal(bundles, atlas=None):
     for the first and last node of the streamlines in this bundle.
     """
     if atlas is None:
-        atlas = read_aal_atlas()['atlas'].get_fdata()
+        atlas = read_aal_atlas()['atlas']
 
     endpoint_dict = {
         "ATR_L": [['leftfrontal'], None],
@@ -2367,21 +2367,29 @@ def bundles_to_aal(bundles, atlas=None):
         "SupParietal": [None, None],
         "Temporal": [None, None]}
 
-    targets = []
-    for bundle in bundles:
-        targets.append([])
+    targets = {}
 
+    for bundle in bundles:
         if (endpoint_dict.get(bundle)):
-            for region in endpoint_dict[bundle]:
+            for region_name, region in zip(
+                    ["start", "end"], endpoint_dict[bundle]):
                 if region is None:
-                    targets[-1].append(None)
+                    targets[bundle + "_" + region_name] = region
                 else:
-                    targets[-1].append(aal_to_regions(region, atlas=atlas))
+                    region_list = aal_to_regions(
+                        region, atlas=atlas.get_fdata())
+                    aal_roi = np.zeros(atlas.get_fdata().shape[:3])
+                    aal_roi[region_list[:, 0],
+                            region_list[:, 1],
+                            region_list[:, 2]] = 1
+                    targets[bundle + "_" + region_name] = nib.Nifti1Image(
+                        aal_roi, atlas.affine)
         else:
             logger = logging.getLogger('AFQ.data')
             logger.warning(f"Segmentation end points undefined for {bundle},"
                            + " continuing without end points")
-            targets[-1] = [None, None]
+            targets[bundle + "_start"] = None
+            targets[bundle + "_end"] = None
 
     return targets
 

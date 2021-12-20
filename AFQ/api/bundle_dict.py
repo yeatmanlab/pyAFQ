@@ -95,7 +95,7 @@ class _GeneratedBundleDict(MutableMapping):
         return iter(self._dict)
 
     def copy(self):
-        return _GeneratedBundleDict(
+        return self.__class__(
             self._dict.copy(),
             self.resample_to)
 
@@ -103,10 +103,20 @@ class _GeneratedBundleDict(MutableMapping):
         if self.resample_to:
             if "resampled" not in self._dict[key]\
                     or not self._dict[key]["resampled"]:
-                for ii, roi in enumerate(self._dict[key]['ROIs']):
-                    self._dict[key]['ROIs'][ii] =\
-                        afd.read_resample_roi(
-                            roi, resample_to=self.resample_to)
+                for roi_type in ["include", "exclude"]:
+                    if roi_type != "include"\
+                            and not self._dict[key].get(roi_type):
+                        continue
+                    for ii, roi in enumerate(self._dict[key][roi_type]):
+                        self._dict[key][roi_type][ii] =\
+                            afd.read_resample_roi(
+                                roi, resample_to=self.resample_to)
+                for roi_type in ["start", "end"]:
+                    if self._dict[key].get(roi_type):
+                        self._dict[key][roi_type] =\
+                            afd.read_resample_roi(
+                                self._dict[key][roi_type],
+                                resample_to=self.resample_to)
                 self._dict[key]["resampled"] = True
 
     def __add__(self, other):
@@ -205,7 +215,12 @@ class BundleDict(_GeneratedBundleDict):
             self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
             callosal_templates =\
                 afd.read_callosum_templates(resample_to=self.resample_to)
-            self.templates = {**self.templates, **callosal_templates}
+            endpoint_templates =\
+                afd.bundles_to_aal(self.bundle_names)
+            self.templates = {
+                **self.templates,
+                **callosal_templates,
+                **endpoint_templates}
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
                 self.templates = afd.read_hcp_atlas(80)
@@ -214,6 +229,7 @@ class BundleDict(_GeneratedBundleDict):
         else:
             raise ValueError(
                 "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
+        self.templates_loaded = True
 
     def gen(self, bundle_name):
         if not self.templates_loaded:
@@ -234,27 +250,34 @@ class BundleDict(_GeneratedBundleDict):
                     and self.templates.get(roi_name2)):
                 x_midline = False
                 p_map = {}
-                rois = [
+                include = [
                     self.templates[roi_name1],
                     self.templates[roi_name2]]
-                rules = [True, True]
+                exclude = []
+                start = None
+                end = None
                 if self.templates.get(name + '_roi3' + hemi):
-                    rois.append(self.templates[name + '_roi3' + hemi])
-                    rules.append(True)
+                    include.append(self.templates[name + '_roi3' + hemi])
                 if name == "SLF":
-                    rois.append(self.templates["SLFt_roi2" + hemi])
-                    rules.append(False)
+                    exclude.append(self.templates["SLFt_roi2" + hemi])
                 if bundle_name in CALLOSUM_BUNDLES\
                         or bundle_name in ["FA", "FP"]:
-                    rois.append(self.templates["Callosum_midsag"])
-                    rules.append(True)
+                    include.append(self.templates["Callosum_midsag"])
                     x_midline = True
                 if self.templates.get(bundle_name + '_prob_map'):
                     p_map['prob_map'] = self.templates[
                         bundle_name + '_prob_map']
+                if self.templates.get(bundle_name + "_start"):
+                    start = self.templates[
+                        bundle_name + "_start"]
+                if self.templates.get(bundle_name + "_end"):
+                    start = self.templates[
+                        bundle_name + "_end"]
                 self._dict[bundle_name] = {
-                    'ROIs': rois,
-                    'rules': rules,
+                    'include': include,
+                    'exclude': exclude,
+                    'start': start,
+                    'end': end,
                     'cross_midline': x_midline,
                     **p_map}
                 self.resample_roi(bundle_name)
