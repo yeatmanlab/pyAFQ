@@ -13,8 +13,20 @@ def do_preprocessing():
     raise NotImplementedError
 
 
+def append_l_r(bundle_list, no_lr_list):
+    new_bundle_list = []
+    for bundle in bundle_list:
+        if bundle in no_lr_list:
+            new_bundle_list.append(bundle)
+        else:
+            new_bundle_list.append(bundle + "_L")
+            new_bundle_list.append(bundle + "_R")
+    return new_bundle_list
+
+
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
            "FA", "FP"]
+BUNDLES = append_l_r(BUNDLES, ["FA", "FP"])
 
 CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
                     "PostParietal", "SupFrontal", "SupParietal",
@@ -22,9 +34,14 @@ CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
 
 # See: https://www.cmu.edu/dietrich/psychology/cognitiveaxon/documents/yeh_etal_2018.pdf  # noqa
 
+RECO_UNIQUE = [
+    'CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP', 'AC', 'PC', 'SCP',
+    'V', 'CC', 'F_L_R']
+
 RECO_BUNDLES_16 = [
     'CST', 'C', 'F', 'UF', 'MCP', 'AF', 'CCMid',
     'CC_ForcepsMajor', 'CC_ForcepsMinor', 'IFOF']
+RECO_BUNDLES_16 = append_l_r(RECO_BUNDLES_16, RECO_UNIQUE)
 
 RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
                    "CC_ForcepsMinor", "CC", "CCMid", "CNII", "CNIII",
@@ -32,13 +49,11 @@ RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
                    "CTT", "DLF", "EMC", "F_L_R", "FPT", "ICP", "IFOF", "ILF",
                    "LL", "MCP", "MdLF", "ML", "MLF", "OPT", "OR", "PC", "PPT",
                    "RST", "SCP", "SLF", "STT", "TPT", "UF", "V", "VOF"]
-
-RECO_UNIQUE = [
-    'CCMid', 'CC_ForcepsMajor', 'CC_ForcepsMinor', 'MCP', 'AC', 'PC', 'SCP',
-    'V', 'CC', 'F_L_R']
+RECO_BUNDLES_80 = append_l_r(RECO_BUNDLES_80, RECO_UNIQUE)
 
 PEDIATRIC_BUNDLES = [
     "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
@@ -53,8 +68,10 @@ class BundleDict(MutableMapping):
 
         Parameters
         ----------
-        bundle_names : list, optional
-            A list of the bundles to be used in this case. Default: all of them
+        bundle_info : list or dict, optional
+            A list of the bundles to be used, or a dictionary defining
+            custom bundles.
+            Default: AFQ.api.bundle_dict.BUNDLES
 
         seg_algo: One of {"afq", "reco", "reco16", "reco80"}
             The bundle segmentation algorithm to use.
@@ -80,44 +97,15 @@ class BundleDict(MutableMapping):
             resample_to = afd.read_mni_template()
         self.resample_to = resample_to
 
+        self._dict = {}
+        self.bundle_names = []
+        self.templates_loaded = False
         if isinstance(bundle_info, dict):
-            self.bundle_names = list(bundle_info.keys())
-            self._dict = bundle_info.copy()
-            self.resample_all_roi()
-            self.all_gen = True
+            for key, item in bundle_info.items():
+                self.__setitem__(key, item)
         else:
-            expanded_bundle_names = []
             for bundle_name in bundle_info:
-                if self.seg_algo == "afq":
-                    if bundle_name in ["FA", "FP"]\
-                            or bundle_name in CALLOSUM_BUNDLES:
-                        expanded_bundle_names.append(bundle_name)
-                    else:
-                        expanded_bundle_names.append(bundle_name + "_R")
-                        expanded_bundle_names.append(bundle_name + "_L")
-                elif self.seg_algo.startswith("reco"):
-                    if bundle_name in RECO_UNIQUE\
-                            or bundle_name == "whole_brain":
-                        expanded_bundle_names.append(bundle_name)
-                    else:
-                        expanded_bundle_names.append(bundle_name + "_R")
-                        expanded_bundle_names.append(bundle_name + "_L")
-                else:
-                    raise ValueError(
-                        "Input: %s is not a valid input`seg_algo`"
-                        % self.seg_algo)
-            self.bundle_names = expanded_bundle_names
-            self._dict = {}
-            self.all_gen = False
-
-        # Each bundles gets a digit identifier
-        # (to be stored in the tractogram)
-        # we keep track of this for when bundles are added
-        # with set item
-        self._uid_dict = {}
-        for ii, b_name in enumerate(self.bundle_names):
-            self._uid_dict[b_name] = ii + 1
-            self._c_uid = ii + 2
+                self.add_bundle_name(bundle_name)
 
         self.logger = logging.getLogger('AFQ.api')
 
@@ -144,105 +132,98 @@ class BundleDict(MutableMapping):
                     " Only AntFrontal will be used."))
                 self.bundle_names.remove("FA")
 
-    def gen_all(self):
-        if self.all_gen:
-            return
+    def load_templates(self):
         if self.seg_algo == "afq":
-            templates =\
+            self.templates =\
                 afd.read_templates(resample_to=self.resample_to)
             # For the arcuate, we need to rename a few of these
             # and duplicate the SLF ROI:
-            templates['ARC_roi1_L'] = templates['SLF_roi1_L']
-            templates['ARC_roi1_R'] = templates['SLF_roi1_R']
-            templates['ARC_roi2_L'] = templates['SLFt_roi2_L']
-            templates['ARC_roi2_R'] = templates['SLFt_roi2_R']
-            callosal_templates =\
+            self.templates['ARC_roi1_L'] = self.templates['SLF_roi1_L']
+            self.templates['ARC_roi1_R'] = self.templates['SLF_roi1_R']
+            self.templates['ARC_roi2_L'] = self.templates['SLFt_roi2_L']
+            self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
+            self.callosal_templates =\
                 afd.read_callosum_templates(resample_to=self.resample_to)
-
-            for key in self.bundle_names:
-                # Consider hard coding since we might have different rules
-                # for some tracts
-                if key in ["FA", "FP"]:
-                    bundle = {
-                        'ROIs': [
-                            templates[key + "_L"],
-                            templates[key + "_R"],
-                            callosal_templates["Callosum_midsag"]],
-                        'rules': [True, True, True],
-                        'prob_map': templates[key + "_prob_map"],
-                        'cross_midline': True,
-                        'uid': self._uid_dict[key]}
-                elif key in CALLOSUM_BUNDLES:
-                    bundle = {
-                        'ROIs': [
-                            callosal_templates["L_" + key],
-                            callosal_templates["R_" + key],
-                            callosal_templates["Callosum_midsag"]],
-                        'rules': [True, True, True],
-                        'cross_midline': True,
-                        'uid': self._uid_dict[key]}
-
-                # SLF is a special case, because it has an exclusion ROI:
-                elif key in ["SLF_L", "SLF_R"]:
-                    name = key[:-2]
-                    hemi = key[-2:]
-                    bundle = {
-                        'ROIs': [
-                            templates[name + '_roi1' + hemi],
-                            templates[name + '_roi2' + hemi],
-                            templates["SLFt_roi2" + hemi]],
-                        'rules': [True, True, False],
-                        'prob_map': templates[name + hemi + '_prob_map'],
-                        'cross_midline': False,
-                        'uid': self._uid_dict[key]}
-                else:
-                    name = key[:-2]
-                    hemi = key[-2:]
-                    if (templates.get(name + '_roi1' + hemi)
-                            and templates.get(name + '_roi2' + hemi)
-                            and templates.get(name + hemi + '_prob_map')):
-                        bundle = {
-                            'ROIs': [
-                                templates[name + '_roi1' + hemi],
-                                templates[name + '_roi2' + hemi]],
-                            'rules': [True, True],
-                            'prob_map': templates[
-                                name + hemi + '_prob_map'],
-                            'cross_midline': False,
-                            'uid': self._uid_dict[key]}
-                    else:
-                        raise ValueError(f"{key} is not in AFQ templates")
-                self._dict[key] = bundle
-            self.resample_all_roi()
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
-                reco_bundle_dict = afd.read_hcp_atlas(80)
+                self.templates = afd.read_hcp_atlas(80)
             else:
-                reco_bundle_dict = afd.read_hcp_atlas(16)
-            for key in self.bundle_names:
-                bundle = reco_bundle_dict[key]
-                bundle['uid'] = self._uid_dict[key]
-                self._dict[key] = bundle
+                self.templates = afd.read_hcp_atlas(16)
         else:
             raise ValueError(
                 "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
-        self.all_gen = True
+
+    def gen(self, bundle_name):
+        if not self.templates_loaded:
+            self.load_templates()
+        if self.seg_algo == "afq":
+            if bundle_name in ["FA", "FP"]:
+                bundle = {
+                    'ROIs': [
+                        self.templates[bundle_name + "_L"],
+                        self.templates[bundle_name + "_R"],
+                        self.callosal_templates["Callosum_midsag"]],
+                    'rules': [True, True, True],
+                    'prob_map': self.templates[bundle_name + "_prob_map"],
+                    'cross_midline': True}
+            elif bundle_name in CALLOSUM_BUNDLES:
+                bundle = {
+                    'ROIs': [
+                        self.callosal_templates["L_" + bundle_name],
+                        self.callosal_templates["R_" + bundle_name],
+                        self.callosal_templates["Callosum_midsag"]],
+                    'rules': [True, True, True],
+                    'cross_midline': True}
+
+            # SLF is a special case, because it has an exclusion ROI:
+            elif bundle_name in ["SLF_L", "SLF_R"]:
+                name = bundle_name[:-2]
+                hemi = bundle_name[-2:]
+                bundle = {
+                    'ROIs': [
+                        self.templates[name + '_roi1' + hemi],
+                        self.templates[name + '_roi2' + hemi],
+                        self.templates["SLFt_roi2" + hemi]],
+                    'rules': [True, True, False],
+                    'prob_map': self.templates[name + hemi + '_prob_map'],
+                    'cross_midline': False}
+            else:
+                name = bundle_name[:-2]
+                hemi = bundle_name[-2:]
+                if (self.templates.get(name + '_roi1' + hemi)
+                        and self.templates.get(name + '_roi2' + hemi)
+                        and self.templates.get(name + hemi + '_prob_map')):
+                    bundle = {
+                        'ROIs': [
+                            self.templates[name + '_roi1' + hemi],
+                            self.templates[name + '_roi2' + hemi]],
+                        'rules': [True, True],
+                        'prob_map': self.templates[
+                            name + hemi + '_prob_map'],
+                        'cross_midline': False}
+                else:
+                    raise ValueError(f"{bundle_name} is not in AFQ templates")
+            self._dict[bundle_name] = bundle
+            self.resample_roi(bundle_name)
+        elif self.seg_algo.startswith("reco"):
+            self._dict[bundle_name] = self.templates[bundle_name]
+
+    def gen_all(self):
+        for bundle_name in self.bundle_names:
+            if bundle_name not in self._dict:
+                self.gen(bundle_name)
 
     def __setitem__(self, key, item):
-        if not isinstance(item, dict):
-            raise ValueError((
-                "After BundleDict initialization, additional"
-                " bundles can only be added as dictionaries "
-                "(see BundleDict.gen_all for examples)"))
-        self.gen_all()
         self._dict[key] = item
-        self._uid_dict[key] = self._c_uid
-        self._dict[key]["uid"] = self._c_uid
-        self._c_uid += 1
         self.bundle_names.append(key)
+        self.resample_roi(key)
+
+    def add_bundle_name(self, bundle_name):
+        self.bundle_names.append(bundle_name)
 
     def __getitem__(self, key):
-        self.gen_all()
+        if key not in self._dict:
+            self.gen(key)
         return self._dict[key]
 
     def __len__(self):
@@ -270,15 +251,20 @@ class BundleDict(MutableMapping):
 
     def copy(self):
         self.gen_all()
-        return self._dict.copy()
+        return BundleDict(
+            self._dict.copy(),
+            seg_algo=self.seg_algo,
+            resample_to=self.resample_to)
 
-    def resample_all_roi(self):
+    def resample_roi(self, key):
         if self.resample_to:
-            for key in self._dict.keys():
+            if "resampled" not in self._dict[key]\
+                    or not self._dict[key]["resampled"]:
                 for ii, roi in enumerate(self._dict[key]['ROIs']):
                     self._dict[key]['ROIs'][ii] =\
                         afd.read_resample_roi(
                             roi, resample_to=self.resample_to)
+                self._dict[key]["resampled"] = True
 
 
 class PediatricBundleDict(BundleDict):
