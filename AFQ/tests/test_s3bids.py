@@ -18,6 +18,7 @@ DATA_PATH = op.join(op.abspath(op.dirname(__file__)), "data/mocks3")
 TEST_BUCKET = "test-bucket"
 TEST_DATASET = "ds000102-mimic"
 
+
 @pytest.fixture
 def temp_data_dir():
     test_dir = str(uuid4())
@@ -26,6 +27,7 @@ def temp_data_dir():
     yield test_dir
 
     shutil.rmtree(test_dir)
+
 
 @mock_s3
 def s3_setup():
