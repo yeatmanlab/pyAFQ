@@ -47,8 +47,7 @@ def test_BundleDict():
             "include": [
                 afq_templates["FA_L"],
                 afq_templates["FP_R"]],
-            "cross_midline": False,
-            "uid": 1}})
+            "cross_midline": False}})
     afq_bundles.get("custom_bundle")
 
     assert len(afq_bundles) == 1

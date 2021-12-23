@@ -14,6 +14,7 @@ from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 from AFQ.s3bids import write_json
 from AFQ.viz.utils import Viz
+from AFQ.utils.streamlines import bname_to_uid
 
 from plotly.subplots import make_subplots
 
@@ -185,7 +186,7 @@ def viz_indivBundle(subses_dict,
 
     for bundle_name in bundle_names:
         logger.info(f"Generating {bundle_name} visualization...")
-        uid = bundle_dict[bundle_name]['uid']
+        uid = bname_to_uid(bundle_name)
         figure = viz_backend.visualize_volume(
             volume,
             opacity=volume_opacity_indiv,

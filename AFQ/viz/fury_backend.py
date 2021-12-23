@@ -63,9 +63,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         resampling is done.
 
     bundle_dict : dict, optional
-        Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the sft
-        metadata. Default: bundles are either not identified, or identified
+        Keys are names of bundles and values are dicts that specify them.
+        Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
     bundle : str or int, optional

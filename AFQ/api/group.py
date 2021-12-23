@@ -6,6 +6,7 @@ import logging
 import AFQ.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, add_method_descriptions
+from AFQ.utils.streamlines import bname_to_uid
 
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
@@ -429,7 +430,7 @@ class GroupAFQ(object):
                         sft, img, mapping = subses_info[i]
                         idx = np.where(
                             sft.data_per_streamline['bundle']
-                            == bundle_dict[b]['uid'])[0]
+                            == bname_to_uid(b))[0]
                         # use the first subses that works
                         # otherwise try each successive subses
                         if len(idx) == 0:

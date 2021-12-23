@@ -1,6 +1,7 @@
 import numpy as np
 import nibabel as nib
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+import math
 
 
 def add_bundles(t1, t2):
@@ -20,7 +21,16 @@ def add_bundles(t1, t2):
         affine_to_rasmm=t2.affine_to_rasmm)
 
 
-def bundles_to_tgram(bundles, bundle_dict, reference):
+def bname_to_uid(bundle_name):
+    return int.from_bytes(bundle_name.encode(), "little")
+
+
+def uid_to_bname(uid):
+    return int(uid).to_bytes(
+        math.ceil(int(uid).bit_length / 8), 'little').decode()
+
+
+def bundles_to_tgram(bundles, reference):
     """
     Create a StatefulTractogram object from bundles and their
     specification.
@@ -30,11 +40,6 @@ def bundles_to_tgram(bundles, bundle_dict, reference):
     bundles: dict
         Each key in the dict is a bundle name and each value in the dict
         is the stateful tractogram of a particular bundle.
-    bundle_dict: dict
-        A bundle specification dictionary. Each key is a bundle name, and each
-        value is another dictionary specifying bundle properties. In this
-        value dictionary, there must be one `uid` key whose value is a
-        unique integer for that bundle.
     reference : Nifti
         The affine_to_rasmm input to `nib.streamlines.Tractogram`
     """
@@ -45,7 +50,7 @@ def bundles_to_tgram(bundles, bundle_dict, reference):
             this_sl,
             data_per_streamline={
                 'bundle': (len(this_sl)
-                           * [bundle_dict[b]['uid']])},
+                           * [bname_to_uid(b)])},
                 affine_to_rasmm=reference.affine)
         tgram = add_bundles(tgram, this_tgram)
     return StatefulTractogram(tgram.streamlines, reference, Space.VOX,
@@ -60,17 +65,19 @@ def tgram_to_bundles(tgram, bundle_dict, reference):
     Parameters
     ----------
     tgram : StatefulTractogram class instance.
-        Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
+        Requires a data_per_streamline['bundle'] attribute.
 
     bundle_dict: dict
-        A bundle specification dictionary. Each item includes in particular a
-        `uid` key that is a unique integer for that bundle.
+        A bundle specification dictionary.
+
+    reference : Nifti
+        The affine_to_rasmm to specify the StatefulTractogram
     """
     bundles = {}
     for bb in bundle_dict.keys():
         if not bb == 'whole_brain':
-            uid = bundle_dict[bb]['uid']
-            idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
+            idx = np.where(
+                tgram.data_per_streamline['bundle'] == bname_to_uid(bb))[0]
             bundles[bb] = StatefulTractogram(
                 tgram.streamlines[idx].copy(), reference, Space.VOX)
     return bundles

@@ -664,7 +664,8 @@ def test_AFQ_data_waypoint():
         afd.read_mni_template(mask=True, weight="T1w"),
         t1_path)
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiMask(),
                            n_seeds=100,

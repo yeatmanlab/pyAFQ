@@ -249,9 +249,8 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         resampling is done.
 
     bundle_dict : dict, optional
-        Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the sft
-        metadata. Default: bundles are either not identified, or identified
+        Keys are names of bundles and values are dicts that specify them.
+        Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
     bundle : str or int, optional
@@ -668,7 +667,7 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
                dimensions, flip_axes):
     fgarray = np.asarray(set_number_of_points(sls, n_points))
     fgarray = np.median(fgarray, axis=0)
-    #colormap = px.colors.diverging.Portland
+    # colormap = px.colors.diverging.Portland
     # colormap = np.asarray(
     #     [[int(i) for i in c[4:-1].split(',')] for c in colormap]) / 256
     colormap = px.colors.sequential.Viridis
@@ -761,9 +760,8 @@ def single_bundle_viz(indiv_profile, sft,
 
     bundle_dict : dict, optional
         This parameter is used if bundle is an int.
-        Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the sft
-        metadata. Default: Either the entire sft is treated as a bundle,
+        Keys are names of bundles and values are dicts that specify them.
+        Default: Either the entire sft is treated as a bundle,
         or identified only as unique integers in the metadata.
 
     flip_axes : ndarray

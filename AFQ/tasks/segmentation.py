@@ -16,6 +16,7 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.s3bids import write_json
 import AFQ.api.bundle_dict as abd
+from AFQ.utils.streamlines import bname_to_uid
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -69,7 +70,7 @@ def segment(subses_dict, data_imap, mapping_imap,
         bundles = {bundle: bundles[bundle]['sl']
                    for bundle in bundle_dict}
 
-    tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
+    tgram = aus.bundles_to_tgram(bundles, img)
 
     segmentation_params_out = {}
     for arg_name, value in segmentation_params.items():
@@ -124,7 +125,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
     for b in bundle_dict.keys():
         if b != "whole_brain":
             idx = np.where(
-                sft.data_per_streamline['bundle'] == bundle_dict[b]['uid'])[0]
+                sft.data_per_streamline['bundle'] == bname_to_uid(b))[0]
             this_tg = StatefulTractogram(
                 sft.streamlines[idx],
                 img,
@@ -141,7 +142,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
                 this_tg.streamlines,
                 data_per_streamline={
                     'bundle': (
-                        len(this_tg) * [bundle_dict[b]['uid']])},
+                        len(this_tg) * [bname_to_uid(b)])},
                     affine_to_rasmm=img.affine)
             tgram = aus.add_bundles(tgram, this_tgram)
 
@@ -199,7 +200,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
         streamlines = tg.streamlines
         for bundle in bundle_dict:
             if bundle != "whole_brain":
-                uid = bundle_dict[bundle]['uid']
+                uid = bname_to_uid(bundle)
                 idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
                 this_sl = dtu.transform_tracking_output(
                     streamlines[idx],
@@ -301,7 +302,7 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     vals = []
     for k in bundle_dict.keys():
         if k != "whole_brain":
-            keys.append(bundle_dict[k]['uid'])
+            keys.append(bname_to_uid(k))
             vals.append(k)
     reverse_dict = dict(zip(keys, vals))
 

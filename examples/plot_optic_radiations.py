@@ -34,7 +34,6 @@ bundles = abd.BundleDict({
         "start": or_rois['left_thal_MNI'],
         "end": or_rois['left_V1_MNI'],
         "cross_midline": False,
-        "uid": 1
     },
     "R_OR": {
         "include": [
@@ -46,8 +45,7 @@ bundles = abd.BundleDict({
             or_rois["right_pos_thal_MNI"]],
         "start": or_rois['right_thal_MNI'],
         "end": or_rois['right_V1_MNI'],
-        "cross_midline": False,
-        "uid": 2
+        "cross_midline": False
     }
 })
 

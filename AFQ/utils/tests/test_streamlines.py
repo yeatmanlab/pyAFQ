@@ -36,9 +36,8 @@ def test_bundles_to_tgram():
                                          img,
                                          Space.VOX)}
 
-    bundle_dict = {'b1': {'uid': 1}, 'b2':{'uid': 2}}
-    tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
-    new_bundles = aus.tgram_to_bundles(tgram, bundle_dict, img)
+    tgram = aus.bundles_to_tgram(bundles, img)
+    new_bundles = aus.tgram_to_bundles(tgram, img)
     for k1 in bundles.keys():
         for k2 in bundles[k1].__dict__.keys():
             for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
