@@ -3,7 +3,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
-import AFQ.data as afd
+import AFQ.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, add_method_descriptions
 
@@ -652,7 +652,7 @@ def download_and_combine_afq_profiles(bucket,
         deriv_name = True
 
     with nib.tmpdirs.InTemporaryDirectory() as t_dir:
-        remote_study = afd.S3BIDSStudy(
+        remote_study = afs.S3BIDSStudy(
             "get_profiles",
             bucket,
             study_s3_prefix,

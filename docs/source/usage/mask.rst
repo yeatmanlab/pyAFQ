@@ -86,7 +86,7 @@ for use with the CLI.
 Here is an example of using the :class:`AFQ.definitions.mask.RoiMask` and :class:`AFQ.definitions.mask.LabelledMaskFile` on the HCP
 data with the AFQ object::
 
-    from AFQ.data import fetch_hcp
+    from AFQ.s3bids import fetch_hcp
     from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 
