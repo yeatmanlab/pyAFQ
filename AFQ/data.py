@@ -1054,6 +1054,7 @@ def aal_to_regions(regions, atlas=None):
                   'cerebellum': np.arange(91, 117),
                   'leftarcfrontal': np.array([1, 11, 13]),
                   'leftarctemp': np.array([79, 81, 85, 89]),
+                  'leftthalamus': np.array([77]),
                   }
 
     # Right symmetrical is off by one:
@@ -1067,6 +1068,7 @@ def aal_to_regions(regions, atlas=None):
     atlas_vals['rightinfparietal'] = atlas_vals['leftinfparietal'] + 1
     atlas_vals['rightarcfrontal'] = atlas_vals['leftarcfrontal'] + 1
     atlas_vals['rightarctemp'] = atlas_vals['leftarctemp'] + 1
+    atlas_vals['rightthalamus'] = atlas_vals['leftthalamus'] + 1
 
     # Multiply named regions:
     atlas_vals['leftuncinatetemp'] = atlas_vals['leftilftemp'] =\
@@ -1125,8 +1127,8 @@ def bundles_to_aal(bundles, atlas=None):
         atlas = read_aal_atlas()['atlas']
 
     endpoint_dict = {
-        "ATR_L": [['leftfrontal'], None],
-        "ATR_R": [['rightfrontal'], None],
+        "ATR_L": [['leftfrontal'], ['leftthalamus']],
+        "ATR_R": [['rightfrontal'], ['rightthalamus']],
         "CST_L": [['cstinferior'], ['cstsuperior']],
         "CST_R": [['cstinferior'], ['cstsuperior']],
         "CGC_L": [['leftcingpost'], None],
@@ -1157,7 +1159,7 @@ def bundles_to_aal(bundles, atlas=None):
     targets = {}
 
     for bundle in bundles:
-        if (endpoint_dict.get(bundle)):
+        if bundle in endpoint_dict:
             for region_name, region in zip(
                     ["start", "end"], endpoint_dict[bundle]):
                 if region is None:

@@ -57,34 +57,30 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
     roi_files = {}
     for bundle in bundle_dict:
         roi_files[bundle] = []
-        for ii, roi in enumerate(bundle_dict[bundle]['ROIs']):
-            if bundle_dict[bundle]['rules'][ii]:
-                inclusion = 'include'
-            else:
-                inclusion = 'exclude'
+        for roi_type in ['include', 'exclude']:
+            for ii, roi in enumerate(bundle_dict[bundle][roi_type]):
+                fname = op.split(
+                    get_fname(
+                        subses_dict,
+                        f'_desc-ROI-{bundle}-{ii + 1}-{roi_type}.nii.gz'))
 
-            fname = op.split(
-                get_fname(
-                    subses_dict,
-                    f'_desc-ROI-{bundle}-{ii + 1}-{inclusion}.nii.gz'))
+                fname = op.join(rois_dir, fname[1])
+                if not op.exists(fname):
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        mapping,
+                        bundle_name=bundle)
 
-            fname = op.join(rois_dir, fname[1])
-            if not op.exists(fname):
-                warped_roi = auv.transform_inverse_roi(
-                    roi,
-                    mapping,
-                    bundle_name=bundle)
-
-                # Cast to float32, so that it can be read in by MI-Brain:
-                logger.info(f"Saving {fname}")
-                nib.save(
-                    nib.Nifti1Image(
-                        warped_roi.astype(np.float32),
-                        dwi_affine), fname)
-                meta = dict()
-                meta_fname = fname.split('.')[0] + '.json'
-                afd.write_json(meta_fname, meta)
-            roi_files[bundle].append(fname)
+                    # Cast to float32, so that it can be read in by MI-Brain:
+                    logger.info(f"Saving {fname}")
+                    nib.save(
+                        nib.Nifti1Image(
+                            warped_roi.astype(np.float32),
+                            dwi_affine), fname)
+                    meta = dict()
+                    meta_fname = fname.split('.')[0] + '.json'
+                    afd.write_json(meta_fname, meta)
+                roi_files[bundle].append(fname)
     return {'rois_file': roi_files}
 
 

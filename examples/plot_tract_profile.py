@@ -122,17 +122,17 @@ print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
-        for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            if bundles[bundle]['rules'][idx]:
-                warped_roi = transform_inverse_roi(
-                    roi,
-                    mapping,
-                    bundle_name=bundle)
+        for idx, roi in enumerate(bundles[bundle]['include']):
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
+                bundle_name=bundle)
 
-                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
-                # Add voxels that aren't there yet:
-                seed_roi = np.logical_or(seed_roi, warped_roi)
+            nib.save(
+                nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+            # Add voxels that aren't there yet:
+            seed_roi = np.logical_or(seed_roi, warped_roi)
     nib.save(nib.Nifti1Image(
         seed_roi.astype(float), img.affine),
         op.join(working_dir, 'seed_roi.nii.gz'))

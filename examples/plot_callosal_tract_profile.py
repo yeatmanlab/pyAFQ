@@ -266,10 +266,10 @@ bundles = {}
 
 # anterior frontal ROIs
 bundles["AntFrontal"] = {
-    'ROIs': [callosal_templates["L_AntFrontal"],
-             callosal_templates["R_AntFrontal"],
-             callosal_templates["Callosum_midsag"]],
-    'rules': [True, True, True],
+    'include': [
+        callosal_templates["L_AntFrontal"],
+        callosal_templates["R_AntFrontal"],
+        callosal_templates["Callosum_midsag"]],
     'cross_midline': True
 }
 
@@ -300,23 +300,25 @@ print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
-        for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            if bundles[bundle]['rules'][idx]:
-                warped_roi = transform_inverse_roi(
-                    roi,
-                    mapping,
-                    bundle_name=bundle)
+        for idx, roi in enumerate(bundles[bundle]["include"]):
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
+                bundle_name=bundle)
 
-                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+            nib.save(
+                nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
 
-                warped_roi_img = nib.load(op.join(working_dir,
-                                                  f"{bundle}_{idx+1}.nii.gz"))
-                show_anatomical_slices(warped_roi_img.get_fdata(),
-                                       f'warped {bundle}_{idx+1} ROI')
+            warped_roi_img = nib.load(op.join(
+                working_dir,
+                f"{bundle}_{idx+1}.nii.gz"))
+            show_anatomical_slices(
+                warped_roi_img.get_fdata(),
+                f'warped {bundle}_{idx+1} ROI')
 
-                # Add voxels that aren't there yet:
-                seed_roi = np.logical_or(seed_roi, warped_roi)
+            # Add voxels that aren't there yet:
+            seed_roi = np.logical_or(seed_roi, warped_roi)
 
     seed_roi_img = nib.Nifti1Image(seed_roi.astype(float), img.affine)
     nib.save(seed_roi_img, op.join(working_dir, 'seed_roi.nii.gz'))

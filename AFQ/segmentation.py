@@ -150,12 +150,12 @@ class Segmentation:
             ROI in order to be included or excluded.
             If set to None (default), will be calculated as the
             center-to-corner distance of the voxel in the diffusion data.
-            If a bundle has additional_tolerance in its bundle_dict, that
+            If a bundle has inc_addtol or exc_addtol in its bundle_dict, that
             tolerance will be added to this distance.
             For example, if you wanted to increase tolerance for the right
             arcuate waypoint ROIs by 3 each, you could make the following
             modification to your bundle_dict:
-            bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
+            bundle_dict["ARC_R"]["inc_addtol"] = [3, 3]
             Additional tolerances can also be negative.
         rng : RandomState or int
             If None, creates RandomState.
@@ -169,10 +169,10 @@ class Segmentation:
             If not None, presegment by ROIs before performing
             RecoBundles. Only used if seg_algo starts with 'Reco'.
             Meta-data for the segmentation. The format is something like::
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
+                {'bundle_name': {
+                    'include':[img1, img2],
+                    'prob_map': img3,
+                    'cross_midline': False}}
             Default: None
         presegment_kwargs : dict
             Optional arguments for initializing the segmentation for the
@@ -273,10 +273,10 @@ class Segmentation:
         ----------
         bundle_dict: dict or AFQ.api.BundleDict
             Meta-data for the segmentation. The format is something like::
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
+                {'bundle_name': {
+                    'include':[img1, img2],
+                    'prob_map': img3,
+                    'cross_midline': False}}
         tg : StatefulTractogram
             Bundles to segment
         fdata, fbval, fbvec : str
@@ -449,69 +449,70 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol):
+    def _get_bundle_info(self, bundle, vox_dim, tol):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
         bundle_entry = self.bundle_dict[bundle]
-        rules = bundle_entry['rules']
         include_rois = []
         include_roi_tols = []
         exclude_rois = []
         exclude_roi_tols = []
-        for rule_idx, rule in enumerate(rules):
-            roi = bundle_entry['ROIs'][rule_idx]
-            if 'additional_tolerance' in bundle_entry:
-                this_tol = (bundle_entry['additional_tolerance'][rule_idx]
-                            / vox_dim + tol)**2
-            else:
-                this_tol = tol**2
+        for roi_type in ['include', 'exclude']:
+            for roi_idx, roi in enumerate(bundle_entry[roi_type]):
+                if f'{roi_type[:3]}_addtol' in bundle_entry:
+                    this_tol = (
+                        bundle_entry[f'{roi_type[:3]}_addtol'][
+                            roi_idx] / vox_dim + tol)**2
+                else:
+                    this_tol = tol**2
 
-            warped_roi = auv.transform_inverse_roi(
-                roi,
-                self.mapping,
-                bundle_name=bundle)
+                warped_roi = auv.transform_inverse_roi(
+                    roi,
+                    self.mapping,
+                    bundle_name=bundle)
 
-            if rule:
-                # include ROI:
-                include_roi_tols.append(this_tol)
-                include_rois.append(np.array(np.where(warped_roi)).T)
-            else:
-                # Exclude ROI:
-                exclude_roi_tols.append(this_tol)
-                exclude_rois.append(np.array(np.where(warped_roi)).T)
+                if roi_type == 'include':
+                    # include ROI:
+                    include_roi_tols.append(this_tol)
+                    include_rois.append(np.array(np.where(warped_roi)).T)
+                else:
+                    # Exclude ROI:
+                    exclude_roi_tols.append(this_tol)
+                    exclude_rois.append(np.array(np.where(warped_roi)).T)
 
-            # For debugging purposes, we can save the variable as it is:
-            if self.save_intermediates is not None:
-                os.makedirs(
-                    op.join(self.save_intermediates,
-                            'warpedROI_',
-                            bundle),
-                    exist_ok=True)
-                nib.save(
-                    nib.Nifti1Image(warped_roi.astype(np.float32),
-                                    self.img_affine),
-                    op.join(self.save_intermediates,
-                            'warpedROI_',
-                            bundle,
-                            'as_used.nii.gz'))
+                # For debugging purposes, we can save the variable as it is:
+                if self.save_intermediates is not None:
+                    os.makedirs(
+                        op.join(self.save_intermediates,
+                                'warpedROI_',
+                                bundle),
+                        exist_ok=True)
+                    nib.save(
+                        nib.Nifti1Image(warped_roi.astype(np.float32),
+                                        self.img_affine),
+                        op.join(self.save_intermediates,
+                                'warpedROI_',
+                                bundle,
+                                'as_used.nii.gz'))
 
-        # The probability map if doesn't exist is all ones with the same
-        # shape as the ROIs:
-        if isinstance(roi, str):
-            roi = nib.load(roi)
-        if isinstance(roi, nib.Nifti1Image):
-            roi = roi.get_fdata()
-        prob_map = bundle_entry.get(
-            'prob_map', np.ones(roi.shape))
+            # The probability map if doesn't exist is all ones with the same
+            # shape as the ROIs:
+            if isinstance(roi, str):
+                roi = nib.load(roi)
+            if isinstance(roi, nib.Nifti1Image):
+                roi = roi.get_fdata()
+            prob_map = bundle_entry.get(
+                'prob_map', np.ones(roi.shape))
 
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_fdata()
-        warped_prob_map = \
-            self.mapping.transform_inverse(prob_map.copy(),
-                                           interpolation='nearest')
-        return warped_prob_map, include_rois, exclude_rois,\
-            include_roi_tols, exclude_roi_tols
+            if not isinstance(prob_map, np.ndarray):
+                prob_map = prob_map.get_fdata()
+            warped_prob_map = \
+                self.mapping.transform_inverse(
+                    prob_map.copy(),
+                    interpolation='nearest')
+            return warped_prob_map, include_rois, exclude_rois,\
+                include_roi_tols, exclude_roi_tols
 
     def _return_empty(self, bundle):
         """
@@ -585,7 +586,7 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
                 include_roi_tols, exclude_roi_tols =\
-                self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
+                self._get_bundle_info(bundle, vox_dim, tol)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,

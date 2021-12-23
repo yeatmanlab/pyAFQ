@@ -52,9 +52,9 @@ def test_BundleDict():
     afq_templates = afd.read_templates()
     afq_bundles = abd.BundleDict({
         "custom_bundle": {
-            "ROIs": [afq_templates["FA_L"],
-                     afq_templates["FP_R"]],
-            "rules": [True, True],
+            "include": [
+                afq_templates["FA_L"],
+                afq_templates["FP_R"]],
             "cross_midline": False,
             "uid": 1}})
     afq_bundles.get("custom_bundle")

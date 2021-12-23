@@ -24,22 +24,24 @@ or_rois = afd.read_or_templates()
 
 bundles = abd.BundleDict({
     "L_OR": {
-        "ROIs": [or_rois["left_OR_1"],
-                 or_rois["left_OR_2"],
-                 or_rois["left_OP_MNI"],
-                 or_rois["left_TP_MNI"],
-                 or_rois["left_pos_thal_MNI"]],
-        "rules": [True, True, False, False, False],
+        "include": [
+            or_rois["left_OR_1"],
+            or_rois["left_OR_2"]],
+        "exclude": [
+            or_rois["left_OP_MNI"],
+            or_rois["left_TP_MNI"],
+            or_rois["left_pos_thal_MNI"]],
         "cross_midline": False,
         "uid": 1
     },
     "R_OR": {
-        "ROIs": [or_rois["right_OR_1"],
-                 or_rois["right_OR_2"],
-                 or_rois["right_OP_MNI"],
-                 or_rois["right_TP_MNI"],
-                 or_rois["right_pos_thal_MNI"]],
-        "rules": [True, True, False, False, False],
+        "include": [
+            or_rois["right_OR_1"],
+            or_rois["right_OR_2"]],
+        "exclude": [
+            or_rois["right_OP_MNI"],
+            or_rois["right_TP_MNI"],
+            or_rois["right_pos_thal_MNI"]],
         "cross_midline": False,
         "uid": 2
     }
