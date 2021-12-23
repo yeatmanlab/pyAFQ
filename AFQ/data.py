@@ -94,20 +94,20 @@ baseurl = "https://ndownloader.figshare.com/files/"
 
 def _make_reusable_fetcher(name, folder, baseurl, remote_fnames, local_fnames,
                            doc="", **make_fetcher_kwargs):
-    all_files_downloaded = True
-    for fname in local_fnames:
-        if not op.exists(op.join(folder, fname)):
-            all_files_downloaded = False
-    if all_files_downloaded:
-        def fetcher():
+    def fetcher():
+        all_files_downloaded = True
+        for fname in local_fnames:
+            if not op.exists(op.join(folder, fname)):
+                all_files_downloaded = False
+        if all_files_downloaded:
             return local_fnames, folder
-        fetcher.__name__ = name
-        fetcher.__doc__ = doc
-        return fetcher
-    else:
-        return _make_fetcher(
-            name, folder, baseurl, remote_fnames, local_fnames,
-            doc=doc, **make_fetcher_kwargs)
+        else:
+            return _make_fetcher(
+                name, folder, baseurl, remote_fnames, local_fnames,
+                doc=doc, **make_fetcher_kwargs)()
+    fetcher.__name__ = name
+    fetcher.__doc__ = doc
+    return fetcher
 
 
 callosum_fnames = ["Callosum_midsag.nii.gz",
