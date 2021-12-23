@@ -17,7 +17,6 @@ from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram
-from dipy.align import resample
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -703,21 +702,15 @@ class Segmentation:
                                  f"{len(select_sl)} streamlines")
                 # We use definitions of endpoints provided
                 # through this dict:
+                atlas_idx = []
                 for end_type in ['start', 'end']:
                     if end_type in self.bundle_dict[bundle]:
                         pp = self.bundle_dict[bundle][end_type]
-                        atlas_idx = []
-                        pp = resample(
-                            pp.get_fdata(),
-                            self.reg_template,
-                            pp.affine,
-                            self.reg_template.affine).get_fdata()
-                        atlas_roi = np.zeros(pp.shape)
-                        atlas_roi[np.where(pp > 0)] = 1
+
                         # Create binary masks and warp these into subject's
                         # DWI space:
                         warped_roi = self.mapping.transform_inverse(
-                            atlas_roi,
+                            pp,
                             interpolation='nearest')
 
                         if self.save_intermediates is not None:
