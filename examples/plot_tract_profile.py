@@ -109,7 +109,9 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = abd.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
+bundles = abd.BundleDict(
+    ["CST_L", "CST_R", "ARC_L", "ARC_R"],
+    resample_to=MNI_T2_img)
 
 
 ##########################################################################

@@ -82,7 +82,10 @@ else:
                                img, MNI_T2_img)
 
 
-bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
+bundle_names = [
+    "CST_L", "CST_R", "UF_L", "UF_R",
+    "CC_ForcepsMajor", "CC_ForcepsMinor",
+    "OR_L", "OR_R", "VOF_L", "VOF_R"]
 bundles = abd.BundleDict(bundle_names, seg_algo="reco80")
 
 print("Tracking...")
