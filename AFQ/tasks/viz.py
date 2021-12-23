@@ -211,11 +211,9 @@ def viz_indivBundle(subses_dict,
 
         if segmentation_params["filter_by_endpoints"]:
             warped_rois = []
-            endpoint_info = segmentation_params["endpoint_info"]
-            if endpoint_info is not None:
-                start_p = endpoint_info[bundle_name]['startpoint']
-                end_p = endpoint_info[bundle_name]['endpoint']
-                for pp in [start_p, end_p]:
+            for reg_type in ['start', 'end']:
+                if reg_type in bundle_dict[bundle_name]:
+                    pp = bundle_dict[bundle_name][reg_type]
                     pp = resample(
                         pp.get_fdata(),
                         reg_template,
@@ -229,22 +227,6 @@ def viz_indivBundle(subses_dict,
                         mapping,
                         bundle_name=bundle_name)
                     warped_rois.append(warped_roi)
-            else:
-                aal_atlas = afd.read_aal_atlas(reg_template)
-                atlas = aal_atlas['atlas'].get_fdata()
-                aal_targets = afd.bundles_to_aal(
-                    [bundle_name], atlas=atlas)[0]
-                for targ in aal_targets:
-                    if targ is not None:
-                        aal_roi = np.zeros(atlas.shape[:3])
-                        aal_roi[targ[:, 0],
-                                targ[:, 1],
-                                targ[:, 2]] = 1
-                        warped_roi = auv.transform_inverse_roi(
-                            aal_roi,
-                            mapping,
-                            bundle_name=bundle_name)
-                        warped_rois.append(warped_roi)
             for i, roi in enumerate(warped_rois):
                 figure = viz_backend.visualize_roi(
                     roi,

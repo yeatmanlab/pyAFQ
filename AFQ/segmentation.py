@@ -65,7 +65,6 @@ class Segmentation:
                  presegment_bundle_dict=None,
                  presegment_kwargs={},
                  filter_by_endpoints=True,
-                 endpoint_info=None,
                  dist_to_atlas=4,
                  save_intermediates=None):
         """
@@ -172,25 +171,18 @@ class Segmentation:
                 {'bundle_name': {
                     'include':[img1, img2],
                     'prob_map': img3,
-                    'cross_midline': False}}
+                    'cross_midline': False,
+                    'start': img4,
+                    'end': img5}}
             Default: None
         presegment_kwargs : dict
             Optional arguments for initializing the segmentation for the
             presegmentation. Only used if presegment_bundle_dict is not None.
             Default: {}
         filter_by_endpoints: bool
-            Whether to filter the bundles based on their endpoints relative
-            to regions defined in the AAL atlas. Applies only to the waypoint
-            approach (XXX for now). Default: True.
-        endpoint_info : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior.
-            The format for this should be:
-            {"bundle1": {"startpoint":img1_1,
-                         "endpoint":img1_2},
-             "bundle2": {"startpoint":img2_1,
-                          "endpoint":img2_2}}
-            where the images used are binary masks of the desired
-            endpoints.
+            Whether to filter the bundles based on their endpoints.
+            Applies only to the waypoint approach.
+            Default: True.
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance
             from the endpoints to the atlas ROIs.
@@ -234,7 +226,6 @@ class Segmentation:
         self.presegment_bundle_dict = presegment_bundle_dict
         self.presegment_kwargs = presegment_kwargs
         self.filter_by_endpoints = filter_by_endpoints
-        self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
         self.parallel_segmentation = parallel_segmentation
 
@@ -276,7 +267,9 @@ class Segmentation:
                 {'bundle_name': {
                     'include':[img1, img2],
                     'prob_map': img3,
-                    'cross_midline': False}}
+                    'cross_midline': False,
+                    'start': img4,
+                    'end': img5}}
         tg : StatefulTractogram
             Bundles to segment
         fdata, fbval, fbvec : str
@@ -567,20 +560,6 @@ class Segmentation:
         else:
             tol = self.dist_to_waypoint / vox_dim
 
-        if self.filter_by_endpoints:
-            if self.endpoint_info is None:
-                aal_atlas = afd.read_aal_atlas(self.reg_template)
-                atlas = aal_atlas['atlas']
-                if self.save_intermediates is not None:
-                    nib.save(
-                        atlas,
-                        op.join(self.save_intermediates,
-                                'atlas_registered_to_template.nii.gz'))
-
-                atlas = atlas.get_fdata()
-
-            dist_to_atlas = self.dist_to_atlas / vox_dim
-
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
@@ -696,6 +675,7 @@ class Segmentation:
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
         self.logger.info("Re-orienting streamlines to consistent directions")
+        dist_to_atlas = self.dist_to_atlas / vox_dim
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Processing {bundle}")
 
@@ -721,20 +701,17 @@ class Segmentation:
                 self.logger.info("Filtering by endpoints")
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
-                if self.endpoint_info is not None:
-                    # We use definitions of endpoints provided
-                    # through this dict:
-                    start_p = self.endpoint_info[bundle]['startpoint']
-                    end_p = self.endpoint_info[bundle]['endpoint']
-
-                    atlas_idx = []
-                    for ii, pp in enumerate([start_p, end_p]):
+                # We use definitions of endpoints provided
+                # through this dict:
+                for end_type in ['start', 'end']:
+                    if end_type in self.bundle_dict[bundle]:
+                        pp = self.bundle_dict[bundle][end_type]
+                        atlas_idx = []
                         pp = resample(
                             pp.get_fdata(),
                             self.reg_template,
                             pp.affine,
                             self.reg_template.affine).get_fdata()
-
                         atlas_roi = np.zeros(pp.shape)
                         atlas_roi[np.where(pp > 0)] = 1
                         # Create binary masks and warp these into subject's
@@ -744,10 +721,6 @@ class Segmentation:
                             interpolation='nearest')
 
                         if self.save_intermediates is not None:
-                            if ii == 0:
-                                point_name = "startpoint"
-                            else:
-                                point_name = "endpoint"
                             os.makedirs(op.join(
                                 self.save_intermediates,
                                 'endpoint_ROI',
@@ -760,29 +733,12 @@ class Segmentation:
                                 op.join(self.save_intermediates,
                                         'endpoint_ROI',
                                         bundle,
-                                        f'{point_name}_as_used.nii.gz'))
+                                        f'{end_type}point_as_used.nii.gz'))
 
                         atlas_idx.append(
                             np.array(np.where(warped_roi > 0)).T)
-                else:
-                    # We automatically fallback on AAL, which as its own
-                    # set of rules.
-                    aal_targets = afd.bundles_to_aal(
-                        [bundle], atlas=atlas)[0]
-                    atlas_idx = []
-                    for targ in aal_targets:
-                        if targ is not None:
-                            aal_roi = np.zeros(atlas.shape[:3])
-                            aal_roi[targ[:, 0],
-                                    targ[:, 1],
-                                    targ[:, 2]] = 1
-                            warped_roi = self.mapping.transform_inverse(
-                                aal_roi,
-                                interpolation='nearest')
-                            atlas_idx.append(
-                                np.array(np.where(warped_roi > 0)).T)
-                        else:
-                            atlas_idx.append(None)
+                    else:
+                        atlas_idx.append(None)
 
                 new_select_sl = clean_by_endpoints(
                     select_sl,

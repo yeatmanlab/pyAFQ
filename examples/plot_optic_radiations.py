@@ -31,6 +31,8 @@ bundles = abd.BundleDict({
             or_rois["left_OP_MNI"],
             or_rois["left_TP_MNI"],
             or_rois["left_pos_thal_MNI"]],
+        "start": or_rois['left_thal_MNI'],
+        "end": or_rois['left_V1_MNI'],
         "cross_midline": False,
         "uid": 1
     },
@@ -42,18 +44,12 @@ bundles = abd.BundleDict({
             or_rois["right_OP_MNI"],
             or_rois["right_TP_MNI"],
             or_rois["right_pos_thal_MNI"]],
+        "start": or_rois['right_thal_MNI'],
+        "end": or_rois['right_V1_MNI'],
         "cross_midline": False,
         "uid": 2
     }
 })
-
-endpoint_info = {
-    "L_OR": {
-        "startpoint": or_rois['left_thal_MNI'],
-        "endpoint": or_rois['left_V1_MNI']},
-    "R_OR": {
-        "startpoint": or_rois['right_thal_MNI'],
-        "endpoint": or_rois['right_V1_MNI']}}
 
 brain_mask_definition = LabelledMaskFile(
     suffix="seg",
@@ -69,7 +65,6 @@ my_afq = GroupAFQ(
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiMask()},
-    segmentation_params=dict(endpoint_info=endpoint_info),
     bundle_info=bundles)
 
 my_afq.export_all()
