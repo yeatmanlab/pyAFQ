@@ -14,7 +14,7 @@ from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
-import AFQ.data as afd
+from AFQ.s3bids import write_json
 import AFQ.api.bundle_dict as abd
 
 from dipy.io.streamline import load_tractogram, save_tractogram
@@ -220,7 +220,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                     this_tgm, fname, bbox_valid_check=False)
                 meta = dict(source=this_bundles_file)
                 meta_fname = fname.split('.')[0] + '.json'
-                afd.write_json(meta_fname, meta)
+                write_json(meta_fname, meta)
     return True
 
 

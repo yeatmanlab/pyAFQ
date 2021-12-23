@@ -12,7 +12,7 @@ from dipy.align import resample
 
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
-import AFQ.data as afd
+from AFQ.s3bids import write_json
 from AFQ.viz.utils import Viz
 
 from plotly.subplots import make_subplots
@@ -125,7 +125,7 @@ def viz_bundles(subses_dict,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
-    afd.write_json(meta_fname, meta)
+    write_json(meta_fname, meta)
     return figure
 
 
@@ -327,7 +327,7 @@ def viz_indivBundle(subses_dict,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
-    afd.write_json(meta_fname, meta)
+    write_json(meta_fname, meta)
     return fnames
 
 
@@ -369,7 +369,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
-    afd.write_json(meta_fname, meta)
+    write_json(meta_fname, meta)
 
     return fnames
 

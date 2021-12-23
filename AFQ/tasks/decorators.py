@@ -7,7 +7,7 @@ from time import time
 import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
-import AFQ.data as afd
+from AFQ.s3bids import write_json
 
 import numpy as np
 
@@ -107,7 +107,7 @@ def as_file(suffix, include_track=False, include_seg=False):
                     subses_dict, suffix.split('.')[0] + '.json',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params)
-                afd.write_json(meta_fname, meta)
+                write_json(meta_fname, meta)
             return this_file
         return wrapper_as_file
     return _as_file

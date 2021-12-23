@@ -22,18 +22,10 @@ def test_BundleDict():
     # test defaults
     afq_bundles = abd.BundleDict()
 
-    # bundles restricted within hemisphere
-    # NOTE: FA and FP cross midline so are removed
-    # NOTE: all others generate two bundles
-    num_hemi_bundles = (len(abd.BUNDLES)-2)*2
-
-    # bundles that cross the midline
-    num_whole_bundles = 2
-
-    assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
+    assert len(afq_bundles) == len(abd.BUNDLES)
 
     # Arcuate Fasciculus
-    afq_bundles = abd.BundleDict(["ARC"])
+    afq_bundles = abd.BundleDict(["ARC_L", "ARC_R"])
 
     assert len(afq_bundles) == 2
 
@@ -44,7 +36,7 @@ def test_BundleDict():
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = abd.BundleDict(["HCC"])
+    afq_bundles = abd.BundleDict(["HCC_L", "HCC_R"])
 
     assert len(afq_bundles) == 2
 
@@ -69,7 +61,7 @@ def test_BundleDict():
         afq_bundles = abd.BundleDict(["VOF"])
         afq_bundles["VOF_R"]
 
-    afq_bundles = abd.BundleDict(["VOF"], seg_algo="reco80")
+    afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"], seg_algo="reco80")
     assert len(afq_bundles) == 2
 
     afq_bundles = abd.BundleDict(["whole_brain"], seg_algo="reco80")

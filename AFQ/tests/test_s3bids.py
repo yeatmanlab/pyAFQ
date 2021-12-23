@@ -1,4 +1,4 @@
-import AFQ.data as afs
+import AFQ.s3bids as afs
 
 import pytest
 import s3fs

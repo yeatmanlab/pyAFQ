@@ -36,15 +36,18 @@ def test_aal_to_regions():
 
 def test_bundles_to_aal():
     atlas = np.zeros((20, 20, 20, 5))
+    affine = np.identity(4)
 
     atlas[0, 0, 0, 0] = 1
 
-    targets = afd.bundles_to_aal(["ATR_L"], atlas)
+    targets = afd.bundles_to_aal(
+        ["ATR_L"], nib.Nifti1Image(atlas, affine))
     npt.assert_equal(targets, [[np.array(np.where(atlas[..., 0] == 1)).T, None]])
 
     atlas[0, 0, 1, 0] = 2
 
-    targets = afd.bundles_to_aal(["ATR_L", "ATR_R"], atlas)
+    targets = afd.bundles_to_aal(
+        ["ATR_L", "ATR_R"], nib.Nifti1Image(atlas, affine))
     npt.assert_equal(
         targets,
         [
@@ -52,6 +55,8 @@ def test_bundles_to_aal():
             [np.array(np.where(atlas[..., 0] == 2)).T, None],
         ],
     )
+
+    atlas = nib.Nifti1Image(atlas, affine)
 
     targets = afd.bundles_to_aal([], atlas)
     assert len(targets) == 0
