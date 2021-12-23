@@ -102,6 +102,25 @@ afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
 baseurl = "https://ndownloader.figshare.com/files/"
 
+
+def _make_reusable_fetcher(name, folder, baseurl, remote_fnames, local_fnames,
+                           doc="", **make_fetcher_kwargs):
+    all_files_downloaded = True
+    for fname in local_fnames:
+        if not op.exists(op.join(folder, fname)):
+            all_files_downloaded = False
+    if all_files_downloaded:
+        def fetcher():
+            return local_fnames, folder
+        fetcher.__name__ = name
+        fetcher.__doc__ = doc
+        return fetcher
+    else:
+        return _make_fetcher(
+            name, folder, baseurl, remote_fnames, local_fnames,
+            doc=doc, **make_fetcher_kwargs)
+
+
 callosum_fnames = ["Callosum_midsag.nii.gz",
                    "L_AntFrontal.nii.gz",
                    "L_Motor.nii.gz",
@@ -144,13 +163,14 @@ callosum_md5_hashes = ["709fa90baadeacd64f1d62b5049a4125",
                        "25f24eb22879a05d12bda007c81ea55a",
                        "2664e0b8c2d9c59f13649a89bfcce399"]
 
-fetch_callosum_templates = _make_fetcher("fetch_callosum_templates",
-                                         op.join(afq_home,
-                                                 'callosum_templates'),
-                                         baseurl, callosum_remote_fnames,
-                                         callosum_fnames,
-                                         md5_list=callosum_md5_hashes,
-                                         doc="Download AFQ callosum templates")
+fetch_callosum_templates = _make_reusable_fetcher(
+    "fetch_callosum_templates",
+    op.join(afq_home,
+            'callosum_templates'),
+    baseurl, callosum_remote_fnames,
+    callosum_fnames,
+    md5_list=callosum_md5_hashes,
+    doc="Download AFQ callosum templates")
 
 
 def read_callosum_templates(resample_to=False):
@@ -202,7 +222,7 @@ def read_callosum_templates(resample_to=False):
 #
 # Templates downloaded from:
 #
-# - https://figshare.com/articles/dataset/ROIs_probabilistic_maps_and_transform_data_for_pediatric_automated_fiber_quantification/13027487
+# - https://figshare.com/articles/dataset/ROIs_probabilistic_maps_and_transform_data_for_pediatric_automated_fiber_quantification/13027487  # noqa
 #
 
 pediatric_fnames = [
@@ -284,7 +304,7 @@ pediatric_remote_fnames = [
     "24880616", "24880613", "24986396"
 ]
 
-fetch_pediatric_templates = _make_fetcher(
+fetch_pediatric_templates = _make_reusable_fetcher(
     'fetch_pediatric_templates',
     op.join(afq_home, 'pediatric_templates'),
     'https://ndownloader.figshare.com/files/',
@@ -297,14 +317,14 @@ fetch_pediatric_templates = _make_fetcher(
 
 def read_pediatric_templates():
     """
-    Load pediatric pyAFQ templates. 
+    Load pediatric pyAFQ templates.
 
     Used to create pediatric `bundle_dict`.
 
     Returns
     -------
-    dict : 
-        keys = names of template ROIs, and 
+    dict :
+        keys = names of template ROIs, and
         values = `Nifti1Image` from each of the ROI nifti files.
     """
     files, folder = fetch_pediatric_templates()
@@ -528,11 +548,12 @@ template_md5_hashes = ["6b7aaed1a2982fd0ea436a223133908b",
                        "04d5af0feb2c1b5b52a87ccbbf148e4b",
                        "53c277be990d00f7de04f2ea35e74d73"]
 
-fetch_templates = _make_fetcher("fetch_templates",
-                                op.join(afq_home, 'templates'),
-                                baseurl, template_remote_fnames,
-                                template_fnames, md5_list=template_md5_hashes,
-                                doc="Download AFQ templates")
+fetch_templates = _make_reusable_fetcher(
+    "fetch_templates",
+    op.join(afq_home, 'templates'),
+    baseurl, template_remote_fnames,
+    template_fnames, md5_list=template_md5_hashes,
+    doc="Download AFQ templates")
 
 
 def read_templates(resample_to=False):
@@ -622,13 +643,14 @@ or_md5_hashes = [
     "60a748567e4dd81b40ad8967a14cb09e",
 ]
 
-fetch_or_templates = _make_fetcher("fetch_or_templates",
-                                   op.join(afq_home,
-                                           'or_templates'),
-                                   baseurl, or_remote_fnames,
-                                   or_fnames,
-                                   md5_list=or_md5_hashes,
-                                   doc="Download AFQ or templates")
+fetch_or_templates = _make_reusable_fetcher(
+    "fetch_or_templates",
+    op.join(afq_home,
+            'or_templates'),
+    baseurl, or_remote_fnames,
+    or_fnames,
+    md5_list=or_md5_hashes,
+    doc="Download AFQ or templates")
 
 
 def read_or_templates(resample_to=False):
@@ -652,11 +674,13 @@ def read_or_templates(resample_to=False):
         if resample_to:
             if isinstance(resample_to, str):
                 resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(reg.resample(img.get_fdata(),
-                                               resample_to,
-                                               img.affine,
-                                               resample_to.affine),
-                                  resample_to.affine)
+            img = nib.Nifti1Image(
+                resample(
+                    img.get_fdata(),
+                    resample_to,
+                    img.affine,
+                    resample_to.affine),
+                resample_to.affine)
         template_dict[f.split('.')[0]] = img
 
     toc = time.perf_counter()
@@ -1152,6 +1176,7 @@ class HBNSubject(S3BIDSSubject):
         def get_deriv_type(s3_key):
             after_sub = s3_key.split('/' + self.subject_id + '/')[-1]
             deriv_type = after_sub.split('/')[0]
+            return deriv_type
 
         deriv_keys = {
             dt: [
@@ -1338,7 +1363,7 @@ class S3BIDSStudy:
 
     @property
     def local_directories(self):
-        """A list of local directories to which this study has been downloaded"""
+        """A list of local directories where this study has been downloaded"""
         return self._local_directories
 
     @property
@@ -1498,12 +1523,14 @@ class S3BIDSStudy:
         directory : str
             Directory to which to download subject files
 
-        include_modality_agnostic : bool, "all" or any subset of ["dataset_description.json", "CHANGES", "README", "LICENSE"]
+        include_modality_agnostic : bool, "all" or any subset of [
+                "dataset_description.json", "CHANGES", "README", "LICENSE"]
             If True or "all", download all keys in self.non_sub_s3_keys
             also. If a subset of ["dataset_description.json", "CHANGES",
             "README", "LICENSE"], download only those files. This is
             useful if the non_sub_s3_keys contain files common to all
-            subjects that should be inherited. Default: ("dataset_description.json",)
+            subjects that should be inherited.
+            Default: ("dataset_description.json",)
 
         include_derivs : bool or str
             If True, download all derivatives files. If False, do not.
@@ -1532,7 +1559,8 @@ class S3BIDSStudy:
         self._local_directories.append(directory)
         self._local_directories = list(set(self._local_directories))
 
-        if include_modality_agnostic is True or include_modality_agnostic == "all":
+        if include_modality_agnostic is True\
+                or include_modality_agnostic == "all":
             self._download_non_sub_keys(directory, select="all")
         elif include_modality_agnostic is not False:
             # Subset selection
@@ -1542,7 +1570,8 @@ class S3BIDSStudy:
                          "LICENSE"}
             if not set(include_modality_agnostic) <= valid_set:
                 raise ValueError(
-                    "include_modality_agnostic must be either a boolean, 'all', "
+                    "include_modality_agnostic must be either"
+                    " a boolean, 'all', "
                     "or a subset of {valid_set}".format(valid_set=valid_set)
                 )
 
@@ -1729,7 +1758,8 @@ class HBNSite(S3BIDSStudy):
         directory : str
             Directory to which to download subject files
 
-        include_modality_agnostic : bool, "all" or any subset of ["dataset_description.json", "CHANGES", "README", "LICENSE"]
+        include_modality_agnostic : bool, "all" or any subset of [
+                "dataset_description.json", "CHANGES", "README", "LICENSE"]
             If True or "all", download all keys in self.non_sub_s3_keys
             also. If a subset of ["dataset_description.json", "CHANGES",
             "README", "LICENSE"], download only those files. This is
@@ -1896,11 +1926,12 @@ stanford_hardi_tractography_remote_fnames = ["5325715", "5325718", "25289735"]
 stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
                                       'f20854b4f710577c58bd01072cfb4de6',
                                       '294bfd1831861e8635eef8834ff18892']
-stanford_hardi_tractography_fnames = ['mapping.nii.gz',
-                                      'tractography_subsampled.trk',
-                                      'full_segmented_cleaned_tractography.trk']
+stanford_hardi_tractography_fnames = [
+    'mapping.nii.gz',
+    'tractography_subsampled.trk',
+    'full_segmented_cleaned_tractography.trk']
 
-fetch_stanford_hardi_tractography = _make_fetcher(
+fetch_stanford_hardi_tractography = _make_reusable_fetcher(
     "fetch_stanford_hardi_tractography",
     op.join(afq_home,
             'stanford_hardi_tractography'),
@@ -2083,7 +2114,7 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
                            "PipelineDescription": {"Name": "freesurfer"}})
 
 
-fetch_hcp_atlas_16_bundles = _make_fetcher(
+fetch_hcp_atlas_16_bundles = _make_reusable_fetcher(
     "fetch_hcp_atlas_16_bundles",
     op.join(afq_home,
             'hcp_atlas_16_bundles'),
@@ -2095,7 +2126,7 @@ fetch_hcp_atlas_16_bundles = _make_fetcher(
     unzip=True)
 
 
-fetch_hcp_atlas_80_bundles = _make_fetcher(
+fetch_hcp_atlas_80_bundles = _make_reusable_fetcher(
     "fetch_hcp_atlas_80_bundles",
     op.join(afq_home,
             'hcp_atlas_80_bundles'),
@@ -2113,9 +2144,9 @@ def read_hcp_atlas(n_bundles=16):
         16 or 80, which selects among the two different
         atlases:
 
-        https://figshare.com/articles/Simple_model_bundle_atlas_for_RecoBundles/6483614  #noqa
+        https://figshare.com/articles/Simple_model_bundle_atlas_for_RecoBundles/6483614  # noqa
 
-        https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883  #noqa
+        https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883  # noqa
     """
     bundle_dict = {}
     if n_bundles == 16:
@@ -2131,7 +2162,7 @@ def read_hcp_atlas(n_bundles=16):
             atlas_folder,
             'whole_brain',
             'whole_brain_MNI.trk'),
-            'same', bbox_valid_check=False).streamlines
+        'same', bbox_valid_check=False).streamlines
 
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
@@ -2161,7 +2192,7 @@ def read_hcp_atlas(n_bundles=16):
     return bundle_dict
 
 
-fetch_aal_atlas = _make_fetcher(
+fetch_aal_atlas = _make_reusable_fetcher(
     "fetch_aal_atlas",
     op.join(afq_home,
             'aal_atlas'),
@@ -2612,7 +2643,7 @@ def read_mni_template(resolution=1, mask=True, weight="T2w"):
 
 
 fetch_biobank_templates = \
-    _make_fetcher(
+    _make_reusable_fetcher(
         "fetch_biobank_templates",
         op.join(afq_home,
                 'biobank_templates'),

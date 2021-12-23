@@ -58,78 +58,7 @@ PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-class _GeneratedBundleDict(MutableMapping):
-    def __init__(self, gen_dict, resample_to):
-        self._dict = gen_dict
-        self.bundle_names = list(gen_dict.keys())
-        self.resample_to = resample_to
-
-    def __setitem__(self, key, item):
-        self._dict[key] = item
-        self.bundle_names.append(key)
-        self.resample_roi(key)
-
-    def __getitem__(self, key):
-        return self._dict[key]
-
-    def __len__(self):
-        return len(self.bundle_names)
-
-    def __delitem__(self, key):
-        if key not in self._dict and key not in self.bundle_names:
-            raise KeyError(f"{key} not found")
-        if key in self._dict:
-            del self._dict[key]
-        else:
-            raise RuntimeError((
-                f"{key} not found in internal dictionary, "
-                f"but found in bundle_names"))
-        if key in self.bundle_names:
-            self.bundle_names.remove(key)
-        else:
-            raise RuntimeError((
-                f"{key} not found in bundle_names, "
-                f"but found in internal dictionary"))
-
-    def __iter__(self):
-        return iter(self._dict)
-
-    def copy(self):
-        return self.__class__(
-            self._dict.copy(),
-            self.resample_to)
-
-    def resample_roi(self, key):
-        if self.resample_to:
-            if "resampled" not in self._dict[key]\
-                    or not self._dict[key]["resampled"]:
-                for roi_type in ["include", "exclude"]:
-                    if roi_type != "include"\
-                            and not self._dict[key].get(roi_type):
-                        continue
-                    for ii, roi in enumerate(self._dict[key][roi_type]):
-                        self._dict[key][roi_type][ii] =\
-                            afd.read_resample_roi(
-                                roi, resample_to=self.resample_to)
-                for roi_type in ["start", "end"]:
-                    if self._dict[key].get(roi_type):
-                        self._dict[key][roi_type] =\
-                            afd.read_resample_roi(
-                                self._dict[key][roi_type],
-                                resample_to=self.resample_to)
-                self._dict[key]["resampled"] = True
-
-    def __add__(self, other):
-        if self.hasattr(self, "gen_all"):
-            self.gen_all()
-        if other.hasattr(other, "gen_all"):
-            other.gen_all()
-        return _GeneratedBundleDict(
-            {**self._dict, **other._dict},
-            self.resample_to)
-
-
-class BundleDict(_GeneratedBundleDict):
+class BundleDict(MutableMapping):
     def __init__(self,
                  bundle_info=BUNDLES,
                  seg_algo="afq",
@@ -246,40 +175,37 @@ class BundleDict(_GeneratedBundleDict):
             else:
                 roi_name1 = name + '_roi1' + hemi
                 roi_name2 = name + '_roi2' + hemi
-            if (self.templates.get(roi_name1)
-                    and self.templates.get(roi_name2)):
-                x_midline = False
-                p_map = {}
-                include = [
+            if (roi_name1 in self.templates
+                    and roi_name2 in self.templates):
+                roi_dict = {}
+                roi_dict['cross_midline'] = False
+                roi_dict['include'] = [
                     self.templates[roi_name1],
                     self.templates[roi_name2]]
-                exclude = []
-                start = None
-                end = None
-                if self.templates.get(name + '_roi3' + hemi):
-                    include.append(self.templates[name + '_roi3' + hemi])
+                roi_dict['exclude'] = []
+                roi_dict['start'] = None
+                roi_dict['end'] = None
+                if name + '_roi3' + hemi in self.templates:
+                    roi_dict['include'].append(
+                        self.templates[name + '_roi3' + hemi])
                 if name == "SLF":
-                    exclude.append(self.templates["SLFt_roi2" + hemi])
+                    roi_dict['exclude'].append(
+                        self.templates["SLFt_roi2" + hemi])
                 if bundle_name in CALLOSUM_BUNDLES\
                         or bundle_name in ["FA", "FP"]:
-                    include.append(self.templates["Callosum_midsag"])
-                    x_midline = True
-                if self.templates.get(bundle_name + '_prob_map'):
-                    p_map['prob_map'] = self.templates[
+                    roi_dict['include'].append(
+                        self.templates["Callosum_midsag"])
+                    roi_dict['cross_midline'] = True
+                if bundle_name + '_prob_map' in self.templates:
+                    roi_dict['prob_map'] = self.templates[
                         bundle_name + '_prob_map']
-                if self.templates.get(bundle_name + "_start"):
-                    start = self.templates[
+                if bundle_name + "_start" in self.templates:
+                    roi_dict['start'] = self.templates[
                         bundle_name + "_start"]
-                if self.templates.get(bundle_name + "_end"):
-                    start = self.templates[
+                if bundle_name + "_end" in self.templates:
+                    roi_dict['end'] = self.templates[
                         bundle_name + "_end"]
-                self._dict[bundle_name] = {
-                    'include': include,
-                    'exclude': exclude,
-                    'start': start,
-                    'end': end,
-                    'cross_midline': x_midline,
-                    **p_map}
+                self._dict[bundle_name] = roi_dict
                 self.resample_roi(bundle_name)
             else:
                 raise ValueError(f"{bundle_name} is not in AFQ templates")
@@ -299,6 +225,30 @@ class BundleDict(_GeneratedBundleDict):
             self.gen(key)
         return self._dict[key]
 
+    def __setitem__(self, key, item):
+        self._dict[key] = item
+        self.bundle_names.append(key)
+        self.resample_roi(key)
+
+    def __len__(self):
+        return len(self.bundle_names)
+
+    def __delitem__(self, key):
+        if key not in self._dict and key not in self.bundle_names:
+            raise KeyError(f"{key} not found")
+        if key in self._dict:
+            del self._dict[key]
+        else:
+            raise RuntimeError((
+                f"{key} not found in internal dictionary, "
+                f"but found in bundle_names"))
+        if key in self.bundle_names:
+            self.bundle_names.remove(key)
+        else:
+            raise RuntimeError((
+                f"{key} not found in bundle_names, "
+                f"but found in internal dictionary"))
+
     def __iter__(self):
         self.gen_all()
         return iter(self._dict)
@@ -310,12 +260,41 @@ class BundleDict(_GeneratedBundleDict):
             seg_algo=self.seg_algo,
             resample_to=self.resample_to)
 
+    def resample_roi(self, key):
+        if self.resample_to:
+            if "resampled" not in self._dict[key]\
+                    or not self._dict[key]["resampled"]:
+                for roi_type in ["include", "exclude"]:
+                    if roi_type != "include"\
+                            and roi_type not in self._dict[key]:
+                        continue
+                    for ii, roi in enumerate(self._dict[key][roi_type]):
+                        self._dict[key][roi_type][ii] =\
+                            afd.read_resample_roi(
+                                roi, resample_to=self.resample_to)
+                for roi_type in ["start", "end"]:
+                    if roi_type in self._dict[key]:
+                        self._dict[key][roi_type] =\
+                            afd.read_resample_roi(
+                                self._dict[key][roi_type],
+                                resample_to=self.resample_to)
+                self._dict[key]["resampled"] = True
+
+    def __add__(self, other):
+        if self.hasattr(self, "gen_all"):
+            self.gen_all()
+        if other.hasattr(other, "gen_all"):
+            other.gen_all()
+        return self.__class__(
+            {**self._dict, **other._dict},
+            self.resample_to)
+
 
 class PediatricBundleDict(BundleDict):
     def __init__(self,
                  bundle_info=PEDIATRIC_BUNDLES,
                  seg_algo="afq",
-                 resample_to=False):
+                 resample_to=None):
         """
         Create a pediatric bundle dictionary, needed for the segmentation
 
@@ -333,9 +312,15 @@ class PediatricBundleDict(BundleDict):
 
         resample_to : Nifti1Image or bool, optional
             If set, templates will be resampled to the affine and shape of this
-            image. If False, no resampling will be done.
-            Default: False
+            image. If None, the MNI template will be used.
+            If False, no resampling will be done.
+            Default: afd.read_pediatric_templates()[
+                'UNCNeo-withCerebellum-for-babyAFQ']
         """
+        if resample_to is None:
+            resample_to = afd.read_pediatric_templates()[
+                'UNCNeo-withCerebellum-for-babyAFQ']
+        self.resample_to = resample_to
         BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
 
     def load_templates(self):
