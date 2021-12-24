@@ -14,7 +14,6 @@ from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
 from AFQ.s3bids import write_json
 from AFQ.viz.utils import Viz
-from AFQ.utils.streamlines import bname_to_uid
 
 from plotly.subplots import make_subplots
 
@@ -186,7 +185,6 @@ def viz_indivBundle(subses_dict,
 
     for bundle_name in bundle_names:
         logger.info(f"Generating {bundle_name} visualization...")
-        uid = bname_to_uid(bundle_name)
         figure = viz_backend.visualize_volume(
             volume,
             opacity=volume_opacity_indiv,
@@ -199,7 +197,7 @@ def viz_indivBundle(subses_dict,
                 shade_by_volume=shade_by_volume,
                 sbv_lims=sbv_lims_indiv,
                 bundle_dict=bundle_dict,
-                bundle=uid,
+                bundle=bundle_name,
                 n_points=n_points_indiv,
                 flip_axes=flip_axes,
                 interact=False,
@@ -305,7 +303,7 @@ def viz_indivBundle(subses_dict,
                     shade_by_volume=shade_by_volume,
                     sbv_lims=sbv_lims_indiv,
                     bundle_dict=bundle_dict,
-                    bundle=uid,
+                    bundle=bundle_name,
                     colors={bundle_name: [0.5, 0.5, 0.5]},
                     n_points=n_points_indiv,
                     flip_axes=flip_axes,
@@ -315,7 +313,7 @@ def viz_indivBundle(subses_dict,
                 core_fig = viz_backend.single_bundle_viz(
                     indiv_profile,
                     segmentation_imap["clean_bundles_file"],
-                    uid,
+                    bundle_name,
                     best_scalar,
                     affine=None,
                     bundle_dict=bundle_dict,

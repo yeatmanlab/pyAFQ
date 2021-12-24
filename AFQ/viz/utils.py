@@ -14,6 +14,7 @@ from dipy.align import resample
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
+from AFQ.utils.streamlines import bname_to_idx
 
 __all__ = ["Viz"]
 
@@ -151,56 +152,6 @@ def viz_import_msg_error(module):
     return msg
 
 
-def bundle_selector(bundle_dict, colors, b):
-    """
-    Selects bundle and color
-    from the given bundle dictionary and color informaiton
-    Helper function
-
-    Parameters
-    ----------
-    bundle_dict : dict, optional
-    Keys are names of bundles and values are dicts that specify them.
-    Default: bundles are either not identified, or identified
-        only as unique integers in the metadata.
-
-    bundle : str or int, optional
-        The name of a bundle to select from among the keys in `bundle_dict`
-        or an integer for selection from the trk metadata.
-
-    colors : dict or list
-        If this is a dict, keys are bundle names and values are RGB tuples.
-        If this is a list, each item is an RGB tuple. Defaults to a list
-        with Tableau 20 RGB values
-
-    Returns
-    -------
-    RGB tuple and str
-    """
-    b_name = str(b)
-    if bundle_dict is None:
-        # We'll choose a color from a rotating list:
-        if isinstance(colors, list):
-            color = colors[np.mod(len(colors), int(b))]
-        else:
-            color_list = colors.values()
-            color = color_list[np.mod(len(colors), int(b))]
-    else:
-        # We have a mapping from UIDs to bundle names:
-        b_found = False
-        for b_name_iter, b_iter in bundle_dict.items():
-            if b_iter['uid'] == b:
-                b_name = b_name_iter
-                b_found = True
-                break
-
-        # ignore bundle if it is not in the bundle_dict
-        if b_found is False:
-            return None, None
-        color = colors[b_name]
-    return color, b_name
-
-
 def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
                     n_sls_viz=3600, n_sls_min=75):
     """
@@ -220,9 +171,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
     affine : ndarray
        An affine transformation to apply to the streamlines.
 
-    bundle : str or int
-        The name of a bundle to select from among the keys in `bundle_dict`
-        or an integer for selection from the trk metadata.
+    bundle : str
+        The name of a bundle to select from the trk metadata.
 
     bundle_dict : dict, optional
         Keys are names of bundles and values are dicts that specify them.
@@ -286,15 +236,17 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
 
     else:
         # There are bundles:
-        if bundle_dict is not None:
+        if bundle_dict is None:
+            bundle_dict = {'whole_brain': None}
+        else:
             bundle_dict = bundle_dict.copy()
-            bundle_dict.pop('whole_brain', None)
+            if 'whole_brain' in bundle_dict:
+                del bundle_dict['whole_brain']
 
         if bundle is None:
             # No selection: visualize all of them:
-
-            for b in np.unique(sft.data_per_streamline['bundle']):
-                idx = np.where(sft.data_per_streamline['bundle'] == b)[0]
+            for bundle_name in bundle_dict.keys():
+                idx = bname_to_idx(bundle_name)
                 n_sl_viz = (len(idx) * n_sls_viz) //\
                     len(sft.streamlines)
                 n_sl_viz = max(n_sls_min, n_sl_viz)
@@ -303,26 +255,21 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
                 these_sls = streamlines[idx]
                 if n_points is not None:
                     these_sls = dps.set_number_of_points(these_sls, n_points)
-                color, b_name = bundle_selector(bundle_dict, colors, b)
-                if color is None:
-                    continue
-                yield these_sls, color, b_name, sft.dimensions
-
+                if isinstance(colors, dict):
+                    color = colors[bundle_name]
+                else:
+                    color = colors[0]
+                yield these_sls, color, bundle_name, sft.dimensions
         else:
-            # Select just one to visualize:
-            if isinstance(bundle, str):
-                # We need to find the UID:
-                uid = bundle_dict[bundle]['uid']
-            else:
-                # It's already a UID:
-                uid = bundle
-
-            idx = np.where(sft.data_per_streamline['bundle'] == uid)[0]
+            idx = bname_to_idx(bundle, sft)
             these_sls = streamlines[idx]
             if n_points is not None:
                 these_sls = dps.set_number_of_points(these_sls, n_points)
-            color, b_name = bundle_selector(bundle_dict, colors, uid)
-            yield these_sls, color, b_name, sft.dimensions
+            if isinstance(colors, dict):
+                color = colors[bundle]
+            else:
+                color = colors[0]
+            yield these_sls, color, bundle, sft.dimensions
 
 
 def gif_from_pngs(tdir, gif_fname, n_frames,

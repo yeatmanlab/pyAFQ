@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-import math
+import struct
 
 
 def add_bundles(t1, t2):
@@ -21,13 +21,34 @@ def add_bundles(t1, t2):
         affine_to_rasmm=t2.affine_to_rasmm)
 
 
+# this converts an arbitrary string (bundle_name) to
+# a unique, compact array of floats, to be used in data_per_streamline
 def bname_to_uid(bundle_name):
-    return int.from_bytes(bundle_name.encode(), "little")
+    base_idx = 0
+    arr_idx = 0
+    uid = [0]
+    for c in bundle_name:
+        c_int = ord(c.upper())
+        if c_int >= 65 and c_int <= 90:  # if c is A-Z
+            c_int = c_int - 65
+            uid[arr_idx] = uid[arr_idx] + c_int * 26**base_idx
+            base_idx = base_idx + 1
+            if base_idx > 5:
+                arr_idx = arr_idx + 1
+                uid.append(0)
+                base_idx = 0
+    for i in range(len(uid)):
+        uid[i] = struct.unpack('f', int(uid[i]).to_bytes(4, "little"))[0]
+    return uid
 
 
-def uid_to_bname(uid):
-    return int(uid).to_bytes(
-        math.ceil(int(uid).bit_length / 8), 'little').decode()
+def bname_to_idx(bundle_name, sft):
+    uid = bname_to_uid(bundle_name)
+    idxs = []
+    for idx, data in enumerate(sft.data_per_streamline['bundle']):
+        if np.array_equal(data, uid):
+            idxs.append(idx)
+    return idxs
 
 
 def bundles_to_tgram(bundles, reference):
@@ -49,9 +70,8 @@ def bundles_to_tgram(bundles, reference):
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
-                'bundle': (len(this_sl)
-                           * [bname_to_uid(b)])},
-                affine_to_rasmm=reference.affine)
+                'bundle': len(this_sl) * bname_to_uid(b)},
+            affine_to_rasmm=reference.affine)
         tgram = add_bundles(tgram, this_tgram)
     return StatefulTractogram(tgram.streamlines, reference, Space.VOX,
                               data_per_streamline=tgram.data_per_streamline)
@@ -76,8 +96,7 @@ def tgram_to_bundles(tgram, bundle_dict, reference):
     bundles = {}
     for bb in bundle_dict.keys():
         if not bb == 'whole_brain':
-            idx = np.where(
-                tgram.data_per_streamline['bundle'] == bname_to_uid(bb))[0]
+            idx = bname_to_idx(bb, tgram)
             bundles[bb] = StatefulTractogram(
                 tgram.streamlines[idx].copy(), reference, Space.VOX)
     return bundles

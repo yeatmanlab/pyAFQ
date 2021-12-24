@@ -253,7 +253,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
-    bundle : str or int, optional
+    bundle : str, optional
         The name of a bundle to select from among the keys in `bundle_dict`
         or an integer for selection from the sft metadata.
 
@@ -749,7 +749,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     bundle : str or int
         The name of the bundle to be used as the label for the plot,
-        or an integer for selection from the sft metadata.
+        and for selection from the sft metadata.
 
     scalar_name : str
         The name of the scalar being used.

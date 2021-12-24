@@ -720,7 +720,7 @@ def test_AFQ_data_waypoint():
 
     bundles = aus.tgram_to_bundles(
         tgram, myafq.bundle_dict, myafq.img)
-    npt.assert_(len(bundles['CST_L']) > 0)
+    assert len(bundles['CST_L']) > 0
 
     # Test ROI exporting:
     myafq.export_rois()

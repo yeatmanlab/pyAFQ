@@ -16,7 +16,7 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.s3bids import write_json
 import AFQ.api.bundle_dict as abd
-from AFQ.utils.streamlines import bname_to_uid
+from AFQ.utils.streamlines import bname_to_uid, bname_to_idx
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -124,8 +124,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
 
     for b in bundle_dict.keys():
         if b != "whole_brain":
-            idx = np.where(
-                sft.data_per_streamline['bundle'] == bname_to_uid(b))[0]
+            idx = bname_to_idx(b, sft)
             this_tg = StatefulTractogram(
                 sft.streamlines[idx],
                 img,
@@ -141,9 +140,8 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             this_tgram = nib.streamlines.Tractogram(
                 this_tg.streamlines,
                 data_per_streamline={
-                    'bundle': (
-                        len(this_tg) * [bname_to_uid(b)])},
-                    affine_to_rasmm=img.affine)
+                    'bundle': len(this_tg) * bname_to_uid(b)},
+                affine_to_rasmm=img.affine)
             tgram = aus.add_bundles(tgram, this_tgram)
 
     sft = StatefulTractogram(
@@ -200,8 +198,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
         streamlines = tg.streamlines
         for bundle in bundle_dict:
             if bundle != "whole_brain":
-                uid = bname_to_uid(bundle)
-                idx = np.where(tg.data_per_streamline['bundle'] == uid)[0]
+                idx = bname_to_idx(bundle, tg)
                 this_sl = dtu.transform_tracking_output(
                     streamlines[idx],
                     np.linalg.inv(img.affine))
@@ -302,9 +299,17 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     vals = []
     for k in bundle_dict.keys():
         if k != "whole_brain":
-            keys.append(bname_to_uid(k))
-            vals.append(k)
-    reverse_dict = dict(zip(keys, vals))
+            vals.append(bname_to_uid(k))
+            keys.append(k)
+    uid_dict = dict(zip(keys, vals))
+
+    def get_bundle_name(uid):
+        for bundle_name, this_uid in uid_dict.items():
+            if this_uid == uid:
+                return bundle_name
+        raise ValueError((
+            f"Bundle ID: {uid} found in clean_bundles_file, "
+            "but not found in bundle_dict"))
 
     bundle_names = []
     node_numbers = []
@@ -317,7 +322,7 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
         idx = np.where(
             trk.tractogram.data_per_streamline['bundle'] == b)[0]
         this_sl = trk.streamlines[idx]
-        bundle_name = reverse_dict[b]
+        bundle_name = get_bundle_name(b)
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
             scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):

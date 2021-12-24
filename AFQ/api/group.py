@@ -6,7 +6,7 @@ import logging
 import AFQ.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, add_method_descriptions
-from AFQ.utils.streamlines import bname_to_uid
+from AFQ.utils.streamlines import bname_to_idx
 
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
@@ -428,9 +428,7 @@ class GroupAFQ(object):
                 if b != "whole_brain":
                     for i in range(len(self.valid_sub_list)):
                         sft, img, mapping = subses_info[i]
-                        idx = np.where(
-                            sft.data_per_streamline['bundle']
-                            == bname_to_uid(b))[0]
+                        idx = bname_to_idx(b, sft)
                         # use the first subses that works
                         # otherwise try each successive subses
                         if len(idx) == 0:
