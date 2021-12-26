@@ -42,19 +42,17 @@ def test_bundles_to_aal():
 
     targets = afd.bundles_to_aal(
         ["ATR_L"], nib.Nifti1Image(atlas, affine))
-    npt.assert_equal(targets, [[np.array(np.where(atlas[..., 0] == 1)).T, None]])
+    npt.assert_equal(np.sum(targets["ATR_L_start"].get_fdata()), 1)
+    npt.assert_equal(np.sum(targets["ATR_L_end"].get_fdata()), 0)
 
     atlas[0, 0, 1, 0] = 2
 
     targets = afd.bundles_to_aal(
         ["ATR_L", "ATR_R"], nib.Nifti1Image(atlas, affine))
-    npt.assert_equal(
-        targets,
-        [
-            [np.array(np.where(atlas[..., 0] == 1)).T, None],
-            [np.array(np.where(atlas[..., 0] == 2)).T, None],
-        ],
-    )
+    npt.assert_equal(np.sum(targets["ATR_L_start"].get_fdata()), 1)
+    npt.assert_equal(np.sum(targets["ATR_L_end"].get_fdata()), 0)
+    npt.assert_equal(np.sum(targets["ATR_R_start"].get_fdata()), 1)
+    npt.assert_equal(np.sum(targets["ATR_R_end"].get_fdata()), 0)
 
     atlas = nib.Nifti1Image(atlas, affine)
 
@@ -62,12 +60,10 @@ def test_bundles_to_aal():
     assert len(targets) == 0
 
     targets = afd.bundles_to_aal(["HCC_L"], atlas)
-    assert len(targets) == 1
-    npt.assert_equal(targets, [[None, None]])
+    npt.assert_equal(targets, {'HCC_L_end': None, 'HCC_L_start': None})
 
     targets = afd.bundles_to_aal(["VOF"], atlas)
-    assert len(targets) == 1
-    npt.assert_equal(targets, [[None, None]])
+    npt.assert_equal(targets, {'VOF_end': None, 'VOF_start': None})
 
     
 def test_read_roi():
