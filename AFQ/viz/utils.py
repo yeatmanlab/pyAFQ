@@ -246,7 +246,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         if bundle is None:
             # No selection: visualize all of them:
             for bundle_name in bundle_dict.keys():
-                idx = bname_to_idx(bundle_name)
+                idx = bname_to_idx(bundle_name, sft)
                 n_sl_viz = (len(idx) * n_sls_viz) //\
                     len(sft.streamlines)
                 n_sl_viz = max(n_sls_min, n_sl_viz)

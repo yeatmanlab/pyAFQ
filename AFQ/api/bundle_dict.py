@@ -221,7 +221,7 @@ class BundleDict(MutableMapping):
         self.bundle_names.append(bundle_name)
 
     def __getitem__(self, key):
-        if key not in self._dict:
+        if key not in self._dict and key in self.bundle_names:
             self.gen(key)
         return self._dict[key]
 
