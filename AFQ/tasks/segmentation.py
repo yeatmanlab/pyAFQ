@@ -140,7 +140,8 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             this_tgram = nib.streamlines.Tractogram(
                 this_tg.streamlines,
                 data_per_streamline={
-                    'bundle': len(this_tg) * bname_to_uid(b)},
+                    'bundle': np.repeat(
+                        bname_to_uid(b).reshape(1, -1), len(this_tg), axis=0)},
                 affine_to_rasmm=img.affine)
             tgram = aus.add_bundles(tgram, this_tgram)
 

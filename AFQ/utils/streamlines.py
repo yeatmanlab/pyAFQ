@@ -39,7 +39,7 @@ def bname_to_uid(bundle_name):
                 base_idx = 0
     for i in range(len(uid)):
         uid[i] = struct.unpack('f', int(uid[i]).to_bytes(4, "little"))[0]
-    return uid
+    return np.asarray(uid)
 
 
 def bname_to_idx(bundle_name, sft):
@@ -70,7 +70,8 @@ def bundles_to_tgram(bundles, reference):
         this_tgram = nib.streamlines.Tractogram(
             this_sl,
             data_per_streamline={
-                'bundle': len(this_sl) * bname_to_uid(b)},
+                'bundle': np.repeat(
+                    bname_to_uid(b).reshape(1, -1), len(this_sl), axis=0)},
             affine_to_rasmm=reference.affine)
         tgram = add_bundles(tgram, this_tgram)
     return StatefulTractogram(tgram.streamlines, reference, Space.VOX,
