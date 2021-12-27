@@ -459,10 +459,15 @@ class Segmentation:
                 else:
                     this_tol = tol**2
 
-                warped_roi = auv.transform_inverse_roi(
-                    roi,
-                    self.mapping,
-                    bundle_name=bundle)
+                if "space" not in self.bundle_dict[bundle]\
+                        or self.bundle_dict[bundle][
+                            "space"] == "template":
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        self.mapping,
+                        bundle_name=bundle)
+                else:
+                    warped_roi = roi
 
                 if roi_type == 'include':
                     # include ROI:
@@ -499,10 +504,15 @@ class Segmentation:
 
             if not isinstance(prob_map, np.ndarray):
                 prob_map = prob_map.get_fdata()
-            warped_prob_map = \
-                self.mapping.transform_inverse(
-                    prob_map.copy(),
-                    interpolation='nearest')
+            if "space" in bundle_entry\
+                    and bundle_entry["space"] == "subject":
+                warped_prob_map = prob_map.copy()
+            else:
+                warped_prob_map = \
+                    self.mapping.transform_inverse(
+                        prob_map.copy(),
+                        interpolation='nearest')
+                
             return warped_prob_map, include_rois, exclude_rois,\
                 include_roi_tols, exclude_roi_tols
 
@@ -705,25 +715,29 @@ class Segmentation:
                 atlas_idx = []
                 for end_type in ['start', 'end']:
                     if end_type in self.bundle_dict[bundle]:
-                        pp = self.bundle_dict[bundle][end_type]
+                        warped_roi = self.bundle_dict[bundle][end_type]
 
                         # Create binary masks and warp these into subject's
                         # DWI space:
-                        warped_roi = self.mapping.transform_inverse(
-                            pp.get_fdata(),
-                            interpolation='nearest')
+                        if "space" not in self.bundle_dict[bundle]\
+                                or self.bundle_dict[bundle][
+                                    "space"] == "template":
+                            warped_roi = self.mapping.transform_inverse(
+                                warped_roi.get_fdata(),
+                                interpolation='nearest')
 
-                        if self.save_intermediates is not None:
-                            os.makedirs(op.join(
-                                self.save_intermediates,
-                                'endpoint_ROI',
-                                bundle), exist_ok=True)
+                            if self.save_intermediates is not None:
+                                os.makedirs(op.join(
+                                    self.save_intermediates,
+                                    'endpoint_ROI',
+                                    bundle), exist_ok=True)
 
-                            nib.save(
-                                nib.Nifti1Image(
-                                    warped_roi,
-                                    self.img_affine),
-                                op.join(self.save_intermediates,
+                                nib.save(
+                                    nib.Nifti1Image(
+                                        warped_roi,
+                                        self.img_affine),
+                                    op.join(
+                                        self.save_intermediates,
                                         'endpoint_ROI',
                                         bundle,
                                         f'{end_type}point_as_used.nii.gz'))

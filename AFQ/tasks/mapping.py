@@ -67,10 +67,15 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
 
                 fname = op.join(rois_dir, fname[1])
                 if not op.exists(fname):
-                    warped_roi = auv.transform_inverse_roi(
-                        roi,
-                        mapping,
-                        bundle_name=bundle)
+                    if "space" not in bundle_dict[bundle]\
+                        or bundle_dict[bundle][
+                            "space"] == "template":
+                        warped_roi = auv.transform_inverse_roi(
+                            roi,
+                            mapping,
+                            bundle_name=bundle)
+                    else:
+                        warped_roi = roi
 
                     # Cast to float32, so that it can be read in by MI-Brain:
                     logger.info(f"Saving {fname}")

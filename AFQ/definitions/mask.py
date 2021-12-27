@@ -212,19 +212,22 @@ class RoiMask(Definition):
                 bundle_dict = bundle_dict
 
             for bundle_name, bundle_info in bundle_dict.items():
-                for roi_type in ['include', 'exclude']:
-                    for idx, roi in enumerate(bundle_info[roi_type]):
-                        if bundle_info[roi_type][idx]:
-                            warped_roi = auv.transform_inverse_roi(
-                                roi,
-                                mapping_imap["mapping"],
-                                bundle_name=bundle_name)
+                for roi in bundle_info['include']:
+                    if "space" not in bundle_info\
+                        or bundle_info[
+                            "space"] == "template":
+                        warped_roi = auv.transform_inverse_roi(
+                            roi,
+                            mapping_imap["mapping"],
+                            bundle_name=bundle_name)
+                    else:
+                        warped_roi = roi
 
-                            if mask_data is None:
-                                mask_data = np.zeros(warped_roi.shape)
-                            mask_data = np.logical_or(
-                                mask_data,
-                                warped_roi.astype(bool))
+                    if mask_data is None:
+                        mask_data = np.zeros(warped_roi.shape)
+                    mask_data = np.logical_or(
+                        mask_data,
+                        warped_roi.astype(bool))
             return mask_data, dict(source="ROIs")
         return mask_getter
 
