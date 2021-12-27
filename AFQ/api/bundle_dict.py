@@ -183,6 +183,7 @@ class BundleDict(MutableMapping):
                     self.templates[roi_name1],
                     self.templates[roi_name2]]
                 roi_dict['exclude'] = []
+                roi_dict['space'] = 'template'
                 if name + '_roi3' + hemi in self.templates:
                     roi_dict['include'].append(
                         self.templates[name + '_roi3' + hemi])
@@ -261,17 +262,17 @@ class BundleDict(MutableMapping):
             resample_to=self.resample_to)
 
     def resample_roi(self, key):
-        if self.resample_to:
+        if self.resample_to and (
+            "space" not in self._dict[key]\
+                or self._dict[key]["space"] == "template"):
             if "resampled" not in self._dict[key]\
                     or not self._dict[key]["resampled"]:
                 for roi_type in ["include", "exclude"]:
-                    if roi_type != "include"\
-                            and roi_type not in self._dict[key]:
-                        continue
-                    for ii, roi in enumerate(self._dict[key][roi_type]):
-                        self._dict[key][roi_type][ii] =\
-                            afd.read_resample_roi(
-                                roi, resample_to=self.resample_to)
+                    if roi_type in self._dict[key]:
+                        for ii, roi in enumerate(self._dict[key][roi_type]):
+                            self._dict[key][roi_type][ii] =\
+                                afd.read_resample_roi(
+                                    roi, resample_to=self.resample_to)
                 for roi_type in ["start", "end"]:
                     if roi_type in self._dict[key]:
                         self._dict[key][roi_type] =\

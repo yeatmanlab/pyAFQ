@@ -597,7 +597,10 @@ class Segmentation:
                 fiber_probabilities > self.prob_threshold)
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold."))
-            crosses_midline = self.bundle_dict[bundle]['cross_midline']
+            if 'cross_midline' in self.bundle_dict[bundle]:
+                crosses_midline = self.bundle_dict[bundle]['cross_midline']
+            else:
+                crosses_midline = None
 
             # with parallel segmentation, the first for loop will
             # only collect streamlines and does not need tqdm
