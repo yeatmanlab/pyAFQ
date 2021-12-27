@@ -1131,8 +1131,12 @@ def _is_streamline_in_ROIs(sl, tol, include_roi,
                 tol,
                 exclude_roi_tols)
         if is_far:
-            return np.argmin(dist[0], 0)[0],\
-                np.argmin(dist[1], 0)[0], fiber_prob
+            if len(dist) > 1:
+                return np.argmin(dist[0], 0)[0],\
+                    np.argmin(dist[1], 0)[0], fiber_prob
+            else:
+                return np.argmin(dist[0], 0)[0],\
+                    np.argmin(dist[0], 0)[0], fiber_prob
     return 0, 0, 0
 
 
