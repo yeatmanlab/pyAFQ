@@ -183,8 +183,6 @@ class BundleDict(MutableMapping):
                     self.templates[roi_name1],
                     self.templates[roi_name2]]
                 roi_dict['exclude'] = []
-                roi_dict['start'] = None
-                roi_dict['end'] = None
                 if name + '_roi3' + hemi in self.templates:
                     roi_dict['include'].append(
                         self.templates[name + '_roi3' + hemi])
@@ -199,10 +197,12 @@ class BundleDict(MutableMapping):
                 if bundle_name + '_prob_map' in self.templates:
                     roi_dict['prob_map'] = self.templates[
                         bundle_name + '_prob_map']
-                if bundle_name + "_start" in self.templates:
+                if bundle_name + "_start" in self.templates and self.templates[
+                        bundle_name + "_start"] is not None:
                     roi_dict['start'] = self.templates[
                         bundle_name + "_start"]
-                if bundle_name + "_end" in self.templates:
+                if bundle_name + "_end" in self.templates and self.templates[
+                        bundle_name + "_end"] is not None:
                     roi_dict['end'] = self.templates[
                         bundle_name + "_end"]
                 self._dict[bundle_name] = roi_dict

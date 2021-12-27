@@ -39,7 +39,9 @@ def test_bundles_to_tgram():
     tgram = aus.bundles_to_tgram(bundles, img)
     new_bundles = aus.tgram_to_bundles(tgram, bundles, img)
     for k1 in bundles.keys():
-        for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
+        for sl1, sl2 in zip(
+                bundles[k1].streamlines,
+                new_bundles[k1].streamlines):
             npt.assert_equal(sl1, sl2)
 
 

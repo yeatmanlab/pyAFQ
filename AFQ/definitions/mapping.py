@@ -1,5 +1,6 @@
 import nibabel as nib
 import numpy as np
+import logging
 from time import time
 import os.path as op
 
@@ -26,6 +27,10 @@ except ModuleNotFoundError:
     has_h5py = False
 
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
+
+
+logger = logging.getLogger('AFQ.definitions.mapping')
+
 
 # For map defintions, get_for_subses should return only the mapping
 # Where the mapping has transform and transform_inverse functions
@@ -302,6 +307,7 @@ class GeneratedMapMixin(object):
                 type="rigid",
                 timing=time() - start_time)
             if save:
+                logger.info(f"Saving {prealign_file}")
                 np.save(prealign_file, aff)
                 meta_fname = get_fname(
                     subses_dict, '_prealign_from-DWI_to-MNI_xfm.json')
@@ -331,6 +337,7 @@ class GeneratedMapMixin(object):
                 reg_prealign)
             total_time = time() - start_time
 
+            logger.info(f"Saving {mapping_file}")
             reg.write_mapping(mapping, mapping_file)
             meta = dict(
                 type="displacementfield",

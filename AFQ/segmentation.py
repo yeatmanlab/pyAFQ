@@ -710,7 +710,7 @@ class Segmentation:
                         # Create binary masks and warp these into subject's
                         # DWI space:
                         warped_roi = self.mapping.transform_inverse(
-                            pp,
+                            pp.get_fdata(),
                             interpolation='nearest')
 
                         if self.save_intermediates is not None:

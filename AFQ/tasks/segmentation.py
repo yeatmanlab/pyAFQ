@@ -141,7 +141,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
                 this_tg.streamlines,
                 data_per_streamline={
                     'bundle': np.repeat(
-                        bname_to_uid(b).reshape(1, -1), len(this_tg), axis=0)},
+                        bname_to_uid(b), len(this_tg), axis=0)},
                 affine_to_rasmm=img.affine)
             tgram = aus.add_bundles(tgram, this_tgram)
 
@@ -300,7 +300,7 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     vals = []
     for k in bundle_dict.keys():
         if k != "whole_brain":
-            vals.append(bname_to_uid(k))
+            vals.append(bname_to_uid(k)[0])
             keys.append(k)
     uid_dict = dict(zip(keys, vals))
 
