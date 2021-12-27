@@ -17,7 +17,7 @@ def test_bundles_to_tgram():
                        [0., 0., 0., 1.]])
     img = nib.Nifti1Image(np.ones((10, 10, 10, 30)), affine)
 
-    bundles = {'b1': StatefulTractogram([np.array([[0, 0, 0],
+    bundles = {'ba': StatefulTractogram([np.array([[0, 0, 0],
                                                    [0, 0, 0.5],
                                                    [0, 0, 1],
                                                    [0, 0, 1.5]]),
@@ -26,7 +26,7 @@ def test_bundles_to_tgram():
                                                    [0, 1, 1]])],
                                          img,
                                          Space.VOX),
-               'b2': StatefulTractogram([np.array([[0, 0, 0],
+               'bb': StatefulTractogram([np.array([[0, 0, 0],
                                                    [0, 0, 0.5],
                                                    [0, 0, 2],
                                                    [0, 0, 2.5]]),
@@ -37,11 +37,10 @@ def test_bundles_to_tgram():
                                          Space.VOX)}
 
     tgram = aus.bundles_to_tgram(bundles, img)
-    new_bundles = aus.tgram_to_bundles(tgram, img)
+    new_bundles = aus.tgram_to_bundles(tgram, bundles, img)
     for k1 in bundles.keys():
-        for k2 in bundles[k1].__dict__.keys():
-            for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
-                npt.assert_equal(sl1, sl2)
+        for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
+            npt.assert_equal(sl1, sl2)
 
 
 def test_split_streamline():
