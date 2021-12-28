@@ -18,7 +18,12 @@ For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
 
 .. note::
 
-    bundle names are encoded in .trk files using the alphabetic
+    Bundle names are encoded in .trk files using the alphabetic
     characters in their name only. Avoid two bundle names that have the same
     alphabetic characters in the same order (ie, "CST_L", "CST L", "CS_TL"),
     because their .trk encodings will indistinguishable.
+
+.. note::
+
+    Keep bundle names short (less than 5 alphabetic characters is best)
+    in order to reduce the space they take in segmented trk files.

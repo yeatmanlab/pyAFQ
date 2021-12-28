@@ -115,7 +115,6 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
         bundles_file,
         img,
         Space.VOX)
-    img = nib.load(subses_dict['dwi_file'])
 
     start_time = time()
     tgram = nib.streamlines.Tractogram([], {'bundle': []})
@@ -296,34 +295,21 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
             "if profile_weights is a string,"
             + " it must be 'gauss' or 'median'")
 
-    keys = []
-    vals = []
-    for k in bundle_dict.keys():
-        if k != "whole_brain":
-            vals.append(bname_to_uid(k)[0])
-            keys.append(k)
-    uid_dict = dict(zip(keys, vals))
-
-    def get_bundle_name(uid):
-        for bundle_name, this_uid in uid_dict.items():
-            if this_uid == uid:
-                return bundle_name
-        raise ValueError((
-            f"Bundle ID: {uid} found in clean_bundles_file, "
-            "but not found in bundle_dict"))
-
     bundle_names = []
     node_numbers = []
     profiles = np.empty((len(scalar_dict), 0)).tolist()
     this_profile = np.zeros((len(scalar_dict), 100))
 
-    trk = nib.streamlines.load(clean_bundles_file)
-    for b in np.unique(
-            trk.tractogram.data_per_streamline['bundle']):
-        idx = np.where(
-            trk.tractogram.data_per_streamline['bundle'] == b)[0]
+    img = nib.load(subses_dict['dwi_file'])
+    trk = load_tractogram(
+        clean_bundles_file,
+        img,
+        Space.VOX)
+    for bundle_name in bundle_dict.keys():
+        idx = bname_to_idx(bundle_name, trk)
+        if len(idx) == 0:
+            continue
         this_sl = trk.streamlines[idx]
-        bundle_name = get_bundle_name(b)
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
             scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):

@@ -12,9 +12,24 @@ def add_bundles(t1, t2):
     ----------
     t1, t2 : nib.streamlines.Tractogram class instances
     """
-    data_per_streamline = {k: (list(t1.data_per_streamline[k])
-                               + list(t2.data_per_streamline[k]))
-                           for k in t2.data_per_streamline.keys()}
+    data_per_streamline = {}
+    for k in t2.data_per_streamline.keys():
+        l1 = np.array(t1.data_per_streamline[k])
+        l2 = np.array(t2.data_per_streamline[k])
+        if len(l1) == 0:
+            data_per_streamline[k] = l2
+        elif len(l2) == 0:
+            data_per_streamline[k] = l1
+        else:
+            l1_len = l1.shape[1]
+            l2_len = l2.shape[1]
+            if l1_len > l2_len:
+                nanfill = np.full((l2.shape[0], l1_len - l2_len), np.nan)
+                l2 = np.concatenate((l2, nanfill), axis=1)
+            if l2_len > l1_len:
+                nanfill = np.full((l1.shape[0], l2_len - l1_len), np.nan)
+                l1 = np.concatenate((l1, nanfill), axis=1)
+            data_per_streamline[k] = np.concatenate((l1, l2), axis=0)
     return nib.streamlines.Tractogram(
         list(t1.streamlines) + list(t2.streamlines),
         data_per_streamline,
@@ -47,7 +62,8 @@ def bname_to_idx(bundle_name, sft):
     uid = bname_to_uid(bundle_name)[0]
     idxs = []
     for idx, data in enumerate(sft.data_per_streamline['bundle']):
-        if np.array_equal(data, uid):
+        data = data[~np.isnan(data)]
+        if np.allclose(data, uid, rtol=1e-5, atol=0):
             idxs.append(idx)
     return idxs
 
