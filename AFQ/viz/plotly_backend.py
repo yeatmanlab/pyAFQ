@@ -45,6 +45,8 @@ def _to_color_range(num):
         num = 0
     if num >= 0.999:
         num = 0.999
+    if num <= 0.001:
+        num = 0.001
     return num
 
 

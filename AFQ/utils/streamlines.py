@@ -63,7 +63,8 @@ def bname_to_idx(bundle_name, sft):
     idxs = []
     for idx, data in enumerate(sft.data_per_streamline['bundle']):
         data = data[~np.isnan(data)]
-        if np.allclose(data, uid, rtol=1e-5, atol=0):
+        if len(data) == len(uid) and np.allclose(
+                data, uid, rtol=1e-5, atol=0):
             idxs.append(idx)
     return idxs
 
