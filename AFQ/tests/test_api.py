@@ -460,10 +460,8 @@ def test_AFQ_slr():
         reg_template_spec='hcp_atlas',
         mapping_definition=SlrMap())
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CST_L']) > 0)
+    seg_sft = aus.SegmentedSFT(myafq.clean_bundles["01"], myafq.img["01"])
+    npt.assert_(len(seg_sft.get_bundle('CST_L')) > 0)
 
 
 @pytest.mark.nightly_reco
@@ -481,10 +479,8 @@ def test_AFQ_reco():
             'seg_algo': 'reco',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CCMid']) > 0)
+    seg_sft = aus.SegmentedSFT(myafq.clean_bundles["01"], myafq.img["01"])
+    npt.assert_(len(seg_sft.get_bundle('CCMid')) > 0)
     myafq.export_all()
 
 
@@ -522,10 +518,8 @@ def test_AFQ_reco80():
             'seg_algo': 'reco80',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CCMid']) > 0)
+    seg_sft = aus.SegmentedSFT(myafq.clean_bundles["01"], myafq.img["01"])
+    npt.assert_(len(seg_sft.get_bundle('CCMid')) > 0)
 
 
 @pytest.mark.nightly_pft
@@ -716,11 +710,8 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    tgram = load_tractogram(myafq.bundles, myafq.img)
-
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.img)
-    assert len(bundles['CST_L']) > 0
+    seg_sft = aus.SegmentedSFT(myafq.clean_bundles["01"], myafq.img["01"])
+    npt.assert_(len(seg_sft.get_bundle('CST_L')) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()

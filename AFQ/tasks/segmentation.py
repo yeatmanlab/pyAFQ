@@ -16,6 +16,7 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.s3bids import write_json
 import AFQ.api.bundle_dict as abd
+import AFQ.utils.streamlines as aus
 from AFQ.utils.streamlines import bname_to_uid, bname_to_idx
 
 from dipy.io.streamline import load_tractogram, save_tractogram
@@ -64,13 +65,9 @@ def segment(subses_dict, data_imap, mapping_imap,
         reg_template=reg_template,
         mapping=mapping_imap["mapping"])
 
-    if segmentation_params['return_idx']:
-        idx = {bundle: bundles[bundle]['idx'].tolist()
-               for bundle in bundle_dict}
-        bundles = {bundle: bundles[bundle]['sl']
-                   for bundle in bundle_dict}
+    seg_sft = aus.SegmentedSFT(bundles)
 
-    tgram = aus.bundles_to_tgram(bundles, img)
+    tgram, meta = seg_sft.get_sft_and_sidecar()
 
     segmentation_params_out = {}
     for arg_name, value in segmentation_params.items():
@@ -79,10 +76,8 @@ def segment(subses_dict, data_imap, mapping_imap,
             segmentation_params_out[arg_name] = value
         else:
             segmentation_params_out[arg_name] = str(value)
-    meta = dict(source=streamlines_file,
-                Parameters=segmentation_params_out)
-    if segmentation_params['return_idx']:
-        meta["idx"] = idx
+    meta["source"] = streamlines_file
+    meta["Parameters"] = segmentation_params_out
     meta["Timing"] = time() - start_time
     return tgram, meta
 
@@ -111,58 +106,38 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
     clean_params = default_clean_params
 
     img = nib.load(subses_dict['dwi_file'])
-    sft = load_tractogram(
-        bundles_file,
-        img,
-        Space.VOX)
+    seg_sft = aus.SegmentedSFT(bundles_file, img)
 
     start_time = time()
-    tgram = nib.streamlines.Tractogram([], {'bundle': []})
-    if clean_params['return_idx']:
-        return_idx = {}
 
+    bundles = {}
     for b in bundle_dict.keys():
         if b != "whole_brain":
-            idx = bname_to_idx(b, sft)
+            idx = seg_sft.bundle_idxs[b]
             this_tg = StatefulTractogram(
-                sft.streamlines[idx],
+                seg_sft.sft.streamlines[idx],
                 img,
                 Space.VOX)
             this_tg = seg.clean_bundle(this_tg, **clean_params)
             if clean_params['return_idx']:
-                this_tg, this_idx = this_tg
-                idx_file = bundles_file.split('.')[0] + '.json'
-                with open(idx_file) as ff:
-                    bundle_idx = json.load(ff)["idx"][b]
-                return_idx[b] = np.array(
-                    bundle_idx)[this_idx].tolist()
-            this_tgram = nib.streamlines.Tractogram(
-                this_tg.streamlines,
-                data_per_streamline={
-                    'bundle': np.repeat(
-                        bname_to_uid(b), len(this_tg), axis=0)},
-                affine_to_rasmm=img.affine)
-            tgram = aus.add_bundles(tgram, this_tgram)
-
-    sft = StatefulTractogram(
-        tgram.streamlines,
-        sft,
-        Space.VOX,
-        data_per_streamline=tgram.data_per_streamline)
+                bundles[b] = {}
+                bundles[b]['sl'], bundles[b]['idx'] = this_tg
+                bundles[b]['idx'] = np.array(
+                    idx)[bundles[b]['idx']].tolist()
+            else:
+                bundles[b] = this_tg
 
     seg_args = get_default_args(seg.clean_bundle)
     for k in seg_args:
         if callable(seg_args[k]):
             seg_args[k] = seg_args[k].__name__
 
-    meta = dict(source=bundles_file,
-                Parameters=seg_args)
+    new_seg_sft = aus.SegmentedSFT(bundles)
+    sft, meta = new_seg_sft.get_sft_and_sidecar()
 
-    if clean_params['return_idx']:
-        meta["idx"] = return_idx
-
+    meta["source"] = bundles_file
+    meta["Parameters"] = seg_args
     meta["Timing"] = time() - start_time
-
     return sft, meta
 
 
@@ -241,16 +216,14 @@ def export_sl_counts(subses_dict, data_imap,
     lists = [sl_counts_clean, sl_counts]
 
     for bundles_file, count in zip(bundles_files, lists):
-        tg = load_tractogram(bundles_file, img)
-        bundles = aus.tgram_to_bundles(
-            tg, bundle_dict, img)
+        seg_sft = aus.SegmentedSFT.fromfile(bundles_file, img)
 
-        for bundle in bundles:
+        for bundle in seg_sft.bundle_names:
             if bundle == "whole_brain":
-                count.append(len(tg.streamlines))
+                count.append(len(seg_sft.sft.streamlines))
             else:
                 count.append(len(
-                    bundles[bundle].streamlines))
+                    seg_sft.get_bundle(bundle).streamlines))
     counts_df = pd.DataFrame(
         data=dict(
             n_streamlines=sl_counts,

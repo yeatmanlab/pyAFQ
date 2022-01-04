@@ -14,7 +14,7 @@ from dipy.align import resample
 
 import AFQ.utils.volume as auv
 import AFQ.registration as reg
-from AFQ.utils.streamlines import bname_to_idx
+import AFQ.utils.streamlines as aus
 
 __all__ = ["Viz"]
 

@@ -282,10 +282,12 @@ class BundleDict(MutableMapping):
                 self._dict[key]["resampled"] = True
 
     def __add__(self, other):
-        if self.hasattr(self, "gen_all"):
-            self.gen_all()
-        if other.hasattr(other, "gen_all"):
-            other.gen_all()
+        self.gen_all()
+        other.gen_all()
+        # TODO: check for seg algo and throw error,
+        # TODO: check if spaces the same,
+        # checking shape and affine
+        # if not same, raise error
         return self.__class__(
             {**self._dict, **other._dict},
             self.resample_to)

@@ -6,7 +6,7 @@ import logging
 import AFQ.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, add_method_descriptions
-from AFQ.utils.streamlines import bname_to_idx
+import AFQ.utils.streamlines as aus
 
 import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
@@ -411,11 +411,10 @@ class GroupAFQ(object):
                     this_bundles_file = self.clean_bundles[sub]
                     this_mapping = self.mapping[sub]
                     this_img = nib.load(self.dwi[sub])
-                this_sft = load_tractogram(
+                seg_sft = aus.SegmentedSFT.fromfile(
                     this_bundles_file,
-                    this_img,
-                    Space.VOX)
-                subses_info.append((this_sft, this_img, this_mapping))
+                    this_img)
+                subses_info.append((seg_sft, this_mapping))
 
             bundle_dict = self.bundle_dict[
                 self.valid_sub_list[0]]
@@ -427,8 +426,8 @@ class GroupAFQ(object):
             for b in bundle_dict.keys():
                 if b != "whole_brain":
                     for i in range(len(self.valid_sub_list)):
-                        sft, img, mapping = subses_info[i]
-                        idx = bname_to_idx(b, sft)
+                        seg_sft, mapping = subses_info[i]
+                        idx = seg_sft.bundle_idxs[b]
                         # use the first subses that works
                         # otherwise try each successive subses
                         if len(idx) == 0:
@@ -442,11 +441,11 @@ class GroupAFQ(object):
                         if len(idx) > 100:
                             idx = np.random.choice(
                                 idx, size=100, replace=False)
-                        these_sls = sft.streamlines[idx]
+                        these_sls = seg_sft.sft.streamlines[idx]
                         these_sls = dps.set_number_of_points(these_sls, 100)
                         tg = StatefulTractogram(
                             these_sls,
-                            img,
+                            seg_sft.reference,
                             Space.VOX)
                         tg.to_rasmm()
                         delta = dts.values_from_volume(

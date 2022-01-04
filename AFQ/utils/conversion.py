@@ -57,7 +57,7 @@ def matlab_mori_groups(mat_file, img):
     segmentation. The keys are bundle names and the values are 
     :class:`StatefulTractogram` instances.
     If you want to merge this dictionary into one :class:`StatefulTractogram`,
-    use :func:`bundles_to_tgram`.
+    use :class:`SegmentedSFT`.
 
     Parameters
     ----------
