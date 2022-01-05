@@ -37,7 +37,7 @@ def test_SegmentedSFT():
     for k1 in bundles.keys():
         for sl1, sl2 in zip(
                 bundles[k1].streamlines,
-                seg_sft.get_bundle(k1)):
+                seg_sft.get_bundle(k1).streamlines):
             npt.assert_equal(sl1, sl2)
 
 

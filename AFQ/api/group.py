@@ -445,7 +445,7 @@ class GroupAFQ(object):
                         these_sls = dps.set_number_of_points(these_sls, 100)
                         tg = StatefulTractogram(
                             these_sls,
-                            seg_sft.reference,
+                            seg_sft.sft,
                             Space.VOX)
                         tg.to_rasmm()
                         delta = dts.values_from_volume(

@@ -1,6 +1,7 @@
 import logging
 from collections.abc import MutableMapping
 import AFQ.data as afd
+import numpy as np
 
 
 logging.basicConfig(level=logging.INFO)
@@ -284,12 +285,35 @@ class BundleDict(MutableMapping):
     def __add__(self, other):
         self.gen_all()
         other.gen_all()
-        # TODO: check for seg algo and throw error,
-        # TODO: check if spaces the same,
-        # checking shape and affine
-        # if not same, raise error
+        if self.seg_algo != other.seg_algo:
+            raise ValueError((
+                "Adding BundleDicts where seg_algo do not match."
+                f"seg_algo's are {self.seg_algo} and {other.seg_algo}"))
+        if self.resample_to == False or other.resample_to == False:
+            if self.resample_to != other.resample_to:
+                raise ValueError((
+                    "Adding BundleDicts where resample_to do not match."
+                    f"resample_to's are {self.resample_to} and "
+                    f"{other.resample_to}"))
+        else:
+            if not np.all(
+                    self.resample_to.affine == other.resample_to.affine):
+                raise ValueError((
+                    "Adding BundleDicts where resample_to affines"
+                    " do not match. resample_to affines are"
+                    f"{self.resample_to.affine} and "
+                    f"{other.resample_to.affine}"))
+            if not np.all(
+                self.resample_to.header['dim'] ==\
+                    other.resample_to.header['dim']):
+                raise ValueError((
+                    "Adding BundleDicts where resample_to dimensions"
+                    " do not match. resample_to dimensions are"
+                    f"{self.resample_to.header['dim']} and "
+                    f"{other.resample_to.header['dim']}"))
         return self.__class__(
             {**self._dict, **other._dict},
+            self.seg_algo,
             self.resample_to)
 
 

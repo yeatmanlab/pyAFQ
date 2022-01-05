@@ -152,7 +152,7 @@ def viz_import_msg_error(module):
     return msg
 
 
-def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
+def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
                     n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
@@ -164,9 +164,8 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
 
     Parameters
     ----------
-    sft : Stateful Tractogram, str
-        A Stateful Tractogram containing streamline information
-        or a path to a trk file
+    trk_file : str
+        Path to a trk file
 
     affine : ndarray
        An affine transformation to apply to the streamlines.
@@ -207,21 +206,20 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         else:
             colors = gen_color_dict(bundle_dict.keys())
 
-    if isinstance(sft, str):
-        viz_logger.info("Loading Stateful Tractogram...")
-        sft = load_tractogram(sft, 'same', Space.VOX, bbox_valid_check=False)
+    viz_logger.info("Loading Stateful Tractogram...")
+    seg_sft = aus.SegmentedSFT.fromfile(trk_file)
 
     if affine is not None:
         viz_logger.info("Transforming Stateful Tractogram...")
-        sft = StatefulTractogram.from_sft(
-            transform_tracking_output(sft.streamlines, affine),
-            sft,
-            data_per_streamline=sft.data_per_streamline)
+        seg_sft.sft = StatefulTractogram.from_sft(
+            transform_tracking_output(seg_sft.sft.streamlines, affine),
+            seg_sft.sft)
 
-    streamlines = sft.streamlines
+    streamlines = seg_sft.sft.streamlines
     viz_logger.info("Generating colorful lines from tractography...")
 
-    if list(sft.data_per_streamline.keys()) == []:
+    if len(seg_sft.bundle_names) == 1\
+            and seg_sft.bundle_names[0] == "whole_brain":
         if isinstance(colors, dict):
             colors = list(colors.values())
         # There are no bundles in here:
@@ -232,8 +230,7 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
             streamlines = streamlines[idx]
         if n_points is not None:
             streamlines = dps.set_number_of_points(streamlines, n_points)
-        yield streamlines, colors[0], "all_bundles", sft.dimensions
-
+        yield streamlines, colors[0], "all_bundles", seg_sft.sft.dimensions
     else:
         # There are bundles:
         if bundle_dict is None:
@@ -246,9 +243,9 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
         if bundle is None:
             # No selection: visualize all of them:
             for bundle_name in bundle_dict.keys():
-                idx = bname_to_idx(bundle_name, sft)
+                idx = seg_sft.bundle_idxs[bundle_name]
                 n_sl_viz = (len(idx) * n_sls_viz) //\
-                    len(sft.streamlines)
+                    len(streamlines)
                 n_sl_viz = max(n_sls_min, n_sl_viz)
                 if len(idx) > n_sl_viz:
                     idx = np.random.choice(idx, size=n_sl_viz, replace=False)
@@ -259,17 +256,16 @@ def tract_generator(sft, affine, bundle, bundle_dict, colors, n_points,
                     color = colors[bundle_name]
                 else:
                     color = colors[0]
-                yield these_sls, color, bundle_name, sft.dimensions
+                yield these_sls, color, bundle_name, seg_sft.sft.dimensions
         else:
-            idx = bname_to_idx(bundle, sft)
-            these_sls = streamlines[idx]
+            these_sls = seg_sft.get_bundle(bundle).streamlines
             if n_points is not None:
                 these_sls = dps.set_number_of_points(these_sls, n_points)
             if isinstance(colors, dict):
                 color = colors[bundle]
             else:
                 color = colors[0]
-            yield these_sls, color, bundle, sft.dimensions
+            yield these_sls, color, bundle, seg_sft.sft.dimensions
 
 
 def gif_from_pngs(tdir, gif_fname, n_frames,

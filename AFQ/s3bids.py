@@ -1352,7 +1352,7 @@ def read_json(fname):
     -------
     dict
     """
-    with open(fname, 'w') as ff:
+    with open(fname, 'r') as ff:
         out = json.load(ff)
     return out
 

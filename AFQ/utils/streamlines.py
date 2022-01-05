@@ -1,7 +1,9 @@
+from dipy.io.streamline import load_tractogram
 import numpy as np
 import nibabel as nib
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from AFQ.s3bids import read_json
+import os.path as op
 
 
 class SegmentedSFT():
@@ -13,13 +15,13 @@ class SegmentedSFT():
         this_tracking_idxs = []
         idx_count = 0
         for b_name in bundles:
-            if 'idx' in bundles[b_name]:
+            if isinstance(bundles[b_name], dict):
                 this_sls = bundles[b_name]['sl']
                 this_tracking_idxs.extend(bundles[b_name]['idx'])
             else:
                 this_sls = bundles[b_name]
             if reference is None:
-                reference = this_sls.reference
+                reference = this_sls
             this_sls = list(this_sls.streamlines)
             sls.extend(this_sls)
             new_idx_count = idx_count + len(this_sls)
@@ -38,7 +40,8 @@ class SegmentedSFT():
         sidecar_info = {}
         sidecar_info["bundle_idx"] = {}
         for bundle_name in self.bundle_names:
-            sidecar_info["bundle_idx"][f"{bundle_name}"] = self.idxs[bundle_name]
+            sidecar_info["bundle_idx"][f"{bundle_name}"] = self.bundle_idxs[
+                bundle_name]
         if self.this_tracking_idxs is not None:
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
         return self.sft, sidecar_info
@@ -47,19 +50,28 @@ class SegmentedSFT():
         return self.sft[self.bundle_idxs[b_name]]
 
     @classmethod
-    def fromfile(cls, trk_file, reference, sidecar_file=None):
+    def fromfile(cls, trk_file, reference="same", sidecar_file=None):
         if sidecar_file is None:
             # assume json sidecar has the same name as trk_file,
             # but with json suffix
             sidecar_file = trk_file.split('.')[0] + '.json'
+            if not op.exists(sidecar_file):
+                raise ValueError((
+                    "JSON sidecars are required for trk files. "
+                    f"JSON sidecar not found for: {sidecar_file}"))
         sidecar_info = read_json(sidecar_file)
-        tgram = nib.streamlines.load(trk_file)
+        sft = load_tractogram(trk_file, reference, Space.VOX)
+        if reference == "same":
+            reference = sft
         bundles = {}
-        for b_name, b_idxs in sidecar_info["bundle_idx"].items():
-            if not b_name == "whole_brain":
-                bundles[b_name] = StatefulTractogram(
-                    tgram.streamlines[b_idxs].copy(), reference, Space.VOX)
-        return cls(bundles, reference)
+        if "bundle_idx" in sidecar_info:
+            for b_name, b_idxs in sidecar_info["bundle_idx"].items():
+                if not b_name == "whole_brain":
+                    bundles[b_name] = StatefulTractogram(
+                        sft.streamlines[b_idxs].copy(), reference, Space.VOX)
+        else:
+            bundles["whole_brain"] = sft
+        return cls(bundles)
 
 
 def split_streamline(streamlines, sl_to_split, split_idx):

@@ -17,7 +17,6 @@ from AFQ.tasks.utils import get_default_args
 from AFQ.s3bids import write_json
 import AFQ.api.bundle_dict as abd
 import AFQ.utils.streamlines as aus
-from AFQ.utils.streamlines import bname_to_uid, bname_to_idx
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -106,7 +105,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
     clean_params = default_clean_params
 
     img = nib.load(subses_dict['dwi_file'])
-    seg_sft = aus.SegmentedSFT(bundles_file, img)
+    seg_sft = aus.SegmentedSFT.fromfile(bundles_file, img)
 
     start_time = time()
 
@@ -168,14 +167,14 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                                          ['clean_bundles', 'bundles']):
         bundles_dir = op.join(subses_dict['results_dir'], folder)
         os.makedirs(bundles_dir, exist_ok=True)
-        trk = nib.streamlines.load(this_bundles_file)
-        tg = trk.tractogram
-        streamlines = tg.streamlines
+        img = nib.load(subses_dict['dwi_file'])
+        seg_sft = aus.SegmentedSFT.fromfile(
+            clean_bundles_file,
+            img)
         for bundle in bundle_dict:
             if bundle != "whole_brain":
-                idx = bname_to_idx(bundle, tg)
                 this_sl = dtu.transform_tracking_output(
-                    streamlines[idx],
+                    seg_sft.get_bundle(bundle).streamlines,
                     np.linalg.inv(img.affine))
 
                 this_tgm = StatefulTractogram(
@@ -218,7 +217,7 @@ def export_sl_counts(subses_dict, data_imap,
     for bundles_file, count in zip(bundles_files, lists):
         seg_sft = aus.SegmentedSFT.fromfile(bundles_file, img)
 
-        for bundle in seg_sft.bundle_names:
+        for bundle in bundles:
             if bundle == "whole_brain":
                 count.append(len(seg_sft.sft.streamlines))
             else:
@@ -274,15 +273,13 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     this_profile = np.zeros((len(scalar_dict), 100))
 
     img = nib.load(subses_dict['dwi_file'])
-    trk = load_tractogram(
+    seg_sft = aus.SegmentedSFT.fromfile(
         clean_bundles_file,
-        img,
-        Space.VOX)
+        img)
     for bundle_name in bundle_dict.keys():
-        idx = bname_to_idx(bundle_name, trk)
-        if len(idx) == 0:
+        this_sl = seg_sft.get_bundle(bundle_name).streamlines
+        if len(this_sl) == 0:
             continue
-        this_sl = trk.streamlines[idx]
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
             scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):
