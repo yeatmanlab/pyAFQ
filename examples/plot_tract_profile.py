@@ -22,7 +22,7 @@ from dipy.io.stateful_tractogram import Space
 from dipy.align import affine_registration
 
 import AFQ.api.bundle_dict as abd
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti

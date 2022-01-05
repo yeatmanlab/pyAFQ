@@ -7,7 +7,7 @@ from time import time
 import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
-from AFQ.s3bids import write_json
+from AFQ.data.s3bids import write_json
 
 import numpy as np
 

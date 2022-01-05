@@ -13,7 +13,7 @@ import dipy.tracking.utils as dtu
 from dipy.stats.analysis import afq_profile
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.tractography as aft
 import AFQ.segmentation as seg
 import AFQ.models.dti as dti

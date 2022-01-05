@@ -1,7 +1,7 @@
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import MaskFile
 
-from AFQ.s3bids import write_json
+from AFQ.data.s3bids import write_json
 from AFQ.tasks.utils import get_fname
 
 import nibabel as nib

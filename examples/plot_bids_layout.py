@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 
 from AFQ.api.group import GroupAFQ
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 
 ##########################################################################

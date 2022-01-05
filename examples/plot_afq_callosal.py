@@ -12,7 +12,7 @@ import plotly
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 from AFQ.definitions.mask import RoiMask
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 ##########################################################################
 # Get some example data

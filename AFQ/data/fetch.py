@@ -23,6 +23,7 @@ try:
 except ValueError:
     pass
 import nibabel as nib
+import boto3
 
 # capture templateflow resource warning and log
 import warnings
@@ -52,40 +53,6 @@ __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "read_stanford_hardi_tractography",
            "organize_stanford_data"]
 
-
-BUNDLE_RECO_2_AFQ = \
-    {
-        "AF_L": "ARC_L", "AF_R": "ARC_R",
-        "UF_L": "UNC_L", "UF_R": "UNC_R",
-        "IFOF_L": "IFO_L", "IFOF_R": "IFO_R",
-        "CST_L": "CST_L", "CST_R": "CST_R",
-        "ILF_L": "ILF_L", "ILF_R": "ILF_R",
-        "SLF_L": "SLF_L", "SLF_R": "SLF_R"
-    }
-
-BUNDLE_MAT_2_PYTHON = \
-    {'Right Corticospinal': 'CST_R', 'Left Corticospinal': 'CST_L',
-     'RightCorticospinal': 'CST_R', 'LeftCorticospinal': 'CST_L',
-     'Right Uncinate': 'UNC_R', 'Left Uncinate': 'UNC_L',
-     'RightUncinate': 'UNC_R', 'LeftUncinate': 'UNC_L',
-     'Left IFOF': 'IFO_L', 'Right IFOF': 'IFO_R',
-     'LeftIFOF': 'IFO_L', 'RightIFOF': 'IFO_R',
-     'Right Arcuate': 'ARC_R', 'Left Arcuate': 'ARC_L',
-     'RightArcuate': 'ARC_R', 'LeftArcuate': 'ARC_L',
-     'Right Thalamic Radiation': 'ATR_R', 'Left Thalamic Radiation': 'ATR_L',
-     'RightThalamicRadiation': 'ATR_R', 'LeftThalamicRadiation': 'ATR_L',
-     'Right Cingulum Cingulate': 'CGC_R', 'Left Cingulum Cingulate': 'CGC_L',
-     'RightCingulumCingulate': 'CGC_R', 'LeftCingulumCingulate': 'CGC_L',
-     'Right Cingulum Hippocampus': 'HCC_R',
-     'Left Cingulum Hippocampus': 'HCC_L',
-     'RightCingulumHippocampus': 'HCC_R',
-     'LeftCingulumHippocampus': 'HCC_L',
-     'Callosum Forceps Major': 'FP', 'Callosum Forceps Minor': 'FA',
-     'CallosumForcepsMajor': 'FP', 'CallosumForcepsMinor': 'FA',
-     'Right ILF': 'ILF_R', 'Left ILF': 'ILF_L',
-     'RightILF': 'ILF_R', 'LeftILF': 'ILF_L',
-     'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L',
-     'RightSLF': 'SLF_R', 'LeftSLF': 'SLF_L'}
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
@@ -1322,3 +1289,122 @@ def read_ukbb_fa_template(mask=True):
         return template_img
     else:
         return _apply_mask(template_img, 1)
+
+
+def fetch_hcp(subjects,
+              hcp_bucket='hcp-openaccess',
+              profile_name="hcp",
+              path=None,
+              study='HCP_1200',
+              aws_access_key_id=None,
+              aws_secret_access_key=None):
+    """
+    Fetch HCP diffusion data and arrange it in a manner that resembles the
+    BIDS [1]_ specification.
+
+    Parameters
+    ----------
+    subjects : list
+        Each item is an integer, identifying one of the HCP subjects
+    hcp_bucket : string, optional
+        The name of the HCP S3 bucket. Default: "hcp-openaccess"
+    profile_name : string, optional
+        The name of the AWS profile used for access. Default: "hcp"
+    path : string, optional
+        Path to save files into. Default: '~/AFQ_data'
+    study : string, optional
+        Which HCP study to grab. Default: 'HCP_1200'
+    aws_access_key_id : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
+    aws_secret_access_key : string, optional
+        AWS credentials to HCP AWS S3. Will only be used if `profile_name` is
+        set to False.
+
+    Returns
+    -------
+    dict with remote and local names of these files,
+    path to BIDS derivative dataset
+
+    Notes
+    -----
+    To use this function with its default setting, you need to have a
+    file '~/.aws/credentials', that includes a section:
+
+    [hcp]
+    AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
+    AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXX
+
+    The keys are credentials that you can get from HCP
+    (see https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS)  # noqa
+
+    Local filenames are changed to match our expected conventions.
+
+    .. [1] Gorgolewski et al. (2016). The brain imaging data structure,
+           a format for organizing and describing outputs of neuroimaging
+           experiments. Scientific Data, 3::160044. DOI: 10.1038/sdata.2016.44.
+    """
+    if profile_name:
+        boto3.setup_default_session(profile_name=profile_name)
+    elif aws_access_key_id is not None and aws_secret_access_key is not None:
+        boto3.setup_default_session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+    else:
+        raise ValueError("Must provide either a `profile_name` or ",
+                         "both `aws_access_key_id` and ",
+                         "`aws_secret_access_key` as input to 'fetch_hcp'")
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(hcp_bucket)
+
+    if path is None:
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        my_path = afq_home
+    else:
+        my_path = path
+
+    base_dir = op.join(my_path, study, 'derivatives', 'dmriprep')
+
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir, exist_ok=True)
+
+    data_files = {}
+    for subject in subjects:
+        # We make a single session folder per subject for this case, because
+        # AFQ api expects session structure:
+        sub_dir = op.join(base_dir, f'sub-{subject}')
+        sess_dir = op.join(sub_dir, "ses-01")
+        if not os.path.exists(sub_dir):
+            os.makedirs(os.path.join(sess_dir, 'dwi'), exist_ok=True)
+            os.makedirs(os.path.join(sess_dir, 'anat'), exist_ok=True)
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.bval')] =\
+            f'{study}/{subject}/T1w/Diffusion/bvals'
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.bvec')] =\
+            f'{study}/{subject}/T1w/Diffusion/bvecs'
+        data_files[op.join(sess_dir, 'dwi', f'sub-{subject}_dwi.nii.gz')] =\
+            f'{study}/{subject}/T1w/Diffusion/data.nii.gz'
+        data_files[op.join(sess_dir, 'anat', f'sub-{subject}_T1w.nii.gz')] =\
+            f'{study}/{subject}/T1w/T1w_acpc_dc.nii.gz'
+        data_files[op.join(sess_dir, 'anat',
+                           f'sub-{subject}_aparc+aseg_seg.nii.gz')] =\
+            f'{study}/{subject}/T1w/aparc+aseg.nii.gz'
+
+    for k in data_files.keys():
+        if not op.exists(k):
+            bucket.download_file(data_files[k], k)
+    # Create the BIDS dataset description file text
+    hcp_acknowledgements = """Data were provided by the Human Connectome Project, WU-Minn Consortium (Principal Investigators: David Van Essen and Kamil Ugurbil; 1U54MH091657) funded by the 16 NIH Institutes and Centers that support the NIH Blueprint for Neuroscience Research; and by the McDonnell Center for Systems Neuroscience at Washington University.""",  # noqa
+    to_bids_description(op.join(my_path, study),
+                        **{"Name": study,
+                           "Acknowledgements": hcp_acknowledgements,
+                           "Subjects": subjects})
+
+    # Create the BIDS derivatives description file text
+    to_bids_description(base_dir,
+                        **{"Name": study,
+                           "Acknowledgements": hcp_acknowledgements,
+                           "PipelineDescription": {'Name': 'dmriprep'}})
+
+    return data_files, op.join(my_path, study)

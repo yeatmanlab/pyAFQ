@@ -38,7 +38,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
     import s3fs
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
-    from AFQ.s3bids import fetch_hcp
+    from AFQ.data.fetch import fetch_hcp
     from AFQ.api.group import GroupAFQ
     import AFQ.definitions.mask as afm
 

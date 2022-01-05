@@ -6,7 +6,7 @@ import scipy.io
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import nibabel as nib
 
-from AFQ.data import BUNDLE_MAT_2_PYTHON
+from AFQ.data.utils import BUNDLE_MAT_2_PYTHON
 
 
 class MatlabFileTracking():

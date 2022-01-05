@@ -7,8 +7,8 @@ import logging
 import pimms
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
-import AFQ.data as afd
-from AFQ.s3bids import write_json
+import AFQ.data.fetch as afd
+from AFQ.data.s3bids import write_json
 import AFQ.utils.volume as auv
 from AFQ.definitions.mapping import SynMap
 from AFQ.definitions.utils import Definition

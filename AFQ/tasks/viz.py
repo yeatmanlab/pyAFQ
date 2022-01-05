@@ -12,7 +12,7 @@ from dipy.align import resample
 
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.utils.volume as auv
-from AFQ.s3bids import write_json
+from AFQ.data.s3bids import write_json
 from AFQ.viz.utils import Viz
 
 from plotly.subplots import make_subplots

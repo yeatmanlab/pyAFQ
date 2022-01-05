@@ -21,7 +21,8 @@ from dipy.io.streamline import save_tractogram
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-import AFQ.data as afd
+import AFQ.data.fetch as afd
+from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.utils.parallel import parfor
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
@@ -901,7 +902,7 @@ class Segmentation:
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
-                afq_bundle_name = afd.BUNDLE_RECO_2_AFQ.get(bundle, bundle)
+                afq_bundle_name = BUNDLE_RECO_2_AFQ.get(bundle, bundle)
                 if "return_idx" in self.presegment_kwargs\
                         and self.presegment_kwargs["return_idx"]:
                     indiv_tg = roiseg_fg[afq_bundle_name]['sl']

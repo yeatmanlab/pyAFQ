@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 import AFQ.viz.utils as vut
 from AFQ.viz.utils import display_string
 from AFQ.utils.stats import contrast_index as calc_contrast_index
-from AFQ.data import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
+from AFQ.data.utils import BUNDLE_RECO_2_AFQ, BUNDLE_MAT_2_PYTHON
 
 try:
     from pingouin import intraclass_corr, corr

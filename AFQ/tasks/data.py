@@ -14,7 +14,7 @@ from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.api.bundle_dict as abd
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import B0Mask

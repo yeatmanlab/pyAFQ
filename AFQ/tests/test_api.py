@@ -27,7 +27,7 @@ from dipy.testing.decorators import xvfb_it
 
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb

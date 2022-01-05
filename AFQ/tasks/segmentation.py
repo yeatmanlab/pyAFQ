@@ -14,7 +14,7 @@ from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
-from AFQ.s3bids import write_json
+from AFQ.data.s3bids import write_json
 import AFQ.api.bundle_dict as abd
 import AFQ.utils.streamlines as aus
 

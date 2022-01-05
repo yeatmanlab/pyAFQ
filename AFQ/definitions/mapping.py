@@ -7,7 +7,7 @@ import os.path as op
 from AFQ.definitions.utils import Definition, find_file
 from dipy.align import syn_registration, affine_registration
 import AFQ.registration as reg
-import AFQ.s3bids as afs
+import AFQ.data.s3bids as afs
 from AFQ.tasks.utils import get_fname
 
 from dipy.align.imaffine import AffineMap

@@ -7,8 +7,6 @@ import numpy as np
 import nibabel as nib
 from dipy.align.imwarp import DiffeomorphicMap
 
-from dipy.align.imaffine import AffineMap
-
 from dipy.align import (syn_registration, center_of_mass, translation,
                         rigid, affine, register_series, )
 
@@ -50,7 +48,7 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     DiffeomorphicMap object
     """
     if template is None:
-        import AFQ.data as afd
+        import AFQ.data.fetch as afd
         template = afd.read_mni_template()
     if isinstance(template, str):
         template = nib.load(template)

@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.testing as npt
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import nibabel as nib
 
 def test_aal_to_regions():

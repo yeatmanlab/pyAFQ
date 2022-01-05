@@ -3,7 +3,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
-import AFQ.s3bids as afs
+import AFQ.data.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import wf_sections, add_method_descriptions
 import AFQ.utils.streamlines as aus

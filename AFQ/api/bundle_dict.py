@@ -1,6 +1,6 @@
 import logging
 from collections.abc import MutableMapping
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import numpy as np
 
 
