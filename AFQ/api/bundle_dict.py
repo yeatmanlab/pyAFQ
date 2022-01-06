@@ -63,7 +63,8 @@ class BundleDict(MutableMapping):
     def __init__(self,
                  bundle_info=BUNDLES,
                  seg_algo="afq",
-                 resample_to=None):
+                 resample_to=None,
+                 resample_subject_to=None):
         """
         Create a bundle dictionary, needed for the segmentation
 
@@ -86,7 +87,16 @@ class BundleDict(MutableMapping):
             If set, templates will be resampled to the affine and shape of this
             image. If None, the MNI template will be used.
             If False, no resampling will be done.
-            Default: afd.read_mni_template()
+            Default: None
+
+        resample_subject_to : Nifti1Image or bool, optional
+            If there are ROIs with the 'space' attribute
+            set to 'subject', those ROIs will be resampled to the affine
+            and shape of this image.
+            If None, the template will be overriden when passed to
+            an API class.
+            If False, no resampling will be done.
+            Default: None
         """
         if not (isinstance(bundle_info, dict)
                 or isinstance(bundle_info, list)):
@@ -97,6 +107,7 @@ class BundleDict(MutableMapping):
         if resample_to is None:
             resample_to = afd.read_mni_template()
         self.resample_to = resample_to
+        self.resample_subject_to = resample_subject_to
 
         self._dict = {}
         self.bundle_names = []
@@ -262,25 +273,35 @@ class BundleDict(MutableMapping):
             seg_algo=self.seg_algo,
             resample_to=self.resample_to)
 
-    def resample_roi(self, key):
-        if self.resample_to and (
-            "space" not in self._dict[key]\
-                or self._dict[key]["space"] == "template"):
-            if "resampled" not in self._dict[key]\
-                    or not self._dict[key]["resampled"]:
-                for roi_type in ["include", "exclude"]:
-                    if roi_type in self._dict[key]:
-                        for ii, roi in enumerate(self._dict[key][roi_type]):
-                            self._dict[key][roi_type][ii] =\
-                                afd.read_resample_roi(
-                                    roi, resample_to=self.resample_to)
-                for roi_type in ["start", "end"]:
-                    if roi_type in self._dict[key]:
-                        self._dict[key][roi_type] =\
-                            afd.read_resample_roi(
-                                self._dict[key][roi_type],
-                                resample_to=self.resample_to)
-                self._dict[key]["resampled"] = True
+    def apply_to_rois(self, b_name, func, *args, **kwargs):
+        for roi_type in ["include", "exclude", "start", "end"]:
+            if roi_type in self._dict[b_name]:
+                roi = self._dict[b_name][roi_type]
+                if roi_type in ["start", "end"]:
+                    rois = [roi]
+                else:
+                    rois = roi
+                changed_rois = []
+                for roi in rois:
+                    changed_rois.append(func(roi, *args, **kwargs))
+                if roi_type in ["start", "end"]:
+                    self._dict[b_name][roi_type] = changed_rois[0]
+                else:
+                    self._dict[b_name][roi_type] = changed_rois
+
+    def resample_roi(self, b_name):
+        if self.resample_to:
+            if "resampled" not in self._dict[b_name]\
+                    or not self._dict[b_name]["resampled"]:
+                if self._dict[b_name]["space"] == "template":
+                    resample_to = self.resample_to
+                else:
+                    resample_to = self.resample_subject_to
+                self.apply_to_rois(
+                    b_name,
+                    afd.read_resample_roi,
+                    resample_to=resample_to)
+                self._dict[b_name]["resampled"] = True
 
     def __add__(self, other):
         self.gen_all()
@@ -289,28 +310,33 @@ class BundleDict(MutableMapping):
             raise ValueError((
                 "Adding BundleDicts where seg_algo do not match."
                 f"seg_algo's are {self.seg_algo} and {other.seg_algo}"))
-        if self.resample_to == False or other.resample_to == False:
-            if self.resample_to != other.resample_to:
-                raise ValueError((
-                    "Adding BundleDicts where resample_to do not match."
-                    f"resample_to's are {self.resample_to} and "
-                    f"{other.resample_to}"))
-        else:
-            if not np.all(
-                    self.resample_to.affine == other.resample_to.affine):
-                raise ValueError((
-                    "Adding BundleDicts where resample_to affines"
-                    " do not match. resample_to affines are"
-                    f"{self.resample_to.affine} and "
-                    f"{other.resample_to.affine}"))
-            if not np.all(
-                self.resample_to.header['dim'] ==\
-                    other.resample_to.header['dim']):
-                raise ValueError((
-                    "Adding BundleDicts where resample_to dimensions"
-                    " do not match. resample_to dimensions are"
-                    f"{self.resample_to.header['dim']} and "
-                    f"{other.resample_to.header['dim']}"))
+        for resample in ["resample_to", "resample_subject_to"]:
+            if getattr(self, resample) == False\
+                or getattr(other, resample) == False\
+                    or getattr(self, resample) == None\
+                        or getattr(other, resample) == None:
+                if getattr(self, resample) != getattr(other, resample):
+                    raise ValueError((
+                        f"Adding BundleDicts where {resample} do not match."
+                        f"{resample}'s are {getattr(self, resample)} and "
+                        f"{getattr(other, resample)}"))
+            else:
+                if not np.all(
+                    getattr(self, resample).affine == getattr(
+                        other, resample).affine):
+                    raise ValueError((
+                        f"Adding BundleDicts where {resample} affines"
+                        f" do not match. {resample} affines are"
+                        f"{getattr(self, resample).affine} and "
+                        f"{getattr(other, resample).affine}"))
+                if not np.all(
+                    getattr(self, resample).header['dim'] ==\
+                        getattr(other, resample).header['dim']):
+                    raise ValueError((
+                        f"Adding BundleDicts where {resample} dimensions"
+                        f" do not match. {resample} dimensions are"
+                        f"{getattr(self, resample).header['dim']} and "
+                        f"{getattr(other, resample).header['dim']}"))
         return self.__class__(
             {**self._dict, **other._dict},
             self.seg_algo,
@@ -321,7 +347,8 @@ class PediatricBundleDict(BundleDict):
     def __init__(self,
                  bundle_info=PEDIATRIC_BUNDLES,
                  seg_algo="afq",
-                 resample_to=None):
+                 resample_to=None,
+                 resample_subject_to=None):
         """
         Create a pediatric bundle dictionary, needed for the segmentation
 
@@ -339,16 +366,27 @@ class PediatricBundleDict(BundleDict):
 
         resample_to : Nifti1Image or bool, optional
             If set, templates will be resampled to the affine and shape of this
-            image. If None, the MNI template will be used.
+            image. If None, this will be used:
+            afd.read_pediatric_templates()['UNCNeo-withCerebellum-for-babyAFQ']
             If False, no resampling will be done.
-            Default: afd.read_pediatric_templates()[
-                'UNCNeo-withCerebellum-for-babyAFQ']
+            Default: None
+
+        resample_subject_to : Nifti1Image or bool, optional
+            If there are ROIs with the 'space' attribute
+            set to 'subject', those ROIs will be resampled to the affine
+            and shape of this image.
+            If None, the template will be overriden when passed to
+            an API class.
+            If False, no resampling will be done.
+            Default: None
         """
         if resample_to is None:
             resample_to = afd.read_pediatric_templates()[
                 'UNCNeo-withCerebellum-for-babyAFQ']
         self.resample_to = resample_to
-        BundleDict.__init__(self, bundle_info, seg_algo, resample_to)
+        BundleDict.__init__(
+            self, bundle_info, seg_algo,
+            resample_to, resample_subject_to)
 
     def load_templates(self):
         # Pediatric bundles differ from adult bundles:

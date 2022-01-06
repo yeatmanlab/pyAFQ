@@ -251,7 +251,7 @@ def get_mapping_plan(kwargs, use_sls=False):
                     bids_info["subject"],
                     bids_info["session"]
                 )
-            mapping_tasks["{scalar.name}_file_res"] =\
+            mapping_tasks[f"{scalar.name}_file_res"] =\
                 pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
 
     if use_sls:
