@@ -59,34 +59,36 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
     for bundle in bundle_dict:
         roi_files[bundle] = []
         for roi_type in ['include', 'exclude']:
-            for ii, roi in enumerate(bundle_dict[bundle][roi_type]):
-                fname = op.split(
-                    get_fname(
-                        subses_dict,
-                        f'_desc-ROI-{bundle}-{ii + 1}-{roi_type}.nii.gz'))
+            if roi_type in bundle_dict[bundle]:
+                for ii, roi in enumerate(bundle_dict[bundle][roi_type]):
+                    fname = op.split(
+                        get_fname(
+                            subses_dict,
+                            f'_desc-ROI-{bundle}-{ii + 1}-{roi_type}.nii.gz'))
 
-                fname = op.join(rois_dir, fname[1])
-                if not op.exists(fname):
-                    if "space" not in bundle_dict[bundle]\
-                        or bundle_dict[bundle][
-                            "space"] == "template":
-                        warped_roi = auv.transform_inverse_roi(
-                            roi,
-                            mapping,
-                            bundle_name=bundle)
-                    else:
-                        warped_roi = roi
+                    fname = op.join(rois_dir, fname[1])
+                    if not op.exists(fname):
+                        if "space" not in bundle_dict[bundle]\
+                            or bundle_dict[bundle][
+                                "space"] == "template":
+                            warped_roi = auv.transform_inverse_roi(
+                                roi,
+                                mapping,
+                                bundle_name=bundle)
+                        else:
+                            warped_roi = roi
 
-                    # Cast to float32, so that it can be read in by MI-Brain:
-                    logger.info(f"Saving {fname}")
-                    nib.save(
-                        nib.Nifti1Image(
-                            warped_roi.astype(np.float32),
-                            dwi_affine), fname)
-                    meta = dict()
-                    meta_fname = fname.split('.')[0] + '.json'
-                    write_json(meta_fname, meta)
-                roi_files[bundle].append(fname)
+                        # Cast to float32,
+                        # so that it can be read in by MI-Brain:
+                        logger.info(f"Saving {fname}")
+                        nib.save(
+                            nib.Nifti1Image(
+                                warped_roi.astype(np.float32),
+                                dwi_affine), fname)
+                        meta = dict()
+                        meta_fname = fname.split('.')[0] + '.json'
+                        write_json(meta_fname, meta)
+                    roi_files[bundle].append(fname)
     return {'rois_file': roi_files}
 
 

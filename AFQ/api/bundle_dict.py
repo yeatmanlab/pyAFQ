@@ -312,10 +312,10 @@ class BundleDict(MutableMapping):
                 "Adding BundleDicts where seg_algo do not match."
                 f"seg_algo's are {self.seg_algo} and {other.seg_algo}"))
         for resample in ["resample_to", "resample_subject_to"]:
-            if getattr(self, resample) == False\
-                or getattr(other, resample) == False\
+            if not getattr(self, resample)\
+                    or not getattr(other, resample)\
                     or getattr(self, resample) == None\
-                        or getattr(other, resample) == None:
+                    or getattr(other, resample) == None:
                 if getattr(self, resample) != getattr(other, resample):
                     raise ValueError((
                         f"Adding BundleDicts where {resample} do not match."
@@ -331,7 +331,7 @@ class BundleDict(MutableMapping):
                         f"{getattr(self, resample).affine} and "
                         f"{getattr(other, resample).affine}"))
                 if not np.all(
-                    getattr(self, resample).header['dim'] ==\
+                    getattr(self, resample).header['dim'] ==
                         getattr(other, resample).header['dim']):
                     raise ValueError((
                         f"Adding BundleDicts where {resample} dimensions"

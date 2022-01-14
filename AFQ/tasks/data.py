@@ -600,7 +600,7 @@ def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
         else:
             return roi
     for b_name, b_info in bundle_dict._dict.items():
-        if b_info["space"] == "subject":
+        if "space" in b_info and b_info["space"] == "subject":
             bundle_dict.apply_to_rois(b_name, roi_scalar_to_info)
     return bundle_dict, reg_template
 
