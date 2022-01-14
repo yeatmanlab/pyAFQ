@@ -72,7 +72,10 @@ class ScalarFile(MaskFile):
 
     def get_data(self, subses_dict, bids_info, dwi_affine,
                  reg_template, mapping):
-        return self.fnames[bids_info['session']][bids_info['subject']]
+        if self.from_path:
+            return self.fname
+        else:
+            return self.fnames[bids_info['session']][bids_info['subject']]
 
 
 class TemplateScalar(ScalarMixin, Definition):

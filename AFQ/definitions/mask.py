@@ -221,7 +221,7 @@ class RoiMask(Definition):
                             mapping_imap["mapping"],
                             bundle_name=bundle_name)
                     else:
-                        warped_roi = roi
+                        warped_roi = roi.get_fdata()
 
                     if mask_data is None:
                         mask_data = np.zeros(warped_roi.shape)

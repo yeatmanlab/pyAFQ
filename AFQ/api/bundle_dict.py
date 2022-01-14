@@ -236,6 +236,10 @@ class BundleDict(MutableMapping):
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
             self.gen(key)
+        if self.resample_to and key in self._dict and (
+            "resampled" not in self._dict[key] or not self._dict[
+                key]["resampled"]):
+            self.resample_roi(key)
         return self._dict[key]
 
     def __setitem__(self, key, item):
@@ -298,11 +302,17 @@ class BundleDict(MutableMapping):
                     resample_to = self.resample_to
                 else:
                     resample_to = self.resample_subject_to
-                self.apply_to_rois(
-                    b_name,
-                    afd.read_resample_roi,
-                    resample_to=resample_to)
-                self._dict[b_name]["resampled"] = True
+                try:
+                    self.apply_to_rois(
+                        b_name,
+                        afd.read_resample_roi,
+                        resample_to=resample_to)
+                    self._dict[b_name]["resampled"] = True
+                except AttributeError as e:
+                    if "'ScalarFile' object" in str(e):
+                        self._dict[b_name]["resampled"] = False
+                    else:
+                        raise
 
     def __add__(self, other):
         self.gen_all()
