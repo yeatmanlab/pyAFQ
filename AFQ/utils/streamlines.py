@@ -48,6 +48,8 @@ class SegmentedSFT():
             self.sft.streamlines, self.sft, Space.VOX,
             data_per_streamline=dps)
         if self.this_tracking_idxs is not None:
+            for ii in range(len(self.this_tracking_idxs)):
+                self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
 
         return sft, sidecar_info
