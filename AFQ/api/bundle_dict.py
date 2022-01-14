@@ -293,7 +293,8 @@ class BundleDict(MutableMapping):
         if self.resample_to:
             if "resampled" not in self._dict[b_name]\
                     or not self._dict[b_name]["resampled"]:
-                if self._dict[b_name]["space"] == "template":
+                if "space" not in self._dict[b_name]\
+                        or self._dict[b_name]["space"] == "template":
                     resample_to = self.resample_to
                 else:
                     resample_to = self.resample_subject_to

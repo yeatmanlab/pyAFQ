@@ -38,13 +38,19 @@ class SegmentedSFT():
 
     def get_sft_and_sidecar(self):
         sidecar_info = {}
-        sidecar_info["bundle_idx"] = {}
-        for bundle_name in self.bundle_names:
-            sidecar_info["bundle_idx"][f"{bundle_name}"] = self.bundle_idxs[
-                bundle_name]
+        sidecar_info["bundle_ids"] = {}
+        dps = np.zeros(len(self.sft.streamlines))
+        for ii, bundle_name in enumerate(self.bundle_names):
+            sidecar_info["bundle_ids"][f"{bundle_name}"] = ii + 1
+            dps[self.bundle_idxs[bundle_name]] = ii + 1
+        dps = {"bundle": dps}
+        sft = StatefulTractogram(
+            self.sft.streamlines, self.sft, Space.VOX,
+            data_per_streamline=dps)
         if self.this_tracking_idxs is not None:
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
-        return self.sft, sidecar_info
+
+        return sft, sidecar_info
 
     def get_bundle(self, b_name):
         return self.sft[self.bundle_idxs[b_name]]
@@ -64,11 +70,12 @@ class SegmentedSFT():
         if reference == "same":
             reference = sft
         bundles = {}
-        if "bundle_idx" in sidecar_info:
-            for b_name, b_idxs in sidecar_info["bundle_idx"].items():
+        if "bundle_ids" in sidecar_info:
+            for b_name, b_id in sidecar_info["bundle_ids"].items():
                 if not b_name == "whole_brain":
+                    idx = np.where(sft.data_per_streamline['bundle'] == b_id)[0]
                     bundles[b_name] = StatefulTractogram(
-                        sft.streamlines[b_idxs].copy(), reference, Space.VOX)
+                        sft.streamlines[idx].copy(), reference, Space.VOX)
         else:
             bundles["whole_brain"] = sft
         return cls(bundles)
