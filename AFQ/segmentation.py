@@ -513,7 +513,7 @@ class Segmentation:
                     self.mapping.transform_inverse(
                         prob_map.copy(),
                         interpolation='nearest')
-                
+
             return warped_prob_map, include_rois, exclude_rois,\
                 include_roi_tols, exclude_roi_tols
 

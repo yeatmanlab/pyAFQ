@@ -31,4 +31,3 @@ BUNDLE_MAT_2_PYTHON = \
      'RightILF': 'ILF_R', 'LeftILF': 'ILF_L',
      'Right SLF': 'SLF_R', 'Left SLF': 'SLF_L',
      'RightSLF': 'SLF_R', 'LeftSLF': 'SLF_L'}
-
