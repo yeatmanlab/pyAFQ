@@ -39,6 +39,7 @@ import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
+from AFQ.utils.streamlines import SegmentedSFT
 from AFQ.utils.volume import transform_inverse_roi, density_map
 from AFQ.viz.plot import show_anatomical_slices
 from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
@@ -455,12 +456,17 @@ for bundle in bundles:
                            f'Cleaned {bundle} Density Map')
 
 ##########################################################################
-# Visualizing bundles and tract profiles:
+# Visualizing a bundle and tract profile:
 # ---------------------------------------
 
-plotly.io.show(visualize_bundles(tractogram,
+bundle_to_viz = SegmentedSFT({"AntFrontal": load_tractogram(
+    op.join(working_dir, f'afq_AntFrontal.trk'),
+    img, to_space=Space.VOX)})
+
+plotly.io.show(visualize_bundles(bundle_to_viz,
                                  figure=visualize_volume(warped_MNI_T2_data),
-                                 shade_by_volume=FA_data))
+                                 shade_by_volume=FA_data,
+                                 bundle_dict=bundles))
 
 ##########################################################################
 # Bundle profiles:

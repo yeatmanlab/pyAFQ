@@ -164,8 +164,8 @@ def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
 
     Parameters
     ----------
-    trk_file : str
-        Path to a trk file
+    trk_file : str or SegmentedSFT
+        Path to a trk file or SegmentedSFT
 
     affine : ndarray
        An affine transformation to apply to the streamlines.
@@ -207,7 +207,10 @@ def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
             colors = gen_color_dict(bundle_dict.keys())
 
     viz_logger.info("Loading Stateful Tractogram...")
-    seg_sft = aus.SegmentedSFT.fromfile(trk_file)
+    if isinstance(trk_file, str):
+        seg_sft = aus.SegmentedSFT.fromfile(trk_file)
+    else:
+        seg_sft = trk_file
 
     if affine is not None:
         viz_logger.info("Transforming Stateful Tractogram...")

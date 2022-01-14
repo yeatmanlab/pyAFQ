@@ -8,8 +8,8 @@ you can customize it to define a new bundle based
 on both waypoint ROIs of your design, as well as endpoint
 ROIs of your design.
 
-For now, this is a hypothetical example, as we do not yet
-provide these ROIs as part of the software.
+In these example, we run pyAFQ with both the custom ROIs and
+the default waypoint ROIs.
 """
 
 import os.path as op
@@ -48,6 +48,9 @@ bundles = abd.BundleDict({
         "cross_midline": False
     }
 })
+
+# combine custom ROIs with default BundleDict ROIs
+bundles = bundles + abd.BundleDict()
 
 brain_mask_definition = LabelledMaskFile(
     suffix="seg",

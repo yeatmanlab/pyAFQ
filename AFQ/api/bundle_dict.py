@@ -324,8 +324,8 @@ class BundleDict(MutableMapping):
         for resample in ["resample_to", "resample_subject_to"]:
             if not getattr(self, resample)\
                     or not getattr(other, resample)\
-                    or getattr(self, resample) == None\
-                    or getattr(other, resample) == None:
+                    or getattr(self, resample) is None\
+                    or getattr(other, resample) is None:
                 if getattr(self, resample) != getattr(other, resample):
                     raise ValueError((
                         f"Adding BundleDicts where {resample} do not match."

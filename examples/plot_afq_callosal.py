@@ -38,6 +38,20 @@ tracking_params = dict(seed_mask=RoiMask(),
                        rng_seed=42)
 
 ##########################################################################
+# Set segmentation parameters (optional)
+# ---------------------
+# We make this segmentation_params which we will pass to the AFQ object
+# which specifies that we want to clip the extracted tract profiles
+# to only be between the two ROIs.
+#
+# We do this because tract profiles become less reliable as the bundles
+# approach the gray matter-white matter boundary. On some of the non-callosal
+# bundles, ROIs are not in a good position to clip edges. In these cases,
+# one can remove the first and last nodes in a tract profile.
+
+segmentation_params = {"clip_edges": True}
+
+##########################################################################
 # Initialize an AFQ object:
 # -------------------------
 #
@@ -52,6 +66,7 @@ myafq = GroupAFQ(
     preproc_pipeline='vistasoft',
     bundle_info=abd.CALLOSUM_BUNDLES,
     tracking_params=tracking_params,
+    segmentation_params=segmentation_params,
     viz_backend_spec='plotly_no_gif')
 
 # Calling export all produces all of the outputs of processing, including
