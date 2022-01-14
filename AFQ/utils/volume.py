@@ -2,9 +2,7 @@ import logging
 import numpy as np
 
 import scipy.ndimage as ndim
-from skimage.filters import gaussian
 from skimage.morphology import binary_dilation
-from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import dice
 
 import nibabel as nib

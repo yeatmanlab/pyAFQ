@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 import numpy as np
 import nibabel as nib
-import dipy.reconst.shm as shm
 import logging
 
 import dipy.data as dpd

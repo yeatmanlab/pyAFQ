@@ -4,7 +4,6 @@ import os.path as op
 import numpy as np
 import nibabel as nib
 
-from dipy.core.geometry import vector_norm
 from dipy.reconst import dti
 from scipy.special import gamma
 

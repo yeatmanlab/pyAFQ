@@ -8,15 +8,11 @@ import numpy.testing as npt
 import nibabel as nib
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
-import dipy.tracking.streamline as dts
-import dipy.tracking.utils as dtu
 from dipy.stats.analysis import afq_profile
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data.fetch as afd
-import AFQ.tractography as aft
 import AFQ.segmentation as seg
-import AFQ.models.dti as dti
 
 
 dpd.fetch_stanford_hardi()

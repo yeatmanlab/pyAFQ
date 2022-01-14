@@ -12,7 +12,6 @@ import AFQ.viz.utils as vut
 from AFQ.utils.parallel import parfor
 
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import load_tractogram
 import dipy.tracking.streamlinespeed as dps
 import dipy.tracking.streamline as dts
 

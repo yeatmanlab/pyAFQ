@@ -341,8 +341,8 @@ class BundleDict(MutableMapping):
                         f"{getattr(self, resample).affine} and "
                         f"{getattr(other, resample).affine}"))
                 if not np.all(
-                    getattr(self, resample).header['dim'] ==
-                        getattr(other, resample).header['dim']):
+                    getattr(self, resample).header['dim']
+                        == getattr(other, resample).header['dim']):
                     raise ValueError((
                         f"Adding BundleDicts where {resample} dimensions"
                         f" do not match. {resample} dimensions are"

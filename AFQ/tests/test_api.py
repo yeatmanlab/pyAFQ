@@ -19,16 +19,12 @@ import nibabel.tmpdirs as nbtmp
 
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-import dipy.data as dpd
-from dipy.data import fetcher, get_fnames
-from dipy.io.streamline import save_tractogram, load_tractogram
-from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
 
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
-import AFQ.segmentation as seg
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
 from AFQ.definitions.mask import RoiMask,\

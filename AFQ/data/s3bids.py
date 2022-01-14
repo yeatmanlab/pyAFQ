@@ -21,7 +21,7 @@ from tqdm.auto import tqdm
 import nibabel as nib
 
 from bids import BIDSLayout
-from AFQ.data.fetch import afq_home, to_bids_description
+from AFQ.data.fetch import to_bids_description
 
 
 # +----------------------------------------------------+

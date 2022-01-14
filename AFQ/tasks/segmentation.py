@@ -2,7 +2,6 @@ import nibabel as nib
 import os
 import os.path as op
 from time import time
-import json
 import numpy as np
 import pandas as pd
 import logging

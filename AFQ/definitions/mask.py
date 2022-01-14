@@ -194,7 +194,6 @@ class RoiMask(Definition):
 
     def __init__(self, use_presegment=False):
         self.use_presegment = use_presegment
-        pass
 
     def find_path(self, bids_layout, from_path, subject, session):
         pass

@@ -6,10 +6,9 @@ import numpy as np
 import imageio as io
 
 import nibabel as nib
-from dipy.io.streamline import load_tractogram
 from dipy.tracking.utils import transform_tracking_output
 import dipy.tracking.streamlinespeed as dps
-from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.align import resample
 
 import AFQ.utils.volume as auv

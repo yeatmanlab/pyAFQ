@@ -15,7 +15,6 @@ from AFQ.registration import (register_dwi, write_mapping,
 import AFQ.data.fetch as afd
 
 from dipy.io.streamline import load_tractogram
-from dipy.io.stateful_tractogram import Space
 from dipy.align.imwarp import DiffeomorphicMap
 
 
