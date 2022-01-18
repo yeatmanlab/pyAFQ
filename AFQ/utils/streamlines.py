@@ -1,3 +1,4 @@
+import gc
 from dipy.io.streamline import load_tractogram
 import numpy as np
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -43,15 +44,13 @@ class SegmentedSFT():
             sidecar_info["bundle_ids"][f"{bundle_name}"] = ii + 1
             dps[self.bundle_idxs[bundle_name]] = ii + 1
         dps = {"bundle": dps}
-        sft = StatefulTractogram(
-            self.sft.streamlines, self.sft, Space.VOX,
-            data_per_streamline=dps)
+        self.sft.data_per_streamline = dps
         if self.this_tracking_idxs is not None:
             for ii in range(len(self.this_tracking_idxs)):
                 self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
 
-        return sft, sidecar_info
+        return self.sft, sidecar_info
 
     def get_bundle(self, b_name):
         return self.sft[self.bundle_idxs[b_name]]
@@ -77,7 +76,7 @@ class SegmentedSFT():
                     idx = np.where(
                         sft.data_per_streamline['bundle'] == b_id)[0]
                     bundles[b_name] = StatefulTractogram(
-                        sft.streamlines[idx].copy(), reference, Space.VOX)
+                        sft.streamlines[idx], reference, Space.VOX)
         else:
             bundles["whole_brain"] = sft
         return cls(bundles)
