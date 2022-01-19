@@ -2,6 +2,7 @@ import logging
 from collections.abc import MutableMapping
 import AFQ.data.fetch as afd
 import numpy as np
+import nibabel as nib
 
 
 logging.basicConfig(level=logging.INFO)
@@ -243,6 +244,8 @@ class BundleDict(MutableMapping):
         return self._dict[key]
 
     def __setitem__(self, key, item):
+        if isinstance(item, str):
+            item = nib.load(item)
         self._dict[key] = item
         self.bundle_names.append(key)
         self.resample_roi(key)
