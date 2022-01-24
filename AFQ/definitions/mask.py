@@ -184,7 +184,16 @@ class FullMask(Definition):
 
 class RoiMask(Definition):
     """
-    Define a mask which is all ROIs or'd together.
+    Define a mask which is all include ROIs or'd together.
+
+    Parameters
+    ----------
+    use_presegment : bool
+        Whether to use presegment bundle dict from segmentation params
+        to get ROIs.
+    use_endpoints : bool
+        Whether to use the endpoints ("start" and "end") instead of the
+        include ROIs to generate the mask. 
 
     Examples
     --------
@@ -192,8 +201,9 @@ class RoiMask(Definition):
     api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
-    def __init__(self, use_presegment=False):
+    def __init__(self, use_presegment=False, use_endpoints=False):
         self.use_presegment = use_presegment
+        self.use_endpoints = use_endpoints
 
     def find_path(self, bids_layout, from_path, subject, session):
         pass
@@ -211,7 +221,11 @@ class RoiMask(Definition):
                 bundle_dict = bundle_dict
 
             for bundle_name, bundle_info in bundle_dict.items():
-                for roi in bundle_info['include']:
+                if self.use_endpoints:
+                    rois = [bundle_info["start"], bundle_info["end"]]
+                else:
+                    rois = bundle_info['include']
+                for roi in rois:
                     if "space" not in bundle_info\
                         or bundle_info[
                             "space"] == "template":
