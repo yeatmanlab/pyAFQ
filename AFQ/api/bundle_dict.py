@@ -215,13 +215,11 @@ class BundleDict(MutableMapping):
                 "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
         self.templates_loaded = True
 
-    def gen(self, bundle_name):
+    def _gen(self, bundle_name):
         """
         Given a bundle name, load its
         bundle's dictionary describing the bundle. 
         """
-        if not self.templates_loaded:
-            self.load_templates()
         if self.seg_algo == "afq":
             name = bundle_name[:-2]
             hemi = bundle_name[-2:]
@@ -277,13 +275,18 @@ class BundleDict(MutableMapping):
         If bundle_info is a list of names, this will load
         each bundle's dictionary describing the bundle. 
         """
+        if not self.templates_loaded:
+            self.load_templates()
         for bundle_name in self.bundle_names:
             if bundle_name not in self._dict:
-                self.gen(bundle_name)
+                self._gen(bundle_name)
+        del self.templates
+        self.templates_loaded = False
 
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
-            self.gen(key)
+            # generate all in one go, so templates are not kept in memory
+            self.gen_all()
         if self.resample_to and key in self._dict and (
             "resampled" not in self._dict[key] or not self._dict[
                 key]["resampled"]):
