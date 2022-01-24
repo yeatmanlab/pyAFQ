@@ -73,7 +73,8 @@ class BundleDict(MutableMapping):
         ----------
         bundle_info : list or dict, optional
             A list of the bundles to be used, or a dictionary defining
-            custom bundles.
+            custom bundles. See `Defining Custom Bundle Dictionaries`
+            in the `usage` section of pyAFQ's documentation for details.
             Default: AFQ.api.bundle_dict.BUNDLES
 
         seg_algo: One of {"afq", "reco", "reco16", "reco80"}
@@ -85,19 +86,56 @@ class BundleDict(MutableMapping):
                 "reco80": Use Recobundles with an 80-bundle set.
 
         resample_to : Nifti1Image or bool, optional
-            If set, templates will be resampled to the affine and shape of this
-            image. If None, the MNI template will be used.
+            If there are bundles in bundle_info with the 'space' attribute
+            set to 'template', or with no 'space' attribute,
+            their images (all ROIs and probability maps)
+            will be resampled to the affine and shape of this image.
+            If None, the MNI template will be used.
             If False, no resampling will be done.
             Default: None
 
         resample_subject_to : Nifti1Image or bool, optional
-            If there are ROIs with the 'space' attribute
-            set to 'subject', those ROIs will be resampled to the affine
-            and shape of this image.
+            If there are bundles in bundle_info with the 'space' attribute
+            set to 'subject', their images (all ROIs and probability maps)
+            will be resampled to the affine and shape of this image.
             If None, the template will be overriden when passed to
             an API class.
             If False, no resampling will be done.
             Default: None
+
+        Examples
+        --------
+        # import OR ROIs and create a custom bundle dict
+        # from them
+        import AFQ.data.fetch as afd
+        or_rois = afd.read_or_templates()
+
+        bundles = BundleDict({
+            "L_OR": {
+                "include": [
+                    or_rois["left_OR_1"],  # these can be paths to Nifti files
+                    or_rois["left_OR_2"]],  # or they can Nifti images
+                "exclude": [
+                    or_rois["left_OP_MNI"],
+                    or_rois["left_TP_MNI"],
+                    or_rois["left_pos_thal_MNI"]],
+                "start": or_rois['left_thal_MNI'],
+                "end": or_rois['left_V1_MNI'],
+                "cross_midline": False,
+            },
+            "R_OR": {
+                "include": [
+                    or_rois["right_OR_1"],
+                    or_rois["right_OR_2"]],
+                "exclude": [
+                    or_rois["right_OP_MNI"],
+                    or_rois["right_TP_MNI"],
+                    or_rois["right_pos_thal_MNI"]],
+                "start": or_rois['right_thal_MNI'],
+                "end": or_rois['right_V1_MNI'],
+                "cross_midline": False
+            }
+        })
         """
         if not (isinstance(bundle_info, dict)
                 or isinstance(bundle_info, list)):
@@ -118,7 +156,7 @@ class BundleDict(MutableMapping):
                 self.__setitem__(key, item)
         else:
             for bundle_name in bundle_info:
-                self.add_bundle_name(bundle_name)
+                self.bundle_names.append(bundle_name)
 
         self.logger = logging.getLogger('AFQ.api')
 
@@ -146,6 +184,10 @@ class BundleDict(MutableMapping):
                 self.bundle_names.remove("FA")
 
     def load_templates(self):
+        """
+        Loads templates for generating bundle dictionaries
+        from bundle names.
+        """
         if self.seg_algo == "afq":
             self.templates =\
                 afd.read_templates(resample_to=self.resample_to)
@@ -174,6 +216,10 @@ class BundleDict(MutableMapping):
         self.templates_loaded = True
 
     def gen(self, bundle_name):
+        """
+        Given a bundle name, load its
+        bundle's dictionary describing the bundle. 
+        """
         if not self.templates_loaded:
             self.load_templates()
         if self.seg_algo == "afq":
@@ -227,12 +273,13 @@ class BundleDict(MutableMapping):
             self._dict[bundle_name] = self.templates[bundle_name]
 
     def gen_all(self):
+        """
+        If bundle_info is a list of names, this will load
+        each bundle's dictionary describing the bundle. 
+        """
         for bundle_name in self.bundle_names:
             if bundle_name not in self._dict:
                 self.gen(bundle_name)
-
-    def add_bundle_name(self, bundle_name):
-        self.bundle_names.append(bundle_name)
 
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
@@ -274,29 +321,63 @@ class BundleDict(MutableMapping):
         return iter(self._dict)
 
     def copy(self):
+        """
+        Generates a copy of this BundleDict where the internal dictionary
+        is a copy of this BundleDict's internal dictionary.
+        Useful if you want to add or remove bundles from a copy
+        of a BundleDict.
+
+        Returns
+        ---------
+        bundle_dict : BundleDict
+            Euclidean norms of vectors.
+        """
         self.gen_all()
         return self.__class__(
             self._dict.copy(),
             seg_algo=self.seg_algo,
-            resample_to=self.resample_to)
+            resample_to=self.resample_to,
+            resample_subject_to=self.resample_subject_to)
 
     def apply_to_rois(self, b_name, func, *args, **kwargs):
-        for roi_type in ["include", "exclude", "start", "end"]:
+        """
+        Applies some transformation to all ROIs (include, exclude, end, start)
+        and the prob_map in a given bundle.
+
+        Parameters
+        ----------
+        b_name : name 
+            bundle name of bundle whose ROIs will be transformed.
+        func : function
+            function whose first argument must be a Nifti1Image and which
+            returns a Nifti1Image
+        *args : 
+            Additional arguments for func
+        **kwargs
+            Optional arguments for func
+        """
+        for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
             if roi_type in self._dict[b_name]:
                 roi = self._dict[b_name][roi_type]
-                if roi_type in ["start", "end"]:
+                if roi_type in ["start", "end", "prob_map"]:
                     rois = [roi]
                 else:
                     rois = roi
                 changed_rois = []
                 for roi in rois:
                     changed_rois.append(func(roi, *args, **kwargs))
-                if roi_type in ["start", "end"]:
+                if roi_type in ["start", "end", "prob_map"]:
                     self._dict[b_name][roi_type] = changed_rois[0]
                 else:
                     self._dict[b_name][roi_type] = changed_rois
 
     def resample_roi(self, b_name):
+        """
+        Given a bundle name, resample all ROIs and prob maps
+        into either template or subject space for that bundle,
+        depending on its "space" attribute.
+        """
+        self.gen(b_name)
         if self.resample_to:
             if "resampled" not in self._dict[b_name]\
                     or not self._dict[b_name]["resampled"]:
@@ -335,7 +416,7 @@ class BundleDict(MutableMapping):
                         f"{resample}'s are {getattr(self, resample)} and "
                         f"{getattr(other, resample)}"))
             else:
-                if not np.all(
+                if not np.allclose(
                     getattr(self, resample).affine == getattr(
                         other, resample).affine):
                     raise ValueError((
@@ -343,7 +424,7 @@ class BundleDict(MutableMapping):
                         f" do not match. {resample} affines are"
                         f"{getattr(self, resample).affine} and "
                         f"{getattr(other, resample).affine}"))
-                if not np.all(
+                if not np.allclose(
                     getattr(self, resample).header['dim']
                         == getattr(other, resample).header['dim']):
                     raise ValueError((
@@ -354,7 +435,8 @@ class BundleDict(MutableMapping):
         return self.__class__(
             {**self._dict, **other._dict},
             self.seg_algo,
-            self.resample_to)
+            self.resample_to,
+            self.resample_subject_to)
 
 
 class PediatricBundleDict(BundleDict):

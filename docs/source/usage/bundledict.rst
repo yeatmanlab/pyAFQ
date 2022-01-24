@@ -1,3 +1,5 @@
+Defining Custom Bundle Dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ has a system for defining custom bundles. Custom bundles are defined
 by passing a custom bundle_info dicitonary to
 :class:`AFQ.api.bundle_dict.BundleDict`: . The keys of bundle_info are bundle
