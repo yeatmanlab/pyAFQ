@@ -275,10 +275,10 @@ class BundleDict(MutableMapping):
         If bundle_info is a list of names, this will load
         each bundle's dictionary describing the bundle. 
         """
-        if not self.templates_loaded:
-            self.load_templates()
         for bundle_name in self.bundle_names:
             if bundle_name not in self._dict:
+                if not self.templates_loaded:
+                    self.load_templates()
                 self._gen(bundle_name)
         del self.templates
         self.templates_loaded = False
