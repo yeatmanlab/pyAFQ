@@ -452,7 +452,22 @@ class Segmentation:
         exclude_rois = []
         exclude_roi_tols = []
         for roi_type in ['include', 'exclude']:
-            for roi_idx, roi in enumerate(bundle_entry[roi_type]):
+            if roi_type == 'exclude' and roi_type not in bundle_entry:
+                continue
+            # if no include ROIs, use endpoint ROIs
+            if roi_type == 'include' and roi_type not in bundle_entry:
+                rois = []
+                for end_type in ["start", "end"]:
+                    if end_type in bundle_entry:
+                        rois.append(bundle_entry[end_type])
+                if len(rois) == 0:
+                    raise ValueError((
+                        f"In bundle {bundle}, no include ROIs are found, "
+                        "and no start or endpoint ROIs are found. "
+                        "At least one of these is required"))
+            else:
+                rois = bundle_entry[roi_type]
+            for roi_idx, roi in enumerate(rois):
                 if f'{roi_type[:3]}_addtol' in bundle_entry:
                     this_tol = (
                         bundle_entry[f'{roi_type[:3]}_addtol'][

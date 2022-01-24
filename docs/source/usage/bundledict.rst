@@ -5,7 +5,8 @@ by passing a custom bundle_info dicitonary to
 :class:`AFQ.api.bundle_dict.BundleDict`: . The keys of bundle_info are bundle
 names; the values are another dictionary describing the bundle, with these
 key-value pairs::
-    - 'include' : a list of Nifti1Images containing inclusion ROI(s)
+    - 'include' : a list of Nifti1Images containing inclusion ROI(s). One must
+      either have a tleast 1 include ROI, or 'start' or 'end' ROIs.
     - 'exclude' : a list of Nifti1Images containing exclusion ROI(s), optional
     - 'start' : a Nifti1Image containing the start ROI, optional
     - 'end' : a Nifti1Image containing the end ROI, optional

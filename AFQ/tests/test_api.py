@@ -21,6 +21,7 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
+from AFQ.api.bundle_dict import BundleDict
 
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
@@ -234,7 +235,8 @@ def test_AFQ_custom_tract():
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     # move subsampled tractography into bids folder
     os.rename(
@@ -527,7 +529,8 @@ def test_AFQ_pft():
     """
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
     os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
@@ -561,12 +564,13 @@ def test_AFQ_custom_subject_reg():
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_info = BundleDict([
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"])
 
     b0_file = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_names).b0["01"]
+        bundle_info=bundle_info).b0["01"]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()
@@ -576,7 +580,7 @@ def test_AFQ_custom_subject_reg():
     my_afq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_names,
+        bundle_info=bundle_info,
         reg_template_spec="mni_T2",
         reg_subject_spec=ScalarFile(
             "customb0",
@@ -658,6 +662,9 @@ def test_AFQ_data_waypoint():
 
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+    bundle_info = BundleDict(bundle_names)
+    del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
+
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiMask(),
                            n_seeds=100,
@@ -679,7 +686,7 @@ def test_AFQ_data_waypoint():
         op.join(vista_folder, "sub-01_ses-01_dwi.bval"),
         op.join(vista_folder, "sub-01_ses-01_dwi.bvec"),
         afq_folder,
-        bundle_info=bundle_names,
+        bundle_info=bundle_info,
         scalars=[
             "dti_FA",
             "dti_MD",

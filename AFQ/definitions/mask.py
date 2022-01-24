@@ -222,9 +222,15 @@ class RoiMask(Definition):
 
             for bundle_name, bundle_info in bundle_dict.items():
                 if self.use_endpoints:
-                    rois = [bundle_info["start"], bundle_info["end"]]
+                    rois = []
+                    for end_type in ["start", "end"]:
+                        if end_type in bundle_info:
+                            rois.append(end_type)
                 else:
-                    rois = bundle_info['include']
+                    if 'include' in bundle_info:
+                        rois = bundle_info['include']
+                    else:
+                        rois = []
                 for roi in rois:
                     if "space" not in bundle_info\
                         or bundle_info[

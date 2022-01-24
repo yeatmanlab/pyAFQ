@@ -376,8 +376,9 @@ class BundleDict(MutableMapping):
         Given a bundle name, resample all ROIs and prob maps
         into either template or subject space for that bundle,
         depending on its "space" attribute.
+        Requires b_name to be generated first, if initially
+        only provided as a name.
         """
-        self.gen(b_name)
         if self.resample_to:
             if "resampled" not in self._dict[b_name]\
                     or not self._dict[b_name]["resampled"]:
