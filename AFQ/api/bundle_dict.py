@@ -280,7 +280,8 @@ class BundleDict(MutableMapping):
                 if not self.templates_loaded:
                     self.load_templates()
                 self._gen(bundle_name)
-        del self.templates
+        if self.templates_loaded:
+            del self.templates
         self.templates_loaded = False
 
     def __getitem__(self, key):
