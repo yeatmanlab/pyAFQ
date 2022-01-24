@@ -522,7 +522,8 @@ def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
     bundle_info : list of strings, dict, or BundleDict, optional
         List of bundle names to include in segmentation,
         or a bundle dictionary (see BundleDict for inspiration),
-        or a BundleDict.
+        or a BundleDict. See `Defining Custom Bundle Dictionaries`
+        in the `usage` section of pyAFQ's documentation for details.
         If None, will get all appropriate bundles for the chosen
         segmentation algorithm.
         Default: None

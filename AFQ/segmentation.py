@@ -181,7 +181,7 @@ class Segmentation:
             Default: {}
         filter_by_endpoints: bool
             Whether to filter the bundles based on their endpoints.
-            Applies only to the waypoint approach.
+            Applies only when `seg_algo == 'AFQ'`.
             Default: True.
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance

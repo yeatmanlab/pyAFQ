@@ -1,3 +1,4 @@
+import gc
 import nibabel as nib
 import os
 import os.path as op
@@ -112,10 +113,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
     for b in bundle_dict.keys():
         if b != "whole_brain":
             idx = seg_sft.bundle_idxs[b]
-            this_tg = StatefulTractogram(
-                seg_sft.sft.streamlines[idx],
-                img,
-                Space.VOX)
+            this_tg = seg_sft.get_bundle(b)
             this_tg = seg.clean_bundle(this_tg, **clean_params)
             if clean_params['return_idx']:
                 bundles[b] = {}
@@ -125,13 +123,12 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             else:
                 bundles[b] = this_tg
 
+    sft, meta = aus.SegmentedSFT(bundles).get_sft_and_sidecar()
+
     seg_args = get_default_args(seg.clean_bundle)
     for k in seg_args:
         if callable(seg_args[k]):
             seg_args[k] = seg_args[k].__name__
-
-    new_seg_sft = aus.SegmentedSFT(bundles)
-    sft, meta = new_seg_sft.get_sft_and_sidecar()
 
     meta["source"] = bundles_file
     meta["Parameters"] = seg_args
