@@ -10,10 +10,10 @@ a string inside of one's configuration file for use with the CLI. To do this,
 give a scalar object as an element of the scalars array passed to :class:`AFQ.api.group.GroupAFQ`.
 Then your custom scalar will be automatically used during tract profile extraction.
 
-- :class:`AFQ.definitions.mask.TemplateMask`: This class can be used if you want to transform a scalar
+- :class:`AFQ.definitions.scalar.TemplateMask`: This class can be used if you want to transform a scalar
   you made in some template space to each subject space before using it.
 
-- :class:`AFQ.definitions.mask.ScalarFile`: This class can be used if you have your scalar in subject
+- :class:`AFQ.definitions.scalar.ScalarFile`: This class can be used if you have your scalar in subject
   space, and there is a scalar file in BIDS format already for each subject.
 
 As an example, one might have "ICVF" and "ODI" maps in a BIDS pipeline named "noddi"::
@@ -36,7 +36,7 @@ As an example, one might have "ICVF" and "ODI" maps in a BIDS pipeline named "no
                           ├── sub-01_ses-01_dwi.bvec
                           └── sub-01_ses-01_dwi.nii.gz
 
-You can use :class:`AFQ.definitions.mask.ScalarFile`
+You can use :class:`AFQ.definitions.scalar.ScalarFile`
 to provide these custom scalars to the AFQ object::
 
     ICVF_scalar = ScalarFile(
@@ -53,4 +53,5 @@ to provide these custom scalars to the AFQ object::
             scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
 
 Or provide them using the CLI, by adding them to the `scalars` parameter::
+
     scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', 'ODI', {'scope': 'noddi'})", "ScalarFile('ICVF', 'ICVF', {'scope': 'noddi')" ]

@@ -24,7 +24,7 @@ The requirements of each of these methods are described below:
   object initialization, simply override this method with a method that only
   passes (see :func:`AFQ.definitions.mask.FullMask.find_path` source for an example.)
 
-- The :class:`AFQ.api.group.group.GroupAFQ` object calls `get_for_subses` to get the mask, map,
+- The :class:`AFQ.api.group.GroupAFQ` object calls `get_for_subses` to get the mask, map,
   etc. during workflow construction or execution. The form of this method varies significantly
   between mapping, scalar, and mask `Definition`-inherited classes. `get_for_subses` must
   return a task which can be called to generate the mask.
