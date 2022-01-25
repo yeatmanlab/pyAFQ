@@ -113,7 +113,7 @@ html_theme_options = {
 }
 
 html_sidebars = {
-    "**": ['globaltoc.html'],
+    "**": ['search-field.html', 'sidebar-nav-bs.html'],
 }
 
 html_context = {
