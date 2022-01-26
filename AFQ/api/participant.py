@@ -43,7 +43,7 @@ class ParticipantAFQ(object):
             the BIDS layout to each participant.
         kwargs : additional optional parameters
             You can set additional parameters for any step
-            of the process. See :ref:`kwargs_docs` for more details.
+            of the process. See :ref:`usage/kwargs` for more details.
 
         Examples
         --------

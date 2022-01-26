@@ -112,6 +112,10 @@ html_theme_options = {
 
 }
 
+html_sidebars = {
+    "**": ['search-field.html', 'sidebar-nav-bs.html'],
+}
+
 html_context = {
     "github_url": "https://github.com",
     "github_user": "yeatmanlab",
