@@ -518,7 +518,8 @@ def test_AFQ_reco80():
             'seg_algo': 'reco80',
             'rng': 42})
 
-    seg_sft = aus.SegmentedSFT(myafq.clean_bundles["01"], myafq.img["01"])
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.clean_bundles["01"], myafq.img["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
 
 

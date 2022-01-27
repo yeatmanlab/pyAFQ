@@ -193,7 +193,7 @@ class RoiMask(Definition):
         to get ROIs.
     use_endpoints : bool
         Whether to use the endpoints ("start" and "end") instead of the
-        include ROIs to generate the mask. 
+        include ROIs to generate the mask.
 
     Examples
     --------

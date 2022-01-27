@@ -991,7 +991,7 @@ class Segmentation:
                     recognized_sl = tg.streamlines[rec_labels]
                 else:
                     recognized_sl = indiv_tg.streamlines[rec_labels]
-            standard_sl = self.bundle_dict[bundle]['centroid']
+            standard_sl = next(iter(self.bundle_dict[bundle]['centroid']))
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
             self.logger.info(

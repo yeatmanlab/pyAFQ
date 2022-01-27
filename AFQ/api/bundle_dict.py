@@ -218,9 +218,9 @@ class BundleDict(MutableMapping):
                 **endpoint_templates}
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
-                self.templates = afd.read_hcp_atlas(80)
+                self.templates = afd.read_hcp_atlas(80, as_file=True)
             else:
-                self.templates = afd.read_hcp_atlas(16)
+                self.templates = afd.read_hcp_atlas(16, as_file=True)
         else:
             raise ValueError(
                 "Input: %s is not a valid input`seg_algo`" % self.seg_algo)
@@ -229,7 +229,7 @@ class BundleDict(MutableMapping):
     def _gen(self, bundle_name):
         """
         Given a bundle name, load its
-        bundle's dictionary describing the bundle. 
+        bundle's dictionary describing the bundle.
         """
         if self.seg_algo == "afq":
             name = bundle_name[:-2]
@@ -283,7 +283,7 @@ class BundleDict(MutableMapping):
     def gen_all(self):
         """
         If bundle_info is a list of names, this will load
-        each bundle's dictionary describing the bundle. 
+        each bundle's dictionary describing the bundle.
         """
         for bundle_name in self.bundle_names:
             if bundle_name not in self._dict:
@@ -383,12 +383,12 @@ class BundleDict(MutableMapping):
 
         Parameters
         ----------
-        b_name : name 
+        b_name : name
             bundle name of bundle whose ROIs will be transformed.
         func : function
             function whose first argument must be a Nifti1Image and which
             returns a Nifti1Image
-        *args : 
+        *args :
             Additional arguments for func
         **kwargs
             Optional arguments for func

@@ -940,7 +940,7 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
             feature = ResampleFeature(nb_points=100)
             metric = AveragePointwiseEuclideanMetric(feature)
             qb = QuickBundles(np.inf, metric=metric)
-            cluster = qb.cluster(bundle_sl.streamlines).centroids[0]
+            cluster = [qb.cluster(bundle_sl.streamlines).centroids[0]]
             save_tractogram(
                 StatefulTractogram(
                     cluster, bundle_sl, Space.RASMM),
