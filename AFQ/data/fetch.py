@@ -2,7 +2,8 @@ from dipy.align import resample
 from dipy.segment.clustering import QuickBundles
 from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
                                  ResampleFeature)
-from dipy.io.streamline import load_tractogram, load_trk
+from dipy.io.streamline import (
+    load_tractogram, save_tractogram, StatefulTractogram, Space)
 from dipy.data.fetcher import _make_fetcher
 import dipy.data as dpd
 
@@ -77,6 +78,25 @@ def _make_reusable_fetcher(name, folder, baseurl, remote_fnames, local_fnames,
     return fetcher
 
 
+def _fetcher_to_template(fetcher, as_img=False, resample_to=False):
+    if isinstance(resample_to, str):
+        resample_to = nib.load(resample_to)
+    files, folder = fetcher()
+    template_dict = {}
+    for f in files:
+        img = op.join(folder, f)
+        if as_img:
+            img = nib.load(img)
+        if resample_to:
+            img = nib.Nifti1Image(resample(img.get_fdata(),
+                                           resample_to,
+                                           img.affine,
+                                           resample_to.affine).get_fdata(),
+                                  resample_to.affine)
+        template_dict[f.split('.')[0]] = img
+    return template_dict
+
+
 callosum_fnames = ["Callosum_midsag.nii.gz",
                    "L_AntFrontal.nii.gz",
                    "L_Motor.nii.gz",
@@ -129,8 +149,18 @@ fetch_callosum_templates = _make_reusable_fetcher(
     doc="Download AFQ callosum templates")
 
 
-def read_callosum_templates(resample_to=False):
+def read_callosum_templates(as_img=True, resample_to=False):
     """Load AFQ callosum templates from file
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
 
     Returns
     -------
@@ -139,23 +169,13 @@ def read_callosum_templates(resample_to=False):
     """
     logger = logging.getLogger('AFQ.data')
 
-    files, folder = fetch_callosum_templates()
-
     logger.debug('loading callosum templates')
     tic = time.perf_counter()
 
-    template_dict = {}
-    for f in files:
-        img = nib.load(op.join(folder, f))
-        if resample_to:
-            if isinstance(resample_to, str):
-                resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(resample(img.get_fdata(),
-                                           resample_to,
-                                           img.affine,
-                                           resample_to.affine).get_fdata(),
-                                  resample_to.affine)
-        template_dict[f.split('.')[0]] = img
+    template_dict = _fetcher_to_template(
+        fetch_callosum_templates,
+        as_img=as_img,
+        resample_to=resample_to)
 
     toc = time.perf_counter()
     logger.debug(f'callosum templates loaded in {toc - tic:0.4f} seconds')
@@ -271,11 +291,21 @@ fetch_pediatric_templates = _make_reusable_fetcher(
 )
 
 
-def read_pediatric_templates():
+def read_pediatric_templates(as_img=True, resample_to=False):
     """
     Load pediatric pyAFQ templates.
 
     Used to create pediatric `bundle_dict`.
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
 
     Returns
     -------
@@ -283,13 +313,12 @@ def read_pediatric_templates():
         keys = names of template ROIs, and
         values = `Nifti1Image` from each of the ROI nifti files.
     """
-    files, folder = fetch_pediatric_templates()
 
     print('Loading pediatric templates...', flush=True)
-    pediatric_templates = {}
-    for f in files:
-        img = nib.load(op.join(folder, f))
-        pediatric_templates[f.split('.')[0]] = img
+    pediatric_templates = _fetcher_to_template(
+        fetch_pediatric_templates,
+        as_img=as_img,
+        resample_to=resample_to)
 
     # For the arcuate (AF/ARC), reuse the SLF ROIs
     pediatric_templates['ARC_roi1_L'] = pediatric_templates['SLF_roi1_L']
@@ -512,8 +541,18 @@ fetch_templates = _make_reusable_fetcher(
     doc="Download AFQ templates")
 
 
-def read_templates(resample_to=False):
+def read_templates(as_img=True, resample_to=False):
     """Load AFQ templates from file
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
 
     Returns
     -------
@@ -521,26 +560,13 @@ def read_templates(resample_to=False):
     objects from each of the ROI nifti files.
     """
     logger = logging.getLogger('AFQ.data')
-
-    files, folder = fetch_templates()
-
     logger.debug('loading AFQ templates')
     tic = time.perf_counter()
 
-    template_dict = {}
-    for f in files:
-        img = nib.load(op.join(folder, f))
-        if resample_to:
-            if isinstance(resample_to, str):
-                resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(
-                resample(
-                    img.get_fdata(),
-                    resample_to,
-                    img.affine,
-                    resample_to.affine).get_fdata(),
-                resample_to.affine)
-        template_dict[f.split('.')[0]] = img
+    template_dict = _fetcher_to_template(
+        fetch_templates,
+        as_img=as_img,
+        resample_to=resample_to)
 
     toc = time.perf_counter()
     logger.debug(f'AFQ templates loaded in {toc - tic:0.4f} seconds')
@@ -609,8 +635,18 @@ fetch_or_templates = _make_reusable_fetcher(
     doc="Download AFQ or templates")
 
 
-def read_or_templates(resample_to=False):
+def read_or_templates(as_img=True, resample_to=False):
     """Load AFQ OR templates from file
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
 
     Returns
     -------
@@ -619,25 +655,13 @@ def read_or_templates(resample_to=False):
     """
     logger = logging.getLogger('AFQ.data')
 
-    files, folder = fetch_or_templates()
-
     logger.debug('loading or templates')
     tic = time.perf_counter()
 
-    template_dict = {}
-    for f in files:
-        img = nib.load(op.join(folder, f))
-        if resample_to:
-            if isinstance(resample_to, str):
-                resample_to = nib.load(resample_to)
-            img = nib.Nifti1Image(
-                resample(
-                    img.get_fdata(),
-                    resample_to,
-                    img.affine,
-                    resample_to.affine),
-                resample_to.affine)
-        template_dict[f.split('.')[0]] = img
+    template_dict = _fetcher_to_template(
+        fetch_or_templates,
+        as_img=as_img,
+        resample_to=resample_to)
 
     toc = time.perf_counter()
     logger.debug(f'or templates loaded in {toc - tic:0.4f} seconds')
@@ -680,7 +704,7 @@ def read_stanford_hardi_tractography():
     # We need the original data as reference
     dwi_img, gtab = dpd.read_stanford_hardi()
 
-    files_dict['tractography_subsampled.trk'] = load_trk(
+    files_dict['tractography_subsampled.trk'] = load_tractogram(
         op.join(afq_home,
                 'stanford_hardi_tractography',
                 'tractography_subsampled.trk'),
@@ -688,7 +712,7 @@ def read_stanford_hardi_tractography():
         bbox_valid_check=False,
         trk_header_check=False).streamlines
 
-    files_dict['full_segmented_cleaned_tractography.trk'] = load_trk(
+    files_dict['full_segmented_cleaned_tractography.trk'] = load_tractogram(
         op.join(
             afq_home,
             'stanford_hardi_tractography',
@@ -861,8 +885,12 @@ fetch_hcp_atlas_80_bundles = _make_reusable_fetcher(
     unzip=True)
 
 
-def read_hcp_atlas(n_bundles=16):
+def read_hcp_atlas(n_bundles=16, as_file=False):
     """
+    as_file : bool, optional
+        If True, values are paths to sls. Otherwise, the sl
+        are located and the centroids calculated. Default: False
+
     n_bundles : int
         16 or 80, which selects among the two different
         atlases:
@@ -879,13 +907,15 @@ def read_hcp_atlas(n_bundles=16):
         _, folder = fetch_hcp_atlas_80_bundles()
         atlas_folder = "Atlas_80_Bundles"
 
-    whole_brain = load_tractogram(
-        op.join(
-            folder,
-            atlas_folder,
-            'whole_brain',
-            'whole_brain_MNI.trk'),
-        'same', bbox_valid_check=False).streamlines
+    whole_brain = op.join(
+        folder,
+        atlas_folder,
+        'whole_brain',
+        'whole_brain_MNI.trk')
+    if not as_file:
+        whole_brain = load_tractogram(
+            whole_brain,
+            'same', bbox_valid_check=False).streamlines
 
     bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
@@ -893,19 +923,40 @@ def read_hcp_atlas(n_bundles=16):
             folder,
             atlas_folder,
             "bundles", "*.trk"))
+    centroid_folder = op.join(
+            folder,
+            atlas_folder,
+            "centroid")
+    os.makedirs(centroid_folder, exist_ok=True)
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
+        centroid_file = op.join(centroid_folder, bundle + ".trk")
         bundle_dict[bundle] = {}
-        bundle_dict[bundle]['sl'] = load_tractogram(
-            bundle_file,
-            'same',
-            bbox_valid_check=False).streamlines
-
-        feature = ResampleFeature(nb_points=100)
-        metric = AveragePointwiseEuclideanMetric(feature)
-        qb = QuickBundles(np.inf, metric=metric)
-        cluster = qb.cluster(bundle_dict[bundle]['sl'])
-        bundle_dict[bundle]['centroid'] = cluster.centroids[0]
+        if not op.exists(centroid_file):
+            bundle_sl = load_tractogram(
+                bundle_file,
+                'same',
+                bbox_valid_check=False)
+            feature = ResampleFeature(nb_points=100)
+            metric = AveragePointwiseEuclideanMetric(feature)
+            qb = QuickBundles(np.inf, metric=metric)
+            cluster = qb.cluster(bundle_sl.streamlines).centroids[0]
+            save_tractogram(
+                StatefulTractogram(
+                    cluster, bundle_sl, Space.RASMM),
+                centroid_file,
+                bbox_valid_check=False)
+        if not as_file:
+            bundle_dict[bundle]['sl'] = load_tractogram(
+                bundle_file,
+                'same',
+                bbox_valid_check=False).streamlines
+            bundle_dict[bundle]['centroid'] = load_tractogram(
+                centroid_file,
+                "same", bbox_valid_check=False).streamlines
+        else:
+            bundle_dict[bundle]['sl'] = bundle_file
+            bundle_dict[bundle]['centroid'] = centroid_file
 
     # For some reason, this file-name has a 0 in it, instead of an O:
     bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]

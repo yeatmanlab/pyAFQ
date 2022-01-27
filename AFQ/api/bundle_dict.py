@@ -1,9 +1,11 @@
+from curses import KEY_REPLACE
 import logging
 from collections.abc import MutableMapping
 import AFQ.data.fetch as afd
 import numpy as np
 import nibabel as nib
 
+from dipy.io.streamline import load_tractogram
 
 logging.basicConfig(level=logging.INFO)
 
@@ -65,7 +67,8 @@ class BundleDict(MutableMapping):
                  bundle_info=BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None):
+                 resample_subject_to=None,
+                 keep_in_memory=False):
         """
         Create a bundle dictionary, needed for the segmentation
 
@@ -102,6 +105,13 @@ class BundleDict(MutableMapping):
             an API class.
             If False, no resampling will be done.
             Default: None
+
+        keep_in_memory : bool, optional
+            Whether, once loaded, all ROIs and probability maps will stay
+            loaded in memory within this object. By default, ROIs are loaded
+            into memory on demand and no references to ROIs are kept, other
+            than their paths. The default 18 bundles use ~6GB when all loaded.
+            Default: False
 
         Examples
         --------
@@ -147,6 +157,7 @@ class BundleDict(MutableMapping):
             resample_to = afd.read_mni_template()
         self.resample_to = resample_to
         self.resample_subject_to = resample_subject_to
+        self.keep_in_memory = keep_in_memory
 
         self._dict = {}
         self.bundle_names = []
@@ -190,7 +201,7 @@ class BundleDict(MutableMapping):
         """
         if self.seg_algo == "afq":
             self.templates =\
-                afd.read_templates(resample_to=self.resample_to)
+                afd.read_templates(as_img=False)
             # For the arcuate, we need to rename a few of these
             # and duplicate the SLF ROI:
             self.templates['ARC_roi1_L'] = self.templates['SLF_roi1_L']
@@ -198,7 +209,7 @@ class BundleDict(MutableMapping):
             self.templates['ARC_roi2_L'] = self.templates['SLFt_roi2_L']
             self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
             callosal_templates =\
-                afd.read_callosum_templates(resample_to=self.resample_to)
+                afd.read_callosum_templates(as_img=False)
             endpoint_templates =\
                 afd.bundles_to_aal(self.bundle_names)
             self.templates = {
@@ -264,7 +275,6 @@ class BundleDict(MutableMapping):
                     roi_dict['end'] = self.templates[
                         bundle_name + "_end"]
                 self._dict[bundle_name] = roi_dict
-                self.resample_roi(bundle_name)
             else:
                 raise ValueError(f"{bundle_name} is not in AFQ templates")
         elif self.seg_algo.startswith("reco"):
@@ -288,18 +298,40 @@ class BundleDict(MutableMapping):
         if key not in self._dict and key in self.bundle_names:
             # generate all in one go, so templates are not kept in memory
             self.gen_all()
+        if self.seg_algo == "afq":
+            def cond_load(roi): return nib.load(roi) if isinstance(
+                roi, str) else roi
+        elif self.seg_algo.startswith("reco"):
+            def cond_load(sl): return load_tractogram(
+                sl,
+                'same',
+                bbox_valid_check=False).streamlines
+        if not self.keep_in_memory:
+            old_vals = self.apply_to_rois(key, cond_load)
+        else:
+            if "loaded" not in self._dict[key] or\
+                    not self._dict[key]["loaded"]:
+                self.apply_to_rois(key, cond_load)
+                self._dict[key]["loaded"] = True
+            old_vals = None
         if self.resample_to and key in self._dict and (
             "resampled" not in self._dict[key] or not self._dict[
                 key]["resampled"]):
             self.resample_roi(key)
-        return self._dict[key]
+        _item = self._dict[key].copy()
+        if old_vals is not None:
+            if isinstance(old_vals, dict):
+                for roi_type, roi in old_vals.items():
+                    self._dict[key][roi_type] = roi
+            else:
+                self._dict[key] = old_vals
+        return _item
 
     def __setitem__(self, key, item):
         if isinstance(item, str):
             item = nib.load(item)
         self._dict[key] = item
         self.bundle_names.append(key)
-        self.resample_roi(key)
 
     def __len__(self):
         return len(self.bundle_names)
@@ -341,7 +373,8 @@ class BundleDict(MutableMapping):
             self._dict.copy(),
             seg_algo=self.seg_algo,
             resample_to=self.resample_to,
-            resample_subject_to=self.resample_subject_to)
+            resample_subject_to=self.resample_subject_to,
+            keep_in_memory=self.keep_in_memory)
 
     def apply_to_rois(self, b_name, func, *args, **kwargs):
         """
@@ -359,21 +392,36 @@ class BundleDict(MutableMapping):
             Additional arguments for func
         **kwargs
             Optional arguments for func
+
+        Returns
+        -------
+        Dictionary containing the old values of all ROIs and prob_map
         """
-        for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
-            if roi_type in self._dict[b_name]:
-                roi = self._dict[b_name][roi_type]
-                if roi_type in ["start", "end", "prob_map"]:
-                    rois = [roi]
-                else:
-                    rois = roi
-                changed_rois = []
-                for roi in rois:
-                    changed_rois.append(func(roi, *args, **kwargs))
-                if roi_type in ["start", "end", "prob_map"]:
-                    self._dict[b_name][roi_type] = changed_rois[0]
-                else:
-                    self._dict[b_name][roi_type] = changed_rois
+        old_vals = {}
+        if self.seg_algo == "afq":
+            for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
+                if roi_type in self._dict[b_name]:
+                    roi = self._dict[b_name][roi_type]
+                    old_vals[roi_type] = roi
+                    if roi_type in ["start", "end", "prob_map"]:
+                        self._dict[b_name][roi_type] = func(roi, *args, **kwargs)
+                    else:
+                        changed_rois = []
+                        for _roi in roi:
+                            changed_rois.append(func(_roi, *args, **kwargs))
+                        self._dict[b_name][roi_type] = changed_rois
+        elif self.seg_algo.startswith("reco"):
+            if b_name == "whole_brain":
+                old_vals = self._dict[b_name]
+                self._dict[b_name] = func(
+                    self._dict[b_name], *args, **kwargs)
+            else:
+                for sl_type in ["sl", "centroid"]:
+                    sl = self._dict[b_name][sl_type]
+                    old_vals[sl_type] = sl
+                    self._dict[b_name][sl_type] = func(
+                        sl, *args, **kwargs)
+        return old_vals
 
     def resample_roi(self, b_name):
         """
@@ -383,7 +431,7 @@ class BundleDict(MutableMapping):
         Requires b_name to be generated first, if initially
         only provided as a name.
         """
-        if self.resample_to:
+        if self.resample_to and self.seg_algo == "afq":
             if "resampled" not in self._dict[b_name]\
                     or not self._dict[b_name]["resampled"]:
                 if "space" not in self._dict[b_name]\
@@ -441,7 +489,8 @@ class BundleDict(MutableMapping):
             {**self._dict, **other._dict},
             self.seg_algo,
             self.resample_to,
-            self.resample_subject_to)
+            self.resample_subject_to,
+            self.keep_in_memory)
 
 
 class PediatricBundleDict(BundleDict):
@@ -449,7 +498,8 @@ class PediatricBundleDict(BundleDict):
                  bundle_info=PEDIATRIC_BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None):
+                 resample_subject_to=None,
+                 keep_in_memory=False):
         """
         Create a pediatric bundle dictionary, needed for the segmentation
 
@@ -480,6 +530,14 @@ class PediatricBundleDict(BundleDict):
             an API class.
             If False, no resampling will be done.
             Default: None
+
+        keep_in_memory : bool, optional
+            Whether, once loaded, all ROIs and probability maps will stay
+            loaded in memory within this object. By default, ROIs are loaded
+            into memory on demand and no references to ROIs are kept, other
+            than their paths. The default 18 bundles use ~6GB when all loaded.
+            Default: False
+
         """
         if resample_to is None:
             resample_to = afd.read_pediatric_templates()[
