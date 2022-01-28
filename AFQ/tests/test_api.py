@@ -643,7 +643,7 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
     arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['DATA']['bundle_info']['default'] = ["CST"]
+    arg_dict['DATA']['bundle_info']['default'] = ["CST_L"]
     arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
