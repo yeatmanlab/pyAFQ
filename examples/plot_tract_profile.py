@@ -137,7 +137,8 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
         seed_roi.astype(float), img.affine),
         op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
-                    stop_mask=FA_data, stop_threshold=0.1)
+                    stop_mask=FA_data, stop_threshold=0.1,
+                    directions="det", odf_model="dti")
     save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
                     bbox_valid_check=False)
 else:
