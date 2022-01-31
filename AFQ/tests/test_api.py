@@ -665,7 +665,7 @@ def test_AFQ_data_waypoint():
         t1_path)
 
     bundle_names = ["SLF", "ARC", "CST", "FP"]
-    tracking_params = dict(odf_model="dti",
+    tracking_params = dict(odf_model="csd",
                            seed_mask=RoiMask(),
                            n_seeds=100,
                            random_seeds=True,
@@ -733,22 +733,22 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.profiles
     tract_profiles = pd.read_csv(tract_profile_fname)
-    assert tract_profiles.shape == (400, 7)
+    assert tract_profiles.shape == (600, 7)
 
     myafq.indiv_bundles_figures
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -769,7 +769,7 @@ def test_AFQ_data_waypoint():
 
     # Set up config to use the same parameters as above:
     # ROI mask needs to be put in quotes in config
-    tracking_params = dict(odf_model="DTI",
+    tracking_params = dict(odf_model="CSD",
                            seed_mask="RoiMask()",
                            n_seeds=100,
                            random_seeds=True,
@@ -807,7 +807,7 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (400, 7)
+    assert from_file.shape == (600, 7)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
@@ -819,7 +819,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-DTI_desc-det-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
 
 
 @pytest.mark.nightly_msmt_and_init

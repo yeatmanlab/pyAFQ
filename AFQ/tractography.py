@@ -19,10 +19,10 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
 
 
-def track(params_file, directions="det", max_angle=30., sphere=None,
+def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=10, max_length=1000, odf_model="DTI",
+          min_length=10, max_length=1000, odf_model="CSD",
           tracker="local"):
     """
     Tractography

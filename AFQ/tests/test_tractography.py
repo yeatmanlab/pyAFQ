@@ -62,16 +62,21 @@ def test_dti_local_tracking():
             n_seeds=1,
             step_size=step_size,
             min_length=min_length,
+            odf_model="DTI",
             tracker="local").streamlines
         npt.assert_(len(sl[0]) >= min_length * step_size)
 
 
 def test_pft_tracking():
-    for fname in [fit_dti(fdata, fbval, fbvec)['params'],
-                  fit_csd(fdata, fbval, fbvec,
-                        response=((0.0015, 0.0003, 0.0003), 100),
-                        sh_order=8, lambda_=1, tau=0.1, mask=None,
-                        out_dir=tmpdir.name)]:
+    for fname, odf in zip(
+            [
+                fit_dti(fdata, fbval, fbvec)['params'],
+                fit_csd(
+                    fdata, fbval, fbvec,
+                    response=((0.0015, 0.0003, 0.0003), 100),
+                    sh_order=8, lambda_=1, tau=0.1, mask=None,
+                    out_dir=tmpdir.name)],
+            ["DTI", "CSD"]):
         img = nib.load(fdata)
         data_shape  = img.shape
         data_affine = img.affine
@@ -93,6 +98,7 @@ def test_pft_tracking():
                     n_seeds=1,
                     step_size=step_size,
                     min_length=min_length,
+                    odf_model=odf,
                     tracker="pft").streamlines
                 npt.assert_(len(sl[0]) >= min_length * step_size)
 
