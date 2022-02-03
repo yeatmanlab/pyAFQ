@@ -151,7 +151,7 @@ def viz_import_msg_error(module):
     return msg
 
 
-def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
+def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
                     n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
@@ -165,9 +165,6 @@ def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
     ----------
     trk_file : str or SegmentedSFT
         Path to a trk file or SegmentedSFT
-
-    affine : ndarray
-       An affine transformation to apply to the streamlines.
 
     bundle : str
         The name of a bundle to select from the trk metadata.
@@ -211,12 +208,7 @@ def tract_generator(trk_file, affine, bundle, bundle_dict, colors, n_points,
     else:
         seg_sft = trk_file
 
-    if affine is not None:
-        viz_logger.info("Transforming Stateful Tractogram...")
-        seg_sft.sft = StatefulTractogram.from_sft(
-            transform_tracking_output(seg_sft.sft.streamlines, affine),
-            seg_sft.sft)
-
+    seg_sft.sft.to_vox()
     streamlines = seg_sft.sft.streamlines
     viz_logger.info("Generating colorful lines from tractography...")
 

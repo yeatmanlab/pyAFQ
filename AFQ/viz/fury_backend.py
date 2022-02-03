@@ -34,7 +34,7 @@ def _inline_interact(scene, inline, interact):
     return scene
 
 
-def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
+def visualize_bundles(sft, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, shade_by_volume=None,
                       color_by_streamline=None,
                       sbv_lims=[None, None], include_profiles=(None, None),
@@ -53,10 +53,6 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         In order to visualize individual bundles, the Stateful Tractogram
         must contain a bundle key in it's data_per_streamline which is a list
         of bundle `'uid'`.
-
-    affine : ndarray, optional
-       An affine transformation to apply to the streamlines before
-       visualization. Default: no transform.
 
     n_points : int or None
         n_points to resample streamlines to before plotting. If None, no
@@ -117,7 +113,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     figure.SetBackground(background[0], background[1], background[2])
 
     for (sls, color, name, _) in vut.tract_generator(
-            sft, affine, bundle, bundle_dict, colors, n_points):
+            sft, bundle, bundle_dict, colors, n_points):
         sls = list(sls)
         if name == "all_bundles":
             color = line_colors(sls)

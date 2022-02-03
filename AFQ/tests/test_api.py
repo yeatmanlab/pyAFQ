@@ -459,7 +459,7 @@ def test_AFQ_slr():
         mapping_definition=SlrMap())
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles["01"], myafq.img["01"])
+        myafq.clean_bundles["01"])
     npt.assert_(len(seg_sft.get_bundle.streamlines('CST_L')) > 0)
 
 
@@ -479,7 +479,7 @@ def test_AFQ_reco():
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles["01"], myafq.img["01"])
+        myafq.clean_bundles["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
     myafq.export_all()
 
@@ -519,7 +519,7 @@ def test_AFQ_reco80():
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles["01"], myafq.img["01"])
+        myafq.clean_bundles["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
 
 
@@ -717,7 +717,7 @@ def test_AFQ_data_waypoint():
     np.save(reg_prealign_file, np.eye(4))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles, myafq.img)
+        myafq.clean_bundles)
     npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
 
     # Test ROI exporting:
@@ -736,6 +736,9 @@ def test_AFQ_data_waypoint():
 
     tract_profile_fname = myafq.profiles
     tract_profiles = pd.read_csv(tract_profile_fname)
+
+    assert not tract_profiles.isnull().values.any()
+    assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
     assert tract_profiles.shape == (600, 7)
 
     myafq.indiv_bundles_figures

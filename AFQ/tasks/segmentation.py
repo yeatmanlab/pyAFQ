@@ -1,4 +1,3 @@
-import gc
 import nibabel as nib
 import os
 import os.path as op
@@ -64,7 +63,7 @@ def segment(subses_dict, data_imap, mapping_imap,
         reg_template=reg_template,
         mapping=mapping_imap["mapping"])
 
-    seg_sft = aus.SegmentedSFT(bundles)
+    seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
     tgram, meta = seg_sft.get_sft_and_sidecar()
 
@@ -104,8 +103,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             default_clean_params[k] = clean_params[k]
     clean_params = default_clean_params
 
-    img = nib.load(subses_dict['dwi_file'])
-    seg_sft = aus.SegmentedSFT.fromfile(bundles_file, img)
+    seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
 
     start_time = time()
 
@@ -123,7 +121,8 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             else:
                 bundles[b] = this_tg
 
-    sft, meta = aus.SegmentedSFT(bundles).get_sft_and_sidecar()
+    sft, meta = aus.SegmentedSFT(
+        bundles, Space.RASMM).get_sft_and_sidecar()
 
     seg_args = get_default_args(seg.clean_bundle)
     for k in seg_args:
@@ -163,18 +162,9 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                                          ['clean_bundles', 'bundles']):
         bundles_dir = op.join(subses_dict['results_dir'], folder)
         os.makedirs(bundles_dir, exist_ok=True)
-        img = nib.load(subses_dict['dwi_file'])
-        seg_sft = aus.SegmentedSFT.fromfile(
-            clean_bundles_file,
-            img)
+        seg_sft = aus.SegmentedSFT.fromfile(this_bundles_file)
         for bundle in bundle_dict:
             if bundle != "whole_brain":
-                this_sl = dtu.transform_tracking_output(
-                    seg_sft.get_bundle(bundle).streamlines,
-                    np.linalg.inv(img.affine))
-
-                this_tgm = StatefulTractogram(
-                    this_sl, img, Space.VOX)
                 fname = op.split(
                     get_fname(
                         subses_dict,
@@ -185,7 +175,8 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                 fname = op.join(bundles_dir, fname[1])
                 logger.info(f"Saving {fname}")
                 save_tractogram(
-                    this_tgm, fname, bbox_valid_check=False)
+                    seg_sft.get_bundle(bundle), fname,
+                    bbox_valid_check=False)
                 meta = dict(source=this_bundles_file)
                 meta_fname = fname.split('.')[0] + '.json'
                 write_json(meta_fname, meta)
@@ -201,7 +192,6 @@ def export_sl_counts(subses_dict, data_imap,
     full path to a JSON file containing streamline counts
     """
     bundle_dict = data_imap["bundle_dict"]
-    img = nib.load(subses_dict['dwi_file'])
     sl_counts_clean = []
     sl_counts = []
     bundles = list(bundle_dict.keys())
@@ -211,7 +201,7 @@ def export_sl_counts(subses_dict, data_imap,
     lists = [sl_counts_clean, sl_counts]
 
     for bundles_file, count in zip(bundles_files, lists):
-        seg_sft = aus.SegmentedSFT.fromfile(bundles_file, img)
+        seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
 
         for bundle in bundles:
             if bundle == "whole_brain":
@@ -268,10 +258,9 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     profiles = np.empty((len(scalar_dict), 0)).tolist()
     this_profile = np.zeros((len(scalar_dict), 100))
 
-    img = nib.load(subses_dict['dwi_file'])
     seg_sft = aus.SegmentedSFT.fromfile(
-        clean_bundles_file,
-        img)
+        clean_bundles_file)
+    seg_sft.sft.to_rasmm()
     for bundle_name in bundle_dict.keys():
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
         if len(this_sl) == 0:

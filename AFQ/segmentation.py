@@ -814,7 +814,7 @@ class Segmentation:
 
             select_sl = StatefulTractogram(select_sl,
                                            self.img,
-                                           Space.RASMM)
+                                           Space.VOX)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}

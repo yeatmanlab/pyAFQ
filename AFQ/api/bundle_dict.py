@@ -1,4 +1,3 @@
-from curses import KEY_REPLACE
 import logging
 from collections.abc import MutableMapping
 import AFQ.data.fetch as afd
@@ -317,7 +316,7 @@ class BundleDict(MutableMapping):
         if self.resample_to and key in self._dict and (
             "resampled" not in self._dict[key] or not self._dict[
                 key]["resampled"]):
-            self.resample_roi(key)
+            self._resample_roi(key)
         _item = self._dict[key].copy()
         if old_vals is not None:
             if isinstance(old_vals, dict):
@@ -404,7 +403,8 @@ class BundleDict(MutableMapping):
                     roi = self._dict[b_name][roi_type]
                     old_vals[roi_type] = roi
                     if roi_type in ["start", "end", "prob_map"]:
-                        self._dict[b_name][roi_type] = func(roi, *args, **kwargs)
+                        self._dict[b_name][roi_type] = func(
+                            roi, *args, **kwargs)
                     else:
                         changed_rois = []
                         for _roi in roi:
@@ -423,13 +423,16 @@ class BundleDict(MutableMapping):
                         sl, *args, **kwargs)
         return old_vals
 
-    def resample_roi(self, b_name):
+    def _resample_roi(self, b_name):
         """
         Given a bundle name, resample all ROIs and prob maps
         into either template or subject space for that bundle,
         depending on its "space" attribute.
-        Requires b_name to be generated first, if initially
-        only provided as a name.
+
+        Parameters
+        ----------
+        b_name : str
+            Name of the bundle to be resampled.
         """
         if self.resample_to and self.seg_algo == "afq":
             if "resampled" not in self._dict[b_name]\

@@ -33,7 +33,7 @@ def test_SegmentedSFT():
                                          img,
                                          Space.VOX)}
 
-    seg_sft = aus.SegmentedSFT(bundles)
+    seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
     for k1 in bundles.keys():
         for sl1, sl2 in zip(
                 bundles[k1].streamlines,

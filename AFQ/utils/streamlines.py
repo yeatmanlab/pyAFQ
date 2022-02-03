@@ -7,7 +7,7 @@ import os.path as op
 
 
 class SegmentedSFT():
-    def __init__(self, bundles):
+    def __init__(self, bundles, space):
         reference = None
         self.bundle_names = []
         sls = []
@@ -29,7 +29,7 @@ class SegmentedSFT():
             idx_count = new_idx_count
             self.bundle_names.append(b_name)
 
-        self.sft = StatefulTractogram(sls, reference, Space.VOX)
+        self.sft = StatefulTractogram(sls, reference, space)
         self.bundle_idxs = idxs
         if len(this_tracking_idxs) > 1:
             self.this_tracking_idxs = this_tracking_idxs
@@ -66,7 +66,7 @@ class SegmentedSFT():
                     "JSON sidecars are required for trk files. "
                     f"JSON sidecar not found for: {sidecar_file}"))
         sidecar_info = read_json(sidecar_file)
-        sft = load_tractogram(trk_file, reference, Space.VOX)
+        sft = load_tractogram(trk_file, reference, Space.RASMM)
         if reference == "same":
             reference = sft
         bundles = {}
@@ -76,10 +76,10 @@ class SegmentedSFT():
                     idx = np.where(
                         sft.data_per_streamline['bundle'] == b_id)[0]
                     bundles[b_name] = StatefulTractogram(
-                        sft.streamlines[idx], reference, Space.VOX)
+                        sft.streamlines[idx], reference, Space.RASMM)
         else:
             bundles["whole_brain"] = sft
-        return cls(bundles)
+        return cls(bundles, Space.RASMM)
 
 
 def split_streamline(streamlines, sl_to_split, split_idx):

@@ -223,7 +223,7 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
             yaxis_title=dict(text=vut.display_string(scalar), font=font)))
 
 
-def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
+def visualize_bundles(sft, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, shade_by_volume=None,
                       color_by_streamline=None,
                       sbv_lims=[None, None], include_profiles=(None, None),
@@ -241,10 +241,6 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         In order to visualize individual bundles, the Stateful Tractogram
         must contain a bundle key in it's data_per_streamline which is a list
         of bundle `'uid'`.
-
-    affine : ndarray, optional
-       An affine transformation to apply to the streamlines before
-       visualization. Default: no transform.
 
     n_points : int or None
         n_points to resample streamlines to before plotting. If None, no
@@ -345,7 +341,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
-            sft, affine, bundle, bundle_dict, colors, n_points):
+            sft, bundle, bundle_dict, colors, n_points):
         if isinstance(color_by_streamline, dict):
             if name in color_by_streamline:
                 cbs = color_by_streamline[name]
@@ -728,7 +724,6 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
 
 def single_bundle_viz(indiv_profile, sft,
                       bundle, scalar_name,
-                      affine=None,
                       bundle_dict=None,
                       flip_axes=[False, False, False],
                       figure=None,
@@ -755,10 +750,6 @@ def single_bundle_viz(indiv_profile, sft,
 
     scalar_name : str
         The name of the scalar being used.
-
-    affine : ndarray, optional
-       An affine transformation to apply to the streamlines before
-       visualization. Default: no transform.
 
     bundle_dict : dict, optional
         This parameter is used if bundle is an int.
@@ -797,7 +788,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     n_points = len(indiv_profile)
     sls, _, bundle_name, dimensions = next(vut.tract_generator(
-        sft, affine, bundle, bundle_dict, None, n_points))
+        sft, bundle, bundle_dict, None, n_points))
 
     line_color = _draw_core(
         sls, n_points, figure, bundle_name, indiv_profile,

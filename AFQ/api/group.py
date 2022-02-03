@@ -413,6 +413,7 @@ class GroupAFQ(object):
                 seg_sft = aus.SegmentedSFT.fromfile(
                     this_bundles_file,
                     this_img)
+                seg_sft.sft.to_rasmm()
                 subses_info.append((seg_sft, this_mapping))
 
             bundle_dict = self.bundle_dict[
@@ -445,8 +446,7 @@ class GroupAFQ(object):
                         tg = StatefulTractogram(
                             these_sls,
                             seg_sft.sft,
-                            Space.VOX)
-                        tg.to_rasmm()
+                            Space.RASMM)
                         delta = dts.values_from_volume(
                             mapping.forward,
                             tg.streamlines, np.eye(4))
