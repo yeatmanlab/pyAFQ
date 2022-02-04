@@ -461,7 +461,7 @@ for bundle in bundles:
 
 bundle_to_viz = SegmentedSFT({"AntFrontal": load_tractogram(
     op.join(working_dir, f'afq_AntFrontal.trk'),
-    img, to_space=Space.VOX)})
+    img, to_space=Space.VOX)}, Space.VOX)
 
 plotly.io.show(visualize_bundles(bundle_to_viz,
                                  figure=visualize_volume(warped_MNI_T2_data),
