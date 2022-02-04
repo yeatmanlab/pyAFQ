@@ -718,7 +718,7 @@ def test_AFQ_data_waypoint():
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.clean_bundles)
-    npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
+    npt.assert_(len(seg_sft.get_bundle('SLF_L').streamlines) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
@@ -732,25 +732,24 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-SLF_L_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.profiles
     tract_profiles = pd.read_csv(tract_profile_fname)
 
-    assert not tract_profiles.isnull().values.any()
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (600, 7)
+    assert tract_profiles.shape == (200, 7)
 
     myafq.indiv_bundles_figures
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -809,19 +808,19 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (600, 7)
+    assert from_file.shape == (200, 7)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
+        'sub-01_ses-01_dwi_desc-ROI-SLF_L-1-include.json'))
 
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-SLF_L_tractography.trk'))  # noqa
 
 
 @pytest.mark.nightly_msmt_and_init
