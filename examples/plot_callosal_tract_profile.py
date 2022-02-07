@@ -34,11 +34,12 @@ from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.align import affine_registration
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
 import AFQ.segmentation as seg
+from AFQ.utils.streamlines import SegmentedSFT
 from AFQ.utils.volume import transform_inverse_roi, density_map
 from AFQ.viz.plot import show_anatomical_slices
 from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
@@ -266,10 +267,10 @@ bundles = {}
 
 # anterior frontal ROIs
 bundles["AntFrontal"] = {
-    'ROIs': [callosal_templates["L_AntFrontal"],
-             callosal_templates["R_AntFrontal"],
-             callosal_templates["Callosum_midsag"]],
-    'rules': [True, True, True],
+    'include': [
+        callosal_templates["L_AntFrontal"],
+        callosal_templates["R_AntFrontal"],
+        callosal_templates["Callosum_midsag"]],
     'cross_midline': True
 }
 
@@ -300,23 +301,25 @@ print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
-        for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            if bundles[bundle]['rules'][idx]:
-                warped_roi = transform_inverse_roi(
-                    roi,
-                    mapping,
-                    bundle_name=bundle)
+        for idx, roi in enumerate(bundles[bundle]["include"]):
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
+                bundle_name=bundle)
 
-                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+            nib.save(
+                nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
 
-                warped_roi_img = nib.load(op.join(working_dir,
-                                                  f"{bundle}_{idx+1}.nii.gz"))
-                show_anatomical_slices(warped_roi_img.get_fdata(),
-                                       f'warped {bundle}_{idx+1} ROI')
+            warped_roi_img = nib.load(op.join(
+                working_dir,
+                f"{bundle}_{idx+1}.nii.gz"))
+            show_anatomical_slices(
+                warped_roi_img.get_fdata(),
+                f'warped {bundle}_{idx+1} ROI')
 
-                # Add voxels that aren't there yet:
-                seed_roi = np.logical_or(seed_roi, warped_roi)
+            # Add voxels that aren't there yet:
+            seed_roi = np.logical_or(seed_roi, warped_roi)
 
     seed_roi_img = nib.Nifti1Image(seed_roi.astype(float), img.affine)
     nib.save(seed_roi_img, op.join(working_dir, 'seed_roi.nii.gz'))
@@ -453,12 +456,17 @@ for bundle in bundles:
                            f'Cleaned {bundle} Density Map')
 
 ##########################################################################
-# Visualizing bundles and tract profiles:
+# Visualizing a bundle and tract profile:
 # ---------------------------------------
 
-plotly.io.show(visualize_bundles(tractogram,
+bundle_to_viz = SegmentedSFT({"AntFrontal": load_tractogram(
+    op.join(working_dir, f'afq_AntFrontal.trk'),
+    img, to_space=Space.VOX)}, Space.VOX)
+
+plotly.io.show(visualize_bundles(bundle_to_viz,
                                  figure=visualize_volume(warped_MNI_T2_data),
-                                 shade_by_volume=FA_data))
+                                 shade_by_volume=FA_data,
+                                 bundle_dict=bundles))
 
 ##########################################################################
 # Bundle profiles:

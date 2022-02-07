@@ -1,7 +1,7 @@
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import MaskFile
 
-import AFQ.data as afd
+from AFQ.data.s3bids import write_json
 from AFQ.tasks.utils import get_fname
 
 import nibabel as nib
@@ -32,7 +32,7 @@ class ScalarMixin():
                 meta_fname = get_fname(
                     subses_dict,
                     f'_model-{self.name}.json')
-                afd.write_json(meta_fname, meta)
+                write_json(meta_fname, meta)
             return scalar_file
         return get_for_subses_getter
 
@@ -72,7 +72,10 @@ class ScalarFile(MaskFile):
 
     def get_data(self, subses_dict, bids_info, dwi_affine,
                  reg_template, mapping):
-        return self.fnames[bids_info['session']][bids_info['subject']]
+        if self.from_path:
+            return self.fname
+        else:
+            return self.fnames[bids_info['session']][bids_info['subject']]
 
 
 class TemplateScalar(ScalarMixin, Definition):

@@ -1,12 +1,13 @@
 import nibabel as nib
 import numpy as np
+import logging
 from time import time
 import os.path as op
 
 from AFQ.definitions.utils import Definition, find_file
 from dipy.align import syn_registration, affine_registration
 import AFQ.registration as reg
-import AFQ.data as afd
+import AFQ.data.s3bids as afs
 from AFQ.tasks.utils import get_fname
 
 from dipy.align.imaffine import AffineMap
@@ -26,6 +27,10 @@ except ModuleNotFoundError:
     has_h5py = False
 
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
+
+
+logger = logging.getLogger('AFQ.definitions.mapping')
+
 
 # For map defintions, get_for_subses should return only the mapping
 # Where the mapping has transform and transform_inverse functions
@@ -302,10 +307,11 @@ class GeneratedMapMixin(object):
                 type="rigid",
                 timing=time() - start_time)
             if save:
+                logger.info(f"Saving {prealign_file}")
                 np.save(prealign_file, aff)
                 meta_fname = get_fname(
                     subses_dict, '_prealign_from-DWI_to-MNI_xfm.json')
-                afd.write_json(meta_fname, meta)
+                afs.write_json(meta_fname, meta)
             else:
                 return aff
         if save:
@@ -331,11 +337,12 @@ class GeneratedMapMixin(object):
                 reg_prealign)
             total_time = time() - start_time
 
+            logger.info(f"Saving {mapping_file}")
             reg.write_mapping(mapping, mapping_file)
             meta = dict(
                 type="displacementfield",
                 timing=total_time)
-            afd.write_json(meta_fname, meta)
+            afs.write_json(meta_fname, meta)
         if self.use_prealign:
             reg_prealign_inv = np.linalg.inv(reg_prealign)
         else:

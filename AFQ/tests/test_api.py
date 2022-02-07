@@ -19,16 +19,13 @@ import nibabel.tmpdirs as nbtmp
 
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
-import dipy.data as dpd
-from dipy.data import fetcher, get_fnames
-from dipy.io.streamline import save_tractogram, load_tractogram
-from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
+from AFQ.api.bundle_dict import BundleDict
 
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
-import AFQ.data as afd
-import AFQ.segmentation as seg
+import AFQ.data.fetch as afd
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
 from AFQ.definitions.mask import RoiMask,\
@@ -238,7 +235,8 @@ def test_AFQ_custom_tract():
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     # move subsampled tractography into bids folder
     os.rename(
@@ -460,10 +458,9 @@ def test_AFQ_slr():
         reg_template_spec='hcp_atlas',
         mapping_definition=SlrMap())
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CST_L']) > 0)
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.clean_bundles["01"])
+    npt.assert_(len(seg_sft.get_bundle.streamlines('CST_L')) > 0)
 
 
 @pytest.mark.nightly_reco
@@ -481,10 +478,9 @@ def test_AFQ_reco():
             'seg_algo': 'reco',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CCMid']) > 0)
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.clean_bundles["01"])
+    npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
     myafq.export_all()
 
 
@@ -522,10 +518,9 @@ def test_AFQ_reco80():
             'seg_algo': 'reco80',
             'rng': 42})
 
-    tgram = load_tractogram(myafq.clean_bundles["01"], myafq.img["01"])
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict["01"], myafq.img["01"])
-    npt.assert_(len(bundles['CCMid']) > 0)
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.clean_bundles["01"])
+    npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
 
 
 @pytest.mark.nightly_pft
@@ -535,7 +530,8 @@ def test_AFQ_pft():
     """
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
     os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
@@ -569,12 +565,13 @@ def test_AFQ_custom_subject_reg():
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_info = BundleDict([
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"])
 
     b0_file = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_names).b0["01"]
+        bundle_info=bundle_info).b0["01"]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()
@@ -584,7 +581,7 @@ def test_AFQ_custom_subject_reg():
     my_afq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_names,
+        bundle_info=bundle_info,
         reg_template_spec="mni_T2",
         reg_subject_spec=ScalarFile(
             "customb0",
@@ -646,7 +643,7 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
     arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['DATA']['bundle_info']['default'] = ["CST"]
+    arg_dict['DATA']['bundle_info']['default'] = ["CST_L"]
     arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
@@ -664,7 +661,11 @@ def test_AFQ_data_waypoint():
         afd.read_mni_template(mask=True, weight="T1w"),
         t1_path)
 
-    bundle_names = ["SLF", "ARC", "CST", "FP"]
+    bundle_names = [
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+    bundle_info = BundleDict(bundle_names)
+    del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
+
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiMask(),
                            n_seeds=100,
@@ -686,7 +687,7 @@ def test_AFQ_data_waypoint():
         op.join(vista_folder, "sub-01_ses-01_dwi.bval"),
         op.join(vista_folder, "sub-01_ses-01_dwi.bvec"),
         afq_folder,
-        bundle_info=bundle_names,
+        bundle_info=bundle_info,
         scalars=[
             "dti_FA",
             "dti_MD",
@@ -715,11 +716,9 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    tgram = load_tractogram(myafq.bundles, myafq.img)
-
-    bundles = aus.tgram_to_bundles(
-        tgram, myafq.bundle_dict, myafq.img)
-    npt.assert_(len(bundles['CST_L']) > 0)
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.clean_bundles)
+    npt.assert_(len(seg_sft.get_bundle('SLF_L').streamlines) > 0)
 
     # Test ROI exporting:
     myafq.export_rois()
@@ -733,22 +732,24 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-SLF_L_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.profiles
     tract_profiles = pd.read_csv(tract_profile_fname)
-    assert tract_profiles.shape == (600, 7)
+
+    assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
+    assert tract_profiles.shape == (200, 7)
 
     myafq.indiv_bundles_figures
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.results_dir,
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_CST_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -807,19 +808,19 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (600, 7)
+    assert from_file.shape == (200, 7)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
+        'sub-01_ses-01_dwi_desc-ROI-SLF_L-1-include.json'))
 
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-CST_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-SLF_L_tractography.trk'))  # noqa
 
 
 @pytest.mark.nightly_msmt_and_init

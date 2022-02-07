@@ -1,79 +1,85 @@
+import gc
+from dipy.io.streamline import load_tractogram
 import numpy as np
-import nibabel as nib
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
+from AFQ.data.s3bids import read_json
+import os.path as op
 
 
-def add_bundles(t1, t2):
-    """
-    Combine two bundles, using the second bundles' affine and
-    data_per_streamline keys.
-     Parameters
-    ----------
-    t1, t2 : nib.streamlines.Tractogram class instances
-    """
-    data_per_streamline = {k: (list(t1.data_per_streamline[k])
-                               + list(t2.data_per_streamline[k]))
-                           for k in t2.data_per_streamline.keys()}
-    return nib.streamlines.Tractogram(
-        list(t1.streamlines) + list(t2.streamlines),
-        data_per_streamline,
-        affine_to_rasmm=t2.affine_to_rasmm)
+class SegmentedSFT():
+    def __init__(self, bundles, space):
+        reference = None
+        self.bundle_names = []
+        sls = []
+        idxs = {}
+        this_tracking_idxs = []
+        idx_count = 0
+        for b_name in bundles:
+            if isinstance(bundles[b_name], dict):
+                this_sls = bundles[b_name]['sl']
+                this_tracking_idxs.extend(bundles[b_name]['idx'])
+            else:
+                this_sls = bundles[b_name]
+            if reference is None:
+                reference = this_sls
+            this_sls = list(this_sls.streamlines)
+            sls.extend(this_sls)
+            new_idx_count = idx_count + len(this_sls)
+            idxs[b_name] = list(range(idx_count, new_idx_count))
+            idx_count = new_idx_count
+            self.bundle_names.append(b_name)
 
+        self.sft = StatefulTractogram(sls, reference, space)
+        self.bundle_idxs = idxs
+        if len(this_tracking_idxs) > 1:
+            self.this_tracking_idxs = this_tracking_idxs
+        else:
+            self.this_tracking_idxs = None
 
-def bundles_to_tgram(bundles, bundle_dict, reference):
-    """
-    Create a StatefulTractogram object from bundles and their
-    specification.
+    def get_sft_and_sidecar(self):
+        sidecar_info = {}
+        sidecar_info["bundle_ids"] = {}
+        dps = np.zeros(len(self.sft.streamlines))
+        for ii, bundle_name in enumerate(self.bundle_names):
+            sidecar_info["bundle_ids"][f"{bundle_name}"] = ii + 1
+            dps[self.bundle_idxs[bundle_name]] = ii + 1
+        dps = {"bundle": dps}
+        self.sft.data_per_streamline = dps
+        if self.this_tracking_idxs is not None:
+            for ii in range(len(self.this_tracking_idxs)):
+                self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
+            sidecar_info["tracking_idx"] = self.this_tracking_idxs
 
-    Parameters
-    ----------
-    bundles: dict
-        Each key in the dict is a bundle name and each value in the dict
-        is the stateful tractogram of a particular bundle.
-    bundle_dict: dict
-        A bundle specification dictionary. Each key is a bundle name, and each
-        value is another dictionary specifying bundle properties. In this
-        value dictionary, there must be one `uid` key whose value is a
-        unique integer for that bundle.
-    reference : Nifti
-        The affine_to_rasmm input to `nib.streamlines.Tractogram`
-    """
-    tgram = nib.streamlines.Tractogram([], {'bundle': []})
-    for b in bundles:
-        this_sl = bundles[b].streamlines
-        this_tgram = nib.streamlines.Tractogram(
-            this_sl,
-            data_per_streamline={
-                'bundle': (len(this_sl)
-                           * [bundle_dict[b]['uid']])},
-                affine_to_rasmm=reference.affine)
-        tgram = add_bundles(tgram, this_tgram)
-    return StatefulTractogram(tgram.streamlines, reference, Space.VOX,
-                              data_per_streamline=tgram.data_per_streamline)
+        return self.sft, sidecar_info
 
+    def get_bundle(self, b_name):
+        return self.sft[self.bundle_idxs[b_name]]
 
-def tgram_to_bundles(tgram, bundle_dict, reference):
-    """
-    Convert a StatefulTractogram object to a dict with StatefulTractogram
-    objects for each bundle.
-
-    Parameters
-    ----------
-    tgram : StatefulTractogram class instance.
-        Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
-
-    bundle_dict: dict
-        A bundle specification dictionary. Each item includes in particular a
-        `uid` key that is a unique integer for that bundle.
-    """
-    bundles = {}
-    for bb in bundle_dict.keys():
-        if not bb == 'whole_brain':
-            uid = bundle_dict[bb]['uid']
-            idx = np.where(tgram.data_per_streamline['bundle'] == uid)[0]
-            bundles[bb] = StatefulTractogram(
-                tgram.streamlines[idx].copy(), reference, Space.VOX)
-    return bundles
+    @classmethod
+    def fromfile(cls, trk_file, reference="same", sidecar_file=None):
+        if sidecar_file is None:
+            # assume json sidecar has the same name as trk_file,
+            # but with json suffix
+            sidecar_file = trk_file.split('.')[0] + '.json'
+            if not op.exists(sidecar_file):
+                raise ValueError((
+                    "JSON sidecars are required for trk files. "
+                    f"JSON sidecar not found for: {sidecar_file}"))
+        sidecar_info = read_json(sidecar_file)
+        sft = load_tractogram(trk_file, reference, Space.RASMM)
+        if reference == "same":
+            reference = sft
+        bundles = {}
+        if "bundle_ids" in sidecar_info:
+            for b_name, b_id in sidecar_info["bundle_ids"].items():
+                if not b_name == "whole_brain":
+                    idx = np.where(
+                        sft.data_per_streamline['bundle'] == b_id)[0]
+                    bundles[b_name] = StatefulTractogram(
+                        sft.streamlines[idx], reference, Space.RASMM)
+        else:
+            bundles["whole_brain"] = sft
+        return cls(bundles, Space.RASMM)
 
 
 def split_streamline(streamlines, sl_to_split, split_idx):

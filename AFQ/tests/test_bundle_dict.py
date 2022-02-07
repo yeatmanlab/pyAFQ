@@ -1,7 +1,7 @@
 import AFQ.api.bundle_dict as abd
 from AFQ.tests.test_api import create_dummy_bids_path
 from AFQ.api.group import GroupAFQ
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import pytest
 
 
@@ -22,18 +22,10 @@ def test_BundleDict():
     # test defaults
     afq_bundles = abd.BundleDict()
 
-    # bundles restricted within hemisphere
-    # NOTE: FA and FP cross midline so are removed
-    # NOTE: all others generate two bundles
-    num_hemi_bundles = (len(abd.BUNDLES)-2)*2
-
-    # bundles that cross the midline
-    num_whole_bundles = 2
-
-    assert len(afq_bundles) == num_hemi_bundles + num_whole_bundles
+    assert len(afq_bundles) == len(abd.BUNDLES)
 
     # Arcuate Fasciculus
-    afq_bundles = abd.BundleDict(["ARC"])
+    afq_bundles = abd.BundleDict(["ARC_L", "ARC_R"])
 
     assert len(afq_bundles) == 2
 
@@ -44,7 +36,7 @@ def test_BundleDict():
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = abd.BundleDict(["HCC"])
+    afq_bundles = abd.BundleDict(["HCC_L", "HCC_R"])
 
     assert len(afq_bundles) == 2
 
@@ -52,11 +44,10 @@ def test_BundleDict():
     afq_templates = afd.read_templates()
     afq_bundles = abd.BundleDict({
         "custom_bundle": {
-            "ROIs": [afq_templates["FA_L"],
-                     afq_templates["FP_R"]],
-            "rules": [True, True],
-            "cross_midline": False,
-            "uid": 1}})
+            "include": [
+                afq_templates["FA_L"],
+                afq_templates["FP_R"]],
+            "cross_midline": False}})
     afq_bundles.get("custom_bundle")
 
     assert len(afq_bundles) == 1
@@ -65,11 +56,11 @@ def test_BundleDict():
     # not included and does not exist in afq templates
     with pytest.raises(
             ValueError,
-            match="VOF_R is not in AFQ templates"):
-        afq_bundles = abd.BundleDict(["VOF"])
+            match="VOF_L is not in AFQ templates"):
+        afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"])
         afq_bundles["VOF_R"]
 
-    afq_bundles = abd.BundleDict(["VOF"], seg_algo="reco80")
+    afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"], seg_algo="reco80")
     assert len(afq_bundles) == 2
 
     afq_bundles = abd.BundleDict(["whole_brain"], seg_algo="reco80")

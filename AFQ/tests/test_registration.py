@@ -12,10 +12,9 @@ from AFQ.registration import (register_dwi, write_mapping,
                               read_mapping, syn_register_dwi,
                               slr_registration)
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 from dipy.io.streamline import load_tractogram
-from dipy.io.stateful_tractogram import Space
 from dipy.align.imwarp import DiffeomorphicMap
 
 

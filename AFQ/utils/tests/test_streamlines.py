@@ -1,15 +1,12 @@
-import os.path as op
 import numpy as np
 import numpy.testing as npt
 import nibabel as nib
-import nibabel.tmpdirs as nbtmp
 from AFQ.utils import streamlines as aus
-import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 
-def test_bundles_to_tgram():
+def test_SegmentedSFT():
 
     affine = np.array([[2., 0., 0., -80.],
                        [0., 2., 0., -120.],
@@ -17,7 +14,7 @@ def test_bundles_to_tgram():
                        [0., 0., 0., 1.]])
     img = nib.Nifti1Image(np.ones((10, 10, 10, 30)), affine)
 
-    bundles = {'b1': StatefulTractogram([np.array([[0, 0, 0],
+    bundles = {'ba': StatefulTractogram([np.array([[0, 0, 0],
                                                    [0, 0, 0.5],
                                                    [0, 0, 1],
                                                    [0, 0, 1.5]]),
@@ -26,7 +23,7 @@ def test_bundles_to_tgram():
                                                    [0, 1, 1]])],
                                          img,
                                          Space.VOX),
-               'b2': StatefulTractogram([np.array([[0, 0, 0],
+               'bb': StatefulTractogram([np.array([[0, 0, 0],
                                                    [0, 0, 0.5],
                                                    [0, 0, 2],
                                                    [0, 0, 2.5]]),
@@ -36,13 +33,12 @@ def test_bundles_to_tgram():
                                          img,
                                          Space.VOX)}
 
-    bundle_dict = {'b1': {'uid': 1}, 'b2':{'uid': 2}}
-    tgram = aus.bundles_to_tgram(bundles, bundle_dict, img)
-    new_bundles = aus.tgram_to_bundles(tgram, bundle_dict, img)
+    seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
     for k1 in bundles.keys():
-        for k2 in bundles[k1].__dict__.keys():
-            for sl1, sl2 in zip(bundles[k1].streamlines, new_bundles[k1].streamlines):
-                npt.assert_equal(sl1, sl2)
+        for sl1, sl2 in zip(
+                bundles[k1].streamlines,
+                seg_sft.get_bundle(k1).streamlines):
+            npt.assert_equal(sl1, sl2)
 
 
 def test_split_streamline():
@@ -70,23 +66,3 @@ def test_split_streamline():
                 )
         else:
             assert new_streamlines.__dict__[k] == test_streamlines.__dict__[k]
-
-
-def test_add_bundles():
-    t1 = nib.streamlines.Tractogram(
-            [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-             np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    t2 = nib.streamlines.Tractogram(
-        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    added = aus.add_bundles(t1, t2)
-    test_tgram =nib.streamlines.Tractogram(
-        [np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]]),
-            np.array([[0, 0, 0], [0, 0, 0.5], [0, 0, 1], [0, 0, 1.5]]),
-            np.array([[0, 0, 0], [0, 0.5, 0.5], [0, 1, 1]])])
-
-    for sl1, sl2 in zip(added.streamlines, test_tgram.streamlines):
-        npt.assert_array_equal(sl1, sl2)

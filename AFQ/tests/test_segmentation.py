@@ -8,15 +8,11 @@ import numpy.testing as npt
 import nibabel as nib
 import dipy.data as dpd
 import dipy.data.fetcher as fetcher
-import dipy.tracking.streamline as dts
-import dipy.tracking.utils as dtu
 from dipy.stats.analysis import afq_profile
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
-import AFQ.data as afd
-import AFQ.tractography as aft
+import AFQ.data.fetch as afd
 import AFQ.segmentation as seg
-import AFQ.models.dti as dti
 
 
 dpd.fetch_stanford_hardi()
@@ -32,16 +28,18 @@ tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
 streamlines = tg.streamlines
 templates = afd.read_templates()
-bundles = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
-                              templates['CST_roi2_L']],
-                     'rules': [True, True],
-                     'prob_map': templates['CST_L_prob_map'],
-                     'cross_midline': None},
-           'CST_R': {'ROIs': [templates['CST_roi1_R'],
-                              templates['CST_roi1_R']],
-                     'rules': [True, True],
-                     'prob_map': templates['CST_R_prob_map'],
-                     'cross_midline': None}}
+bundles = {'CST_L': {
+                    'include': [
+                        templates['CST_roi1_L'],
+                        templates['CST_roi2_L']],
+                    'prob_map': templates['CST_L_prob_map'],
+                    'cross_midline': None},
+           'CST_R': {
+                    'include': [
+                        templates['CST_roi1_R'],
+                        templates['CST_roi1_R']],
+                    'prob_map': templates['CST_R_prob_map'],
+                    'cross_midline': None}}
 
 
 def test_segment():
@@ -73,14 +71,17 @@ def test_segment():
 @pytest.mark.nightly
 def test_segment_no_prob():
     # What if you don't have probability maps?
-    bundles_no_prob = {'CST_L': {'ROIs': [templates['CST_roi1_L'],
-                                          templates['CST_roi2_L']],
-                                 'rules': [True, True],
-                                 'cross_midline': False},
-                       'CST_R': {'ROIs': [templates['CST_roi1_R'],
-                                          templates['CST_roi1_R']],
-                                 'rules': [True, True],
-                                 'cross_midline': False}}
+    bundles_no_prob = {
+        'CST_L': {
+            'include': [
+                templates['CST_roi1_L'],
+                templates['CST_roi2_L']],
+            'cross_midline': False},
+        'CST_R': {
+            'include': [
+                templates['CST_roi1_R'],
+                templates['CST_roi1_R']],
+            'cross_midline': False}}
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles_no_prob,

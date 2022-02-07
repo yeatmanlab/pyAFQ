@@ -17,12 +17,12 @@ from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram
-from dipy.align import resample
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
-import AFQ.data as afd
+import AFQ.data.fetch as afd
+from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.utils.parallel import parfor
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
@@ -65,7 +65,6 @@ class Segmentation:
                  presegment_bundle_dict=None,
                  presegment_kwargs={},
                  filter_by_endpoints=True,
-                 endpoint_info=None,
                  dist_to_atlas=4,
                  save_intermediates=None):
         """
@@ -150,12 +149,12 @@ class Segmentation:
             ROI in order to be included or excluded.
             If set to None (default), will be calculated as the
             center-to-corner distance of the voxel in the diffusion data.
-            If a bundle has additional_tolerance in its bundle_dict, that
+            If a bundle has inc_addtol or exc_addtol in its bundle_dict, that
             tolerance will be added to this distance.
             For example, if you wanted to increase tolerance for the right
             arcuate waypoint ROIs by 3 each, you could make the following
             modification to your bundle_dict:
-            bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
+            bundle_dict["ARC_R"]["inc_addtol"] = [3, 3]
             Additional tolerances can also be negative.
         rng : RandomState or int
             If None, creates RandomState.
@@ -169,28 +168,21 @@ class Segmentation:
             If not None, presegment by ROIs before performing
             RecoBundles. Only used if seg_algo starts with 'Reco'.
             Meta-data for the segmentation. The format is something like::
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
+                {'bundle_name': {
+                    'include':[img1, img2],
+                    'prob_map': img3,
+                    'cross_midline': False,
+                    'start': img4,
+                    'end': img5}}
             Default: None
         presegment_kwargs : dict
             Optional arguments for initializing the segmentation for the
             presegmentation. Only used if presegment_bundle_dict is not None.
             Default: {}
         filter_by_endpoints: bool
-            Whether to filter the bundles based on their endpoints relative
-            to regions defined in the AAL atlas. Applies only to the waypoint
-            approach (XXX for now). Default: True.
-        endpoint_info : dict, optional. This overrides use of the
-            AAL atlas, which is the default behavior.
-            The format for this should be:
-            {"bundle1": {"startpoint":img1_1,
-                         "endpoint":img1_2},
-             "bundle2": {"startpoint":img2_1,
-                          "endpoint":img2_2}}
-            where the images used are binary masks of the desired
-            endpoints.
+            Whether to filter the bundles based on their endpoints.
+            Applies only when `seg_algo == 'AFQ'`.
+            Default: True.
         dist_to_atlas : float
             If filter_by_endpoints is True, this is the required distance
             from the endpoints to the atlas ROIs.
@@ -234,7 +226,6 @@ class Segmentation:
         self.presegment_bundle_dict = presegment_bundle_dict
         self.presegment_kwargs = presegment_kwargs
         self.filter_by_endpoints = filter_by_endpoints
-        self.endpoint_info = endpoint_info
         self.dist_to_atlas = dist_to_atlas
         self.parallel_segmentation = parallel_segmentation
 
@@ -273,10 +264,12 @@ class Segmentation:
         ----------
         bundle_dict: dict or AFQ.api.BundleDict
             Meta-data for the segmentation. The format is something like::
-                {'name': {'ROIs':[img1, img2],
-                'rules':[True, True]},
-                'prob_map': img3,
-                'cross_midline': False}
+                {'bundle_name': {
+                    'include':[img1, img2],
+                    'prob_map': img3,
+                    'cross_midline': False,
+                    'start': img4,
+                    'end': img5}}
         tg : StatefulTractogram
             Bundles to segment
         fdata, fbval, fbvec : str
@@ -449,69 +442,95 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol):
+    def _get_bundle_info(self, bundle, vox_dim, tol):
         """
         Get fiber probabilites and ROIs for a given bundle.
         """
         bundle_entry = self.bundle_dict[bundle]
-        rules = bundle_entry['rules']
         include_rois = []
         include_roi_tols = []
         exclude_rois = []
         exclude_roi_tols = []
-        for rule_idx, rule in enumerate(rules):
-            roi = bundle_entry['ROIs'][rule_idx]
-            if 'additional_tolerance' in bundle_entry:
-                this_tol = (bundle_entry['additional_tolerance'][rule_idx]
-                            / vox_dim + tol)**2
+        for roi_type in ['include', 'exclude']:
+            if roi_type == 'exclude' and roi_type not in bundle_entry:
+                continue
+            # if no include ROIs, use endpoint ROIs
+            if roi_type == 'include' and roi_type not in bundle_entry:
+                rois = []
+                for end_type in ["start", "end"]:
+                    if end_type in bundle_entry:
+                        rois.append(bundle_entry[end_type])
+                if len(rois) == 0:
+                    raise ValueError((
+                        f"In bundle {bundle}, no include ROIs are found, "
+                        "and no start or endpoint ROIs are found. "
+                        "At least one of these is required"))
             else:
-                this_tol = tol**2
+                rois = bundle_entry[roi_type]
+            for roi_idx, roi in enumerate(rois):
+                if f'{roi_type[:3]}_addtol' in bundle_entry:
+                    this_tol = (
+                        bundle_entry[f'{roi_type[:3]}_addtol'][
+                            roi_idx] / vox_dim + tol)**2
+                else:
+                    this_tol = tol**2
 
-            warped_roi = auv.transform_inverse_roi(
-                roi,
-                self.mapping,
-                bundle_name=bundle)
+                if "space" not in self.bundle_dict[bundle]\
+                        or self.bundle_dict[bundle][
+                            "space"] == "template":
+                    warped_roi = auv.transform_inverse_roi(
+                        roi,
+                        self.mapping,
+                        bundle_name=bundle)
+                else:
+                    warped_roi = roi
 
-            if rule:
-                # include ROI:
-                include_roi_tols.append(this_tol)
-                include_rois.append(np.array(np.where(warped_roi)).T)
+                if roi_type == 'include':
+                    # include ROI:
+                    include_roi_tols.append(this_tol)
+                    include_rois.append(np.array(np.where(warped_roi)).T)
+                else:
+                    # Exclude ROI:
+                    exclude_roi_tols.append(this_tol)
+                    exclude_rois.append(np.array(np.where(warped_roi)).T)
+
+                # For debugging purposes, we can save the variable as it is:
+                if self.save_intermediates is not None:
+                    os.makedirs(
+                        op.join(self.save_intermediates,
+                                'warpedROI_',
+                                bundle),
+                        exist_ok=True)
+                    nib.save(
+                        nib.Nifti1Image(warped_roi.astype(np.float32),
+                                        self.img_affine),
+                        op.join(self.save_intermediates,
+                                'warpedROI_',
+                                bundle,
+                                'as_used.nii.gz'))
+
+            # The probability map if doesn't exist is all ones with the same
+            # shape as the ROIs:
+            if isinstance(roi, str):
+                roi = nib.load(roi)
+            if isinstance(roi, nib.Nifti1Image):
+                roi = roi.get_fdata()
+            prob_map = bundle_entry.get(
+                'prob_map', np.ones(roi.shape))
+
+            if not isinstance(prob_map, np.ndarray):
+                prob_map = prob_map.get_fdata()
+            if "space" in bundle_entry\
+                    and bundle_entry["space"] == "subject":
+                warped_prob_map = prob_map.copy()
             else:
-                # Exclude ROI:
-                exclude_roi_tols.append(this_tol)
-                exclude_rois.append(np.array(np.where(warped_roi)).T)
+                warped_prob_map = \
+                    self.mapping.transform_inverse(
+                        prob_map.copy(),
+                        interpolation='nearest')
 
-            # For debugging purposes, we can save the variable as it is:
-            if self.save_intermediates is not None:
-                os.makedirs(
-                    op.join(self.save_intermediates,
-                            'warpedROI_',
-                            bundle),
-                    exist_ok=True)
-                nib.save(
-                    nib.Nifti1Image(warped_roi.astype(np.float32),
-                                    self.img_affine),
-                    op.join(self.save_intermediates,
-                            'warpedROI_',
-                            bundle,
-                            'as_used.nii.gz'))
-
-        # The probability map if doesn't exist is all ones with the same
-        # shape as the ROIs:
-        if isinstance(roi, str):
-            roi = nib.load(roi)
-        if isinstance(roi, nib.Nifti1Image):
-            roi = roi.get_fdata()
-        prob_map = bundle_entry.get(
-            'prob_map', np.ones(roi.shape))
-
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_fdata()
-        warped_prob_map = \
-            self.mapping.transform_inverse(prob_map.copy(),
-                                           interpolation='nearest')
-        return warped_prob_map, include_rois, exclude_rois,\
-            include_roi_tols, exclude_roi_tols
+            return warped_prob_map, include_rois, exclude_rois,\
+                include_roi_tols, exclude_roi_tols
 
     def _return_empty(self, bundle):
         """
@@ -566,26 +585,12 @@ class Segmentation:
         else:
             tol = self.dist_to_waypoint / vox_dim
 
-        if self.filter_by_endpoints:
-            if self.endpoint_info is None:
-                aal_atlas = afd.read_aal_atlas(self.reg_template)
-                atlas = aal_atlas['atlas']
-                if self.save_intermediates is not None:
-                    nib.save(
-                        atlas,
-                        op.join(self.save_intermediates,
-                                'atlas_registered_to_template.nii.gz'))
-
-                atlas = atlas.get_fdata()
-
-            dist_to_atlas = self.dist_to_atlas / vox_dim
-
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle}")
             warped_prob_map, include_roi, exclude_roi,\
                 include_roi_tols, exclude_roi_tols =\
-                self._get_bundle_info(bundle_idx, bundle, vox_dim, tol)
+                self._get_bundle_info(bundle, vox_dim, tol)
             if self.save_intermediates is not None:
                 os.makedirs(
                     op.join(self.save_intermediates,
@@ -608,7 +613,10 @@ class Segmentation:
                 fiber_probabilities > self.prob_threshold)
             self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
                               " the probability threshold."))
-            crosses_midline = self.bundle_dict[bundle]['cross_midline']
+            if 'cross_midline' in self.bundle_dict[bundle]:
+                crosses_midline = self.bundle_dict[bundle]['cross_midline']
+            else:
+                crosses_midline = None
 
             # with parallel segmentation, the first for loop will
             # only collect streamlines and does not need tqdm
@@ -695,6 +703,7 @@ class Segmentation:
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
         self.logger.info("Re-orienting streamlines to consistent directions")
+        dist_to_atlas = self.dist_to_atlas / vox_dim
         for bundle_idx, bundle in enumerate(self.bundle_dict):
             self.logger.info(f"Processing {bundle}")
 
@@ -720,68 +729,42 @@ class Segmentation:
                 self.logger.info("Filtering by endpoints")
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
-                if self.endpoint_info is not None:
-                    # We use definitions of endpoints provided
-                    # through this dict:
-                    start_p = self.endpoint_info[bundle]['startpoint']
-                    end_p = self.endpoint_info[bundle]['endpoint']
+                # We use definitions of endpoints provided
+                # through this dict:
+                atlas_idx = []
+                for end_type in ['start', 'end']:
+                    if end_type in self.bundle_dict[bundle]:
+                        warped_roi = self.bundle_dict[bundle][end_type]
 
-                    atlas_idx = []
-                    for ii, pp in enumerate([start_p, end_p]):
-                        pp = resample(
-                            pp.get_fdata(),
-                            self.reg_template,
-                            pp.affine,
-                            self.reg_template.affine).get_fdata()
-
-                        atlas_roi = np.zeros(pp.shape)
-                        atlas_roi[np.where(pp > 0)] = 1
                         # Create binary masks and warp these into subject's
                         # DWI space:
-                        warped_roi = self.mapping.transform_inverse(
-                            atlas_roi,
-                            interpolation='nearest')
+                        if "space" not in self.bundle_dict[bundle]\
+                                or self.bundle_dict[bundle][
+                                    "space"] == "template":
+                            warped_roi = self.mapping.transform_inverse(
+                                warped_roi.get_fdata(),
+                                interpolation='nearest')
 
-                        if self.save_intermediates is not None:
-                            if ii == 0:
-                                point_name = "startpoint"
-                            else:
-                                point_name = "endpoint"
-                            os.makedirs(op.join(
-                                self.save_intermediates,
-                                'endpoint_ROI',
-                                bundle), exist_ok=True)
+                            if self.save_intermediates is not None:
+                                os.makedirs(op.join(
+                                    self.save_intermediates,
+                                    'endpoint_ROI',
+                                    bundle), exist_ok=True)
 
-                            nib.save(
-                                nib.Nifti1Image(
-                                    warped_roi,
-                                    self.img_affine),
-                                op.join(self.save_intermediates,
+                                nib.save(
+                                    nib.Nifti1Image(
+                                        warped_roi,
+                                        self.img_affine),
+                                    op.join(
+                                        self.save_intermediates,
                                         'endpoint_ROI',
                                         bundle,
-                                        f'{point_name}_as_used.nii.gz'))
+                                        f'{end_type}point_as_used.nii.gz'))
 
                         atlas_idx.append(
                             np.array(np.where(warped_roi > 0)).T)
-                else:
-                    # We automatically fallback on AAL, which as its own
-                    # set of rules.
-                    aal_targets = afd.bundles_to_aal(
-                        [bundle], atlas=atlas)[0]
-                    atlas_idx = []
-                    for targ in aal_targets:
-                        if targ is not None:
-                            aal_roi = np.zeros(atlas.shape[:3])
-                            aal_roi[targ[:, 0],
-                                    targ[:, 1],
-                                    targ[:, 2]] = 1
-                            warped_roi = self.mapping.transform_inverse(
-                                aal_roi,
-                                interpolation='nearest')
-                            atlas_idx.append(
-                                np.array(np.where(warped_roi > 0)).T)
-                        else:
-                            atlas_idx.append(None)
+                    else:
+                        atlas_idx.append(None)
 
                 new_select_sl = clean_by_endpoints(
                     select_sl,
@@ -831,7 +814,7 @@ class Segmentation:
 
             select_sl = StatefulTractogram(select_sl,
                                            self.img,
-                                           Space.RASMM)
+                                           Space.VOX)
 
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
@@ -934,7 +917,7 @@ class Segmentation:
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
             if self.presegment_bundle_dict is not None:
-                afq_bundle_name = afd.BUNDLE_RECO_2_AFQ.get(bundle, bundle)
+                afq_bundle_name = BUNDLE_RECO_2_AFQ.get(bundle, bundle)
                 if "return_idx" in self.presegment_kwargs\
                         and self.presegment_kwargs["return_idx"]:
                     indiv_tg = roiseg_fg[afq_bundle_name]['sl']
@@ -1008,7 +991,7 @@ class Segmentation:
                     recognized_sl = tg.streamlines[rec_labels]
                 else:
                     recognized_sl = indiv_tg.streamlines[rec_labels]
-            standard_sl = self.bundle_dict[bundle]['centroid']
+            standard_sl = next(iter(self.bundle_dict[bundle]['centroid']))
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
             self.logger.info(
@@ -1167,8 +1150,12 @@ def _is_streamline_in_ROIs(sl, tol, include_roi,
                 tol,
                 exclude_roi_tols)
         if is_far:
-            return np.argmin(dist[0], 0)[0],\
-                np.argmin(dist[1], 0)[0], fiber_prob
+            if len(dist) > 1:
+                return np.argmin(dist[0], 0)[0],\
+                    np.argmin(dist[1], 0)[0], fiber_prob
+            else:
+                return np.argmin(dist[0], 0)[0],\
+                    np.argmin(dist[0], 0)[0], fiber_prob
     return 0, 0, 0
 
 

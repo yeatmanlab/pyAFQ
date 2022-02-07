@@ -6,7 +6,7 @@ import scipy.io
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import nibabel as nib
 
-from AFQ.data import BUNDLE_MAT_2_PYTHON
+from AFQ.data.utils import BUNDLE_MAT_2_PYTHON
 
 
 class MatlabFileTracking():
@@ -57,7 +57,7 @@ def matlab_mori_groups(mat_file, img):
     segmentation. The keys are bundle names and the values are 
     :class:`StatefulTractogram` instances.
     If you want to merge this dictionary into one :class:`StatefulTractogram`,
-    use :func:`bundles_to_tgram`.
+    use :class:`SegmentedSFT`.
 
     Parameters
     ----------

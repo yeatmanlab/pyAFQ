@@ -41,7 +41,7 @@ Example data
 To get some example diffusion data formatted for input into `pyAFQ`, you can
 run::
 
-    import AFQ.data as afd
+    import AFQ.data.fetch as afd
     afd.organize_stanford_data()
 
 This should create a folder in your home directory with a properly-formatted

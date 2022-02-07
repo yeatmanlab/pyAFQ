@@ -184,7 +184,16 @@ class FullMask(Definition):
 
 class RoiMask(Definition):
     """
-    Define a mask which is all ROIs or'd together.
+    Define a mask which is all include ROIs or'd together.
+
+    Parameters
+    ----------
+    use_presegment : bool
+        Whether to use presegment bundle dict from segmentation params
+        to get ROIs.
+    use_endpoints : bool
+        Whether to use the endpoints ("start" and "end") instead of the
+        include ROIs to generate the mask.
 
     Examples
     --------
@@ -192,9 +201,9 @@ class RoiMask(Definition):
     api.GroupAFQ(tracking_params={"seed_mask": seed_mask})
     """
 
-    def __init__(self, use_presegment=False):
+    def __init__(self, use_presegment=False, use_endpoints=False):
         self.use_presegment = use_presegment
-        pass
+        self.use_endpoints = use_endpoints
 
     def find_path(self, bids_layout, from_path, subject, session):
         pass
@@ -212,18 +221,32 @@ class RoiMask(Definition):
                 bundle_dict = bundle_dict
 
             for bundle_name, bundle_info in bundle_dict.items():
-                for idx, roi in enumerate(bundle_info['ROIs']):
-                    if bundle_dict[bundle_name]['rules'][idx]:
+                if self.use_endpoints:
+                    rois = []
+                    for end_type in ["start", "end"]:
+                        if end_type in bundle_info:
+                            rois.append(end_type)
+                else:
+                    if 'include' in bundle_info:
+                        rois = bundle_info['include']
+                    else:
+                        rois = []
+                for roi in rois:
+                    if "space" not in bundle_info\
+                        or bundle_info[
+                            "space"] == "template":
                         warped_roi = auv.transform_inverse_roi(
                             roi,
                             mapping_imap["mapping"],
                             bundle_name=bundle_name)
+                    else:
+                        warped_roi = roi.get_fdata()
 
-                        if mask_data is None:
-                            mask_data = np.zeros(warped_roi.shape)
-                        mask_data = np.logical_or(
-                            mask_data,
-                            warped_roi.astype(bool))
+                    if mask_data is None:
+                        mask_data = np.zeros(warped_roi.shape)
+                    mask_data = np.logical_or(
+                        mask_data,
+                        warped_roi.astype(bool))
             return mask_data, dict(source="ROIs")
         return mask_getter
 

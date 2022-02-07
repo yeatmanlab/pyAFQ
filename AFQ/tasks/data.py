@@ -10,11 +10,12 @@ import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
+from AFQ.definitions.scalar import ScalarFile
 
 from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.api.bundle_dict as abd
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.mask import B0Mask
@@ -509,8 +510,9 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
 
 
 @pimms.calc("bundle_dict", "reg_template")
-def get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None,
-                    reg_template_spec="mni_T1"):
+def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
+                    brain_mask_file, bids_info,
+                    bundle_info=None, reg_template_spec="mni_T1"):
     """
     Dictionary defining the different bundles to be segmented,
     and a Nifti1Image containing the template for registration
@@ -520,7 +522,8 @@ def get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None,
     bundle_info : list of strings, dict, or BundleDict, optional
         List of bundle names to include in segmentation,
         or a bundle dictionary (see BundleDict for inspiration),
-        or a BundleDict.
+        or a BundleDict. See `Defining Custom Bundle Dictionaries`
+        in the `usage` section of pyAFQ's documentation for details.
         If None, will get all appropriate bundles for the chosen
         segmentation algorithm.
         Default: None
@@ -585,6 +588,21 @@ def get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None,
             seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
+    def roi_scalar_to_info(roi):
+        if isinstance(roi, ScalarFile):
+            roi.find_path(
+                bids_info["bids_layout"],
+                subses_dict["dwi_file"],
+                bids_info["subject"],
+                bids_info["session"])
+            return nib.load(roi.get_data(
+                subses_dict, bids_info, dwi_affine,
+                reg_template, None))
+        else:
+            return roi
+    for b_name, b_info in bundle_dict._dict.items():
+        if "space" in b_info and b_info["space"] == "subject":
+            bundle_dict.apply_to_rois(b_name, roi_scalar_to_info)
     return bundle_dict, reg_template
 
 

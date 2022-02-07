@@ -1,7 +1,6 @@
-import numpy as np
 import numpy.testing as npt
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 from AFQ.utils.conversion import matlab_tractography, matlab_mori_groups
 
 import os.path as op

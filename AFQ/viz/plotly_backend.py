@@ -45,6 +45,8 @@ def _to_color_range(num):
         num = 0
     if num >= 0.999:
         num = 0.999
+    if num <= 0.001:
+        num = 0.001
     return num
 
 
@@ -221,7 +223,7 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
             yaxis_title=dict(text=vut.display_string(scalar), font=font)))
 
 
-def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
+def visualize_bundles(sft, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, shade_by_volume=None,
                       color_by_streamline=None,
                       sbv_lims=[None, None], include_profiles=(None, None),
@@ -240,21 +242,16 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
         must contain a bundle key in it's data_per_streamline which is a list
         of bundle `'uid'`.
 
-    affine : ndarray, optional
-       An affine transformation to apply to the streamlines before
-       visualization. Default: no transform.
-
     n_points : int or None
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
     bundle_dict : dict, optional
-        Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the sft
-        metadata. Default: bundles are either not identified, or identified
+        Keys are names of bundles and values are dicts that specify them.
+        Default: bundles are either not identified, or identified
         only as unique integers in the metadata.
 
-    bundle : str or int, optional
+    bundle : str, optional
         The name of a bundle to select from among the keys in `bundle_dict`
         or an integer for selection from the sft metadata.
 
@@ -344,7 +341,7 @@ def visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
-            sft, affine, bundle, bundle_dict, colors, n_points):
+            sft, bundle, bundle_dict, colors, n_points):
         if isinstance(color_by_streamline, dict):
             if name in color_by_streamline:
                 cbs = color_by_streamline[name]
@@ -668,7 +665,7 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
                dimensions, flip_axes):
     fgarray = np.asarray(set_number_of_points(sls, n_points))
     fgarray = np.median(fgarray, axis=0)
-    #colormap = px.colors.diverging.Portland
+    # colormap = px.colors.diverging.Portland
     # colormap = np.asarray(
     #     [[int(i) for i in c[4:-1].split(',')] for c in colormap]) / 256
     colormap = px.colors.sequential.Viridis
@@ -727,7 +724,6 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
 
 def single_bundle_viz(indiv_profile, sft,
                       bundle, scalar_name,
-                      affine=None,
                       bundle_dict=None,
                       flip_axes=[False, False, False],
                       figure=None,
@@ -750,20 +746,15 @@ def single_bundle_viz(indiv_profile, sft,
 
     bundle : str or int
         The name of the bundle to be used as the label for the plot,
-        or an integer for selection from the sft metadata.
+        and for selection from the sft metadata.
 
     scalar_name : str
         The name of the scalar being used.
 
-    affine : ndarray, optional
-       An affine transformation to apply to the streamlines before
-       visualization. Default: no transform.
-
     bundle_dict : dict, optional
         This parameter is used if bundle is an int.
-        Keys are names of bundles and values are dicts that should include
-        a key `'uid'` with values as integers for selection from the sft
-        metadata. Default: Either the entire sft is treated as a bundle,
+        Keys are names of bundles and values are dicts that specify them.
+        Default: Either the entire sft is treated as a bundle,
         or identified only as unique integers in the metadata.
 
     flip_axes : ndarray
@@ -797,7 +788,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     n_points = len(indiv_profile)
     sls, _, bundle_name, dimensions = next(vut.tract_generator(
-        sft, affine, bundle, bundle_dict, None, n_points))
+        sft, bundle, bundle_dict, None, n_points))
 
     line_color = _draw_core(
         sls, n_points, figure, bundle_name, indiv_profile,

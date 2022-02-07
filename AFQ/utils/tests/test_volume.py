@@ -1,7 +1,6 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import os.path as op
 
 import nibabel as nib
 
@@ -9,7 +8,7 @@ from dipy.io.stateful_tractogram import Space
 from dipy.io.streamline import StatefulTractogram
 
 import AFQ.utils.volume as afv
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 
 def test_patch_up_roi():

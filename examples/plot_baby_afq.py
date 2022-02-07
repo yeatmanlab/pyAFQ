@@ -19,7 +19,7 @@ import plotly
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 from AFQ.definitions.mask import RoiMask, MaskFile
 
