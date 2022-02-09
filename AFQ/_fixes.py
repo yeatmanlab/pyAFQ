@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 
 from scipy.special import lpmv, gammaln
 
@@ -244,7 +245,9 @@ def solve_qp(P, Q, G, H):
     try:
         prob.solve()
         opt = np.array(x.value).reshape((Q.shape[0],))
-    except (cvx.error.SolverError, cvx.error.DCPError):
+    except (
+            cvx.error.SolverError, cvx.error.DCPError,
+            scipy.sparse.linalg._eigen.arpack.arpack.ArpackNoConvergence):
         opt = np.empty((Q.shape[0],))
         opt[:] = np.NaN
 
