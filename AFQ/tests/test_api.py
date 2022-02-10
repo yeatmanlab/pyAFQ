@@ -460,7 +460,7 @@ def test_AFQ_slr():
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.clean_bundles["01"])
-    npt.assert_(len(seg_sft.get_bundle.streamlines('CST_L')) > 0)
+    npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
 
 
 @pytest.mark.nightly_reco
