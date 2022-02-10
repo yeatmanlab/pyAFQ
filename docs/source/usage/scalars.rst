@@ -1,7 +1,9 @@
-The pyAFQ Custom Scalars API
-~~~~~~~~~~~~~~~~~~
-pyAFQ has a system for users to add custom scalars (scalars beyond the several
-we calculate by default). The scalars API is similar to our Mask API.
+The pyAFQ Custom Structural Properties API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pyAFQ has a system for users to add additional structural properties
+or other additional images (beyond the several we calculate by default).
+We call these images 'scalars', and we extract from them to make the tract
+profiles. The scalars API is similar to our Mask API.
 
 In AFQ/definitions/scalar.py, there are two scalar classes one
 can use to specify custom scalars. As a user, one should initialize scalar
@@ -41,17 +43,18 @@ to provide these custom scalars to the AFQ object::
 
     ICVF_scalar = ScalarFile(
       "ICVF",
-      "ICVF",
-      {"scope": "noddi"})
+      suffix="ICVF",
+      filters={"scope": "noddi"})
 
     ODI_scalar = ScalarFile(
       "ODI",
-      "ODI",
-      {"scope": "noddi"})
+      suffix="ODI",
+      filters={"scope": "noddi"})
 
-    api.GroupAFQ("my_bids_path",
-            scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
+    api.GroupAFQ(
+      "my_bids_path",
+      scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
 
 Or provide them using the CLI, by adding them to the `scalars` parameter::
 
-    scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', 'ODI', {'scope': 'noddi'})", "ScalarFile('ICVF', 'ICVF', {'scope': 'noddi')" ]
+    scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', suffix='ODI', filters={'scope': 'noddi'})", "ScalarFile('ICVF', suffix='ICVF', filters={'scope': 'noddi')" ]
