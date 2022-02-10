@@ -57,6 +57,7 @@ extensions = [
     'numpydoc',
     'updatedocs',
     'kwargsdocs',
+    'methodsdocs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -209,20 +210,20 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'numpy': ('https://docs.scipy.org/doc/numpy/', None),
                        'dipy': ('https://dipy.org/documentation/latest',
                                 'https://dipy.org/documentation/1.4.1./objects.inv/')
-                        }
+                       }
 
 image_scrapers = ('matplotlib', plotly_sg_scraper,)
 
 from _progressbars import reset_progressbars  # noqa
 
 sphinx_gallery_conf = {
-     # path to your examples scripts
-     'examples_dirs': '../../examples',
-     # path where to save gallery generated examples
-     'gallery_dirs': 'auto_examples',
-     'ignore_pattern': 'plot_baby_afq.py',
-     'image_scrapers': image_scrapers,
-     'reset_modules': (reset_progressbars),
+    # path to your examples scripts
+    'examples_dirs': '../../examples',
+    # path where to save gallery generated examples
+    'gallery_dirs': 'auto_examples',
+    'ignore_pattern': 'plot_baby_afq.py',
+    'image_scrapers': image_scrapers,
+    'reset_modules': (reset_progressbars),
 }
 
 # Auto API
