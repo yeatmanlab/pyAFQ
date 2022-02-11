@@ -12,7 +12,7 @@ a string inside of one's configuration file for use with the CLI. To do this,
 give a scalar object as an element of the scalars array passed to :class:`AFQ.api.group.GroupAFQ`.
 Then your custom scalar will be automatically used during tract profile extraction.
 
-- :class:`AFQ.definitions.scalar.TemplateMask`: This class can be used if you want to transform a scalar
+- :class:`AFQ.definitions.scalar.TemplateScalar`: This class can be used if you want to transform a scalar
   you made in some template space to each subject space before using it.
 
 - :class:`AFQ.definitions.scalar.ScalarFile`: This class can be used if you have your scalar in subject

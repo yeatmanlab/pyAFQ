@@ -30,5 +30,5 @@ def setup(app):
             {desc}
         """)
 
-    with open('./source/usage/kwargs.rst', 'w') as ff:
+    with open('./source/usage/methods.rst', 'w') as ff:
         ff.write(prologue + method_descriptions)
