@@ -1,9 +1,10 @@
-The pyAFQ Custom Structural Properties API
+The pyAFQ Custom Tissue Properties API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pyAFQ has a system for users to add additional structural properties
-or other additional images (beyond the several we calculate by default).
-We call these images 'scalars', and we extract from them to make the tract
-profiles. The scalars API is similar to our Mask API.
+Per default, pyAFQ calculates tract profiles of the FA and MD using DTI
+in every bundle that it recognizes. However, there is also a system for users
+to add tissue properties or other scalar images (i.e., 3D images with one
+numeric value per voxel). This system is the scalars API and is similar to
+our Mask API.
 
 In AFQ/definitions/scalar.py, there are two scalar classes one
 can use to specify custom scalars. As a user, one should initialize scalar
