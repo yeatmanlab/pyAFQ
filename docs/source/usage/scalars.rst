@@ -1,7 +1,10 @@
-The pyAFQ Custom Scalars API
-~~~~~~~~~~~~~~~~~~
-pyAFQ has a system for users to add custom scalars (scalars beyond the several
-we calculate by default). The scalars API is similar to our Mask API.
+The pyAFQ Custom Tissue Properties API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Per default, pyAFQ calculates tract profiles of the FA and MD using DTI
+in every bundle that it recognizes. However, there is also a system for users
+to add tissue properties or other scalar images (i.e., 3D images with one
+numeric value per voxel). This system is the scalars API and is similar to
+our Mask API.
 
 In AFQ/definitions/scalar.py, there are two scalar classes one
 can use to specify custom scalars. As a user, one should initialize scalar
@@ -10,7 +13,7 @@ a string inside of one's configuration file for use with the CLI. To do this,
 give a scalar object as an element of the scalars array passed to :class:`AFQ.api.group.GroupAFQ`.
 Then your custom scalar will be automatically used during tract profile extraction.
 
-- :class:`AFQ.definitions.scalar.TemplateMask`: This class can be used if you want to transform a scalar
+- :class:`AFQ.definitions.scalar.TemplateScalar`: This class can be used if you want to transform a scalar
   you made in some template space to each subject space before using it.
 
 - :class:`AFQ.definitions.scalar.ScalarFile`: This class can be used if you have your scalar in subject
@@ -41,17 +44,18 @@ to provide these custom scalars to the AFQ object::
 
     ICVF_scalar = ScalarFile(
       "ICVF",
-      "ICVF",
-      {"scope": "noddi"})
+      suffix="ICVF",
+      filters={"scope": "noddi"})
 
     ODI_scalar = ScalarFile(
       "ODI",
-      "ODI",
-      {"scope": "noddi"})
+      suffix="ODI",
+      filters={"scope": "noddi"})
 
-    api.GroupAFQ("my_bids_path",
-            scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
+    api.GroupAFQ(
+      "my_bids_path",
+      scalars=["dti_fa", "dti_md", ICVF_scalar, ODI_scalar])
 
 Or provide them using the CLI, by adding them to the `scalars` parameter::
 
-    scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', 'ODI', {'scope': 'noddi'})", "ScalarFile('ICVF', 'ICVF', {'scope': 'noddi')" ]
+    scalars = ["dti_fa", "dti_md", "ScalarFile('ODI', suffix='ODI', filters={'scope': 'noddi'})", "ScalarFile('ICVF', suffix='ICVF', filters={'scope': 'noddi')" ]

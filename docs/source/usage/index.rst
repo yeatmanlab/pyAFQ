@@ -28,6 +28,7 @@ The csv file has the same format as
     data
     usage
     kwargs
+    methods
     bundledict
     config
     viz_backend
