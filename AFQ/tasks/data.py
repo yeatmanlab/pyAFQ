@@ -223,7 +223,8 @@ def csd(subses_dict, dwi_affine,
         threshold controlling the amplitude below which the corresponding
         fODF is assumed to be zero.  Ideally, tau should be set to
         zero. However, to improve the stability of the algorithm, tau is
-        set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+        set to tau*100 percent of the mean fODF amplitude (here, 10 percent
+        by default)
         (see [1]_). Default: 0.1
 
     References
@@ -248,7 +249,7 @@ def csd(subses_dict, dwi_affine,
             'Could not compute CSD response function for subject: '
             f'{subses_dict["subject"]} in session: {subses_dict["ses"]} '
             f'file: {subses_dict["dwi_file"]}.'
-            )
+        )
     meta = dict(
         SphericalHarmonicDegree=csd_sh_order,
         ResponseFunctionTensor=csd_response,
