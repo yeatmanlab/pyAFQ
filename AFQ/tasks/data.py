@@ -234,7 +234,6 @@ def csd(subses_dict, dwi_affine,
             Non-negativity constrained super-resolved spherical
             deconvolution
     """
-    msmt = (tracking_params["odf_model"] == "MSMT")
     mask =\
         nib.load(brain_mask_file).get_fdata()
     try:
@@ -242,8 +241,7 @@ def csd(subses_dict, dwi_affine,
             gtab, data,
             mask=mask,
             response=csd_response, sh_order=csd_sh_order,
-            lambda_=csd_lambda_, tau=csd_tau,
-            msmt=msmt)
+            lambda_=csd_lambda_, tau=csd_tau)
     except CsdNanResponseError:
         raise CsdNanResponseError(
             'Could not compute CSD response function for subject: '
@@ -256,11 +254,7 @@ def csd(subses_dict, dwi_affine,
         lambda_=csd_lambda_,
         tau=csd_tau)
     meta["SphericalHarmonicBasis"] = "DESCOTEAUX"
-    if msmt:
-        model_file = "mcsd.py"
-    else:
-        model_file = "csdeconv.py"
-    meta["ModelURL"] = f"{DIPY_GH}reconst/{model_file}"
+    meta["ModelURL"] = f"{DIPY_GH}reconst/csdeconv.py"
     return csdf.shm_coeff, meta
 
 
