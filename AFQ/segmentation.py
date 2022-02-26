@@ -813,8 +813,8 @@ class Segmentation:
             if self.clip_edges:
                 self.logger.info("Clipping Streamlines by ROI")
                 for idx in range(len(select_sl)):
-                    min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
-                    min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+                    min0 = int(min_dist_coords_bundle[idx, bundle_idx, 0])
+                    min1 = int(min_dist_coords_bundle[idx, bundle_idx, 1])
 
                     # If the point that is closest to the first ROI
                     # is the same as the point closest to the second ROI,
