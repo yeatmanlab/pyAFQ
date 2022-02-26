@@ -238,6 +238,8 @@ def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
             # No selection: visualize all of them:
             for bundle_name in bundle_dict.keys():
                 idx = seg_sft.bundle_idxs[bundle_name]
+                if len(idx) == 0:
+                    continue
                 n_sl_viz = (len(idx) * n_sls_viz) //\
                     len(streamlines)
                 n_sl_viz = max(n_sls_min, n_sl_viz)
